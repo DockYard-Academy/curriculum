@@ -1,0 +1,1189 @@
+# Lesson 2: Operators
+
+## Setup
+
+Ensure that you evaluate all code using the `ea` keybinding. press the `e` then the `a` key.
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
+## Overview
+
+You can think of all programming as split into data and behavior. In the previous lesson,
+you learned all about data, and in this lesson you're going to learn about behavior.
+
+To operate means to control a a machine, process, or system.
+Thus we have **operators** which control the behavior of our program.
+
+In this lesson, you're going to learn:
+
+* **Arithmetic operators** performing mathematical operations. `+`, `-`, `*`, `/`, `div`, and `rem`
+* **Match operator** assigning data to a variable. `=`
+* **Comparison operators** comparing values to one another. `===` `==` `>=` `<=` `<` `>`
+* **Boolean operators** comparing booleans and truthy values. `and` `or` `not` `&&` `||` `!`
+* **String operators** manipulating strings. `<>`, `#{}`
+* **List operators** manipulating lists. `++` `--`
+* Accessing map values with dot `.` notation and **map[key]** notation.
+
+## Arithmetic Operators
+
+**Arithmetic** is a branch of mathematics. Essentially, we have operators to perform math.
+This isn't so suprising, given that we write programs for **computers** (compute+ers). 
+As in something that computes. Infact, computers are just the latest step in a long-line of
+[mathematical machines](https://www.cs.uah.edu/~rcoleman/Common/History/History.html).
+
+Using **arithmetic operators** we can add `+`, subtract `-`, multiply `*` and divide `/`
+We also have two special arithmetic operators `div` for integer division and `rem` for
+remainder.
+
+Arithmetic operators work on both integers and floats. They can be used on both positive
+and negative values.
+
+As previously mentioned in the lesson on floats, arithmetic operations on 
+floats may result in floating-point errors.
+
+### Addition
+
+We can add numbers together with the plus `+` operator.
+
+```elixir
+7 + 5
+```
+
+You can create entire equations by writing operators one after the other. So long as there is a
+valid number (integer or float) on the left and right hand side of the operator.
+
+```elixir
+4 + 3 + 2 + 1
+```
+
+For example, the following code with crash because there is a dangling `+` operator. You'll notice 
+that the error says `TokenMissingError` and `expression is incomplete`. Whenever our code crashes, 
+Elixir does it's best to let you know why with an error message.
+
+```elixir
+2 +
+```
+
+You can also add floats together. However, that may result in floating-point errors so it's best
+to consider how precise you need to be when using floats in calculations. It might be fine to 
+be 0.0000002 off in a calculation of how wide a loading bar needs to be, but that's unacceptable when 
+dealing with money.
+
+```elixir
+1.2 + 1.4
+```
+
+You can also add floats and integers together.
+
+```elixir
+1.2 + 4
+```
+
+```elixir
+1.5 + 3.5 + 3 + 4.1 + 9
+```
+
+You can add negative and positive numbers together. 
+Adding a negative number is the same as subtracting a positive number.
+
+```elixir
+8 + -9
+```
+
+Adding negative numbers might feel unintuitive, so it's rare
+to write code like this, but it's useful to know you can.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Subtraction
+
+We can subtract numbers with the minus `-` operator.
+
+```elixir
+20 - 12
+```
+
+Like with addition, we can subtract floats and integers in any combination.
+
+```elixir
+2.5 - 10
+```
+
+```elixir
+10 - 2.5 - 2.1
+```
+
+floating-point errors can still occur.
+
+```elixir
+1.3 - 1.2
+```
+
+Like addition, we can also subtract negative numbers.
+Subtracting a negative is the same as adding a positive.
+
+```elixir
+10 - -1
+```
+
+### Multiplication
+
+Computers can efficiently multiply numbers. Under the hood, multiplication is actually just 
+repeated additon. For example, `5 * 5` is actually just `5 + 5 + 5 + 5 + 5`.
+
+```elixir
+10 * 10
+```
+
+Multiplication can still result in floating-point errors.
+
+```elixir
+2.2 * 2.1
+```
+
+You can multiply integers and floats both positive and negative in combination, like with addition and subtraction.
+
+```elixir
+2 * 30 * -2 * 1.4
+```
+
+### Division
+
+We can also divide numbers. However, in Elixir there are two operators for division.
+There is the `/` operator which will always return a `float` and the `div` operator which will always return an `integer` (rounded down)
+
+```elixir
+10 / 5
+```
+
+`div` is a function. You will learn more about functions in the future. 
+For now, it's enough to know that `div` allows you to take two numbers, and divide them.
+
+```elixir
+div(10, 5)
+```
+
+Keep in mind that `div` always rounds values down, so `1.5` becomes `1`.
+
+```elixir
+div(3, 2)
+```
+
+There's a limit to how precise numbers can be in any computer program, so you should always
+take care when using fractions that don't divide evenly. You can also run into the same 
+floating-point calculation issues discussed in the floats lesson.
+
+For example, notice that `10 / 3` is `3.3333333333333335`.
+
+```elixir
+10 / 3
+```
+
+### BEDMAS
+
+Calculations in Elixir follow the **BEDMAS** order of operations.
+**BEDMAS** stands for brackets, exponents, division, multiplication, addition, subtraction.
+
+That means that the following will evaluate 5 * 2 before 5 + 5.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+5 + 5 * 2
+```
+
+So it first evaluates into
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+5 + 10
+```
+
+To get the result of 15.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+15
+```
+
+Here's the same statement in an Elixir cell so that you can confirm it's result
+is 15.
+
+```elixir
+5 + 5 * 2
+```
+
+Had it evaluated from left to right, the result would have been 20.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+5 + 5 * 2
+10 * 2
+20
+```
+
+You might notice the **B** in BEDMAS stands for brackets. You can use brackets in your program
+to convey which calculation you would like to evaluate first.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+(5 + 5) * 2
+(10) * 2
+20
+```
+
+Here's the same statement in an Elixir cell for you to confirm it's result is 20.
+
+```elixir
+(5 + 5) * 2
+```
+
+### Exponents
+
+You also might notice the **E** in BEDMAS stands for exponents. The exponent operator in
+Elixir is `**`.
+
+That means that `10 ** 2` is 10 to the power of 2. Mathematically that's the same as `10 * 10`.
+
+`10 ** 3` means `10 * 10 * 10`. If you would like a more in depth explanation of exponents there's
+a [video by Khan Academy](https://www.youtube.com/watch?v=XZRQhkii0h0&ab_channel=KhanAcademy).
+
+```elixir
+10 ** 2
+```
+
+### Remainder
+
+A remainder is the amount left when you divide one number by the other.
+For example, if you divide 5 by 2, the remainder is 1.
+
+That's because 2 goes into 5 twice, and leaves a remainder of 1.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+5 ~ 2
+5 ~ 4
+5 - 4 = leftover (i.e. the remainder)
+5 - 4 = 1
+```
+
+If you're not familiar with remainders, here's a [video by Khan Academy](https://www.youtube.com/watch?v=P1qyjdh_sIw&ab_channel=KhanAcademy).
+
+```elixir
+rem(5, 2)
+```
+
+In programming, we often use remainders to check if a number is evenly divisible by a number.
+For example, a number is even if `rem(number, 2)` equals `0`.
+
+```elixir
+rem(6, 2)
+```
+
+Where as an odd number will have a remainder of `1`.
+
+```elixir
+rem(5, 2)
+```
+
+You'll also sometimes use remainders to cycle through numbers, but then reset back to 0 when you hit
+a limit. You don't need to know how to do this yet, but it will be useful in future lessons.
+
+````elixir
+# TODO - Hide
+
+Kino.animate(500, 0, fn i ->
+  md = Kino.Markdown.new("
+  ```elixir
+  rem(#{i}, 10)
+  #{rem(i, 10)}
+  ```
+  ")
+
+  {:cont, md, i + 1}
+end)
+````
+
+### Your turn
+
+Add two massive numbers together that you normally couldn't do in your head.
+
+```elixir
+
+```
+
+Subtract two massive numbers together.
+
+```elixir
+
+```
+
+Multiply two massive numbers together.
+
+```elixir
+
+```
+
+Divide `223` by `71` using `/` to get a nice slice of **pi**.
+
+```elixir
+
+```
+
+Divide a `100` by `3` using `div`.
+
+```elixir
+
+```
+
+Find `10` to the power of `214`.
+
+```elixir
+
+```
+
+## Match Operator
+
+The match operator `=` is a way of assigning a some data to a named `variable` that we can
+use in place of that data throughout the rest of a program.
+
+For example, you can store the number `9` in a variable named `my_variable` and then
+use `my_variable` in place of 9 in the rest of the program.
+
+```elixir
+my_variable = 9
+
+my_variable + 1
+```
+
+In the example above, the variable is named `my_variable`, but you can name a variable almost anything
+as long as it doesn't break certain rules.
+
+```elixir
+a_different_variable_name = 9
+a_different_variable_name + 1
+```
+
+Elixir calls the equals sign `=` a match operator, however in other programming
+languages it's often called an assignment operator.
+
+Elixir calls `=` the match operator because it can do more than assign values to a variable.
+You'll learn more about that in future lessons. For now, this lesson will focus on using `=`
+for assignment.
+
+Why is storing a value in a variable useful? Imagine you have a program that runs several calculations on a number.
+Let's say the number 8.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+8 + 7 - 8 * 10 * 8 + 8
+```
+
+If we want to run these operations on the number 7 instead,
+that suddenly becomes tedious to write.
+
+A variable allows us to store a value and reuse it throughout the program.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+my_number = 8
+my_number + 7 - my_number * 10 * my_number + my_number
+```
+
+Now, if the desired value changes, you only need to change the variable's value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+my_number = 7
+my_number + 7 - my_number * 10 * my_number + my_number
+```
+
+Variables are also helpful for making programs more clear. There's an anti-pattern
+in programming called **magic values**. Magic values are values in a program that don't
+have a name but are significant. You'll see **magic numbers** and **magic strings**
+as common **anti-patterns**. An anti-pattern means something you should generally avoid doing
+in your programs otherwise they become less clear and difficult to work with.
+
+For example, imagine you're working on a program that accepts payments, and you find the following 
+code
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+100 * 1.12
+```
+
+What is 1.12? What is 100? This program would be a lot more clear if we used well-named variables.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+item_cost = 100
+tax_multiplier = 1.12
+item_cost * tax_multiplier
+```
+
+Oh! So this is a program that takes the cost of an item and adds tax to it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Naming Variables
+
+It's conventional in Elixir to name variables using `snake case` which means all lowercase 
+with words separated by underscores `_`.
+
+This is not enforced by the language, but is a convention you should generally follow.
+That said, your program will not crash if you break convention.
+
+However, variable names must follow a few rules:
+
+* must start with a letter.
+* may contain valid alphanumeric characters.
+* may end with predicates such as ! or ?.
+* may not contain spaces.
+* may not contain certain special characters such as $.
+
+If you break the rules for naming a variable, your program will crash with an error.
+Much like with naming atoms, it's not important to memorize the rules of naming variables.
+You will develop an intuition for if you variable name is valid or not through repeated exposure.
+In practice, most variable names are made of only lowercase letters, underscores, and
+sometimes numbers.
+
+While it's not important to memorize the rules of naming variables, it's incredibly important
+to give your variables meaningful names. Short variable names that do not convey 
+meaning are often undesirable unless it's an established convention.
+
+For example, you'll often see the variable `i` to refer to an index.
+Though in general, it's better to use verbose, descriptive variables names.
+
+Here are some example variable names that do not convey meaning.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+t = "12:00"
+c = 10
+```
+
+Instead, prefer verbose variable names that convey meaning.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+time = "12:00"
+cost = 10
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Unassigned Variables
+
+It's important to note that using a variable in your program that has not been assigned will 
+crash your program.
+
+```elixir
+a_variable_that_has_not_been_assigned
+```
+
+If you look closely at the error, you'll see `undefined function a_variable_that_has_not_been_assigned/0 (there is no such import)`
+
+When you use a variable name that hasn't been defined, Elixir assumes it's a function that has
+not been defined. You haven't covered functions yet, but you will learn more about them in future lessons.
+
+For now, it's enough to be familiar with this error so that if you see it, you'll know
+you're using a variable that has not been assigned.
+
+### Your Turn
+
+In the Elixir cell below, create a variable `hello` and assign it to the value `"world"`
+
+```elixir
+
+```
+
+## Comparison Operators
+
+Comparison operators allow us to compare values.
+
+Using comparison operators we check if values are equal `===`, greater than `>`, less than `<`,
+greater than or equal `>=`, and less than or equal `<=`.
+
+Comparison operators can be used on any type of value, but are most commonly used to compare
+integers and floats.
+
+The result of a comparison is a boolean, either `true` or `false`.
+
+For example, if we check that `5` is equal to `5`, we return `true`.
+
+```elixir
+5 === 5
+```
+
+Here are a view example comparisons and their result.
+
+```elixir
+# TODO - Hide
+
+data = [
+  %{comparison: "5 === 5", result: true},
+  %{comparison: "5 === 4", result: false},
+  %{comparison: "5 > 4", result: true},
+  %{comparison: "4 > 5", result: false},
+  %{comparison: "5 < 4", result: false},
+  %{comparison: "4 < 5", result: true},
+  %{comparison: "5 >= 5", result: true},
+  %{comparison: "5 >= 4", result: true},
+  %{comparison: "4 >= 5", result: false},
+  %{comparison: "5 <= 5", result: true},
+  %{comparison: "4 <= 5", result: true},
+  %{comparison: "5 <= 4", result: false}
+]
+
+Kino.DataTable.new(data)
+```
+
+While comparison operators are often used on integers and floats, 
+they can also be used on other data types.
+
+```elixir
+"hello" === "hello"
+```
+
+```elixir
+%{hello: "world"} === %{hello: "world"}
+```
+
+```elixir
+["hello", "world"] === ["hello", "world"]
+```
+
+### Comparing Strings
+
+When comparing strings, they are compared based on alphabetical order. Letters earlier
+in the alphabet are evaluated as smaller than numbers later in the alphabet.
+
+```elixir
+"a" < "z"
+```
+
+Under the hood it uses the `code point` representation of the letters in order to compare the values. 
+This can be useful for alphabetical ordering. However, it does mean that capital letters are always
+less than lowercase letters regardless of alphabetical order.
+
+```elixir
+"Z" < "a"
+```
+
+```elixir
+?Z
+```
+
+```elixir
+?A
+```
+
+### Remembering Greater Than and Less Than
+
+`>` greater than
+
+`<` less than
+
+To help remember which symbol `<` or `>` means greater than or less than, you might find it helpful 
+to remember that the statement is `true` if the larger number goes on the larger side.
+
+Some people find it useful to visualize the statement as an aligator eating. And the aligator always wants
+the biggest meal.
+
+### Comparing Different Data Types
+
+You can compare different data types to eachother in the following order.
+
+It's not important to memorize this order, but it's useful to be aware that it exists. If you're
+curious to learn the exact order you can read the [Elixir Documentation](https://hexdocs.pm/elixir/master/operators.html#term-ordering).
+
+```elixir
+"" > 1
+```
+
+### Strictly Equals
+
+<!-- livebook:{"break_markdown":true} -->
+
+There are actually two operators for checking equality in Elixir. `===` will check if two values
+are strictly equal in both value and type. so despite having  the same numerical value, 
+`1` does not equal `1.0` because integers and floats are not the same type.
+
+```elixir
+1 === 1.0
+```
+
+However, if you only care about the numerical value, and not the data type, you can use only 
+two equals signs instead of three `==`
+
+```elixir
+1.0 == 1
+```
+
+### Your turn
+
+In the Elixir cell below, check if `10` is less than (`<`) `5`
+
+```elixir
+
+```
+
+In the Elixir cell below, check if `7` greater than or equal to (`>=`) `7`
+
+```elixir
+
+```
+
+In the form below, Enter the operator `==`, `===`, `>`, `<`, `>=`, or `<=` that makes the statement `true`.
+note that `<operator>` is where the operator would be used in the comparison.
+
+```elixir
+# TODO - Hide
+
+[
+  Kino.Input.text("8 <operator> 8"),
+  Kino.Input.text("8 <operator> 8.0"),
+  Kino.Input.text("7 <operator> 8"),
+  Kino.Input.text("8 <operator> 7"),
+  Kino.Input.text("8 <operator> 7 and 7 <operator> 7"),
+  Kino.Input.text("7 <operator> 8 and 7 <operator> 7")
+]
+|> Enum.map(&Kino.render/1)
+
+Kino.nothing()
+```
+
+## Boolean Operators
+
+**Boolean operators** are useful for comparing booleans.
+
+The boolean operators are `and`, `or`, and `not`.=
+
+`and` allows you to check if two values are `true` and otherwise returns `false`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  A[true] --> C
+  B[true] --> C
+  C[and] --> D[true]
+```
+
+```elixir
+true and true
+```
+
+```elixir
+true and false
+```
+
+```elixir
+false and true
+```
+
+```elixir
+false and false
+```
+
+`or` checks if either value is `true` and returns `false` only if both values are `false`
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  true --> or
+  false --> or
+  or --> t[true]
+```
+
+```elixir
+true or true
+```
+
+```elixir
+true or false
+```
+
+```elixir
+false or true
+```
+
+```elixir
+false or false
+```
+
+`not` flips the value from `true` to `false` or from `false` to `true`.
+
+```elixir
+not true
+```
+
+```elixir
+not false
+```
+
+`not` can be used together with `and` and `or` in a sequence.
+
+```elixir
+true and not false
+```
+
+```elixir
+not false or (false and false)
+```
+
+### Truthy and Falsy
+
+We also have operators for comparing **truthy** and **falsy** values.
+What does that mean? In some programming languages it can
+get complicated, but in Elixir, every value other than `nil` and `false` are truthy.
+
+`nil` and `false` are refered to as **falsy**.
+
+This means all values other than `nil` and `false` will be treaded as `true` for the sake
+of comparison.
+
+Elixir provides the equivalent operators for `and`, `or`, and `not` for comparing truthy and
+falsy values.
+
+They are **and** (`&&`), **or** (`||`), and **not** `!`.
+
+The `&&` operator allows you to check if two values are truthy and will return the right hand
+value or `false`.
+
+```elixir
+false && 7
+```
+
+```elixir
+8 && false
+```
+
+```elixir
+7 && 8
+```
+
+```elixir
+true && [hello: "world"]
+```
+
+The `||` operator checks if either value is truthy, and returns the first truthy value.
+
+```elixir
+false || 7
+```
+
+```elixir
+7 || 8
+```
+
+```elixir
+true || 8
+```
+
+```elixir
+8 || true
+```
+
+The `!` (not) operator flips a `truthy` value to `false` or converts `false` values to `true`.
+
+```elixir
+!1
+```
+
+```elixir
+![hello: "world"]
+```
+
+```elixir
+!nil
+```
+
+```elixir
+!false
+```
+
+It's sometimes handy to use two `!` operators to convert values to a boolean.
+
+```elixir
+!!"a truthy value"
+```
+
+While `&&`, `||`, and `!` work with booleans, it's conventional to use `and`, `or`, and `not`
+for booleans, and `&&`, `||`, and `!` when you expect non-boolean values.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Falsy
+
+Some programming languages have a wide variety of `falsy` values; however, Elixir does not.
+
+In Elixir, only `nil` and `false` are false when used with boolean operators.
+
+For example, JavaScript, another programming language, treats the number 0 as `false` when used,
+but that's not the case in Elixir.
+
+For those of you coming from other programming languages, caution is advised!
+
+```elixir
+0 && 6
+```
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+In the Elixir cell below, enter the return value of `7 && 10`.
+
+```elixir
+
+```
+
+Enter the return value of `20 || "hello!"`
+
+```elixir
+
+```
+
+Enter the return value of `!0`
+
+```elixir
+
+```
+
+## String Operators
+
+String operators allow us to manipulate strings.
+
+The `<>` operator joins or two strings together. You'll see this refered to as **string concatination**.
+
+```elixir
+"hello, " <> "world"
+```
+
+Only strings can be concatinated together using the `<>` operator. You'll notice using `1`
+for string concatination results in an error `expected binary argument in <> operator but got 1`
+
+```elixir
+"hello" <> 1
+```
+
+### String Interpolation
+
+<!-- livebook:{"break_markdown":true} -->
+
+Using `#{}`We can also **interpolate** values in strings. Essentially, this means we can evaluate code inside of
+a string and the string will contain the result. The code you want to interpolate inside of the string
+goes between the curly braces `{}`
+
+So we can evaluate `4 + 4` which equals `8` inside of a string.
+
+```elixir
+"I have #{4 + 4} apples."
+```
+
+This is often useful when you have variables you want to use in a string that includes punctuation.
+
+```elixir
+greeting = "Hello"
+to = "world"
+
+"#{greeting}, #{to}"
+```
+
+Otherwise it's easy to make mistakes.
+
+```elixir
+greeting = "Hello"
+to = "world"
+
+greeting <> to
+```
+
+### Your Turn
+
+In the Elixir cell below, Use **string concatination** to join `"hello, "` and `"world"`
+
+```elixir
+
+```
+
+Use **string interpolation** to evaluate 16 + 20 inside of a string.
+
+```elixir
+
+```
+
+## List Operators
+
+List operators are useful for manipulating lists
+
+The main list operators are `++` and `--`
+
+`++` allows you to add lists together.
+
+```elixir
+[1] ++ [2]
+```
+
+`--` allows you to subtract matching elements from a list.
+
+```elixir
+[1, 2, 3] -- [2, 3]
+```
+
+Unlike `Arithmetic Operators` Lists do not follow the **BEDMAS** order for evaluation. Actually,
+lists can be a bit unituitive.
+
+For example, what do you think the result of `[1, 2] ++ [1] -- [2]` should be?
+Intuitively, you might think it would be an empty list `[]`. Because
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[1, 2] -- [1] -- [2]
+```
+
+Becomes `[2]` when you subtract `[1]`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[2] -- [2]
+```
+
+And then becomes `[]` when you subtract `[2]`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[]
+```
+
+However, this is not the case. It's actually `[2]`. Why? because list operations evaluate from
+right to left.
+
+```elixir
+[1, 2] -- [1] -- [2]
+```
+
+To avoid writing unintuitive code, you can either use brackets or assign values to variables to
+break up the operations into steps using the match operator.
+
+```elixir
+([1, 2] -- [1]) -- [2]
+```
+
+```elixir
+step1 = [1, 2]
+step2 = step1 -- [1]
+step2 -- [2]
+```
+
+### Keyword Lists
+
+You can also use `--` and `++` with keyword lists.
+
+```elixir
+[one: 1, two: 2] -- [one: 1]
+```
+
+If you add a normal list to a keyword list, you'll notice that the keyword list element will
+evaluate as a tuple again. Remember that keyword lists are simply lists of tuples with an atom and a value.
+
+```elixir
+[one: 1] ++ [1]
+```
+
+### Your Turn
+
+In the Elixir cell below, add `[1, 2, 3]` and `[4, 5, 6]` together to make `[1, 2, 3, 4, 5, 6].`
+
+```elixir
+
+```
+
+In the Elixir cell below, remove `[1]` from `[1, 1, 2, 3]` to make `[1, 2, 3]`
+
+```elixir
+
+```
+
+## Maps
+
+Unlike the other data types, there aren't specific Map operators. To manipulate maps we
+use a different tool called the **Map** module which you will learn more about in a future lesson.
+
+For now, it's enough to know that you can access values in an atom key map using a few different methods.
+
+You can use dot **map.key** notation like so.
+
+```elixir
+map = %{example_key: "value"}
+
+map.example_key
+```
+
+With **map.key** notation, your program will throw an error if your map doesn't have the expected value.
+
+```elixir
+map = %{example_key: "value"}
+map.non_existing_key
+```
+
+You can also use **map[key]** syntax to access values in a map where key is the value of the key.
+This works for any value of map key.
+
+```elixir
+map = %{"test" => "value"}
+map["test"]
+```
+
+```elixir
+map = %{1 => "value"}
+map[1]
+```
+
+```elixir
+map = %{%{} => "value"}
+map[%{}]
+```
+
+Unlike **map.key** notation, **map[key]** syntax will return `nil` rather 
+than throwing an error if the key is undefined.
+
+```elixir
+map = %{}
+map["non_existing_key"]
+```
+
+### Your Turn
+
+In the Elixir cell below, Create a map `%{hello: "world"}` and assign it to a variable `map`. Use **map.key** notation
+to access the `:hello` key. The cell should output `"world"`
+
+```elixir
+
+```
+
+Create a map `%{one: 1}` and assign it to a variable `map`. Use **map[key]** syntax to access
+the key `:two`. It should return `nil`.
+
+```elixir
+
+```
+
+## Combining Operators
+
+So far you've only used operators in isolation. But it's important to remember that you
+can use them in combination.
+
+```elixir
+2 + 3 > 4
+```
+
+```elixir
+"4 + 7 is greater than 8 and 2 + 10 is less than 20: #{4 + 7 > 8 && 2 + 10 < 20}"
+```
+
+### Your Turn: Min Max Program
+
+Here's a small program that checks if a variable input is between a minimum integer and a maximum
+integer. It returns a string that the input is between the min and max or the input is outside the
+min and the max.
+
+You'll notice that code can include line breaks to make it easier to read.
+
+Try setting `input` to `15` to see it return. `"15 is between 10 and 20"`.
+
+```elixir
+input = 5
+max = 20
+min = 10
+
+# TODO - Hide?
+(input < max && input > min &&
+   "#{input} is between #{min} and #{max}") || "#{input} is outside #{min} and #{max}"
+```
+
+### Your Turn: Rock Paper Scissors
+
+In the Elixir cell below, You're going to create the perfect AI for rock paper scissors
+You should only need to use `&&`, `=`, `===`, `||` operators.
+
+* Create a variable `input` and assign it to `"Rock"`.
+* Use **comparison** operators to check if input equals "Rock" then return "Paper"
+* Bonus: handle if input equals "Paper" then return "Scissors"
+* Bonus: handle if input equals "Scissors" then return "Rock"
+
+```elixir
+
+```
+
+## Syntax Errors
+
+`Syntax` refers to the keywords and symbols you use to provide instruction to the computer through
+Elixir. If you do not follow the rules that Elixir sets, your code will not
+compile into instructions for the computer, and you will see a red `error` message.
+
+Sometimes your code is valid, but you may still see a yellow `warning`. Warnings let you know
+that you might be making a mistake in your program, but the code still compiles into valid
+instruction.
+
+In general, in programming, you have to be precise. A single misplaced character causes your entire
+program to stop working!
+
+Take care to regularly evaluate any code you're writing to ensure
+it compiles. Regularly verifying your code compiles makes it a lot easier to know if a 
+change triggered an error or warning.
+
+The error message you recieve will do it's best to be clear about what's going wrong, but
+it can take some time to get used to reading them.
+
+For example, here's the error messages you recieve when you have a dangling operator without a 
+value on the right hand side.
+
+```elixir
+2 *
+```
+
+In general, errors will provide you an **error type**, **error message**, **line number**, 
+and even the **code causing the crash**
+
+Here's what the error above tells us.
+
+* **Error type**: **TokenMissingError** because we're mising the next token 
+  (in this case a number) in the `2 * number` expression.
+* **Error message**: `syntax error: expression is incomplete `
+* **code causing the crash**:
+  ```elixir
+    |
+  1 | 2 *
+    |   ^
+  ```
+* **line number**: the crash is on **line 1**
+
+### Your Turn
+
+In the Elixir cell bellow, Reproduce a crash by writing `"hello" <>`.
+Try using `Enter` to create a new line and shift the code down to **line 2**. See how the 
+error is different now.
+
+```elixir
+
+```

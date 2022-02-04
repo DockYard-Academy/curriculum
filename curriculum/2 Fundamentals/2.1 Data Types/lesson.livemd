@@ -1,0 +1,947 @@
+# Lesson 1: Elixir Data Types
+
+## Setup
+
+Ensure that you evaluate all code using the `ea` keybinding. press the `e` then the `a` key.
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
+## Overview
+
+Elixir and other programming languages allow you to represent information as data.
+What does that mean?  Well our job as programmers is often to translate project requirements 
+into something that a computer understands. However while computers can do amazing things
+and calculate things that would take or you our entire lives in only a few seconds, they only
+do what we tell them to. We have to provide incredibly explicit instruction to computers in order
+for the to understand how to do what we want.
+
+The great thing about computers is they do exactly what we tell them to. The not so
+great thing about computers is they do exactly what we tell them to...
+
+For more on why check out the
+[Exact Instructions Challenge: Peanut Butter and Jelly](https://www.youtube.com/watch?v=cDA3_5982h8&ab_channel=JoshDarnit)
+
+Computers are deterministic. That means that if you tell a computer to perform an instruction,
+it will perform that instruction exactly the same each time it executes. So whenever there's
+an issue, our instructions are the problem.
+
+In order to provide instruction to the computer, you need to understand the language it speaks.
+Well, that's not quite true. The actual language the computer speaks is in electrical signals 
+represented as 0s and 1s. This is called **binary**. Instead of writing programs in binary
+We have programming languages like **Elixir** that allow use to write instructions in
+more or less plain english with some special words, characters, and restrictions.
+
+Some programming languages look more like plain english, and other's definitelly don't. 
+There's even a programming language that let's you [write a program as a cow](https://esolangs.org/wiki/COW)!
+
+```
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO Moo MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MoO MoO
+ MoO MoO MoO MoO MoO Moo Moo MoO MoO MoO Moo OOO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MOo
+ MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo
+ MOo MOo MOo MOo MOo Moo MOo MOo MOo MOo MOo MOo MOo MOo Moo MoO MoO MoO Moo MOo MOo MOo MOo MOo MOo Moo MOo MOo MOo MOo MOo MOo MOo MOo Moo
+ OOO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo 
+```
+
+Some programming languages operate closer to the machine code the computer uses, 
+these are called **low level programming languages**. They are great when you want to optimize
+for performance, but often much harder to read and understand.
+
+Alternatively, other programming languages are designed to be more readable and improve developer
+quality of life and productivity. These languages are refered to as **high level programming languages**.
+Elixir is a high level programming language. It's developer friendly and powerful.
+
+Whatever programming language you're using, you need to understand how to convert real-world concepts
+into instructions the computer understands. This lesson is going to focus on exactly that.
+So, how do we represent real-world information as something the computer understands? The answer
+is **data**. Depending on what type of information we want in the program, we use different **data types**.
+
+For example, on your social media profile (Linkedin, Twitter, Instagram, etc), you often have to
+store information like your name, birthday, and some of your interests. The
+computer program that powers these social media sites stores that information in different
+data types.
+
+You name might be stored in a data type called a **string**.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"Peter Parker"
+```
+
+The same goes with the month you were born
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"August"
+```
+
+Although the month could also be an **integer**
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+10
+```
+
+You're going to learn all of the data types below and what kinds of information they are good
+at representing. Don't worry, this is just an overview of what you're about to learn.
+You are not expected to be familiar with any of these data types yet. The sections below will
+go into further detail on each data type.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+1                        # integer
+1.2                      # float
+:example                 # atom
+"hello"                  # string
+true                     # boolean
+false                    # boolean
+[1, 2, 3]                # list
+1..3                     # range
+[key: "val", key: "val"] # keyword list (non-unique keys allowed)
+{1, 2, 3}                # tuple
+%{"key" => "val"}        # map with string keys (unique keys only)
+%{key: "val"}            # map with atom keys (unique keys only)
+```
+
+## Booleans
+
+Programming languages hide the internal details of how computers work. This allows us as
+developers to think at a high level. However, it's still useful to be aware of some of the internal
+details.
+
+Under the hood, computers store electrical signals. You can think of this like powering a 
+lightbulb but on a much smaller scale. An electrical signal is either **on** or **off**, and by manipulating
+these electrical signals we are able to create complex information and instruction.
+
+You may have seen movies or tv series that show coding as a bunch of `1`s and `0`s
+![](images/binary.jpg). A 0 represents a signal that's **off** and a `1` represents a signal
+that's **on**. These `0`s and `1`s are called **binary**.
+
+After we write our Elixir code, our instructions are then converted or **compiled** into binary.
+**binary** which is the machine code that the computer actually understands.
+
+So, you might wonder how we go from `0`s and `1`s to creating rockets, websites, self-driving
+cars, smart phones, and 3D animations.
+
+Well let's take the first step with booleans. A boolean (BOO-LEE-AN). 
+is a `true` or a `false` value. Conceptually, this is a direct representation of
+`on` and `off` in your program.
+
+There are only two booleans.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+true
+false
+```
+
+### Turn on the Power!
+
+Since booleans represent something that is `on` or `off` it makes sense to use them to
+turn on the power! We've set up a program that displays a light. We need you to power it on.
+replace `false` with `true`.
+
+```elixir
+power = false
+
+# TODO - Hide
+content = if power, do: "/images/on.png", else: "/images/off.png"
+image = Kino.Image.new(File.read!(__DIR__ <> content), :png)
+```
+
+## Integers
+
+Early computers were built to perform mathematical calculations.Therefore it's necessary
+to be able to represent an entire number system. We use **Integers** to represent whole positive or negative
+numbers. `100` is an integer, `0` is an integer, and so is `-10`.
+
+Under the hood, computers store information as electrical signals, either `on` or `off`, `0` or `1`.
+So you might wonder, how are they able to represent numbers larger than 1?
+
+Fortunately, humans have been thinking about base 2 counting systems since the days of ancient
+Egypt. The current binary counting system was created by [Gottfried Wilhelm Leibniz](https://www.inverse.com/article/46587-gottfried-wilhelm-leibniz-binary-system)
+In the 17th Century.
+
+What's a base 2 counting system? Well first, let's take a second to appreciate that we have a
+base 10 counting system. We have ten digits, and use placeholders to represent shifting values.
+
+```
+1 2 3 4 5 6 7 8 9 0
+```
+
+As we count from 1 to 9, we then add a 1 in the placeholder on the left, and restart at 0.
+You probably do this intuitively. This means we have placeholders for **ones**, **tens**, **hundreds**, etc.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Take the example number `4762`. It has
+
+* `4` thousands
+* `7` hundreds
+* `6` tens
+* `2` ones
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  Thousands --- 4
+  Hundreds --- 7
+  Tens --- 6
+  Ones --- 2
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The base10 counting system shouldn't be taken for granted. Humans have been intellectually
+capable of creating a base10 counting system for over 200000 years, and yet our current
+system was only invented in the 7th century. 🤯
+
+Can you imagine if we had different symbols for every number? 
+It would be impossible to remember.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Counting  Visualization
+
+<!-- livebook:{"break_markdown":true} -->
+
+To help you visualize counting in a base10 system, Here's a visualization of 4 placeholders.
+You have your ones, tens, hundreds, and thousands.
+
+Evaluate the elixir cell below to visualize how numbers shift to the left placeholder as you count.
+
+````elixir
+## TODO - Hide
+
+Kino.animate(500, 0, fn i ->
+  digits = Integer.digits(i)
+  reverse_digits = Enum.reverse(digits)
+  ones = Enum.at(reverse_digits, 0)
+  tens = Enum.at(reverse_digits, 1)
+  hundreds = Enum.at(reverse_digits, 2)
+  thousands = Enum.at(reverse_digits, 3)
+  md = Kino.Markdown.new("
+  ```mermaid
+  flowchart
+  Thousands --- TH[#{thousands || 0}]
+  Hundreds --- H[#{hundreds || 0}]
+  Tens --- T[#{tens || 0}]
+  Ones --- O[#{ones || 0}]
+```
+")
+
+  # performant_alternative = [thousands || 0, hundreds || 0, tens || 0, ones]
+
+  {:cont, md, rem(i + 1, 9999)}
+end)
+````
+
+Now, a base 2 counting system works on the same principle as a base 10, except we
+only have 2 digits to represent numbers with.
+
+```
+0 1
+```
+
+Everytime we run out of digits, we shift the placeholder over.
+
+Take the example binary number `1011` which is eleven in base10. It has
+
+* `1` eight
+* `0` four
+* `1` two
+* `1` one
+
+It's eleven, because `8 + 2 + 1 = 11`.
+
+You can see how our base10 numbers are represented as binary in this table.
+
+```elixir
+# TODO - Hide
+
+data =
+  Enum.map(1..500, fn integer ->
+    binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
+    %{base10: integer, base2: binary}
+  end)
+
+Kino.DataTable.new(data)
+```
+
+### Counting Binary Visualization
+
+Want to see binary counting in action?
+Evaluate the Elixir cell below to see an animation.
+
+````elixir
+# Todo - Hide
+
+Kino.animate(1000, 0, fn i ->
+  digits = Integer.digits(i, 2)
+  reverse_digits = Enum.reverse(digits)
+  ones = Enum.at(reverse_digits, 0)
+  twos = Enum.at(reverse_digits, 1)
+  fours = Enum.at(reverse_digits, 2)
+  eights = Enum.at(reverse_digits, 3)
+  sixteens = Enum.at(reverse_digits, 4)
+  thirtytwos = Enum.at(reverse_digits, 5)
+  sixtyfours = Enum.at(reverse_digits, 6)
+  hundredtwentyeights = Enum.at(reverse_digits, 7)
+
+  md = Kino.Markdown.new("
+  ```mermaid
+  flowchart
+  Integer[#{i}]
+  HundredAndTwentyEights --- 128[#{hundredtwentyeights || 0}]
+  SixtyFours --- 64[#{sixtyfours || 0}]
+  ThirtyTwos --- 32[#{thirtytwos || 0}]
+  Sixteens --- 16[#{sixteens || 0}]
+  Eights --- 8[#{eights || 0}]
+  Fours --- 4[#{fours || 0}]
+  Twos --- 2[#{twos || 0}]
+  Ones --- 1[#{ones || 0}]
+```
+")
+
+  # performant_alternative = ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0] -- Enum.map(0..length(digits), fn _ -> 0 end)) ++ digits
+  max = 128 + 64 + 32 + 16 + 4 + 2 + 1
+  {:cont, md, rem(i + 1, max)}
+end)
+````
+
+This is how despite only having `on` and `off`, `0` and `1` computers are able to
+represent large numbers.
+
+You'll notice that in the above animation we show eight placeholders. That's because binary
+digits are grouped together in eights. each digit is called a **bit**, and each grouping of eight
+is called a **byte**.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Back to Integers
+
+It's useful to be aware that integers are representations of binary numbers, but you often
+don't need to concern yourself with these details. Let's have a look now at integers in Elixir.
+As mentioned, integers are whole numbers, that also include negative numbers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+1
+1023
+1235460
+-1
+-100
+-123512
+```
+
+Often you'll use integers for representing ages, days, years, cash values and more.
+
+For example, You could represent the month of June as an integer
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+6 # because June is the 6th month.
+```
+
+You can represent the 28th day in a month with an integer.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+28
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your turn
+
+In the Elixir cell below, enter the biggest number you can think of.
+If you've used any other programming language, you might be surprised! Integers
+in Elixir are unbounded, meaning they have no maximum size.
+
+Contrast that with a language like JavaScript which as a maximum integer size of `9007199254740991`
+Elixir makes that look tiny!
+
+```elixir
+
+```
+
+## Floats
+
+**Floats** refer to **floating-point numbers**.
+
+Floats are used to reprecent decimal numbers in your program like `1.22`, `2.3`, `1.0`, and even `0.0`.
+Just like for integers, floats are represented in binary. Any numbers to the right of the `.` uses
+binary to represent decimal numbers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+0.0
+```
+
+The number of digits after the decimal point is known as the **precision** of the float.
+For example, the precision of the float `1.2` is one. the precision of the float `1.22` is two.
+
+You'll often use floats for representing percentages.
+For example, you might want to represent a progress bar as a percentage.
+
+Almost done!
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+99.4
+```
+
+Take great care when performing calculations with floats. 
+Computers are limited to how precise they can be when representing floating-point numbers. 
+Therefore, it's possible to have rounding errors.
+
+```elixir
+1.2 + 1.4
+```
+
+Evaluate the above and you'll notice that `1.2 + 1.4` is not `2.6`, but `2.5999999999999996`. 
+Computerphile has an [excellent video on why](https://www.youtube.com/watch?v=PZRI1IfStY0&ab_channel=Computerphile).
+
+It's for this reason it's not recommended to use floats for representing money, even though
+it might seem intuitive to do so. Often you'll use integers to represent pennies, or some other contruct
+specifically for money.
+
+For our purposes, it's enough to be aware of this, without understanding the internal reasons for why this occurs.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, enter some floating point addition that returns an unexpected result.
+
+```elixir
+
+```
+
+## Strings
+
+A string is any sequence characters contained within two double quotes "".
+A character is any single number, letter, or symbol.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"T" # letters
+"t" # letters
+"1" # numbers
+"&" # symbols
+"_" # symbols
+```
+
+Strings can be a single character, no characters, or many characters!
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+""
+"H"
+"Hello World"
+```
+
+Strings can contain single quotes and other symbols such as !@#$%^&*()_+-=';: and more.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"I hope you're excited to learn about programming!"
+```
+
+They are useful for representing all kinds of information as text.
+
+### How did we go from Integers to Strings?
+
+You might wonder how we went from representing integers to representing strings and 
+any valid text character.
+
+Essentially, characters have an equivalent integer associated with them. 
+This integer is called a **code point**.
+
+For example, the code point for the letter `a` is `97`. Lowercase and uppercase letters have
+different codepoints.
+
+You can find the code point of any character by using `?` in Elixir. Evaluate the Elixir cell below
+to see how `?a` returns `97`.
+
+```elixir
+?a
+```
+
+Once again, while it's useful to be aware of how strings are represented by the computer. 
+it's not crucial to understand for most purposes.
+
+If you are curious, the full list of representable characters is called the [The Unicode Standard](https://unicode.org/standard/standard.html).
+below is a table of code_points for uppercase and lowercase letters in the 
+alphabet.
+
+You do not need to memorize these values! The goal of this lesson is simply awareness.
+
+```elixir
+# TODO - hide
+
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+|> String.codepoints()
+|> Enum.map(fn char ->
+  <<code_point::utf8>> = char
+  %{character: char, code_point: code_point}
+end)
+|> Kino.DataTable.new()
+```
+
+### Your Turn
+
+In the Elixir cell below, create a string "Hello, world!". This is a right of passage for every 
+programmer.
+
+```elixir
+
+```
+
+In the Elixir cell below, enter the codepoint for the letter `"Y"`. You're allowed to use `?`!
+
+```elixir
+
+```
+
+## Atoms
+
+Atoms are named constants. In other words, their name is their value.
+
+Atoms are often used to represent common constants in your program.
+For example, they often represent the :success or :error of a program.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:success
+:error
+```
+
+They might also be used to represent the state of some action. For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:completed
+:in_progress
+:starting
+```
+
+You might wonder why we have both strings and atoms, because they seem to do the same thing.
+One primary reason, is performance. Atoms are stored in an **atom table** and can be referenced by an integer.
+This makes it way faster to check if two atoms are equal.
+
+What is an **atom table**? well imagine it like an excel spreadsheet.
+each value has a numbered key, so checking `1 = 1` is a lot easier than checking.
+`"HeLloWorld = HeLloWorLd"`.
+
+Atoms are defined using a colon `:` and a series of letters, digits, and certain valid symbols.
+
+### Rules for Naming Atoms
+
+There are specific rules for naming atoms, but fortunately you don't need
+to memorize them! Instead, pay attention to the colors in your code. 
+If you define an atom incorrectly, you'll notice that it's no longer blue.
+
+Here are some valid atoms:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:hello
+:my_atom1
+:_my_ATOM
+```
+
+Here are some invalid atoms, notice they are mostly white:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:$this_is_invalid
+:!this_is_invalid
+:2
+:@
+:$
+:?
+:in valid # spaces are not valid
+```
+
+It should be noted that it's Elixir convention to name atoms using lowercase letters,
+but this is not enforced.
+
+You can use quotes with atoms to avoid name rules.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:"$Now we don't have to follow any rules. This is a valid atom (though unconventional)"
+```
+
+### Erlang Atoms
+
+Atoms in Elixir are also used to provide access to [Erlang](https://elixir-lang.org/getting-started/erlang-libraries.html#the-binary-module).
+
+Erlang is the low level language that Elixir is built on. Erlang contains a collection
+of useful pre-built tools you can access.
+
+For example, there is the `:math` module, which has math related functionality.
+Here's how you can get the value of `pi` from the `:math` module.
+
+```elixir
+:math.pi()
+```
+
+Atoms in Elixir are also used to provide access to Erlang tools.
+If you're not already familiar, Erlang is the low level language that Elixir is built on. 
+It contains a collection of useful tools
+
+For example, there is the `:math` module, which has math related functionality.
+
+Here's how you can get pi from the :math module.
+
+You will learn more about how to use Erlang through atoms in future lessons. It's enough for
+now to be aware that Erlang tools can be accessed through certain atoms.
+
+### Your Turn
+
+In the Elixir cell below, create an atom of your favorite element. Mine is `:hydrogen` 
+because it likes to get along with everyone.
+
+```elixir
+
+```
+
+## Lists
+
+Lists are exactly what they sound like, they are lists of information.
+Lists contain a sequence of any other data type, even themselves. Use square brackets `[]` to
+create a list, and then separate each value with a comma `,`.
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[1, 2, 3]                           # A list of integers
+["a", "b", "c"]                     # A list of strings
+[1, "b", 2]                         # A list of integers and strings
+[1.2, true, false, 3123, "b^&e8*"]  # A list of floats, booleans, integers, and strings.
+[]                                  # an empty list
+[[], []]                            # a list of empty lists
+[[1,2,3], [3,2,1]]                  # a list of lists with numbers
+[[[]], [], [[], []]]                # deeply nested lists are valid, but often hard to read!
+```
+
+Lists are used to represent a collection of information. For example, a shopping list, a todo list,
+or a list of tags on an article. Values in a list are often refered to as `elements`.
+
+### Indexes
+
+An **index** is the position of an element in a list.
+
+In programming, we count indexes starting at 0. Why? The short answer is,
+it relates to how computer hardware works.
+
+So take this example list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+["a", "b", "c"]
+```
+
+* `"a"` is at index `0`
+* `"b"` is at index `1`
+* `"c"` is at index `2`
+
+### Your Turn
+
+In the Elixir cell below, Create a list of your favourite foods as strings.
+
+```elixir
+
+```
+
+## Ranges
+
+**Ranges** represent a sequence of ascending or descending integers.
+Ranges are useful for representing an ascending or descending sequence of numbers, without needing
+to manually type each number in a list.
+
+such as 1 to 10
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+1..10
+```
+
+or 5 to -5.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+5..-5
+```
+
+You can visualize a range as representing an ascending or descending list of integers.
+
+On it's own, it might not seem like much. But ranges will be incredibly usefull in future lessons.
+We'll give you a taste of the future and show you how you can convert a range into a list.
+
+Don't worry, we don't expect you to understand this code yet, but it's useful to understand
+the relationship between `1..5` and `[1, 2, 3, 4, 5]`
+
+```elixir
+Enum.to_list(1..5)
+```
+
+Ranges can have a step. The step is that each number in the range increments or decrements by.
+
+Represent the step of the range using `//` like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+0..10//2
+```
+
+That means the range `0..10//2` correlates to the list `[0, 2, 4, 6, 8, 10]`
+
+Here's the same range converted into a list to help you visualize it. Once again, you will
+learn more about what `Enum.to_list` is in a future lesson.
+
+```elixir
+Enum.to_list(0..10//2)
+```
+
+### Your Turn
+
+In the Elixir cell below, create a range from `3` to `9` with a step of `3`.
+
+## Tuples
+
+Tuples are fixed size containers for multiple elements. 
+Like lists they can contain any data type.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{}
+{7}
+{1, 2, 3}
+{"example"}
+{1, "pizza", 3, :success, false}
+```
+
+They are often used when you know the number of desired elements and their type.
+For example, it's common in Elixir to use tuples to represent failure or success cases
+with the associated error message or success value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:success, "Well done!"}
+{:error, "Too bad!"}
+```
+
+### Lists vs Tuples
+
+You might notice that tuples and lists seem very similar, and they are. They are both
+data types that contain a collection of elements.
+
+The major difference is performance. Both are good at different things. In Elixir,
+it's fast to retrieve an element from a tuple, however it's slow to add a new element in.
+
+Why? Well that requires some understanding of how memory workes in a computer.
+The short version is that a tuple is stored continuously all together. So, you know where
+each element is on the computer.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  1[location 1] --- T
+  2[location 2] --- U
+  3[location 3] --- P
+  4[location 4] --- L
+  5[location 5] --- E
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+However, if you want to add a new element in that means you have
+to move the location of every element.
+
+Lists on the other hand have the opposite strengths and weaknesses. Lists are stored
+as **linked-lists** which means each element in the list knows the location of the next element.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  L -- location of I --> I -- location of S --> S -- location of T --> T
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+So we can store elements in a list anywhere, if we need to add or remove a new element
+we only have to change the location one element is pointing to.
+
+However, we don't know the location of every element upfront like with a tuple, so if you
+want to get the third element, you need to look through the first and second to find it.
+
+### Your Turn
+
+In the Elixir cell below, create a tuple with `:ok` as the first element, and `"got it!"` as
+the second element.
+
+## Keyword Lists
+
+Keyword lists belong to a category of data structures known as **associative data structures**.
+That's because keyword lists allow you to associate values in the list with a key.
+
+Elements in a keyword lists are broken up into two parts, a key, and a value. That's why
+you'll also often hear it refered to as a **key-value data structure**.
+
+In Elixir, the key is an atom, and the value can be any data structure, even another keyword list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[key: "value"]
+[atom: "anything!"]
+["You can use quotes for the atom key!": ""]
+[snake_case_is_convention: ""]
+[ButThatIsNotEnforced: ""]
+```
+
+Keys in a keyword list do not have to be unique.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[my_key: "value", my_key: "value"]
+```
+
+Elixir allows you to work with keyword lists in this nice `[key: "value"]` syntax. However,
+keyword lists are actually just a list of tuples where the first element is an atom.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[{:key, "value"}]
+```
+
+In the Elixir cell below, you can see how Elixir converts lists of tuples matching the `{:atom, value}` syntax
+into a keyword list.
+
+```elixir
+[{:key, "value"}, {:key, "value"}]
+```
+
+If you break the convention in the keyword list, Elixir reverts to displaying
+the keyword list as a list of tuples.
+
+```elixir
+[{}, key: "value"]
+```
+
+List order is guaranteed, so the same is true for keyword lists.
+
+### Your Turn
+
+In the Elixir cell below, create a keyword list of your favourite super hero. Include their `:name` and `:secret_identity`.
+
+```elixir
+
+```
+
+## Maps
+
+Maps are another type of associative data structure. Infact maps are the common go-to for a key-value
+data structure. You can create a map using `%{}`. Similar to keyword lists they can have atoms as keys and then any value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{key: "value"}
+```
+
+However, unlike keyword lists, keys must be unique otherwise they will be overwritten.
+Elixir is very helpful and provides a warning to let us know we're overriding a duplicate key.
+
+```elixir
+%{duplicate_key: "value1", duplicate_key: "value2"}
+```
+
+Unlike keyword lists, maps do not guarantee key order, which is why you'll notice the returned value of the map below
+does not have the same order as the map created.
+
+```elixir
+%{one: "one", two: "two", three: "three"}
+```
+
+Keyword lists suffer from the same problems as lists if you want to access an element in the middle
+of the list, where as maps are designed to access elements quickly. You'll learn more about how to
+access elements in a map in a future lesson.
+
+Unlike keyword lists, maps can have any values as the key. Commonly you will see atom-key maps
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{atom_key: "value"}
+```
+
+And also string-key maps.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{"string key" => "value"}
+```
+
+However, the key to a map could be anything! even another map! You will need to use the `=>` symbol
+though, not a colon `:`. `=>` is an equals sign `=` and a greater than symbol `>`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{[1,2,3] => "value"}
+%{%{example: "my_example"} => "value"}
+%{1 => "value"}
+```
+
+### Your Turn
+
+Since this is the last exercise in the lesson, let's say `:goodbye` `"world"` and call it a day!
+
+In the Elixir cell below, create a map with the key `:goodbye` and the value `"world"`.
+
+```elixir
+
+```
