@@ -1,0 +1,264 @@
+# Enumeration
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.5.1"}
+])
+```
+
+## Overview
+
+Often while programming, you run into problems where you need the ability
+to do something many many times.
+
+For example, let's say you're creating a shopping application.
+In this application, customers create a shopping list.
+
+You're responsible for displaying the cost of each item to the user
+after taxes.
+
+Given a list of costs in pennies, how might you do that
+with what you've learned so far?
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# one 
+[100, 200, 150, 200]
+```
+
+With only four items, That would still be a fairly difficult task. 
+You would have to extract out each value with pattern matching, and
+then apply some `calculate_tax/1` function to each value, then rebuild 
+a new list with the new values
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[one, two, three, four] = [100, 200, 150, 200]
+
+[calculate_tax.(one), calculate_tax.(two), calculate_tax.(three), calculate_tax.(four)]
+```
+
+However the above would only work for four items, you would need
+to create different cases for every size of list you want to support.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+list = [100, 200, 150, 200]
+
+case list do
+  [] -> []
+  [one] -> [calculate_tax.(one)]
+  [one, two] -> [calculate_tax.(one), calculate_tax.(two)]
+  [one, two, three] -> [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three)]
+  [one, two, three, four] -> [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three), calculate_tax.(four)]
+end
+```
+
+Now imagine if you had to support a hundred items. Or if you
+have enterprise customers who buy thousands of items! This simply doesn't
+scale.
+
+To handle scenarios where we need to repeat an action over and over
+again, we can use **enumeration**. This is sometimes called **looping** or 
+**iteration**
+
+```mermaid
+flowchart LR
+  Input ---> Enumeration --> Function --> Enumeration
+  Enumeration --> Output
+```
+
+This lesson will cover tools and techniques to accomplish enumeration.
+In total we will cover:
+
+* **Enumerable** **Collections** that support enumeration.
+* How to use the **Enum** module's built-in functionality with **Collections**.
+* Using `for` **Comprehensions**
+* Using **Recursion** to create functions that call themselves.
+
+### Enumerables
+
+First, it's useful to know what we can enumerate on. In Elixir, certain
+data types are **enumerable** which means that we have the ability
+to enumerate through them and apply some function on each element.
+
+These structures are called **Collections** because they contain a collection of
+elements. You are already familiar with them. They are **lists**, **tuples**, **keyword lists**, **ranges**, 
+and **maps**.
+
+### Enumeration With Non-Enumerables
+
+Data types that do not contain multiple elements are not enumerable.
+However, it's still sometimes useful to enumerate over non-enumerable data types.
+
+Even though you can't enumerate over them directly, the trick is to convert
+non-enumerable data into an enumerable data type.
+
+Strings are not enumerable, however they can be converted into lists with either `String.graphemes/1`
+or `String.codepoints/1`.
+
+Remember that the under the hood, strings are represented with a codepoint.
+each character such as `"a"` has a corresponding codepoint. That's why the
+function is called `String.codepoints/1`.
+
+```elixir
+String.codepoints("abcdefghijklmnopqrstuvwxyz")
+```
+
+But what is a **grapheme**? Well some characters like é require multiple code points to represent.
+
+You'll notice that é is actually 2 characters if you use `String.codepoints/1`
+
+```elixir
+String.codepoints("é")
+```
+
+So, if you want to split a string that contains characters like é, you'll want to use `String.graphemes/1`
+
+```elixir
+String.graphemes("é")
+```
+
+Now you're string is an enumerable list!
+
+### Your Turn
+
+In the Elixir cell below, convert the string `"Hello, world!"` into a list.
+
+```elixir
+
+```
+
+### Integers
+
+How would you convert integers into an Enumerable? 
+You can use the `Integer.digits/1` function.
+
+```elixir
+Integer.digits(1, 2, 3)
+```
+
+### Your Turn
+
+In the Elixir cell below, convert the integer `4389` into a list of digits.
+
+```elixir
+
+```
+
+### Breaking Down Problems As Input And Output
+
+We've shown some examples of how to convert non-enumerable data into
+an enumerable as a list. This highlights the critical ability as a developer to
+manipulate the shape of data from one form to another.
+
+If you think about your program as the input of data and the output of data,
+you can model your desired functionality even if you don't understand how you're 
+going to implement it.
+
+Modelling a problem and understanding it is the first step to solving it.
+For example, let's say you want to convert an integer into a keyword list where the
+keys are the name of the integer, and the values are the integer.
+
+You could model that problem with input an output.
+
+```mermaid
+flowchart
+  12 --> Input
+  Input --> B[Black Box]
+  B --> Output
+  Output --> A["[one: 1, two: 2]"]
+```
+
+Then you could break that problem down further into a series of
+transformations.
+
+```mermaid
+flowchart
+  12 --> A["[1, 2]"]
+  A --> B[[one: 1, two: 2]]
+```
+
+Often, you need to solve problems that you don't know the answer to.
+In this case, you might not know how to go from `[1, 2]` to `[one: 1, two: 2]`.
+
+Can you break that problem down even further? If you can't solve one problem, try to solve
+an easier problem that will build your knowledge for how to solve the harder problem.
+
+For example, could you make a function that takes in an integer and returns it's atom?
+
+### Your turn
+In the Elixir cell below, create a function `to_atom_name/1` that accepts a single digit from 1-9 for it's
+parameter. Return the correct atom, `:one`, `:two`, `:three`, etc.
+
+<details>
+<summary>Hint</summary>
+You may need to create a `map` that uses integers as keys, and the corresponding atom as values.
+Then you can use map[key] syntax to get the correct atom.
+</details>
+
+```elixir
+
+```
+
+## Enum
+In order to convert `[1, 2]` Into `[one: 1, two: 2]` you'll need to use enumeration.
+Elixir provides the `Enum` module for enumeration related functionality.
+
+The [Enum](https://hexdocs.pm/elixir/1.13.2/Enum.html)
+module provides many helpful functions. The most important for you to learn now are.
+- `Enum.map/2` enumerate over every element and create a new collection with a new value.
+- `Enum.reduce/2` and `Enum.reduce/3`. Enumerate over every element into an accumulated value.
+- `Enum.filter/2` filter out elements from a collection.
+- `Enum.all?/2` check if all elements in a collection match some condition.
+` `Enum.any?` check if any elements in a collection match some condition.
+- `Enum.count/1` return the number of elements in a collection collection.
+- `Enum.find/3` return an element in a collection that matches some condition.
+
+The `Enum` module has a ton more functionality. Whenever you think to yourself
+"How can I ____ in a collection" you should see if the `Enum` module has a built-in solution.
+It's not realistic to learn it all upfront. Instead you'll learn functions over time
+whenever you run into a problem that requires `Enum` as a solution.
+
+`Enum.map/2` allows you to enumerate through the collection you provide it as it's first argument.
+It then calls a function that you provide it as it's second argument on each element.
+It then returns a new list with the modified values.
+
+Here's an example that doubles all the integers in a list.
+
+```elixir
+Enum.map([1, 2, 3, 4], fn integer -> integer * 2 end)
+```
+
+It's useful to be aware that you can use ranges with enumerables to easily enumerate over large
+ranges without needing to define every element in the list.
+
+```elixir
+Enum.map(1..100, fn integer -> integer * 2 end)
+```
+
+### Your Turn
+Back to our example above, how would you use `Enum.map/2` to convert [1, 2] into
+a keyword list? Remember that keyword lists are actually lists of tuples.
+
+In the Elixir cell below, convert `[1, 2]` into `[{:int, 1}, {:int, 2}]`
+
+```elixir
+
+```
+
+Bonus: In the Elixir cell below, instead of using the generic `:number` atom key, convert
+`[1, 2]` into `[{:one, 1}, {:two, 3}]`
+
+```elixir
+
+```
+
+### Mutation
+
+### Enum.map

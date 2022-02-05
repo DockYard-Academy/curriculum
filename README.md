@@ -1,14 +1,14 @@
-# Dockyard Academy Curriculum
+# Beta Academy Curriculum
 To open the .livemd files in the **curriculum** folder you will need the latest version of `livebook` running. 
 Presently, there are no other requirements.
 
-The Fundamentals Section currently has 2.1 to 2.5 lessons complete. The other folders are placeholders.
+The Fundamentals section currently has completed lessons. The other folders are placeholders.
 
 ## Philosophy
-Dockyard Academy is follows a flipped classroom design where students complete interactive instructional material,
+The academy is follows a flipped classroom design where students complete interactive instructional material,
 and then perform exercises and create projects inspired by the learning material.
 
-Dockyard Academy is inspired by:
+The academy is inspired by:
 - Scaffolded Design
 - Backwards Design
 - Collaborative Learning
@@ -21,10 +21,10 @@ Dockyard Academy is inspired by:
 Instruction will focus on supporting student exercises rather than lecture.
 
 Classtime will be broken into 
-1. **assessment & review**
-3. **exercises**
-4. **labs**
-5. **support & self-instruction time**
+1. **Assessment & Review**
+3. **Exercises**
+4. **Labs**
+5. **Support & Self-Instruction Time**
 
 ### Assessment & Review
 Assessment will provide the teacher an understanding of how students incorporated the learning from the 
@@ -56,11 +56,11 @@ For more on this see [Mark Rober's Talk](https://www.youtube.com/watch?v=9vJRopa
 
 ## Class Culture & Values
 Class values will be reinforced continuously to students.
-- Rely on your cohort. Support eachother.
+- Rely On Your Cohort. Support Eachother.
 - Failure Is Ok. I.E. "Red Is The First Step"
 - Get Ahead, Don't Fall Behind.
-- Attend Support Time and Help Others.
-- Turn on your cameras.
+- Attend Support Time And Help Others.
+- Turn On Your Cameras.
 
 ## Student Goals
 Students will be competent developers prepared to excel in the Elixir Industry. They will have
@@ -117,8 +117,8 @@ The course is broken into 5 major sections
    - plugins
    - .tool-versions
  - hex
-- Run the DockYard Curriculum Repo
- - Clone the Dockyard Repo
+- Run the Curriculum Repo
+ - Clone the Repo
  - Install & Configure Postgres
  - Install Elixir & Erlang
  - May need to install inotify tools
@@ -191,7 +191,7 @@ The course is broken into 5 major sections
   - Multiclause Functions (ALREADY COVERED - now with matching)
   - Guards (ALREADY COVERED)
   - Error Handling
-- Loops and Iteration
+- Enumeration
   - Collections
   - Linked List + Stack and Heap.
   - Tail-call Optimization
