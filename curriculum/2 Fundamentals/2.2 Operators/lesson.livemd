@@ -24,7 +24,7 @@ In this lesson, you're going to learn:
 * **Boolean operators** comparing booleans and truthy values. `and` `or` `not` `&&` `||` `!`
 * **String operators** manipulating strings. `<>`, `#{}`
 * **List operators** manipulating lists. `++` `--`
-* Accessing map values with dot `.` notation and **map[key]** notation.
+* Accessing map values with **map.key** notation and **map[key]** notation.
 
 ## Arithmetic Operators
 
@@ -58,7 +58,7 @@ valid number (integer or float) on the left and right hand side of the operator.
 4 + 3 + 2 + 1
 ```
 
-For example, the following code with crash because there is a dangling `+` operator. You'll notice 
+The following code with crash because there is a dangling `+` operator. You'll notice 
 that the error says `TokenMissingError` and `expression is incomplete`. Whenever our code crashes, 
 Elixir does it's best to let you know why with an error message.
 
@@ -576,20 +576,10 @@ in the alphabet are evaluated as smaller than numbers later in the alphabet.
 "a" < "z"
 ```
 
-Under the hood it uses the `code point` representation of the letters in order to compare the values. 
-This can be useful for alphabetical ordering. However, it does mean that capital letters are always
-less than lowercase letters regardless of alphabetical order.
+Capital letters are always less than lowercase letters regardless of alphabetical order.
 
 ```elixir
 "Z" < "a"
-```
-
-```elixir
-?Z
-```
-
-```elixir
-?A
 ```
 
 ### Remembering Greater Than and Less Than
@@ -729,6 +719,12 @@ false or false
 
 `not` flips the value from `true` to `false` or from `false` to `true`.
 
+```mermaid
+flowchart LR
+false --> true
+t[true] --> f[false]
+```
+
 ```elixir
 not true
 ```
@@ -743,9 +739,15 @@ not false
 true and not false
 ```
 
-```elixir
-not false or (false and false)
+```mermaid
+flowchart LR
+  1[true] --> 2[and]
+  3[not false] --> 4[true]
+  4 --> 2
+  2 --> 5[true]
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Truthy and Falsy
 
@@ -838,7 +840,8 @@ In Elixir, only `nil` and `false` are false when used with boolean operators.
 For example, JavaScript, another programming language, treats the number 0 as `false` when used,
 but that's not the case in Elixir.
 
-For those of you coming from other programming languages, caution is advised!
+For those of you coming from other programming languages, caution is advised! You might
+be used to `0 && 6` returning nothing, but in Elixir it returns `6`!
 
 ```elixir
 0 && 6
@@ -1074,15 +1077,21 @@ map["non_existing_key"]
 
 ### Your Turn
 
-In the Elixir cell below, Create a map `%{hello: "world"}` and assign it to a variable `map`. Use **map.key** notation
+In the Elixir cell below, retrieve the value of `:example` using both **map[key]** and **map.key** notation.
+
+```elixir
+%{example: "value"}
+```
+
+Create a map `%{hello: "world"}` and assign it to a variable `map`. Use **map.key** notation
 to access the `:hello` key. The cell should output `"world"`
 
 ```elixir
 
 ```
 
-Create a map `%{one: 1}` and assign it to a variable `map`. Use **map[key]** syntax to access
-the key `:two`. It should return `nil`.
+Create a map `%{"one" =>  1}` and assign it to a variable `map`. Use **map[key]** syntax to access
+the key `"one"`. It should return `1`.
 
 ```elixir
 
@@ -1170,13 +1179,13 @@ Here's what the error above tells us.
 * **Error type**: **TokenMissingError** because we're mising the next token 
   (in this case a number) in the `2 * number` expression.
 * **Error message**: `syntax error: expression is incomplete `
-* **code causing the crash**:
+* **Code causing the crash**:
   ```elixir
     |
   1 | 2 *
     |   ^
   ```
-* **line number**: the crash is on **line 1**
+* **Line number**: the crash is on **line 1**
 
 ### Your Turn
 
