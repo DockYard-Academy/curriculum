@@ -1,0 +1,5 @@
+Booleans
+    - Light Bulb
+
+Integers
+    - 

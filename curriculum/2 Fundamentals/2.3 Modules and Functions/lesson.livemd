@@ -2,7 +2,7 @@
 
 ## Setup
 
-```elixir
+```Elixir
 require Integer
 ```
 
@@ -14,10 +14,10 @@ Data structures and operators are fundamental for providing instructions
 to the computer, but you're limited in how repeatable and reusable those
 instructions can be.
 
-For example, if you want to determine if many numbers are even, you need to reimplement that behavior repeatedly.
+For example, if you want to determine if many numbers are even, you must repeatedly reimplement that behavior.
 
 Reusing repeatable instructions makes programming far more powerful. 
-Each solved problem acts as a building block for the next.
+This is because each solved problem acts as a building block for the next.
 
 ### Abstractions
 
@@ -132,15 +132,15 @@ Let's break down what we did above.
     B --> C[anonymous function]
    ```
 
-3. Elixir uses the `fn` keyword to start defining a function.
+3. Elixir uses the `fn` keyword to define a function.
 
 4. The next value `->` separates the **function head** and the **function body**.
 
-5. The **function head** describes the input of the function. In this example it's empty.
+5. The **function head** describes the input of the function. In this example, it's empty.
 
 6. The **function body** contains the function's implementation or **black box** . In this example, it returns `nil`.
 
-7. Elixir uses the `end` keyword to end the defining a function.
+7. Elixir uses the `end` keyword to stop creating a function.
 
 <!--  -->
 
@@ -170,19 +170,19 @@ We use the `.()` syntax in Elixir to get the function's output. We often say we 
 double.()
 ```
 
-`double` should return `nil` because so far that's all we've told it to do. However, we want
+`double` should return `nil` because that's all we've told it to do so far. However, we want
 it to multiply a number by `2`.
 
-In order to do that, we need to make the function to accept some input. To do this,
+To do that, we need to make the function accept some input. To do this,
 we define a **parameter** in the function like so.
 
 ```elixir
 double = fn parameter -> nil end
 ```
 
-You'll notice a warning above. That's because Elixir is being smart and letting us know that we've
-created a parameter, but we're not actually using it. In Elixir, if you want to have an unused variable
-without the warning, you can mark it with an underscore `_`
+You'll notice a warning above. That's because Elixir is smart and lets us know that we've
+created a parameter, but we're not using it. In Elixir, if you want to have an unused variable
+without warning, you can mark it with an underscore `_`
 
 ```elixir
 double = fn _parameter -> nil end
@@ -195,25 +195,24 @@ modify the function to return the parameter instead.
 double = fn parameter -> parameter end
 ```
 
-The parameter is named parameter here for sake of example. But it works a lot like a variable and it can be named anything.
-Let's rename it to `number` to be more clear since we expect the function will be called with
-an integer or float.
+The parameter is named parameter here for the sake of example. But it works a lot like a variable, and it can be named anything.
+Let's rename it to `number` to clarify what we expect the input to the function to be.
 
 ```elixir
 double = fn number -> number end
 ```
 
-Now the function head takes in a value. This means that when we call it, we have to pass it
-an **argument**. An argument is a value that will be assigned to the parameter when the function 
+Now the function head takes in a value. We have to pass it
+an **argument**when we call it. The argument will be assigned to the parameter when the function 
 executes. We'll give it the integer `2`.
 
 ```elixir
 double.(2)
 ```
 
-Under the hood when the function runs, the parameter is assigned the value of the argument.
+Under the hood, when the function runs, the parameter is assigned the argument's value.
 
-Step by step that would look like this.
+Step by step, that would look like this.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -226,14 +225,14 @@ fn 2 -> 2 end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Notice that if you try to call the function without an argument, the function fails now because
+Notice that if you try to call the function without an argument, it fails because
 it expects an argument. Not all languages do that, but Elixir is pretty smart 😎
 
-```elixir
+```Elixir
 is_even.()
 ```
 
-Great, now all that's left to multiply the parameter by `2`. You should be familiar with 
+Great, now all that's left is to multiply the parameter by `2`. You should be familiar with 
 this from the previous sections.
 
 ```elixir
@@ -256,9 +255,11 @@ double.(10 ** 2 - 1)
 
 ### Implied Return Values
 
-Some languages allow you to specifically specify the return value of the function.
-However, in Elixir the output of a function is always the last line. So far you've only seen one-line 
-functions, so here's an example of a multi-line function. Notice that the return value is `first` + `second` which equals `3`.
+Some languages require explicit return values.
+
+However, in Elixir the output of a function is always the last line. 
+
+For example, notice that the return value below is `first` + `second`, which equals `3`.
 
 ```elixir
 multiline_function = fn ->
@@ -274,7 +275,7 @@ multiline_function.()
 
 Functions can accept multiple inputs. Separate parameters with commas `,` to create a multi-parameter function.
 
-Let's say you're creating a function `calculate_force` which will take in `mass` and
+Let's say you're creating a function `calculate_force`, which will take in `mass` and
 `acceleration`. (remember that force = mass * acceleration)
 
 Let's start with the `double` function and see how we could convert it into a `calculate_force` function.
@@ -295,7 +296,7 @@ an acceleration of 2.
 
 However, we want it to be truly reusable, so we need to figure out how to replace 2 with another
 parameter. You can declare a function that accepts multiple parameters by separating them with a 
-comma `,` the same way you do in a list or tuple.
+comma `,` as you do in a list or tuple.
 
 ```elixir
 calculate_force = fn mass, acceleration -> mass * acceleration end
@@ -303,7 +304,7 @@ calculate_force = fn mass, acceleration -> mass * acceleration end
 
 That should be working! Now you can call the function by passing in two arguments the same way.
 
-```elixir
+```Elixir
 calculate_force.(10, 2)
 ```
 
@@ -316,11 +317,11 @@ example = fn a, b, c, d, e -> [a, b, c, d, e] end
 example.(1, 2, 3, 4, 5)
 ```
 
-But usually you want to avoid having too many parameters because it makes your function hard
+But usually, you want to avoid having too many parameters because it makes your function hard
 to understand.
 
-A paramater can be assigned to any valid data type, so you could instead use associative data
-structure like a map or keyword list.
+A parameter can be assigned to any valid data type, so you could instead use associative data
+a structure like a map or keyword list.
 
 ```elixir
 is_even = nil
@@ -329,20 +330,20 @@ is_even = nil
 ## Shorthand Syntax
 
 Anonymous functions can be defined using a shorthand syntax. It is only an alternative and shorter
-version to define a function. You will sometimes see shorthand syntax, so it's useful to be able to read it.
-However, it should not be over-used otherwise you program may be less clear.
+version to define a function. You will sometimes see shorthand syntax, so it's helpful to understand it.
+However, it should not be over-used. Otherwise, your program may be less clear.
 
-With the shorthand syntax, you can still assign the anonymous function to a variable.
+You can still assign the anonymous function to a variable with the shorthand syntax.
 However, you define the function with `&()` and put the function body between the brackets.
 
-Here's the same `double` function for example.
+Here's the same `double` function using short-hand syntax.
 
 ```elixir
 double = &(&1 * 2)
 double.(5)
 ```
 
-`&1` means the first parameter. If the function had more parameters you could access them with `&2`, `&3`, and so on.
+`&1` means the first parameter. If the function had more parameters, you could access them with `&2`, `&3`, and so on.
 
 ```elixir
 add_two = &(&1 + &2)
@@ -363,12 +364,11 @@ is called `add_two/2`.
 
 Functions in Elixir are [first-class citizens](https://en.wikipedia.org/wiki/First-class_citizen).
 
-For our purposes, this means that functions can be assigned to variables, stored in other data types, and 
-used as arguments to other functions.
+For our purposes, this means we can assign functions to variables, store them in other data types, pass them as arguments to other functions.
 
-If a function takes in another function as a parameter, it's often called a **higher-order function**.
+If a function takes in another function as a parameter, it's called a **higher-order function**.
 
-For example, we could make a function named `call_twice` which calls a function on a value twice.
+For example, we could make a function named `call_twice`, which calls a function on a value twice.
 
 ```elixir
 call_twice = fn function, parameter -> function.(function.(parameter)) end
@@ -382,7 +382,7 @@ double = fn number -> number * 2 end
 call_twice.(double, 3)
 ```
 
-We don't need to assign the passed function to a variable first. We can actually pass 
+We don't need to assign the passed function to a variable first. We can pass 
 in the anonymous function directly.
 
 ```elixir
@@ -395,8 +395,8 @@ referred to as a **callback function**.
 
 ## Pipe Operator
 
-To create larger behavior, you'll often compose smaller functions together. This reflects the 
-nature of problem solving where we take large problems and break them down into smaller ones.
+To create more complex behavior, you'll often compose smaller functions together. Composing functions together reflects
+nature of problem-solving where we take large problems and break them down into smaller ones.
 
 To help compose functions together, Elixir provides the pipe `|>` operator.
 That's the `|` symbol likely above your enter key, and the greater than `>` symbol side by side to make `|>`.
@@ -432,9 +432,11 @@ If a function is called with multiple arguments, the function piped in will be t
 
 <!-- livebook:{"force_markdown":true} -->
 
-```elixir
-two(1, 2) # how the function is normally called.
+```Elixir
+two(1, 2) # how to call two/2 by itself.
 
+# How to use the pipe operator
+# to call the two/2 with one/1 as the first argument.
 one.() |> two.(2)
 ```
 
@@ -442,7 +444,7 @@ You can also pass in a value to a pipe.
 
 <!-- livebook:{"force_markdown":true} -->
 
-```elixir
+```Elixir
 1 |> two.()
 ```
 
@@ -467,17 +469,16 @@ add_blueberries.(add_pizza.(add_blueberries.(add_pizza.(add_grapes.([])))))
 
 ## Modules
 
-Functions are amazing, but as you create more and more functions, it becomes necessary to organize them
-together. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions".
+As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions".
 
 Here's what an empty module looks like.
 
-```elixir
+```Elixir
 defmodule Hello do
 end
 ```
 
-Again, don't worry about the somewhat strange looking return value. 
+Again, don't worry about the somewhat strange-looking return value. 
 `{:module, Hello, <<70, 79, 82, 49, 0, 0, 4, ...>>, nil}` That's how Elixir represents 
 modules internally.
 
@@ -490,9 +491,9 @@ Let's break down what this all means.
 4. `end` a keyword that finishes the module definition.
 
 Modules define functions inside of them. Each function has a name, so they are called **named functions**.
-You can define functions inside of a module using a slightly different syntax than anonymous functions.
+You can define functions inside a module using the following syntax.
 
-```elixir
+```Elixir
 defmodule Greeter do
   def hello do
     "hello world"
@@ -500,29 +501,28 @@ defmodule Greeter do
 end
 ```
 
-Let's break down the above named function.
+Let's break down the named function above.
 
 1. `def` this means "define function"
 2. `do` a keyword that separates the function head and the function body.
 3. `"hello world"` this is the function body. This function returns the string "hello world"
-4. `end` a keyword that ends the function definition.
+4. `end` is a keyword that ends the function definition.
 
 ### Calling a Named Function
 
-To call a function inside of a module, you use the name of the module followed by a dot `.` then the
-name of the function. You then call it with round brackets `()` with arguments if it has any.
+To call a function inside a module, you use `Module.function(args)` syntax.
 
-```elixir
+```Elixir
 Greeter.hello()
 ```
 
 ### Named Functions with parameters
 
-You can create multiple functions in a module, so let's a another function that greets people.
-We'll call this function `hi` and it will accept one parameter called `name`. 
-It will then return `hi <name>`.
+You can create multiple functions in a module.
 
-```elixir
+Here's a new `hi/1` function that says hi to a person.
+
+```Elixir
 defmodule Greeter do
   def hello do
     "hello world"
@@ -536,15 +536,15 @@ end
 
 You call the named function in the module by passing it an argument.
 
-```elixir
+```Elixir
 Greeter.hi("Brooklin")
 ```
 
 ## Internal Module Functions
 
-A module can use it's own functions.
+A module can use its own functions.
 
-```elixir
+```Elixir
 defmodule InspectorGadget do
   def gogo(gadget) do
     "Go go gadget #{gadget}!"
@@ -560,7 +560,7 @@ InspectorGadget.necktie()
 
 However, you can omit the module name. notice `gogo` instead of `InspectorGadget.gogo`
 
-```elixir
+```Elixir
 defmodule InspectorGadget do
   def gogo(gadget) do
     "Go go gadget #{gadget}!"
@@ -578,7 +578,7 @@ InspectorGadget.necktie()
 
 Modules can access other module functions.
 
-```elixir
+```Elixir
 defmodule Speaker do
   def speak() do
     "hi there"
@@ -594,14 +594,14 @@ end
 Listener.listen()
 ```
 
-However, sometimes it's important that a module keep a function private for internal use only. Why?
-Well it may be for security reasons, or because you don't think it's a useful function to expose. 
+However, sometimes a module must keep a function private for internal use only. Why?
+It may be for security reasons or because you don't think it's unnecessary to expose the function to the outside world. 
 Often it communicates to other developers how to use your module.
 
 You can create a private module function with `defp` instead of `def`. You'll notice that below the 
 `Speaker.think/0` function is undefined to the outside world.
 
-```elixir
+```Elixir
 defmodule Speaker do
   defp think() do
     "hi there"
@@ -611,9 +611,9 @@ end
 Speaker.think()
 ```
 
-Private functions can be used internally, which means that public functions could expose their values.
+We use private functions internally in the module, which means that public functions could expose their values.
 
-```elixir
+```Elixir
 defmodule Speaker do
   defp think() do
     "hi there"
@@ -630,11 +630,11 @@ Speaker.speak()
 ## Module Attributes
 
 What if you have many functions in a module that all use the same value? You've already learned
-that repeating the same hard coded value over and over again isn't very reusable, and you've
+that repeating the same hard-coded value over and over again isn't very reusable, and you've
 used variables to pass the same value around in your code. However, that's not possible in a module.
 
-Modules and functions in a module close themselves to the outside world. we call this `scope`.
-Modules, functions, and many other similar constructs in Elixir are `lexically scoped`.
+Modules and functions in a module close themselves to the outside world. We call this `scope`.
+Modules, functions, and many other similar constructs in Elixir are `lexically scoped.
 
 That means that variables defined in one scope cannot be accessed in another scope.
 
@@ -695,9 +695,9 @@ flowchart
   end
 ```
 
-Notice that we're able to use a module attribute inside of the module's function now.
+Notice that we can use a module attribute inside of the module's function now.
 
-```elixir
+```Elixir
 defmodule MyModule do
   @my_attribute "any valid data type"
   def my_function do
@@ -708,7 +708,7 @@ end
 MyModule.my_function()
 ```
 
-We can also access a variable in the top-level-scope now so long as we set a module attribute.
+We can also access a variable in the top-level scope as long as we set a module attribute.
 
 ```elixir
 top_level_variable = 1
@@ -723,9 +723,9 @@ end
 MyModule.my_function()
 ```
 
-Now we can easily share constant values between mutliple module functions.
+Now we can easily share constant values between multiple module functions.
 
-```elixir
+```Elixir
 defmodule Hero do
   @name "Batman"
   @nemesis "Joker"
@@ -742,9 +742,9 @@ end
 Hero.victory()
 ```
 
-If the module attribute value changes, you would only need to change the module attribute.
+If the module attribute value changes, you only need to change the module attribute.
 
-```elixir
+```Elixir
 defmodule Hero do
   @name "IronMan"
   @nemesis "Mandarin"
@@ -763,7 +763,7 @@ Hero.victory()
 
 ## Multiple Function Clauses
 
-Elixir allows us to define multiple functions with the same name, but that expect different parameters.
+Elixir allows us to define multiple functions with the same name but that expect different parameters.
 This means the function has multiple function clauses.
 For example, we can take our `hi` function and create a new version that says hi to two people.
 
@@ -782,7 +782,7 @@ Greeter.hi("Peter Parker", "Mary Jane")
 ```
 
 In the example above, each function has a different **arity**. You can treat each function with
-a different arity as a different function. In fact, we often refer to each function by their arity
+a different arity as a different function. We often refer to each function by its arity
 as function/arity.
 
 So the `Greeter` module has a  `hi/1` (hi one) function and `hi/2` (hi two) function.
@@ -807,7 +807,7 @@ care about the specific function that it's calling twice.
     A --- F[Specific Implementation]
 ```
 
-Running is a great real-world example of polymorphism. There are many different animals that run,
+Running is a great real-world example of polymorphism. Many different animals run,
 and they all run in different ways.
 
 ```mermaid
@@ -821,7 +821,7 @@ and they all run in different ways.
 
 ## Default Arguments
 
-You can provide default arguments to functions using the `//` syntax after the paramenter
+You can provide default arguments to functions using the `//` syntax after the parameter
  and then the default value.
 
 ```elixir
@@ -834,7 +834,7 @@ end
 Greeter.greet("Peter")
 ```
 
-Then if desired you can override the default value.
+Then if desired, you can override the default value.
 
 ```elixir
 defmodule Greeter do
@@ -874,9 +874,9 @@ Greeter.greet("HI")
 ## Guards
 
 It's often useful to validate that a module function is called with the correct arguments.
-Elixir provides `Guards` which allow you to validate the parameters.
+Elixir provides `Guards`, which allow you to validate the parameters.
 
-For example, let's say we have a `Multiplier` module which handles doubling numbers.
+For example, here's a `Multiplier` module that doubles numbers.
 
 ```elixir
 defmodule Multiplier do
@@ -888,8 +888,8 @@ end
 Multiplier.double(4)
 ```
 
-You'll notice, that we can pass in strings to the `Mutliplier.double/1` function and the program will error. 
-However, to an outside user that error is not very helpful.
+You'll notice that we can pass in strings to the `Mutliplier.double/1` function, and the program will error. 
+However, to an outside user, that error is not very helpful.
 
 ```elixir
 defmodule Multiplier do
@@ -937,14 +937,14 @@ end
 Multiplier.double("example")
 ```
 
-There are many guards available in Elixir. If you ever need a specific guard you can refer to the
+There are many guards available in Elixir. If you ever need a specific guard, you can refer to the
 [Guards](https://hexdocs.pm/elixir/1.13/Kernel.html#guards) documentation
 
 It's also useful to know that the order of function clauses does matter. So let's say you remove
 the `is_integer/1` guard. Now the first function expects any type of input, so it will always
 execute instead of the `is_bitstring/1` version.
 
-```elixir
+```Elixir
 defmodule Multiplier do
   def double(num) do
     num * 2
