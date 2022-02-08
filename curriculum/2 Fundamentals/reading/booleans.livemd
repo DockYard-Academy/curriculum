@@ -1,0 +1,125 @@
+# Booleans
+
+## Booleans
+
+Programming languages hide the internal details of how computers work. This allows us as
+developers to think at a high level. However, it's still useful to be aware of some of the inner workings.
+
+Under the hood, computers store electrical signals. You can think of this like powering a 
+lightbulb but on a much smaller scale. An electrical signal is either **on** or **off**, and by manipulating
+these electrical signals, we are able to create complex information and instruction.
+
+You may have seen movies or tv series that show coding as a bunch of `1`s and `0`s
+![](images/binary.jpg). A 0 represents a signal that's **off** and a `1` represents a signal
+that's **on**. These `0`s and `1`s are called **binary**.
+
+After we write our Elixir code, our instructions are then converted or **compiled** into binary.
+**binary** is the machine code that the computer actually understands.
+
+So, you might wonder how we go from `0`s and `1`s to creating rockets, websites, self-driving
+cars, smartphones, and 3D animations.
+
+Well let's take the first step with booleans. A boolean (BOO-LEE-AN). 
+is a `true` or a `false` value. Conceptually, this is a direct representation of
+`on` and `off` in your program.
+
+There are only two booleans.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+true
+false
+```
+
+## Boolean Operators
+
+**Boolean operators** are useful for comparing booleans.
+
+The boolean operators are `and`, `or`, and `not`.
+
+`and` allows you to check if two values are `true` and otherwise returns `false`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  A[true] --> C
+  B[true] --> C
+  C[and] --> D[true]
+```
+
+```Elixir
+true and true
+```
+
+```Elixir
+true and false
+```
+
+```Elixir
+false and true
+```
+
+```Elixir
+false and false
+```
+
+`or` checks if either value is `true` and returns `false` only if both values are `false`
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  true --> or
+  false --> or
+  or --> t[true]
+```
+
+```Elixir
+true or true
+```
+
+```Elixir
+true or false
+```
+
+```Elixir
+false or true
+```
+
+```Elixir
+false or false
+```
+
+`not` flips the value from `true` to `false` or from `false` to `true`.
+
+```mermaid
+flowchart LR
+false --> true
+t[true] --> f[false]
+```
+
+```Elixir
+not true
+```
+
+```Elixir
+not false
+```
+
+`not` can be used together with `and` and `or` in a sequence.
+
+```Elixir
+true and not false
+```
+
+```mermaid
+flowchart LR
+  1[true] --> 2[and]
+  3[not false] --> 4[true]
+  4 --> 2
+  2 --> 5[true]
+```
+
+<!-- livebook:{"break_markdown":true} -->

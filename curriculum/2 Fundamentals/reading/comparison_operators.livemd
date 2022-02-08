@@ -1,0 +1,140 @@
+## Comparison Operators
+
+Comparison operators allow us to compare values.
+
+Using comparison operators, we check if values are equal `===`, greater than `>`, less than `<`,
+greater than or equal `>=`, and less than or equal `<=`.
+
+Comparison operators can be used on any type of value but are most commonly used to compare
+integers and floats.
+
+The result of a comparison is a boolean, either `true` or `false`.
+
+For example, if we check that `5` is equal to `5`, we return `true`.
+
+```elixir
+5 === 5
+```
+
+Here are a few example comparisons and their results.
+
+```Elixir
+# TODO - Hide
+
+data = [
+  %{comparison: "5 === 5", result: true},
+  %{comparison: "5 === 4", result: false},
+  %{comparison: "5 > 4", result: true},
+  %{comparison: "4 > 5", result: false},
+  %{comparison: "5 < 4", result: false},
+  %{comparison: "4 < 5", result: true},
+  %{comparison: "5 >= 5", result: true},
+  %{comparison: "5 >= 4", result: true},
+  %{comparison: "4 >= 5", result: false},
+  %{comparison: "5 <= 5", result: true},
+  %{comparison: "4 <= 5", result: true},
+  %{comparison: "5 <= 4", result: false}
+]
+
+Kino.DataTable.new(data)
+```
+
+Comparison operators are not limited to comparing integers and floats. For example, they are often used to compare the equality of other data types.
+
+```elixir
+"hello" === "hello"
+```
+
+```elixir
+%{hello: "world"} === %{hello: "world"}
+```
+
+```elixir
+["hello", "world"] === ["hello", "world"]
+```
+
+### Comparing Strings
+
+When comparing strings, they compare based on alphabetical order. Letters earlier
+in the alphabet are evaluated as smaller than numbers later in the alphabet.
+
+```elixir
+"a" < "z"
+```
+
+Capital letters are always less than lowercase letters regardless of alphabetical order.
+
+```Elixir
+"Z" < "a"
+```
+
+### Remembering Greater Than and Less Than
+
+`>` greater than
+
+`<` less than
+
+To help remember which symbol `<` or `>` means greater than or less than, you might find it helpful 
+to remember that the statement is `true` if the larger number goes on the larger side.
+
+Some people find it helpful to visualize the statement as an alligator eating. And the alligator always wants
+the biggest meal.
+
+### Comparing Different Data Types
+
+You can compare different data types to each other in the following [Sorting Order](https://hexdocs.pm/elixir/master/operators.html#term-ordering).
+
+```elixir
+"" > 1
+```
+
+### Strictly Equals
+
+<!-- livebook:{"break_markdown":true} -->
+
+There are two operators for checking equality in Elixir. `===` will check if two values
+are strictly equal in both value and type. so despite having  the same numerical value, 
+`1` does not equal `1.0` because integers and floats are not the same types.
+
+```elixir
+1 === 1.0
+```
+
+However, if you only care about the numerical value and not the data type, you can use only 
+two equals signs instead of three `==`
+
+```elixir
+1.0 == 1
+```
+
+### Your turn
+
+In the Elixir cell below, check if `10` is less than (`<`) `5`
+
+```Elixir
+
+```
+
+In the Elixir cell below, check if `7` is greater than or equal to (`>=`) `7`
+
+```Elixir
+
+```
+
+In the form below, Enter the operator `==`, `===`, `>`, `<`, `>=`, or `<=` that would make the statement `true` if it replaced `<operator>`.
+
+```Elixir
+# TODO - Hide
+
+[
+  Kino.Input.text("8 <operator> 8"),
+  Kino.Input.text("8 <operator> 8.0"),
+  Kino.Input.text("7 <operator> 8"),
+  Kino.Input.text("8 <operator> 7"),
+  Kino.Input.text("8 <operator> 7 and 7 <operator> 7"),
+  Kino.Input.text("7 <operator> 8 and 7 <operator> 7")
+]
+|> Enum.map(&Kino.render/1)
+
+Kino.nothing()
+```

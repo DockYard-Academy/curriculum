@@ -1,0 +1,319 @@
+# Modules
+## Lesson
+As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions".
+
+Here's what an empty module looks like.
+
+```Elixir
+defmodule Hello do
+end
+```
+
+Again, don't worry about the somewhat strange-looking return value. 
+`{:module, Hello, <<70, 79, 82, 49, 0, 0, 4, ...>>, nil}` That's how Elixir represents 
+modules internally.
+
+Let's break down what this all means.
+
+1. `defmodule` a keyword that means "define module".
+2. `Greeter` is the name of this module. It can be any valid name, and is usually **CapitalCase**.
+   you'll often heard the name of the module refered to as the **namespace** that functions are organized under.
+3. `do` a keyword that separates the module name and it's internal implementation.
+4. `end` a keyword that finishes the module definition.
+
+Modules define functions inside of them. Each function has a name, so they are called **named functions**.
+You can define functions inside a module using the following syntax.
+
+```Elixir
+defmodule Greeter do
+  def hello do
+    "hello world"
+  end
+end
+```
+
+Let's break down the named function above.
+
+1. `def` this means "define function"
+2. `do` a keyword that separates the function head and the function body.
+3. `"hello world"` this is the function body. This function returns the string "hello world"
+4. `end` is a keyword that ends the function definition.
+
+### Calling a Named Function
+
+To call a function inside a module, you use `Module.function(args)` syntax.
+
+```Elixir
+Greeter.hello()
+```
+
+### Named Functions with parameters
+
+You can create multiple functions in a module.
+
+Here's a new `hi/1` function that says hi to a person.
+
+```Elixir
+defmodule Greeter do
+  def hello do
+    "hello world"
+  end
+
+  def hi(name) do
+    "hi #{name}"
+  end
+end
+```
+
+You call the named function in the module by passing it an argument.
+
+```Elixir
+Greeter.hi("Brooklin")
+```
+
+## Internal Module Functions
+
+A module can use its own functions.
+
+```Elixir
+defmodule InspectorGadget do
+  def gogo(gadget) do
+    "Go go gadget #{gadget}!"
+  end
+
+  def necktie do
+    InspectorGadget.gogo("Necktie")
+  end
+end
+
+InspectorGadget.necktie()
+```
+
+However, you can omit the module name. notice `gogo` instead of `InspectorGadget.gogo`
+
+```Elixir
+defmodule InspectorGadget do
+  def gogo(gadget) do
+    "Go go gadget #{gadget}!"
+  end
+
+  def necktie do
+    gogo("Necktie")
+  end
+end
+
+InspectorGadget.necktie()
+```
+
+## Private Functions
+
+Modules can access other module functions.
+
+```Elixir
+defmodule Speaker do
+  def speak() do
+    "hi there"
+  end
+end
+
+defmodule Listener do
+  def listen() do
+    "I heard you say: " <> Speaker.speak()
+  end
+end
+
+Listener.listen()
+```
+
+However, sometimes a module must keep a function private for internal use only. Why?
+It may be for security reasons or because you don't think it's unnecessary to expose the function to the outside world. 
+Often it communicates to other developers how to use your module.
+
+You can create a private module function with `defp` instead of `def`. You'll notice that below the 
+`Speaker.think/0` function is undefined to the outside world.
+
+```Elixir
+defmodule Speaker do
+  defp think() do
+    "hi there"
+  end
+end
+
+Speaker.think()
+```
+
+We use private functions internally in the module, which means that public functions could expose their values.
+
+```Elixir
+defmodule Speaker do
+  defp think() do
+    "hi there"
+  end
+
+  def speak() do
+    think()
+  end
+end
+
+Speaker.speak()
+```
+
+## Module Attributes
+
+What if you have many functions in a module that all use the same value? You've already learned
+that repeating the same hard-coded value over and over again isn't very reusable, and you've
+used variables to pass the same value around in your code. However, that's not possible in a module.
+
+Modules and functions in a module close themselves to the outside world. We call this `scope`.
+Modules, functions, and many other similar constructs in Elixir are `lexically scoped.
+
+That means that variables defined in one scope cannot be accessed in another scope.
+
+```mermaid
+  flowchart
+    subgraph Top Level Scope
+      A[top level variable]
+      subgraph Module Scope
+        B[module variable]
+        subgraph Function Scope
+          C[function variable]
+        end
+      end
+    end
+```
+
+Notice how the following example has an error because we cannot access the variable 
+`top_level_scope`
+
+```elixir
+top_level_scope = 1
+
+defmodule MyModule do
+  def my_function do
+    top_level_scope
+  end
+end
+```
+
+The same is true for the module scope.
+
+```elixir
+defmodule MyModule do
+  module_scope = 2
+
+  def my_function do
+    module_scope
+  end
+end
+```
+
+To get around this, Elixir allows you to store constant values as module attributes 
+using the `@module_attribute value` syntax. You can then access the `@module_attribue` value in 
+any module function.
+
+```mermaid
+flowchart
+  direction TB
+  subgraph A[Top Level Scope]
+    a[Top Level Variable] --- b
+    direction TB
+    subgraph B[Module Level Scope]
+      b[Define Module Attribute] --- c
+      subgraph C[Function Level Scope]
+        c[Access Module Attribute]
+      end
+    end
+  end
+```
+
+Notice that we can use a module attribute inside of the module's function now.
+
+```Elixir
+defmodule MyModule do
+  @my_attribute "any valid data type"
+  def my_function do
+    @my_attribute
+  end
+end
+
+MyModule.my_function()
+```
+
+We can also access a variable in the top-level scope as long as we set a module attribute.
+
+```elixir
+top_level_variable = 1
+
+defmodule MyModule do
+  @my_attribute top_level_variable
+  def my_function do
+    @my_attribute
+  end
+end
+
+MyModule.my_function()
+```
+
+Now we can easily share constant values between multiple module functions.
+
+```Elixir
+defmodule Hero do
+  @name "Batman"
+  @nemesis "Joker"
+
+  def catchphrase do
+    "I am #{@name}."
+  end
+
+  def victory do
+    "I #{@name} will defeat you #{@nemesis}!"
+  end
+end
+
+Hero.victory()
+```
+
+If the module attribute value changes, you only need to change the module attribute.
+
+```Elixir
+defmodule Hero do
+  @name "IronMan"
+  @nemesis "Mandarin"
+
+  def catchphrase do
+    "I am #{@name}."
+  end
+
+  def victory do
+    "I #{@name} will defeat you #{@nemesis}!"
+  end
+end
+
+Hero.victory()
+```
+
+## Multiple Function Clauses
+
+Elixir allows us to define multiple functions with the same name but that expect different parameters.
+This means the function has multiple function clauses.
+For example, we can take our `hi` function and create a new version that says hi to two people.
+
+```elixir
+defmodule Greeter do
+  def hi(name1, name2) do
+    "hi #{name1}, hi #{name2}"
+  end
+
+  def hi(name) do
+    "hi #{name}"
+  end
+end
+
+Greeter.hi("Peter Parker", "Mary Jane")
+```
+
+In the example above, each function has a different **arity**. You can treat each function with
+a different arity as a different function. We often refer to each function by its arity
+as function/arity.
+
+So the `Greeter` module has a  `hi/1` (hi one) function and `hi/2` (hi two) function.

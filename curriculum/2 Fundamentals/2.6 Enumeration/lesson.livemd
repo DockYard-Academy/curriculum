@@ -64,13 +64,21 @@ have enterprise customers who buy thousands of items! This simply doesn't
 scale.
 
 To handle scenarios where we need to repeat an action over and over
-again, we can use **enumeration**. This is sometimes called **looping** or 
-**iteration**
+again, we can use **enumeration**. Enumeration is the act of looping through a collection and reading
+it's elements for the sake of returning some output.
 
 ```mermaid
 flowchart LR
   Input ---> Enumeration --> Function --> Enumeration
   Enumeration --> Output
+```
+
+With enumeration, we can `calculate_tax/1` on any number of items with a single line.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Enum.map(list, fn item -> calculate_tax(item) end)
 ```
 
 This lesson will cover tools and techniques to accomplish enumeration.
@@ -81,8 +89,6 @@ In total we will cover:
 * Using `for` **Comprehensions**
 * Using **Recursion** to create functions that call themselves.
 
-### Enumerables
-
 First, it's useful to know what we can enumerate on. In Elixir, certain
 data types are **enumerable** which means that we have the ability
 to enumerate through them and apply some function on each element.
@@ -91,7 +97,7 @@ These structures are called **Collections** because they contain a collection of
 elements. You are already familiar with them. They are **lists**, **tuples**, **keyword lists**, **ranges**, 
 and **maps**.
 
-### Enumeration With Non-Enumerables
+## Enumeration With Non-Enumerables
 
 Data types that do not contain multiple elements are not enumerable.
 However, it's still sometimes useful to enumerate over non-enumerable data types.
@@ -102,8 +108,8 @@ non-enumerable data into an enumerable data type.
 Strings are not enumerable, however they can be converted into lists with either `String.graphemes/1`
 or `String.codepoints/1`.
 
-Remember that the under the hood, strings are represented with a codepoint.
-each character such as `"a"` has a corresponding codepoint. That's why the
+Under the hood, strings are represented with a codepoint. A codepoint is an integer that represents
+the character. Each character such as `"a"` has a corresponding codepoint. That's why the
 function is called `String.codepoints/1`.
 
 ```elixir
@@ -112,10 +118,10 @@ String.codepoints("abcdefghijklmnopqrstuvwxyz")
 
 But what is a **grapheme**? Well some characters like é require multiple code points to represent.
 
-You'll notice that é is actually 2 characters if you use `String.codepoints/1`
+You'll notice that é is actually 2 characters if you use `String.codepoints/1`.
 
 ```elixir
-String.codepoints("é")
+String.codepoints("é")
 ```
 
 So, if you want to split a string that contains characters like é, you'll want to use `String.graphemes/1`
@@ -124,7 +130,7 @@ So, if you want to split a string that contains characters like é, you'll want 
 String.graphemes("é")
 ```
 
-Now you're string is an enumerable list!
+Now your string is an enumerable list of characters.
 
 ### Your Turn
 
@@ -140,7 +146,7 @@ How would you convert integers into an Enumerable?
 You can use the `Integer.digits/1` function.
 
 ```elixir
-Integer.digits(1, 2, 3)
+Integer.digits(123)
 ```
 
 ### Your Turn
@@ -150,6 +156,23 @@ In the Elixir cell below, convert the integer `4389` into a list of digits.
 ```elixir
 
 ```
+
+### Tuples
+
+Despite being so similar to lists, tuples are not considered collections. 
+That's primarily because they are intended as fixed-sized containers, and any case that requires
+enumeration would likely be better served with lists.
+
+To get around this if needed, you can convert a tuple to a list with `Tuple.to_list/1`. 
+Now you have a list that you can work with as a collection if necessary. However, if you find
+yourself doing this often, it may have been a better
+choice to start with a list instead of a tuple.
+
+```elixir
+Tuple.to_list({1, 2, 3})
+```
+
+## Breaking Down Problems
 
 ### Breaking Down Problems As Input And Output
 
@@ -168,7 +191,7 @@ keys are the name of the integer, and the values are the integer.
 You could model that problem with input an output.
 
 ```mermaid
-flowchart
+flowchart LR
   12 --> Input
   Input --> B[Black Box]
   B --> Output
@@ -179,7 +202,7 @@ Then you could break that problem down further into a series of
 transformations.
 
 ```mermaid
-flowchart
+flowchart LR
   12 --> A["[1, 2]"]
   A --> B[[one: 1, two: 2]]
 ```
@@ -193,6 +216,7 @@ an easier problem that will build your knowledge for how to solve the harder pro
 For example, could you make a function that takes in an integer and returns it's atom?
 
 ### Your turn
+
 In the Elixir cell below, create a function `to_atom_name/1` that accepts a single digit from 1-9 for it's
 parameter. Return the correct atom, `:one`, `:two`, `:three`, etc.
 
@@ -207,33 +231,57 @@ Then you can use map[key] syntax to get the correct atom.
 ```
 
 ## Enum
+
 In order to convert `[1, 2]` Into `[one: 1, two: 2]` you'll need to use enumeration.
 Elixir provides the `Enum` module for enumeration related functionality.
 
 The [Enum](https://hexdocs.pm/elixir/1.13.2/Enum.html)
 module provides many helpful functions. The most important for you to learn now are.
-- `Enum.map/2` enumerate over every element and create a new collection with a new value.
-- `Enum.reduce/2` and `Enum.reduce/3`. Enumerate over every element into an accumulated value.
-- `Enum.filter/2` filter out elements from a collection.
-- `Enum.all?/2` check if all elements in a collection match some condition.
-` `Enum.any?` check if any elements in a collection match some condition.
-- `Enum.count/1` return the number of elements in a collection collection.
-- `Enum.find/3` return an element in a collection that matches some condition.
+
+* `Enum.map/2` enumerate over every element and create a new collection with a new value.
+* `Enum.reduce/2` and `Enum.reduce/3`. Enumerate over every element into an accumulated value.
+* `Enum.filter/2` filter out elements from a collection.
+* `Enum.all?/2` check if all elements in a collection match some condition.
+* `Enum.any?` check if any elements in a collection match some condition.
+* `Enum.count/1` return the number of elements in a collection collection.
+* `Enum.find/3` return an element in a collection that matches some condition.
 
 The `Enum` module has a ton more functionality. Whenever you think to yourself
 "How can I ____ in a collection" you should see if the `Enum` module has a built-in solution.
 It's not realistic to learn it all upfront. Instead you'll learn functions over time
 whenever you run into a problem that requires `Enum` as a solution.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Enum.map
+
 `Enum.map/2` allows you to enumerate through the collection you provide it as it's first argument.
 It then calls a function that you provide it as it's second argument on each element.
-It then returns a new list with the modified values.
+It then returns a new collection with the modified values.
+
+```mermaid
+flowchart LR
+  A[Collection] --> E[Enum.map]
+  E --> Function
+  Function --> E
+  E --> B[New Collection]  
+```
 
 Here's an example that doubles all the integers in a list.
 
 ```elixir
 Enum.map([1, 2, 3, 4], fn integer -> integer * 2 end)
 ```
+
+```mermaid
+flowchart LR
+  A["[1, 2, 3, 4]"] --> E[Enum.map]
+  E --> F["fn integer -> integer * 2 end"]
+  F --> E
+  E --> B["[2, 4, 6, 8]"]
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 It's useful to be aware that you can use ranges with enumerables to easily enumerate over large
 ranges without needing to define every element in the list.
@@ -243,6 +291,7 @@ Enum.map(1..100, fn integer -> integer * 2 end)
 ```
 
 ### Your Turn
+
 Back to our example above, how would you use `Enum.map/2` to convert [1, 2] into
 a keyword list? Remember that keyword lists are actually lists of tuples.
 
@@ -259,6 +308,294 @@ Bonus: In the Elixir cell below, instead of using the generic `:number` atom key
 
 ```
 
-### Mutation
+### Enum.reduce
 
-### Enum.map
+<!-- livebook:{"break_markdown":true} -->
+
+`Enum.reduce/2` allows you to enumerator over a collection, except you have more flexibility over
+the output.
+
+You can build up a value using an accumulator, and then return a final value.
+
+```mermaid
+flowchart LR
+  A[Collection] --> E[Enum.reduce]
+  E -- Accumulator --> Function
+  Function -- Accumulator --> E
+  E --> B[Output]  
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Notice that the **Output** could be any data type, not just a collection. For example, you could
+use this to take in a list of numbers and sum all of the numbers together.
+
+```elixir
+list = [1, 2, 3, 4]
+
+Enum.reduce(list, fn integer, accumulator -> integer + accumulator end)
+```
+
+By default, the first value in the collection will be the initial accumulator value.
+The function that you pass in as the second argument will then be called on every element after
+the first. Here's what that looks like step by step in this animation:
+
+````elixir
+# Todo - Hide
+
+sequence = [
+  "
+First, we define the call the `Enum.reduce/2` function with a list, and a function.
+```elixir
+Enum.reduce([1, 2, 3, 4], fn integer, accumulator -> integer + accumulator  end)
+```
+",
+  "
+The first element in the list `1` is the initial accumulator value.
+```elixir
+Enum.reduce([2, 3, 4], fn integer, 1 -> integer + 1  end)
+```
+",
+  "
+The function is called on the next element `2`. The next accumulator is 2 + 1
+```elixir
+Enum.reduce([3, 4], fn 2, 1 -> 2 + 1  end)
+```
+",
+  "
+The function is called on the next element `3`. The next accumulator is 3 + 3
+```elixir
+Enum.reduce([4], fn 3, 3 -> 3 + 3  end)
+```
+",
+  "
+The function is called on the next element `4`. The next accumulator is 4 + 6
+```elixir
+Enum.reduce([], fn 4, 6 -> 4 + 6  end)
+```
+",
+  "
+```elixir
+4 + 6 equals 10.
+Enum.reduce([], fn 4, 6 -> 10  end)
+```
+",
+  "
+`10` is the last accumulator value, so `Enum.reduce/2` returns `10`.
+```elixir
+                           10
+```
+"
+]
+
+Kino.animate(8000, 0, fn i ->
+  md = Enum.at(sequence, i) |> Kino.Markdown.new()
+  {:cont, md, rem(i + 1, length(sequence))}
+end)
+````
+
+### Enum.reduce/3
+
+You can also override the default accumulator with `Enum.reduce/3`. `Enum.reduce/3` takes three 
+arguments. The first is the collection, the second is the default accumulator, and the third
+is the function to call with each element and the accumulator.
+
+Enum.reduce/3 will call the function on every element, rather than setting the initial accumulator
+as the first element.
+
+```elixir
+Enum.reduce([1, 2, 3], 10, fn integer, accumulator -> integer + accumulator end)
+```
+
+````elixir
+sequence = [
+  "
+First, we define the call the `Enum.reduce/3` function with a list, and a function.
+```elixir
+Enum.reduce([1,2,3], 10, fn integer, accumulator -> integer + accumulator end)
+```
+",
+  "
+The second argument `10` is the initial accumulator value.
+```elixir
+Enum.reduce([1,2,3], 10, fn integer, 10 -> integer + 10 end)
+```
+",
+  "
+The function is called on the first element `1`. The next accumulator is 10 + 1.
+```elixir
+Enum.reduce([2,3], 10, fn 1, 10 -> 1 + 10 end)
+```
+",
+  "
+The function is called on the next element `2`. The next accumulator is 11 + 2.
+```elixir
+Enum.reduce([3], 10, fn 2, 11 -> 2 + 10 end)
+```
+",
+  "
+The function is called on the next element `3`. The next accumulator is 13 + 3
+```elixir
+Enum.reduce([], 10, fn 3, 13 -> 3 + 13 end)
+```
+",
+  "
+`3` + `13` equals `16`.
+```elixir
+Enum.reduce([], 10, fn 3, 13 -> 16 end)
+```
+",
+  "
+`16` is the last accumulator value, so `Enum.reduce/3` returns `16`.
+```elixir
+                                16
+```
+"
+]
+
+Kino.animate(8000, 0, fn i ->
+  md = Enum.at(sequence, i) |> Kino.Markdown.new()
+  {:cont, md, rem(i + 1, length(sequence))}
+end)
+````
+
+## Enum.filter
+
+The `Enum.filter/2` function allows us to filter elements in a collection. `Enum.filter/2` takes in two
+arguments. The first is a collection, and the second is a function to call on each element
+in the collection. If the function returns `false` then the element is filtered out.
+
+```mermaid
+flowchart LR
+  C[Collection] --> E[Enum.filter]
+  E --> F[Function]
+  F -- boolean --> E
+  F --> true --> A[Keep]
+  F --> false --> B[Remove]
+  E --> O[Filtered Collection]
+```
+
+```elixir
+Enum.filter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], fn integer -> integer <= 5 end)
+```
+
+### Enum.all?/2
+
+Enum.all?/2 takes in a collection and a function. `Enum.all?/2` calls the function on every element
+in the collection. If any element returns `false` then `Enum.all?/2` returns false. Otherwise,
+`Enum.all/2` returns `true`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+Collection --> E[Enum.all?]
+E --> Function
+Function -- boolean --> E
+E --> Boolean
+```
+
+```elixir
+Enum.all?([1, 2, 3], fn integer -> integer < 5 end)
+```
+
+```elixir
+Enum.all?([1, 2, 10], fn integer -> integer < 5 end)
+```
+
+### Enum.any?/2
+
+`Enum.any?/2` Is much like `Enum.all/2` except it checks if any element in the collection
+returns `true` when called with the passed in function.
+
+```elixir
+Enum.any?([1, 2, 3], fn integer -> integer === 1 end)
+```
+
+```elixir
+Enum.any?([2, 2, 3], fn integer -> integer === 1 end)
+```
+
+### Enum.count/1
+
+Enum.count returns the number of items in a collection.
+
+```mermaid
+flowchart LR
+  Collection --> Enum.count --> Integer
+```
+
+```elixir
+Enum.count([1, 2, 3])
+```
+
+### Enum.find/2
+
+`Enum.find/2` takes in a collection and a function. `Enum.find/2` then searches the collection
+and returns the first element that returns true when called as the argument to the passed in function.
+
+```elixir
+Enum.find(["hello", 2, 10], fn each -> is_integer(each) end)
+```
+
+If no element is found, `Enum.find/2` returns `nil`.
+
+```elixir
+Enum.find(["h", "e", "l", "l", "o"], fn each -> is_integer(each) end)
+```
+
+## Enum on Other Collections
+
+`lists` are only one of many collection types.
+
+### Keyword Lists
+
+Remember that keyword lists are simply lists of tuples.
+
+```elixir
+[{:one, 1}, {:two, 2}]
+```
+
+So whenever an `Enum` module function uses an element inside of the collection, it's a tuple.
+
+```elixir
+Enum.reduce([one: 1], fn tuple, _accumulator -> tuple end)
+```
+
+You can use pattern matching inside of the function.
+
+```elixir
+Enum.map([one: 1], fn {_key, value} -> value end)
+```
+
+### Maps
+
+Internally, maps are also treated as tuples in a collection.
+
+```elixir
+Enum.reduce(%{key: "value"}, fn tuple, _accumulator -> tuple end)
+```
+
+Which means you can also use pattern matching on the elements in a map.
+
+```elixir
+Enum.map(%{key: "value"}, fn {_key, value} -> value end)
+```
+
+Map keys can still be any type in the tuple.
+
+```elixir
+Enum.map(%{%{} => "value"}, fn {key, _value} -> key end)
+```
+
+## Further Reading.
+
+### Enum
+
+The Enum module has many more functions. You'll have the opportunity to encounter more
+as you need them to solve future challenges.
+
+For more information, you may also wish to read:
+
+* [The Enum Documentation](https://hexdocs.pm/elixir/1.13/Enum.html)
+* [Elixir Schools Enum](https://elixirschool.com/en/lessons/basics/enum)

@@ -1,0 +1,135 @@
+# Maps
+
+Maps are another type of associative data structure. In fact maps are the common go-to for a key-value
+data structure. You can create a map using `%{}`. Similar to keyword lists they can have atoms as keys and then any value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{key: "value"}
+```
+
+However, unlike keyword lists, keys must be unique; otherwise they will be overwritten.
+Elixir is very helpful and provides a warning to let us know we're overriding a duplicate key.
+
+```elixir
+%{duplicate_key: "value1", duplicate_key: "value2"}
+```
+
+Unlike keyword lists, maps do not guarantee key order, which is why you'll notice the returned value of the map below
+does not have the same order as the map created.
+
+```elixir
+%{one: "one", two: "two", three: "three"}
+```
+
+Keyword lists suffer from the same problems as lists if you want to access an element in the middle
+of the list, where as maps are designed to access elements quickly. You'll learn more about how to
+access elements in a map in a future lesson.
+
+Unlike keyword lists, maps can have any values as the key. Commonly you will see atom-key maps
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{atom_key: "value"}
+```
+
+And also string-key maps.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{"string key" => "value"}
+```
+
+However, the key to a map could be anything! even another map! You will need to use the `=>` symbol
+though, not a colon `:`. `=>` is an equals sign `=` and a greater than symbol `>`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{[1,2,3] => "value"}
+%{%{example: "my_example"} => "value"}
+%{1 => "value"}
+```
+
+### Your Turn
+
+Since this is the last exercise in the lesson, let's say `:goodbye` `"world"` and call it a day!
+
+In the Elixir cell below, create a map with the key `:goodbye` and the value `"world"`.
+
+```elixir
+
+```
+
+## Maps
+
+Unlike the other data types, there aren't specific Map operators. To manipulate maps we
+use a different tool called the **Map** module, which you will learn more about in a future lesson.
+
+For now, it's enough to know that you can access values in an atom-key map using a few different methods.
+
+You can use dot **map.key** notation like so.
+
+```elixir
+map = %{example_key: "value"}
+
+map.example_key
+```
+
+With **map.key** notation, your program will throw an error if your map doesn't have the expected value.
+
+```elixir
+map = %{example_key: "value"}
+map.non_existing_key
+```
+
+You can also use **map[key]** syntax to access values in a map.
+
+```elixir
+map = %{"test" => "value"}
+map["test"]
+```
+
+```elixir
+map = %{1 => "value"}
+map[1]
+```
+
+```elixir
+map = %{%{} => "value"}
+map[%{}]
+```
+
+Unlike **map.key** notation, **map[key]** syntax will return `nil` rather 
+than throwing an error if the key is not defined.
+
+```elixir
+map = %{}
+map["non_existing_key"]
+```
+
+### Your Turn
+
+In the Elixir cell below, retrieve the value of `:example` using both **map[key]** and **map.key** notation.
+
+```elixir
+%{example: "value"}
+```
+
+Create a map `%{hello: "world"}` and assign it to a variable `map`. Use **map.key** notation
+to access the `:hello` key. The cell should output `"world"`
+
+```Elixir
+
+```
+
+Create a map `%{"one" =>  1}` and assign it to a variable `map`. Use **map[key]** syntax to access
+the key `"one"`. It should return `1`.
+
+```Elixir
+
+```
+

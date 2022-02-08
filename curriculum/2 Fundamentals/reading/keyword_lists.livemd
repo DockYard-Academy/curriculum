@@ -1,0 +1,95 @@
+# Keyword Lists
+
+Keyword lists are lists with keys. Each key associates with a value.
+
+```mermaid
+flowchart
+  key1: --> Value1
+  key2: --> Value2
+  key3: --> Value3
+```
+
+Keyword lists belong to a family of data types known as **associative data structures**.
+you'll also often hear it referred to as a **key-value data structure**.
+
+In Elixir, the key is an atom, and the value can be any data structure, even another keyword list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[key: "value"]
+[atom: "anything!"]
+["You can use quotes for the atom key!": ""]
+[snake_case_is_convention: ""]
+[ButThatIsNotEnforced: ""]
+```
+
+Keys in a keyword list do not have to be unique.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[my_key: "value", my_key: "value"]
+```
+
+Elixir allows you to work with keyword lists in this nice `[key: "value"]` syntax. However,
+keyword lists are actually just a list of tuples where the first element is an atom.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[{:key, "value"}]
+```
+
+In the Elixir cell below, you can see how Elixir converts lists of tuples matching the `{:atom, value}` syntax
+into a keyword list.
+
+```elixir
+[{:key, "value"}, {:key, "value"}]
+```
+
+If you break the convention in the keyword list, Elixir reverts to displaying
+the keyword list as a list of tuples.
+
+```elixir
+[{}, key: "value"]
+```
+
+List order is guaranteed, so the same is true for keyword lists.
+
+### Your Turn
+
+In the Elixir cell below, create a keyword list of your favourite super hero. Include their `:name` and `:secret_identity`.
+
+```elixir
+
+```
+
+## Keyword List Operators
+
+You can also use `--` and `++` with keyword lists.
+
+```elixir
+[one: 1, two: 2] -- [one: 1]
+```
+
+If you add a list to a keyword list, you'll notice that the keyword list element will
+evaluate as a tuple again. Remember that keyword lists are simply lists of tuples with an atom and a value.
+
+```elixir
+[one: 1] ++ [1]
+```
+
+### Your Turn
+
+In the Elixir cell below, add `[1, 2, 3]` and `[4, 5, 6]` together to make `[1, 2, 3, 4, 5, 6].`
+
+```Elixir
+
+```
+
+In the Elixir cell below, remove `[1]` from `[1, 1, 2, 3]` to make `[1, 2, 3]`
+
+```Elixir
+
+```

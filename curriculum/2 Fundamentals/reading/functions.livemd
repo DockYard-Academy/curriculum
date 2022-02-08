@@ -1,0 +1,322 @@
+# Functions
+
+Elixir is a Functional programming language. So you can imagine that Functions must be important. But what is a function?
+
+### Input and Output (IO)
+
+A function is a set of repeatable instructions. A function accepts some **input**, and returns
+some **output**.
+
+```mermaid
+  flowchart LR
+    Input --> Output
+```
+
+### Black Box
+
+How the function converts some input to some output is often referred to as a **black box**.
+It's a black box because you don't need to know (or can't know) the details of how it works.
+
+```mermaid
+  flowchart LR
+    Input --> B[Black Box]
+    B --> Output
+```
+
+### Creating a Function
+
+Let's create a function called `double` which will take in a number and
+double its value.
+
+```mermaid
+flowchart LR
+  A[Input `2`] --> B[BlackBox `double`]
+  B --> C[Output `4`]
+```
+
+Now, let's create our first function. At first, it's going to do nothing.
+A function must have an output. We can return `nil` for now.
+
+```elixir
+double = fn -> nil end
+```
+
+You may see some weird-looking output like `#Function<45.65746770/0 in :erl_eval.expr/5>`.
+Don't worry too much about that. It's how Elixir represents a function internally.
+
+### Parts of a Function
+
+Let's break down what we did above.
+
+1. `double` is a variable name. Often you'll refer to it as the **function name**. 
+   It can be any valid variable name.
+
+2. We assign `double` to an **anonymous function**.
+   The anonymous function is everything from the `fn` to the `end`.
+
+   ```mermaid
+   flowchart LR
+    A[function name] --> B[=]
+    B --> C[anonymous function]
+   ```
+
+3. Elixir uses the `fn` keyword to define a function.
+
+4. The next value `->` separates the **function head** and the **function body**.
+
+5. The **function head** describes the input of the function. In this example, it's empty.
+
+6. The **function body** contains the function's implementation or **black box** . In this example, it returns `nil`.
+
+7. Elixir uses the `end` keyword to stop creating a function.
+
+<!--  -->
+
+```mermaid
+flowchart LR
+   direction LR
+   a[function name] --> B
+   b[function head] --> A
+   b[function head] --> B
+   c[function body] --> C
+   subgraph a[Breaking Down A Function]
+      direction LR
+      A[fn] ---- B
+      B[->] --- C
+      C[nil] --- D
+      D[end]
+   end
+```
+
+### Calling a Function
+
+Our `double` function doesn't do much at this point, but let's see the **output** that it returns.
+
+We use the `.()` syntax in Elixir to get the function's output. We often say we are **executing** or **calling** a function.
+
+```elixir
+double.()
+```
+
+`double` should return `nil` because that's all we've told it to do so far. However, we want
+it to multiply a number by `2`.
+
+To do that, we need to make the function accept some input. To do this,
+we define a **parameter** in the function like so.
+
+```elixir
+double = fn parameter -> nil end
+```
+
+You'll notice a warning above. That's because Elixir is smart and lets us know that we've
+created a parameter, but we're not using it. In Elixir, if you want to have an unused variable
+without warning, you can mark it with an underscore `_`
+
+```elixir
+double = fn _parameter -> nil end
+```
+
+No more warning 😀 But we actually want to use that parameter, so let's 
+modify the function to return the parameter instead.
+
+```elixir
+double = fn parameter -> parameter end
+```
+
+The parameter is named parameter here for the sake of example. But it works a lot like a variable, and it can be named anything.
+Let's rename it to `number` to clarify what we expect the input to the function to be.
+
+```elixir
+double = fn number -> number end
+```
+
+Now the function head takes in a value. We have to pass it
+an **argument**when we call it. The argument will be assigned to the parameter when the function 
+executes. We'll give it the integer `2`.
+
+```elixir
+double.(2)
+```
+
+Under the hood, when the function runs, the parameter is assigned the argument's value.
+
+Step by step, that would look like this.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+double = fn number -> number end
+double.(2)
+fn 2 -> 2 end
+2
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Notice that if you try to call the function without an argument, it fails because
+it expects an argument. Not all languages do that, but Elixir is pretty smart 😎
+
+```Elixir
+is_even.()
+```
+
+Great, now all that's left is to multiply the parameter by `2`. You should be familiar with 
+this from the previous sections.
+
+```elixir
+double = fn number -> number * 2 end
+```
+
+And you can use it to double any number.
+
+```elixir
+double.(10)
+```
+
+```elixir
+double.(11)
+```
+
+```elixir
+double.(10 ** 2 - 1)
+```
+
+### Implied Return Values
+
+Some languages require explicit return values.
+
+However, in Elixir the output of a function is always the last line. 
+
+For example, notice that the return value below is `first` + `second`, which equals `3`.
+
+```elixir
+multiline_function = fn ->
+  first = 1
+  second = 2
+  first + second
+end
+
+multiline_function.()
+```
+
+## Multi-Parameter Functions
+
+Functions can accept multiple inputs. Separate parameters with commas `,` to create a multi-parameter function.
+
+Let's say you're creating a function `calculate_force`, which will take in `mass` and
+`acceleration`. (remember that force = mass * acceleration)
+
+Let's start with the `double` function and see how we could convert it into a `calculate_force` function.
+
+```elixir
+double = fn number -> number * 2 end
+```
+
+First, let's rename `double` to `calculate_force` and rename `number` to `mass`. That gets us
+most of the way there!
+
+```elixir
+calculate_force = fn mass -> mass * 2 end
+```
+
+Technically, we've got a function that calculates the force of an object with a given mass and
+an acceleration of 2.
+
+However, we want it to be truly reusable, so we need to figure out how to replace 2 with another
+parameter. You can declare a function that accepts multiple parameters by separating them with a 
+comma `,` as you do in a list or tuple.
+
+```elixir
+calculate_force = fn mass, acceleration -> mass * acceleration end
+```
+
+That should be working! Now you can call the function by passing in two arguments the same way.
+
+```Elixir
+calculate_force.(10, 2)
+```
+
+Keep in mind that the first argument will be the value of the first parameter, and the second argument
+will be the value of the second parameter. You can repeat this with as many parameters as you want!
+
+```elixir
+example = fn a, b, c, d, e -> [a, b, c, d, e] end
+
+example.(1, 2, 3, 4, 5)
+```
+
+But usually, you want to avoid having too many parameters because it makes your function hard
+to understand.
+
+A parameter can be assigned to any valid data type, so you could instead use associative data
+a structure like a map or keyword list.
+
+```elixir
+is_even = nil
+```
+
+## Shorthand Syntax
+
+Anonymous functions can be defined using a shorthand syntax. It is only an alternative and shorter
+version to define a function. You will sometimes see shorthand syntax, so it's helpful to understand it.
+However, it should not be over-used. Otherwise, your program may be less clear.
+
+You can still assign the anonymous function to a variable with the shorthand syntax.
+However, you define the function with `&()` and put the function body between the brackets.
+
+Here's the same `double` function using short-hand syntax.
+
+```elixir
+double = &(&1 * 2)
+double.(5)
+```
+
+`&1` means the first parameter. If the function had more parameters, you could access them with `&2`, `&3`, and so on.
+
+```elixir
+add_two = &(&1 + &2)
+add_two.(2, 3)
+```
+
+### Function Arity
+
+The number of parameters your function accepts is called the `arity` of the function.
+
+A function with no parameters has an arity of zero. A function with one parameter has
+an arity of one, and so on.
+
+You refer to the function as `function_name/arity` thus a function named `add_two` with two parameters
+is called `add_two/2`.
+
+## First-class Functions
+
+Functions in Elixir are [first-class citizens](https://en.wikipedia.org/wiki/First-class_citizen).
+
+For our purposes, this means we can assign functions to variables, store them in other data types, pass them as arguments to other functions.
+
+If a function takes in another function as a parameter, it's called a **higher-order function**.
+
+For example, we could make a function named `call_twice`, which calls a function on a value twice.
+
+```elixir
+call_twice = fn function, parameter -> function.(function.(parameter)) end
+```
+
+We'll use our `double` function and create a quadruple result.
+
+```elixir
+double = fn number -> number * 2 end
+
+call_twice.(double, 3)
+```
+
+We don't need to assign the passed function to a variable first. We can pass 
+in the anonymous function directly.
+
+```elixir
+call_twice.(fn number -> number * 2 end, 5)
+```
+
+Whenever you pass a function into a higher-order function with the 
+expectation that the higher-order function is going to call it, the passed function is
+referred to as a **callback function**.
