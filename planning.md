@@ -40,3 +40,4 @@ Keyword Lists
 Ranges
 - Reading: Ranges
 - Exercise: Freelancer Rate Tracking
+- * [ASCII Art](exercises/ascii_art.livemd)
