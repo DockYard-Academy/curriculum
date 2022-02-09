@@ -4,7 +4,7 @@ As you create more and more functions, it becomes necessary to organize them. Th
 
 Here's what an empty module looks like.
 
-```Elixir
+```elixir
 defmodule Hello do
 end
 ```
@@ -24,7 +24,7 @@ Let's break down what this all means.
 Modules define functions inside of them. Each function has a name, so they are called **named functions**.
 You can define functions inside a module using the following syntax.
 
-```Elixir
+```elixir
 defmodule Greeter do
   def hello do
     "hello world"
@@ -43,7 +43,7 @@ Let's break down the named function above.
 
 To call a function inside a module, you use `Module.function(args)` syntax.
 
-```Elixir
+```elixir
 Greeter.hello()
 ```
 
@@ -53,7 +53,7 @@ You can create multiple functions in a module.
 
 Here's a new `hi/1` function that says hi to a person.
 
-```Elixir
+```elixir
 defmodule Greeter do
   def hello do
     "hello world"
@@ -67,7 +67,7 @@ end
 
 You call the named function in the module by passing it an argument.
 
-```Elixir
+```elixir
 Greeter.hi("Brooklin")
 ```
 
@@ -75,7 +75,7 @@ Greeter.hi("Brooklin")
 
 A module can use its own functions.
 
-```Elixir
+```elixir
 defmodule InspectorGadget do
   def gogo(gadget) do
     "Go go gadget #{gadget}!"
@@ -91,7 +91,7 @@ InspectorGadget.necktie()
 
 However, you can omit the module name. notice `gogo` instead of `InspectorGadget.gogo`
 
-```Elixir
+```elixir
 defmodule InspectorGadget do
   def gogo(gadget) do
     "Go go gadget #{gadget}!"
@@ -109,7 +109,7 @@ InspectorGadget.necktie()
 
 Modules can access other module functions.
 
-```Elixir
+```elixir
 defmodule Speaker do
   def speak() do
     "hi there"
@@ -132,7 +132,7 @@ Often it communicates to other developers how to use your module.
 You can create a private module function with `defp` instead of `def`. You'll notice that below the 
 `Speaker.think/0` function is undefined to the outside world.
 
-```Elixir
+```elixir
 defmodule Speaker do
   defp think() do
     "hi there"
@@ -144,7 +144,7 @@ Speaker.think()
 
 We use private functions internally in the module, which means that public functions could expose their values.
 
-```Elixir
+```elixir
 defmodule Speaker do
   defp think() do
     "hi there"
@@ -228,7 +228,7 @@ flowchart
 
 Notice that we can use a module attribute inside of the module's function now.
 
-```Elixir
+```elixir
 defmodule MyModule do
   @my_attribute "any valid data type"
   def my_function do
@@ -256,7 +256,7 @@ MyModule.my_function()
 
 Now we can easily share constant values between multiple module functions.
 
-```Elixir
+```elixir
 defmodule Hero do
   @name "Batman"
   @nemesis "Joker"
@@ -275,7 +275,7 @@ Hero.victory()
 
 If the module attribute value changes, you only need to change the module attribute.
 
-```Elixir
+```elixir
 defmodule Hero do
   @name "IronMan"
   @nemesis "Mandarin"
