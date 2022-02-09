@@ -13,7 +13,7 @@ Often functional programming languages like Elixir get a bad reputation for bein
 The same goes for programming in general, but especially functional programming.
 
 Let's dispel that myth. While there are some applications of programming that require
-advanced math skills, many do not. Infact, most of the most in demand programming industries such
+advanced math skills, many do not. Infact, the most in demand programming industries such
 as web development only require familiarity with simple arithmetic 
 (adding, subtracting, dividing, multiplying, etc), and even then, we let the computer's do most
 of the heavy lifting!
@@ -59,7 +59,7 @@ In the Elixir cell below, enter the biggest number you can think of.
 If you've used any other programming language, you might be surprised! Integers
 in Elixir are unbounded, meaning they have no maximum size.
 
-Contrast that with a language like JavaScript which as a maximum integer size of `9007199254740991`
+Contrast that with a language like JavaScript which has a maximum integer size of `9007199254740991`
 Elixir makes that look tiny!
 
 ```elixir
@@ -99,10 +99,21 @@ For example, the precision of the float `1.2` is one. the precision of the float
 You'll often use floats for representing percentages.
 For example, you might want to represent a progress bar as a percentage.
 
-<!-- livebook:{"force_markdown":true} -->
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, try changing the float `percentage` to any float between `0` and `100`
+and see how the loading bar changes! Replace `50` with your answer.
 
 ```elixir
-99.4 # Almost done!
+percentage = 50
+
+# TODO - Hide
+Kino.Markdown.new("
+<div style=\"height: 20px; width: 100%; background-color: grey\">
+<div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
+</div>")
 ```
 
 ### Floating-Point Errors
@@ -125,7 +136,7 @@ how the computer hardware works under the hood. For our purposes it's enough to 
 If you are curious, Computerphile has an [excellent video on why](https://www.youtube.com/watch?v=PZRI1IfStY0&ab_channel=Computerphile).
 
 Due to these errors, **you should not use floats to represent money** even though it might seem
-intuitive to translate `$1.29` into 1.29.
+intuitive to translate `$1.29` into `1.29`.
 
 Instead, you'll often use integers to represent pennies so `$1.29` becomes `129`.
 
@@ -175,9 +186,6 @@ Elixir lets you know why with an error message.
 
 As mentioned, adding floats together may result in floating point errors, so only use them
 when a small amount of innaccuracy isn't an issue.
-
-For example, it might be fine to be `0.02` off when calculating the width of a loading bar, 
-but that's unacceptable when dealing with money.
 
 ```elixir
 1.2 + 1.4

@@ -146,33 +146,20 @@ In the text inputs below, enter the **boolean** or **boolean operator** that sat
 If `and` and `or` both satisfy the blank, then prefer `and`.
 
 ```elixir
-Kino.Input.text("not ____ and true === false")
-```
+# TODO - Hide
 
-```elixir
-Kino.Input.text("true ____ false === true")
-```
+[
+  "not ____ and true === false",
+  "true ____ false === true",
+  "not true ____ true === true",
+  "not false ____ true === true",
+  "not (true and false) ____ false === true",
+  "not (true or false) or not (not ____ and true) === true",
+  "____ false and true === true",
+  "false or ____ true === false"
+]
+|> Enum.map(&Kino.Input.text/1)
+|> Enum.map(&Kino.render/1)
 
-```elixir
-Kino.Input.text("not true ____ true === true")
-```
-
-```elixir
-Kino.Input.text("not false ____ true === true")
-```
-
-```elixir
-Kino.Input.text("not (true and false) ____ false === true")
-```
-
-```elixir
-Kino.Input.text("not (true or false) or not (not ____ and true) === true")
-```
-
-```elixir
-Kino.Input.text("____ false and true === true")
-```
-
-```elixir
-Kino.Input.text("false or ____ true === false")
+Kino.nothing()
 ```

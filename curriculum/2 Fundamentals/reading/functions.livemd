@@ -51,7 +51,7 @@ Let's break down what we did above.
 1. `double` is a variable name. Often you'll refer to it as the **function name**. 
    It can be any valid variable name.
 
-2. We assign `double` to an **anonymous function**.
+2. We bind `double` to an **anonymous function**.
    The anonymous function is everything from the `fn` to the `end`.
 
    ```mermaid
@@ -131,14 +131,14 @@ double = fn number -> number end
 ```
 
 Now the function head takes in a value. We have to pass it
-an **argument**when we call it. The argument will be assigned to the parameter when the function 
+an **argument**when we call it. The argument will be bound to the parameter when the function 
 executes. We'll give it the integer `2`.
 
 ```elixir
 double.(2)
 ```
 
-Under the hood, when the function runs, the parameter is assigned the argument's value.
+Under the hood, when the function runs, the parameter is bound to the argument's value.
 
 Step by step, that would look like this.
 
@@ -248,7 +248,7 @@ example.(1, 2, 3, 4, 5)
 But usually, you want to avoid having too many parameters because it makes your function hard
 to understand.
 
-A parameter can be assigned to any valid data type, so you could instead use associative data
+A parameter can be bound to any valid data type, so you could instead use associative data
 a structure like a map or keyword list.
 
 ```elixir
@@ -261,7 +261,7 @@ Anonymous functions can be defined using a shorthand syntax. It is only an alter
 version to define a function. You will sometimes see shorthand syntax, so it's helpful to understand it.
 However, it should not be over-used. Otherwise, your program may be less clear.
 
-You can still assign the anonymous function to a variable with the shorthand syntax.
+You can still bind the anonymous function to a variable with the shorthand syntax.
 However, you define the function with `&()` and put the function body between the brackets.
 
 Here's the same `double` function using short-hand syntax.
@@ -292,7 +292,7 @@ is called `add_two/2`.
 
 Functions in Elixir are [first-class citizens](https://en.wikipedia.org/wiki/First-class_citizen).
 
-For our purposes, this means we can assign functions to variables, store them in other data types, pass them as arguments to other functions.
+For our purposes, this means we can bind functions to variables, store them in other data types, pass them as arguments to other functions.
 
 If a function takes in another function as a parameter, it's called a **higher-order function**.
 
@@ -310,7 +310,7 @@ double = fn number -> number * 2 end
 call_twice.(double, 3)
 ```
 
-We don't need to assign the passed function to a variable first. We can pass 
+We don't need to bind the passed function to a variable first. We can pass 
 in the anonymous function directly.
 
 ```elixir
