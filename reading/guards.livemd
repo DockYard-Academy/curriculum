@@ -1,0 +1,124 @@
+# Guards
+## Guards
+
+It's often useful to validate that a module function is called with the correct arguments.
+Elixir provides `Guards`, which allow you to validate the parameters.
+
+For example, here's a `Multiplier` module that doubles numbers.
+
+```elixir
+defmodule Multiplier do
+  def double(num1) do
+    num1 * 2
+  end
+end
+
+Multiplier.double(4)
+```
+
+You'll notice that we can pass in strings to the `Mutliplier.double/1` function, and the program will error. 
+However, to an outside user, that error is not very helpful.
+
+```elixir
+defmodule Multiplier do
+  def double(num1) do
+    num1 * 2
+  end
+end
+
+Multiplier.double("")
+```
+
+To enforce the function is only called with integers, we can use the built-in `is_integer` guard 
+and the `when` guard operator.
+
+Now when you call the `double/1` function, it will let you know that the function does not exist
+for string arguments.
+
+```elixir
+defmodule Multiplier do
+  def double(value) when is_integer(value) do
+    value * 2
+  end
+end
+
+Multiplier.double("")
+```
+
+But what if you wanted to handle doubling strings? You can also use guards to create multiple function
+clauses. In this case, when we call `double/1` with a string `"example"` we want it two return double
+the string so `"exampleexample"`.
+
+We can use the built-in `is_bitstring` guard to check if the variable is a string.
+
+```elixir
+defmodule Multiplier do
+  def double(num) when is_integer(num) do
+    num * 2
+  end
+
+  def double(string) when is_bitstring(string) do
+    string <> string
+  end
+end
+
+Multiplier.double("example")
+```
+
+There are many guards available in Elixir. If you ever need a specific guard, you can refer to the
+[Guards](https://hexdocs.pm/elixir/1.13/Kernel.html#guards) documentation
+
+It's also useful to know that the order of function clauses does matter. So let's say you remove
+the `is_integer/1` guard. Now the first function expects any type of input, so it will always
+execute instead of the `is_bitstring/1` version.
+
+```elixir
+defmodule Multiplier do
+  def double(num) do
+    num * 2
+  end
+
+  def double(string) when is_bitstring(string) do
+    string <> string
+  end
+end
+
+Multiplier.double("example")
+```
+
+You'll notice our program crashes with an error, and we also get a warning 
+**this clause for double/1 cannot match because a previous clause at line 2 always matches**
+
+However, if you move the more generic function below, then strings will run through the
+`is_bitstring` version first.
+
+**Floats** now work as well! because previously they failed the `is_integer` guard.
+
+```elixir
+defmodule Multiplier do
+  def double(string) when is_bitstring(string) do
+    string <> string
+  end
+
+  def double(num) do
+    num * 2
+  end
+end
+
+Multiplier.double("example")
+```
+
+```elixir
+Multiplier.double(1)
+```
+
+```elixir
+Multiplier.double(2.5)
+```
+
+### Your Turn
+Create a module `Math` with an `add/2` function that only accepts integers.
+
+```elixir
+
+```

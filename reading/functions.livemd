@@ -1,6 +1,14 @@
 # Functions
 
-Elixir is a Functional programming language. So you can imagine that Functions must be important. But what is a function?
+## Setup
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
+## Functions
+
+Elixir is a functional programming language. So you can imagine that functions must be important. But what is a function?
 
 ### Input and Output (IO)
 
@@ -19,8 +27,7 @@ It's a black box because you don't need to know (or can't know) the details of h
 
 ```mermaid
   flowchart LR
-    Input --> B[Black Box]
-    B --> Output
+    Input --> B[Black Box] --> Output
 ```
 
 ### Creating a Function
@@ -30,8 +37,7 @@ double its value.
 
 ```mermaid
 flowchart LR
-  A[Input `2`] --> B[BlackBox `double`]
-  B --> C[Output `4`]
+  A[2] --> B[double] --> C[4]
 ```
 
 Now, let's create our first function. At first, it's going to do nothing.
@@ -109,8 +115,9 @@ double = fn parameter -> nil end
 ```
 
 You'll notice a warning above. That's because Elixir is smart and lets us know that we've
-created a parameter, but we're not using it. In Elixir, if you want to have an unused variable
-without warning, you can mark it with an underscore `_`
+created a parameter, but we're not using it.
+
+In Elixir, you can ignore this warning for unused variables by starting them with an underscore `_`
 
 ```elixir
 double = fn _parameter -> nil end
@@ -123,41 +130,28 @@ modify the function to return the parameter instead.
 double = fn parameter -> parameter end
 ```
 
-The parameter is named parameter here for the sake of example. But it works a lot like a variable, and it can be named anything.
-Let's rename it to `number` to clarify what we expect the input to the function to be.
+The parameter is named `parameter` here for the sake of example. But it works a lot like a variable, 
+and it can be named any valid variable name.
+
+Let's rename it to `number` to clarify that we expect the input to be a number.
 
 ```elixir
 double = fn number -> number end
 ```
 
 Now the function head takes in a value. We have to pass it
-an **argument**when we call it. The argument will be bound to the parameter when the function 
+an **argument** when we call it. The argument will be bound to the parameter when the function 
 executes. We'll give it the integer `2`.
 
 ```elixir
 double.(2)
 ```
 
-Under the hood, when the function runs, the parameter is bound to the argument's value.
-
-Step by step, that would look like this.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-double = fn number -> number end
-double.(2)
-fn 2 -> 2 end
-2
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
 Notice that if you try to call the function without an argument, it fails because
 it expects an argument. Not all languages do that, but Elixir is pretty smart 😎
 
 ```elixir
-is_even.()
+double.()
 ```
 
 Great, now all that's left is to multiply the parameter by `2`. You should be familiar with 
@@ -181,11 +175,55 @@ double.(11)
 double.(10 ** 2 - 1)
 ```
 
+Under the hood, when the function runs, the parameter is bound to the argument's value.
+
+Here's an animation to show how the function evaluates step by step.
+
+````elixir
+# TODO - Hide
+
+sequence = [
+  "
+  First, we define the `double` function and call it.
+  ```elixir
+  double = fn number -> number * 2 end
+  double.(3)
+  ```
+  ",
+  "
+  The parameter is bound to the argument `3`
+  ```elixir
+  double = fn 3 -> 3 * 2 end
+  double.(3)
+  ```
+  ",
+  "
+  The function evaluates the function body between the `->` and the `end`
+  ```elixir
+  double = fn 3 -> 6 end
+  double.(3)
+  ```
+  ",
+  "
+  The function call returns the value from the body
+  ```elixir
+  double = fn 3 -> 6 end
+  6
+  ```
+  "
+]
+
+Kino.animate(3000, 0, fn i ->
+  md = Enum.at(sequence, i) |> Kino.Markdown.new()
+  {:cont, md, rem(i + 1, length(sequence))}
+end)
+````
+
 ### Implied Return Values
 
 Some languages require explicit return values.
 
-However, in Elixir the output of a function is always the last line. 
+However, in Elixir the output of a function is always the last line.
 
 For example, notice that the return value below is `first` + `second`, which equals `3`.
 
@@ -199,60 +237,63 @@ end
 multiline_function.()
 ```
 
+### Your Turn
+
+In the Elixir cell below, create a function `is_even?` that checks if an integer is even or not.
+The function should return `true` if the integer is even and `false` if the integer is odd.
+
+```elixir
+
+```
+
 ## Multi-Parameter Functions
 
 Functions can accept multiple inputs. Separate parameters with commas `,` to create a multi-parameter function.
 
-Let's say you're creating a function `calculate_force`, which will take in `mass` and
-`acceleration`. (remember that force = mass * acceleration)
-
-Let's start with the `double` function and see how we could convert it into a `calculate_force` function.
-
 ```elixir
-double = fn number -> number * 2 end
-```
+sum3 = fn param1, param2, param3 -> param1 + param2 + param3 end
 
-First, let's rename `double` to `calculate_force` and rename `number` to `mass`. That gets us
-most of the way there!
-
-```elixir
-calculate_force = fn mass -> mass * 2 end
-```
-
-Technically, we've got a function that calculates the force of an object with a given mass and
-an acceleration of 2.
-
-However, we want it to be truly reusable, so we need to figure out how to replace 2 with another
-parameter. You can declare a function that accepts multiple parameters by separating them with a 
-comma `,` as you do in a list or tuple.
-
-```elixir
-calculate_force = fn mass, acceleration -> mass * acceleration end
-```
-
-That should be working! Now you can call the function by passing in two arguments the same way.
-
-```elixir
-calculate_force.(10, 2)
+sum3.(2, 3, 4)
 ```
 
 Keep in mind that the first argument will be the value of the first parameter, and the second argument
 will be the value of the second parameter. You can repeat this with as many parameters as you want!
 
 ```elixir
-example = fn a, b, c, d, e -> [a, b, c, d, e] end
+to_list = fn a, b, c, d, e -> [a, b, c, d, e] end
 
-example.(1, 2, 3, 4, 5)
+to_list.(1, 2, 3, 4, 5)
 ```
 
 But usually, you want to avoid having too many parameters because it makes your function hard
 to understand.
 
-A parameter can be bound to any valid data type, so you could instead use associative data
-a structure like a map or keyword list.
+A parameter can be bound to any valid data type, so you could instead use an associative data
+structure like a map or keyword list.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Function Arity
+
+The number of parameters your function accepts is called the `arity` of the function.
+
+A function with no parameters has an arity of zero. A function with one parameter has
+an arity of one, and so on.
+
+You refer to the function as `function_name/arity` thus a function named `add_two` with two parameters
+is called `add_two/2`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below create a multi-parameter function `calculate_force/2`.
+`calculate_force/2` should take in an integer `mass` parameter and an integer `acceleration` parameter.
+
+The function should calculate force by returning `mass * force`.
 
 ```elixir
-is_even = nil
+
 ```
 
 ## Shorthand Syntax
@@ -278,15 +319,13 @@ add_two = &(&1 + &2)
 add_two.(2, 3)
 ```
 
-### Function Arity
+### Your Turn
 
-The number of parameters your function accepts is called the `arity` of the function.
+In the Elixir cell below, convert your `calculate_force/2` function from earlier into short-hand syntax.
 
-A function with no parameters has an arity of zero. A function with one parameter has
-an arity of one, and so on.
+```elixir
 
-You refer to the function as `function_name/arity` thus a function named `add_two` with two parameters
-is called `add_two/2`.
+```
 
 ## First-class Functions
 
@@ -320,3 +359,16 @@ call_twice.(fn number -> number * 2 end, 5)
 Whenever you pass a function into a higher-order function with the 
 expectation that the higher-order function is going to call it, the passed function is
 referred to as a **callback function**.
+
+### Your Turn
+
+In the Elixir cell below,
+
+* Create a higher order function `is_not?/2` which takes in a
+  **callback function** and a value. It should then call the function on the value
+  and use the `not` operator to flip the value.
+* Call `is_not?/2` with the`is_even?/1` function from earlier and an integer to check if a number is odd.
+
+```elixir
+
+```

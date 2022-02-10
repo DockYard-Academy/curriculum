@@ -1,5 +1,7 @@
 # Modules
-## Lesson
+
+## Modules
+
 As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions".
 
 Here's what an empty module looks like.
@@ -16,7 +18,7 @@ modules internally.
 Let's break down what this all means.
 
 1. `defmodule` a keyword that means "define module".
-2. `Greeter` is the name of this module. It can be any valid name, and is usually **CapitalCase**.
+2. `Greeter` is the name of this module. It can be any valid name, and should be **CapitalCase**.
    you'll often heard the name of the module refered to as the **namespace** that functions are organized under.
 3. `do` a keyword that separates the module name and it's internal implementation.
 4. `end` a keyword that finishes the module definition.
@@ -36,12 +38,12 @@ Let's break down the named function above.
 
 1. `def` this means "define function"
 2. `do` a keyword that separates the function head and the function body.
-3. `"hello world"` this is the function body. This function returns the string "hello world"
+3. `"hello world"` this is the function body. This function returns the string "hello world".
 4. `end` is a keyword that ends the function definition.
 
 ### Calling a Named Function
 
-To call a function inside a module, you use `Module.function(args)` syntax.
+To call a function inside a module, you use `Module.function(arguments)` syntax.
 
 ```elixir
 Greeter.hello()
@@ -71,6 +73,15 @@ You call the named function in the module by passing it an argument.
 Greeter.hi("Brooklin")
 ```
 
+### Your Turn
+
+In the Elixir cell below, create a `Math` module with a function `add` that adds two integers
+together.
+
+```elixir
+
+```
+
 ## Internal Module Functions
 
 A module can use its own functions.
@@ -98,11 +109,24 @@ defmodule InspectorGadget do
   end
 
   def necktie do
-    gogo("Necktie")
+    gogo("necktie")
   end
 end
 
 InspectorGadget.necktie()
+```
+
+### Your Turn
+
+In the Elixir cell below, add an `arms/0` function to the `InspectorGadget` module
+that calls `gogo("arms")`
+
+```elixir
+defmodule InspectorGadget do
+  def gogo(gadget) do
+    "Go go gadget #{gadget}!"
+  end
+end
 ```
 
 ## Private Functions
@@ -158,6 +182,73 @@ end
 Speaker.speak()
 ```
 
+## Namespaces
+
+You can use modules to organize functions under a single **namespace**.
+This allows you to create many unique namespaces with their own functions to organize
+the functionality of your program.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  A[Namespace]
+  B[Namespace]
+  C[Namespace]
+  A1[Function]
+  A2[Function]
+  A3[Function]
+  B1[Function]
+  B2[Function]
+  B3[Function]
+  C1[Function]
+  C2[Function]
+  C3[Function]
+  A --> A1
+  A --> A2
+  A --> A3
+  B --> B1
+  B --> B2
+  B --> B3
+  C --> C1
+  C --> C2
+  C --> C3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+However, sometimes you need to further split the functions in a module.
+This can be because the module is too large, or because the module has multiple
+separate responsibilities and it's more clear to separate them.
+
+```mermaid
+flowchart
+  Module --> SubModule
+  SubModule --> a[Function]
+  SubModule --> b[Function]
+  SubModule --> c[Function]
+```
+
+To do this you can nest modules with a period `.`.
+
+```elixir
+defmodule MyModule.SubModule do
+  def my_function do
+    "my return value"
+  end
+end
+
+MyModule.SubModule.my_function()
+```
+
+### Your Turn
+
+In the Elixir cell below, create two submodules under as single namespace.
+
+```elixir
+
+```
+
 ## Module Attributes
 
 What if you have many functions in a module that all use the same value? You've already learned
@@ -165,7 +256,7 @@ that repeating the same hard-coded value over and over again isn't very reusable
 used variables to pass the same value around in your code. However, that's not possible in a module.
 
 Modules and functions in a module close themselves to the outside world. We call this `scope`.
-Modules, functions, and many other similar constructs in Elixir are `lexically scoped.
+Modules, functions, and many other similar constructs in Elixir are `lexically scoped`.
 
 That means that variables defined in one scope cannot be accessed in another scope.
 
@@ -208,7 +299,7 @@ end
 ```
 
 To get around this, Elixir allows you to store constant values as module attributes 
-using the `@module_attribute value` syntax. You can then access the `@module_attribue` value in 
+using the `@module_attribute value` syntax. You can then access the `@module_attribute` value in 
 any module function.
 
 ```mermaid
@@ -317,3 +408,72 @@ a different arity as a different function. We often refer to each function by it
 as function/arity.
 
 So the `Greeter` module has a  `hi/1` (hi one) function and `hi/2` (hi two) function.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create a `Math` module with `add/2` and `add/3` functions. Each should add all of it's parameters
+together.
+
+```elixir
+
+```
+
+## Default Arguments
+
+You can provide default arguments to functions using the `//` syntax after the parameter
+ and then the default value.
+
+```elixir
+defmodule Greeter do
+  def greet(name, greeting \\ "Hello") do
+    "#{greeting} #{name}!"
+  end
+end
+
+Greeter.greet("Peter")
+```
+
+Then if desired, you can override the default value.
+
+```elixir
+defmodule Greeter do
+  def greet(name, greeting \\ "Hello") do
+    "#{greeting} #{name}!"
+  end
+end
+
+Greeter.greet("Peter", "Hi")
+```
+
+Multiple parameters can have default values.
+
+```elixir
+defmodule Greeter do
+  def greet(name \\ "Peter", greeting \\ "Hello") do
+    "#{greeting} #{name}!"
+  end
+end
+
+Greeter.greet()
+```
+
+However, you can even have a default for the first of multiple parameters. Elixir
+is smart enough to handle that!
+
+```elixir
+defmodule Greeter do
+  def greet(name \\ "Peter", greeting) do
+    "#{greeting} #{name}!"
+  end
+end
+
+Greeter.greet("HI")
+```
+
+### Your Turn
+In the Elixir cell below, define a module with a function that uses a default argument.
+
+```elixir
+```
