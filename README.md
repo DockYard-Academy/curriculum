@@ -4,6 +4,12 @@ Presently, there are no other requirements.
 
 The Fundamentals section currently has completed lessons. The other folders are placeholders.
 
+## Getting Started
+- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed
+- Ensure you have the latest [livebook](https://github.com/livebook-dev/livebook) installed.
+- Run the project with `livebook server`.
+- Go to the `instructions.livemd` to see the course content.
+
 ## Philosophy
 The academy is follows a flipped classroom design where students complete interactive instructional material,
 and then perform exercises and create projects inspired by the learning material.
