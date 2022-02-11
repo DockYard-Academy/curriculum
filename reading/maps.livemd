@@ -1,6 +1,6 @@
 # Maps
 
-## Section
+## Maps
 
 Maps are another type of associative data structure. In fact maps are the common go-to for a key-value
 data structure. You can create a map using `%{}`. Similar to keyword lists they can have atoms as keys and then any value.
@@ -72,14 +72,16 @@ Create a map with a non-string or atom key and any value.
 
 ```
 
-## Maps
+## Manipulating Maps
 
 Unlike the other data types, there aren't specific ap operators. To manipulate maps we
 use a different tool called the **Map** module, which you will learn more about in a future lesson.
 
 For now, it's enough to know that you can access values in an atom-key map using a few different methods.
 
-You can use dot **map.key** notation like so.
+### Accessing Map Values.
+
+You can retrieve values in a map using **map.key** notation like so.
 
 ```elixir
 map = %{example_key: "value"}
@@ -139,4 +141,37 @@ the key `"one"`. It should return `1`.
 
 ```elixir
 
+```
+
+### Updating Maps
+
+You can update values in a map using `%{initial_map | updated_values}` syntax like so.
+
+```elixir
+initial = %{key: "value"}
+
+%{initial | key: "new value"}
+```
+
+Elixir does not allow you to mutate values. That means
+the variable `initial` is still `%{key: "value"}`
+
+```elixir
+initial
+```
+
+You can instead store a new variable for the updated map.
+
+```elixir
+updated = %{initial | key: "new value"}
+```
+
+Or rebind the existing `initial` variable.
+
+```elixir
+initial = %{initial | key: "new value"}
+```
+
+```elixir
+initial
 ```

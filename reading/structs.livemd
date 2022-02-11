@@ -159,28 +159,55 @@ You can define functions as usual.
 * create an `introduce/2` function which takes in an instance of a hero and a greeting
   and returns
 
-  `"#{greeting} I am #{hero.secret_identity}"`
+  `"#{greeting} I am #{hero.name}"`
 
 ```elixir
 
 ```
 
-Once you've created the struct in the cell above, you can test it's working with the following.
+### Your Turn
 
-```elixir
-spider_man = %Hero{
-  name: "Spider Man",
-  catchphrase: "I'm just your friendly neighborhood Spiderman!",
-  secret_identity: "Peter Parker"
-}
+In the Elixir below, create an instance of a Hero with the following data and bind it
+to the variable `spider_man`.
+
+```mermaid
+classDiagram
+  class Hero {
+    name: Spider Man
+    catchphrase: Friendly neighborhood Spiderman!
+    secret_identity: Peter Parker
+  }
 ```
 
 ```elixir
-Hero.reveal(spider_man)
+
+```
+
+Use the `Hero.introduce/1` function on `spider_man`.
+
+```elixir
+
+```
+
+Use the `Hero.reveal/2` function on `spider_man`.
+
+```elixir
+
+```
+
+### Updating a Struct
+
+Structs are an extension of maps under the hood, so you can use the same map update syntax.
+
+```elixir
+defmodule MyUpdatableStruct do
+  defstruct [:key]
+end
 ```
 
 ```elixir
-Hero.introduce(spider_man, "hello!")
+initial = %MyUpdatableStruct{key: "value"}
+updated = %{initial | key: "new value"}
 ```
 
 ## Futher Reading

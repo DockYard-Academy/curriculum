@@ -1,0 +1,78 @@
+# RPG Dialogue
+
+## Overview
+
+In this exercise, you're going to create a `Dialogue` module that takes an an `Character` 
+struct and generates dialogue for an RPG (Role Playing Game).
+
+### Create A Character Struct
+
+In the Elixir cell below, create an `Character` struct.
+
+* enforce that characters have a `:name`.
+* characters can have a `:class` that will be either `:wizard`, `:rogue`, or `:warrior`.
+* characters can have a `:weapon` that will be either `:sword`, `:dagger`, or `:staff`.
+
+```elixir
+
+```
+
+Create instances of character structs with the following information:
+
+```mermaid
+classDiagram
+  class Arthur {
+    class: :warror
+    weapon: :sword
+  }
+  class Gandalf {
+    class: :wizard
+    weapon: :staff
+  }
+  class Jarlaxle {
+    class: :rogue
+    weapon: :daggers
+  }
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create A Dialogue Module
+
+In the Elixir cell below.
+
+* Create an `Dialogue.greet/1` function which accepts a character and returns
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"Hello, my name is #{character.name}"
+```
+
+* Create an `Dialogue.attack/2` function which accepts a character and an enemy name as a string. 
+  <!-- livebook:{"force_markdown": true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"I attack the #{enemy} with my #{character.weapon}"
+```
+
+* Create a `Dialogue.relinquish_weapon/1` function which returns different dialogue depending on the character's class.
+
+  * `:rogue`: `"Fine, have my #{character.weapon}. I have more hidden anyway"`
+  * `:wizard`: `"You would not part an old man from his walking stick?"`
+  * `:warrior`: `"Have my #{character.weapon} then!"`
+  * if the character has no class: `"My Precious!"`
+
+* Create a function `matching_weapon/1` that returns different dialogue depending on
+  the character's class and weapon.
+
+  * `:wizard` and `:staff`: `"My lovely magical staff."`
+  * `:rogue` and `:dagger`: `"Hidden and deadly."`
+  * `:warrior` and `:sword`: `"My noble sword!"`
+  * any other combination: `"I'm not sure a #{character.weapon} suits a #{character.class}."`
+
+```elixir
+
+```
