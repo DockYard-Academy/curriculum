@@ -1,3 +1,481 @@
+
+Under the hood, computers store information as electrical signals, either `on` or `off`, `0` or `1`.
+So you might wonder, how are they able to represent numbers larger than 1?
+
+Fortunately, humans have been thinking about base 2 counting systems since the days of ancient
+Egypt. The current binary counting system was created by [Gottfried Wilhelm Leibniz](https://www.inverse.com/article/46587-gottfried-wilhelm-leibniz-binary-system)
+In the 17th Century.
+
+What's a base 2 counting system? Well first, let's take a second to appreciate that we have a
+base 10 counting system. We have ten digits, and use placeholders to represent shifting values.
+
+```
+1 2 3 4 5 6 7 8 9 0
+```
+
+Early computers were built to perform mathematical calculations. Therefore it's necessary
+to be able to represent an entire number system. We use **Integers** to represent whole positive or negative
+numbers. `100` is an integer, `0` is an integer, and so is `-10`.
+
+Take the example number `4762`. It has
+
+* `4` thousands
+* `7` hundreds
+* `6` tens
+* `2` ones
+
+```mermaid
+flowchart
+  Thousands --- 4
+  Hundreds --- 7
+  Tens --- 6
+  Ones --- 2
+```
+
+### Counting  Visualization
+
+<!-- livebook:{"break_markdown":true} -->
+
+To help you visualize counting in a base10 system, Here's a visualization of 4 placeholders.
+You have your ones, tens, hundreds, and thousands.
+
+Evaluate the elixir cell below to visualize how numbers shift to the left placeholder as you count.
+
+````elixir
+## TODO - Hide
+
+Kino.animate(500, 0, fn i ->
+  digits = Integer.digits(i)
+  reverse_digits = Enum.reverse(digits)
+  ones = Enum.at(reverse_digits, 0)
+  tens = Enum.at(reverse_digits, 1)
+  hundreds = Enum.at(reverse_digits, 2)
+  thousands = Enum.at(reverse_digits, 3)
+  md = Kino.Markdown.new("
+  ```mermaid
+  flowchart
+  Thousands --- TH[#{thousands || 0}]
+  Hundreds --- H[#{hundreds || 0}]
+  Tens --- T[#{tens || 0}]
+  Ones --- O[#{ones || 0}]
+```
+")
+
+  # performant_alternative = [thousands || 0, hundreds || 0, tens || 0, ones]
+
+  {:cont, md, rem(i + 1, 9999)}
+end)
+````
+
+Now, a base 2 counting system works on the same principle as a base 10, except we
+only have 2 digits to represent numbers with.
+
+```
+0 1
+```
+
+Everytime we run out of digits, we shift the placeholder over.
+
+Take the example binary number `1011` which is eleven in base10. It has
+
+* `1` eight
+* `0` four
+* `1` two
+* `1` one
+
+It's eleven, because `8 + 2 + 1 = 11`.
+
+You can see how our base10 numbers are represented as binary in this table.
+
+```elixir
+# TODO - Hide
+
+data =
+  Enum.map(1..500, fn integer ->
+    binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
+    %{base10: integer, base2: binary}
+  end)
+
+Kino.DataTable.new(data)
+```
+
+### Counting Binary Visualization
+
+Want to see binary counting in action?
+Evaluate the Elixir cell below to see an animation.
+
+````elixir
+# Todo - Hide
+
+Kino.animate(1000, 0, fn i ->
+  digits = Integer.digits(i, 2)
+  reverse_digits = Enum.reverse(digits)
+  ones = Enum.at(reverse_digits, 0)
+  twos = Enum.at(reverse_digits, 1)
+  fours = Enum.at(reverse_digits, 2)
+  eights = Enum.at(reverse_digits, 3)
+  sixteens = Enum.at(reverse_digits, 4)
+  thirtytwos = Enum.at(reverse_digits, 5)
+  sixtyfours = Enum.at(reverse_digits, 6)
+  hundredtwentyeights = Enum.at(reverse_digits, 7)
+
+  md = Kino.Markdown.new("
+  ```mermaid
+  flowchart
+  Integer[#{i}]
+  HundredAndTwentyEights --- 128[#{hundredtwentyeights || 0}]
+  SixtyFours --- 64[#{sixtyfours || 0}]
+  ThirtyTwos --- 32[#{thirtytwos || 0}]
+  Sixteens --- 16[#{sixteens || 0}]
+  Eights --- 8[#{eights || 0}]
+  Fours --- 4[#{fours || 0}]
+  Twos --- 2[#{twos || 0}]
+  Ones --- 1[#{ones || 0}]
+```
+")
+
+  # performant_alternative = ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0] -- Enum.map(0..length(digits), fn _ -> 0 end)) ++ digits
+  max = 128 + 64 + 32 + 16 + 4 + 2 + 1
+  {:cont, md, rem(i + 1, max)}
+end)
+````
+
+This is how despite only having `on` and `off`, `0` and `1` computers are able to
+represent large numbers.
+
+You'll notice that in the above animation we show eight placeholders. That's because binary
+digits are grouped together in eights. each digit is called a **bit**, and each grouping of eight
+is called a **byte**.
+
+<!-- livebook:{"break_markdown":true} -->
+
+
+As we count from 1 to 9, we then add a 1 in the placeholder on the left, and restart at 0.
+You probably do this intuitively. This means we have placeholders for **ones**, **tens**, **hundreds**, etc.
+
+The base10 counting system shouldn't be taken for granted. Humans have been intellectually
+capable of creating a base10 counting system for over 200000 years, and yet our current
+system was only invented in the 7th century. 🤯
+
+Can you imagine if we had different symbols for every number? 
+It would be impossible to remember.
+
+## CodePoints
+
+
+### How did we go from Integers to Strings?
+
+You might wonder how we went from representing integers to representing strings and 
+any valid text character.
+
+Essentially, characters have an equivalent integer associated with them. 
+This integer is called a **code point**.
+
+For example, the code point for the letter `a` is `97`. Lowercase and uppercase letters have
+different codepoints.
+
+You can find the code point of any character by using `?` in Elixir. Evaluate the Elixir cell below
+to see how `?a` returns `97`.
+
+```elixir
+?a
+```
+
+Once again, while it's useful to be aware of how strings are represented by the computer. 
+it's not crucial to understand for most purposes.
+
+If you are curious, the full list of representable characters is called the [The Unicode Standard](https://unicode.org/standard/standard.html).
+below is a table of code points for uppercase and lowercase letters in the 
+alphabet.
+
+You do not need to memorize these values! The goal of this lesson is simply awareness.
+
+```elixir
+# TODO - hide
+
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+|> String.codepoints()
+|> Enum.map(fn char ->
+  <<code_point::utf8>> = char
+  %{character: char, code_point: code_point}
+end)
+|> Kino.DataTable.new()
+```
+
+In the Elixir cell below, enter the codepoint for the letter `"Y"`. You're allowed to use `?`!
+
+# Tuples
+
+
+### Lists vs Tuples
+
+You might notice that tuples and lists seem very similar, and they are. They are both
+data types that contain a collection of elements.
+
+The major difference is performance. Both are good at different things. In Elixir,
+it's fast to retrieve an element from a tuple, however it's slow to add a new element in.
+
+Why? Well, that requires some understanding of how memory works in a computer.
+The short version is that a tuple is stored continuously all together. So, you know where
+each element is on the computer.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  1[location 1] --- T
+  2[location 2] --- U
+  3[location 3] --- P
+  4[location 4] --- L
+  5[location 5] --- E
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+However, if you want to add a new element in that means you have
+to move the location of every element.
+
+Lists on the other hand have the opposite strengths and weaknesses. Lists are stored
+as **linked-lists** which means each element in the list knows the location of the next element.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  L -- location of I --> I -- location of S --> S -- location of T --> T
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+So we can store elements in a list anywhere, if we need to add or remove a new element
+we only have to change the location one element is pointing to.
+
+However, we don't know the location of every element upfront like with a tuple, so if you
+want to get the third element, you need to look through the first and second to find it.
+
+## Comparison Operators
+Comparison operators are not limited to comparing integers and floats. For example, they are often used to compare the equality of other data types.
+
+```elixir
+"hello" === "hello"
+```
+
+```elixir
+%{hello: "world"} === %{hello: "world"}
+```
+
+```elixir
+["hello", "world"] === ["hello", "world"]
+```
+
+## Booleans
+Programming languages hide the internal details of how computers work. This allows us as
+developers to think at a high level. However, it's still useful to be aware of some of the inner workings.
+
+Under the hood, computers store electrical signals. You can think of this like powering a 
+lightbulb but on a much smaller scale. An electrical signal is either **on** or **off**, and by manipulating
+these electrical signals, we are able to create complex information and instruction.
+
+You may have seen movies or tv series that show coding as a bunch of `1`s and `0`s
+![](images/binary.jpg). A 0 represents a signal that's **off** and a `1` represents a signal
+that's **on**. These `0`s and `1`s are called **binary**.
+
+After we write our Elixir code, our instructions are then converted or **compiled** into binary.
+**binary** is the machine code that the computer actually understands.
+
+So, you might wonder how we go from `0`s and `1`s to creating rockets, websites, self-driving
+cars, smartphones, and 3D animations.
+
+Well let's take the first step with booleans. A boolean (BOO-LEE-AN). 
+is a `true` or a `false` value. Conceptually, this is a direct representation of
+`on` and `off` in your program.
+
+There are only two booleans.
+
+## Control Flow Overview
+* **Pattern matching** with the **match operator**
+* Using `with` to check a series of conditions before entering a path.
+* using **Multi-clause functions** with **pattern matching**
+* Handling errors with the :ok, and :error tuple and **pattern matching**
+
+## Enum
+Which means you can also use pattern matching on the elements in a map.
+
+```elixir
+Enum.map(%{key: "value"}, fn {_key, value} -> value end)
+```
+
+
+Map keys can still be any type in the tuple.
+
+```elixir
+Enum.map(%{%{} => "value"}, fn {key, _value} -> key end)
+```
+
+You can use pattern matching inside of the function.
+
+```elixir
+Enum.map([one: 1], fn {_key, value} -> value end)
+```
+
+## WHy use polymophism
+### Why Use Polymorphism?
+
+Instead of specific constructs that enable polymorphism, 
+you can instead use control flow constructs like `if`, `cond`, and `case` to
+alter the behavior of your programs.
+
+Often though, we use polymorphism to improve the clarity of your code where `if`, `cond`, and `case`
+would become less clear. For example, let's say we don't use polymorphism with multiple arity functions
+and instead write a single function with a list for the parameter.
+
+We'd need to check the length of names with `length/1`,
+and retrieve each element in the list.
+
+```elixir
+defmodule Greeter do
+  def hi(names) do
+    case length(names) do
+      1 -> "Hi #{Enum.at(names, 0)}!"
+      2 -> "Hi #{Enum.at(names, 0)} and #{Enum.at(names, 1)}!"
+      _ -> "Hi everyone!"
+  end
+end
+```
+
+Is it better or worse? It's not always clear-cut, but it's useful to
+rely on polymorphism when it would improve the clarity of your code.
+
+## Lesson 2: Operators
+
+## Setup
+
+Ensure that you evaluate all code using the `ea` keybinding. Press the `e` then the `a` key.
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
+## Overview
+
+You can think of all programming as split into data and behavior. In the previous lesson,
+you learned all about data, and in this lesson, you're going to learn about behavior.
+
+### Operators
+
+To operate means to control a machine, process, or system.
+Thus we have **operators** which control the behavior of our program.
+
+In this lesson, you're going to learn:
+
+* **Arithmetic operators** performing mathematical operations. `+`, `-`, `*`, `/`, `div`, and `rem`
+* **Match operator** binding data to a variable. `=`
+* **Comparison operators** comparing values to one another. `===` `==` `>=` `<=` `<` `>`
+* **Boolean operators** comparing booleans and truthy values. `and` `or` `not` `&&` `||` `!`
+* **String operators** manipulating strings. `<>`, `#{}`
+* **List operators** manipulating lists. `++` `--`
+* Accessing map values with **map.key** notation and **map[key]** notation.
+
+
+
+
+
+## Combining Operators
+
+So far, you've only used operators in isolation. But it's important to remember that you
+can use them in combination.
+
+```elixir
+2 + 3 > 4
+```
+
+```elixir
+"4 + 7 is greater than 8 and 2 + 10 is less than 20: #{4 + 7 > 8 && 2 + 10 < 20}"
+```
+
+### Your Turn: Min Max Program
+
+Here's a small program that checks if a variable is between two integers.
+
+You'll notice that code can include line breaks to make it easier to read.
+
+Try setting `input` to `15` to see it return. `"15 is between 10 and 20"`.
+
+```elixir
+input = 5
+max = 20
+min = 10
+
+(input < max && input > min &&
+   "#{input} is between #{min} and #{max}") || "#{input} is outside #{min} and #{max}"
+```
+
+### Your Turn: Rock Paper Scissors
+
+In the Elixir cell below, You're going to create the perfect AI for rock paper scissors.
+You should only need to use `&&`, `=`, `===`, `||` operators.
+
+* Create a variable `input` and bind it to `"Rock"`.
+* Use **comparison** operators to check if input equals "Rock" then return "Paper"
+* Bonus: handle if input equals "Paper" then return "Scissors"
+* Bonus: handle if input equals "Scissors" then return "Rock"
+
+```elixir
+
+```
+
+## Syntax Errors
+
+`Syntax` refers to the keywords and symbols you use to provide instruction to the computer through
+Elixir. If you do not follow the rules that Elixir sets, your code will not
+compile into instructions for the computer, and you will see a red `error` message.
+
+Sometimes your code is valid, but you may still see a yellow `warning`. Warnings let you know
+that you might be making a mistake in your program, but the code still compiles into valid
+instruction.
+
+In general, in programming, you have to be precise. A single misplaced character causes your entire
+program to stop working!
+
+Take care to regularly evaluate any code you're writing to ensure
+it compiles. Regularly verifying your code compiles makes it a lot easier to know if a 
+change triggered an error or warning.
+
+Elixir does it's best to let you know the cause of your error, but it can take some time to get used to reading these messages.
+
+For example, here's the error messages you receive when you have a dangling operator without a 
+value on the right-hand side.
+
+```elixir
+2 *
+```
+
+In general, errors will provide you an **error type**, **error message**, **line number**, 
+and even the **code causing the crash**
+
+Here's what the error above tells us.
+
+* **Error type**: **TokenMissingError** because we're mising the next token 
+  (in this case a number) in the `2 * number` expression.
+* **Error message**: `syntax error: expression is incomplete `
+* **Code causing the crash**:
+  ```elixir
+    |
+  1 | 2 *
+    |   ^
+  ```
+* **Line number**: the crash is on **line 1**
+
+### Your Turn
+
+In the Elixir cell below, Reproduce a crash by writing `"hello" <>`.
+Then, try using `Enter` to create a new line and shift the code down to **line 2**. See how the 
+error is different now.
+
+```elixir
+
+```
+
 # Modules and Functions
 
 ## Setup
@@ -818,6 +1296,38 @@ and they all run in different ways.
     A --- E[Horses]
     A --- F[Humans]
 ```
+
+# Structs, Built-In Modules, Behaviors, and Protocols
+
+## Setup
+
+```elixir
+require Integer
+```
+
+## Overview
+
+Have you ever heard the expression "Reinventing the wheel?". Essentially it means repeating
+a useless action or solving an already solved problem.
+
+In programming, it's important to avoid reinventing the wheel, and instead rely on previously
+existing solutions. Sometimes those previously existing solutions are our own!
+
+In the previous lesson you learned about how to use modules and functions in order to 
+abstract away generic and reusable behavior.
+
+We also talked about polymorphism. Polymorphic code maintains consistent behavior while changing
+the underlaying implementation.
+
+In this lesson, you'll learn about more constructs and built-in tools Elixir provides to enable
+reusable code and polymorphic code.
+
+In this lesson we'll talk about:
+
+* Custom reusable data structures with **Structs**.
+* Reusable pre-built functionality with **Built-In Elixir Modules**.
+* Polymorphic code with **Behaviours**.
+* Polymorphic code with **Protocols**.
 
 
 

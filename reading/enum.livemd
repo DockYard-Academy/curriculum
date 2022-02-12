@@ -1,12 +1,4 @@
-# Enumeration
-
-## Setup
-
-```elixir
-Mix.install([
-  {:kino, "~> 0.5.1"}
-])
-```
+# Enum
 
 ## Overview
 
@@ -86,157 +78,23 @@ In total we will cover:
 
 * **Enumerable** **Collections** that support enumeration.
 * How to use the **Enum** module's built-in functionality with **Collections**.
-* Using `for` **Comprehensions**
-* Using **Recursion** to create functions that call themselves.
 
-First, it's useful to know what we can enumerate on. In Elixir, certain
+First, it's useful to know what we can enumerate on.
+
+## Enum
+
+We use the `Enum` module to accomplish enumeration. The Enum module contains
+a large amount of useful functions that all work on enumerable data types.
+
+In Elixir, certain
 data types are **enumerable** which means that we have the ability
 to enumerate through them and apply some function on each element.
 
 These structures are called **Collections** because they contain a collection of
-elements. You are already familiar with them. They are **lists**, **tuples**, **keyword lists**, **ranges**, 
+elements. You are already familiar with them. They are **lists**, **keyword lists**, **ranges**, 
 and **maps**.
 
-## Enumeration With Non-Enumerables
-
-Data types that do not contain multiple elements are not enumerable.
-However, it's still sometimes useful to enumerate over non-enumerable data types.
-
-Even though you can't enumerate over them directly, the trick is to convert
-non-enumerable data into an enumerable data type.
-
-Strings are not enumerable, however they can be converted into lists with either `String.graphemes/1`
-or `String.codepoints/1`.
-
-Under the hood, strings are represented with a codepoint. A codepoint is an integer that represents
-the character. Each character such as `"a"` has a corresponding codepoint. That's why the
-function is called `String.codepoints/1`.
-
-```elixir
-String.codepoints("abcdefghijklmnopqrstuvwxyz")
-```
-
-But what is a **grapheme**? Well some characters like é require multiple code points to represent.
-
-You'll notice that é is actually 2 characters if you use `String.codepoints/1`.
-
-```elixir
-String.codepoints("é")
-```
-
-So, if you want to split a string that contains characters like é, you'll want to use `String.graphemes/1`
-
-```elixir
-String.graphemes("é")
-```
-
-Now your string is an enumerable list of characters.
-
-### Your Turn
-
-In the Elixir cell below, convert the string `"Hello, world!"` into a list.
-
-```elixir
-
-```
-
-### Integers
-
-How would you convert integers into an Enumerable? 
-You can use the `Integer.digits/1` function.
-
-```elixir
-Integer.digits(123)
-```
-
-### Your Turn
-
-In the Elixir cell below, convert the integer `4389` into a list of digits.
-
-```elixir
-
-```
-
-### Tuples
-
-Despite being so similar to lists, tuples are not considered collections. 
-That's primarily because they are intended as fixed-sized containers, and any case that requires
-enumeration would likely be better served with lists.
-
-To get around this if needed, you can convert a tuple to a list with `Tuple.to_list/1`. 
-Now you have a list that you can work with as a collection if necessary. However, if you find
-yourself doing this often, it may have been a better
-choice to start with a list instead of a tuple.
-
-```elixir
-Tuple.to_list({1, 2, 3})
-```
-
-## Breaking Down Problems
-
-### Breaking Down Problems As Input And Output
-
-We've shown some examples of how to convert non-enumerable data into
-an enumerable as a list. This highlights the critical ability as a developer to
-manipulate the shape of data from one form to another.
-
-If you think about your program as the input of data and the output of data,
-you can model your desired functionality even if you don't understand how you're 
-going to implement it.
-
-Modelling a problem and understanding it is the first step to solving it.
-For example, let's say you want to convert an integer into a keyword list where the
-keys are the name of the integer, and the values are the integer.
-
-You could model that problem with input an output.
-
-```mermaid
-flowchart LR
-  12 --> Input
-  Input --> B[Black Box]
-  B --> Output
-  Output --> A["[one: 1, two: 2]"]
-```
-
-Then you could break that problem down further into a series of
-transformations.
-
-```mermaid
-flowchart LR
-  12 --> A["[1, 2]"]
-  A --> B[[one: 1, two: 2]]
-```
-
-Often, you need to solve problems that you don't know the answer to.
-In this case, you might not know how to go from `[1, 2]` to `[one: 1, two: 2]`.
-
-Can you break that problem down even further? If you can't solve one problem, try to solve
-an easier problem that will build your knowledge for how to solve the harder problem.
-
-For example, could you make a function that takes in an integer and returns it's atom?
-
-### Your turn
-
-In the Elixir cell below, create a function `to_atom_name/1` that accepts a single digit from 1-9 for it's
-parameter. Return the correct atom, `:one`, `:two`, `:three`, etc.
-
-<details>
-<summary>Hint</summary>
-You may need to create a `map` that uses integers as keys, and the corresponding atom as values.
-Then you can use map[key] syntax to get the correct atom.
-</details>
-
-```elixir
-
-```
-
-## Enum
-
-In order to convert `[1, 2]` Into `[one: 1, two: 2]` you'll need to use enumeration.
-Elixir provides the `Enum` module for enumeration related functionality.
-
-The [Enum](https://hexdocs.pm/elixir/1.13.2/Enum.html)
-module provides many helpful functions. The most important for you to learn now are.
+We'll focus on common `Enum` functions you'll use frequently.
 
 * `Enum.map/2` enumerate over every element and create a new collection with a new value.
 * `Enum.reduce/2` and `Enum.reduce/3`. Enumerate over every element into an accumulated value.
@@ -246,7 +104,7 @@ module provides many helpful functions. The most important for you to learn now 
 * `Enum.count/1` return the number of elements in a collection collection.
 * `Enum.find/3` return an element in a collection that matches some condition.
 
-The `Enum` module has a ton more functionality. Whenever you think to yourself
+The `Enum` module has a lot more functionality. Whenever you think to yourself
 "How can I ____ in a collection" you should see if the `Enum` module has a built-in solution.
 It's not realistic to learn it all upfront. Instead you'll learn functions over time
 whenever you run into a problem that requires `Enum` as a solution.
@@ -400,7 +258,7 @@ You can also override the default accumulator with `Enum.reduce/3`. `Enum.reduce
 arguments. The first is the collection, the second is the default accumulator, and the third
 is the function to call with each element and the accumulator.
 
-Enum.reduce/3 will call the function on every element, rather than setting the initial accumulator
+`Enum.reduce/3` will call the function on every element, rather than setting the initial accumulator
 as the first element.
 
 ```elixir
@@ -481,7 +339,7 @@ Enum.filter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], fn integer -> integer <= 5 end)
 
 ### Enum.all?/2
 
-Enum.all?/2 takes in a collection and a function. `Enum.all?/2` calls the function on every element
+`Enum.all?/2` takes in a collection and a function. `Enum.all?/2` calls the function on every element
 in the collection. If any element returns `false` then `Enum.all?/2` returns false. Otherwise,
 `Enum.all/2` returns `true`.
 
@@ -518,7 +376,7 @@ Enum.any?([2, 2, 3], fn integer -> integer === 1 end)
 
 ### Enum.count/1
 
-Enum.count returns the number of items in a collection.
+`Enum.count/1` returns the number of items in a collection.
 
 ```mermaid
 flowchart LR
@@ -562,30 +420,12 @@ So whenever an `Enum` module function uses an element inside of the collection, 
 Enum.reduce([one: 1], fn tuple, _accumulator -> tuple end)
 ```
 
-You can use pattern matching inside of the function.
-
-```elixir
-Enum.map([one: 1], fn {_key, value} -> value end)
-```
-
 ### Maps
 
 Internally, maps are also treated as tuples in a collection.
 
 ```elixir
 Enum.reduce(%{key: "value"}, fn tuple, _accumulator -> tuple end)
-```
-
-Which means you can also use pattern matching on the elements in a map.
-
-```elixir
-Enum.map(%{key: "value"}, fn {_key, value} -> value end)
-```
-
-Map keys can still be any type in the tuple.
-
-```elixir
-Enum.map(%{%{} => "value"}, fn {key, _value} -> key end)
 ```
 
 ## Further Reading.

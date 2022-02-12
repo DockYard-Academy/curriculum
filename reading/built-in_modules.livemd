@@ -1,0 +1,249 @@
+# Built-In Elixir Modules
+
+## Overview
+Elixir provides a great deal of built-in behavior in common modules.
+
+There is far to much available for you to master each module in depth. However, it's useful to
+be aware of them and where to look when you're reaching for some specific functionality.
+
+Modules group related functions together, and in general, each data type has a module 
+associated with it where elixir provides a variety of functions for that data type.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### The Kernel Module
+
+The [Kernel](https://hexdocs.pm/elixir/1.13.2/Kernel.html#functions) is the core of everything Elixir. It provides all of functionality that
+Elixir is built upon.
+
+Even the basic operators that you've been using are simply an alternative syntax to using functions in
+the Kernel.
+
+```elixir
+Kernel.+(3, 3)
+```
+
+The Kernel has many useful functions for determining a value's type such as `is_map/1`.
+
+```elixir
+Kernel.is_map(%{})
+```
+
+Functions in the Kernel module can be accessed directly without using the `Kernel.` namespace.
+
+```elixir
+is_map(%{})
+```
+
+The Kernel is fairly large and overwhelming to look at. Remember, your goal for this section is not
+to remember every function of every module. Instead, you'll develop familiarity over time and with
+practice.
+
+It's more important to know that the Elixir standard library exists, and that you use 
+it's many useful functions and modules.
+
+Every developers most fundamental skill is the ability to learn and lookup information 
+when you need it, not memorize a list of functions.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Try using the `is_atom/1`, `is_bitstring/1`, and `is_integer/1` functions.
+use `%{}`, `"hello"`, and `2` as an argument to each.
+
+```elixir
+
+```
+
+### The Integer Module
+
+The [Integer](https://hexdocs.pm/elixir/1.13.2/Integer.html#functions) module contains functionality related to Integers.
+
+It's time to confess, we've been making you determine if a number is even or odd the hard way.
+
+Integer provides an `is_even/1` and `is_odd/1` function.
+
+```elixir
+Integer.is_even(3)
+```
+
+```elixir
+Integer.is_odd(3)
+```
+
+### Your Turn
+
+Use the `Integer.to_string/1` function to convert `"2"` to an integer.
+
+```elixir
+
+```
+
+Try using the `Integer.gcd/2` function to determine the greatest common denominator of 
+`10` and `15`. The greatest common divisor (GCD) is the largest 
+positive integer that divides both 10 and 15 evenly.
+
+<details>
+<summary>Hint</summary>
+the result of `Integer.gcd(10, 15) should be 5
+</details>
+
+```elixir
+
+```
+
+### The String Module
+
+<!-- livebook:{"break_markdown":true} -->
+
+The [String](https://hexdocs.pm/elixir/1.13.2/String.html#functions) module contains functionality related to strings.
+
+Here's a few common functions to get you started.
+
+* `at/2` get the value at the index of a string.
+* `contains?/2` check if a string contains a value
+* `capitalize/2` capitalize first word in a string and leaves the rest lowercase.
+* `split/1` split the string into a list of words.
+* `trim/2` remove whitespace from a string.
+* `upcase/2` upcase a string so it is ALL CAPS
+
+### Your turn
+
+Use the `String.at/2` function to get the character at index 2 of "hello".
+
+You might not yet be familiar with strings and indexes.
+You can imagine a string like a list of characters
+
+```mermaid
+flowchart TB
+  subgraph Characters
+    S
+    T
+    R
+    I
+    N
+    G
+  end
+  subgraph Indexes
+    direction TB
+    S --- 0
+    T --- 1
+    R --- 2
+    I --- 3
+    N --- 4
+    G --- 5
+  end
+```
+
+So to get the character at index 1 in `"hello"` would be `"e"`.
+
+```mermaid
+flowchart TB
+  subgraph Characters
+    H
+    E
+    L1[L]
+    L2[L]
+    O
+  end
+  subgraph Indexes
+    direction TB
+    H --- 0
+    E --- 1
+    L1 --- 2
+    L2 --- 3
+    O --- 4
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your answer in the Elixir cell below.
+
+```elixir
+
+```
+
+### The Map Module
+
+The [Map](https://hexdocs.pm/elixir/1.13.2/Map.html#functions) module contains functionality related to maps.
+
+Here's a few common functions to get you started.
+
+* `get/3` retrieve values in a map.
+* `put/3` put a value into a map.
+* `keys/1` list the keys in a map.
+* `delete/2` remove a key and value from a map.
+* `merge/2` merge two maps together.
+* `values/1` list the values in a map.
+
+### Your turn
+
+Try using `Map.merge/2` to combine `%{one: 1}` and `%{two: 2}`.
+
+```elixir
+
+```
+
+### Date and DateTime
+
+Elixir provides useful built-in structs. You'll become familiar with the `Date` and `DateTime` modules
+if you ever need to work with time in your programs.
+
+Both represent a date in a calendar, however `DateTime` provides increased specificity by also
+storing the time of the day. Thus `Date` and `DateTime`.
+
+You can create a new `Date` the same way you would create any struct. It accepts a `:year`, `:month`,
+and `:day`
+
+```elixir
+%Date{year: 2001, month: 8, day: 10}
+```
+
+### Your Turn
+
+Try creating a `Date` for your birthday, if you don't want to use your birthday you can use
+any day you like.
+
+```elixir
+
+```
+
+### Sigils
+
+Woah, what is `~D[2001-08-10]`? Well that's how Elixir internally represents dates. 
+It uses a construct called a `sigil`. A sigil is an alternative syntax for working with 
+certain types of values.
+
+You don't yet need to be deply familiar with how sigils work, but it's useful to be aware of them.
+A sigil is defined with a tilde `~` character followed by a character. In this case the `~D`
+is for a `Date`. You can create a Date directly with this syntax.
+
+```elixir
+~D[2001-08-10]
+```
+
+### Your Turn
+
+Create the same data as you did above. This time, use the `~D[]` syntax.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Date.new/4
+
+Often when creating dates, it's beneficial to use the built-in `Date.new/4` function which
+validates the date when creating it.
+
+Otherwise, you can create some pretty wacky dates!
+
+```elixir
+%Date{year: 20222, month: 143, day: 123}
+```
+
+You can see the above is not valid when using `Date.new/4`. it returns `{:error, :invalid_date}`
+
+```elixir
+Date.new(20222, 143, 123)
+```
+

@@ -1,14 +1,10 @@
-# Polymorphism
-## Lesson
+# Polymorphism: Protocols & Behaviors
+
+## Polymorphism
 
 The word polymorphism comes from the Greek word for "many shapes".
 It means essentially the same thing for our programs.
 We often want to define a single general behavior, but apply it to different things.
-
-In the example above, we use multiple function clauses to achieve polymophism using the same
-generic `hi` function to say hi to one person, or two people. Earlier, we also achieved polymorphism 
-with the `call_twice` function, which abstracts a generic repeatable behavior, but does not
-care about the specific function that it's calling twice.
 
 ```mermaid
   flowchart
@@ -29,4 +25,63 @@ and they all run in different ways.
     A --- D[Dogs]
     A --- E[Horses]
     A --- F[Humans]
+```
+
+For a more technical example, you can think of many devices that need to implement an **off** feature.
+You can turn off your computer, your tv, your lights, and your phone. Each needs to do this differently
+under the hood, but the behavior is universal.
+
+```mermaid
+  flowchart
+    A[off] --- B[TV]
+    A --- C[Computer]
+    A --- D[Phone]
+    A --- E[Lights]
+```
+
+Anytime you have a universal behavior, but separate implementation depending on some context, it's
+an opportunity to use polymorphism to improve the clarity of your code.
+
+You've also been using the `Enum` module which provides polymorphic
+behavior for different collection data types.
+
+```mermaid
+  flowchart
+    A[Enum] --- B[map]
+    A --- C[list]
+    A --- D[keyword-list]
+    A --- E[range]
+```
+
+You have also already learned some methods of achieving polymorphism with multi-clause functions.
+
+```elixir
+defmodule Greeter do
+  def hi(name) do
+    "Hi #{name}!"
+  end
+  def hi(name1, name2) do
+    "Hi #{name1} and #{name2}!"
+  end
+  def hi(_name1, _name2, _name3) do
+    "Hi everyone!"
+  end
+end
+```
+
+For example, multiple arity functions could be said to be polymorphic,
+They the same generic behavior but with different implementations depending
+on the number of arguments given.
+
+```mermaid
+  flowchart
+    A[Greeter.hi] --> B[1 person] 
+    A --> C[2 people]
+    A --> D[3 people]
+```
+
+### Your Turn
+
+```elixir
+Kino.Text.input("What is an example of polymorphic behavior found in everyday life?")
 ```

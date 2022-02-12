@@ -1,0 +1,116 @@
+# Protocols
+## Protocols
+In english, a protocol means a set of rules or procedures. In Elixir, a protocol allows us to 
+create a common functionality, with different implementations.
+
+You might think that sounds a lot like behaviours. They are similar, because
+they both enable polymorphism. However, behaviors handle polymorphism based on modules,
+and protocols enable polymorphism based on data.
+
+```mermaid
+flowchart
+  A -- data --> B
+  B --> C
+  B --> D
+  B --> E
+  B --> F
+
+  A[Caller]
+  B[Protocol]
+  C[Implementation]
+  D[Implementation]
+  E[Implementation]
+  F[Implementation]
+```
+
+## Create an Adder protocol
+
+Let's create a protocol `Adder` that's going to add two values together.
+
+This awesome adder protocol is going to hide the specifics of which
+operator is necessary to add different types. So it will handle adding integers,
+strings, and
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Adder.add(1, 2)
+3
+
+Adder.add("hello, ", "world")
+"hello, world"
+
+Adder.add([1], [2])
+[1, 2]
+```
+
+So if we give the protocol an integer, it will use the implementation for `Integer`.
+
+```mermaid
+flowchart
+  A -- Integer --> B
+  B -- Integer --> C
+  B -- BitString --> D
+  B -- List --> E
+  style C color:green
+  style D color:red
+  style E color:red
+  A[Caller]
+  B[Adder Protocol]
+  C[Integer Implementation]
+  D[String Implementation]
+  E[List Implementation]
+```
+
+We define a protocol using `defprotocol` and otherwise the protocol will look just a lot like a 
+behaviour. Protocols do not require a typespec, however we do still
+define a function clause.
+
+```elixir
+defprotocol Adder do
+  def add(value, value)
+end
+```
+
+We've defined a protocol above, but we haven't implemented it yet, so it's impossible to
+call the `Adder.add/2` function. Notice the error for `Adder.add/2` called with two integers says 
+`protocol Adder not implemented for 1 of type Integer`
+
+```elixir
+Adder.add(1, 2)
+```
+
+To define an implementation for a protocol, we use `defimpl` and provide it the name of the protocol.
+We also declare what struct or data type the protocol is `for:`
+
+```elixir
+defimpl Adder, for: Integer do
+  def add(int1, int2) do
+    int1 + int2
+  end
+end
+
+Adder.add(1, 2)
+```
+
+We also want the `Adder` protocol to handle strings and lists. That means we need to create
+an implementation for List and String. In Elixir, the underlaying type for strings is `BitString`.
+
+```elixir
+defimpl Adder, for: BitString do
+  def add(string1, string2) do
+    string1 <> string2
+  end
+end
+
+Adder.add("hello, ", "world")
+```
+
+### Your turn
+
+In the Elixir cell below, create an implementation of Adder for lists, then call `Adder.add([1], [2])` to ensure it works.
+To give you a hint, the protocol implementation will be for `List`
+
+```elixir
+
+```
