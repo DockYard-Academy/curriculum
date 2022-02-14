@@ -103,6 +103,7 @@ We'll focus on common `Enum` functions you'll use frequently.
 * `Enum.any?` check if any elements in a collection match some condition.
 * `Enum.count/1` return the number of elements in a collection collection.
 * `Enum.find/3` return an element in a collection that matches some condition.
+* `Enum.random/1` return a random element in a collection.
 
 The `Enum` module has a lot more functionality. Whenever you think to yourself
 "How can I ____ in a collection" you should see if the `Enum` module has a built-in solution.
@@ -387,6 +388,14 @@ flowchart LR
 Enum.count([1, 2, 3])
 ```
 
+### Your Turn
+
+In the Elixir cell below, count the number of elements in the `collection`
+
+```elixir
+collection = [1, 2, 3, 4, 5]
+```
+
 ### Enum.find/2
 
 `Enum.find/2` takes in a collection and a function. `Enum.find/2` then searches the collection
@@ -400,6 +409,31 @@ If no element is found, `Enum.find/2` returns `nil`.
 
 ```elixir
 Enum.find(["h", "e", "l", "l", "o"], fn each -> is_integer(each) end)
+```
+
+### Your Turn
+
+In the Elixir cell below, use `Enum.find/2` to find `5` in this list.
+
+```elixir
+list = [1, 2, 3, 4, 5]
+```
+
+## Enum.random/1
+
+`Enum.random/1` returns a random element in a collection. It's often used
+to generate random numbers in a range.
+
+```elixir
+Enum.random(1..10)
+```
+
+### Your Turn
+
+In the elixir cell below, use `Enum.random/1` to retrieve a random element from the `collection`
+
+```elixir
+collection = ["one", 3, {}]
 ```
 
 ## Enum on Other Collections
@@ -428,9 +462,30 @@ Internally, maps are also treated as tuples in a collection.
 Enum.reduce(%{key: "value"}, fn tuple, _accumulator -> tuple end)
 ```
 
-## Further Reading.
+### Your Turn
 
-### Enum
+In the Elixir cell below, use `Enum.reduce/1` to sum all of the **values** in a map.
+So `%{key1: 1, key2: 10}` should become 10.
+
+```elixir
+map = %{key1: 1, key2: 10}
+```
+
+In the Elixir cell below, use `Enum.reduce/1` to sum all of the **keys** and **values** in a map.
+So `%{1 => 15, 10 => 12}` should become `38` `(1 + 15 + 10 + 12)`  .
+
+```elixir
+map = %{key1: 1, key2: 10}
+```
+
+Use `Enum.reduce/1` to sum all of the values in a keyword list.
+so `%{add: 20, add: 5}` should become `25`.
+
+```elixir
+keyword_list = %{add: 20, add: 5}
+```
+
+## Further Reading.
 
 The Enum module has many more functions. You'll have the opportunity to encounter more
 as you need them to solve future challenges.

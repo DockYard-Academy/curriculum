@@ -1,10 +1,17 @@
 # Pattern Matching
+
+## Setup
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
 ## Pattern Matching
 
 In many other programming languages, the match operator `=` is called an assignment operator.
 
 That makes sense, because so far you've only seen the `=` used to bind values to variables.
-However Elixir actually uses **Pattern Matching** and binding instead of assignment.
+However Elixir actually uses **pattern matching** and binding instead of assignment.
 
 What is pattern matching? Well rather than simply assigning values to variables, Elixir allows
 you to bind variables on the left-hand side of the `=`. So long as it matches the same shape of the
@@ -16,7 +23,7 @@ What does that mean? Well, we already know we can use `=` to bind the right hand
 my_tuple = {1, 2, 3}
 ```
 
-But did you know that you can also pattern match like this?
+But you can also bind a variable to each element in the tuple with pattern matching.
 
 ```elixir
 {one, two, three} = {1, 2, 3}
@@ -24,8 +31,9 @@ But did you know that you can also pattern match like this?
 two
 ```
 
-You can create an expression on the left-hand side, and so long as it matches the shape
-of the data on the right-hand side, you can extract and **match** on internal values.
+So long as the expression on the left side of match operator `=` matches the pattern of the right side, 
+you can bind variables to values.
+
 Here's the same concept with a list
 
 ```elixir
@@ -35,7 +43,7 @@ hero
 ```
 
 This binds a new variable. If you aren't concerned about a value then you can use underscore `_`
-to avoid binding it to a named variable.
+to ignore it.
 
 ```elixir
 [_, secret_identity] = ["Spider Man", "Peter Parker"]
@@ -59,6 +67,7 @@ variable. The first exercise is filled out as an example. Choose any variable na
 
 ```elixir
 %{spiderman: identity1} = %{spiderman: "Peter Parker"}
+identity1
 ```
 
 ```elixir
@@ -75,7 +84,7 @@ variable = [hello: "world"]
 
 ## Pattern Matching with Case
 
-Previously, we talked about how the case statement checks for equality.
+Previously, we talked about how the case statement checks for a match.
 
 ```elixir
 case "same" do
@@ -105,8 +114,8 @@ case my_variable do
   [] -> nil
   [1, 2, 3] -> "A"
   %{one: _} -> "B"
-  {1, 2, 3, %{hello: "world"}} -> "C"
-  10 -> "D"
+  {1, _, _, %{hello: _}} -> "C"
+  _ -> "D"
 end
 ```
 
@@ -141,6 +150,77 @@ Greeter.greet(["Peter", "Bruce"])
 
 ```elixir
 Greeter.greet(%{name: "Batman", identity: "Bruce Wayne"})
+```
+
+## Pattern Matching Lists
+
+Sometimes a collection is large, and it's unreasonable to pattern match on every element.
+
+Maps don't have this problem so much, because you don't need to include every key in the match
+
+```elixir
+%{key1: value} = %{key1: "value1", key2: "value2"}
+value
+```
+
+This poses an issue for lists though who seem to require a match for every element.
+
+```elixir
+[one] = [1, 2]
+```
+
+To get around this, you can use the `[head | tail]` syntax for prepending elements to a list.
+
+The **head** is the first element of the list.
+
+```elixir
+[head | _tail] = [1, 2, 3, 4, 5, 6, 7]
+head
+```
+
+The **tail** is rest of the elements in the list.
+
+```elixir
+[_head | tail] = [1, 2, 3, 4, 5, 6, 7]
+tail
+```
+
+You can access multiple elements at the start of the list separated by commas `,`.
+
+```elixir
+[one, two | _tail] = [1, 2, 3, 4, 5, 6, 7]
+{one, two}
+```
+
+Why head and tail? That's because under the hood lists in Elixir are a [linked-list](reading/linked_list_vs_tuples).
+Essentially each element in the list knows the location of the next element in memory.
+
+The **head** is the current element in the list, and the **tail** is the link to the remaining elements.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  subgraph Head
+  L
+  end
+  subgraph Tail
+  I
+  S
+  T
+  end
+  L -- tail --> I --> S --> T 
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Pattern match on only the first element in this list using `[head | tail]` syntax.
+Replace `nil` with your answer.
+
+```elixir
+[1, 2, 3]
 ```
 
 ## With

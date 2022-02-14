@@ -1,11 +1,11 @@
 # Protocols
+
 ## Protocols
+
 In english, a protocol means a set of rules or procedures. In Elixir, a protocol allows us to 
 create a common functionality, with different implementations.
 
-You might think that sounds a lot like behaviours. They are similar, because
-they both enable polymorphism. However, behaviors handle polymorphism based on modules,
-and protocols enable polymorphism based on data.
+Specifically, protocols enable polymorphic behavior based off of data.
 
 ```mermaid
 flowchart
@@ -23,13 +23,48 @@ flowchart
   F[Implementation]
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
+For example, the `Enum` module works with any collection data type. Under the hood, it uses the 
+`Enumerable` protocol.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  E[Enum]
+  EN[Enumerable]
+  E --> EN
+  EN --> Map
+  EN --> List
+  EN --> k[Keyword List]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+It then executes the appropriate instructions depending on which data type the `Enum` function
+is called with.
+
+```elixir
+Enum.random(%{one: 1, two: 2})
+```
+
+```elixir
+Enum.random(1..20)
+```
+
+```elixir
+Enum.random(one: 1, two: 2)
+```
+
 ## Create an Adder protocol
 
-Let's create a protocol `Adder` that's going to add two values together.
+Anytime you need a common function for multiple data types or structs, you
+can consider a protocol.
 
-This awesome adder protocol is going to hide the specifics of which
-operator is necessary to add different types. So it will handle adding integers,
-strings, and
+For example, let's create an `Adder` protocol
+that's going to add two values together. It will accept integers, strings, and lists
+and hide the specifics of which operator is necessary to add different types.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -45,6 +80,10 @@ Adder.add([1], [2])
 ```
 
 So if we give the protocol an integer, it will use the implementation for `Integer`.
+If we provide the protocol a string, it will use the implementation for `BitString`, and 
+if we provide the protocol a list, it will use the implementation for `List`.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart
@@ -62,9 +101,11 @@ flowchart
   E[List Implementation]
 ```
 
-We define a protocol using `defprotocol` and otherwise the protocol will look just a lot like a 
-behaviour. Protocols do not require a typespec, however we do still
-define a function clause.
+`List`, `Integer`, and `BitString` are all built-in Elixir modules used to define
+which data type the protocol implementation is for.
+
+We define a protocol using `defprotocol` and define a function clause. We only need the function
+head, not the function body.
 
 ```elixir
 defprotocol Adder do
@@ -72,8 +113,9 @@ defprotocol Adder do
 end
 ```
 
-We've defined a protocol above, but we haven't implemented it yet, so it's impossible to
-call the `Adder.add/2` function. Notice the error for `Adder.add/2` called with two integers says 
+We've defined a protocol above, but we haven't implemented it for any data type yet.
+
+Notice the error for `Adder.add/2` called with two integers says 
 `protocol Adder not implemented for 1 of type Integer`
 
 ```elixir
@@ -96,6 +138,8 @@ Adder.add(1, 2)
 We also want the `Adder` protocol to handle strings and lists. That means we need to create
 an implementation for List and String. In Elixir, the underlaying type for strings is `BitString`.
 
+Why `BitString`? That's because under the hood Elixir represents strings with [binary](reading/binary.livemd) bits.
+
 ```elixir
 defimpl Adder, for: BitString do
   def add(string1, string2) do
@@ -109,7 +153,6 @@ Adder.add("hello, ", "world")
 ### Your turn
 
 In the Elixir cell below, create an implementation of Adder for lists, then call `Adder.add([1], [2])` to ensure it works.
-To give you a hint, the protocol implementation will be for `List`
 
 ```elixir
 

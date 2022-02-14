@@ -2,8 +2,6 @@
 To open the .livemd files in the **curriculum** folder you will need the latest version of `livebook` running. 
 Presently, there are no other requirements.
 
-The Fundamentals section currently has completed lessons. The other folders are placeholders.
-
 ## Getting Started
 - Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed
 - Ensure you have the latest [livebook](https://github.com/livebook-dev/livebook) installed.

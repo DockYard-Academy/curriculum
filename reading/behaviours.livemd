@@ -1,5 +1,7 @@
 # Behaviours
+
 ## Behaviours
+
 Behaviors allow us create modules that all share a common pattern, but need different implementations.
 
 You can define a behavior, and then two other modules will implement it.
@@ -70,6 +72,8 @@ allow us to create "templates" for modules to ensure each module is consistent.
 The **caller**, which is the place in the code where we call a module's function, can
 then have a consistent experience between modules.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ```mermaid
 flowchart
   A --> C
@@ -89,15 +93,20 @@ flowchart
   F[Implementation]
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 If the behavior ever needs to change, we can modify the behavior, and know which modules
 need to be updated thanks to the warnings Elixir provides.
 
-There are other reasons such as [Dynamic Dispatching](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#dynamic-dispatch)
-Which allow the caller to deal with a single module, and swap out the implementation.
+You can also implement behaviors with [dynamic dispatching](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#dynamic-dispatch)
+which allows the caller to deal with a single module, and swap out the implementation.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart
   A --> B
+
   B --> C
   B --> D
   B --> E
@@ -110,16 +119,20 @@ flowchart
   F[Implementation]
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 But that's beyond the scope of this lesson.
 
 ### Your Turn
 
 In the Elixir cell below
 
-* Create a behaviour called Pet. a Pet should have a `@callback` module attribute `speak/0`
+* Create a behaviour called `Pet`. a `Pet` should have a `@callback` module attribute `speak/0`
   function that returns a string.
-* Create a module `Dog` that uses the `Pet` behaviour.
+* Create a module `Dog` that implements the `Pet` behaviour.
 * Implement a `speak` function in the `Dog` module that returns `"woof"`.
+* Create a module `Cat` that implements the `Pet` behaviour.
+* Implement a `speak` function in the `Cat` module that returns `"meow"`.
 
 ```elixir
 
