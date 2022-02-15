@@ -18,7 +18,7 @@ The academy is inspired by:
 - Collaborative Learning
 - Flipped Classroom Design
 - Intrinsic Motivation
-- Drefus Model of Skill Aquisition
+- Dreyfus Model of Skill Aquisition
 
 ## Classtime
 
