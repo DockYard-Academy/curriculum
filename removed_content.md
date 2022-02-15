@@ -623,12 +623,12 @@ add_two.(2, 3)
 
 ### Function Arity
 
-The number of parameters your function accepts is called the `arity` of the function.
+The number of parameters your function accepts is called the **arity** of the function.
 
 A function with no parameters has an arity of zero. A function with one parameter has
 an arity of one, and so on.
 
-You refer to the function as `function_name/arity` thus a function named `add_two` with two parameters
+You refer to the function as **function_name/arity** thus a function named `add_two` with two parameters
 is called `add_two/2`.
 
 ## First-class Functions
@@ -1122,5 +1122,61 @@ In this lesson we'll talk about:
 * Polymorphic code with **Behaviours**.
 * Polymorphic code with **Protocols**.
 
+### Mutation
 
+Under the hood, the values bound to variables are stored on the computer.
 
+The variable, is actually pointing to the value in that location.
+
+```mermaid
+flowchart LR
+    variable --> location
+```
+
+For example, a variable `hello` with the value `"world"` would store the string
+`"world"` somewhere in **memory**. **memory** is a hardware component on the computer.
+You may have heard of **RAM** (Random Access Memory).
+
+```mermaid
+flowchart LR
+    hello --> w["world"]
+```
+
+Object Oriented Programming languages allow you to mutate the actual value in memory.
+So when we write `hello = 4`, the data `"world"` mutates into `4`.
+
+```mermaid
+flowchart LR
+    hello --> w["world"]
+```
+
+However, in a functional programming language like Elixir, we do not allow mutation.
+So instead of mutating the data, we **rebind** the variable to new data.
+
+```mermaid
+flowchart
+    w["world"]
+    hello --> 4
+```
+
+```elixir
+hello = "hello"
+hello_world = hello <> "world"
+hello = "hi"
+hello_world
+```
+
+```elixir
+hello
+```
+
+You'll notice that if you rebind `hello` below to `4`, the Elixir cell above will still
+have `hello` bound to `"world"`
+
+```elixir
+hello = 4
+```
+
+```elixir
+hello
+```

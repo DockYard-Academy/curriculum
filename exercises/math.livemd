@@ -1,0 +1,169 @@
+# Math
+
+## Overview
+
+In this exercise, you're going to create a math module that handles adding, subtracting, and multiplying different
+data types.
+
+You will implement the `Math` module in 3 different ways using guards, behaviours, and protocols.
+This serves to show that you can accomplish the same functionality but using different methods, to highlight
+the differences and benefits of each method.
+
+## Math Guards
+
+In this exercise, you're going to create a `Math.Guard` module.
+
+* Create `add/2`, `subtract/2`, and `multiply/2` functions
+* `add/2`, `subtract/2`, and `multiply/2` should each have different clauses for 
+  **integers**, **strings**, **lists**, **tuples**, **maps**, and **ranges**.
+
+Ensure the module matches the following functionality.
+
+```elixir
+# Integers and Floats behave as expected
+
+# Strings
+Math.Guard.add("he", "llo")
+"hello"
+Math.Guard.subtract("here", "he")
+"re"
+Math.Guard.subtract("here", "hee")
+"r"
+Math.Guard.multiply("ba", "ha")
+"bhaaha"
+Math.Guard.multiply("123", "234")
+"122334"
+
+# Lists and Keyword Lists
+Math.List.add([1, 2, 3], [1])
+[1, 2, 3, 1]
+Math.List.subtract([1, 2, 3], [1])
+[2, 3]
+Math.List.multiply([1, 2, 3], 3)
+[1, 2, 3, 1, 2, 3, 1, 2, 3]
+Math.List.multiply([one: 1, two: 2], 2)
+[one: 1, two: 2, one: 1, two: 2]
+
+# Tuples
+Math.Map.add({1, 2}, {3, 4})
+{1, 2, 3, 4}
+Math.Map.subtract({1, 2, 3, 4}, {3, 4})
+{1, 2}
+Math.Map.multiply({1, 2}, {3, 4})
+{{3, 4}, {1, 2}}
+
+# Maps
+Math.Map.add(%{one: 1}, %{two: 2})
+%{one: 1, two: 2}
+Math.Map.subtract(%{one: 1, two: 2}, %{two: 2})
+%{one: 1}
+Math.Map.multiply(%{one: 1, two: 2}, %{three: 3})
+%{one: %{three: 3}, two: %{three: 3}}
+
+# Ranges
+Math.Range.add(1..10, 2..20)
+3..30
+Math.Range.subtract(5..20, 1..5)
+3..15
+Math.Range.multiply(5..20, 1..5)
+5..100
+```
+
+## Math Behaviours
+
+Now you're going to accomplish the same as `Math.Guard`, but in a new `Math.Behaviour` module.
+The
+
+```mermaid
+flowchart
+  M[Math.Behavior]
+  I[Math.Behavior.Integer]
+  L[Math.Behavior.List]
+  T[Math.Behavior.Tuple]
+  maps[Math.Behavior.Map]
+  R[Math.Behavior.Range]
+
+  M --> I
+  M --> L
+  M --> T
+  M --> maps
+  M --> R
+```
+
+In the Elixir cell below, create a behaviour `Math` which defines the common interface
+for `add/2`, `subtract/2`, and `multiply/2` different data types.
+
+```elixir
+
+```
+
+* Create a module `Math.Number` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for integers and floats.
+
+```elixir
+
+```
+
+* Create a module `Math.String` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for strings.
+
+```
+
+```
+
+```
+
+- Create a module `Math.List` which implements the `Math` behavior.
+- handle `add/2`, `subtract/2`, and `multiply/2` for lists.
+
+
+
+- Create a module `Math.Map` which implements the `Math` behavior.
+- handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+
+```
+
+```
+
+- Create a module `Math.Range` which implements the `Math` behavior.
+- handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
+
+```
+
+```
+
+## Protocols
+
+Using protocols, build the same `Math` functionality.
+
+In the Elixir cell below, define a `Math` protocol with `add/2`, `subtract/2` and `multiply/2` function heads.
+
+```
+
+```
+
+Create a `Math` implementation for integers
+
+```
+
+```
+
+Create a `Math` implementation for floats
+
+```
+
+```
+
+Create a `Math` implementation for strings
+
+```
+
+```
+
+Create a `Math` implementation for lists
+
+```
+
+```
+
+```

@@ -1,0 +1,175 @@
+# RPG Abilities
+
+## Overview
+
+You're creating an RPG game.
+In your game there are **characters** and `Consumable` **items**.
+
+```mermaid
+classDiagram
+    class Character {
+        class: :rogue, :wizard, :warrior
+        health: 20
+        speed: 10
+        items: []
+    }
+    class HealingPotion {
+    }
+    class Pie {
+    }
+    class Poison {
+    }
+```
+
+## Create a Character Struct
+
+In the Elixir cell below, define a `Character` struct with `:health`, `:speed`, `:class`, and `:items`.
+
+* `health` should be an integer defaulted to 100.
+* `speed` should be an integer defaulted to 20.
+* `class` should expect an atom of either `:wizard`, `:rogue`, or `:warrior`.
+* `items` should be a list that defaults to an empty list `[]`.
+  ```elixir
+  %Character{class: :wizard}
+  # %Character{health: 100, speed: 20, class: :wizard, items: []}
+  ```
+
+```elixir
+
+```
+
+### Create Items
+
+For each of the following items, create a single struct with no fields or the fields shown below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+    class HealingPotion {
+    strength: integer
+    }
+    class Pie {
+    }
+    class Poison {
+    }
+```
+
+You should be able to create a new struct for `HealingPotion`, `Pie`, and `Poison` like so.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%Pie{}
+%Poison{}
+%HealingPotion{strength: 20}
+%EmptyBottle{}
+```
+
+```elixir
+
+```
+
+## Create a Consumable Protocol
+
+Some items can be consumed to heal or damage the character.
+
+### Create Consumable
+
+* Create the `Consumable` protocol with a `consume` function that expects a `Character` 
+  and an **item**.
+
+```elixir
+
+```
+
+### Pie
+
+* Implement the Consumable Protocol for `Pie`, it should heal a character for `5` health.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Consumable.consume(%Character{class: :wizard, health: 90}, %Pie{})
+%Character{health: 95, speed: 20, items: [], class: :wizard}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Some items when consumed leave the character with another item. For example, `HealingPotion` heals
+the character for it's strength, and then leaves them with an `EmptyBottle`.
+
+### Healing Potion
+
+* Implement the `Consumable` protocol for `HealingPotion`. It should heal a character for it's 
+  strength and add an `EmptyBottle` to their items.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Consumable.consume(%Character{class: :wizard, health: 50}, %HealingPotion{strength: 25})
+%Character{health: 75, speed: 20, items: [%EmptyBottle{}], class: :wizard}
+```
+
+```elixir
+
+```
+
+### Poison
+
+Implement the `Consumable` protocol for `Poison`. It should remove health from a character for it's 
+strength and add an `EmptyBottle` to their items.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Consumable.consume(%Character{class: :wizard, health: 50}, %Poison{strength: 25})
+%Character{health: 25, speed: 20, items: [%EmptyBottle{}], class: :wizard}
+```
+
+```elixir
+
+```
+
+## Create a Wearable Protocol
+
+Time to stretch your creativity. You're going to create a `Wearable` protocol and
+some custom items of your choosing.
+
+### Wearable
+
+Create a `Wearable` protocol with `wear/2` and `remove/2` functions.
+
+```elixir
+
+```
+
+### Custom Items
+
+Create 3 custom items that implement the `Wearable` Protocol.
+
+* `wear/2` should expect a `Character` as a parameter and an item that implements the `Wearable` protocol
+* `wear/2` should return a new `Character` with modified stats, and the item in their `items` list.
+* `remove` should return a new `Character` with the unmodified stats and the item removed.
+
+```elixir
+
+```
+
+### Class Specific Items
+
+* Create three new custom items that implement the `Wearable` protocol,
+* Each item should only be `Wearable` by one class. Each class should have one class specific item.
+
+```elixir
+
+```
+
+## Create a Custom Protocol
+
+Take everything you've learned above and create a custom protocol! You can add any feature that
+you want to the game. For example, you might create a protocol for actions the character can perform.
+
+```elixir
+
+```

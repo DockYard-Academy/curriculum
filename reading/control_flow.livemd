@@ -589,14 +589,15 @@ end
   "
 ]
 
-Kino.animate(2000, 0, fn i ->
+Kino.animate(6000, 0, fn i ->
   md = Enum.at(sequence, i) |> Kino.Markdown.new()
   {:cont, md, rem(i + 1, length(sequence))}
 end)
 ````
 
 Now, you may notice that if you give the `case` statement a value that doesn't match any case, 
-the program crashes with a **CaseClauseError** error.
+the program crashes with a **CaseClauseError** error. In general, it's wise to have a default
+case that handles any value.
 
 ```elixir
 case "no match" do

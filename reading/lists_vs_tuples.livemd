@@ -1,0 +1,81 @@
+# Lists Vs Tuples
+
+## Setup
+
+This content is WIP.
+```elixir
+Mix.install([
+  {:vega_lite, "~> 0.1.3"},
+  {:kino, github: "livebook-dev/kino"}
+])
+
+alias VegaLite, as: Vl
+```
+
+## Performance
+
+Computers are broken into a variety of parts. As programmers, we are primarily concerned about
+ the **processor**, and the **memory**.
+
+### CPU (Central Processing Unit)
+
+The processor interprets and executes the instructions that we as developers provide.
+It's speed is measured in Gigahertz (GHz).
+
+More importantly, the processor speed impacts
+
+```elixir
+{time, _result} =
+  :timer.tc(fn -> 1_000_000_000_000_000_000_000 + 1_000_000_000_000_000_000_000_000 end)
+
+time
+```
+
+### Algorythms
+
+### Big O Notation.
+
+```elixir
+# TODO - Hide
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "x", type: :quantitative)
+  |> Vl.encode_field(:y, "y", type: :quantitative)
+  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
+  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+max_x = 5
+initial_x = 2
+
+linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
+constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
+exponential = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
+logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
+
+Kino.VegaLite.push_many(widget, exponential)
+Kino.VegaLite.push_many(widget, logarithmic)
+Kino.VegaLite.push_many(widget, constant)
+Kino.VegaLite.push_many(widget, linear)
+```
+
+:math.l
+
+```elixir
+:math.log2(4)
+```
+
+### Mutation
+
+## Linked Lists
+
+lists in Elixir are implemented as linked lists.
+
+```mermaid
+flowchart
+l
+```
