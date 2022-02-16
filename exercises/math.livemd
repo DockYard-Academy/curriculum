@@ -17,12 +17,32 @@ In this exercise, you're going to create a `Math.Guard` module.
 * `add/2`, `subtract/2`, and `multiply/2` should each have different clauses for 
   **integers**, **strings**, **lists**, **tuples**, **maps**, and **ranges**.
 
-Ensure the module matches the following functionality.
+In the Elixir cell below, add the following functionality step by step.
+
+### Step 1: Integers and Floats
+
+Should behave as expected.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Integers and Floats behave as expected
+Math.Guard.add(1, 1)
+2
+Math.Guard.subtract(3, 2)
+1
+Math.Guard.multiply(5, 5)
+25
+```
 
-# Strings
+### Step 2: Strings
+
+* `add/2` should concatinate strings
+* `subtract/2` should the first matching letter from the string.
+* `multiply/2` should repeat the second string after every letter in the first string.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
 Math.Guard.add("he", "llo")
 "hello"
 Math.Guard.subtract("here", "he")
@@ -33,40 +53,66 @@ Math.Guard.multiply("ba", "ha")
 "bhaaha"
 Math.Guard.multiply("123", "234")
 "122334"
+```
 
-# Lists and Keyword Lists
-Math.List.add([1, 2, 3], [1])
-[1, 2, 3, 1]
-Math.List.subtract([1, 2, 3], [1])
-[2, 3]
-Math.List.multiply([1, 2, 3], 3)
-[1, 2, 3, 1, 2, 3, 1, 2, 3]
-Math.List.multiply([one: 1, two: 2], 2)
-[one: 1, two: 2, one: 1, two: 2]
+### Step 3: Lists and Keyword Lists
 
-# Tuples
-Math.Map.add({1, 2}, {3, 4})
-{1, 2, 3, 4}
-Math.Map.subtract({1, 2, 3, 4}, {3, 4})
-{1, 2}
-Math.Map.multiply({1, 2}, {3, 4})
-{{3, 4}, {1, 2}}
+* `add/2` should add lists.
+* `subtract/2` should subtract lists.
+* `multiply/2` should repeat elements in the first list.
+  ```elixir
+  Math.Guards.add([1, 2, 3], [1])
+  [1, 2, 3, 1]
+  Math.Guards.subtract([1, 2, 3], [1])
+  [2, 3]
+  Math.Guards.multiply([1, 2, 3], 3)
+  [1, 2, 3, 1, 2, 3, 1, 2, 3]
+  ```
 
-# Maps
-Math.Map.add(%{one: 1}, %{two: 2})
-%{one: 1, two: 2}
-Math.Map.subtract(%{one: 1, two: 2}, %{two: 2})
-%{one: 1}
-Math.Map.multiply(%{one: 1, two: 2}, %{three: 3})
-%{one: %{three: 3}, two: %{three: 3}}
+### Step 4: Tuples
 
-# Ranges
-Math.Range.add(1..10, 2..20)
-3..30
-Math.Range.subtract(5..20, 1..5)
-3..15
-Math.Range.multiply(5..20, 1..5)
-5..100
+* `add/2` should add tuples.
+* `subtract/2` should subtract tuples.
+* `multiply/2` should repeat elements in the first tuple.
+  ```elixir
+  Math.Guards.add({1, 2}, {3, 4})
+  {1, 2, 3, 4}
+  Math.Guards.subtract({1, 2, 3, 4}, {3, 4})
+  {1, 2}
+  Math.Guards.multiply({1, 2}, 2)
+  {1, 2, 1, 2}
+  ```
+
+### Step 5: Maps
+
+* `add/2` should merge maps.
+* `subtract/2` should remove matching keys and values.
+* `multiply/2` should replace values in the first map with the second map. 
+  ```elixir
+  Math.Guards.add(%{one: 1}, %{two: 2})
+  %{one: 1, two: 2}
+  Math.Guards.subtract(%{one: 1, two: 2}, %{two: 2})
+  %{one: 1}
+  Math.Guards.multiply(%{one: 1, two: 2}, %{three: 3})
+  %{one: %{three: 3}, two: %{three: 3}}
+  ```
+
+### Step 6: Ranges
+
+* should perform arithmetic operations on the start of the range, and the end of the range.
+  ```elixir
+  Math.Guards.add(1..10, 2..20)
+  3..30
+  Math.Guards.subtract(5..20, 2..5)
+  3..15
+  Math.Guards.multiply(5..20, 1..5)
+  5..100
+  ```
+
+### Your Solution:
+
+```elixir
+
 ```
 
 ## Math Behaviours
@@ -107,28 +153,28 @@ for `add/2`, `subtract/2`, and `multiply/2` different data types.
 * Create a module `Math.String` which implements the `Math` behavior.
 * handle `add/2`, `subtract/2`, and `multiply/2` for strings.
 
-```
+```elixir
 
 ```
 
-```
+* Create a module `Math.List` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for lists.
 
-- Create a module `Math.List` which implements the `Math` behavior.
-- handle `add/2`, `subtract/2`, and `multiply/2` for lists.
-
-
-
-- Create a module `Math.Map` which implements the `Math` behavior.
-- handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+```elixir
 
 ```
 
+* Create a module `Math.Map` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+
+```elixir
+
 ```
 
-- Create a module `Math.Range` which implements the `Math` behavior.
-- handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
+* Create a module `Math.Range` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
 
-```
+```elixir
 
 ```
 
@@ -138,32 +184,30 @@ Using protocols, build the same `Math` functionality.
 
 In the Elixir cell below, define a `Math` protocol with `add/2`, `subtract/2` and `multiply/2` function heads.
 
-```
+```elixir
 
 ```
 
 Create a `Math` implementation for integers
 
-```
+```elixir
 
 ```
 
 Create a `Math` implementation for floats
 
-```
+```elixir
 
 ```
 
 Create a `Math` implementation for strings
 
-```
+```elixir
 
 ```
 
 Create a `Math` implementation for lists
 
-```
-
-```
+```elixir
 
 ```

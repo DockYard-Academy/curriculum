@@ -1180,3 +1180,316 @@ hello = 4
 ```elixir
 hello
 ```
+
+# What is Elixir?
+
+## Elixir
+
+Elixir and other programming languages allow you to represent information as data.
+What does that mean?  Our job as programmers is often to translate project requirements 
+into something that a computer understands. However, while computers can do computations in only a few seconds that would
+take our entire lives, they only
+do what we tell them to. So we have to provide incredibly explicit instruction.
+
+The great thing about computers is they do what we tell them to. But, unfortunately, that means if something goes wrong, it's usually our fault.
+
+Check out the 
+[Exact Instructions Challenge: Peanut Butter and Jelly](https://www.youtube.com/watch?v=cDA3_5982h8&ab_channel=JoshDarnit) for a messy example!
+
+To provide instruction to the computer, you need to understand the language it speaks.
+Well, that's not entirely true. The actual language the computer speaks is in electrical signals 
+represented as 0s and 1s. This is called **binary**. Instead of writing programs in binary
+We have programming languages like **Elixir** that allow use to write instructions in
+more or less plain English with some special words, characters, and restrictions.
+
+Some programming languages look more like plain English, and other's definitely don't. 
+There's even a programming language that let's you [write a program as a cow](https://esolangs.org/wiki/COW)!
+
+```
+MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO Moo MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MoO MoO
+ MoO MoO MoO MoO MoO Moo Moo MoO MoO MoO Moo OOO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
+ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo MOo
+ MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo MOo
+ MOo MOo MOo MOo MOo Moo MOo MOo MOo MOo MOo MOo MOo MOo Moo MoO MoO MoO Moo MOo MOo MOo MOo MOo MOo Moo MOo MOo MOo MOo MOo MOo MOo MOo Moo
+ OOO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO Moo 
+```
+
+Some programming languages operate closer to the machine code the computer uses, 
+these are called **low-level programming languages**. They are great for optimizing
+performance but often much harder to read and understand.
+
+Alternatively, other programming languages improve developer's quality of life by operating closer to human language. These languages are referred to as **high level programming languages**.
+Elixir is a high-level programming language. It's developer-friendly and powerful.
+
+Whatever programming language you're using, you need to understand how to convert real-world concepts
+into instructions the computer understands. This lesson is going to focus on exactly that.
+So, how do we represent real-world information as something the computer understands? The answer
+is **data**. Depending on what type of information we want in the program, we use different **data types**.
+
+For example, on your social media profile (Linkedin, Twitter, Instagram, etc), you often have to
+store your name, birthday, and some of your interests.
+
+Your name might be in a data type called a **string**.
+
+```elixir
+"Peter Parker"
+```
+
+The same goes with the month you were born.
+
+```elixir
+"August"
+```
+
+Sometimes we can use different data types to represent the same information. For example,
+August is the 10th month, so we could use an **integer** instead.
+
+```elixir
+10
+```
+
+You will learn all of the data types below and what kinds of information they are good
+at representing. Don't worry; this is just an overview of what you're about to learn.
+You are not expected to be familiar with any of these data types yet.
+
+* **Booleans** `true` and `false` values.
+* **Integers** whole positive and negative numbers such as `1`, `345`, `0`, and `-98`.
+* **Floats** positive and negative decimal numbers such as `1.3`, `31.54`, `0.0`, and `-65.2`.
+* **Strings** text information such as `"Hello, world!"`.
+* **Atoms** constants who's name is their value such as `:ok` and `:error`.
+* **Lists** lists of information such as `[1, 2, 3]`.
+* **Tuples** store multiple items of a known size `{5, 2, 1}`.
+* **Ranges** ascending or descending series of numbers with a step such as `1..10`.
+* **Keyword Lists** lists of information with associated keys and values `[hello: "world"]`
+* **Maps** a key-value data structure `%{hello: "world"}`
+
+# Error Handling
+## Expected Errors
+
+Now that you understand control flow and pattern matching, you're ready to tackle error handling.
+
+Computers are nearly perfect. However, humans are not. Errors and bugs are part of life as
+a programmer.
+
+Sometimes we can anticipate potential errors. 
+For example, what happens when you try to create a Date with an invalid month?
+
+```elixir
+Date.new(1998, 122, 21)
+```
+
+The module function returns an error tuple `{:error, :invalid_date}`.
+
+For the errors that we expect, Elixir developers established a pattern of using
+`:error` and `:ok` tuples.
+
+```elixir
+Date.new(1998, 12, 21)
+```
+
+Functions that anticipate errors return either
+ `{:ok, data}` or `{:error, reason}`
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  Function --> OK
+  Function --> Error
+  Error["{error: reason}"]
+  OK["{ok: data}"]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+This allows us to call these functions, and then use pattern matching to handle the `:ok` or `:error`
+case.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  Caller --- Function
+  Caller --> A[ok instructions]
+  Caller --> B[error instructions]
+  Function --> Output
+  Output --- ERROR["{:error, reason}"]
+  Output --- OK["{:ok, data}"]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `Date` module expects that we'll sometimes call it with mismatched integers and it handles that
+error specifically.
+
+<!-- livebook:{"break_markdown":true} -->
+
+This enables predictable error handling. We can use `case` to match on the `:error` and `:ok` tuples,
+then handle them however is appropriate.
+
+```elixir
+case Date.new(1998, 12, 21) do
+  {:ok, date} -> date
+  {:error, reason} -> reason
+end
+```
+
+### Your Turn
+
+In the Elixir cell below, trigger the `:error` case by changing `Date.new(1998, 12, 21)` to an invalid
+date.
+
+```elixir
+case Date.new(1998, 12, 21) do
+  {:ok, value} -> value
+  {:error, reason} -> reason
+end
+```
+
+### Your Turn
+
+Create a function `convert_to_12_hour`
+which takes in an integer from 1 to 24. It will then return the equivalent time
+on a 12 hour clock.
+
+* 1 would become `{:ok, "1am"}`
+* 14 would become `{:ok, "2pm"}`
+* If the value given is less than 1 return `{:error, :time_too_low}`.
+* If the value given is greater than 24 return `{:error, :time_too_high}`
+
+## Unexpected Errors
+
+While we can do our best to predict errors, it's truly impossible to predict them all. Some
+errors are not within our control, such as the malfunction of physical hardware, some errors
+result out of unexpected complexity and behavior.
+
+Some errors result because of external systems, or malformed data, and some errors are because
+we spelled **accelleration** with one **l** instead of two. 🤦‍♂️
+
+Whatever the reason, unpredictable errors happen. Infact, 
+Elixir has a philosophy of "Let it crash" which you'll learn more about in future lessons.
+
+There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/1.13.2/RuntimeError.html).
+A runtime error occurs while the program is running. That's why it's called a runtime error.
+
+The other is a [CompileError](https://hexdocs.pm/elixir/1.13.2/CompileError.html)
+. A compile error occurs during compile time. 
+What is compile time? Compile time when the Elixir source code that you've written gets converted
+into binary machine code instructions for the computer.
+
+Elixir is a **compiled** language, so it's instructions get compiled into binary machine code before being
+run. Alternatively, some languages are **interpreted**. Interpreted languages get converted into computer instruction as
+they run rather than upfront.
+
+Whenever you encounter an error, Elixir attempts to provide information about what
+happened by raising an error.
+
+What does **raise** an error mean? You may have noticed Elixir provides a variety of errors that help you understand what
+went wrong in your program. Whenever Elixir encounters an error, it stops the current execution and displays an error.
+
+You can manually raise a **RuntimeError** error with the `raise` keyword.
+
+```elixir
+raise "Oh no!"
+```
+
+You can also trigger a **CompileError** by writing some invalid Elixir syntax. Because Elixir
+is compiled, it's able to pre-determine that the code is invalid before running it.
+
+```elixir
+you(cannot(just(write(anything))))
+```
+
+You've already been introduced to several other kinds of errors. It's not important
+that you remember all of them, but you should try to understand what they mean when you see them.
+
+* **FunctionClauseError**: a function is called with input that doesn't match any clause. i.e `Date.new("", "", "")`
+* **ArithmeticError**: when you misuse an arithmetic operator i.e. `1 + ""`
+* **TokenMissingError**: when you don't complete an expression i.e. `1 +`
+
+These are all runtime errors that occur under specific conditions.
+They help you determine the cause of your error better than a generic **RuntimeError**.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+RuntimeError --> FunctionClauseError
+RuntimeError --> ArithmeticError
+RuntimeError --> TokenMissingError
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Try/Rescue
+
+When executing code that could result in an error, you case use `try` and `rescue` to prevent it from crashing
+the entire program's execution. The code in the `try` block will run, and if it results in an error,
+then the `rescue` block will run. the `rescue` block works like a `case` statement where you can
+pattern match on the error from the `try` block.
+
+```elixir
+try do
+  raise "oh no!"
+rescue
+  _ -> "that's better"
+end
+```
+
+In the above example we pattern match using the default case with underscore `_`.
+You could instead match on the specific error **RuntimeError**
+
+```elixir
+try do
+  raise "oh no!"
+rescue
+  RuntimeError -> "that's better"
+end
+```
+
+Infact, you have the ability to decide which type of error to `raise`.
+
+```elixir
+try do
+  raise ArithmeticError, "Math can be hard sometimes"
+rescue
+  ArithmeticError -> "Fortunately you have support!"
+end
+```
+
+It's convention in Elixir to use bang `!` in the name of a function that expects to raise an error.
+For example, there's an alternative to `Date.new/4` called `Date.new!/4`. Instead of returning an
+`:ok` or `:error` tuple it either returns a date, or raises an error.
+
+```elixir
+Date.new!(1982, 06, 29)
+```
+
+```elixir
+Date.new!(11982, 06, 29)
+```
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+In the Elixir cell below, `raise` a **TokenMissingError**
+
+```elixir
+
+```
+
+In the Elixir cell below
+
+* Create a `try`/`rescue` block.
+* Cause a **SyntaxError** in the try block.
+* Handle the **SyntaxError** in the rescue block and return `"phew!"` .
+
+```elixir
+
+```

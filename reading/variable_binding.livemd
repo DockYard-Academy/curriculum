@@ -151,3 +151,46 @@ In the Elixir cell below, create a variable `hello` and bind it to the value `"w
 ```elixir
 
 ```
+
+### Mutation
+
+Under the hood, the values bound to variables are stored on the computer.
+
+The variable, is actually pointing to the value in that location.
+
+```mermaid
+flowchart LR
+    variable --> location
+```
+
+For example, a variable `hello` with the value `"world"` would store the string
+`"world"` somewhere in **memory**. **memory** is a hardware component on the computer.
+You may have heard of **RAM** (Random Access Memory).
+
+```mermaid
+flowchart LR
+    hello --> w["world"]
+```
+
+Object Oriented Programming languages allow you to mutate the actual value in memory.
+So when we write `hello = 4`, the data `"world"` mutates into `4`.
+
+```mermaid
+flowchart LR
+    hello --> w["world"]
+```
+
+However, in a functional programming language like Elixir, we do not allow mutation.
+So instead of mutating the data, we **rebind** the variable to new data.
+
+```mermaid
+flowchart
+    w["world"]
+    hello --> 4
+```
+
+That's why we call data in Elixir **immutable**.
+
+It may not be clear why this matters, and that's ok. For now, it's enough to 
+be aware that data is immutable, as you will have more opportunities to see the impact of
+immutability in future lessons. 

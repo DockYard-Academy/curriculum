@@ -438,3 +438,55 @@ In the Elixir cell below
 ```elixir
 
 ```
+
+## Pin Operator
+
+The **pin operator** allows us to use variables as hard-coded values, 
+rather than rebinding a variable.
+
+Often we use the pin operator when testing our code to assert that the value is correct.
+
+For example, the following will rebind the **recieved** variable to `[1, 2, 3]`
+
+```elixir
+recieved = [1, 2]
+expected = [1, 2, 3]
+
+recieved = expected
+```
+
+But instead, we might use the match operator to check that the recieved value matches the expected
+value.
+
+```elixir
+recieved = [1, 2]
+expected = [1, 2, 3]
+
+^recieved = expected
+```
+
+By using the pin operator above, we accomplish the same as if we had wrote:
+
+```elixir
+[1, 2] = [1, 2, 3]
+```
+
+We can also use this for internal values in a collection. The following is the same
+as `[1, 2, 3] = [2, 2, 3]`
+
+```elixir
+first = 1
+actual = [2, 2, 3]
+[^first, 2, 3] = actual
+```
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+In the Elixir cell below, use the pin operator to avoid rebinding a variable and instead check
+that one value matches a pattern.
+
+```elixir
+
+```
