@@ -1,8 +1,7 @@
-# Lists Vs Tuples
+# Performance
 
 ## Setup
 
-This content is WIP.
 ```elixir
 Mix.install([
   {:vega_lite, "~> 0.1.3"},
@@ -12,28 +11,219 @@ Mix.install([
 alias VegaLite, as: Vl
 ```
 
-## Performance
+## Performance Concerns
 
 Computers are broken into a variety of parts. As programmers, we are primarily concerned about
  the **processor**, and the **memory**.
 
-### CPU (Central Processing Unit)
+The processor determines the computer's ability to make calculations. It's speed is measured
+in GHz (Gigahertz).
 
-The processor interprets and executes the instructions that we as developers provide.
-It's speed is measured in Gigahertz (GHz).
+Memory or **RAM** (random access memory) is measured in GB (Gigabytes) and is the amount of data
+we can store during a calculation.
 
-More importantly, the processor speed impacts
+In software terms, this translates to the **speed** and **memory consumption** of our program. Generally
+as you build software, those are your main performance concerns.
+
+While Computers are also incredibly fast, but they have limits. Certain calculations take time to complete.
+So, we need to be mindful of how to optimize our programs to operate efficiently.
+
+For example, this statement may take some time.
 
 ```elixir
-{time, _result} =
-  :timer.tc(fn -> 1_000_000_000_000_000_000_000 + 1_000_000_000_000_000_000_000_000 end)
-
-time
+Enum.map(1..10_000_000, fn each -> each + 2 end)
 ```
 
-### Algorythms
+## Linear Growth
 
-### Big O Notation.
+The amount of time it takes to complete the above calculation grows linearly as we increase the number of
+elements in the range.
+
+For each additional item added to the collection, the computer needs to
+perform approximately the same number of additional calculations.
+
+Plotted onto a graph you would expect a constant line upward.
+
+```elixir
+# TODO - Hide
+
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "x", type: :quantitative)
+  |> Vl.encode_field(:y, "y", type: :quantitative)
+  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+base = 100
+init = 1
+max = 5000
+
+linear =
+  Enum.map(init..max, fn each ->
+    # {time, _value} = :timer.tc(fn -> Enum.map(1..each, fn each -> each + 2 end) end)
+    %{x: each, y: each, type: "O(n)"}
+  end)
+
+Kino.VegaLite.push_many(widget, linear)
+```
+
+## Polonomial Growth
+
+Some calculation instead follow polonomial growth, where the number of calculations necessary 
+increases with each additonal element. Typically polonomial growth doubles for each element,
+but it can triple, quaduple, etc.
+
+### Your Turn
+
+For example, this function creates a larger list with each enumeration.
+
+Try changing `number` to `2`, `3`, and `4`. Notice how it creates more lists, with more
+elements for each increase in number.
+
+```elixir
+number = 1
+
+Enum.map(1..number, fn element1 ->
+  Enum.map(1..number, fn element2 -> element2 end)
+end)
+```
+
+* With 1 element it creates 1 element
+* With 2 elements it creates 4 elements
+* With 3 elements it creates 9 elements
+* With 4 elements it creates 12 elements
+
+In other words, it creates $$n^2$$ elements.
+
+```elixir
+# TODO - Hide
+
+data =
+  Enum.map(1..10, fn each ->
+    %{
+      "# of elements": each,
+      result: each ** 2,
+      notation: "#{each}**2",
+      equation: "#{each} * #{each}"
+    }
+  end)
+
+Kino.DataTable.new(data)
+```
+
+Plotted onto a graph, you would expect an upward curve for polonomial growth.
+While the previous example was $n^2$, polonomial growth can also be $n^3$, $n^4$, and so on.
+
+```elixir
+# TODO - Hide
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "x", type: :quantitative)
+  |> Vl.encode_field(:y, "y", type: :quantitative)
+  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
+  |> Vl.encode_field(:color, "type", title: "Polonomial Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+init = 1
+max = 200
+
+n2 =
+  Enum.map(init..max, fn number_of_elements ->
+    %{x: number_of_elements, y: number_of_elements ** 2, type: "n^2"}
+  end)
+
+n2 =
+  Enum.map(init..max, fn number_of_elements ->
+    %{x: number_of_elements, y: number_of_elements ** 2, type: "n^2"}
+  end)
+
+n3 =
+  Enum.map(init..max, fn number_of_elements ->
+    %{x: number_of_elements, y: number_of_elements ** 2, type: "n^2"}
+  end)
+
+Kino.VegaLite.push_many(widget, linear)
+```
+
+## Exponential Growth
+
+Certain functions grow exponentially, often enumerating through every possible permutation of
+the input. As you can imagine this is computationally expensive.
+
+For example, if you needed to calculate every permutation of a number, that would require
+an exponential function.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  a[123]
+  a --> b[1]
+  a --> c[2]
+  a --> d[3]
+  b --> b1[2] --> 123
+  b --> b2[3] --> 132
+  c --> c1[1] --> 213
+  c --> c2[3] --> 231
+  d --> d1[1] --> 312
+  d --> d2[2] --> 321
+```
+
+```elixir
+# TODO - Hide
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "x", type: :quantitative)
+  |> Vl.encode_field(:y, "y", type: :quantitative)
+  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
+  |> Vl.encode_field(:color, "type", title: "Exponential Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+init = 1
+max = 5
+
+linear =
+  Enum.map(init..max, fn number_of_elements ->
+    %{x: number_of_elements, y: number_of_elements ** number_of_elements, type: "n^n"}
+  end)
+
+Kino.VegaLite.push_many(widget, linear)
+```
+
+```elixir
+data =
+  Enum.map(1..10, fn each ->
+    %{"# of elements": each, result: each ** each, equation: "#{each} ** #{each}"}
+  end)
+
+Kino.DataTable.new(data)
+```
+
+## Big O Notation
+
+As programmers, we are generally more concerned with how performance cost grows in our
+program.
+
+We use **Big $$\theta$$ Notation** to how calculation time grows the larger the data in our program becomes.
+
+* **$$\theta(1)$$**: Constant Time
+* **$$\theta(log (n))$$**: Logarithmic Time
+* **$$\theta(n)$$**: Linear Time
+* **$$\theta(n^2)$$**: Quadratic Time (Polonomial Time)
+* **$$\theta(n^n)$$**: Exponential Time
+* **$$\theta(n!)$$**: Factorial Time
 
 ```elixir
 # TODO - Hide
@@ -54,28 +244,29 @@ initial_x = 2
 
 linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
 constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
-exponential = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
+polonomial = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
 logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
+exponential = Enum.map(initial_x..(max_x - 2), &%{x: &1, y: &1 ** &1, type: "O(n^n)"})
 
 Kino.VegaLite.push_many(widget, exponential)
+Kino.VegaLite.push_many(widget, polonomial)
 Kino.VegaLite.push_many(widget, logarithmic)
 Kino.VegaLite.push_many(widget, constant)
 Kino.VegaLite.push_many(widget, linear)
 ```
 
-:math.l
+Different Big $\theta$ complexities grow far faster than others.
+See the graph below for a general ranking.
 
-```elixir
-:math.log2(4)
-```
+<!-- livebook:{"break_markdown":true} -->
 
-### Mutation
+![](images/big_o_notation_graph.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+When performance is a concern, you should try to be aware of the performance costs of both the
+code that your write, and the built-in functionality.
 
 ## Linked Lists
 
-lists in Elixir are implemented as linked lists.
 
-```mermaid
-flowchart
-l
-```
