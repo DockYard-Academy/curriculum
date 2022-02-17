@@ -29,7 +29,7 @@ However, if you want to add a new element in that means you have
 to move the location of every element.
 
 Lists on the other hand have the opposite strengths and weaknesses. Lists are stored
-as **linked-lists** which means each element in the list knows the location of the next element.
+as **linked lists** which means each element in the list knows the location of the next element.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1493,3 +1493,39 @@ In the Elixir cell below
 ```elixir
 
 ```
+
+## Testing Performance
+
+While theoretical performance is important, in practice it's best to test your assumptions.
+
+There are a wide variety of tools that allow you to test performance.
+
+You can use the built-in Erlang library `:timer`'s `tc/1` function to measure the time it takes
+to run a function in miliseconds.
+
+```elixir
+{time, _result} = :timer.tc(fn -> 100 ** 1_000_000 end)
+time
+```
+
+In practice, we'll usually lean on a library to test performance. The **Benchee** library allows
+us to check multiple function's performance and memory usage.
+
+```elixir
+list = Enum.to_list(1..100)
+tuple = List.to_tuple(list)
+
+test =
+  Benchee.run(
+    %{
+      "list" => fn -> Enum.at(list, 50) end,
+      "tuple" => fn -> elem(tuple, 50) end
+    },
+    time: 1,
+    memory_time: 2
+  )
+
+Kino.nothing()
+```
+
+## Linked Lists

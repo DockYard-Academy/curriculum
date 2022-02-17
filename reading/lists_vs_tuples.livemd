@@ -1,0 +1,431 @@
+# Performance
+
+## Setup
+
+```elixir
+Mix.install([
+  {:vega_lite, "~> 0.1.3"},
+  {:kino, github: "livebook-dev/kino"}
+])
+
+alias VegaLite, as: Vl
+```
+
+## Memory
+
+We store information in memory. You can think of memory as a series of cells that
+can each store some value.
+
+![](images/memory_blank.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+The string "hello" might be stored in memory like so.
+
+![](images/hello_stored_in_memory.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Stack Vs Heap
+
+Memory is divided into several parts.
+
+The **stack** holds functions and variables as they execute.
+
+The **heap** is a free memory resource where we can put pretty much any value that we want.
+
+![](images/stack_and_heap.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example, when you define the variable `hello` and bind it to `"world"`, hello is stored
+on the **Stack** and it points to the location of memory in the heap.
+
+![](images/hello_stack_heap.png)
+
+## Mutation
+
+In Elixir, we do not allow for mutation. That means that when we rebind `hello` to a new value `"new"`,
+it rebinds the `hello` variable in a new location.
+
+`"world"` is no longer accessable under any
+variable name, so it gets removed. We call the process of removing old data **garbage collection**.
+
+![]()
+
+![](images/rebinding_stack_heep_garbage_collection.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example, when you call a function that sets a variable, it does not mutate that variable.
+Notice that there is a local definition of `example` inside of will_not_mutate that is bound to `10`,
+and an `example` variable in the top level scope that is bound to `5`.
+
+```elixir
+example = 5
+
+will_not_mutate = fn ->
+  example = 10
+  example
+end
+
+will_not_mutate.()
+
+example
+```
+
+![](images/example_does_not_mutate.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, create a function `demonstrate/0` which demonstrates that data in Elixir
+is immutable.
+
+```elixir
+
+```
+
+## Lists
+
+Lists are stored in memory as **linked lists**. That means that each element in the list
+is actually stored in pairs of two. The first element of the pair is the value, the second
+element of the pair is the location of the next element.
+
+For example, let's take the list `[2, 3]`.
+
+Notice below, that each element in the list is stored as a pair in the **heap**. The first
+element of the pair is the value, and the second element of the pair is the location of the next
+element.
+
+![](images/linked_list_cons_cells.png)
+
+In fact, `[2, 3]` can also be written as pairs like so `[2 | [3 | []]]`, where each cell is written
+as `[head | tail]`. The head is the value, and the tail is the reference to the rest of the list.
+You may sometimes hear these called `cons` cells.
+
+## Tuples
+
+Tuples are stored contiguously in memory. Contiguously means that each element in the tuple
+shares a common border.
+
+For example, the tuple `{1, 2, 3}` could be stored like so.
+![](images/tuple_storage_contiguously.png)
+
+## Lists Vs Tuples
+
+Lists and tuples serve different purposes. Due to their structure they are more or less performant
+for certain operations.
+
+We'll use the built-in erlang library's `:timer.tc/1` function to compare the amount of time in microseconds
+that it takes to perform common operations on a large set of data.
+
+## Length
+
+Tuples are fixed-size containers, so their length is known upfront. It's a constant $\theta(1)$
+time to determine the size of a tuple regardless of it's size.
+
+For lists, we only know the location of the first element. So, we need to traverse the entire
+list to find it's length.
+That means it takes $\theta(n)$ time where $n$ is the number of elements in the list.
+
+Let's compare the time it takes to determine the length of an equal sized list and tuple.
+We can use `tuple_size` to count the length of a tuple, and `length` to determine the length of a list.
+
+```elixir
+range = 1..10_000_000
+large_list = Enum.to_list(range)
+large_tuple = List.to_tuple(large_list)
+{tuple_time, _result} = :timer.tc(fn -> tuple_size(large_tuple) end)
+{list_time, _result} = :timer.tc(fn -> length(large_list) end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+The exact result will be different each time, however as expected, the tuple is nearly instant and the
+list takes far longer.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Prepending
+
+Prepending in a list is fast, because we only need to create a new pair of elements in memory
+and point it to the head of the existing list. Let's prepend `1` to `[2, 3]` as an example.
+
+```elixir
+[1 | [2, 3]]
+```
+
+![](images/prepend_linked_list_memory.png)
+
+Therefore, prepending an element to a list is $\theta(1)$ complexity. 
+This holds true no matter the size of the list, because the work done remains the same.
+
+Tuples however, are stored contiguously in memory, so in order to make any change the entire tuple must
+be copied. Since we need to enumerate through the tuple and copy each value, prepending
+and element to a tuple is $\theta(n)$ complexity.
+
+Let's prepend `0` to `{1, 2, 3}` as an example.
+
+```elixir
+Tuple.insert_at({1, 2, 3}, 0, 0)
+```
+
+![](images/prepending_tuples.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's compare the time it takes to prepend an element to an equal sized list and tuple.
+
+```elixir
+range = 1..10_000_000
+large_list = Enum.to_list(range)
+large_tuple = List.to_tuple(large_list)
+{tuple_time, _result} = :timer.tc(fn -> Tuple.insert_at(large_tuple, 0, 0) end)
+{list_time, _result} = :timer.tc(fn -> [0 | large_list] end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+Once again, as expected prepending the list is nearly instant, where as prepending a tuple takes some time.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend `100` to a list with
+`50000` elements.
+
+Then do the same for tuples.
+
+```elixir
+
+```
+
+## Accessing
+
+Accessing an element in a tuple is constant $\theta(1)$ complexity because the size of the tuple
+is already known. Accessing an element in a list is $\theta(n)$ complexity where n is the index of
+the element we need to access.
+
+```mermaid
+flowchart TB
+subgraph Accessing Memory
+lu["Lower Bound: O(1), Upper Bound: O(n)"]
+direction LR
+  subgraph Memory
+    L -- location to --> I -- location to --> S -- location to --> T -- location to --> E[...]
+  end
+  subgraph Time Complexity
+  0["O(1)"] --> L
+  1["O(2)"] --> I
+  2["O(3)"] --> S
+  3["O(4)"] --> T
+  4["O(n)"] --> E
+  end
+end
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+That means retrieving the head of any sized list is constant $\theta(1)$ complexity, and retrieving
+the last element of the list is $\theta(n)$ complexity.
+
+> It's more accurate to use
+> big $O$ to describe the upper bound of time complexity, and omega $\Omega$ to describe the lower bound.
+> For example, the lower bound of accessing a list is $\Omega(1)$ and the upper bound is $O(n)$.
+
+Let's compare accessing the first element of a tuple and list of equal size.
+
+```elixir
+range = 1..10_000_000
+large_list = Enum.to_list(range)
+large_tuple = List.to_tuple(large_list)
+
+{tuple_time, _result} = :timer.tc(fn -> elem(large_tuple, 0) end)
+
+{list_time, _result} =
+  :timer.tc(fn ->
+    [head | _tail] = large_list
+    head
+  end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+As expected, both are very fast. Infact the list is even faster than the tuple. However, this
+changes drastically when we try to access the last element in the list and tuple.
+
+```elixir
+range = 1..10_000_000
+large_list = Enum.to_list(range)
+large_tuple = List.to_tuple(large_list)
+
+{tuple_time, _result} = :timer.tc(fn -> elem(large_tuple, 9_999_999) end)
+
+{list_time, _result} = :timer.tc(fn -> Enum.at(large_list, 9_999_999) end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+### Your Turn
+
+In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes
+to access the first element, and last element of a list with `5000` elements.
+
+Then do the same for tuples.
+
+```elixir
+
+```
+
+## Updating
+
+In a functional programming language, we do not mutate values in a list or tuple. Instead, we
+copy values where necessary.
+
+When updating a list, we copy the elements before the updated element, the reuse the ones after it.
+
+```elixir
+list = [1, 2, 3, 4, 5]
+List.replace_at(list, 2, 7)
+```
+
+![](images/update_linked_list.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Similarly to accessing an element,
+that means it's constant time complexity $\theta(1)$ to update an element at the start,
+and $\theta(n)$ complexity to access an element at the end.
+
+Tuples however, must be copied over completely when updated. Because this is highly inefficient,
+it's recommended to avoid it. Infact, Elixir does not provide a function for updating tuples, 
+because if you need to, then you might be better off using a list.
+
+We can instead use the `:erlang.setelement` function for demonstration
+purposes only. You may notice that this erlang function starts with a `1` index rather than `0`. Don't worry, we also
+think this is weird.
+
+```elixir
+tuple = {1, 2, 3, 4, 5}
+:erlang.setelement(3, tuple, 7)
+```
+
+![](images/update_tuples.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's compare the time it takes to update the first element of a list and tuple of equal size.
+
+```elixir
+{tuple_time, _result} = :timer.tc(fn -> :erlang.setelement(1, large_tuple, 7) end)
+{list_time, _result} = :timer.tc(fn -> List.replace_at(large_list, 0, 7) end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+As expected, the list is fast and the tuple is slow. Now let's compare the time it takes to update
+the last element of a list and tuple of equal size.
+
+```elixir
+{tuple_time, _result} = :timer.tc(fn -> :erlang.setelement(10_000_000, large_tuple, 7) end)
+{list_time, _result} = :timer.tc(fn -> List.replace_at(large_list, 9_999_999, 7) end)
+
+%{tuple: tuple_time, list: list_time}
+```
+
+The list is far slower now that it needs to look through the entire list, while the tuple is approximately
+the same speed as updating the first element.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, use `:timer.tc/1` to compare updating the **first** element of a list
+and tuple with `5000` elements.
+
+```elixir
+
+```
+
+In the Elixir cell below, use `:timer.tc/1` to compare updating the **last** element of a list and tuple
+with `5000` elements.
+
+```elixir
+
+```
+
+## Inserting
+
+Inserting in a list follows the same pattern as updating a list. You can reuse elements 
+after the insertion, but must copy elements before the insertion.
+
+## Deleting
+
+TODO
+
+## Copying
+
+When we modify a tuple, the new version of the tuple will contain an entire copy of the tuple differing only in the modified element.
+
+When you modify the $nth$ element in a list, the new list will contain a copy of the first
+$n - 1$ elements, then the modified element, then it will share the tail with the old list.
+
+### Shallow Copying
+
+When we use the term **copy**, it's important to be clear that we mean **shallow copy**.
+
+You likely won't need to concern yourself with this, but it's useful to be aware of the difference
+between **deep copying** and **shallow copy** and the performance implications.
+
+A shallow copy is the reference to the data, rather than the data itself.
+
+A deep copy, copies the entire collection the underlaying data.
+
+Primitive elements like `1` will simply be copied as `1`. However, larger data types such as lists, maps, and tuples instead 
+contain references to the underlaying data. For collections, it's more effecient to copy the references, 
+rather than the underlaying data.
+
+Let's take an example.
+
+```elixir
+a = {1, 2, 3}
+b = {4, 5, 6}
+c = {7, 8, 9}
+b2 = {11, 12, 13}
+
+a_tuple = {a, b, c}
+new_tuple = put_elem(a_tuple, 1, b2)
+
+new_tuple
+```
+
+Under the hood, when this tuple copies `a` and `c`, it merely copies the references,
+not the actual data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/copying_abc_tuple.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+This frees up `b` and `{4, 5, 6}` for garbage collection, because they are no longer accessible.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/abc_tuple_garbage_collection.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Keep in mind that for the above diagram, we've separated the tuple for spacing reasons. The tuples
+are still stored contiguously.
+
+## Conclussion
+
+* context to use list
+* context to use tuple
+* summarizing adv and disadv
+* table of big o complexity
