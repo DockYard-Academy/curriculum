@@ -252,10 +252,6 @@ end
 That means retrieving the head of any sized list is constant $\theta(1)$ complexity, and retrieving
 the last element of the list is $\theta(n)$ complexity.
 
-> It's more accurate to use
-> big $O$ to describe the upper bound of time complexity, and omega $\Omega$ to describe the lower bound.
-> For example, the lower bound of accessing a list is $\Omega(1)$ and the upper bound is $O(n)$.
-
 Let's compare accessing the first element of a tuple and list of equal size.
 
 ```elixir
@@ -292,7 +288,7 @@ Then do the same for tuples.
 
 ```
 
-## Updating (replacing)
+## Updating (Replacing)
 
 In a functional programming language, we do not mutate values in a list or tuple. Instead, we
 copy values where necessary.
@@ -312,17 +308,12 @@ Similarly to accessing an element,
 that means it's constant time complexity $\theta(1)$ to update an element at the start,
 and $\theta(n)$ complexity to access an element at the end.
 
-Tuples however, must be copied over completely when updated. Because this is highly inefficient,
-it's recommended to avoid it. Infact, Elixir does not provide a function for updating tuples, 
-because if you need to, then you might be better off using a list.
-
-We can instead use the `:erlang.setelement` function for demonstration
-purposes only. You may notice that this erlang function starts with a `1` index rather than `0`. Don't worry, we also
-think this is weird.
+Tuples however, must be copied over completely when updated. We can use `put_elem/3` to update
+an element in a tuple.
 
 ```elixir
 tuple = {1, 2, 3, 4, 5}
-:erlang.setelement(3, tuple, 7)
+put_elem(tuple, 2, 7)
 ```
 
 ![](images/update_tuples.png)
@@ -473,7 +464,9 @@ A deep copy, copies the actual underlaying data.
 In a shallow copy, primitive values such as `1` will simply be copied as `1`. However data types which contain
 references will be copied as references.
 
-Let's take an example.
+### Shallow Copying Tuples
+
+Let's take an example with tuples.
 
 ```elixir
 a = {1, 2, 3}
@@ -522,14 +515,15 @@ subgraph Stack
   end
   subgraph new_tuple
     a2[a] --reference--> a1
-    b2
     c2[c] --reference--> c1
+    b2
   end
 end
 subgraph Heap
-a1 --pointer --> a3["{1, 2, 3}"]
-b1 --pointer--> b3["{4, 5, 6}"]
-c1 --pointer--> c4["{7, 8, 9}"]
+  a1 --pointer --> a3["{1, 2, 3}"]
+  b1 --pointer--> b3["{4, 5, 6}"]
+  c1 --pointer--> c4["{7, 8, 9}"]
+  b2 --pointer--> c5["{10, 11, 12}"]
 end
 
 ```
@@ -578,8 +572,8 @@ that non-immediate values such as `[1]` are not identical.
 :erts_debug.same([1], [1])
 ```
 
-We can prove that `a` and `c` in `a_tuple` and `new_tuple` are structurally
-identical.
+`a` in `a_tuple` and `a` in `new_tuple` share memory. This means they are structurally identical, 
+and we can prove it.
 
 ```elixir
 {a1, b1, c1} = a_tuple
@@ -590,6 +584,51 @@ identical.
 ```elixir
 :erts_debug.same(a2, a1)
 ```
+
+### Shallow Copying Lists
+
+<!-- livebook:{"break_markdown":true} -->
+
+Elements prior to the modification in the list will be shallow copied.
+
+Let's prove that
+by updating a list and using `:erts_debug.same/3` to show that elements prior to the modification
+are shared.
+
+```elixir
+a = {1, 2, 3}
+b = {4, 5, 6}
+c = {7, 8, 9}
+b2 = {10, 11, 12}
+
+# New_list shallow copies a from a_list and reuses c.
+a_list = [a, b, c]
+new_list = List.replace_at(a_list, 1, b2)
+
+# The first element in new_list is a shallow copy of the first element in a_list.
+# This means that the first element in both lists is structurally identical.
+
+# true = :erts_debug.same(List.first(a_list), List.first(new_list))
+# false = :erts_debug.same([a], [a])
+# false = :erts_debug.same(Enum.take(a_list, 1), Enum.take(new_list, 2))
+true = :erts_debug.same(Enum.drop(a_list, 2), Enum.drop(new_list, 2))
+```
+
+```elixir
+:erts_debug.same({1, 2, 3}, {1, 2, 3})
+```
+
+```elixir
+Enum.take([1, 2], 1)
+```
+
+We can also prove that the tail of the list is reused.
+
+```elixir
+:erts_debug.same(List.last(a_list), List.last(new_list))
+```
+
+
 
 ## Conclussion
 
