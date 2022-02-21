@@ -3,7 +3,10 @@
 ## Setup
 
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:live_slide, github: "BrooklinJazz/live_slide"}
+])
 ```
 
 ## Overview
@@ -508,8 +511,7 @@ if it matches any of the cases. It then executes the first case that matches.
 
 ````elixir
 # TODO - Hide this code
-
-sequence = [
+[
   "
 ```elixir
 # We create a case statement.
@@ -588,11 +590,8 @@ end
 ```
   "
 ]
-
-Kino.animate(6000, 0, fn i ->
-  md = Enum.at(sequence, i) |> Kino.Markdown.new()
-  {:cont, md, rem(i + 1, length(sequence))}
-end)
+|> Enum.map(&Kino.Markdown.new/1)
+|> LiveSlide.new()
 ````
 
 Now, you may notice that if you give the `case` statement a value that doesn't match any case, 
