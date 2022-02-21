@@ -131,10 +131,8 @@ that it takes to perform common operations on a large set of data.
 end)
 ```
 
-You may notice that function execution time varies.
-
-This occurs due to operations competing for the computer's resources. In addition,
-our measurement tools for time are not perfect.
+Simultanious operations in your computer compete for resources, and our measurement tools are not
+perfect, so you may notice that execution time is not always consistent.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -150,12 +148,12 @@ need to divide it by `1000`.
 
 ## Length
 
-Tuples are fixed-size containers, so their length is known upfront. It's a constant $\theta(1)$
+Tuples are fixed-size containers, so their length is known upfront. It's a constant $O(1)$
 time to determine the size of a tuple no matter how large.
 
 For lists, we only know the location of the first element. So, we need to traverse the entire
 list to find its length.
-That means it takes $\theta(n)$ time where $n$ is the number of elements in the list.
+That means it takes $O(n)$ time where $n$ is the number of elements in the list.
 
 Let's compare the time it takes to determine the length of an equal sized list and tuple.
 We can use `tuple_size` to count the length of a tuple, and `length` to determine the length of a list.
@@ -181,12 +179,12 @@ and point it to the head of the existing list. Let's prepend `1` to `[2, 3]` as 
 
 ![](images/prepend_linked_list_memory.png)
 
-Therefore, prepending an element to a list is $\theta(1)$ complexity. 
+Therefore, prepending an element to a list is $O(1)$ complexity. 
 This holds true no matter the size of the list, because the work done remains the same.
 
 Tuples however, are stored contiguously in memory, so in order to make any change the entire tuple must
 be copied. Since we need to enumerate through the tuple and copy each value, prepending
-and element to a tuple is $\theta(n)$ complexity.
+and element to a tuple is $O(n)$ complexity.
 
 Let's prepend `0` to `{1, 2, 3}` as an example.
 
@@ -214,9 +212,7 @@ Once again, as expected prepending the list is nearly instant, where as prependi
 ### Your Turn
 
 In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend `100` to a list with
-`50000` elements.
-
-Then do the same for tuples.
+`50000` elements. Then do the same for tuples.
 
 ```elixir
 
@@ -224,8 +220,8 @@ Then do the same for tuples.
 
 ## Accessing
 
-Accessing an element in a tuple is constant $\theta(1)$ complexity because the size of the tuple
-is already known. Accessing an element in a list is $\theta(n)$ complexity where n is the index of
+Accessing an element in a tuple is constant $O(1)$ complexity because the size of the tuple
+is already known. Accessing an element in a list is $O(n)$ complexity where n is the index of
 the element we need to access.
 
 ```mermaid
@@ -249,8 +245,8 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-That means retrieving the head of any sized list is constant $\theta(1)$ complexity, and retrieving
-the last element of the list is $\theta(n)$ complexity.
+That means retrieving the head of any sized list is constant $O(1)$ complexity, and retrieving
+the last element of the list is $O(n)$ complexity.
 
 Let's compare accessing the first element of a tuple and list of equal size.
 
@@ -305,8 +301,8 @@ List.replace_at(list, 2, 7)
 <!-- livebook:{"break_markdown":true} -->
 
 Similarly to accessing an element,
-that means it's constant time complexity $\theta(1)$ to update an element at the start,
-and $\theta(n)$ complexity to access an element at the end.
+that means it's constant time complexity $O(1)$ to update an element at the start,
+and $O(n)$ complexity to access an element at the end.
 
 Tuples however, must be copied over completely when updated. We can use `put_elem/3` to update
 an element in a tuple.
@@ -385,11 +381,11 @@ Tuple.insert_at(tuple, 3, 7)
 
 <!-- livebook:{"break_markdown":true} -->
 
-Based on this knowledge, we expect that inserting in a tuple is always $\theta(n)$ complexity,
+Based on this knowledge, we expect that inserting in a tuple is always $O(n)$ complexity,
 where as inserting in a list will be faster the earlier in the list you insert.
 
-We've already proven earlier that prepending a list has $\theta(1)$ time complexity, now let's 
-prove that inserting at the end of both a list and a tuple has $\theta(n)$ time complexity.
+We've already proven earlier that prepending a list has $O(1)$ time complexity, now let's 
+prove that inserting at the end of both a list and a tuple has $O(n)$ time complexity.
 
 ```elixir
 {tuple_time, _result} = :timer.tc(fn -> Tuple.insert_at(large_tuple, 10_000_000, 7) end)
@@ -627,8 +623,6 @@ We can also prove that the tail of the list is reused.
 ```elixir
 :erts_debug.same(List.last(a_list), List.last(new_list))
 ```
-
-
 
 ## Conclussion
 

@@ -1529,3 +1529,64 @@ Kino.nothing()
 ```
 
 ## Linked Lists
+
+# Installing Libs
+### Benchee
+
+[Benchee](https://github.com/bencheeorg/benchee)
+is a popular library for measuring performance and memory consumption.
+
+External libraries need to be installed to use them.
+
+We use [Mix](https://hexdocs.pm/mix/1.13/Mix.html) to install Benchee.
+
+[Mix](https://hexdocs.pm/mix/1.13/Mix.html)  is a build tool that provides tasks for creating, compiling, and testing Elixir projects, managing its dependencies, and more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+Benchee
+D[Dependencies]
+I[install/2]
+Mix
+Mix --> I
+I --> D
+D --> Benchee
+```
+
+```elixir
+Mix.install([{:benchee, "~> 1.0"}])
+```
+
+External libraries often have different versions, so we need to specify the version of the project we'd like
+to use.
+
+```mermaid
+flowchart
+  0[0.98]
+  1[0.99]
+  2[1.00]
+  3[1.01]
+  B[Benchee]
+  M[Mix]
+  M --> B
+  B --> 0
+  B --> 1
+  B --> 2
+  B --> 3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We can use the `Benchee.run/2` function to measure the performance and memory consumption of some code.
+
+```elixir
+Benchee.run(
+  %{
+    "example test" => fn -> 10000 ** 10000 end
+  },
+  time: 10,
+  memory_time: 2
+)
+```
