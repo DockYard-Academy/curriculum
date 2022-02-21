@@ -268,7 +268,7 @@ The course is broken into 5 major sections:
     - What is an API?
     - What is REST?
     - JSON
-    - What is GraphQL? (Removable?)
+    - What is GraphQL? 
     - What is CRUD?
     - What is a DataBase?
   - Calling an API
