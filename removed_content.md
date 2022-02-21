@@ -234,7 +234,7 @@ Take care to regularly evaluate any code you're writing to ensure
 it compiles. Regularly verifying your code compiles makes it a lot easier to know if a 
 change triggered an error or warning.
 
-Elixir does it's best to let you know the cause of your error, but it can take some time to get used to reading these messages.
+Elixir does its best to let you know the cause of your error, but it can take some time to get used to reading these messages.
 
 For example, here's the error messages you receive when you have a dangling operator without a 
 value on the right-hand side.
@@ -758,7 +758,7 @@ Let's break down what this all means.
 1. `defmodule` a keyword that means "define module".
 2. `Greeter` is the name of this module. It can be any valid name, and is usually **CapitalCase**.
    you'll often heard the name of the module refered to as the **namespace** that functions are organized under.
-3. `do` a keyword that separates the module name and it's internal implementation.
+3. `do` a keyword that separates the module name and its internal implementation.
 4. `end` a keyword that finishes the module definition.
 
 Modules define functions inside of them. Each function has a name, so they are called **named functions**.
