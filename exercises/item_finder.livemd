@@ -1,0 +1,104 @@
+# Item Finder
+
+## Generate Items
+
+### Define an Item Struct
+
+You are building a game with a massive list of magical items.
+
+An `Item` struct will have a `type`, `effect`, `level`, `size`, and `style`.
+
+In the Elixir cell below, define an `Item` struct.
+
+```elixir
+
+```
+
+### Generate Every Permutation Of Items
+
+You have been given the possible `types`, `effects`, `levels`, `sizes`, and `styles`. In the Elixir cell below,
+generate a list `items` with every possible combination of item properties.
+
+Replace `nil` with your answer.
+
+```elixir
+types = [
+  "sword",
+  "halberd",
+  "crossbow",
+  "hammer",
+  "mace",
+  "longsword",
+  "shortsword",
+  "longbow",
+  "shortbow",
+  "shield",
+  "war hammer",
+  "mallet"
+]
+
+effects = [
+  "protection",
+  "healing",
+  "speed",
+  "power",
+  "jump",
+  "attack",
+  "defence",
+  "charisma",
+  "agility"
+]
+
+styles = ["holy", "dark", "heroic", "crude", "mundane", "lavish"]
+sizes = 1..10
+levels = 1..100
+
+items = nil
+```
+
+## Search Items
+
+Players should be able to search for items that match certain properties. They should be able to 
+search by `type`, `effect`, `level`, `size`, and `style` in a keyword list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+items = [
+  %Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"},
+  %Item{type: "mace", effect: "protection", level: 2, size: 3, style: "dark"},
+  ]
+
+Search.all_items(items, type: "sword", effect: "healing")
+[%Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
+```
+
+By default, `all_items/2` should find items that match all filters.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Search.all_items(items, type: "sword", effect: "speed")
+[]
+```
+
+Users should be able to enter an `inclusive: true` filter to find items that match any of
+the properties.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Search.all_items(items, type: "sword", effect: "speed", inclusive: true)
+[%Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your answer in the Elixir cell below.
+
+```elixir
+defmodule Search do
+  def all_items(items, filters) do
+  end
+end
+```

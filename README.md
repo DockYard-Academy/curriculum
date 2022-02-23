@@ -80,7 +80,7 @@ throughout their career. Students will be capable of delivering high-quality, we
 - Important or new concepts should be in **bold** the first time you introduce them.
 - Use title case without a period in headers.
 - Code should be in an executable elixir cell unless it is pseudocode or it reduces the clarity of the lesson.
-- Text should be run through [[grammarly]](https://app.grammarly.com/) to ensure correctness. The free features should be sufficient.
+- Text should be run through [grammarly](https://app.grammarly.com/) to ensure correctness. The free features should be sufficient.
 - Lessons should have a `Setup` section and an `Overview`.
 - Each new major concept should be in its own section. Each section should strive to provide at least one student interaction portion, typically using the **Your Turn** heading.
 
