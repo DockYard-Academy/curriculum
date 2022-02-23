@@ -64,7 +64,7 @@ Class values will be reinforced continuously to students.
 - Failure Is Ok. I.E. "Red Is The First Step."
 - Get Ahead, Don't Fall Behind.
 - Attend Support Time And Help Others.
-- Turn On Your Cameras.
+- Turn On Your Cameras If Possible.
 
 ## Student Goals
 Students will be competent developers prepared to excel in the Elixir industry. They will have

@@ -1,0 +1,74 @@
+# Fibonacci Sequence
+
+## Setup
+
+```elixir
+Mix.install([{:benchee, "~> 0.1"}])
+```
+
+## Fibonacci Sequence
+
+The Fibonacci Sequence is a series of the numbers
+
+```mermaid
+flowchart LR
+a[0] --> b[1] --> c[1] --> d[2] --> e[3] --> f[5] --> g[8] --> h[13] --> i[21] --> k[34] --> ...
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+It's created by taking the sum of the previous to numbers to get the next number.
+
+So $fib(n) = fib(n-1) + fib(n - 2)$
+
+You'll notice that this is a recursive function.
+
+In the Elixir cell below, implement the `Fibonacci.sequence/1` function which should return a fibonacci
+sequence up to the $nth$ Element.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Fibonacci.sequence(0)
+[0]
+
+Fibonacci.sequence(4)
+[0, 1, 1, 2, 3]
+```
+
+```elixir
+defmodule Fibonacci do
+  def sequence(n) do
+  end
+end
+```
+
+## Competition
+
+In the Elixir cell below, create a `FastFib` module.
+The `FastFib` module should be the most performant version of the fibonacci sequence that you can create.
+
+```elixir
+defmodule FastFib do
+  def sequence(n) do
+    Fibonacci.sequence(n)
+  end
+end
+```
+
+Use Benchee to benchmark the performance of `FastFib` compared to `Fibonnaci`. The student in the 
+class with the fastest `FastFib` time wins.
+
+```elixir
+Benchee.run(
+  %{
+    fast_fib: fn n -> FastFib.sequence(n) end
+  },
+  inputs: %{
+    "1: small" => 10,
+    "2: medium" => 30,
+    "3: large" => 100
+  },
+  time: 10
+)
+```

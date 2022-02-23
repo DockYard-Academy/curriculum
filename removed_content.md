@@ -1590,3 +1590,103 @@ Benchee.run(
   memory_time: 2
 )
 ```
+
+## Proving Shallow Copies are the same structure.
+Now, let's prove this to be true. We can use the `:erts_debug.same/2` function from Erlang to
+prove if two values are the same in memory. This is for demonstration purposes only, it's rare that 
+you would need to rely on this function.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Primitive data types like `1` are sometimes called **immediate values**. They are written
+directly into the instruction rather through a reference or pointer. This means that `1` is the same
+value as `1`.
+
+```elixir
+:erts_debug.same(1, 1)
+```
+
+```elixir
+
+```
+
+Non-immediate values are understood by the computer through a reference or pointer. This means 
+that non-immediate values such as `[1]` are not identical.
+
+```elixir
+:erts_debug.same([1], [1])
+```
+
+We can however, prove that a shallow copy of some data structure is the same underlaying data.
+Here we can prove that when two variables contain the matching non-immediate values they are not the
+same data structure.
+
+```elixir
+a = [1]
+b = [1]
+:erts_debug.same(a, b)
+```
+
+And when we instead assign `b` to reference `a` they do share the same non-immediate data structure.
+
+```elixir
+a = [1]
+b = a
+:erts_debug.same(a, b)
+```
+
+`a` in `a_tuple` and `a` in `new_tuple` share memory. This means they are structurally identical, 
+and we can prove it.
+
+```elixir
+{a1, b1, c1} = a_tuple
+{a2, b2, c2} = new_tuple
+:erts_debug.same(a2, a1)
+```
+
+```elixir
+:erts_debug.same(a2, a1)
+```
+
+### Shallow Copying Lists
+
+<!-- livebook:{"break_markdown":true} -->
+
+Elements prior to the modification in the list will be shallow copied.
+
+Let's prove that
+by updating a list and using `:erts_debug.same/3` to show that elements prior to the modification
+are shared.
+
+```elixir
+a = {1, 2, 3}
+b = {4, 5, 6}
+c = {7, 8, 9}
+b2 = {10, 11, 12}
+
+# New_list shallow copies a from a_list and reuses c.
+a_list = [a, b, c]
+new_list = List.replace_at(a_list, 1, b2)
+
+# The first element in new_list is a shallow copy of the first element in a_list.
+# This means that the first element in both lists is structurally identical.
+
+# true = :erts_debug.same(List.first(a_list), List.first(new_list))
+# false = :erts_debug.same([a], [a])
+# false = :erts_debug.same(Enum.take(a_list, 1), Enum.take(new_list, 2))
+true = :erts_debug.same(Enum.drop(a_list, 2), Enum.drop(new_list, 2))
+```
+
+```elixir
+:erts_debug.same({1, 2, 3}, {1, 2, 3})
+```
+
+```elixir
+Enum.take([1, 2], 1)
+```
+
+We can also prove that the tail of the list is reused.
+
+```elixir
+:erts_debug.same(List.last(a_list), List.last(new_list))
+```
