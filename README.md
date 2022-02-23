@@ -4,10 +4,12 @@ Click on the `instructions.livemd` file while running livebook. Then click the "
 From here, you'll be able to follow the links to access each lesson and exercise.
 
 ## Getting Started
-- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed
+- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed or a compatable elixir version as found in `.tool-versions`.
 - Ensure you have the latest [livebook](https://github.com/livebook-dev/livebook) installed.
 - Run the project with `livebook server`.
 - Go to the `instructions.livemd` to see the course content.
+
+It's common for incorrect versions to cause an issue where mermaid graphs cannot be displayed.
 
 ## Philosophy
 The academy follows a flipped classroom design where students complete interactive instructional material,
