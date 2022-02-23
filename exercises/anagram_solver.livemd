@@ -1,0 +1,50 @@
+# Anagram Solver
+
+## Anagram Solver
+
+Two words that contain all the same letters are anagrams.
+For example **bored** and **robed** are anagrams.
+
+You are going to create an `AnagramSolver` with a `solve/1` function that accepts a word and 
+returns every possible permutation of the anagram. Each permutation does not need to be a real word.
+
+For example,
+
+<!-- livebook:{"force_markdown": true} -->
+```elixir
+AnagramSolver.solve("cat")
+[
+  "cat",
+  "cta",
+  "act",
+  "atc",
+  "tac",
+  "tca"
+]
+```
+
+The Anagram solver is an example of exponential complexity $O(n!)$, because for each letter in the word, you must enumerate through every
+other letter. It's helpful to draw a tree to visualize the problem.
+
+```mermaid
+flowchart
+  CAT --> C --> A --> T 
+  CAT --> C --> T --> A 
+  CAT --> A --> C --> T
+  CAT --> A --> T --> C
+  CAT --> T --> C --> A
+  CAT --> T --> A --> C 
+```
+
+You can expect that the number of answers for a word of given length `n` will be `n!`.
+So a word with 3 letters has 6 solutions, a word with 4 letters has 24 answers, a word with
+5 letters has 120 answers.
+
+Enter your solution in the Elixir cell below,
+
+```elixir
+defmodule AnagramSolver do
+  def solve(word) do
+  end
+end
+```
