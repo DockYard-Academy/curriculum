@@ -1,6 +1,7 @@
 # Beta Academy Curriculum
-To open the .livemd files in the **curriculum** folder you will need the latest version of `livebook` running.
-Presently, there are no other requirements.
+To open the .livemd files you will need the latest version of [livebook](https://github.com/livebook-dev/livebook) running.
+Click on the `instructions.livemd` file while running livebook. Then click the "Open" button nearby.
+From here, you'll be able to follow the links to access each lesson and exercise.
 
 ## Getting Started
 - Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed
@@ -33,16 +34,15 @@ Class time will be broken into
 ### Assessment & Review
 Assessment will provide the teacher an understanding of how students incorporated the learning from the
 previous interactive instruction, and will provide reactive lectures based on what students require more
-instruction in. Review will provide the students an opportunity to recall prior information and re-cover
+instruction in. Review will provide the students an opportunity to recall prior information and review
 any topics that require it.
 
 ### Exercises
 Exercises will provide students an opportunity to practice drilled repetition and reinforce the prior interactive
-instruction. Exercises should be concrete, repeatable drills where each exercise iteratively incorporates topics
-from the previous instruction.
+instruction. Exercises should be concrete, repeatable drills. Exercises should build upon established topics. 
 
 ### Labs
-Labs will challenge students to combine the concepts drilled during the exercise phase at a higher level. Labs have a wider variety of solutions and are expected to force students beyond the knowledge they learned in class. Students will need to assess how to solve the problem using the knowledge and tools learned prior. Students may also need to do additional research and learn concepts beyond those taught in class.
+Labs will challenge students to combine the concepts drilled during the exercise phase at a higher level. Labs have a wider variety of solutions and are expected to push students beyond the knowledge they learned in class. Students will need to assess how to solve the problem using the knowledge and tools learned prior. Students may also need to do additional research and learn concepts beyond those taught in class.
 
 ### Midterm Group Project
 Students will complete a group project that will teach them how to work effectively as a team.
@@ -78,7 +78,7 @@ throughout their career. Students will be capable of delivering high-quality, we
 - Important or new concepts should be in **bold** the first time you introduce them.
 - Use title case without a period in headers.
 - Code should be in an executable elixir cell unless it is pseudocode or it reduces the clarity of the lesson.
-- Text should be run through grammarly to ensure correctness.
+- Text should be run through [[grammarly]](https://app.grammarly.com/) to ensure correctness. The free features should be sufficient.
 - Lessons should have a `Setup` section and an `Overview`.
 - Each new major concept should be in its own section. Each section should strive to provide at least one student interaction portion, typically using the **Your Turn** heading.
 
@@ -218,7 +218,7 @@ The course is broken into 5 major sections:
   - Persistence
   - File Based DB and Problems
   - Query
-  - What is a DataBase?
+  - What is a Database?
 
 ### Elixir Development
 - Intro to Elixir
@@ -270,7 +270,7 @@ The course is broken into 5 major sections:
     - JSON
     - What is GraphQL? 
     - What is CRUD?
-    - What is a DataBase?
+    - What is a Database?
   - Calling an API
   - Calling a GraphQL API
   - Calling an API with Authentication
