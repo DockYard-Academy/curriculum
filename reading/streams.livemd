@@ -1,1 +1,69 @@
 # Streams
+
+## Streams
+
+Streams support **lazy evaluation**. What is lazy evaluation?
+
+Well let's contrast it to **eager evaluation** to help understand.
+
+Functions in the The `Enum` module are eager. That means that they execute immediately when you
+call them.
+
+```elixir
+Enum.map(1..10, fn each -> each * 2 end)
+```
+
+So then, that means that lazy functions don't evaluate immediately. Instead, you can build the work you want
+to execute, and then execute it when desired.
+
+Otherwise, the `Stream` module will feel very similar to `Enum`. In fact, we even have some of the same function.
+
+```elixir
+Stream.map(1..5, fn each -> each * 2 end)
+```
+
+However, you'll notice that instead of returning `[2, 4, 6, 8, 10]` as you might expect with the `Enum` module.
+It instead returns a Stream data type.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Stream<[enum: 1..5, funs: [#Function<47.58486609/1 in Stream.map/2>]]>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `Stream` above contains the functions to call on the stream, and the collection (1..5) to call them on.
+
+It's **lazy** because it's waiting to be executed. To execute it, use any `Enum` function on the
+stream.
+
+```elixir
+1..5
+|> Stream.map(fn each -> each * 2 end)
+|> Enum.to_list()
+```
+
+### Streams Execute Sequentially
+
+<!-- livebook:{"break_markdown":true} -->
+
+There's a few reasons to use streams. One reason is performance.
+
+Let's take an example with `Enum` where we call multiple functions on the same collection.
+
+```elixir
+1..100
+|> Enum.map(fn each -> each * 2 end)
+|> Enum.map(fn each -> each * 2 end)
+|> Enum.map(fn each -> each * 2 end)
+```
+
+```elixir
+stream =
+  1..100
+  |> Stream.map(fn each -> each * 2 end)
+  |> Stream.map(fn each -> each * 2 end)
+  |> Stream.map(fn each -> each * 2 end)
+  |> Enum.to_list()
+```
