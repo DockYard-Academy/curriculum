@@ -2,7 +2,7 @@
 
 ## Cards Module
 
-In this exercise you're going to create a `Cards` module. Work through each step in
+In this exercise, you're going to create a `Cards` module. Work through each step in
 the Elixir cell at the bottom.
 
 ### Step 1: Deck
@@ -21,19 +21,18 @@ That means a `deck` should be a list of cards with
 * `"1c"` to `"13c"`
 * `"1d"` to `"13d"`
 
-## Step 2: Shuffle
+### Step 2: Shuffle
 
-Create a `shuffle/1` function which accepts the deck and returns the cards in a random order.
+Create a `shuffle/1` function that accepts the deck and returns the cards in random order.
 
-## Step 3: Deal
+### Step 3: Deal
 
-Create a `deal/3` function which deals cards to players.
-
-* It should accept a deck, the number of cards to deal, and the number of players to deal to.
+Create a `deal/3` function that deals cards to players.
+* The first parameter should be the deck.
+* The second parameter should be the number of cards to deal.
+* The third parameter should be the number of players to deal to.
 * It should return separate lists for each player, and the remaining deck.
-* Cards should be dealt in order from the start of the deck to the end while rotating between each player's hand.
-
-<!-- livebook:{"break_markdown":true} -->
+* Cards should be dealt from the start of the deck to the end while rotating between each hand.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -42,11 +41,7 @@ Cards.deal(["1c", "2c", "3c", "4c", "5c", "6c", "7c"], 2, 3)
 %{deck: ["7c"], dealt: [["1c", "4c"], ["2c", "5c"], ["3c", "6c"]]}
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 * if there are not enough cards, deal as many as you can and return empty or reduced lists for the other players.
-
-<!-- livebook:{"break_markdown":true} -->
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -55,20 +50,22 @@ Cards.deal(["1c", "2c", "3c", "4c", "5c", "6c", "7c"], 3, 3)
 %{deck: [], dealt: [["1c", "4c", "7c"], ["2c", "5c"], ["3c", "6c"]]}
 ```
 
-## Step 4: Sort
+### Step 4: Sort
 
 create a `sort/1` function which accepts a list of cards and sorts them. cards should be 
 sorted by suite in the order `h` -> `s` -> `c` -> `d`. then they should be sorted in chronological order
 `1` -> `2` -> `...` -> `13`.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-cards.sort(["1c", "5d", "4c", "6d", "2c", "3c", "7d", "5s", "3h", "2h", "4s"], 3, 3)
+Cards.sort(["1c", "5d", "4c", "6d", "2c", "3c", "7d", "5s", "3h", "2h", "4s"], 3, 3)
 ["2h", "3h", "4s", "5s", "1c", "2c", "3c", "4c", "5d", "6d", "7d"]
 ```
 
-## Your Solution
+### Your Solution
 
-Enter your answer below:
+Enter your answer in the Elixir cell below.
 
 ```elixir
 defmodule Cards do

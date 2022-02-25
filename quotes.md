@@ -9,3 +9,6 @@ Great quotes - you never know when it will suite a lesson.
 “Before software can be reusable it first has to be usable.” – Ralph Johnson
 “Make it work, make it right, make it fast.” – Kent Beck
 "Persistence without insight will lead to the same result" - The Armorer
+"It is far, far easier to make a correct program fast, than it is to make a fast program correct."
+ ~Herb Sutter and Andrei Alexandrescu
+ "60% of the time it works every time"

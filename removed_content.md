@@ -1690,3 +1690,21 @@ We can also prove that the tail of the list is reused.
 ```elixir
 :erts_debug.same(List.last(a_list), List.last(new_list))
 ```
+
+### Charlists
+You may notice that sometimes your list of integers will print as a strange character. Notice
+that the final element in the following is a `'-\n'` rather than the expected `[45, 10]`
+
+```elixir
+list =
+  for a <- 1..45, b <- 1..10, rem(a, 15) === 0, rem(b, 5) === 0 do
+    [a, b]
+  end
+```
+
+That's because internally Elixir represents lists of integers as [Charlists](reading/charlists.livemd).
+However, if you use the list again, you'll see that `'-\n'` still represents `[45, 10]` internally.
+
+```elixir
+Enum.map(list, fn [a, b] -> {a, b} end)
+```

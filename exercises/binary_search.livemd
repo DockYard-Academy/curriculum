@@ -1,5 +1,16 @@
 # Binary Search
 
+## Setup
+
+```elixir
+Mix.install([
+  {:vega_lite, "~> 0.1.3"},
+  {:kino, github: "livebook-dev/kino"}
+])
+
+alias VegaLite, as: Vl
+```
+
 ## Binary Search
 
 Binary search is a type of sorting algorythm. It's part of a family of algorythms known as
@@ -101,7 +112,44 @@ Instead, binary search halves the number of elements to search with each run.
 At first you have $n$ elements to search, then $n/2$ elements, then $n/4$ elements, and so on.
 That means it has $O(log n)$ complexity.
 
-In the Elixir cell below, create a binary search algorythm that finds a matching value in a tuple.
+```elixir
+# TODO - Hide
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "number of elements", type: :quantitative)
+  |> Vl.encode_field(:y, "time", type: :quantitative)
+  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
+  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+init = 1
+max = 500
+
+logn = for n <- init..max, do: %{"number of elements": n, time: :math.log2(n), type: "log(n)"}
+
+Kino.VegaLite.push_many(widget, logn)
+```
+
+In the Elixir cell below, create a binary search algorythm that finds the index of a given value in a sorted tuple.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+tuple = 1..100 |> Enum.to_list() |> List.to_tuple()
+
+Binary.search(tuple, 1)
+0
+
+Binary.search(tuple, 50)
+49
+
+Binary.search(tuple, 100)
+99
+```
 
 ```elixir
 defmodule Binary do

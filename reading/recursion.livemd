@@ -1,2 +1,282 @@
 # Recursion
 
+## Setup
+
+```elixir
+Mix.install([{:live_slide, github: "brooklinjazz/live_slide"}, {:benchee, "~> 0.1"}])
+```
+
+## Recursion
+
+Recursion is a function that calls itself.
+
+```mermaid
+flowchart LR
+b[Function] --> a[Function]
+a --> b
+```
+
+Recursion creates a loop effect where the function calls itself over and over.
+
+```elixir
+defmodule Recursion do
+  def loop(n) do
+    if n > 0 do
+      IO.puts(n)
+      loop(n - 1)
+    end
+  end
+end
+
+Recursion.loop(5)
+```
+
+This calls the loop function 5 times. Under the hood, this places 5 stack frames on the stack.
+
+We trigger a call to IO.puts to show that the loop function has been called 5 times with
+a different argument.
+
+```mermaid
+flowchart LR
+  a["loop(n)"]
+  b["loop(n - 1)"]
+  c["loop(n - 2)"]
+  d["loop(n - 3)"]
+  e["loop(n - 4)"]
+  f["loop(...)"]
+  5["loop(5)"]
+  4["loop(4)"]
+  3["loop(3)"]
+  2["loop(2)"]
+  1["loop(1)"]
+  5 --> 4 --> 3 --> 2 --> 1 
+  a --> b --> c --> d --> e --> f
+```
+
+[Computerphile](https://www.youtube.com/watch?v=Mv9NEXX1VHc&ab_channel=Computerphile) explains recursion in excellent detail.
+
+<!-- livebook:{"branch_parent_index":1} -->
+
+## Endless Recursion
+
+We should have some end condition, otherwise, this would run forever. You'll notice that
+this Elixir cell never stops running. Under the hood it's calling `Forever.run/0` over and over.
+
+```elixir
+defmodule Forever do
+  def run do
+    run()
+  end
+end
+
+Forever.run()
+```
+
+## Stack Overflow
+
+Coming from another language, you might be surprised that the endless recursion function doesn't crash.
+In most languages, calling a recursive function puts too many stack frames on the stack, and causes a stack
+overflow.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/stack-overflow-without-tail-recursion.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+That's because stack memory gets too full (overflowed) storing each stack frame of the recursive call.
+
+### Tail Recursion And Tail-Call Optimization
+
+Since functional programming languages rely so much on recursion, Elixir (and Erlang) implement tail-call
+optimization.
+
+Tail-call optimization circumvents adding new stack frames, instead, it reuses the current stack frame
+and jumps back to the top of the stack frame. This avoids additional memory consumption.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/tail-recursion-optimized-stack.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Body Recursion
+
+Keep in mind that Elixir can only tail-call optimize your recursive function if the last thing it does
+is call itself. That's why it's called **tail** recursion. Otherwise, if the function calls itself in the body,
+it's called **body-recursion** and is not optimized.
+
+### Your Turn
+
+Let's prove that **body-recursion** is not optimized. First, open the runtime panel in this livebook. 
+There you can see the current memory consumption.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/livebook_runtime.PNG)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Next, uncomment and execute the following Elixir cell that uses body recursion. It's a nonsense function
+that doesn't do anything, however, it will infinitely call itself in the body of the function.
+
+You'll notice the **Process** memory consumption will increase, and eventually, the cell will abort.
+You may need to click the **Connect** button to reconnect the Elixir runtime.
+
+```elixir
+# defmodule Body do
+#   def recursion([head | tail]) do
+#     recursion(tail ++ tail) ++ [head]
+#   end
+# end
+
+# Body.recursion([1,2,3])
+```
+
+Make sure you comment out the code above, otherwise the livebook will keep disconnecting.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/body-recursion-process-full.PNG)
+
+## Using Recursion
+
+So why is recursion useful? Well, it's how we achieve a great deal of functionality in Elixir.
+For example, many functions in the `Enum` module use recursion under the hood.
+
+Recursion primarily allows us to accomplish enumeration.
+
+For example, we could use recursion to enumerate through and sum the elements in a list.
+
+```elixir
+defmodule Recursion do
+  def sum([], accumulator), do: accumulator
+
+  def sum([head | tail], accumulator) do
+    sum(tail, accumulator + head)
+  end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+
+Let's break down how that works in the slide below.
+
+````elixir
+# TODO - Hide
+
+[
+  "
+The base case would return the accumulator when the list is empty.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+ 
+ 
+    
+end
+ 
+ 
+```
+",
+  "
+Otherwise, we'll add the head to an accumulator and recurse on the tail of the list.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+    def sum([head | tail], accumulator do
+        sum(tail, accumulator + head)
+    end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+",
+  "
+The `sum/2` function is called with the list `[4, 5, 6]`.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+    def sum([4 | [5, 6]], 0) do
+        sum([5, 6], 4 + 0)
+    end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+",
+  "
+The `sum/2` function is called again on the tail of the list `[5, 6]`.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+    def sum([5 | [6]], 4) do
+        sum([6], 5 + 4)
+    end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+",
+  "
+The `sum/2` function is called again on the tail of the list `[6]`.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+    def sum([6 | []], 9) do
+        sum([], 6 + 9)
+    end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+",
+  "
+The `sum/2` function is called again on the tail of the list `[]`. This triggers the base case to return the accumulator.
+```elixir
+defmodule Recursion do
+    def sum([], 15), do: 15
+    def sum([head | tail], accumulator) do
+        sum(tail, accumulator + head)
+    end
+end
+
+Recursion.sum([4, 5, 6], 0)
+```
+",
+  "
+And our function returns `15`.
+```elixir
+defmodule Recursion do
+    def sum([], accumulator), do: accumulator
+    def sum([head | tail], accumulator) do
+        sum(tail, accumulator + head)
+    end
+end
+
+15
+```
+"
+]
+|> Enum.map(&Kino.Markdown.new/1)
+|> LiveSlide.new()
+````
+
+### Your Turn
+
+In the Elixir cell below, implement a `CustomEnum.map/2` function for lists using recursion.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+CustomEnum.map([1, 2, 3], fn each -> each * 2 end)
+[2, 4, 6]
+```
+
+```elixir
+defmodule CustomEnum do
+  def map(list, function) do
+  end
+end
+```
+
