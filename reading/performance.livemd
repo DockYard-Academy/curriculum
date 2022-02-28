@@ -198,12 +198,12 @@ widget =
 init = 1
 max = 5
 
-linear =
+exponential =
   Enum.map(init..max, fn number_of_elements ->
-    %{x: number_of_elements, y: number_of_elements ** number_of_elements, type: "n^n"}
+    %{x: number_of_elements, y: number_of_elements ** number_of_elements, type: "2^n"}
   end)
 
-Kino.VegaLite.push_many(widget, linear)
+Kino.VegaLite.push_many(widget, exponential)
 ```
 
 ```elixir
@@ -230,7 +230,7 @@ of the data.
 * **$$O(n)$$**: Linear Time
 * **$$O(n^2)$$**: Quadratic Time (Polonomial Time)
 * **$$O(n!)$$**: Factorial Time
-* **$$O(n^n)$$**: Exponential Time
+* **$$O(2^n)$$**: Exponential Time
 
 ```elixir
 # TODO - Hide
@@ -253,7 +253,7 @@ linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
 constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
 polonomial = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
 logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
-exponential = Enum.map(initial_x..(max_x - 2), &%{x: &1, y: &1 ** &1, type: "O(n^n)"})
+exponential = Enum.map(initial_x..(max_x - 2), &%{x: &1, y: 2 ** &1, type: "O(2^n)"})
 
 Kino.VegaLite.push_many(widget, exponential)
 Kino.VegaLite.push_many(widget, polonomial)
