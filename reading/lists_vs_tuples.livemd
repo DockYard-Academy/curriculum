@@ -16,7 +16,7 @@ large_tuple = List.to_tuple(large_list)
 
 ## Memory
 
-We store information in memory. You can think of memory as a series of cells that
+We store information in memory. We can think of memory as a series of cells that
 can each store some value.
 
 ![](images/memory_blank.png)
@@ -279,6 +279,65 @@ In the Elixir cell below, use the `:timer.tc/1` function to time how long it tak
 to access the first element, and last element of a list with `5000` elements.
 
 Then do the same for tuples.
+
+```elixir
+
+```
+
+## Concatenation
+
+Concatenating a tuple requires copying both tuples in memory, therefore it's performance cost is
+$O(n1 + n2)$ where $n1$ is the number of elements in the first tuple and $n2$ is the number of elements
+in the second tuple.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/tuple_concatination.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+However $O(n1 + n2)$ is only the theoretical performance cost. In reality it's because higher tuples do
+not support concatination, and you would first need to convert them into a list.
+
+Why don't tuples support concatination? Because they should be used for **fixed-sized containers**. [Jose Valim](https://stackoverflow.com/a/28355536/9021210) explains.
+
+> You can't concatenate tuples.
+> The only reason is that you are not supposed to use them as such. Most of tuple usage requires knowing their size and things get blurrier if you can concatenate them. Furthermore, concatenating tuples requires copying both tuples in memory, which is not efficient.
+> In other words, if you want to concatenate tuples, you may have the wrong data structure. You have two options:
+> 
+> * Use lists
+> * Compose the tuples: instead of a ++ b, just write {a, b}
+
+However for a list, only the first list must be coppied, so it has $O(n1)$ cost where $n1$ is the
+number of elements in the first list. The first coppied list can now simply point to the head of
+the second list in memory.
+
+For example,
+
+```elixir
+[1, 2, 3] ++ [4, 5]
+```
+
+![](images/concatinate_list.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+That means that so long as your first list is small, it's a fairly performant operation, even if the second list is massive.
+However, it will be expensive if the first list is large.
+
+```elixir
+{small_first_list, _result} = :timer.tc(fn -> [1] ++ large_list end)
+{large_first_list, _result} = :timer.tc(fn -> large_list ++ [1] end)
+
+%{small_first_list: small_first_list, large_first_list: large_first_list}
+```
+
+### Your Turn
+
+In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes
+to concatenate a list with one element and a list with 5000 elements.
+
+Then try to concatenate a list with 5000 elements to a list with 1 element. Notice how it takes longer.
 
 ```elixir
 
@@ -558,13 +617,72 @@ are still stored contiguously.
 
 ## Conclusion
 
-Upon completing this lesson, you should consider the following key takeaways.
+Operations and lists will have the following Big $O$ notation.
 
-1. Tuples are excellent for use as fixed-sized containers for elements who you do not expect to change.
-2. Lists are best suited for dynamic size containers whose elements you expect to change.
-3. List operations on the $nth$ element have $O(n)$ complexity. Thus operations earlier in the list
-   will be less expensive than operations later in the list.
-4. Tuple operations always have $O(n)$ complexity except for reading a value in a tuple which will be $O(1)$
-5. Functional programming languages like Elixir do not allow for mutation.
-6. Elixir shallow copies a reference instead of deep copying the entire underlaying data
-   structure which is far more expensive.
+```elixir
+# TODO - Hide
+
+Kino.DataTable.new(
+  [
+    %{operation: "length", tuple: "O(1)", list: "O(n)"},
+    %{operation: "prepend", tuple: "O(n)", list: "O(1)"},
+    %{operation: "insert", tuple: "O(n)", list: "O(n*)"},
+    %{operation: "access", tuple: "O(1)", list: "O(n*)"},
+    %{operation: "update/replace", tuple: "O(n)", list: "O(n*)"},
+    %{operation: "delete", tuple: "O(n)", list: "O(n*)"},
+    %{operation: "concatenation", tuple: "O(n1 + n2)", list: "O(n1)"}
+  ],
+  keys: [:operation, :tuple, :list]
+)
+```
+
+> n* will be the index of the operation, instead of the number of elements in the list.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Key Takeaways
+
+* Tuples are $O(1)$ for reading a value and the length, but require $O(n)$ for all other operations.
+* List operations are generally $O(n)$ complexity where $n$ is the index of the operation, meaning operations
+  early in a list can be very performant and are preferred when possible.
+* Tuples should be used for **fixed-size containers**.
+* Lists should be used for **dynamic-size containers**.
+* Functional languages do not allow mutation, they instead rely on **shallow-copying** elements
+  to avoid unneccesary memory consumption.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Select the Big $O$ notation that matches the operation. To challenge yourself, try not to refer to the table above.
+
+```elixir
+# TODO - Hide & Create Validated Form
+
+options = [
+  nil: nil,
+  o_n: "O(n)",
+  o_index: "O(n*)",
+  o_1: "O(1)",
+  o_n1: "O(n1)",
+  on_12: "O(n1 + n2)"
+]
+
+[
+  Kino.Input.select("prepending an element in a list", options),
+  Kino.Input.select("concatenating two lists", options),
+  Kino.Input.select("inserting an element in tuple", options),
+  Kino.Input.select("deleting an element in a list", options),
+  Kino.Input.select("updating an element in a list", options),
+  Kino.Input.select("concatenating two tuples", options),
+  Kino.Input.select("inserting an element in list", options),
+  Kino.Input.select("updating an element in tuple", options),
+  Kino.Input.select("deleting an element in a tuple", options),
+  Kino.Input.select("finding the length of a tuple", options),
+  Kino.Input.select("deleting an element in a list", options),
+  Kino.Input.select("finding the length of a list", options)
+]
+|> Enum.map(&Kino.render/1)
+
+Kino.nothing()
+```
