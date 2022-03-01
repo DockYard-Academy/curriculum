@@ -1,69 +1,454 @@
 # Streams
 
-## Streams
-
-Streams support **lazy evaluation**. What is lazy evaluation?
-
-Well let's contrast it to **eager evaluation** to help understand.
-
-Functions in the The `Enum` module are eager. That means that they execute immediately when you
-call them.
+## Setup
 
 ```elixir
-Enum.map(1..10, fn each -> each * 2 end)
+Mix.install([{:kino, github: "livebook-dev/kino"}, {:benchee, "~> 0.5"}])
 ```
 
-So then, that means that lazy functions don't evaluate immediately. Instead, you can build the work you want
-to execute, and then execute it when desired.
+## Enum vs Stream
 
-Otherwise, the `Stream` module will feel very similar to `Enum`. In fact, we even have some of the same function.
+Currently, we typically use the `Enum` module to work with collections.
+The `Enum` module uses **eager evaluation**. That means any instruction we provide is immediately
+executed. This requires each element in the enumeration to be stored in memory during execution.
 
 ```elixir
-Stream.map(1..5, fn each -> each * 2 end)
+1..10
+|> Enum.map(fn each -> each * 2 end)
+|> Enum.filter(fn each -> each <= 10 end)
+|> Enum.take(4)
 ```
 
-However, you'll notice that instead of returning `[2, 4, 6, 8, 10]` as you might expect with the `Enum` module.
-It instead returns a Stream data type.
+```elixir
+## TODO - Hide
+box = fn text, style ->
+  "<div style=\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center;
+justify-content: center;\">#{text}</div>"
+end
+
+space = fn -> box.("", %{background: "none", border: "none"}) end
+green_box = fn text -> box.(text, %{background: "#D5E8D4", border: "#82B366"}) end
+white_box = fn text -> box.(text, %{background: "#F5F5F5", border: "#666666"}) end
+
+row = fn title, items ->
+  "<div style=\"height: 80px; display: flex; width: 100%; align-items: center;\">
+    <p style=\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\">#{title}</p>
+    <div style=\"display: flex; width: 90%;\">#{items}</div>
+  </div>"
+end
+
+sequence = [
+  "
+  #{row.("1..10", Enum.map(1..10, green_box))}
+  #{row.("map", [])}
+  #{row.("filter", [])}
+  #{row.("take", [])}
+",
+  "
+  #{row.("1..10", Enum.map(1..10, green_box))}
+  #{row.("map", Enum.map(2..20//2, green_box))}
+  #{row.("filter", [])}
+  #{row.("take", [])}
+",
+  "
+  #{row.("1..10", Enum.map(1..10, green_box))}
+  #{row.("map", Enum.map(2..20//2, green_box))}
+  #{row.("filter", Enum.map(2..10//2, green_box) ++ Enum.map(12..20//2, white_box))}
+  #{row.("take", [])}
+",
+  "
+  #{row.("1..10", Enum.map(1..10, green_box))}
+  #{row.("map", Enum.map(2..20//2, green_box))}
+  #{row.("filter", Enum.map(2..10//2, green_box) ++ Enum.map(12..20//2, white_box))}
+  #{row.("take", Enum.map(2..8//2, green_box) ++ Enum.map(10..20//2, white_box))}
+  "
+]
+
+Kino.animate(2000, 0, fn i ->
+  md = Kino.Markdown.new(Enum.at(sequence, i))
+  {:cont, md, rem(i + 1, length(sequence))}
+end)
+```
+
+While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by the
+end of the execution the `Enum.take/2` function only needs two elements.
+
+It seems like a waste of resources to execute every operation on every element, and it is.
+As the list grows, this becomes a massive waste of computation. It would be far more performant if we
+could instead build up a series of functions and run them one by one only when needed.
+
+```elixir
+# TODO - Hide and Refactor
+
+spaces = fn integer -> for _ <- 1..integer, integer > 0, do: space.() end
+green_boxes = fn range -> for n <- range, do: green_box.(n) end
+white_boxes = fn range -> for n <- range, do: white_box.(n) end
+
+Kino.animate(500, {0, 0}, fn {current_row, current_column} ->
+  current_element = current_column + 1
+  range = green_boxes.(1..current_element) ++ white_boxes.((current_element + 1)..10)
+
+  maybe_display = fn expected_row, display ->
+    if current_row === expected_row, do: display, else: []
+  end
+
+  indent = spaces.(current_column)
+  md = Kino.Markdown.new("
+  #{row.("1..10", range)}
+  #{row.("map", maybe_display.(1, indent ++ [green_box.(current_element * 2)]))}
+  #{row.("filter", maybe_display.(2, indent ++ [green_box.(current_element * 2)]))}
+  #{row.("take", green_boxes.(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [green_box.(current_element * 2)]))}
+")
+  next_row = rem(current_row + 1, 4)
+  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)
+  {:cont, md, {next_row, next_column}}
+end)
+```
+
+```elixir
+for n <- 0..0, i > 0, do: n
+```
+
+We can't accomplish this with the `Enum` module, however we can with `Stream`.
+[Streams](https://hexdocs.pm/elixir/1.12/Stream.html#unfold/2) are composable,
+lazy enumerables. **lazy** means they execute on each element in the stream one by one. **composable**
+means that we build up functions to execute on each element in the stream.
+
+Notice that the following does not execute, it instead builds up future work to execute and returns
+a Stream data structure.
+
+```elixir
+1..10
+|> Stream.map(fn each -> each * 2 end)
+|> Stream.filter(fn each -> each <= 10 end)
+|> Stream.take(4)
+```
+
+The Stream stores the enumerable, and the list of functions to call on it. The Stream will only evaluate
+when it's called with any eager function from the `Enum` module. For example,
+
+```elixir
+1..10
+|> Stream.map(fn each -> each * 2 end)
+|> Stream.filter(fn each -> each <= 10 end)
+|> Stream.take(4)
+|> Enum.to_list()
+```
+
+As the collection grows, the performance benefits become more clear. Let's compare the same
+functionality from the `Stream` module and the `Enum` module.
+
+<!-- livebook:{"branch_parent_index":1} -->
+
+## Performance Comparison
+
+```elixir
+Benchee.run(
+  %{
+    "enum" => fn ->
+      1..200
+      |> Enum.map(fn each -> each * 2 end)
+      |> Enum.filter(fn each -> each <= 10 end)
+      |> Enum.take(4)
+    end,
+    "stream" => fn ->
+      1..200
+      |> Stream.map(fn each -> each * 2 end)
+      |> Stream.filter(fn each -> each <= 10 end)
+      |> Stream.take(4)
+      |> Enum.to_list()
+    end
+  },
+  memory_time: 2
+)
+```
+
+While the exact results may vary, you should notice that the stream runs faster and consumes less memory.
+
+```
+Name             ips        average  deviation         median         99th %
+stream       69.84 K       14.32 μs   ±126.27%       11.30 μs       59.40 μs
+enum          8.77 K      114.02 μs    ±75.94%      106.10 μs      227.45 μs
+
+Comparison: 
+stream       69.84 K
+enum          8.77 K - 7.96x slower +99.70 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+stream        31.25 KB
+enum         191.88 KB - 6.14x memory usage +160.63 KB
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, try refactoring this code using the `Stream` module.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Stream<[enum: 1..5, funs: [#Function<47.58486609/1 in Stream.map/2>]]>
+1..100
+|> Enum.map(fn each -> div(each, 2))
+|> Enum.map(fn each -> each * 3)
+|> Enum.filter(fn each -> rem(each, 2) === 0)
+```
+
+```elixir
+
+```
+
+## Stream Gotchas
+
+While the Stream module can improve performance, it's worth mentioning that it's not a silver bullet.
+For example, a single `Stream.map` is not faster than `Enum.map`.
+
+```elixir
+{stream_time, _result} = :timer.tc(fn -> Stream.map(1..1000, &(&1 * 2)) |> Enum.to_list() end)
+{enum_time, _result} = :timer.tc(fn -> Enum.map(1..1000, &(&1 * 2)) end)
+
+%{stream_time: stream_time, enum_time: enum_time}
+```
+
+That's because we only gain performance benefits when sequential execution on each element in the 
+collection reduces the amount of computation and/or memory necessary.
+
+Notice how when we string
+multiple maps together, the `Enum` module is still just as fast or even faster than the `Stream` module.
+
+```elixir
+stream_fn = fn ->
+  1..1000
+  |> Stream.map(&(&1 * 2))
+  |> Stream.map(&(&1 * 2))
+  |> Stream.map(&(&1 * 2))
+  |> Enum.to_list()
+end
+
+enum_fn = fn -> 1..1000 |> Enum.map(&(&1 * 2)) |> Enum.map(&(&1 * 2)) |> Enum.map(&(&1 * 2)) end
+
+{stream_time, _result} = :timer.tc(stream_fn)
+{enum_time, _result} = :timer.tc(enum_fn)
+
+%{stream_time: stream_time, enum_time: enum_time}
+```
+
+In terms of improving performance, streams will generally provide the greatest benefits when operations 
+reduce the number of elements in the enumerable.
+
+## Stream
+
+As you've seen, Streams generate elements one by one and can improve performance.
+They are often beneficial when working with large data as they only consume the amount of data 
+necessary for each operation. On the other hand, `Enum` will create an entire copy of
+the collection for each intermediate step.
+
+```mermaid
+flowchart
+  subgraph Enum
+    direction LR
+    E1[Enum] --> EO1[Operation] --> L1[Collection] --> EO2[Operation] --> L2[Collection]
+  end
+  subgraph Stream
+    S1[Stream] --> SE1[Enum] --> SO1[Operation] --> SR[Collection]
+  end
+```
+
+Stream provides many equivalent functions that we'll find on the Enum module. You've
+already seen `map/2`, `filter/2`, and `take/2`.
+
+We also have access to equivalent functions such as `with_index/1`, `drop/2`, `chunk_every/2`, and `each/2`.
+We've used pattern matching here to demonstrate each has similar behavior.
+
+```elixir
+[{"a", 0}, {"b", 1}, {"c", 2}] = Enum.with_index(["a", "b", "c"])
+[{"a", 0}, {"b", 1}, {"c", 2}] = Stream.with_index(["a", "b", "c"]) |> Enum.to_list()
+
+["b", "c"] = Enum.drop(["a", "b", "c"], 1)
+["b", "c"] = Stream.drop(["a", "b", "c"], 1) |> Enum.to_list()
+
+[[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]] = Enum.chunk_every(1..10, 2)
+[[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]] = Stream.chunk_every(1..10, 2) |> Enum.to_list()
+
+Kino.nothing()
+```
+
+### Streams As Generators
+
+However, Streams are more than a performant alternative to Enum.
+Streams are also used to generate a (potentially infinite) amount of data.
+
+Streams only execute necessary computation, so we can have a theoretically 
+infinite stream such as `1,2,3,1,2,3,1,2,3....` continue forever. However, we'll only ever generate the necessary number of elements.
+
+```mermaid
+flowchart LR
+1 --> 2 --> 3 --> 1
+```
+
+Here's that shown using `Stream.cycle/2`, which cycles through an enumerable.
+
+```elixir
+Stream.cycle([1, 2, 3])
+|> Enum.take(10)
+```
+
+We've been using Streams for a while now! Did you know that ranges are streams? Each element
+in the range is only created as necessary. For example, we can create an incredibly massive range in a
+single moment.
+
+But when we use that massive range with an `Enum` operation, then we pay the computational price!
+
+```elixir
+{creation_time, _result} = :timer.tc(fn -> 1..10_000_000_000_000_000_000_000_000_000 end)
+# The below range is smaller to avoid crashing your computer!
+{execution_time, _result} = :timer.tc(fn -> Enum.to_list(1..10_000_000) end)
+
+%{creation_time: creation_time, execution_time: execution_time}
+```
+
+### Stream.iterate/2
+
+We can use `Stream.iterate/2` to iterate over an accumulator.
+For example, we could start at `0`, and then add `1` to it for every iteration.
+
+```mermaid
+flowchart LR
+  1 --> 2 --> 3 --> 4 --> 5
+  n1[n] --> n2[n + 1] --> n3[n + 2] --> n4[n + 3] --> n5[n + 4]
+```
+
+```elixir
+Stream.iterate(0, fn accumulator -> accumulator + 1 end) |> Enum.take(5)
+```
+
+The initial value of the accumulator will be `0`. The next value of the accumulator will
+be `accumulator + 1` which is `0 + 1`. This pattern continues to create `[1, 2, 3, 4, 5]`.
+
+```mermaid
+flowchart LR
+Accumulator --> Function --> A2[Next Accumulator] --> Function
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-The `Stream` above contains the functions to call on the stream, and the collection (1..5) to call them on.
+You could build more complicated sequences this way too. For example, there is
+such a thing as the [Collatz Conjecture](https://www.youtube.com/watch?v=094y1Z2wpJg&ab_channel=Veritasium)
+Also known as the simplest math problem that no one can solve.
 
-It's **lazy** because it's waiting to be executed. To execute it, use any `Enum` function on the
-stream.
+The Collatz Conjecture states that if you take any number and apply the following two
+rules:
+
+1. If the number is odd, multiply the number by three and add 1
+2. If the number is even, divide by two.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Eventually, no matter the starting number, the sequence should infinitely repeat `4, 2, 1`.
+
+```mermaid
+flowchart LR
+integer --> even
+integer --> odd
+  even --> a[x / 2]
+  odd --> b[3x + 1]
+  a --> 4
+  b --> 4
+  4 --> 2 --> 1
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example, let's take the number `5` to see how it quickly repeats `4, 2, 1`
+
+```mermaid
+flowchart LR
+  5 -- 5 * 3 + 1 --> 16 --16 / 2--> 8 -- 8 / 2 --> 4 -- 4 / 2--> 2 -- 2 / 2 --> 1 
+  -- 1 * 3 + 1--> a[4] --4 / 2--> b[2] --2 / 2--> c[1]
+```
+
+### Your turn
+
+In the Elixir cell below, try changing `starting_integer` and see how it always
+eventually repeats `4, 2, 1`.
+
+We're limited to how many elements we can display, so if the integer is
+too large you might not see the end of the list.
 
 ```elixir
-1..5
-|> Stream.map(fn each -> each * 2 end)
+starting_integer = 20
+
+Stream.iterate(starting_integer, fn n -> if rem(n, 2) === 0, do: div(n, 2), else: 3 * n + 1 end)
+|> Enum.take(100)
+```
+
+### Stream.unfold/2
+
+While `Stream.iterate/2` treats the accumulator as the value, `unfold/2` separates the accumulator and
+the return value. So you can accumulate, and then generate a separate value from the accumulator.
+
+```mermaid
+flowchart LR
+  Accumulator --> Function --> Value
+  Function --> Accumulator
+```
+
+```elixir
+Stream.unfold(5, fn accumulator ->
+  value = "value: #{accumulator}"
+  next_accumulator = accumulator + 1
+  {value, next_accumulator}
+end)
+|> Enum.take(5)
+```
+
+You can use `Stream.unfold/2` with `Enum.to_list/2` so long as you specify when the stream should end.
+Otherwise, the stream would be infinite and run forever. To specify when the stream should end, you return `nil`.
+
+You could do this with a separate function head, or some other control flow.
+
+```elixir
+Stream.unfold(5, fn
+  0 ->
+    nil
+
+  accumulator ->
+    value = "value: #{accumulator}"
+    next_accumulator = accumulator + 1
+    {value, next_accumulator}
+end)
+|> Enum.take(5)
+```
+
+For example, we could use `Stream.unfold/2` to improve the **Collatz Conjecture** function from above
+to simply stop when the element reaches `4`. That way if it ever stops, it must have
+reached `4` and we've proven the conjecture.
+
+```elixir
+starting_number = 100
+
+Stream.unfold(starting_number, fn
+  4 ->
+    nil
+
+  accumulator ->
+    next_accumulator =
+      if rem(accumulator, 2) === 0, do: div(accumulator, 2), else: 3 * accumulator + 1
+
+    {accumulator, next_accumulator}
+end)
 |> Enum.to_list()
 ```
 
-### Streams Execute Sequentially
+### Your Turn
 
-<!-- livebook:{"break_markdown":true} -->
+In the Elixir cell below, use `Stream.unfold/2` to generate a list of cubed numbers. Use `Enum.take/2`
+to evaluate the first `100` numbers.
 
-There's a few reasons to use streams. One reason is performance.
-
-Let's take an example with `Enum` where we call multiple functions on the same collection.
-
-```elixir
-1..100
-|> Enum.map(fn each -> each * 2 end)
-|> Enum.map(fn each -> each * 2 end)
-|> Enum.map(fn each -> each * 2 end)
-```
+I.e. $1^1, 2^2, 3^3, 4^4, ...$ which would be `[1, 4, 9, 16]` and so on.
 
 ```elixir
-stream =
-  1..100
-  |> Stream.map(fn each -> each * 2 end)
-  |> Stream.map(fn each -> each * 2 end)
-  |> Stream.map(fn each -> each * 2 end)
-  |> Enum.to_list()
+
 ```
