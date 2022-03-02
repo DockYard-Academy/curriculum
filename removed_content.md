@@ -1708,3 +1708,93 @@ However, if you use the list again, you'll see that `'-\n'` still represents `[4
 ```elixir
 Enum.map(list, fn [a, b] -> {a, b} end)
 ```
+
+# Performance
+### Your Turn
+
+Evaluate the Elixir cell below to view the exercise.
+
+````elixir
+# TODO - Hide
+Kino.Input.text("What is the Big O Notation for the following?") |> Kino.render()
+
+Kino.Markdown.new("
+```elixir
+1 + 1
+```
+") |> Kino.render()
+
+# TODO - Hide
+Kino.Input.text(
+  "As elements are added to the `map`, what is the Big O Notation for the following?"
+)
+|> Kino.render()
+
+Kino.Markdown.new("
+```elixir
+map = %{key: \"value\"}
+map.key
+```
+") |> Kino.render()
+
+Kino.Input.text(
+  "As elements are added to `list`, what is the Big O Notation for the following code?"
+)
+|> Kino.render()
+
+Kino.Markdown.new("
+```elixir
+list = [1,2,3]
+Enum.map([1, 2, 3], fn each -> each  + 2 end)
+```
+") |> Kino.render()
+
+Kino.Input.text(
+  "As elements are added to `list`, what is the Big O Notation for the following code?"
+)
+|> Kino.render()
+
+Kino.Markdown.new("
+```elixir
+list = [1,2,3]
+Enum.map([1, 2, 3], fn element1 -> 
+  Enum.map(list, fn element2 -> {element1, element2} )
+end)
+```
+")
+````
+
+
+C1[1]
+
+C11[1]
+C12[2]
+C13[3]
+
+C1 --> C11
+C1 --> C12
+C1 --> C13
+
+C111[1]
+C112[2]
+C113[3]
+
+C11 --> C111
+C11 --> C112
+C11 --> C113
+
+C121[1]
+C122[2]
+C123[3]
+
+C12 --> C121
+C12 --> C122
+C12 --> C123
+
+C131[1]
+C132[2]
+C133[3]
+
+C13 --> C131
+C13 --> C132
+C13 --> C133

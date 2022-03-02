@@ -13,13 +13,14 @@ Mix.install([
 alias VegaLite, as: Vl
 ```
 
+<!-- livebook:{"branch_parent_index":0} -->
+
 ## Performance Concerns
 
-Computers are broken into a variety of parts. As programmers, we are primarily concerned about
+Computers are composed of several parts. As programmers, we are primarily concerned about
  the **processor**, and the **memory**.
 
-The processor determines the computer's ability to make calculations. It's speed is measured
-in GHz (Gigahertz).
+The processor determines the computer's speed when performing calculations.
 
 Memory or **RAM** (random access memory) is measured in GB (Gigabytes) and is the amount of data
 we can store during a calculation.
@@ -36,15 +37,123 @@ For example, this statement may take some time.
 Enum.map(1..10_000_000, fn each -> each + 2 end)
 ```
 
-## Linear Growth
+## Big O Notation
 
-The amount of time it takes to complete the above calculation grows linearly as we increase the number of
-elements in the range.
+As programmers, we are generally more concerned with how performance grows in our
+program as data becomes larger.
 
-For each additional item added to the collection, the computer needs to
+We use **Big $$O$$ Notation** to communicate about how performance changes based on the size
+of the data.
+
+* **$$O(1)$$**: Constant Time
+* **$$O(log (n))$$**: Logarithmic Time
+* **$$O(n)$$**: Linear Time
+* **$$O(n^2)$$**: Quadratic Time (Polonomial Time)
+* **$$O(2^n)$$**: Exponential Time
+* **$$O(n!)$$**: Factorial Time
+
+```elixir
+# TODO - Hide
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "x", type: :quantitative)
+  |> Vl.encode_field(:y, "y", type: :quantitative)
+  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
+  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+max_x = 5
+initial_x = 2
+
+linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
+constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
+polonomial = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
+logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
+exponential = Enum.map(initial_x..max_x, &%{x: &1, y: 2 ** &1, type: "O(2^n)"})
+factorial = Enum.map(initial_x..max_x, &%{x: &1, y: Math.factorial(&1), type: "O(n!)"})
+
+Kino.VegaLite.push_many(widget, factorial)
+Kino.VegaLite.push_many(widget, exponential)
+Kino.VegaLite.push_many(widget, polonomial)
+Kino.VegaLite.push_many(widget, linear)
+Kino.VegaLite.push_many(widget, logarithmic)
+Kino.VegaLite.push_many(widget, constant)
+```
+
+As you work with larger amounts of data, different big $O$ complexities grow faster than others.
+See the graph below for a general ranking.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/big_o_notation_graph.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We should try to be aware of the performance costs and memory costs of both the
+code that your write, and the built-in functionality you use, especially when working with large
+amounts of data.
+
+This will inspire both how you write code, and which data structures you choose for particular situations.
+
+## Constant Complexity
+
+Did you know that a [carrier pigeon can be faster than the internet](https://www.bbc.com/news/technology-11325452)?
+It's true, and it's related to the nature of constant growth.
+
+Some operations take the same amount of time to execute no matter how much data is involved.
+For example, a pigeon will travel some distance of kilometers in approximately the same time
+every attempt. If you strap a USB stick to the pigeon, it can carry (within reason) any
+amount of data to it's destination in a constant amount of time.
+
+So a while it makes a great headline about slow internet speed, it's actually a
+mathematical guarantee that for some size of data, a pigeon will be faster than the internet.
+
+We can see the nature of how a constant travel time for some amount of data always intersects with the 
+expected internet speed in the graph below.
+
+```elixir
+# TODO - Hide
+
+size = 600
+
+widget =
+  Vl.new(width: size, height: size)
+  |> Vl.mark(:line)
+  |> Vl.encode_field(:x, "data", type: :quantitative)
+  |> Vl.encode_field(:y, "time", type: :quantitative)
+  |> Vl.encode_field(:color, "type", title: "Linear Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+  |> Kino.render()
+
+init = 1
+max = 5000
+
+internet = for n <- init..max, do: %{data: n, time: n, type: "Internet"}
+pigeon = for n <- init..max, do: %{data: n, time: 3500, type: "Pigeon"}
+
+Kino.VegaLite.push_many(widget, internet)
+Kino.VegaLite.push_many(widget, pigeon)
+```
+
+## Linear Complexity
+
+Linear growth adds the same number of calculations for each element in the collection.
+For example, reading a book would (assuming a consistent reading speed) be linear complexity.
+If you take two minutes to read every page, you add an additional two minute for every page.
+
+* With 1 page it takes 2 minute
+* With 2 pages it takes 4 minutes
+* With 3 pages it takes 6 minutes
+* With 4 pages it takes 8 minutes
+
+In programming terms, for each additional item added to the collection, the computer needs to
 perform approximately the same number of additional calculations.
 
-Plotted onto a graph you would expect that as we increase the number of elements, expected time grows in a constant line upward.
+Plotted onto a graph you would expect that as we increase the number of elements, time grows in a constant line upward.
 
 ```elixir
 # TODO - Hide
@@ -73,21 +182,42 @@ linear =
 Kino.VegaLite.push_many(widget, linear)
 ```
 
-## Polonomial Growth
+```elixir
+Enum.map(1..10_000_000, fn each -> each * 2 end)
+```
 
-Some calculation instead follow polonomial growth, where the number of calculations necessary 
-increases with each additonal element. Typically polonomial growth doubles for each element,
-but it can triple, quaduple, etc.
+## Polynomial Complexity
+
+Rather than grow linearly, polynomial complexity grows to some power.
+For example, nested loops typically result in polynomial complexity.
+
+That's because for every element in the first enumerable, we enumerate through every element in
+the second enumerable.
+
+```mermaid
+flowchart
+A[1] --> B[1]
+A[1] --> C[2]
+A[1] --> D[3]
+
+A1[2] --> B1[1]
+A1[2] --> C1[2]
+A1[2] --> D1[3]
+
+A2[3] --> B2[1]
+A2[3] --> C2[2]
+A2[3] --> D2[3]
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
-
-For example, this function creates a larger list with each enumeration.
 
 Try changing `number` to `2`, `3`, and `4`. Notice how it creates more lists, with more
 elements for each increase in number.
 
 ```elixir
-number = 1
+number = 5
 
 Enum.map(1..number, fn _ ->
   Enum.to_list(1..number)
@@ -99,13 +229,13 @@ end)
 * With 3 elements it creates 9 elements
 * With 4 elements it creates 12 elements
 
-In other words, it creates $$n^2$$ elements.
+In other words, it creates $n^2$ elements. We can see how this grows in the following table.
 
 ```elixir
 # TODO - Hide
 
 data =
-  Enum.map(1..10, fn each ->
+  Enum.map(1..1000, fn each ->
     %{
       "# of elements": each,
       result: each ** 2,
@@ -117,8 +247,132 @@ data =
 Kino.DataTable.new(data)
 ```
 
-Plotted onto a graph, you would expect an upward curve for polonomial growth.
-While the previous example was $n^2$, polonomial growth can also be $n^3$, $n^4$, and so on.
+If you nest a third enumeration it becomes $n^3$.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+A1[1]
+
+A11[1]
+A12[2]
+A13[3]
+
+A1 --> A11
+A1 --> A12
+A1 --> A13
+
+A111[1]
+A112[2]
+A113[3]
+
+A11 --> A111
+A11 --> A112
+A11 --> A113
+
+A121[1]
+A122[2]
+A123[3]
+
+A12 --> A121
+A12 --> A122
+A12 --> A123
+
+A131[1]
+A132[2]
+A133[3]
+
+A13 --> A131
+A13 --> A132
+A13 --> A133
+
+B1[1]
+
+B11[1]
+B12[2]
+B13[3]
+
+B1 --> B11
+B1 --> B12
+B1 --> B13
+
+B111[1]
+B112[2]
+B113[3]
+
+B11 --> B111
+B11 --> B112
+B11 --> B113
+
+B121[1]
+B122[2]
+B123[3]
+
+B12 --> B121
+B12 --> B122
+B12 --> B123
+
+B131[1]
+B132[2]
+B133[3]
+
+B13 --> B131
+B13 --> B132
+B13 --> B133
+
+C1[1]
+
+C11[1]
+C12[2]
+C13[3]
+
+C1 --> C11
+C1 --> C12
+C1 --> C13
+
+C111[1]
+C112[2]
+C113[3]
+
+C11 --> C111
+C11 --> C112
+C11 --> C113
+
+C121[1]
+C122[2]
+C123[3]
+
+C12 --> C121
+C12 --> C122
+C12 --> C123
+
+C131[1]
+C132[2]
+C133[3]
+
+C13 --> C131
+C13 --> C132
+C13 --> C133
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Try changing `number` to `2`, `3`, and `4`. Notice how it creates $n^3$ elements.
+
+```elixir
+number = 3
+
+Enum.map(1..number, fn _ ->
+  Enum.map(1..number, fn _ ->
+    Enum.to_list(1..number)
+  end)
+end)
+```
+
+Plotted onto a graph, you would expect an upward curve.
 
 ```elixir
 # TODO - Hide
@@ -157,28 +411,44 @@ Kino.VegaLite.push_many(widget, n3)
 Kino.VegaLite.push_many(widget, n4)
 ```
 
-## Exponential Growth
+## Exponential Complexity
 
-Certain functions grow exponentially, often enumerating through every possible permutation of
-the input. As you can imagine this is computationally expensive.
+In exponential growth, some constant grows by an additional power for each element added to the collection.
 
-For example, if you needed to calculate every permutation of a number, that would require
-an exponential function.
+Let's take cracking a password as an example. We can assume a password can only be made from
+integers `1` to `9`.
+
+```mermaid
+flowchart LR
+0---1---2---3---4---5---6---7---8---9
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
-```mermaid
-flowchart
-  a[123]
-  a --> b[1]
-  a --> c[2]
-  a --> d[3]
-  b --> b1[2] --> 123
-  b --> b2[3] --> 132
-  c --> c1[1] --> 213
-  c --> c2[3] --> 231
-  d --> d1[1] --> 312
-  d --> d2[2] --> 321
+As the number of digits in the password increases, the number of combinations grows by a power
+of `2`.
+
+* With 1 digit it makes 10 attempts
+* With 2 digits it makes 100 attempts
+* With 3 digits it makes 1000 attempts
+* With 4 digits it makes 10000 attempts
+
+In other words, it executes $$10^n$$ attempts. Now often you'll see exponential complexity
+represented as $2^n$  or $C^n$ where `2` or `C` represents some constant value. In the case of a password cracker, it would
+be `10`.
+
+```elixir
+# Hide
+data =
+  Enum.map(1..100, fn each ->
+    %{
+      "# of elements": each,
+      result: 10 ** each,
+      equation: "100 ** #{each}"
+    }
+  end)
+
+Kino.DataTable.new(data)
 ```
 
 ```elixir
@@ -196,41 +466,75 @@ widget =
   |> Kino.render()
 
 init = 1
-max = 5
+max = 10
 
-exponential =
-  Enum.map(init..max, fn number_of_elements ->
-    %{x: number_of_elements, y: number_of_elements ** number_of_elements, type: "2^n"}
-  end)
+factorial = for n <- init..max, do: %{x: n, y: 10 ** n, type: "2^n"}
 
-Kino.VegaLite.push_many(widget, exponential)
+Kino.VegaLite.push_many(widget, factorial)
 ```
+
+## Factorial Complexity
+
+Certain functions enumerate through every possible permutation of
+the input. As you can imagine this is computationally expensive. for each element, the function needs to
+enumerate through every remaining element.
+
+For example, if you needed to calculate every permutation of a number, that would require
+a factorial function.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  a[123]
+  a --> b[1]
+  a --> c[2]
+  a --> d[3]
+  b --> b1[2] --> 123
+  b --> b2[3] --> 132
+  c --> c1[1] --> 213
+  c --> c2[3] --> 231
+  d --> d1[1] --> 312
+  d --> d2[2] --> 321
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Try adding elements to the `list` and notice how it creates $n!$ permutations of the list.
 
 ```elixir
-# TODO - Hide
+defmodule Permutations do
+  def of([]) do
+    [[]]
+  end
 
-data =
-  Enum.map(1..10, fn each ->
-    %{"# of elements": each, result: each ** each, equation: "#{each} ** #{each}"}
-  end)
+  def of(list) do
+    for h <- list, t <- of(list -- [h]), do: [h | t]
+  end
+end
 
-Kino.DataTable.new(data)
+list = [1, 2, 3]
+Permutations.of(list)
 ```
 
-## Big O Notation
+* With 1 element it creates 1 permutation
+* With 2 elements it creates 2 permutations
+* With 3 elements it creates 6 permutations
+* With 4 elements it creates 24 permutations
+* With 5 elements it creates 120 permutations
 
-As programmers, we are generally more concerned with how performance cost grows in our
-program.
+In other words, it creates $$n!$$ permutations. where $n!$ is a shorthand for
 
-We use **Big $$O$$ Notation** to communicate about how performance changes based on the size
-of the data.
+$n! = n * (n-1) * (n-2) * ... * 1$
 
-* **$$O(1)$$**: Constant Time
-* **$$O(log (n))$$**: Logarithmic Time
-* **$$O(n)$$**: Linear Time
-* **$$O(n^2)$$**: Quadratic Time (Polonomial Time)
-* **$$O(n!)$$**: Factorial Time
-* **$$O(2^n)$$**: Exponential Time
+For example $5!$ is $5 * 4 * 3 * 2 * 1$.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Factorial complexity grows incredibly fast, as you can see according to this graph and corresponding
+data table.
 
 ```elixir
 # TODO - Hide
@@ -242,95 +546,35 @@ widget =
   |> Vl.encode_field(:x, "x", type: :quantitative)
   |> Vl.encode_field(:y, "y", type: :quantitative)
   |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+  |> Vl.encode_field(:color, "type", title: "Factorial Growth", type: :nominal)
   |> Kino.VegaLite.new()
   |> Kino.render()
 
-max_x = 5
-initial_x = 2
+init = 1
+max = 5
 
-linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
-constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
-polonomial = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
-logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
-exponential = Enum.map(initial_x..(max_x - 2), &%{x: &1, y: 2 ** &1, type: "O(2^n)"})
+factorial = for n <- init..max, do: %{x: n, y: Math.factorial(n), type: "n!"}
 
-Kino.VegaLite.push_many(widget, exponential)
-Kino.VegaLite.push_many(widget, polonomial)
-Kino.VegaLite.push_many(widget, logarithmic)
-Kino.VegaLite.push_many(widget, constant)
-Kino.VegaLite.push_many(widget, linear)
+Kino.VegaLite.push_many(widget, factorial)
 ```
 
-Different big $O$ complexities grow far faster than others.
-See the graph below for a general ranking.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/big_o_notation_graph.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-When performance is a concern, you should try to be aware of the performance costs and memory costs of both the
-code that your write, and the built-in functionality you use.
-
-This will inspire both how you write code, and which data structures you choose for particular situations.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Evaluate the Elixir cell below to view the exercise.
-
-````elixir
+```elixir
 # TODO - Hide
-Kino.Input.text("What is the Big O Notation for the following?") |> Kino.render()
 
-Kino.Markdown.new("
-```elixir
-1 + 1
-```
-") |> Kino.render()
+Enum.map(1..10, fn each ->
+  equation =
+    Enum.map(each..1, fn
+      ^each -> "#{each}"
+      n -> " * #{n}"
+    end)
+    |> Enum.join()
 
-# TODO - Hide
-Kino.Input.text(
-  "As elements are added to the `map`, what is the Big O Notation for the following?"
-)
-|> Kino.render()
-
-Kino.Markdown.new("
-```elixir
-map = %{key: \"value\"}
-map.key
-```
-") |> Kino.render()
-
-Kino.Input.text(
-  "As elements are added to `list`, what is the Big O Notation for the following code?"
-)
-|> Kino.render()
-
-Kino.Markdown.new("
-```elixir
-list = [1,2,3]
-Enum.map([1, 2, 3], fn each -> each  + 2 end)
-```
-") |> Kino.render()
-
-Kino.Input.text(
-  "As elements are added to `list`, what is the Big O Notation for the following code?"
-)
-|> Kino.render()
-
-Kino.Markdown.new("
-```elixir
-list = [1,2,3]
-Enum.map([1, 2, 3], fn element1 -> 
-  Enum.map(list, fn element2 -> {element1, element2} )
+  %{"# of elements": each, result: each ** each, equation: equation}
 end)
+|> Kino.DataTable.new()
 ```
-")
-````
+
+<!-- livebook:{"branch_parent_index":2} -->
 
 ## Measuring Performance
 
@@ -374,6 +618,14 @@ And the number of seconds by dividing once again by `1000`.
 
 ```elixir
 seconds = miliseconds / 1000
+```
+
+### Your Turn
+
+In the Elixir cell below, use `:timer.tc/1` to measure an operation that takes more than 5 seconds.
+
+```elixir
+
 ```
 
 ### Benchee
@@ -449,12 +701,13 @@ Therefore, lists should be slow to access, and tuples should be fast to access. 
 verify our assumption and prove it to be true.
 
 ```elixir
-large_list = Enum.to_list(0..10000)
+size = 10000
+large_list = Enum.to_list(0..size)
 large_tuple = List.to_tuple(large_list)
 
 Benchee.run(%{
-  "list" => fn -> Enum.at(large_list, 10000) end,
-  "tuple" => fn -> elem(large_tuple, 10000) end
+  "list" => fn -> Enum.at(large_list, size) end,
+  "tuple" => fn -> elem(large_tuple, size) end
 })
 ```
 
@@ -479,11 +732,5 @@ Use Benchee to compare accessing the **first** element instead of the last eleme
 You should notice the list is faster this time, or at least about the same speed. You'll learn why in a future lesson.
 
 ```elixir
-large_list = Enum.to_list(0..10000)
-large_tuple = List.to_tuple(large_list)
 
-Benchee.run(%{
-  "list" => fn -> Enum.at(large_list, 0) end,
-  "tuple" => fn -> elem(large_tuple, 0) end
-})
 ```
