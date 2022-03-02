@@ -217,7 +217,7 @@ Try changing `number` to `2`, `3`, and `4`. Notice how it creates more lists, wi
 elements for each increase in number.
 
 ```elixir
-number = 5
+number = 1
 
 Enum.map(1..number, fn _ ->
   Enum.to_list(1..number)
@@ -372,7 +372,24 @@ Enum.map(1..number, fn _ ->
 end)
 ```
 
-Plotted onto a graph, you would expect an upward curve.
+We can see $n^3$ this grows in the following table.
+
+```elixir
+data =
+  Enum.map(1..1000, fn each ->
+    %{
+      "# of elements": each,
+      result: each ** 3,
+      notation: "#{each}**3",
+      equation: "#{each} * #{each} * #{each}"
+    }
+  end)
+
+Kino.DataTable.new(data)
+```
+
+Plotted onto a graph, we can see that polynomial complexity results in an upward curve, and
+the size of the power significantly increases the growth.
 
 ```elixir
 # TODO - Hide
