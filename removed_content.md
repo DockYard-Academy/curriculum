@@ -1798,3 +1798,9 @@ C133[3]
 C13 --> C131
 C13 --> C132
 C13 --> C133
+
+
+# File
+We'll focus on using `:read` to allow us to read the contents of the file, and `:write` to allow us
+to write content to the file. Next we provide a callback function to execute before closing the connection
+to the file.

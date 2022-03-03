@@ -1,0 +1,72 @@
+# Persistence
+## Persistence
+
+To persist means to continue to exist.
+
+We often want to store some information over a long period of time.
+This might be some user information, or the particular state of the application.
+
+For example, it would be pretty annoying if none of your emails were saved.
+
+Persistence is necessary for creating almost every application, though some applications
+purposely avoid persistence. Snapchat for example, intentionally avoids persisting messages.
+
+We have a variety of methods to achieve persistence. We also have short term persistence, and long term
+persistence.
+
+Short term persistence is usually in memory. We might have some value that persists during the runtime of our program,
+but as soon as the program ends, that value is lost.
+
+For example, we can bind a variable in memory, then use it in further Elixir cells.
+
+```elixir
+i = 4
+```
+
+```elixir
+i + 2
+```
+
+`i` is stored in memory, but it has no state. 
+Since we do not mutate values in Elixir, `i` will always be `4` unless we re-bind it.
+
+Ideally, we want to ability to persist some changing state in memory, or in a longer term storage for repeated use.
+
+## State
+
+Now that we have persistent data, we're going to encounter issues with the **state** of our
+program. Take the following example. First we write some file.
+
+```elixir
+File.write("data/some_file", "first")
+```
+
+Then we read that file.
+
+```elixir
+File.read("data/some_file")
+```
+
+Then we write to that same file again. Notice that if you reevaluate the `File.read("some_file")`
+above, it's return value has changed.
+
+```elixir
+File.write("data/some_file", "second")
+```
+
+Welcome to issues with state! Have you ever noticed that most tech issues can be solved by
+turning the device on and off again? That's because of state!
+
+Most of the time we experience a bug,
+it's because our program got into a bad state, and resetting the state back to it's initial value
+fixes the issue.
+
+In the next section, we'll use this `reset_file/0` function to avoid issues with state in
+our code examples.
+
+```elixir
+reset_file = fn file_name ->
+  content = for integer <- 1..10, into: "", do: "#{integer}\n"
+  File.write(file_name, content)
+end
+```

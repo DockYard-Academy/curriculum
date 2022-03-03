@@ -1,0 +1,472 @@
+# File
+
+## File
+
+We can store information in files. This entire livebook is persisted in a `.livemd` file.
+To work with the file system in Elixir we use the built-in `File` module.
+
+We'll learn about some common `File` functions, but you can refer to the [File Documentation](https://hexdocs.pm/elixir/1.13/File.html) for the full
+list of functionality.
+
+You'll notice that many `File` operations mimic terminal functionality and even use the same names.
+
+## File.ls/1
+
+We can see the current directory and files using `File.ls/1`.
+
+By calling `File.ls/1` with `"."` we see the root directory of the project.
+
+```elixir
+File.ls(".")
+```
+
+Actually `File.ls/1` has a default argument of `"."` so you can also omit it and get the same result.
+
+```elixir
+File.ls()
+```
+
+### Your Turn
+
+In the Elixir cell below, try listing the parent directory of this livebook file. Use `"../"` as the argument to
+`File.ls/1`.
+
+```elixir
+File.ls("../")
+```
+
+In the Elixir cell below, try listing all of the material in the `reading` folder. Use `"reading"` as
+the argument to `File.ls/1`
+
+```elixir
+File.ls("reading")
+```
+
+## File.read/1
+
+You can read the contents of a file with `File.read/1` with the name of the file including it's
+path.
+
+### Your Turn
+
+In your code editor, find the `example_file` file under the `data` folder.
+Notice that if you change its contents from your editor the return value below changes.
+
+We now have persistence!
+
+```elixir
+File.read("data/example_file")
+```
+
+If you try to read a non-existing file you'll retrieve an error `{:error, :enoent}`.  `:enoent` is short for **Error No Entry**.
+
+```elixir
+File.read("data/non_existing_file")
+```
+
+You can also read a file using `File.read!/1`. The bang `!` convention means that instead of returning an error tuple,
+the function will crash. You'll often use this when you anticipate that the file should always exist, and want to stop
+execution if it doesn't.
+
+```elixir
+File.read!("data/non_existing_file")
+```
+
+### Your Turn
+
+In your code editor, go to the `reading` folder and create a new `name` where `name` can be anything you choose. Enter
+some text in the file, then in the Elixir cell below, use `File.read/1` to read the contents of the file.
+
+```elixir
+
+```
+
+## File.mkdir/1
+
+`mkdir` is short for **make directory**. This allows you to create a new folder. It accepts
+the path to the folder including the name of the new folder as an argument.
+
+In the Elixir cell below, try entering your `name` in the empty string below, and uncomment 
+`File.mkdir("#{name}_made_this")`
+
+```elixir
+name = ""
+# File.mkdir("data/#{name}_made_this")
+```
+
+`mkdir/1` can only create a folder in the current directory, it cannot create nested folders.
+
+```elixir
+File.mkdir("data/non_existing_parent_folder/child_folder")
+```
+
+To create nested folders you can use `mkdir_p/1` instead.
+
+```elixir
+File.mkdir_p("data/parent_folder/sub_folder")
+```
+
+## File.write/2
+
+So far, you've achieved manual persistence by storing some text in a file. Now you can programmatically persist information with `File.write/2`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, change the content of `"hello, world!"` then open the `data` folder in your code editor.
+Notice that the `write_test` file has different content now.
+
+```elixir
+File.write("data/write_test", "hello, world!")
+```
+
+### Invalid File Locations
+
+<!-- livebook:{"break_markdown":true} -->
+
+If a folder doesn't exist, then `File.write/2` returns `{:error, :enoent}`.
+
+```elixir
+File.write("non_existing_folder/test", "hello, world!")
+```
+
+When you expect writing a file to generally succeed, you can use `File.write!/2` instead
+to return an error and halt execution.
+
+```elixir
+File.write!("non_existing_folder/test", "hello, world!")
+```
+
+## File.rm/2
+
+`rm` is short for **remove**. We use File.rm to delete existing files.
+
+```elixir
+File.write("data/temp", "Goodbye!")
+File.rm("temp")
+```
+
+`File.rm/2` will return an error tuple `{:error, :enoent}` if the file does not exist. As usual,
+you can use the bang `!` with File functions to fail and halt execution.
+
+```elixir
+File.rm("data/non_existing_file")
+```
+
+```elixir
+File.rm!("data/non_existing_file")
+```
+
+### Your Turn
+
+If this were a woodshop class, this would be the point that we all need to put goggles on.
+You have direct access to your file system, so you could delete important things with the
+wrong path!
+
+You can always use **git** to recover committed project files, but the same isn't true for files
+outside of this project. Proceed with caution!
+
+In the Elixir cell below, delete the written file `"data/delete_me"` using
+`File.rm/2`. Check the `data` folder to make sure it has been deleted.
+
+```elixir
+File.write("data/delete_me", "")
+```
+
+## Persisting Erlang Terms
+
+`File.write/2` does not play nice with non-string data types.
+
+```elixir
+File.write("data/erlang_term", %{1 => 2})
+```
+
+Some data types like `lists` will work, but are read as a special binary, and are difficult to work with.
+
+```elixir
+File.write("data/erlang_term", [1, 2])
+File.read!("data/erlang_term")
+```
+
+To get around these issues we can use `:erlang.binary_to_term/1` and `:erlang.term_to_binary/1`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+subgraph Write
+  direction LR
+  1[Term] --> 2[Binary] --> 3[Write]
+end
+subgraph Read
+  direction LR
+  A[Read] --> B[Binary] --> C[Term]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+When writing the file, we convert the term (value) into its binary representation to store in the file.
+Then when reading the file we read the binary and convert it back into its original value.
+
+```elixir
+File.write("data/erlang_term", :erlang.term_to_binary([1, 2]))
+```
+
+Then we read the binary and convert it back into the original value. We've added an `IO.inspect/2`
+here so that you can see the binary that represents the original value.
+
+```elixir
+binary = File.read!("data/erlang_term") |> IO.inspect(label: "binary")
+:erlang.binary_to_term(binary)
+```
+
+### Your Turn
+
+In the Elixir cell below, write the `grocery_list` variable to the `data/grocery_list` file.
+Then retrieve it's contents with `File.read/1`.
+
+Use `:erlang.binary_to_term/1` and `:erlang.term_to_binary/1` to ensure you save the list as
+a binary and convert the binary back into a list.
+
+```elixir
+grocery_list = ["eggs", "cheese", "sugar"]
+```
+
+## Handling Large Files
+
+`File.read/1` will load the entire file into memory. This can cause performance issues when dealing with large files.
+
+### File.open/3
+
+To work with larger files, you can instead use `File.open/3` to open the
+file and work with it line by line.
+
+`File.open/3` accepts the name of a file, then we specify some [modes](https://hexdocs.pm/elixir/1.13/File.html#open/2) which
+for now we will leave an empty list `[]`.
+
+```elixir
+File.open("data/open_example", [], fn _file ->
+  "return some value"
+end)
+```
+
+We set the `:read` mode to allow us to read the contents of a file.
+
+We can use the [IO](https://hexdocs.pm/elixir/1.13/IO.html) module to read and write to the file. We can
+use `IO.read/2` to read from a file. We can specify if we would like to read a line or a number
+of characters.
+
+```elixir
+File.write("data/open_read_example", "first line of the file\nsecond line of the file")
+
+File.open("data/open_read_example", [:read], fn file ->
+  IO.read(file, :line)
+end)
+```
+
+```elixir
+File.write("data/open_read_example", "first line of the file\nsecond line of the file")
+
+File.open("data/open_read_example", [:read], fn file ->
+  IO.read(file, 5)
+end)
+```
+
+IO operations execute in order, so if you call `IO.read(file, :line)` twice it will read the first line, then the second line.
+
+```elixir
+File.write("data/open_read_example", "first line of the file\nsecond line of the file")
+
+File.open("data/open_read_example", [:read], fn file ->
+  IO.read(file, :line)
+  IO.read(file, :line)
+end)
+```
+
+### File.write/2 vs File.open/3
+
+`File.write/2` opens and closes a new process for each write, therefore it's not ideal to use `File.write/2`
+inside of an enumeration. You can see how many unnecessary operations this creates in
+the graph below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+ 1 --> W1[File.write/2] --> S1[Start Process] --> A1[Write] --> C1[Close Process]
+ 2 --> W2[File.write/2] --> S2[Start Process] --> A2[Write] --> C2[Close Process]
+ 3 --> W3[File.write/2] --> S3[Start Process] --> A3[Write] --> C3[Close Process]
+ 4 --> W4[File.write/2] --> S4[Start Process] --> A4[Write] --> C4[Close Process]
+ 5 --> W5[File.write/2] --> S5[Start Process] --> A5[Write] --> C5[Close Process]
+ 1 --> 2 --> 3 --> 4 --> 5
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Therefore, the following is an antipattern for appending information to a file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Enum.each(1..5, fn integer ->
+  previous_content = File.read("content")
+  File.write("content", previous_content <> "appended content")
+end)
+```
+
+Instead, we can open a single process with `File.open/3` and use `IO.puts/2` to write information
+to the file.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  1 --> 2 --> 3 --> 4 --> 5
+  File.open/3 --> O[Open Process] --> 1
+ 1 --> A1[Write]
+ 2 --> A2[Write]
+ 3 --> A3[Write]
+ 4 --> A4[Write]
+ 5 --> A5[Write]
+```
+
+```elixir
+File.write("data/open_write_example", "")
+
+File.open("data/open_write_example", [:write], fn file ->
+  IO.puts(file, "write content from IO.puts")
+end)
+
+File.read("data/open_write_example")
+```
+
+And now when we repeatedly write to the file it's more performant.
+
+```elixir
+File.write("data/open_write_example", "")
+
+File.open("data/open_write_example", [:write], fn file ->
+  Enum.each(1..10, fn int ->
+    IO.puts(file, "Append #{int}")
+  end)
+end)
+
+File.read("data/large_data")
+```
+
+If you would prefer to append information and preserve the existing text in the file,
+you can use the `:append` mode for `File.open/3`.
+
+```elixir
+File.write("data/open_write_example", "I will be preserved")
+
+File.open("data/large_data", [:append], fn file ->
+  IO.puts(file, "write content from IO.puts")
+end)
+
+File.read("data/large_data")
+```
+
+### File.open/2
+
+<!-- livebook:{"break_markdown":true} -->
+
+We've preferred `File.open/3` In our examples for the sake of simplicity, but there is also a very similar `File.open/2` function.
+
+`File.open/3` opens a process, runs a callback function, and then automatically closes it, so it's more convenient for demonstration.
+
+`File.open/2` opens a process, and returns the process so you can call `IO` operations on the file.
+
+You then manually close the process with `File.close/1`.
+
+```elixir
+File.write("data/open_2_example", "open 2")
+
+{:ok, file} = File.open("data/open_2_example", [:read])
+content = IO.read(file, :line)
+File.close(file)
+
+content
+```
+
+### File.stream/2
+
+<!-- livebook:{"break_markdown":true} -->
+
+We can read files as a [Stream](streams.livemd). It's a [File Stream](https://hexdocs.pm/elixir/1.13/File.Stream.html)
+but we can work with it the same way we would work with a normal stream. This is best used when you want
+to read an entire very large file.
+
+We'll use a small file for the same example.
+
+```elixir
+File.write("data/stream_example", "line 1\nline 2\nline 3\n")
+
+File.stream!("data/large_data")
+```
+
+Each element in the stream will be a line of the file by default.
+
+The `stream_data` file should look like this:
+
+```ext
+1
+2
+3
+```
+
+That means each line (including the newline character) will be an element in the stream.
+Let's convert the stream to a list to see how that works.
+
+```elixir
+File.write("data/stream_example", "line 1\nline 2\nline 3\n")
+
+File.stream!("data/stream_example")
+|> Enum.to_list()
+```
+
+Now we can treat this stream like any other. For example, here's how we can lazy enumerate 
+through the stream and remove the new-line `\n` characters.
+
+```elixir
+File.write("data/stream_example", "line 1\nline 2\nline 3\n")
+
+File.stream!("data/stream_example")
+|> Stream.map(&String.replace(&1, "\n", ""))
+|> Enum.to_list()
+```
+
+## Challenge
+
+We have the core tools to create file-based persistence. You now know how to read and write files, create folders, and handle very
+large files. Whenever you need a tool related to file-based persistence you should start with the [File Documentation](https://hexdocs.pm/elixir/File.html#content)
+Or if you're working with a file as a Stream you may find the [Stream Documentation](https://hexdocs.pm/elixir/Stream.html) useful.
+
+For example, we haven't taught you how to copy files yet. Programmers must be able to read documentation
+and discover information when they need it.
+
+In the Elixir cell below, take the written file "data/copy_example" and copy the information it contains into a new
+file "data/copied_example".
+
+```elixir
+File.write("data/copy_example", "Copy me!")
+
+# Enter Your Answer Below This Line.
+
+# Enter Your Answer Above This Line.
+
+# TODO - Hide
+ExUnit.start(auto_run: false)
+
+defmodule CopyExample do
+  use ExUnit.Case
+
+  test "file was copied" do
+    assert File.read("data/copied_example") === "Copy me!"
+  end
+end
+
+ExUnit.run()
+```
