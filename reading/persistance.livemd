@@ -1,6 +1,6 @@
 # Persistence
-## Persistence
 
+## Persistance
 To persist means to continue to exist.
 
 We often want to store some information over a long period of time.
@@ -27,46 +27,187 @@ i = 4
 i + 2
 ```
 
-`i` is stored in memory, but it has no state. 
-Since we do not mutate values in Elixir, `i` will always be `4` unless we re-bind it.
+But when the program ends and you turn off your computer and open a different livebook file, `i` no longer exists.
 
-Ideally, we want to ability to persist some changing state in memory, or in a longer term storage for repeated use.
+However the `.livemd` file that powers this notebook is persisted. It's contents are saved. For example, you could
+write some code in the following Elixir cell. Close this course and come back. Then notice that the cell still contains
+the content that you wrote!
+
+This is long term persistence and it's powered by a file system.
+
+```elixir
+
+```
 
 ## State
 
-Now that we have persistent data, we're going to encounter issues with the **state** of our
-program. Take the following example. First we write some file.
+Simple variable values are stored in memory, but they have no state.
 
+The variable `i` never changes value during the execution of the program. We can rebind it in a particular scope,
+but we're not mutation the value so it's not truly a persisting state, it's more like binding a new variable value with the same name.
+
+<!-- livebook:{"force_markdown": true} -->
+
+```elixir
+i = 4
+```
+
+When talking about short term persistence, we generally think in terms of state.
+
+For example, take a road light.
+
+![Road Light Image]()
+
+It cycles from <span style="color: green;">green</span> to <span style="color: yellow;">yellow</span> to
+<span style="color: green;">red</span>.
+
+In other words, it has some state of the light. This state changes, and the lights use that state to determine if
+they should be on or off.
+
+Now that we have persistent data, we're going to encounter issues with the **state** of our
+program. Let's say we're storing some state.
+
+```mermaid
+    State --> 1[First State]
+    Read --> State --First State--> Read
+```
+
+Then some other operation changes the state. Now when we read the state again, we recieve a different value.
+
+```mermaid
+    set[Set State]a --Second State --> State
+    Read --> State --Second State--> Read
+```
+
+This introduces an entire class of bugs with state. What if we set the state at the wrong time? or read the state too fast or slow?
+
+For example, have you ever noticed that most issues with technology are fixed by turning them off and on again? That's because most
+bugs occur when the program gets into a bad state that it can't get out of. 
+By turning it off and on again you reset the state and solve the issue.
+
+### Your Turn
+Let's get practical. Here we have some `File` module functions that create files on your computer.
+You're going to learn more about the `File` module in a future lesson. For now, trust that `write/2` creates a file with
+some content, and `read/1` reads that content.
+
+First we create a file. You can think of this file as storing the first state.
 ```elixir
 File.write("data/some_file", "first")
 ```
 
-Then we read that file.
+Then we read that file. We return the first state.
 
 ```elixir
 File.read("data/some_file")
 ```
 
-Then we write to that same file again. Notice that if you reevaluate the `File.read("some_file")`
-above, it's return value has changed.
+Uncomment this line below and evaluate the Elixir cell. Notice that
+Then we write to that same file again. 
+
+Notice that the return value of `File.read("data/some_file")` has changed. The same is true if
+you re-evaluate the Elixir cell above.
 
 ```elixir
-File.write("data/some_file", "second")
+#File.write("data/some_file", "second")
+File.read("data/some_file")
 ```
 
-Welcome to issues with state! Have you ever noticed that most tech issues can be solved by
-turning the device on and off again? That's because of state!
+## File System Based Persistence
 
-Most of the time we experience a bug,
-it's because our program got into a bad state, and resetting the state back to it's initial value
-fixes the issue.
+We can use a file system to persist information. For example, this entire course is saved in a series of `.livemd` files.
 
-In the next section, we'll use this `reset_file/0` function to avoid issues with state in
-our code examples.
+When working on real world projects, it's not generally recommended to use a file system for persisting long-term information unless you are
+hacking together a small personal project, or you really know what you're doing.
+
+Of course, there are plenty of times to use files. Most often, you'll read information from them. For example, your company might
+be working on some sort of email newsletter. Your sales team has entered a list of emails into an excel spreadsheet document.
+
+If there's only a handful of emails, you might manually copy paste these into your program, but if there are thousands, you'll have to
+write some code to convert them into data that you can persist in your program.
+
+## DBMS (Database Management System).
+
+Generally speaking, we use a **Database** to store long term information in a program. The database is a separate layer in the program that
+handles the complexity of storing information.
+
+```mermaid
+flowchart
+    Program --> Database --> P[Persisted Data]
+```
+
+There are several different types of databases, here's a great primer by Linux Academy if you would like
+an overview of databases in general [Database Primer](https://www.youtube.com/watch?v=Tk1t3WKK-ZY&ab_channel=LinuxAcademy).
+
+This course will focus on **RDBMS** (Relational Database Management Systems). 
+We'll provide a brief primer highlighting the core concepts you'll need to learn to work with DataBases in Elixir.
+In later lessons, you'll get hands on experience to reinforce this overview.
+
+Elixir applications generally default to using [PostgreSQL](https://www.postgresql.org/)
+which is an open source relational database.
+
+```mermaid
+Program --> PostgreSQL --> P[Persisted Data]
+```
+
+Relational databases store data as a series of tables with relationships to eachother.
+
+Think of a table like a spreadsheet with rows and columns. For example, when building out a photo app,
+we might have a table of **users** and a table of **photos**. Each tables stores relevant information for
+the user or photo.
 
 ```elixir
-reset_file = fn file_name ->
-  content = for integer <- 1..10, into: "", do: "#{integer}\n"
-  File.write(file_name, content)
-end
+# TODO USER PHOTO TABLES
 ```
+
+```mermaid
+P[PostgreSQL]
+U[Users]
+PH[Photos]
+P --> U
+P --> PH
+```
+
+There is a relationship between the data, because some photos may belong to a user.
+Typically, the photo will store a **foreign_key** which links to some user on the users table.
+
+```mermaid
+P[PostgreSQL]
+U[Users]
+PH[Users]
+PH1[Picture Of The Daily Bugle]
+U1[Peter Parker]
+
+P --> U --> U1
+P --> PH --> PH1 --foreign_key--> U1
+```
+
+### SQL (Structured Query Language)
+
+We are then able to query the database for information using **SQL**. SQL
+is a **Structured Query Language** specifically for working with SQL based databases.
+We use **SQL** to communicate with **PostgreSQL**.
+
+```mermaid
+E[Elixir Program] --> SQL --> PostgreSQL --> P[Persisted Data]
+```
+
+For a primer on SQL, check out Danielle Thé's excellent video [What is SQL?](https://www.youtube.com/watch?v=27axs9dO7AE&ab_channel=DanielleTh%C3%A9)
+
+For example, with SQL we could write a query to retrieve all of our users.
+
+```sql
+SELECT * from users
+```
+
+## Ecto
+
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a database library for Elixir. 
+It comes with Phoenix, the framework for web development in Elixir.
+
+Rather than deal directly with SQL in Elixir we generally use **Ecto** to interact with SQL databases.
+
+```mermaid
+E[Elixir Program] --> Ecto --> SQL --> PostgreSQL --> P[Persisted Data]
+```
+
+You will have the opportunity to learn more about Ecto and get hands on experience throughout this course.
