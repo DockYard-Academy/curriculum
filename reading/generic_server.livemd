@@ -1,0 +1,403 @@
+# Generic Server
+
+## Generic Server
+
+It's a common pattern to implement a `GenericServer` process which can
+recieve messages, delegate to some module, then send a message back to the caller.
+
+A generic server stores short-term in-memory state. The state can only be updated by other
+processes sending messages to the generic server.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  subgraph GenericServer
+    State --> h
+    h[handle message]
+    h --new state--> State
+  end
+  Process --message--> GenericServer
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Typically the callback module defines an `init` function to define the initial state of
+the `GenericServer` process.
+
+```mermaid
+flowchart LR
+  CallbackModule --> init --> state --> GenericServer
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule GenericServer do
+  def start(callback_module) do
+    spawn(fn ->
+      initial_state = callback_module.init()
+      loop(callback_module, initial_state)
+    end)
+  end
+end
+
+defmodule CallbackModule do
+  def init() do
+    "example state"
+  end
+end
+
+GenericServer.start(CallbackModule)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `GenericServer` should be able to send a message and recieve a response.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  GS2[Genserver 1]
+  GS1[Genserver 2]
+  c[call]
+
+  GS1 --> c --request--> GS2
+  GS2 --response--> c
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule GenericServer
+  def call(server_pid, request) do
+    send(server_pid, {request, self()})
+
+    receive do
+      {:response, response} ->
+        response
+    end
+  end
+  ...
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The callback module will also define event handlers for when the `GenericServer` recieves
+a message.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  GenericServer --> recieve
+  recieve --request, state--> CallbackModule --> h["handle_call(request, state)"]
+  --request, new_state --> recieve
+```
+
+```elixir
+defmodule CallbackModule do
+  ...
+
+  def handle_call(:increment, state) do
+    new_state = state + 1
+    response = {:ok, new_state}
+    {response, new_state}
+  end
+end
+```
+
+The `GenericServer` then loops and recieves messages while delegating to the `CallbackModule`
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+Caller --> GenericServer --> loop 
+--> recieve --> c[CallbackModule.handle_call] --> response --> send --> Caller
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule GenericServer do
+  ...
+
+  defp loop(callback_module, current_state) do
+    receive do
+      {request, caller} ->
+        {response, new_state} =
+          callback_module.handle_call(
+            request,
+            current_state
+          )
+
+        send(caller, {:response, response})
+
+        loop(callback_module, new_state)
+    end
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Putting all of that together, we get the full flow of our `GenericServer` and `CallbackModule`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  GenericServer --> loop --state--> recieve --new state--> loop
+  Caller --> c[call] --request--> recieve --response--> c
+  recieve --request, state--> CallbackModule --> h["handle_call(request, state)"]
+  --request, new_state --> recieve
+
+  style GenericServer fill:orange,stroke:#333,stroke-width:2px
+  style Caller fill:yellow,stroke:#333,stroke-width:2px
+  style CallbackModule fill:#f9f,stroke:#333,stroke-width:2px
+
+  style recieve fill:orange
+  style loop fill:orange
+
+  style c fill:yellow
+
+  style h fill:#f9f
+
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now we have a full `GenericServer` module that can be used with some `CallbackModule`.
+
+```elixir
+defmodule GenericServer do
+  def call(server_pid, request) do
+    send(server_pid, {request, self()})
+
+    receive do
+      {:response, response} ->
+        response
+    end
+  end
+
+  def start(callback_module) do
+    spawn(fn ->
+      initial_state = callback_module.init()
+      loop(callback_module, initial_state)
+    end)
+  end
+
+  defp loop(callback_module, current_state) do
+    receive do
+      {request, caller} ->
+        {response, new_state} =
+          callback_module.handle_call(
+            request,
+            current_state
+          )
+
+        send(caller, {:response, response})
+
+        loop(callback_module, new_state)
+    end
+  end
+end
+```
+
+`GenericServer` is incredibly powerful, because it lets us reuse generic state and message
+passing functionality with more domain-specific callback modules.
+
+Let's re-implement the counter with some extra
+functionality to use with the `GenericServer`.
+
+The `Counter` module is now a domain specific `CallbackModule`.
+
+```elixir
+defmodule Counter do
+  def init() do
+    0
+  end
+
+  def handle_call(:increment, state) do
+    new_state = state + 1
+    response = {:ok, new_state}
+    {response, new_state}
+  end
+end
+
+counter_process = GenericServer.start(Counter)
+```
+
+Now we can call the counter process to update it's internal state.
+
+```elixir
+GenericServer.call(counter_process, :increment)
+```
+
+`handle_call/2` let's us define generic messages that we can send to the Counter process.
+For example, we could `:add` an integer as a payload in the message.
+
+```elixir
+defmodule AddableCounter do
+  def init() do
+    0
+  end
+
+  def handle_call({:add, payload}, state) do
+    new_state = state + payload
+    response = {:ok, new_state}
+    {response, new_state}
+  end
+end
+
+add_counter_process = GenericServer.start(AddableCounter)
+```
+
+Here's how we would send the `:add` message with a payload.
+
+```elixir
+GenericServer.call(add_counter_process, {:add, 10})
+```
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+In the Elixir cell below, create a `NoteBook` callback module.
+
+A `NoteBook`'s initial state should be an empty list. It should implement a `handle_call/2` function
+adds a new note like so.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+note_book = GenericServer.start(NoteBook)
+{:ok, ["new note 1"]} = GenericServer.call(note_book, {:add_note, "new note 1"})
+{:ok, ["new note 1", "new note 2"]} = GenericServer.call(note_book, {:add_note, "new note 2"})
+```
+
+```elixir
+defmodule Notebook do
+end
+```
+
+## GenServer
+
+It's useful to build your own generic server for the purpose of understanding how they work.
+However, we can and should rely on the built in [GenServer](https://hexdocs.pm/elixir/1.13.3/GenServer.html)
+provided by Elixir.
+
+We `use` the `GenServer` provided by Elixir. Under the hood, this defines the generic server functionality
+for the module.
+
+Then much like our `GenericServer` we can define an `init` function. The init function
+now accepts options, which could be used to define the initial state. We'll ignore `_opts` for now.
+
+We use `@impl` to specify that `init` is a callback function for the `GenServer`. You can
+see the [@impl documentation](https://hexdocs.pm/elixir/main/Module.html#module-impl) for
+more on why.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+end
+```
+
+We use `GenServer.start_link/2` to start the new `Counter` process with the new counter process.
+There are no options, so the second parameter is an empty list.
+
+```elixir
+{:ok, pid} = GenServer.start_link(Counter, [])
+```
+
+We can define `handle_call/3` functions. These look mostly the same as before, except
+the second parameter will be the caller pid, and the third will be the state.
+
+We also always return `{:reply, response, new_state}` in a `handle_call/3` function.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    new_state = state + 1
+    response = {:ok, new_state}
+    {:reply, response, new_state}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Counter, 0)
+```
+
+Now let's test our new `Counter`! You can execute this Elixir cell below a few times and notice
+that the count increments.
+
+```elixir
+GenServer.call(pid, :increment)
+```
+
+`call` executes the `handle_call/3` function in the internal code of `GenServer`, just like our 
+`GenericServer`. The parent process then recieves a response.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  P[Parent Process] --> GenServer --> c[call] --> h[handle_call/3] --response--> P
+  h --new_state--> GenServer
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+This is the heart of generic servers. We can create an in-memory process, have it store some state,
+and delegate to it to perform work and return a response. This is often the go-to tool for short-term in-memory persistence.
+
+The built-in `GenServer` also has some additional functionality, which will become more important
+as you work with concurrency. For now, we're going to focus on using it as a tool for persistence, so
+you have everything you currently need.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the Elixir cell below, use the built in `GenServer` module to create a `Journal` module where you can `:add_entry`.
+All journal entries should be stored in state and returned as a `list` for the response.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, journal_pid} = GenServer.start_link(Journal, [])
+
+GenServer.call(:add_entry, "first entry")
+["first entry"]
+
+GenServer.call(:add_entry, "second entry")
+["first entry", "second entry"]
+```
+
+```elixir
+defmodule Journal do
+end
+```

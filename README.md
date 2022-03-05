@@ -81,7 +81,7 @@ throughout their career. Students will be capable of delivering high-quality, we
 - Use title case without a period in headers.
 - Code should be in an executable elixir cell unless it is pseudocode or it reduces the clarity of the lesson.
 - Text should be run through [grammarly](https://app.grammarly.com/) to ensure correctness. The free features should be sufficient.
-- Lessons should have a `Setup` section and an `Overview`.
+- Lessons should have a `Setup` section for any necessary dependencies.
 - Each new major concept should be in its own section. Each section should strive to provide at least one student interaction portion, typically using the **Your Turn** heading.
 
 ## Curriculum Outline
@@ -98,7 +98,7 @@ The course is broken into 5 major sections:
 - Why Elixir?
 - Why Functional Programming?
 - Course Outline
-- Using the Slack or Discord (TBD)
+- Communication Tools
 - Development Environment
   - Using the Terminal
     - mkdir
@@ -145,9 +145,8 @@ The course is broken into 5 major sections:
 
 ### Fundamentals
 - Data Types
-  - Comments (REMOVED)
+  - Comments 
   - Data and Variables
-  - Binaries (REMOVED)
   - Integers
   - Floats
   - Strings
@@ -158,7 +157,6 @@ The course is broken into 5 major sections:
   - Tuples
   - Keyword Lists
   - Maps
-  - Intro to Immutability (REMOVED)
 - Operators
   - Variables
   - Arithmetic (+, -, /, *, rem, div)
@@ -177,8 +175,6 @@ The course is broken into 5 major sections:
   - Public vs Private Functions
   - Module Attributes
   - Pipe Operator: Small Composable Functions. One Responsibility.
-  - ExUnit as Example Module & Testing (Removable?)
-  - What is an Interface? (Removable?)
   - Common Modules
     - Date & Time
     - Map Module
@@ -195,8 +191,8 @@ The course is broken into 5 major sections:
   - Cond
   - Pattern Matching
   - With
-  - Multi-clause Functions (ALREADY COVERED - now with matching)
-  - Guards (ALREADY COVERED)
+  - Multi-clause Functions
+  - Guards
   - Error Handling
 - Enumeration
   - Collections
@@ -255,7 +251,6 @@ The course is broken into 5 major sections:
   - ExDoc: Generate Documentation
   - How to Find and Read Online Documentation with HexDocs
   - Doc Testing
-  - Publishing Packages to HexDocs (Concern about junk packages)
   - Testing with ExUnit
     - Assert Message, Interpolation
     - What Do I Want The Test To Tell Me?

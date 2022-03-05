@@ -1,0 +1,74 @@
+# Traffic Light Server
+
+## Traffic Light Server
+
+Create a `TrafficLightServer` which stores the state of the traffic light `:red`, `:green`, or `:yellow`.
+
+The `TrafficLightServer` should be able to transition from one color to another. It should start as `:green`.
+
+```elixir
+{:ok, pid} = TrafficLightServer.start()
+
+:green = TrafficLightServer.light(pid)
+
+TrafficLightServer.transition(pid)
+:yellow = TrafficLightServer.light(pid)
+
+TrafficLightServer.transition(pid)
+:red = TrafficLightServer.light(pid)
+
+TrafficLightServer.transition(pid)
+:green = TrafficLightServer.light(pid)
+```
+
+Enter your answer in the Elixir cell below.
+
+```elixir
+defmodule TrafficLightServer do
+
+end
+```
+
+## TrafficGrid
+
+Create a `TrafficGrid` which should manage 5 `TrafficLightServer`.
+
+```elixir
+{:ok, pid} = Grid
+
+TrafficGrid.lights(pid)
+[:green, :green, :green, :green, :green]
+```
+
+Every second, the grid should automatically transition one light in order.
+
+```elixir
+{:ok, pid} = Grid
+
+TrafficGrid.lights(pid)
+[:green, :green, :green, :green, :green]
+
+Process.sleep(1000) # This may need to sleep for 1001 miliseconds.
+[:yellow, :green, :green, :green, :green]
+
+Process.sleep(1000) 
+[:yellow, :yellow, :green, :green, :green]
+
+Process.sleep(1000) 
+[:yellow, :yellow, :yellow, :green, :green]
+
+Process.sleep(1000) 
+[:yellow, :yellow, :yellow, :yellow, :green]
+
+Process.sleep(1000) 
+[:yellow, :yellow, :yellow, :yellow, :yellow]
+
+Process.sleep(1000) 
+[:red, :yellow, :yellow, :yellow, :yellow]
+# And so on...
+```
+
+Enter your answer in the Elixir cell below.
+```elixir
+
+```

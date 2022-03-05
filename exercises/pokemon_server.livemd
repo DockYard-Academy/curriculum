@@ -1,0 +1,183 @@
+# Pokemon Server
+
+## Setup
+
+```elixir
+Mix.install([{:ecto, "~> 3.7"}])
+```
+
+## Overview
+
+You're going to create a pokemon battle game with persistence.
+
+Pokemon will each be their own process storing the stats of a pokemon.
+
+```mermaid
+flowchart
+PK[Pokemon]
+PS[PokemonServer]
+PS --> PK
+PK --> name[name: charmander]
+PK --> type[type: fire]
+PK --> hp[health: 20]
+PK --> at[attack: 5]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Pokemon can attack each other. An attack should update the `Pokemon`'s health in the `PokemonServer`'s state.
+
+```mermaid
+flowchart
+PK1[Pokemon]
+PK2[Pokemon]
+PS1[PokemonServer]
+PS2[PokemonServer]
+
+PS1 --> PK1
+PS2 --> PK2
+PS1 --attack--> PS2
+PK2 --> hp[health: 10]
+```
+
+## Define a Pokemon Struct
+
+In the Elixir cell below, define a `Pokemon` struct. Use `Ecto.Changeset`
+to validate the struct fields and ensure that:
+
+* `:name` will be a string.
+* `:type` will be an atom of either `:grass`, `:water`, or `:fire`
+* `:health` will be an integer `0` or greater with a default value of `20`
+* `:attack` will be an integer `1` or greater with a default value of `5`
+
+We should be able to create a new pokemon like so:
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Using default values
+{:ok, %Pokemon{name: "charmander", type: "fire", health: 20, attack: 20}} = 
+Pokemon.new(%{name: "charmander", type: "fire"})
+
+# Or manually setting all values
+{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 30, attack: 2})
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+And we should get an error if we enter invalid input.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Pokemon.new(%{name: 1, type: "fire"})
+{:error, changeset} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 30, attack: 2})
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Pokemon should be able to `attack/2` other pokemon. Take type advantage into consideration. 
+see [Pokemon Battle](pokemon_battle.livemd) for a reminder on type advantages.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 20})
+{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 100})
+
+Pokemon.attack(charmander, bulbasaur)
+%Pokemon{name: "bulbasaur", type: "water", damage: 5, health: 90}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Pokemon health should not fall below 0.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 110})
+{:ok, bulbasaur} = Pokemon.new(%{name: "charmander", type: "fire", health: 100})
+
+Pokemon.attack(charmander, bulbasaur)
+%Pokemon{name: "charmader", type: "fire", damage: 5, health: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Solution
+
+Enter your solution in the Elixir cell below.
+
+```elixir
+defmodule Pokemon do
+end
+```
+
+## Create a Pokemon Genserver
+
+In the Elixir cell below, create a `PokemonServer` Genserver which should store a `Pokemon` struct in it's state.
+
+We should be able to `start/1` a new pokemon server.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire"})
+
+charmander_server = PokemonServer.start(charmander)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We should be able to retrieve current stats of the Pokemon.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+PokemonServer.stats(charmander_server)
+%Pokemon{name: "charmander", type: "fire", health: 20, damage: 5}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We should be able to attack another pokemon.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 20})
+{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 100})
+
+charmander_server = PokemonServer.start(charmander)
+bulbasaur_server = PokemonServer.start(charmander)
+PokemonServer.attack(charmander, bulbasaur)
+
+PokemonServer.stats(bulbasaur_server)
+%Pokemon{name: "bulbasaur", type: "water", damage: 5, health: 90}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Solution
+
+Enter your answer in the Elixir cell below.
+
+```elixir
+defmodule PokemonServer do
+end
+```

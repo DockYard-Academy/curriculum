@@ -1804,3 +1804,18 @@ C13 --> C133
 We'll focus on using `:read` to allow us to read the contents of the file, and `:write` to allow us
 to write content to the file. Next we provide a callback function to execute before closing the connection
 to the file.
+* [Shopping List](exercises/currated_shopping.livemd) (create shopping items)
+* [Save Game State](exercises/save_game_state.livemd)
+* * [User Form](exercises/user_form.livemd)
+* 
+* [Pokemon PC](exercises/pokemon_pc.livemd)
+
+### How to install a utils folder!
+
+Mix.install([
+  other_deps,
+  {:db_utils, path: Path.absname("db_utils")}
+])
+
+### How to icon
+<i class="ri-livebook-sections"></i

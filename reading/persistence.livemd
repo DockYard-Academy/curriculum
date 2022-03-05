@@ -1,6 +1,7 @@
 # Persistence
 
 ## Persistance
+
 To persist means to continue to exist.
 
 We often want to store some information over a long period of time.
@@ -10,6 +11,8 @@ For example, it would be pretty annoying if none of your emails were saved.
 
 Persistence is necessary for creating almost every application, though some applications
 purposely avoid persistence. Snapchat for example, intentionally avoids persisting messages.
+
+### Short Term Persistence vs Long Term Persistence
 
 We have a variety of methods to achieve persistence. We also have short term persistence, and long term
 persistence.
@@ -46,8 +49,6 @@ Simple variable values are stored in memory, but they have no state.
 The variable `i` never changes value during the execution of the program. We can rebind it in a particular scope,
 but we're not mutation the value so it's not truly a persisting state, it's more like binding a new variable value with the same name.
 
-<!-- livebook:{"force_markdown": true} -->
-
 ```elixir
 i = 4
 ```
@@ -56,18 +57,31 @@ When talking about short term persistence, we generally think in terms of state.
 
 For example, take a road light.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ![Road Light Image]()
 
-It cycles from <span style="color: green;">green</span> to <span style="color: yellow;">yellow</span> to
-<span style="color: green;">red</span>.
+<!-- livebook:{"break_markdown":true} -->
+
+It cycles from <span style="color: green;">green</span> to <span style="color: yellow;">yellow</span> to <span style="color: red;">red</span>
 
 In other words, it has some state of the light. This state changes, and the lights use that state to determine if
 they should be on or off.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  subgraph Light
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 Now that we have persistent data, we're going to encounter issues with the **state** of our
 program. Let's say we're storing some state.
 
 ```mermaid
+flowchart
     State --> 1[First State]
     Read --> State --First State--> Read
 ```
@@ -75,6 +89,7 @@ program. Let's say we're storing some state.
 Then some other operation changes the state. Now when we read the state again, we recieve a different value.
 
 ```mermaid
+flowchart
     set[Set State]a --Second State --> State
     Read --> State --Second State--> Read
 ```
@@ -86,11 +101,13 @@ bugs occur when the program gets into a bad state that it can't get out of.
 By turning it off and on again you reset the state and solve the issue.
 
 ### Your Turn
+
 Let's get practical. Here we have some `File` module functions that create files on your computer.
 You're going to learn more about the `File` module in a future lesson. For now, trust that `write/2` creates a file with
 some content, and `read/1` reads that content.
 
 First we create a file. You can think of this file as storing the first state.
+
 ```elixir
 File.write("data/some_file", "first")
 ```
@@ -102,13 +119,13 @@ File.read("data/some_file")
 ```
 
 Uncomment this line below and evaluate the Elixir cell. Notice that
-Then we write to that same file again. 
+Then we write to that same file again.
 
 Notice that the return value of `File.read("data/some_file")` has changed. The same is true if
 you re-evaluate the Elixir cell above.
 
 ```elixir
-#File.write("data/some_file", "second")
+# File.write("data/some_file", "second")
 File.read("data/some_file")
 ```
 
@@ -210,4 +227,4 @@ Rather than deal directly with SQL in Elixir we generally use **Ecto** to intera
 E[Elixir Program] --> Ecto --> SQL --> PostgreSQL --> P[Persisted Data]
 ```
 
-You will have the opportunity to learn more about Ecto and get hands on experience throughout this course.
+You will have the opportunity to learn more about Ecto and get hands on experience with databases throughout this course.

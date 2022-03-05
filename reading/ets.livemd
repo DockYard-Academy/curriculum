@@ -1,0 +1,215 @@
+# ETS
+
+## Setup
+
+```elixir
+Mix.install([{:kino, github: "livebook-dev/kino"}])
+```
+
+## Cache
+
+A cache allows use to store data for the sake of making it quicker to access.
+
+You can imagine you have some performance demanding function or call to retrieve external resources.
+
+```mermaid
+flowchart LR
+input --> e[expensive computation] --> output
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+A cache stores data in memory so that it's quicker to access.
+
+```mermaid
+flowchart
+input --> cache --cached value--> output
+cache --no cached value --> e[expensive computation] --> output
+```
+
+Some caches are smart, and save newly computed values in the cache to avoid repeating the 
+same computation again.
+
+Other caches can be a static chunk of data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example, if we had a slow fibonacci $fib(n) = fib(n - 1) + fib(n-2)$ function, we could speed it up by saving computed values in a cache.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Fib do
+  def of(0), do: 0
+  def of(1), do: 1
+  def of(n) do
+    of(n - 1) + of(n - 2)
+  end
+end
+
+cache = %{
+  0 => 0,
+  1 => 1,
+  2 => 1,
+  3 => 2,
+  4 => 3,
+  5 => 5,
+  6 => 8,
+  7 => 13,
+  8 => 21,
+  9 => 34,
+  10 => 55,
+  11 => 89,
+  12 => 144,
+  13 => 233,
+  14 => 377,
+  ...
+  150 => 9969216677189303386214405760200
+}
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+That cache would allow us to quickly access inputs up to `150` for fib. This speeds things up a lot!
+You can think of this cache as a table of inputs and outputs that we refer to.
+
+```elixir
+# Todo Hide
+defmodule Fib do
+  def get(n) do
+    sequence =
+      Stream.unfold({1, 1}, fn {a, b} ->
+        {a, {b, a + b}}
+      end)
+      |> Enum.take(n)
+
+    [0 | sequence]
+  end
+end
+
+data =
+  Fib.get(1000)
+  |> Enum.with_index()
+  |> Enum.map(fn {value, index} -> %{input: index, output: value} end)
+
+Kino.DataTable.new(data)
+```
+
+However be aware that caching should be well considered. The cache permanently takes up memory in
+your program, so there's a considerable cost. Often it's best to consider how you can improve the performance of
+your application rather than immediately reaching for a cache.
+
+For example, a slow fibonacci function with a cache is no replacement for a fast fibonacci function!
+
+There are many ways to implement a cache, for example you could
+use a GenServer with changing state.
+
+### Your Turn
+
+In the Elixir cell below, create a `Cache` `GenServer` that
+can hold some cached state. We should be able to set a value,
+and retrieve a value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+cache = GenServer.start_link(Cache, %{})
+Genserver.call(cache, {:set, {:key1, "value"}})
+
+Genserver.call(cache, {:get, :key1})
+{:ok, "value"}
+```
+
+```elixir
+defmodule Cache do
+end
+```
+
+## Erlang Term Storage (ETS)
+
+We can use [ETS](https://elixir-lang.org/getting-started/mix-otp/ets.html)
+tables for a convenient in-memory cache. `:ets` is a library provided by Erlang
+through the `:ets` module.
+
+`:ets` tables are their own process with state. They are like a `GenServer` that has been specifically designed
+as an in-memory key-value storage.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+subgraph ETS
+  Process[Process] --> State
+  State --> KV[Key Value Storage]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Livebook let's use view the `:ets` process as a table. So let's start a new `:ets` table called
+`:example_table`.
+
+```elixir
+table = :ets.new(:example_table, [])
+```
+
+We can then insert values into the table with `:ets.insert/2`. Values should be inserted as
+{key, value} tuples. The key and the value can be nearly any value, but most often you'll use
+and atom for the key.
+
+Click the refresh <i class="ri-refresh-line"></i> button for the `ETS :example_table` above
+to see how the key and value are added.
+
+```elixir
+:ets.insert(table, {:key, "value"})
+```
+
+### Your Turn
+
+Try changing the `:key` and the `"value"` below. Notice how
+the table changes above.
+
+```elixir
+:ets.insert(table, {:key, "value"})
+```
+
+### Named Tables
+
+`:ets` tables can be created with a `:named_table` option. This allows you to create 
+the table and refer to them without the variable bound to their pid.
+
+```elixir
+:ets.new(:my_table, [:named_table])
+```
+
+Now you can insert values to the table using the atom name 
+`:my_table` instead of the pid.
+
+```elixir
+:ets.insert(:my_table, {:key, "value"})
+```
+
+The same goes for looking up values.
+
+```elixir
+:ets.lookup(:my_table, :key)
+```
+
+### Your Turn
+
+In the Elixir cell below, create a `:super_heros` ets table.
+You should be able to insert super hero's and their
+secret identities.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:ets.insert(:super_heros, {"Spider Man", "Peter Parker"})
+```
+
+```elixir
+
+```
