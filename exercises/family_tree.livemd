@@ -33,27 +33,57 @@ a `:name`, `:age`, `:status`, and `:parents` keys.
 * `name` is string.
 * `age` is an integer.
 * `status` will be an atom of `:child`, `:parent`, or `:grandparent`.
-* `children` should be a list of maps with their own `:name`, `:age`, `:status`, and `:children` keys.
+* `parents` should be a list of maps with their own `:name`, `:age`, `:status`, and `:parents` keys.
 
 In the Elixir cell below, create a map that represents the following family tree diagram.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart BT
-    c1["Arthur (22)"]
-    p1["Uther (56)"]
-    p2["Ygraine (45)"]
-    p1g1["Han (81)"]
-    p1g2["Leia (82)"]
-    p2g1["Bob (68)"]
-    p2g2["Bridget (70)"]
-    c1 --> p1
-    c1 --> p2
-    p1 --> p1g1
-    p1 --> p1g2
-    p2 --> p2g1
-    p2 --> p2g2
+classDiagram
+    direction BT
+    class Arthur {
+        name: "Arthur"
+        status: :child
+        age: 22
+    }
+    class Uther {
+        name: "Uther"
+        status: :parent
+        age: 56
+    }
+    class Ygraine {
+        name: "Ygraine"
+        status: :parent
+        age: 45
+    }
+    class Han {
+        name: "Han"
+        status: :grand_parent
+        age: 81
+    } 
+    class Leia {
+        name: "Leia"
+        status: :grand_parent
+        age: 82
+    }
+    class Bob {
+        name: "Bob"
+        status: :grand_parent
+        age: 68
+    } 
+    class Bridget {
+        name: "Bridget"
+        status: :grand_parent
+        age: 70
+    }
+
+    Arthur --> Uther
+    Arthur --> Ygraine
+    Ygraine --> Bob
+    Ygraine --> Bridget
+    Uther --> Han
+    Uther --> Leia
 ```
 
 ```elixir
