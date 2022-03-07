@@ -23,10 +23,8 @@ flowchart
 Processes are isolated from eachother, and communicate via message passing.
 
 ```mermaid
-flowchart LR
-  P1[Process]
-  P2[Process]
-  P1 --message--> P2
+sequenceDiagram
+    Process1 ->> Process2: message
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -71,11 +69,11 @@ end
 We can `spawn/1` a new process and get it's pid.
 
 ```mermaid
-flowchart LR
-spawn --> Process 
-subgraph Process
-  pid
-end
+sequenceDiagram
+    Parent Process->>Child Process: spawns
+    activate Child Process 
+    Child Process-->>Parent Process: pid
+    deactivate Child Process
 ```
 
 ```elixir
@@ -116,17 +114,16 @@ an error, that error will not crash the parent process. Instead it will only log
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart LR
-subgraph Child
-  CP[Child Process] --> R[raise] --dies--> CP
-end
-subgraph Parent
-  PA[Parent Process]
-end
-
-PA --spawns--> CP
-  R --logs--> PA
-
+sequenceDiagram
+    Parent Process->>Child Process: spawns
+    activate Child Process 
+    Child Process-->>Parent Process: pid
+    Child Process->>Child Process: raise
+    activate Child Process 
+    Child Process->>Parent Process: logs termination
+    deactivate Child Process 
+    Child Process->>Child Process: dies
+    deactivate Child Process 
 ```
 
 ```elixir
