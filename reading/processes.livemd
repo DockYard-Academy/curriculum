@@ -80,7 +80,7 @@ sequenceDiagram
 spawn(fn -> nil end)
 ```
 
-A process with accept a callback function, and end when that callback function completes.
+A process accepts a callback function, and ends when that callback function completes.
 A process is **alive** and then it **dies**
 
 ```mermaid
@@ -89,7 +89,7 @@ spawn --> Process --> Alive --> cn[Callback Function] --> Dead
 ```
 
 We can use the [Process](https://hexdocs.pm/elixir/1.12/Process.html) module for functionality
-related to processes. We'll use the `alive?1` function to show that the process dies after it calls the function.
+related to processes. We'll use the `alive?1` function to show that the process is alive before it's callback Function called.
 
 ```elixir
 pid = spawn(fn -> IO.puts("I was called") end)
@@ -132,13 +132,26 @@ spawn(fn -> raise "oops" end)
 ```
 
 If this is not desirable behavior, we can link processes together so that if one dies, the other will
-crash. We can either `spawn_link/1`.
+crash.
+
+```mermaid
+flowchart LR
+subgraph Child
+  CP[Child Process] --> raise --dies--> CP
+end
+subgraph Parent
+  PA[Parent Process]
+end
+PA --spawns_link--> Link --> CP
+  raise --crash--> PA
+```
+
+We can either `spawn_link/1`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-pid1 = spawn(fn -> raise "oops" end)
-Process.link(pid)
+pid1 = spawn_link(fn -> raise "oops" end)
 "I will not run, because the above crashes"
 ```
 
@@ -147,7 +160,8 @@ Or manually link a process with `Process.link/1`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-pid1 = spawn_link(fn -> raise "oops" end)
+pid1 = spawn(fn -> raise "oops" end)
+Process.link(pid)
 "I will not run, because the above crashes"
 ```
 
