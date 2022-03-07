@@ -2,23 +2,23 @@
 
 ## Behaviours
 
-Behaviors allow us create modules that all share a common pattern, but need different implementations.
+Behaviours allow us to create modules that all share a common pattern but need different implementations.
 
-You can define a behavior, and then two other modules will implement it.
+You can define a behaviour, and then two other modules will implement it.
 
 ```mermaid
 flowchart
-  A[Behavior] --> B[Module]
-  A[Behavior] --> C[Module]
+  A[Behaviour] --> B[Module]
+  A[Behaviour] --> C[Module]
 ```
 
 This enforces that both modules will implement a shared **application programming interface** 
 or **API**. What is an API? Well, in this specific context the API is the set of 
-public facing functions in a module. More generically an interface is the point at which two systems
+public-facing functions in a module. More generically an interface is the point at which two systems
 interact. Since we're talking about systems for programming applications, we call it the application
 programming interface.
 
-To define a behavior, we start by defining a module. However instead of implementing
+To define a behaviour, we start by defining a module. However, instead of implementing
 functions, we create `@callback` module attributes. These @callback module attributes 
 define the signature of a function.
 
@@ -37,7 +37,7 @@ defmodule Villain do
 end
 ```
 
-Now a module can use the `Villain` behavior using the `@behavior` module attribute.
+Now a module can use the `Villain` behaviour using the `@behaviour` module attribute.
 You'll notice that Elixir displays a warning because the `DarthVader` module is supposed
 to implement a `catchphrase/0` function.
 
@@ -60,13 +60,13 @@ end
 DarthVader.catchphrase()
 ```
 
-So, why use a behavior?
+So, why use a behaviour?
 
-Primarily, behaviors ensure that any module that implements the behavior provides the expected set
+Primarily, behaviours ensure that any module that implements the behaviour provides the expected set
 of functions and that those functions match the expected function signatures.
 
-Behaviors are another way to achieve `polymorphism`. We can define
-a behavior, and then several different modules can implement that behavior. Behaviours
+Behaviours are another way to achieve `polymorphism`. We can define
+a behaviour, and then several different modules can implement that behaviour. Behaviours
 allow us to create "templates" for modules to ensure each module is consistent.
 
 The **caller**, which is the place in the code where we call a module's function, can
@@ -95,10 +95,10 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-If the behavior ever needs to change, we can modify the behavior, and know which modules
+If the behaviour ever needs to change, we can modify the behaviour, and know which modules
 need to be updated thanks to the warnings Elixir provides.
 
-You can also implement behaviors with [dynamic dispatching](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#dynamic-dispatch)
+You can also implement behaviours with [dynamic dispatching](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#dynamic-dispatch)
 which allows the caller to deal with a single module, and swap out the implementation.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -127,8 +127,8 @@ But that's beyond the scope of this lesson.
 
 In the Elixir cell below
 
-* Create a behaviour called `Pet`. a `Pet` should have a `@callback` module attribute `speak/0`
-  function that returns a string.
+* Create a behaviour called `Pet`. a `Pet` should have a `@callback` 
+module attribute defining a `speak/0` function that returns a string.
 * Create a module `Dog` that implements the `Pet` behaviour.
 * Implement a `speak` function in the `Dog` module that returns `"woof"`.
 * Create a module `Cat` that implements the `Pet` behaviour.
