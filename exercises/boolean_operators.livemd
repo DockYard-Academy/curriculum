@@ -5,7 +5,11 @@
 Ensure you run the `ea` command to evaluate all Elixir cells before starting the exercise.
 
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~>0.1.3"},
+  {:utils, path: "utils"}
+])
 ```
 
 ## Boolean Diagrams
@@ -140,26 +144,12 @@ flowchart LR
 Kino.Input.text("operator")
 ```
 
-## Code
+## Fill In The Blank
 
-In the text inputs below, enter the **boolean** or **boolean operator** that satisfies the blank.
+Evaluate the Elixir cell below. In the text inputs, enter the **boolean** or **boolean operator** that satisfies the blank.
 If `and` and `or` both satisfy the blank, then prefer `and`.
 
 ```elixir
 # TODO - Hide
-
-[
-  "not ____ and true === false",
-  "true ____ false === true",
-  "not true ____ true === true",
-  "not false ____ true === true",
-  "not (true and false) ____ false === true",
-  "not (true or false) or not (not ____ and true) === true",
-  "____ false and true === true",
-  "false or ____ true === false"
-]
-|> Enum.map(&Kino.Input.text/1)
-|> Enum.map(&Kino.render/1)
-
-Kino.nothing()
+Utils.form(:boolean_fill_in_the_blank)
 ```

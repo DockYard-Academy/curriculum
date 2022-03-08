@@ -16,6 +16,11 @@ defmodule Utils do
     end)
   end
 
+  @doc ~S"""
+  iex> %Kino.JS{} = Utils.form(:comparison_operators)
+  iex> %Kino.JS{} = Utils.form(:boolean_fill_in_the_blank)
+  """
+
   def form(:comparison_operators) do
     ValidatedForm.new([
       %{label: "7 __ 8", answers: ["<"]},
@@ -25,6 +30,43 @@ defmodule Utils do
       %{label: "8 __ 7 and 7 __ 7", answers: [">="]},
       %{label: "7 __ 8 and 7 __ 7", answers: ["<="]}
     ])
+  end
+
+  def form(:boolean_fill_in_the_blank) do
+    ValidatedForm.new([
+      %{label: "not ____ and true === false", answers: ["true"]},
+      %{label: "true ____ false === true", answers: ["or"]},
+      %{label: "not true ____ true === true", answers: ["or"]},
+      %{label: "not false ____ true === true", answers: ["and"]},
+      %{label: "not (true and false) ____ false === true", answers: ["or"]},
+      %{label: "not (true or false) or not (not ____ and true) === true", answers: ["false"]},
+      %{label: "____ false and true === true", answers: ["not"]},
+      %{label: "false or ____ true === false", answers: ["not"]}
+    ])
+  end
+
+  @doc ~S"""
+  iex> :ok = Utils.graph(:binary_search)
+  """
+  def graph(:binary_search) do
+    size = 600
+
+    widget =
+      VegaLite.new(width: size, height: size)
+      |> VegaLite.mark(:line)
+      |> VegaLite.encode_field(:x, "number of elements", type: :quantitative)
+      |> VegaLite.encode_field(:y, "time", type: :quantitative)
+      |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+      |> VegaLite.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
+      |> Kino.VegaLite.new()
+      |> Kino.render()
+
+    init = 1
+    max = 500
+
+    logn = for n <- init..max, do: %{"number of elements": n, time: :math.log2(n), type: "log(n)"}
+
+    Kino.VegaLite.push_many(widget, logn)
   end
 
   @doc ~S"""
