@@ -3,13 +3,16 @@
 ## Setup
 
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"}
+])
 ```
 
 ## Naming Numbers
 
 In the Elixir cell below, create a function `convert_to_named_integer` which accepts a
-single digit integer and returns its string representation. So `1` would become `"one"`
+single digit integer and returns its string representation. So `1` would become `"one"`.
 
 ```mermaid
 flowchart
@@ -25,43 +28,17 @@ flowchart
    9 --> nine
 ```
 
-```elixir
+<!-- livebook:{"force_markdown":true} -->
 
+```elixir
+convert_to_named_integer.(1)
+"one"
 ```
 
 ```elixir
-# TODO - Hide
+convert_to_named_integer = fn int -> nil end
 
-ExUnit.start(auto_run: false)
-
-:persistent_term.put(:convert_to_named_integer, convert_to_named_integer)
-
-defmodule NamingNumbers do
-  use ExUnit.Case
-
-  test "convert_to_named_integer" do
-    answer_key = %{
-      0 => "zero",
-      1 => "one",
-      2 => "two",
-      3 => "three",
-      4 => "four",
-      5 => "five",
-      6 => "six",
-      7 => "seven",
-      8 => "eight",
-      9 => "nine"
-    }
-
-    convert_to_named_integer = :persistent_term.get(:convert_to_named_integer)
-
-    Enum.each(answer_key, fn {key, value} ->
-      assert convert_to_named_integer.(key) === value
-    end)
-  end
-end
-
-ExUnit.run()
+Utils.test(:naming_numbers, convert_to_named_integer)
 ```
 
 ## Numbering Names
