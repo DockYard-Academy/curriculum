@@ -1,10 +1,17 @@
 # Beta Academy Curriculum
 To open the .livemd files you will need the latest version of [livebook](https://github.com/livebook-dev/livebook) running.
+
+We use some experimental features so ensure you install livebook main.
+
+```
+mix escript.install github livebook-dev/livebook
+```
+
 Click on the `instructions.livemd` file while running livebook. Then click the "Open" button nearby.
 From here, you'll be able to follow the links to access each lesson and exercise.
 
 ## Getting Started
-- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed or a compatable elixir version as found in `.tool-versions`.
+- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed or a compatable local Elixir version as found in `.tool-versions`.
 - Ensure you have the latest [livebook](https://github.com/livebook-dev/livebook) installed.
 - Run the project with `livebook server`.
 - Go to the `instructions.livemd` to see the course content.

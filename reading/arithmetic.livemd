@@ -3,26 +3,28 @@
 ## Setup
 
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab", override: true}
+])
 ```
 
 ## Overview
 
 **Arithmetic** is a branch of mathematics that involves the manipulation of numbers.
-Often functional programming languages like Elixir get a bad reputation for being very math heavy.
+Often functional programming languages like Elixir get a reputation for being very math-heavy.
 The same goes for programming in general, but especially functional programming.
 
-Let's dispel that myth. While there are some applications of programming that require
-advanced math skills, many do not. In fact, the most in demand programming industries such
-as web development only require familiarity with simple arithmetic
+Let's dispel that myth. While some programming fields require
+advanced math skills, many do not. Generally, web development only requires simple arithmetic
 (adding, subtracting, dividing, multiplying, etc), and even then, we let the computers do most
 of the heavy lifting!
 
-Rest assured, this will not be a math course, nor will most real-world applications of
-programming demand advanced mathematics.
+Rest assured, this will not be a math course, nor will most real-world applications demand advanced math knowledge.
 
 Now, with that said, computers were originally built to perform computations that humans could not perform easily or
-at all. So out of the box we have the ability to perform mathematical calculations.
+at all. So out of the box, we can perform mathematical calculations.
 
 Humans have been building [mathematical machines](https://www.cs.uah.edu/~rcoleman/Common/History/History.html)
 for ages and the computers that run our programs are by far the most powerful!
@@ -49,7 +51,7 @@ You can use integers directly in your programs.
 -123512
 ```
 
-Often you'll use integers for representing ages, days, years, cash values and more.
+Often you'll use integers for representing ages, days, years, cash values, and more.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -104,16 +106,12 @@ For example, you might want to represent a progress bar as a percentage.
 ### Your Turn
 
 In the Elixir cell below, try changing the float `percentage` to any float between `0.0` and `100.0`
-and see how the loading bar changes! Replace `50.0` with your answer.
+and see how the loading bar changes! Replace `50.0` with your answer and reevaluate the cell.
 
 ```elixir
 percentage = 50.0
 
-# TODO - Hide
-Kino.Markdown.new("
-<div style=\"height: 20px; width: 100%; background-color: grey\">
-<div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
-</div>")
+Utils.visual(:loading_bar, percentage)
 ```
 
 ### Floating-Point Errors
@@ -133,15 +131,19 @@ You'll see the actual answer is `2.5999999999999996` in the Elixir cell below.
 Why do computers have these errors? Well that requires a fairly in depth understanding of
 how the computer hardware works under the hood. For our purposes it's enough to be aware that it happens.
 
-If you are curious, Computerphile has an [excellent video on why](https://www.youtube.com/watch?v=PZRI1IfStY0&ab_channel=Computerphile).
+If you are curious, Computerphile has an excellent video on why
 
-Due to these errors, **you should not use floats to represent money** even though it might seem
+```elixir
+Kino.YouTube.new("PZRI1IfStY0")
+```
+
+Due to these errors, **do not use floats to represent money** even though it might seem
 intuitive to translate `$1.29` into `1.29`.
 
 Instead, you'll often use integers to represent pennies so `$1.29` becomes `129`.
 
-Alternatively, many projects use other money specific constructs instead that come with safety and
-functionality improvements.
+Alternatively, [some libraries](https://github.com/elixirmoney/money)
+provide utilities for working with money.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -408,7 +410,11 @@ Elixir is `**`.
 That means that `10 ** 2` is 10 to the power of 2. Mathematically that's the same as `10 * 10`.
 
 `10 ** 3` means `10 * 10 * 10`. If you would like a more in-depth explanation of exponents, there's
-a [video by Khan Academy](https://www.youtube.com/watch?v=XZRQhkii0h0&ab_channel=KhanAcademy).
+a video by Khan Academy.
+
+```elixir
+Kino.YouTube.new("XZRQhkii0h0")
+```
 
 ```elixir
 10 ** 2
@@ -430,16 +436,11 @@ For example, if you divide `5` by `2`, the remainder is `1`.
 
 That's because `2` goes into `5` twice and leaves a remainder of `1`.
 
-<!-- livebook:{"force_markdown":true} -->
+If you're not familiar with remainders, here's a video by Khan Academy.
 
 ```elixir
-5 ~ 2
-5 ~ 4
-5 - 4 = remainder
-5 - 4 = 1
+Kino.YouTube.new("P1qyjdh_sIw")
 ```
-
-If you're not familiar with remainders, here's a [video by Khan Academy](https://www.youtube.com/watch?v=P1qyjdh_sIw&ab_channel=KhanAcademy).
 
 ```elixir
 rem(5, 2)
@@ -461,23 +462,13 @@ rem(5, 2)
 You'll also use remainders to cycle through numbers but then reset back to 0 when you hit
 a limit. You don't need to know how to do this yet, but it will be helpful in future lessons.
 
-````elixir
-# TODO - Hide
-
-Kino.animate(500, 0, fn i ->
-  md = Kino.Markdown.new("
-  ```elixir
-  rem(#{i}, 10) = #{rem(i, 10)}
-  ```
-  ")
-
-  {:cont, md, i + 1}
-end)
-````
+```elixir
+Utils.animate(:remainder)
+```
 
 ### Your Turn
 
-In the Elixir cell below, find the remainder of 10 divided by 3 using `rem`.
+In the Elixir cell below, find the remainder of `10` divided by `3` using `rem`.
 
 ```elixir
 
