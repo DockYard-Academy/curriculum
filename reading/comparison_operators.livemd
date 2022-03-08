@@ -3,7 +3,7 @@
 ## Setup
 
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([{:kino, github: "livebook-dev/kino"}, {:utils, path: "utils"}])
 ```
 
 ## Comparison Operators
@@ -13,12 +13,12 @@ Comparison operators allow us to compare values.
 Using comparison operators, we check if values are equal `===`, greater than `>`, less than `<`,
 greater than or equal `>=`, and less than or equal `<=`.
 
-Comparison operators can be used on any type of value but are most commonly used to compare
+Comparison operators can be used on any value but are most commonly used to compare
 integers and floats.
 
 The result of a comparison is a boolean, either `true` or `false`.
 
-For example, if we check that `5` is equal to `5`, we return `true`.
+For example, if we check that `5` equals `5`, we return `true`.
 
 ```elixir
 5 === 5
@@ -27,26 +27,7 @@ For example, if we check that `5` is equal to `5`, we return `true`.
 Here are a few example comparisons and their results.
 
 ```elixir
-# TODO - Hide
-
-data = [
-  %{comparison: "5 === 5", result: true},
-  %{comparison: "5 === 5.0", result: false},
-  %{comparison: "5 == 5.0", result: true},
-  %{comparison: "5 === 4", result: false},
-  %{comparison: "5 > 4", result: true},
-  %{comparison: "4 > 5", result: false},
-  %{comparison: "5 < 4", result: false},
-  %{comparison: "4 < 5", result: true},
-  %{comparison: "5 >= 5", result: true},
-  %{comparison: "5 >= 4", result: true},
-  %{comparison: "4 >= 5", result: false},
-  %{comparison: "5 <= 5", result: true},
-  %{comparison: "4 <= 5", result: true},
-  %{comparison: "5 <= 4", result: false}
-]
-
-Kino.DataTable.new(data)
+Utils.visual(:comparison_examples)
 ```
 
 ### Comparing Strings
@@ -60,7 +41,7 @@ in the alphabet are evaluated as smaller than numbers later in the alphabet.
 
 Capital letters are always less than lowercase letters regardless of alphabetical order.
 
-```elixir
+```Elixir
 "Z" < "a"
 ```
 
@@ -86,9 +67,7 @@ You can compare different data types to each other in the following [Sorting Ord
 number < atom < reference < function < port < pid < tuple < map < list < bitstring
 ```
 
-You'll notice several data types that you may not be familir with above. Don't worry, you're 
-not expected to memorize this sorting order nor know all of these data types. However, it's useful
-to know that this exists.
+You'll notice several data types that you may not be familiar with above. Don't worry. There's no need to memorize this sorting order nor know all of these data types.
 
 ```elixir
 "" > 1
@@ -128,20 +107,8 @@ In the Elixir cell below, check if `7` is greater than or equal to (`>=`) `7`
 ```
 
 In the form below, Enter the operator `==`, `===`, `>`, `<`, `>=`, or `<=`
- that would make the statement `true` if it replaced the blank `__`.
+that would make the statement `true` if it replaced the blank `__`.
 
 ```elixir
-# TODO - Hide
-
-[
-  Kino.Input.text("8 __ 8"),
-  Kino.Input.text("8 __ 8.0"),
-  Kino.Input.text("7 __ 8"),
-  Kino.Input.text("8 __ 7"),
-  Kino.Input.text("8 __ 7 and 7 __ 7"),
-  Kino.Input.text("7 __ 8 and 7 __ 7")
-]
-|> Enum.map(&Kino.render/1)
-
-Kino.nothing()
+Utils.form(:comparison_operators)
 ```
