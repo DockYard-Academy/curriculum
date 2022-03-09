@@ -2,8 +2,18 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}])
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
 ```
 
 ## Functions
@@ -177,47 +187,17 @@ double.(10 ** 2 - 1)
 
 Under the hood, when the function runs, the parameter is bound to the argument's value.
 
-Here's an animation to show how the function evaluates step by step.
+Let's break down how a function executes step by step.
 
-````elixir
-# TODO - Hide
+```elixir
+Utils.slide(:functions)
+```
 
-sequence = [
-  "
-  First, we define the `double` function and call it.
-  ```elixir
-  double = fn number -> number * 2 end
-  double.(3)
-  ```
-  ",
-  "
-  The parameter is bound to the argument `3`
-  ```elixir
-  double = fn 3 -> 3 * 2 end
-  double.(3)
-  ```
-  ",
-  "
-  The function evaluates the function body between the `->` and the `end`
-  ```elixir
-  double = fn 3 -> 6 end
-  double.(3)
-  ```
-  ",
-  "
-  The function call returns the value from the body
-  ```elixir
-  double = fn 3 -> 6 end
-  6
-  ```
-  "
-]
+As expected, `double.(3)` returns `6`.
 
-Kino.animate(6000, 0, fn i ->
-  md = Enum.at(sequence, i) |> Kino.Markdown.new()
-  {:cont, md, rem(i + 1, length(sequence))}
-end)
-````
+```elixir
+double.(3)
+```
 
 ### Implied Return Values
 

@@ -2,8 +2,18 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
-Mix.install([{:live_slide, github: "brooklinjazz/live_slide"}, {:benchee, "~> 0.1"}])
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
 ```
 
 ## Recursion
@@ -162,105 +172,9 @@ Recursion.sum([4, 5, 6], 0)
 
 Let's break down how that works in the slide below.
 
-````elixir
-# TODO - Hide
-
-[
-  "
-The base case would return the accumulator when the list is empty.
 ```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
- 
- 
-    
-end
- 
- 
+Utils.slide(:recursion)
 ```
-",
-  "
-Otherwise, we'll add the head to an accumulator and recurse on the tail of the list.
-```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
-    def sum([head | tail], accumulator do
-        sum(tail, accumulator + head)
-    end
-end
-
-Recursion.sum([4, 5, 6], 0)
-```
-",
-  "
-The `sum/2` function is called with the list `[4, 5, 6]`.
-```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
-    def sum([4 | [5, 6]], 0) do
-        sum([5, 6], 4 + 0)
-    end
-end
-
-Recursion.sum([4, 5, 6], 0)
-```
-",
-  "
-The `sum/2` function is called again on the tail of the list `[5, 6]`.
-```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
-    def sum([5 | [6]], 4) do
-        sum([6], 5 + 4)
-    end
-end
-
-Recursion.sum([4, 5, 6], 0)
-```
-",
-  "
-The `sum/2` function is called again on the tail of the list `[6]`.
-```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
-    def sum([6 | []], 9) do
-        sum([], 6 + 9)
-    end
-end
-
-Recursion.sum([4, 5, 6], 0)
-```
-",
-  "
-The `sum/2` function is called again on the tail of the list `[]`. This triggers the base case to return the accumulator.
-```elixir
-defmodule Recursion do
-    def sum([], 15), do: 15
-    def sum([head | tail], accumulator) do
-        sum(tail, accumulator + head)
-    end
-end
-
-Recursion.sum([4, 5, 6], 0)
-```
-",
-  "
-And our function returns `15`.
-```elixir
-defmodule Recursion do
-    def sum([], accumulator), do: accumulator
-    def sum([head | tail], accumulator) do
-        sum(tail, accumulator + head)
-    end
-end
-
-15
-```
-"
-]
-|> Enum.map(&Kino.Markdown.new/1)
-|> LiveSlide.new()
-````
 
 ### Your Turn
 
@@ -279,4 +193,3 @@ defmodule CustomEnum do
   end
 end
 ```
-

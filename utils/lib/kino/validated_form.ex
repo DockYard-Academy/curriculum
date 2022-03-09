@@ -1,11 +1,10 @@
-defmodule Utils.ValidatedForm do
+defmodule Kino.ValidatedForm do
   @moduledoc """
   LiveSlide is a custom slideshow component for Livebook.
   """
 
   use Kino.JS
 
-  @spec new(any) :: Kino.JS.Live.t()
   def new(fields) do
     Kino.JS.new(__MODULE__, fields)
   end
@@ -16,14 +15,26 @@ defmodule Utils.ValidatedForm do
     export function init(ctx, fields) {
       ctx.importCSS("main.css");
       for (let i = 0; i < fields.length; i++) {
-          const {label: label} = fields[i]
+          const field = fields[i]
 
-        ctx.root.innerHTML += `
-            <div class="container">
-              <div class="label">${label}</div>
-              <input class="input" id="field${i}" />
-            </div>
-          `
+          if (field.options) {
+            ctx.root.innerHTML += `
+                <div class="container">
+                  <div class="label">${field.label}</div>
+                  <select class="input" id="field${i}">
+                  ${field.options.map(each => `<option value="${each}">${each}</option>`)}
+                  </select>
+                </div>
+              `
+          } else {
+            ctx.root.innerHTML += `
+                <div class="container">
+                  <div class="label">${field.label}</div>
+                  <input class="input" id="field${i}" />
+                </div>
+              `
+          }
+
       }
 
       for (let i = 0; i < fields.length; i++) {
@@ -57,7 +68,9 @@ defmodule Utils.ValidatedForm do
       font-size: .875rem;
       line-height: 1.25rem;
       padding: .5rem .75rem;
+      box-sizing: border-box;
       background-color: #F8FAFC;
+      width: 215px;
     }
     .input:focus {
       outline: none;

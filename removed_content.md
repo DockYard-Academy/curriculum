@@ -1819,3 +1819,97 @@ Mix.install([
 
 ### How to icon
 <i class="ri-livebook-sections"></i
+
+# Box Animation
+```elixir
+defmodule Kino.BoxAnimation do
+  @moduledoc """
+  Box Animation was an attempt to improve the :eager_evaluation and :lazy_evaluation animation
+  Unfortunately it caused jittering on each load. In the future, it would make sense to move the logic from Utils.animate
+  to this component.
+  """
+
+  use Kino.JS
+
+  @deprecated
+  def new(rows) do
+    Kino.JS.new(__MODULE__, rows)
+  end
+
+  asset "main.js" do
+    """
+    function box(children) {
+      return `<div class="box">${children || ""}</div>`
+    }
+    function green_box(children) {
+      return `<div class="box box--green">${children || ""}</div>`
+    }
+    function grey_box(children) {
+      return `<div class="box box--grey">${children || ""}</div>`
+    }
+    function row(title, items) {
+      return `<div class="row">
+       <p class="row__title">${title}</p>
+       <div class="row__items"">${items.join("")}</div>
+     </div>`
+    }
+    function to_box(box_data) {
+      switch (box_data.color) {
+        case "green":
+          return green_box(box_data.text)
+        case "grey":
+          return grey_box(box_data.text)
+        default:
+          box(box_data.text)
+      }
+    }
+    export function init(ctx, rows_data) {
+      ctx.importCSS("main.css");
+      rows_data.forEach(row_data => {
+        ctx.root.innerHTML += row(row_data.title, row_data.boxes.map(to_box))
+      })
+    }
+    """
+  end
+
+  asset "main.css" do
+    """
+    .row {
+      height: 80px;
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+    .row__title {
+      font-weight: bold;
+      font-size: 24px;
+      margin: 0;
+      width: 10%;
+    }
+    .row__items {
+      display: flex;
+      width: 90%;
+    }
+
+    .box {
+      margin: 0 10px;
+      font-size: 24px;
+      font-weight: bold;
+      height: 50px;
+      width: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .box--green {
+      background-color: #D5E8D4;
+      border-color: #82B366;
+    }
+    .box--grey {
+      background-color: #F5F5F5;
+      border-color: #666666
+    }
+    """
+  end
+end
+```
