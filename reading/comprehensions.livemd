@@ -2,13 +2,13 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
 Mix.install([
-  {:vega_lite, "~> 0.1.3"},
-  {:kino, github: "livebook-dev/kino"}
-])
-
-alias VegaLite, as: Vl
+  {:utils, path: "utils", submodules: true}
+  ])
 ```
 
 ## Comprehensions
@@ -171,31 +171,7 @@ So the performance follows Big $On^g$ where $g$ is
 the number of generators that you use.
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "number of elements", type: :quantitative)
-  |> Vl.encode_field(:y, "time", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Number Of Generators", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 5
-
-n1 = for n <- init..max, do: %{"number of elements": n, time: n, type: "1"}
-n2 = for n <- init..max, do: %{"number of elements": n, time: n ** 2, type: "2"}
-n3 = for n <- init..max, do: %{"number of elements": n, time: n ** 3, type: "3"}
-n4 = for n <- init..max, do: %{"number of elements": n, time: n ** 4, type: "4"}
-
-Kino.VegaLite.push_many(widget, n1)
-Kino.VegaLite.push_many(widget, n2)
-Kino.VegaLite.push_many(widget, n3)
-Kino.VegaLite.push_many(widget, n4)
+Utils.graph(:comprehension_big_o)
 ```
 
 ### Your Turn

@@ -21,9 +21,11 @@ defmodule Utils.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:kino, github: "livebook-dev/kino"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:kino, github: "livebook-dev/kino"},
+      {:vega_lite, "~> 0.1.3", optional: true},
+      {:benchee, "~> 0.1", optional: true},
+      {:ecto, "~> 3.7", optional: true},
+      {:math, "~> 0.7.0", optional: true}
     ]
   end
 end

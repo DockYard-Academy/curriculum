@@ -2,8 +2,18 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
-Mix.install([{:kino, github: "livebook-dev/kino"}, {:benchee, "~> 0.5"}])
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
 ```
 
 ## Enum vs Stream
@@ -19,55 +29,11 @@ executed. This requires each element in the enumeration to be stored in memory d
 |> Enum.take(4)
 ```
 
+Each `Enum` function stores a copy of the the enumerable it creates and executes sequentially as
+seen in this slide.
+
 ```elixir
-## TODO - Hide
-box = fn text, style ->
-  "<div style=\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center;
-justify-content: center;\">#{text}</div>"
-end
-
-space = fn -> box.("", %{background: "none", border: "none"}) end
-green_box = fn text -> box.(text, %{background: "#D5E8D4", border: "#82B366"}) end
-white_box = fn text -> box.(text, %{background: "#F5F5F5", border: "#666666"}) end
-
-row = fn title, items ->
-  "<div style=\"height: 80px; display: flex; width: 100%; align-items: center;\">
-    <p style=\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\">#{title}</p>
-    <div style=\"display: flex; width: 90%;\">#{items}</div>
-  </div>"
-end
-
-sequence = [
-  "
-  #{row.("1..10", Enum.map(1..10, green_box))}
-  #{row.("map", [])}
-  #{row.("filter", [])}
-  #{row.("take", [])}
-",
-  "
-  #{row.("1..10", Enum.map(1..10, green_box))}
-  #{row.("map", Enum.map(2..20//2, green_box))}
-  #{row.("filter", [])}
-  #{row.("take", [])}
-",
-  "
-  #{row.("1..10", Enum.map(1..10, green_box))}
-  #{row.("map", Enum.map(2..20//2, green_box))}
-  #{row.("filter", Enum.map(2..10//2, green_box) ++ Enum.map(12..20//2, white_box))}
-  #{row.("take", [])}
-",
-  "
-  #{row.("1..10", Enum.map(1..10, green_box))}
-  #{row.("map", Enum.map(2..20//2, green_box))}
-  #{row.("filter", Enum.map(2..10//2, green_box) ++ Enum.map(12..20//2, white_box))}
-  #{row.("take", Enum.map(2..8//2, green_box) ++ Enum.map(10..20//2, white_box))}
-  "
-]
-
-Kino.animate(2000, 0, fn i ->
-  md = Kino.Markdown.new(Enum.at(sequence, i))
-  {:cont, md, rem(i + 1, length(sequence))}
-end)
+Utils.animate(:eager_evaluation)
 ```
 
 While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by the
@@ -78,44 +44,16 @@ As the list grows, this becomes a massive waste of computation. It would be far 
 could instead build up a series of functions and run them one by one only when needed.
 
 ```elixir
-# TODO - Hide and Refactor
-
-spaces = fn integer -> for _ <- 1..integer, integer > 0, do: space.() end
-green_boxes = fn range -> for n <- range, do: green_box.(n) end
-white_boxes = fn range -> for n <- range, do: white_box.(n) end
-
-Kino.animate(500, {0, 0}, fn {current_row, current_column} ->
-  current_element = current_column + 1
-  range = green_boxes.(1..current_element) ++ white_boxes.((current_element + 1)..10)
-
-  maybe_display = fn expected_row, display ->
-    if current_row === expected_row, do: display, else: []
-  end
-
-  indent = spaces.(current_column)
-  md = Kino.Markdown.new("
-  #{row.("1..10", range)}
-  #{row.("map", maybe_display.(1, indent ++ [green_box.(current_element * 2)]))}
-  #{row.("filter", maybe_display.(2, indent ++ [green_box.(current_element * 2)]))}
-  #{row.("take", green_boxes.(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [green_box.(current_element * 2)]))}
-")
-  next_row = rem(current_row + 1, 4)
-  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)
-  {:cont, md, {next_row, next_column}}
-end)
-```
-
-```elixir
-for n <- 0..0, i > 0, do: n
+Utils.animate(:lazy_evaluation)
 ```
 
 We can't accomplish this with the `Enum` module, however we can with `Stream`.
 [Streams](https://hexdocs.pm/elixir/1.12/Stream.html#unfold/2) are composable,
-lazy enumerables. **lazy** means they execute on each element in the stream one by one. **composable**
+lazy enumerables. **lazy** means they execute on each element in the stream one by one. **Composable**
 means that we build up functions to execute on each element in the stream.
 
 Notice that the following does not execute, it instead builds up future work to execute and returns
-a Stream data structure.
+a `Stream` data structure.
 
 ```elixir
 1..10

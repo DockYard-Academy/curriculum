@@ -1,5 +1,18 @@
 # Non-Enumerables
 
+## Setup
+
+```elixir
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
+```
+
 ## Enumeration With Non-Enumerables
 
 Data types that do not contain multiple elements are not enumerable.
@@ -71,15 +84,7 @@ See this table for alphabetical characters and their code point values.
 You do not need to memorize these values! You only need to be aware that each character has a corresponding codepoint.
 
 ```elixir
-# TODO - hide
-
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-|> String.codepoints()
-|> Enum.map(fn char ->
-  <<code_point::utf8>> = char
-  %{character: char, code_point: code_point}
-end)
-|> Kino.DataTable.new()
+Utils.table(:unicode)
 ```
 
 #### `String.graphemes/1`

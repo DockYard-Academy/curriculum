@@ -2,13 +2,18 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
 Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
   {:vega_lite, "~> 0.1.3"},
-  {:kino, github: "livebook-dev/kino"}
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
 ])
-
-alias VegaLite, as: Vl
 ```
 
 ## Binary Search
@@ -113,25 +118,7 @@ At first you have $n$ elements to search, then $n/2$ elements, then $n/4$ elemen
 That means it has $O(log n)$ complexity.
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "number of elements", type: :quantitative)
-  |> Vl.encode_field(:y, "time", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 500
-
-logn = for n <- init..max, do: %{"number of elements": n, time: :math.log2(n), type: "log(n)"}
-
-Kino.VegaLite.push_many(widget, logn)
+Utils.graph(:binary_search)
 ```
 
 In the Elixir cell below, create a binary search algorythm that finds the index of a given value in a sorted tuple.

@@ -1,21 +1,14 @@
 # Utils
 
-**TODO: Add description**
+Utilities For DockYard Academy.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `utils` to your list of dependencies in `mix.exs`:
-
+Add the following to your livebook, with any additional dependencies required.
 ```elixir
-def deps do
-  [
-    {:utils, "~> 0.1.0"}
-  ]
-end
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1"}
+])
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/utils>.
-

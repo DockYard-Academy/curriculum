@@ -1,5 +1,21 @@
 # File
 
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
+```
+
 ## File
 
 To work with the file system in Elixir we use the built-in `File` module.
@@ -451,21 +467,10 @@ file "data/copied_example".
 
 ```elixir
 File.write("data/copy_example", "Copy me!")
+```
 
-# Enter Your Answer Below This Line.
+To confirm you did it correctly, evaluate the Elixir cell below.
 
-# Enter Your Answer Above This Line.
-
-# TODO - Hide
-ExUnit.start(auto_run: false)
-
-defmodule CopyExample do
-  use ExUnit.Case
-
-  test "file was copied" do
-    assert File.read("data/copied_example") === "Copy me!"
-  end
-end
-
-ExUnit.run()
+```elixir
+Utils.test(:file_copy_challenge)
 ```

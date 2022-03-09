@@ -2,94 +2,21 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
-# TODO - Hide
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
 
-string_maze = %{
-  "west" => %{
-    "south" => %{
-      "east" => %{
-        "north" => %{
-          "east" => %{
-            "south" => %{
-              "east" => %{
-                "south" => %{
-                  "east" => %{
-                    "south" => %{
-                      "west" => %{
-                        "north" => "Exit!"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-atom_maze = %{
-  south: %{
-    east: %{
-      north: %{
-        east: %{
-          south: %{
-            west: %{
-              north: %{
-                east: %{
-                  south: %{
-                    east: %{
-                      north: %{
-                        west: %{
-                          south: %{
-                            west: %{
-                              south: %{
-                                west: %{
-                                  north: %{
-                                    west: %{
-                                      south: %{
-                                        west: %{
-                                          south: %{
-                                            west: %{
-                                              south: %{
-                                                east: %{
-                                                  north: %{
-                                                    east: %{
-                                                      south: %{
-                                                        east: %{
-                                                          south: "Exit!"
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+string_maze = Utils.get(:string_maze)
+string_maze = Utils.get(:atom_maze)
 ```
 
 ## Navigate The Maze

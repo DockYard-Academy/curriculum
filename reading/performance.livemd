@@ -2,15 +2,22 @@
 
 ## Setup
 
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
 ```elixir
 Mix.install([
-  {:vega_lite, "~> 0.1.3"},
+  {:utils, path: "utils"},
   {:kino, github: "livebook-dev/kino"},
-  {:benchee, "~> 1.0"},
-  {:math, "~> 0.7"}
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
 ])
+```
 
-alias VegaLite, as: Vl
+```elixir
+
 ```
 
 <!-- livebook:{"branch_parent_index":0} -->
@@ -53,35 +60,7 @@ of the data.
 * **$$O(n!)$$**: Factorial Time
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "x", type: :quantitative)
-  |> Vl.encode_field(:y, "y", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Big O Notation", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-max_x = 5
-initial_x = 2
-
-linear = Enum.map(initial_x..max_x, &%{x: &1, y: &1, type: "O(n)"})
-constant = Enum.map(initial_x..max_x, &%{x: &1, y: 1, type: "O(1)"})
-polonomial = Enum.map(initial_x..max_x, &%{x: &1, y: &1 ** 2, type: "O(n^2)"})
-logarithmic = Enum.map(initial_x..max_x, &%{x: &1, y: :math.log2(&1), type: "O(log n)"})
-exponential = Enum.map(initial_x..max_x, &%{x: &1, y: 2 ** &1, type: "O(2^n)"})
-factorial = Enum.map(initial_x..max_x, &%{x: &1, y: Math.factorial(&1), type: "O(n!)"})
-
-Kino.VegaLite.push_many(widget, factorial)
-Kino.VegaLite.push_many(widget, exponential)
-Kino.VegaLite.push_many(widget, polonomial)
-Kino.VegaLite.push_many(widget, linear)
-Kino.VegaLite.push_many(widget, logarithmic)
-Kino.VegaLite.push_many(widget, constant)
+Utils.graph(:big_o_notation)
 ```
 
 As you work with larger amounts of data, different big $O$ complexities grow faster than others.
@@ -116,27 +95,7 @@ We can see the nature of how a constant travel time for some amount of data alwa
 expected internet speed in the graph below.
 
 ```elixir
-# TODO - Hide
-
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "data", type: :quantitative)
-  |> Vl.encode_field(:y, "time", type: :quantitative)
-  |> Vl.encode_field(:color, "type", title: "Linear Growth", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 5000
-
-internet = for n <- init..max, do: %{data: n, time: n, type: "Internet"}
-pigeon = for n <- init..max, do: %{data: n, time: 3500, type: "Pigeon"}
-
-Kino.VegaLite.push_many(widget, internet)
-Kino.VegaLite.push_many(widget, pigeon)
+Utils.graph(:pigeon_beats_internet)
 ```
 
 ## Linear Complexity
@@ -156,34 +115,7 @@ perform approximately the same number of additional calculations.
 Plotted onto a graph you would expect that as we increase the number of elements, time grows in a constant line upward.
 
 ```elixir
-# TODO - Hide
-
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "number of elements", type: :quantitative)
-  |> Vl.encode_field(:y, "time", type: :quantitative)
-  |> Vl.encode_field(:color, "type", title: "Linear Growth", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-base = 100
-init = 1
-max = 5000
-
-linear =
-  Enum.map(init..max, fn each ->
-    # {time, _value} = :timer.tc(fn -> Enum.map(1..each, fn each -> each + 2 end) end)
-    %{"number of elements": each, time: each, type: "O(n)"}
-  end)
-
-Kino.VegaLite.push_many(widget, linear)
-```
-
-```elixir
-Enum.map(1..10_000_000, fn each -> each * 2 end)
+Utils.graph(:linear_complexity)
 ```
 
 ## Polynomial Complexity
@@ -232,19 +164,7 @@ end)
 In other words, it creates $n^2$ elements. We can see how this grows in the following table.
 
 ```elixir
-# TODO - Hide
-
-data =
-  Enum.map(1..1000, fn each ->
-    %{
-      "# of elements": each,
-      result: each ** 2,
-      notation: "#{each}**2",
-      equation: "#{each} * #{each}"
-    }
-  end)
-
-Kino.DataTable.new(data)
+Utils.table(:n2)
 ```
 
 If you nest a third enumeration it becomes $n^3$.
@@ -372,60 +292,17 @@ Enum.map(1..number, fn _ ->
 end)
 ```
 
-We can see $n^3$ this grows in the following table.
+We can see how $n^3$ grows in the following table.
 
 ```elixir
-data =
-  Enum.map(1..1000, fn each ->
-    %{
-      "# of elements": each,
-      result: each ** 3,
-      notation: "#{each}**3",
-      equation: "#{each} * #{each} * #{each}"
-    }
-  end)
-
-Kino.DataTable.new(data)
+Utils.table(:n3)
 ```
 
 Plotted onto a graph, we can see that polynomial complexity results in an upward curve, and
 the size of the power significantly increases the growth.
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "number of elements", type: :quantitative)
-  |> Vl.encode_field(:y, "time", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Polonomial Growth", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 5
-
-n2 =
-  Enum.map(init..max, fn number_of_elements ->
-    %{"number of elements": number_of_elements, time: number_of_elements ** 2, type: "n^2"}
-  end)
-
-n3 =
-  Enum.map(init..max, fn number_of_elements ->
-    %{"number of elements": number_of_elements, time: number_of_elements ** 3, type: "n^3"}
-  end)
-
-n4 =
-  Enum.map(init..max, fn number_of_elements ->
-    %{"number of elements": number_of_elements, time: number_of_elements ** 4, type: "n^4"}
-  end)
-
-Kino.VegaLite.push_many(widget, n2)
-Kino.VegaLite.push_many(widget, n3)
-Kino.VegaLite.push_many(widget, n4)
+Utils.graph(:polynomial_complexity)
 ```
 
 ## Exponential Complexity
@@ -433,7 +310,7 @@ Kino.VegaLite.push_many(widget, n4)
 In exponential growth, some constant grows by an additional power for each element added to the collection.
 
 Let's take cracking a password as an example. We can assume a password can only be made from
-integers `1` to `9`.
+integers `0` to `9`.
 
 ```mermaid
 flowchart LR
@@ -455,39 +332,11 @@ represented as $2^n$  or $C^n$ where `2` or `C` represents some constant value. 
 be `10`.
 
 ```elixir
-# Hide
-data =
-  Enum.map(1..100, fn each ->
-    %{
-      "# of elements": each,
-      result: 10 ** each,
-      equation: "100 ** #{each}"
-    }
-  end)
-
-Kino.DataTable.new(data)
+Utils.table(:exponential_growth)
 ```
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "x", type: :quantitative)
-  |> Vl.encode_field(:y, "y", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Exponential Growth", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 10
-
-factorial = for n <- init..max, do: %{x: n, y: 10 ** n, type: "2^n"}
-
-Kino.VegaLite.push_many(widget, factorial)
+Utils.graph(:exponential_complexity)
 ```
 
 ## Factorial Complexity
@@ -554,41 +403,11 @@ Factorial complexity grows incredibly fast, as you can see according to this gra
 data table.
 
 ```elixir
-# TODO - Hide
-size = 600
-
-widget =
-  Vl.new(width: size, height: size)
-  |> Vl.mark(:line)
-  |> Vl.encode_field(:x, "x", type: :quantitative)
-  |> Vl.encode_field(:y, "y", type: :quantitative)
-  |> Vl.transform(groupby: ["color"], extent: [2500, 6500])
-  |> Vl.encode_field(:color, "type", title: "Factorial Growth", type: :nominal)
-  |> Kino.VegaLite.new()
-  |> Kino.render()
-
-init = 1
-max = 5
-
-factorial = for n <- init..max, do: %{x: n, y: Math.factorial(n), type: "n!"}
-
-Kino.VegaLite.push_many(widget, factorial)
+Utils.graph(:factorial_complexity)
 ```
 
 ```elixir
-# TODO - Hide
-
-Enum.map(1..10, fn each ->
-  equation =
-    Enum.map(each..1, fn
-      ^each -> "#{each}"
-      n -> " * #{n}"
-    end)
-    |> Enum.join()
-
-  %{"# of elements": each, result: each ** each, equation: equation}
-end)
-|> Kino.DataTable.new()
+Utils.table(:factorial_complexity)
 ```
 
 <!-- livebook:{"branch_parent_index":2} -->
