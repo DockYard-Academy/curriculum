@@ -28,6 +28,7 @@ defmodule Utils do
   iex> Utils.animate(:eager_evaluation)
   iex> Utils.animate(:lazy_evaluation)
   iex> Utils.animate(:remainder)
+  iex> Utils.animate(:road_light)
   """
   def animate(:eager_evaluation) do
     sequence = [
@@ -97,17 +98,32 @@ defmodule Utils do
     end)
   end
 
+  def animate(:road_light) do
+    Kino.animate(500, 0, fn i ->
+      md = Kino.Markdown.new("
+<div style=\"display: flex; justify-content: center; width: 100%;\">
+  <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 0 && "green") || "black"}; border-radius: 50%;\"></div>
+  <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 1 && "yellow") || "black"}; border-radius: 50%;\"></div>
+  <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 2 && "red") || "black"}; border-radius: 50%;\"></div>
+</div>
+  ")
+      {:cont, md, rem(i + 1, 3)}
+    end)
+  end
+
   @doc ~S"""
   iex> %Kino.JS{} = Utils.form(:comparison_operators)
   iex> %Kino.JS{} = Utils.form(:boolean_fill_in_the_blank)
   iex> %Kino.JS{} = Utils.form(:lists_vs_tuples)
   """
-
   def form(:comparison_operators) do
     ValidatedForm.new([
       %{label: "7 __ 8", answers: ["<"]},
       %{label: "8 __ 7", answers: [">"]},
-      %{label: "8 __ 8 and 9 __ 9 and not 10 __ 10.0", answers: ["==="]},
+      %{
+        label: "8 __ 8 and 9 __ 9 and <b>not</b> 10 __ 10.0",
+        answers: ["==="]
+      },
       %{label: "8 __ 8.0 and 0 __ 9.0", answers: ["=="]},
       %{label: "8 __ 7 and 7 __ 7", answers: [">="]},
       %{label: "7 __ 8 and 7 __ 7", answers: ["<="]}
@@ -802,6 +818,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> %Kino.JS.Live{} = Utils.table(:n2)
   iex> %Kino.JS.Live{} = Utils.table(:n3)
   iex> %Kino.JS.Live{} = Utils.table(:unicode)
+  iex> %Kino.JS.Live{} = Utils.table(:users_and_photos)
   """
 
   def table(:exponential_growth) do
@@ -897,6 +914,11 @@ Enum.reduce([], fn 4, 6 -> 10  end)
       %{character: char, code_point: code_point}
     end)
     |> Kino.DataTable.new()
+  end
+
+  def table(:users_and_photos) do
+    Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg"]], name: "Photos") |> Kino.render()
+    Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
   end
 
   @doc ~S"""
