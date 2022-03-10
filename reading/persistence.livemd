@@ -1,5 +1,24 @@
 # Persistence
 
+## Setup
+
+```elixir
+Mix.install([
+  {:utils, path: "utils"},
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"}
+])
+```
+
+## Overview
+
+This lessons serves as a brief primer on the many topics related to persistence. You will have the opportunity
+to practice these concepts throughout the course and flesh out a deeper knowledge.
+
 ## Persistance
 
 To persist means to continue to exist.
@@ -57,11 +76,9 @@ When talking about short term persistence, we generally think in terms of state.
 
 For example, take a road light.
 
-<!-- livebook:{"break_markdown":true} -->
-
-![Road Light Image]()
-
-<!-- livebook:{"break_markdown":true} -->
+```elixir
+Utils.animate(:road_light)
+```
 
 It cycles from <span style="color: green;">green</span> to <span style="color: yellow;">yellow</span> to <span style="color: red;">red</span>
 
@@ -71,8 +88,11 @@ they should be on or off.
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-  subgraph Light
+stateDiagram
+  [*] --> Green
+  Green --> Yellow
+  Yellow --> Red
+  Red --> Green
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -81,20 +101,39 @@ Now that we have persistent data, we're going to encounter issues with the **sta
 program. Let's say we're storing some state.
 
 ```mermaid
-flowchart
-    State --> 1[First State]
-    Read --> State --First State--> Read
+stateDiagram    
+    state "Initial State" as init
+    [*] --> init
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 Then some other operation changes the state. Now when we read the state again, we recieve a different value.
 
 ```mermaid
-flowchart
-    set[Set State]a --Second State --> State
-    Read --> State --Second State--> Read
+sequenceDiagram
+    participant R as Read
+    participant S as State
+    S->>S: Init State
+    R->>S: Get State
+    S->>R: Return State (Init State)
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 This introduces an entire class of bugs with state. What if we set the state at the wrong time? or read the state too fast or slow?
+
+```mermaid
+sequenceDiagram
+    participant R as Read
+    participant S as State
+    S->>S: Init State
+    S->>S: Second State
+    R->>S: Get State
+    S->>R: Return State (Second State)
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 For example, have you ever noticed that most issues with technology are fixed by turning them off and on again? That's because most
 bugs occur when the program gets into a bad state that it can't get out of. 
@@ -152,8 +191,11 @@ flowchart
     Program --> Database --> P[Persisted Data]
 ```
 
-There are several different types of databases, here's a great primer by Linux Academy if you would like
-an overview of databases in general [Database Primer](https://www.youtube.com/watch?v=Tk1t3WKK-ZY&ab_channel=LinuxAcademy).
+There are several different types of databases, here's a great primer by Linux Academy.
+
+```elixir
+Kino.YouTube.new("Tk1t3WKK-ZY")
+```
 
 This course will focus on **RDBMS** (Relational Database Management Systems). 
 We'll provide a brief primer highlighting the core concepts you'll need to learn to work with DataBases in Elixir.
@@ -163,6 +205,7 @@ Elixir applications generally default to using [PostgreSQL](https://www.postgres
 which is an open source relational database.
 
 ```mermaid
+flowchart
 Program --> PostgreSQL --> P[Persisted Data]
 ```
 
@@ -173,10 +216,11 @@ we might have a table of **users** and a table of **photos**. Each tables stores
 the user or photo.
 
 ```elixir
-# TODO USER PHOTO TABLES
+Utils.table(:users_and_photos)
 ```
 
 ```mermaid
+flowchart
 P[PostgreSQL]
 U[Users]
 PH[Photos]
@@ -184,13 +228,18 @@ P --> U
 P --> PH
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 There is a relationship between the data, because some photos may belong to a user.
-Typically, the photo will store a **foreign_key** which links to some user on the users table.
+Typically, the photo will store a **foreign key** which links to some user on the users table.
+
+The foreign key is typically the id of the entry on another table.
 
 ```mermaid
+flowchart
 P[PostgreSQL]
 U[Users]
-PH[Users]
+PH[Photos]
 PH1[Picture Of The Daily Bugle]
 U1[Peter Parker]
 
@@ -198,22 +247,42 @@ P --> U --> U1
 P --> PH --> PH1 --foreign_key--> U1
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
+You can imagine those tables being stored in the Database like so.
+
+```elixir
+Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg", user_id: 2]], name: "Photos")
+|> Kino.render()
+
+Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
+```
+
 ### SQL (Structured Query Language)
 
 We are then able to query the database for information using **SQL**. SQL
 is a **Structured Query Language** specifically for working with SQL based databases.
-We use **SQL** to communicate with **PostgreSQL**.
+We use SQL to communicate with PostgreSQL.
 
 ```mermaid
+flowchart
 E[Elixir Program] --> SQL --> PostgreSQL --> P[Persisted Data]
 ```
 
-For a primer on SQL, check out Danielle Thé's excellent video [What is SQL?](https://www.youtube.com/watch?v=27axs9dO7AE&ab_channel=DanielleTh%C3%A9)
+<!-- livebook:{"break_markdown":true} -->
 
 For example, with SQL we could write a query to retrieve all of our users.
 
 ```sql
 SELECT * from users
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+For a primer on SQL, check out Danielle Thé's excellent video.
+
+```elixir
+Kino.YouTube.new("27axs9dO7AE")
 ```
 
 ## Ecto
@@ -224,6 +293,7 @@ It comes with Phoenix, the framework for web development in Elixir.
 Rather than deal directly with SQL in Elixir we generally use **Ecto** to interact with SQL databases.
 
 ```mermaid
+flowchart
 E[Elixir Program] --> Ecto --> SQL --> PostgreSQL --> P[Persisted Data]
 ```
 
