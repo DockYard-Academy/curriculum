@@ -30,13 +30,13 @@ You'll notice that many `File` operations mimic terminal functionality and even 
 
 We can see the current directory and files using `File.ls/1`.
 
-By calling `File.ls/1` with `"."` we see the root directory of the project.
+By calling `File.ls/1` with `"."` we see the project's root directory.
 
 ```elixir
 File.ls(".")
 ```
 
-Actually `File.ls/1` has a default argument of `"."` so you can also omit it and get the same result.
+Actually, `File.ls/1` has a default argument of `"."`, so you can also omit it and get the same result.
 
 ```elixir
 File.ls()
@@ -51,7 +51,7 @@ In the Elixir cell below, try listing the parent directory of this livebook file
 File.ls("../")
 ```
 
-In the Elixir cell below, try listing all of the material in the `reading` folder. Use `"reading"` as
+In the Elixir cell below, try listing all the material in the `reading` folder. Use `"reading"` as
 the argument to `File.ls/1`
 
 ```elixir
@@ -60,13 +60,13 @@ File.ls("reading")
 
 ## File.read/1
 
-You can read the contents of a file with `File.read/1` with the name of the file including it's
+You can read the contents of a file with `File.read/1` with the name of the file, including it's
 path.
 
 ### Your Turn
 
-In your code editor, find the `example_file` file under the `data` folder.
-Notice that if you change its contents from your editor the return value below changes.
+Find the `example_file` file under the `data` folder in your code editor.
+Notice that if you change its contents from your editor, the return value below changes.
 
 We now have persistence!
 
@@ -74,14 +74,13 @@ We now have persistence!
 File.read("data/example_file")
 ```
 
-If you try to read a non-existing file you'll retrieve an error `{:error, :enoent}`.  `:enoent` is short for **Error No Entry**.
+If you try to read a non-existing file, you'll retrieve an error `{:error, :enoent}`.  `:enoent` is short for **Error No Entry**.
 
 ```elixir
 File.read("data/non_existing_file")
 ```
 
-You can also read a file using `File.read!/1`. The bang `!` convention means that instead of returning an error tuple,
-the function will crash. You'll often use this when you anticipate that the file should always exist, and want to stop
+You can also read a file using `File.read!/1`. The bang `!` convention means that the function will crash instead of returning an error tuple. You'll often use this when you anticipate the file always existing and want to stop
 execution if it doesn't.
 
 ```elixir
@@ -90,8 +89,8 @@ File.read!("data/non_existing_file")
 
 ### Your Turn
 
-In your code editor, go to the `reading` folder and create a new `name` where `name` can be anything you choose. Enter
-some text in the file, then in the Elixir cell below, use `File.read/1` to read the contents of the file.
+Go to the `reading` folder in your code editor and create a new `name` where `name` can be anything you choose. Enter
+some text in the file, then in the Elixir cell below, use `File.read/1` to read the file's contents.
 
 ```elixir
 
@@ -100,7 +99,7 @@ some text in the file, then in the Elixir cell below, use `File.read/1` to read 
 ## File.mkdir/1
 
 `mkdir` is short for **make directory**. This allows you to create a new folder. It accepts
-the path to the folder including the name of the new folder as an argument.
+the path to the folder, including the name of the new folder as an argument.
 
 In the Elixir cell below, try entering your `name` in the empty string below, and uncomment 
 `File.mkdir("#{name}_made_this")`
@@ -110,13 +109,13 @@ name = ""
 # File.mkdir("data/#{name}_made_this")
 ```
 
-`mkdir/1` can only create a folder in the current directory, it cannot create nested folders.
+`mkdir/1` can only create a folder in the current directory. It cannot create nested folders.
 
 ```elixir
 File.mkdir("data/non_existing_parent_folder/child_folder")
 ```
 
-To create nested folders you can use `mkdir_p/1` instead.
+To create nested folders, you can use `mkdir_p/1` instead.
 
 ```elixir
 File.mkdir_p("data/parent_folder/sub_folder")
@@ -177,14 +176,14 @@ File.rm!("data/non_existing_file")
 ### Your Turn
 
 If this were a woodshop class, this would be the point that we all need to put goggles on.
-You have direct access to your file system, so you could delete important things with the
+You have direct access to your file system, so you can accidentally delete important things with the
 wrong path!
 
 You can always use **git** to recover committed project files, but the same isn't true for files
 outside of this project. Proceed with caution!
 
 In the Elixir cell below, delete the written file `"data/delete_me"` using
-`File.rm/2`. Check the `data` folder to make sure it has been deleted.
+`File.rm/2`. Check the `data` folder to make sure.
 
 ```elixir
 File.write("data/delete_me", "")
@@ -198,7 +197,7 @@ File.write("data/delete_me", "")
 File.write("data/erlang_term", %{1 => 2})
 ```
 
-Some data types like `lists` will work, but are read as a special binary, and are difficult to work with.
+Some data types like `lists` will work but are read as a special binary and are difficult to work with.
 
 ```elixir
 File.write("data/erlang_term", [1, 2])
@@ -240,7 +239,7 @@ binary = File.read!("data/erlang_term") |> IO.inspect(label: "binary")
 
 ### Your Turn
 
-In the Elixir cell below, write the `grocery_list` variable to the `data/grocery_list` file.
+Write the `grocery_list` variable to the `data/grocery_list` file in the Elixir cell below.
 Then retrieve it's contents with `File.read/1`.
 
 Use `:erlang.binary_to_term/1` and `:erlang.term_to_binary/1` to ensure you save the list as
@@ -260,7 +259,7 @@ To work with larger files, you can instead use `File.open/3` to open the
 file and work with it line by line.
 
 `File.open/3` accepts the name of a file, then we specify some [modes](https://hexdocs.pm/elixir/1.13/File.html#open/2) which
-for now we will leave an empty list `[]`.
+for now, we will leave an empty list `[]`.
 
 ```elixir
 File.open("data/open_example", [], fn _file ->
@@ -268,7 +267,7 @@ File.open("data/open_example", [], fn _file ->
 end)
 ```
 
-We set the `:read` mode to allow us to read the contents of a file.
+We set the `:read` mode to enable permissions to read the contents of a file.
 
 We can use the [IO](https://hexdocs.pm/elixir/1.13/IO.html) module to read and write to the file. We can
 use `IO.read/2` to read from a file. We can specify if we would like to read a line or a number
@@ -358,7 +357,7 @@ end)
 File.read("data/open_write_example")
 ```
 
-And now when we repeatedly write to the file it's more performant.
+And now, when we repeatedly write to the file, it's more performant.
 
 ```elixir
 File.write("data/open_write_example", "")
@@ -412,8 +411,7 @@ content
 <!-- livebook:{"break_markdown":true} -->
 
 We can read files as a [Stream](streams.livemd). It's a [File Stream](https://hexdocs.pm/elixir/1.13/File.Stream.html)
-but we can work with it the same way we would work with a normal stream. This is best used when you want
-to read an entire very large file.
+but use it the same as a stream. File Streams are often useful when the file is very large.
 
 We'll use a small file for the same example.
 
@@ -423,7 +421,7 @@ File.write("data/stream_example", "line 1\nline 2\nline 3\n")
 File.stream!("data/large_data")
 ```
 
-Each element in the stream will be a line of the file by default.
+Each element in the stream will be a file line by default.
 
 The `stream_data` file should look like this:
 
@@ -457,10 +455,10 @@ File.stream!("data/stream_example")
 ## Challenge
 
 We have the core tools to create file-based persistence. You now know how to read and write files, create folders, and handle very
-large files. Whenever you need a tool related to file-based persistence you should start with the [File Documentation](https://hexdocs.pm/elixir/File.html#content)
-Or if you're working with a file as a Stream you may find the [Stream Documentation](https://hexdocs.pm/elixir/Stream.html) useful.
+large files. When you need a tool related to file-based persistence, you should start with the [File Documentation](https://hexdocs.pm/elixir/File.html#content)
+Or, if you're working with a file as a Stream, you may find the [Stream Documentation](https://hexdocs.pm/elixir/Stream.html) useful.
 
-For example, we haven't taught you how to copy files yet. Programmers must be able to read documentation
+For example, we haven't taught you how to copy files yet. Programmers must be able to read the documentation
 and discover information when they need it.
 
 In the Elixir cell below, take the written file "data/copy_example" and copy the information it contains into a new

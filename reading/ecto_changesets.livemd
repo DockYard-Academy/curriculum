@@ -20,12 +20,12 @@ Mix.install([
 ## Ecto
 
 Ecto is a library we typically use to communicate with a database. We'll learn more about databases in future lessons,
-but for now we're going to see how Ecto helps use interact with data.
+but for now, we'll see how Ecto helps interact with data.
 
 In addition to being the layer that we use to communicate with the database, 
-Ecto is powerful for validating data. So far you've created structs with their own (limited) data validation.
+Ecto is powerful for validating data. So far, you've created structs with their own (limited) data validation.
 
-Structs allow you to enforce keys, and write your own validation functions or guards.
+Structs allow you to enforce keys and write validation functions or guards.
 
 ```elixir
 defmodule Person do
@@ -44,7 +44,7 @@ defmodule Person do
 end
 ```
 
-Then the struct will typically either return an `{ok, struct}` tuple or an `{:error, message}` tuple.
+Then the struct typically returns an `{ok, struct}` tuple or an `{:error, message}` tuple.
 
 ```elixir
 # Valid params
@@ -54,17 +54,17 @@ Then the struct will typically either return an `{ok, struct}` tuple or an `{:er
 {:error, :invalid_params} = Person.new(%{name: ["invalid name"], age: 20})
 ```
 
-However this is pretty clunky, especially as the struct gets larger and validations
+However, this is pretty clunky, especially as the struct gets larger and validations
 grow in complexity.
 
-Structs don't come with any of their own built-in data validation other than enforcing keys.
-Ecto helps use validate data by providing a special type of struct called a **changeset**.
+Structs don't have any built-in data validation other than enforcing keys.
+Ecto helps us validate data with **changeset** structs.
 
 ## Changesets
 
-An `Ecto.Changeset` is a special type of struct that allows us to validate data and return helpful error messages when something is invalid.
+An `Ecto.Changeset` struct allows us to validate data and return helpful error messages when something is invalid.
 
-A changeset describes the expected shape of your data.
+A changeset describes the expected shape of your data and ensures that data conforms to the desired shape.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -81,7 +81,7 @@ User --> a[accepted terms of service] --> true
 
 <!-- livebook:{"break_markdown":true} -->
 
-In order to create a changeset, we need to know
+To create a changeset, we need to know.
 
 * the `initial_data`.
 * the expected data validation as `types`.
@@ -107,11 +107,10 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-Changesets are used both to validate new data, and to validate a change to some already validated
-data.
+We use changesets to validate new data or validate a change to some already validated data.
 
 Here we use the primitive types `:string` and `:integer`. For a full list of
-the allowable types see the [Primitive Types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) table.
+the allowable types, see the [Primitive Types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) table.
 
 ```elixir
 initial_data = %{}
@@ -126,7 +125,7 @@ We've now bound the `changeset` variable to an `Ecto.Changeset` struct.
 
 The changeset contains:
 
-* **changes**: the `params` we want to update the source data with, and whether or not we expect they are valid.
+* **changes**: the `params` we want to update the source data.
 * **data**: the source data for the changeset.
 * **valid?**: whether or not the desired change breaks any validation.
 * **errors**: a keyword list of errors for any changes.
@@ -151,7 +150,7 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-The changeset will store the errors as a keyword list and `valid?` will be false when the parameters
+The changeset will store the errors as a keyword list, and `valid?` will be false when the parameters
 are invalid.
 
 ```elixir
@@ -200,7 +199,7 @@ invalid_changeset =
   |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
 ```
 
-Now when the user enters the correct `params`, the changeset will be valid.
+When the user enters the correct `params`, the changeset will be valid.
 
 ```elixir
 initial_data = %{}
@@ -217,20 +216,19 @@ valid_changeset =
   |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
 ```
 
-To apply changes we can use `Ecto.Changeset.apply_changes/1` which will only apply the changes
-and create a new map if the changes are valid.
+To apply changes, we can use `Ecto.Changeset.apply_changes/1`, which will only apply the changes if the changes are valid.
 
 ```elixir
 Ecto.Changeset.apply_action(valid_changeset, :update)
 ```
 
-If the changes are not valid, we will recieve an error.
+If the changes are not valid, we will receive an error.
 
 ```elixir
 Ecto.Changeset.apply_action(invalid_changeset, :update)
 ```
 
-It's common to use this pattern to attempt to create some validated data, or handle the error.
+It's common to use this pattern to create validated data or handle the error.
 
 ```elixir
 case Ecto.Changeset.apply_action(valid_changeset, :update) do
@@ -241,17 +239,24 @@ end
 
 ### Your Turn
 
-In the Elixir cell below, use changesets to create a
+<!-- livebook:{"break_markdown":true} -->
+
+Use `Ecto.Changeset` to validate some parameters to create a blog.
+
+A blog should have:
+
+* A required `:title` string field.
+* A required `:body` string field.
+* A list of tags no larger than 5.
 
 ## Schemaless Changesets
 
-We often store changeset and validations inside of a struct. The struct typically has a `changeset/2` function
-to create the changeset, and a function `new/1` that creates a struct. This allows use to use a changeset to validate
+We often store the associated changeset and validations inside of a struct. The struct typically has a `changeset/2` function
+to create the changeset and a function `new/1` that creates a struct. This allows us to use a changeset to validate
 the creation of a struct.
 
-We've put `types` into an `@types` module attribute, and used `Map.keys(@types)` to
-get the list of keys. Otherwise this is essentially the same code as above but
-organized and associated with a `User` struct rather than a generic map.
+We've reorganized the same code as above into a `User` struct rather than a generic map. Everything mostly remains unchanged other than putting `types` into an `@types` module attribute and using `Map.keys(@types)` to
+get the list of keys.
 
 ```elixir
 defmodule User do
@@ -276,4 +281,47 @@ defmodule User do
 end
 
 User.new(%{username: "Peter Parker", password: "secret_spider", terms_and_conditions: true})
+```
+
+We're reusing `Ecto.Changeset` a lot, so it may be worth importing it.
+
+```elixir
+defmodule User do
+  import Ecto.Changeset
+  defstruct [:username, :password, :terms_and_conditions]
+
+  @types %{username: :string, password: :string, terms_and_conditions: :boolean}
+
+  def changeset(%User{} = user, params) do
+    {user, @types}
+    |> cast(params, Map.keys(@types))
+    |> validate_required([:username, :password])
+    |> validate_length(:password, min: 10)
+    |> validate_length(:username, min: 3, max: 40)
+    |> validate_acceptance(:terms_and_conditions)
+  end
+
+  def new(params) do
+    %User{}
+    |> changeset(params)
+    |> apply_action(:update)
+  end
+end
+```
+
+### Your Turn
+
+In the Elixir cell below, create a `Book` schemaless changeset struct.
+A blog should have:
+
+* A required `:title` field with a minimum of 3 characters and a maximum of 100 characters.
+* A required `:published_status` field that is either `true` or `false`
+* A `:body` string field.
+* A `published_on` date field.
+* An `:author` string field.
+* An `:is_licenced` field which must always be true.
+
+```elixir
+defmodule Blog do
+end
 ```

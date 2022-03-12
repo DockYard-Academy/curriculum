@@ -20,7 +20,7 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-Processes are isolated from eachother, and communicate via message passing.
+Processes are isolated from each other and communicate via message passing.
 
 ```mermaid
 sequenceDiagram
@@ -29,7 +29,7 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-Processes can store their own state, and allow us to have in-memory persistance.
+Processes can store state and allow us to have in-memory persistence.
 
 ```mermaid
 flowchart
@@ -38,14 +38,14 @@ flowchart
   end
 ```
 
-You've been using processes for some time now. Each Elixir cell in livebook is actually it's own process.
-It even has a **pid** (personal identifier).
+You've been using processes for some time now. Each Elixir cell in livebook is a process.
+It even has a **pid** (personal identifier) that we can see with `self()`.
 
 ```elixir
 self()
 ```
 
-We can `send/2` and `recieve/1` messages between processes by using their **pid**. A process can send its `self()` a message.
+We can `send/2` and `recieve/1` messages between processes by using their **pid**. Likewise, a process can send its `self()` a message.
 
 ```elixir
 send(self(), "message")
@@ -55,7 +55,7 @@ receive do
 end
 ```
 
-The left-hand side of the recieve expression can pattern match on any value. 
+The left-hand side of the receive expression can pattern match on any value. 
 It's much like a `case` statement.
 
 ```elixir
@@ -66,7 +66,7 @@ receive do
 end
 ```
 
-We can `spawn/1` a new process and get it's pid.
+We can `spawn/1` a new process and get its pid.
 
 ```mermaid
 sequenceDiagram
@@ -80,7 +80,7 @@ sequenceDiagram
 spawn(fn -> nil end)
 ```
 
-A process accepts a callback function, and ends when that callback function completes.
+A process accepts a callback function and ends when that callback function completes.
 A process is **alive** and then it **dies**
 
 ```mermaid
@@ -89,7 +89,7 @@ spawn --> Process --> Alive --> cn[Callback Function] --> Dead
 ```
 
 We can use the [Process](https://hexdocs.pm/elixir/1.12/Process.html) module for functionality
-related to processes. We'll use the `alive?1` function to show that the process is alive before it's callback Function called.
+related to processes. We'll use the `alive?/1` function to show that the process is alive before executing its callback function.
 
 ```elixir
 pid = spawn(fn -> IO.puts("I was called") end)
@@ -108,8 +108,7 @@ Process.sleep(1000)
 Process.alive?(pid) || IO.puts("I am dead :(")
 ```
 
-Processes are isolated from eachother. That means that when we spawn a process, if it dies or raises
-an error, that error will not crash the parent process. Instead it will only log an error.
+Processes are isolated from each other. That means that when a child process raises an error, it will not crash the parent process. Instead, it will only log an error.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -128,7 +127,7 @@ sequenceDiagram
 
 ```elixir
 spawn(fn -> raise "oops" end)
-"the above crashes, but I will keep running"
+"the above crashes, but I will keep running."
 ```
 
 If this is not desirable behavior, we can link processes together so that if one dies, the other will
@@ -168,7 +167,7 @@ Process.link(pid)
 ### Your Turn
 
 Spawn a linked process and crash this Elixir cell below.
-Comment out your solution when you are done to avoid continuously crashing the livebook!
+Comment out your solution when complete to avoid continuously crashing the livebook!
 
 ```elixir
 
@@ -177,7 +176,7 @@ Comment out your solution when you are done to avoid continuously crashing the l
 ## Message Passing
 
 By spawning two processes, they can communicate back and forth with `send/2` and `recieve/1`.
-Let's spawn a process in one cell, and send a message in another.
+Let's spawn a process in one cell and send a message in another.
 
 ```mermaid
 flowchart LR
@@ -200,11 +199,11 @@ pid1 =
   end)
 ```
 
-Evaluate the cell above to create a process waiting to recieve a message, then evaluate
-the cell below to send that message a process. You'll notice the `IO.puts/1` is logged in the cell below.
+Evaluate the cell above to create a process waiting to receive a message, then evaluate
+the cell below to send that message a process. You'll notice the `IO.puts/1` logs in the cell below.
 
-As soon as the spawned process recieves a message, it dies. You'll notice you can only send
-and recieve a single message. You can re-evaluate the cell above, and then the cell below to
+As soon as the spawned process receives a message, it dies. You'll notice you can only send
+and receive a single message. You can re-evaluate the cell above and the cell below to
 repeat the example.
 
 ```elixir
@@ -214,7 +213,7 @@ send(pid1, "message")
 ### Your Turn
 
 In the Elixir cell below, spawn a new process and send it a message `{:hello, "world"}`. 
-`IO.puts` the payload of the message where `"world"` is the payload.
+`IO.puts` the message's payload where `"world"` is the payload.
 
 ```elixir
 
@@ -222,7 +221,7 @@ In the Elixir cell below, spawn a new process and send it a message `{:hello, "w
 
 ## State
 
-So far, we spawn a process that recieves a single message, and then dies.
+So far, we spawn a process that receives a single message and then dies.
 
 ```mermaid
 flowchart LR
@@ -232,11 +231,11 @@ flowchart LR
 
 <!-- livebook:{"break_markdown":true} -->
 
-We can also create a process that can recieve many messages by leveraging a recursive
+We can also create a process that can receive many messages by leveraging a recursive
 function.
 
-This recursive function will continue to call recieve indefinitely, so the process should
-keep recieving messages and stay alive.
+This recursive function will continue to call receive indefinitely, so the process should
+keep receiving messages and stay alive.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -259,13 +258,13 @@ end
 server_process = spawn(fn -> ServerProcess.loop() end)
 ```
 
-We've used `Enum.random/1` to show that the process continues to loop and recieve messages.
+We've used `Enum.random/1` to show that the process continues to loop and receive messages.
 
 ```elixir
 send(server_process, "message")
 ```
 
-With a slight modification of the `ServerProcess` we can store state!
+With a slight modification of the `ServerProcess`, we can store state!
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -276,7 +275,7 @@ ServerProcess --initial state--> loop --state--> recieve --new state--> loop
 
 <!-- livebook:{"break_markdown":true} -->
 
-We'll store state as an integer to create a counter.
+We'll store the state as an integer to create a counter.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -306,14 +305,14 @@ We now have stateful processes!
 send(counter_process, "increment")
 ```
 
-Stateful processes are a short-term in-memory persistance. We can create a stateful process
-in order to store some value for the duration of the program.
+Stateful processes are short-term in-memory persistence. We can create a stateful process
+to store some value for the duration of the program.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-Create a `TodoListProcess` which can recieve messages in a loop.
+Create a `TodoListProcess` which can receive messages in a loop.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -321,8 +320,8 @@ Create a `TodoListProcess` which can recieve messages in a loop.
 todo_list_process = spawn(fn -> TodoListProcess.loop() end)
 ```
 
-It should store a `list` of strings in state. You should be able to send messages to the `TodoListProcess` to
-`add` and `remove` items from the list in state.
+It should store a `list` of strings in the state. You should be able to send messages to the `TodoListProcess` to
+`add` and `remove` items from the list in the state.
 
 <!-- livebook:{"force_markdown":true} -->
 

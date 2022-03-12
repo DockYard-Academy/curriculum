@@ -19,9 +19,9 @@ Mix.install([
 
 ## Cache
 
-A cache allows use to store data for the sake of making it quicker to access.
+A cache allows stores data to avoid computing values.
 
-You can imagine you have some performance demanding function or call to retrieve external resources.
+You can imagine some performance-demanding function or call to retrieve external resources.
 
 ```mermaid
 flowchart LR
@@ -30,7 +30,7 @@ input --> e[expensive computation] --> output
 
 <!-- livebook:{"break_markdown":true} -->
 
-A cache stores data in memory so that it's quicker to access.
+A cache stores the input and the expected output in memory for quicker access.
 
 ```mermaid
 flowchart
@@ -38,8 +38,7 @@ input --> cache --cached value--> output
 cache --no cached value --> e[expensive computation] --> output
 ```
 
-Some caches are smart, and save newly computed values in the cache to avoid repeating the 
-same computation again.
+Some caches are smart and save newly computed values in the cache to avoid recomputing the same value.
 
 Other caches can be a static chunk of data.
 
@@ -84,40 +83,41 @@ cache = %{
 
 <!-- livebook:{"break_markdown":true} -->
 
-That cache would allow us to quickly access inputs up to `150` for fib. This speeds things up a lot!
-You can think of this cache as a table of inputs and outputs that we refer to.
+That cache retrieves inputs up to `150` for fib and speeds things up a lot!
+You can think of this cache as a table of inputs and outputs.
 
 ```elixir
 Utils.table(:fib_cache)
 ```
 
-However be aware that caching should be well considered. The cache permanently takes up memory in
-your program, so there's a considerable cost. Often it's best to consider how you can improve the performance of
+However, be aware that caching should be well considered. The cache permanently takes up memory in
+your program, so there's a considerable memory cost. Often it's best to consider how you can improve the performance of
 your application rather than immediately reaching for a cache.
 
-For example, a slow fibonacci function with a cache is no replacement for a fast fibonacci function!
+For example, a slow Fibonacci function with a cache is no replacement for a fast Fibonacci function!
 
-There are many ways to implement a cache, for example you could
-use a `GenServer` with changing state.
+There are many ways to implement a cache. You could use a simple map with keys for the input and values for the output. Or you could
+use a `GenServer` with changing state. 
 
 ### Your Turn
 
-In the Elixir cell below, create a `Cache` `GenServer` that
-can hold some cached state. We should be able to set a value,
-and retrieve a value.
+The Elixir cell below create a `Cache` `GenServer` that
+can hold some cached state. We should be able to set a value
+and retrieve a value like so.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 cache = GenServer.start_link(Cache, %{})
-Genserver.call(cache, {:set, {:key1, "value"}})
+GenServer.call(cache, {:set, {:key1, "value"}})
 
-Genserver.call(cache, {:get, :key1})
+GenServer.call(cache, {:get, :key1})
 {:ok, "value"}
 ```
 
 ```elixir
 defmodule Cache do
+	use GenServer
 end
 ```
 
@@ -127,8 +127,7 @@ We can use [ETS](https://elixir-lang.org/getting-started/mix-otp/ets.html)
 tables for a convenient in-memory cache. `:ets` is a library provided by Erlang
 through the `:ets` module.
 
-`:ets` tables are their own process with state. They are like a `GenServer` that has been specifically designed
-as an in-memory key-value storage.
+`:ets` tables are much like a `GenServer` except designed explicitly for in-memory key-value storage.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -149,9 +148,10 @@ Livebook let's use view the `:ets` process as a table. So let's start a new `:et
 table = :ets.new(:example_table, [])
 ```
 
-We can then insert values into the table with `:ets.insert/2`. Values should be inserted as
-{key, value} tuples. The key and the value can be nearly any value, but most often you'll use
-and atom for the key.
+We can then insert values into the table with `:ets.insert/2`. We insert
+values as `{key, value}` tuples.
+
+The key and the value can be nearly any value, but we'll often use an atom for the key.
 
 Click the refresh <i class="ri-refresh-line"></i> button for the `ETS :example_table` above
 to see how the key and value are added.
@@ -171,15 +171,15 @@ the table changes above.
 
 ### Named Tables
 
-`:ets` tables can be created with a `:named_table` option. This allows you to create 
+`:ets` tables can be created with a `:named_table` option. This allows us to create 
 the table and refer to them without the variable bound to their pid.
 
 ```elixir
 :ets.new(:my_table, [:named_table])
 ```
 
-Now you can insert values to the table using the atom name 
-`:my_table` instead of the pid.
+Now we can insert values to the table using the atom name 
+`:my_table` instead of the PID.
 
 ```elixir
 :ets.insert(:my_table, {:key, "value"})
