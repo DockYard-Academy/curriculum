@@ -3,9 +3,9 @@
 ## Generic Server
 
 It's a common pattern to implement a `GenericServer` process which can
-recieve messages, delegate to some module, then send a message back to the caller.
+receive messages, delegate to some module, then send a message back to the caller.
 
-A generic server stores short-term in-memory state. The state can only be updated by other
+A generic server stores a short-term in-memory state. The state can only be updated by other
 processes sending messages to the generic server.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -55,7 +55,7 @@ GenericServer.start(CallbackModule)
 
 <!-- livebook:{"break_markdown":true} -->
 
-The `GenericServer` should be able to send a message and recieve a response.
+The `GenericServer` should be able to send a message and receive a response.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -90,7 +90,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-The callback module will also define event handlers for when the `GenericServer` recieves
+The callback module will also define event handlers for when the `GenericServer` receives
 a message.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -114,7 +114,7 @@ defmodule CallbackModule do
 end
 ```
 
-The `GenericServer` then loops and recieves messages while delegating to the `CallbackModule`
+The `GenericServer` then loops and receives messages while delegating to the `CallbackModule`
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -166,7 +166,7 @@ flowchart
   style Caller fill:yellow,stroke:#333,stroke-width:2px
   style CallbackModule fill:#f9f,stroke:#333,stroke-width:2px
 
-  style recieve fill:orange
+  style receive fill:orange
   style loop fill:orange
 
   style c fill:yellow
@@ -178,7 +178,7 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-Now we have a full `GenericServer` module that can be used with some `CallbackModule`.
+We have a full `GenericServer` module.
 
 ```elixir
 defmodule GenericServer do
@@ -215,13 +215,13 @@ defmodule GenericServer do
 end
 ```
 
-`GenericServer` is incredibly powerful, because it lets us reuse generic state and message
+`GenericServer` is incredibly powerful because it lets us reuse generic state and message
 passing functionality with more domain-specific callback modules.
 
-Let's re-implement the counter with some extra
+Let's re-implement the `Counter` with some extra
 functionality to use with the `GenericServer`.
 
-The `Counter` module is now a domain specific `CallbackModule`.
+The `Counter` module is now a domain-specific `CallbackModule`.
 
 ```elixir
 defmodule Counter do
@@ -239,14 +239,14 @@ end
 counter_process = GenericServer.start(Counter)
 ```
 
-Now we can call the counter process to update it's internal state.
+Now we can call the counter process to update its internal state.
 
 ```elixir
 GenericServer.call(counter_process, :increment)
 ```
 
-`handle_call/2` let's us define generic messages that we can send to the Counter process.
-For example, we could `:add` an integer as a payload in the message.
+`handle_call/2` lets us define generic messages we can send to the Counter process.
+For example, in the message, we could `:add` an integer as a payload.
 
 ```elixir
 defmodule AddableCounter do
@@ -295,14 +295,14 @@ end
 ## GenServer
 
 It's useful to build your own generic server for the purpose of understanding how they work.
-However, we can and should rely on the built in [GenServer](https://hexdocs.pm/elixir/1.13.3/GenServer.html)
+However, we can and should rely on the built-in [GenServer](https://hexdocs.pm/elixir/1.13.3/GenServer.html)
 provided by Elixir.
 
 We `use` the `GenServer` provided by Elixir. Under the hood, this defines the generic server functionality
 for the module.
 
 Then much like our `GenericServer` we can define an `init` function. The init function
-now accepts options, which could be used to define the initial state. We'll ignore `_opts` for now.
+now accepts options, which we could use to set the initial state. We'll ignore `_opts` for now.
 
 We use `@impl` to specify that `init` is a callback function for the `GenServer`. You can
 see the [@impl documentation](https://hexdocs.pm/elixir/main/Module.html#module-impl) for
@@ -359,7 +359,7 @@ GenServer.call(pid, :increment)
 ```
 
 `call` executes the `handle_call/3` function in the internal code of `GenServer`, just like our 
-`GenericServer`. The parent process then recieves a response.
+`GenericServer`. The parent process then receives a response.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -371,18 +371,17 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-This is the heart of generic servers. We can create an in-memory process, have it store some state,
-and delegate to it to perform work and return a response. This is often the go-to tool for short-term in-memory persistence.
+This is the heart of generic servers. We can create an in-memory process have it store some state. Then, we send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
 
 The built-in `GenServer` also has some additional functionality, which will become more important
-as you work with concurrency. For now, we're going to focus on using it as a tool for persistence, so
+as you work with concurrency. But, for now, we're going to focus on using it as a tool for persistence, so
 you have everything you currently need.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-In the Elixir cell below, use the built in `GenServer` module to create a `Journal` module where you can `:add_entry`.
+In the Elixir cell below, use the built-in `GenServer` module to create a `Journal` module where you can `:add_entry`.
 All journal entries should be stored in state and returned as a `list` for the response.
 
 <!-- livebook:{"force_markdown":true} -->

@@ -282,6 +282,7 @@ The course is broken into 5 major sections:
   - Reading Errors
   - IEx.pry
   - :debugger and :int https://elixir-lang.org/getting-started/debugging.html#iexpry0-and-iexbreak2
+  - :observer
   - How to Debug Crashes
   - Compile Time vs Runtime bugs
   - Common Causes of Bugs

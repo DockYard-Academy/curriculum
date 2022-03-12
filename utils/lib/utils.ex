@@ -819,6 +819,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> %Kino.JS.Live{} = Utils.table(:n3)
   iex> %Kino.JS.Live{} = Utils.table(:unicode)
   iex> %Kino.JS.Live{} = Utils.table(:users_and_photos)
+  iex> %Kino.JS.Live{} = Utils.table(:user_photo_foreign_key)
   """
 
   def table(:exponential_growth) do
@@ -918,6 +919,13 @@ Enum.reduce([], fn 4, 6 -> 10  end)
 
   def table(:users_and_photos) do
     Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg"]], name: "Photos") |> Kino.render()
+    Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
+  end
+
+  def table(:user_photo_foreign_key) do
+    Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg", user_id: 2]], name: "Photos")
+    |> Kino.render()
+
     Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
   end
 
