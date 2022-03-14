@@ -11,8 +11,9 @@ Click on the `instructions.livemd` file while running livebook. Then click the "
 From here, you'll be able to follow the links to access each lesson and exercise.
 
 ## Getting Started
-- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed or a compatable local Elixir version as found in `.tool-versions`.
+- Ensure you have [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) installed or a compatable Elixir and Erlang versions as found in `.tool-versions`.
 - Ensure you have the latest [livebook](https://github.com/livebook-dev/livebook) installed.
+- Ensure you have loaded the `.env` file into your environment with `source .env` from the `beta_curriculum` folder.
 - Run the project with `livebook server`.
 - Go to the `instructions.livemd` to see the course content.
 
