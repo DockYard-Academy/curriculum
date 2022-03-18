@@ -1913,3 +1913,9 @@ defmodule Kino.BoxAnimation do
   end
 end
 ```
+
+(Supervise workers that harvest resources on an interval, Task Supervise special workers)
+(Reset Bomb Timer By Killing Process)
+(Randomly Generate Simple Math Questions, restart timer upon correct answer)
+   * Override Macros to allow using + with lists and other data types. `use` the module to inject `FlexibleMath`.
+   Code Clarity, Mix Testing Tools (--slowest, --stale, tags, Elixir Test extension)
