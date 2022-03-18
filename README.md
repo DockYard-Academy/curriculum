@@ -15,22 +15,15 @@ Class time will be broken into
 3. **Exercises**
 4. **Reading & Support**
 
-### Assessment & Review
-Assessment will provide the teacher an understanding of how students incorporated the learning from the
-previous interactive instruction, and will provide reactive lectures based on what students require more
-instruction in. Review will provide the students an opportunity to recall prior information and review
-any topics that require it.
-
 ### Grading
 Students will not receive a number or letter grade for this course. Due to the nature of the assignments,
-this course will be completion-based and rely on the intrinsic motivation of learning and self-improvement rather than
-carrot and stick motivation.
+this course will be completion-based and rely on the intrinsic motivation of learning and self-improvement rather than carrot and stick motivation.
 
 For more on this see [Mark Rober's Talk](https://www.youtube.com/watch?v=9vJRopau0g0&ab_channel=TEDxTalks).
 
 ## Student Goals
 Students will be competent developers prepared to excel in the Elixir industry. They will have
-a solid grasp of Elixir fundamentals, Elixir project development, Phoenix project development, and OTP.
+a solid grasp of Elixir fundamentals, Elixir project development, Phoenix project development, LiveView, and OTP.
 They will also have the researching and problem-solving skills necessary to expand their skill set and thrive
 throughout their career. Students will be capable of delivering high-quality, well-tested features to a production complexity codebase.
 
