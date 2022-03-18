@@ -1919,3 +1919,15 @@ end
 (Randomly Generate Simple Math Questions, restart timer upon correct answer)
    * Override Macros to allow using + with lists and other data types. `use` the module to inject `FlexibleMath`.
    Code Clarity, Mix Testing Tools (--slowest, --stale, tags, Elixir Test extension)
+
+### Assessment & Review
+Assessment will provide the teacher an understanding of how students incorporated the learning from the
+previous interactive instruction, and will provide reactive lectures based on what students require more
+instruction in. Review will provide the students an opportunity to recall prior information and review
+any topics that require it.
+
+### Introductory Lecture
+In general the academy follows a flipped-classroom format where students will be given interactive livebook material to study during the **Reading & Support** time. However, an introductory lecture will be given to provide an overview of the day's goals and tie larger picture concepts together.
+
+### Exercises
+Students will perform Exercises which generally build in complexity and incorporate more advanced application of previously studied topics. Some exercises will be a guided follow along, some will 
