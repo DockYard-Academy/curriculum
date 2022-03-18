@@ -481,7 +481,7 @@ end
 ```
   ",
       "
-It's false, so check if snowy equals cold.```elixir
+It's false, so check if snowy equals cold.
 ```elixir
 case \"snowy\" do
   false -> \"wear a t-shirt\"
@@ -492,7 +492,7 @@ end
 ```
   ",
       "
-It's false, so check if snowy equals snowy.```elixir
+It's false, so check if snowy equals snowy.
 ```elixir
 case \"snowy\" do
   false -> \"wear a t-shirt\"

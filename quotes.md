@@ -12,3 +12,4 @@ Great quotes - you never know when it will suite a lesson.
 "It is far, far easier to make a correct program fast, than it is to make a fast program correct."
  ~Herb Sutter and Andrei Alexandrescu
  "60% of the time it works every time"
+- By failing to prepare you are preparing to fail - Benjamin Franklin
