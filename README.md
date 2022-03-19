@@ -1,6 +1,6 @@
 # Beta Academy Curriculum
 ## QuickStart
-1. install [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) or a compatable Elixir and Erlang version.
+1. install [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) or a compatible Elixir and Erlang version.
 2. Install livebook main `mix escript.install github livebook-dev/livebook`.
 3. Ensure the `.env` file is loaded in your environment with `source .env` from the `beta_curriculum` folder.
 4. Run the project with `livebook server start.livemd`.

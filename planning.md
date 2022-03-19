@@ -10,7 +10,7 @@ Fundamentals Overview
 - Exercise: Hello World
   - Reading: Strings
 - Exercise: Mad Libs
-  - Reading: String Concatination, Match Operator
+  - Reading: String Concatenation, Match Operator
 - Exercise: ASCII Art
   - Reading: String Interpolation
 - Exercise: Guessing Game

@@ -248,7 +248,7 @@ and even the **code causing the crash**
 
 Here's what the error above tells us.
 
-* **Error type**: **TokenMissingError** because we're mising the next token 
+* **Error type**: **TokenMissingError** because we're missing the next token 
   (in this case a number) in the `2 * number` expression.
 * **Error message**: `syntax error: expression is incomplete `
 * **Code causing the crash**:
@@ -336,7 +336,7 @@ In total this lesson will cover:
 * How we can use **first-class functions** as values in **higher-order functions**
 * How to group functions in a **module**.
 * **Private** and **public** functions in a module.
-* Using **module attributes** to create reusable constant valuse between module functions.
+* Using **module attributes** to create reusable constant values between module functions.
 * How to achieve **polymorphism** with **multiple function clauses**.
 * How to compose functions together using the **pipe operator**.
 * Validating function input with **guards**.
@@ -757,7 +757,7 @@ Let's break down what this all means.
 
 1. `defmodule` a keyword that means "define module".
 2. `Greeter` is the name of this module. It can be any valid name, and is usually **CapitalCase**.
-   you'll often heard the name of the module refered to as the **namespace** that functions are organized under.
+   you'll often heard the name of the module referred to as the **namespace** that functions are organized under.
 3. `do` a keyword that separates the module name and its internal implementation.
 4. `end` a keyword that finishes the module definition.
 
@@ -1110,7 +1110,7 @@ In the previous lesson you learned about how to use modules and functions in ord
 abstract away generic and reusable behavior.
 
 We also talked about polymorphism. Polymorphic code maintains consistent behavior while changing
-the underlaying implementation.
+the underlying implementation.
 
 In this lesson, you'll learn about more constructs and built-in tools Elixir provides to enable
 reusable code and polymorphic code.
@@ -1369,9 +1369,9 @@ errors are not within our control, such as the malfunction of physical hardware,
 result out of unexpected complexity and behavior.
 
 Some errors result because of external systems, or malformed data, and some errors are because
-we spelled **accelleration** with one **l** instead of two. 🤦‍♂️
+we spelled **acceleration** with one **l** instead of two. 🤦‍♂️
 
-Whatever the reason, unpredictable errors happen. Infact, 
+Whatever the reason, unpredictable errors happen. In fact, 
 Elixir has a philosophy of "Let it crash" which you'll learn more about in future lessons.
 
 There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/1.13.2/RuntimeError.html).
@@ -1452,7 +1452,7 @@ rescue
 end
 ```
 
-Infact, you have the ability to decide which type of error to `raise`.
+In fact, you have the ability to decide which type of error to `raise`.
 
 ```elixir
 try do
@@ -1501,7 +1501,7 @@ While theoretical performance is important, in practice it's best to test your a
 There are a wide variety of tools that allow you to test performance.
 
 You can use the built-in Erlang library `:timer`'s `tc/1` function to measure the time it takes
-to run a function in miliseconds.
+to run a function in milliseconds.
 
 ```elixir
 {time, _result} = :timer.tc(fn -> 100 ** 1_000_000 end)
@@ -1617,7 +1617,7 @@ that non-immediate values such as `[1]` are not identical.
 :erts_debug.same([1], [1])
 ```
 
-We can however, prove that a shallow copy of some data structure is the same underlaying data.
+We can however, prove that a shallow copy of some data structure is the same underlying data.
 Here we can prove that when two variables contain the matching non-immediate values they are not the
 same data structure.
 
