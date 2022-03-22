@@ -1931,3 +1931,18 @@ In general the academy follows a flipped-classroom format where students will be
 
 ### Exercises
 Students will perform Exercises which generally build in complexity and incorporate more advanced application of previously studied topics. Some exercises will be a guided follow along, some will 
+
+
+## Class time
+
+Class time will be broken into
+1. **Assessment & Review**
+2. **Introductory Lecture**
+3. **Exercises**
+4. **Reading & Support**
+
+### Grading
+Students will not receive a number or letter grade for this course. Due to the nature of the assignments,
+this course will be completion-based and rely on the intrinsic motivation of learning and self-improvement rather than carrot and stick motivation.
+
+For more on this see [Mark Rober's Talk](https://www.youtube.com/watch?v=9vJRopau0g0&ab_channel=TEDxTalks).

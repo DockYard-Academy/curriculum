@@ -1,44 +1,30 @@
-# Beta Academy Curriculum
-## QuickStart
-1. install [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) or a compatable Elixir and Erlang version.
+# DockYard Academy
+
+The DockYard Academy curriculum is an open source curriculum to help students learn Elixir.
+The `beta_curriculum` is a work in progress effort available for feedback and contribution.
+When launched, this curriculum will be used as the primary teaching material in DockYard Academy.
+
+Contributers and beta testers are welcome to go through the course, raise issues, and make PRs.
+
+Contact Brooklin (brooklin.myers@dockyard.com) if you would like more information.
+
+# QuickStart
+1. install a compatable Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 2. Install livebook main `mix escript.install github livebook-dev/livebook`.
-3. Ensure the `.env` file is loaded in your environment with `source .env` from the `beta_curriculum` folder.
-4. Run the project with `livebook server start.livemd`.
+3. From the project folder run `livebook server start.livemd`. This opens the navigation page where you can find the course reading material and associated exercises.
 
 If you cannot see mermaid.js graphs, ensure your livebook version is correct.
 
-## Class time
+See the full [Beta Tester & Contributor Setup](https://github.com/DockYard-Academy/beta_curriculum/wiki/Beta-Tester-Guide-&-Contributor-Setup) for comprehensive getting started and contribution instructions.
 
-Class time will be broken into
-1. **Assessment & Review**
-2. **Introductory Lecture**
-3. **Exercises**
-4. **Reading & Support**
-
-### Grading
-Students will not receive a number or letter grade for this course. Due to the nature of the assignments,
-this course will be completion-based and rely on the intrinsic motivation of learning and self-improvement rather than carrot and stick motivation.
-
-For more on this see [Mark Rober's Talk](https://www.youtube.com/watch?v=9vJRopau0g0&ab_channel=TEDxTalks).
-
-## Student Goals
+## Course Outcome
 Students will be competent developers prepared to excel in the Elixir industry. They will have
 a solid grasp of Elixir fundamentals, Elixir project development, Phoenix project development, LiveView, and OTP.
 They will also have the researching and problem-solving skills necessary to expand their skill set and thrive
 throughout their career. Students will be capable of delivering high-quality, well-tested features to a production complexity codebase.
 
-## Writing Contribution Guide
-
-- Code keywords such as `defimpl`, `defprotocol`, and `end` should use backticks (``).
-- Important or new concepts should be in **bold** the first time you introduce them.
-- Use title case without a period in headers.
-- Code should be in an executable elixir cell unless it is pseudocode or it reduces the clarity of the lesson.
-- Text should be run through [grammarly](https://app.grammarly.com/) to ensure correctness. The free features should be sufficient.
-- Lessons should have a **Setup** section for any necessary dependencies.
-- Each new major concept should be in its own section. Each section should strive to provide at least one student interaction portion, typically using the **Your Turn** heading.
-
 ## Curriculum Outline
-The curriculum is still a rough outline subject to change and feedback.
+The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full weekly and daily breakdown.
 
 ## Week 1 (Livebook Setup)
 1. Course Overview, Command Line, Git, Livebook, PATH
