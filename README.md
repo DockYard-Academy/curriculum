@@ -6,7 +6,7 @@ When launched, this curriculum will be used as the primary teaching material in 
 
 Contributers and beta testers are welcome to go through the course, raise issues, and make PRs.
 
-Contact Brooklin (brooklin.myers@dockyard.com) if you would like more information.
+Contact Brooklin (brooklin.myers@dockyard.com) or @BrooklinJMyers if you would like more information.
 
 # QuickStart
 1. install a compatable Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).

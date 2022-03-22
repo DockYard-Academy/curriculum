@@ -1,5 +1,9 @@
 # Generic Server
 
+## Navigation
+
+[Return Home](../start.livemd)
+
 ## Generic Server
 
 It's a common pattern to implement a `GenericServer` process which can
@@ -97,9 +101,9 @@ a message.
 
 ```mermaid
 flowchart LR
-  GenericServer --> recieve
-  recieve --request, state--> CallbackModule --> h["handle_call(request, state)"]
-  --request, new_state --> recieve
+  GenericServer --> receive
+  receive --request, state--> CallbackModule --> h["handle_call(request, state)"]
+  --request, new_state --> receive
 ```
 
 ```elixir
@@ -121,7 +125,7 @@ The `GenericServer` then loops and receives messages while delegating to the `Ca
 ```mermaid
 flowchart LR
 Caller --> GenericServer --> loop 
---> recieve --> c[CallbackModule.handle_call] --> response --> send --> Caller
+--> receive --> c[CallbackModule.handle_call] --> response --> send --> Caller
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -157,10 +161,10 @@ Putting all of that together, we get the full flow of our `GenericServer` and `C
 
 ```mermaid
 flowchart
-  GenericServer --> loop --state--> recieve --new state--> loop
-  Caller --> c[call] --request--> recieve --response--> c
-  recieve --request, state--> CallbackModule --> h["handle_call(request, state)"]
-  --request, new_state --> recieve
+  GenericServer --> loop --state--> receive --new state--> loop
+  Caller --> c[call] --request--> receive --response--> c
+  receive --request, state--> CallbackModule --> h["handle_call(request, state)"]
+  --request, new_state --> receive
 
   style GenericServer fill:orange,stroke:#333,stroke-width:2px
   style Caller fill:yellow,stroke:#333,stroke-width:2px
