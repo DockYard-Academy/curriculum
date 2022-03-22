@@ -66,7 +66,7 @@ on the **stack** and it points to the location of memory in the heap.
 In Elixir, we do not allow for mutation. That means that when we rebind `hello` to a new value `"new"`,
 it rebinds the `hello` variable in a new location.
 
-`"world"` is no longer accessable under any
+`"world"` is no longer accessible under any
 variable name, so it gets removed. We call the process of removing old data **garbage collection**.
 
 ![]()
@@ -146,7 +146,7 @@ that it takes to perform common operations on a large set of data.
 end)
 ```
 
-Simultanious operations in your computer compete for resources, and our measurement tools are not
+Simultaneous operations in your computer compete for resources, and our measurement tools are not
 perfect, so you may notice that execution time is not always consistent.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -154,7 +154,7 @@ perfect, so you may notice that execution time is not always consistent.
 ### Your Turn
 
 In the Elixir cell below, Use the `:timer.tc/1` function to measure the time it takes to measure any function you choose.
-Remember that the return value is in microseconds, so if you want to display it in miliseconds you
+Remember that the return value is in microseconds, so if you want to display it in milliseconds you
 need to divide it by `1000`.
 
 ```elixir
@@ -277,7 +277,7 @@ Let's compare accessing the first element of a tuple and list of equal size.
 %{tuple: tuple_time, list: list_time}
 ```
 
-As expected, both are very fast. Infact the list is even faster than the tuple. However, this
+As expected, both are very fast. In fact the list is even faster than the tuple. However, this
 changes drastically when we try to access the last element in the list and tuple.
 
 ```elixir
@@ -312,9 +312,9 @@ in the second tuple.
 <!-- livebook:{"break_markdown":true} -->
 
 However $O(n1 + n2)$ is only the theoretical performance cost. In reality it's because higher tuples do
-not support concatination, and you would first need to convert them into a list.
+not support concatenation, and you would first need to convert them into a list.
 
-Why don't tuples support concatination? Because they should be used for **fixed-sized containers**. [Jose Valim](https://stackoverflow.com/a/28355536/9021210) explains.
+Why don't tuples support concatenation? Because they should be used for **fixed-sized containers**. [Jose Valim](https://stackoverflow.com/a/28355536/9021210) explains.
 
 > You can't concatenate tuples.
 > The only reason is that you are not supposed to use them as such. Most of tuple usage requires knowing their size and things get blurrier if you can concatenate them. Furthermore, concatenating tuples requires copying both tuples in memory, which is not efficient.
@@ -323,8 +323,8 @@ Why don't tuples support concatination? Because they should be used for **fixed-
 > * Use lists
 > * Compose the tuples: instead of a ++ b, just write {a, b}
 
-However for a list, only the first list must be coppied, so it has $O(n1)$ cost where $n1$ is the
-number of elements in the first list. The first coppied list can now simply point to the head of
+However for a list, only the first list must be copied, so it has $O(n1)$ cost where $n1$ is the
+number of elements in the first list. The first copied list can now simply point to the head of
 the second list in memory.
 
 For example,
@@ -540,7 +540,7 @@ between **deep copying** and **shallow copy** and the performance implications.
 
 When we shallow copy, we copy the reference to the data, rather than the data itself.
 
-A deep copy, copies the actual underlaying data.
+A deep copy, copies the actual underlying data.
 
 In a shallow copy, primitive values such as `1` will simply be copied as `1`. However data types which contain
 references will be copied as references.
@@ -650,7 +650,7 @@ Utils.table(:lists_vs_tuples)
 * Tuples should be used for **fixed-size containers**.
 * Lists should be used for **dynamic-size containers**.
 * Functional languages do not allow mutation, they instead rely on **shallow-copying** elements
-  to avoid unneccesary memory consumption.
+  to avoid unnecessary memory consumption.
 
 <!-- livebook:{"break_markdown":true} -->
 

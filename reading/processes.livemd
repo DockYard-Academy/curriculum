@@ -51,7 +51,7 @@ We can `send/2` and `recieve/1` messages between processes by using their **pid*
 send(self(), "message")
 
 receive do
-  "message" -> "recieved"
+  "message" -> "received"
 end
 ```
 
@@ -182,7 +182,7 @@ Let's spawn a process in one cell and send a message in another.
 flowchart LR
 subgraph P1[Process 1]
   pid -->
-  recieve
+  receive
 end
 
 subgraph Process 2
@@ -194,7 +194,7 @@ end
 pid1 =
   spawn(fn ->
     receive do
-      "message" -> IO.puts("recieved!")
+      "message" -> IO.puts("received!")
     end
   end)
 ```
@@ -226,7 +226,7 @@ So far, we spawn a process that receives a single message and then dies.
 ```mermaid
 flowchart LR
   P1[Process] --send-->
-  P2[Process2] --> recieve --dies--> P2
+  P2[Process2] --> receive --dies--> P2
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -241,7 +241,7 @@ keep receiving messages and stay alive.
 
 ```mermaid
 flowchart LR
-Process --> loop --> recieve --> loop
+Process --> loop --> receive --> loop
 ```
 
 ```elixir
@@ -270,7 +270,7 @@ With a slight modification of the `ServerProcess`, we can store state!
 
 ```mermaid
 flowchart LR
-ServerProcess --initial state--> loop --state--> recieve --new state--> loop
+ServerProcess --initial state--> loop --state--> receive --new state--> loop
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -281,7 +281,7 @@ We'll store the state as an integer to create a counter.
 
 ```mermaid
 flowchart LR
-CounterProcess --> loop --0--> recieve --1--> loop
+CounterProcess --> loop --0--> receive --1--> loop
 ```
 
 ```elixir
