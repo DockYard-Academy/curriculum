@@ -4,6 +4,23 @@
 
 [Return Home](../start.livemd)
 
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
 ## Strings
 
 A string is any sequence of characters contained within two double quotes `""`.
@@ -38,9 +55,11 @@ Strings can contain single quotes and other symbols such as `!@#$%^&*()_+-=';:` 
 
 They are useful for representing all kinds of information as text.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
-In the Elixir cell below, create a string "Hello, world!". This is a right of passage for every 
+In the Elixir cell below, create a string `"Hello, world!"`. This is a right of passage for every 
 programmer.
 
 ```elixir
@@ -54,7 +73,7 @@ String operators allow us to manipulate strings.
 The `<>` operator joins two strings together. Joining strings together is called **string concatenation**.
 
 ```elixir
-"hello, " <> "world"
+"hello, " <> "world."
 ```
 
 Only strings can be concatenated together using the `<>` operator. You'll notice concatenating `1` causes an error `expected binary argument in <> operator but got 1`
@@ -65,11 +84,17 @@ Only strings can be concatenated together using the `<>` operator. You'll notice
 
 ### Your Turn
 
-In the Elixir cell below, concatenate the string `"Hi!"` and the name of one of your classmates
-as a string.
+In the Elixir cell below, use string concatenation to join `"Hi, "` and the name of one
+of your classmates.
+
+So `"Peter"` would be come `"Hi, Peter."`.
+
+Replace `nil` with your answer.
 
 ```elixir
+answer = nil
 
+Utils.test(:string_concatenation, answer)
 ```
 
 ### String Interpolation
@@ -89,15 +114,21 @@ So we can evaluate `4 + 4`, which equals `8` inside a string.
 String interpolation is often useful when your string has many computed values or tricky punctuation.
 Otherwise, it's easy to make mistakes.
 
+Notice that there's a grammar mistake below that could easily be missed when using string concatenation.
+
 ```elixir
-"hello" <> "world!"
+"I have" <> "8" <> "apples"
 ```
 
 ### Your Turn
 
-In the Elixir cell below, use **string interpolation** to say `I have (X - 1) classmates`. Where
-X is the number of people in your cohort.
+In the Elixir cell below, use **string interpolation** to say `I have #{X - 1} classmates.`. Where
+X is the number of people in your cohort including yourself.
+
+Replace `nil` with your answer.
 
 ```elixir
+answer = nil
 
+Utils.test(:string_interpolation, answer)
 ```
