@@ -25,11 +25,26 @@ defmodule Utils do
   defp grey_boxes(range), do: Enum.map(range, &grey_box/1)
 
   @doc """
+  iex> Utils.animate(:biggest_integer)
   iex> Utils.animate(:eager_evaluation)
   iex> Utils.animate(:lazy_evaluation)
   iex> Utils.animate(:remainder)
   iex> Utils.animate(:road_light)
   """
+  def animate(:biggest_integer) do
+    max = 10 ** 80
+
+    Kino.animate(100, 1, fn i ->
+      integer_display = (10 ** i < max && 10 ** i) || "$10^{#{i}}$"
+      md = Kino.Markdown.new("
+integer: #{integer_display}\n
+digits: #{Integer.digits(10 ** i) |> Enum.count()}
+  ")
+
+      {:cont, md, i + 1}
+    end)
+  end
+
   def animate(:eager_evaluation) do
     sequence = [
       "
@@ -931,7 +946,59 @@ Enum.reduce([], fn 4, 6 -> 10  end)
 
   @doc ~S"""
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
+  iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
+  iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
   """
+  def test(:string_concatenation, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule StringConcatenation do
+        @answer answer
+        use ExUnit.Case
+
+        test "Hi, name." do
+          assert is_bitstring(@answer), "the answer should be a string."
+          assert "Hi, " <> name = @answer, "the answer should be in the format: Hi, name."
+          assert Regex.match?(~r/Hi, \w+\./, @answer), "the answer should end in a period."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:string_interpolation, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule StringInterpolation do
+        @answer answer
+        use ExUnit.Case
+
+        test "I have X - 1 classmates." do
+          assert is_bitstring(@answer), "the answer should be a string."
+
+          assert "I have " <> name = @answer,
+                 "the answer should be in the format: I have 10 classmates"
+
+          assert Regex.match?(~r/I have \d+/, @answer),
+                 "the answer should contain an integer for classmates."
+
+          assert Regex.match?(~r/I have \d+ classmates\./, @answer) ||
+                   @answer === "I have 1 classmate.",
+                 "the answer should end in a period."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
   def test(:naming_numbers, convert_to_named_integer) do
     ExUnit.start(auto_run: false)
 
@@ -980,14 +1047,22 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   end
 
   @doc ~S"""
+  iex> %Kino.Markdown{} = Utils.visual(:biggest_integer, 10 ** 10000)
   iex> %Kino.Markdown{} = Utils.visual(:loading_bar, 50)
   iex> %Kino.Image{} = Utils.visual(:light_control, true)
   """
+  def visual(:biggest_integer, integer) do
+    Kino.Markdown.new("
+integer: #{integer}\n
+digits: #{integer |> Integer.digits() |> Enum.count()}
+  ")
+  end
+
   def visual(:loading_bar, percentage) do
     Kino.Markdown.new("
-    <div style=\"height: 20px; width: 100%; background-color: grey\">
-      <div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
-    </div>
+<div style=\"height: 20px; width: 100%; background-color: grey\">
+  <div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
+</div>
   ")
   end
 
