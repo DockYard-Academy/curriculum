@@ -24,37 +24,387 @@ Mix.install([
 ## Overview
 
 The command line is used to interact with our computer through a text interface rather than through a 
-GUI (graphical user interface). It's useful for installing programs, working with files and text, and
+GUI (graphical user interface).
 
-Depending on your operating system (Windows, Mac, Linux), the command line is going to differ. Thus, we will include the commands
+Many programs only run through the command line. Generally, we call these **Command Line Applications**, **CLI Applications** (for Command Line Interface), or just **CLIs**.
+
+Depending on your operating system (Windows, Mac, Linux), the command line will differ. Thus, we will include the commands
 specific instructions for each operating system.
 
-Each operating system uses a different program for their command line.
+Each operating system uses a different program for its command line. Follow the instructions for your operating system to open your command line.
 
-The command line differs depending on your operating system.
+* **Windows**: Open the start menu with the <kbd>Win <i class="ri-windows-fill"></i></kbd> key. Search for Command Prompt. Ensure you run in administrator mode to avoid permission issues.
+* **Mac or Linux**: Open the Terminal App <kbd>Ctrl+Alt+T</kbd>
+* **Mac** Click the Launchpad icon in the Dock or open the Launchpad with <kbd>Command + Space</kbd>. Type Terminal in the search field, then click the Terminal program.
 
-* **Windows**: Search for Use the Command Prompt or the Powershell program. Generally, run in administrator mode to avoid permission issues. If you don't have a specific preference, then use Powershell.
-* **Mac or Linux**: Use the Terminal app.
+<!-- livebook:{"break_markdown":true} -->
+
+### Current Working Directory
+
+Your command line should display the **current working directory**. You'll often see `$` represent
+the current working directory in tutorials. Omit the `$` when entering text into your command line.
+
+For example, on Windows 11, mine is:
+
+```
+C:\Users\brook>
+```
 
 ### Your Turn
 
 Open the command line on your computer and enter the `whoami` command to see your current user.
 
-You should see something like this!
+You should see a similar output.
 
 ```
 $ whoami
-your_name
+your_computer_name
 ```
 
-The `whoami` command should be the same in every operating system. Here's what it looks like on
-Windows 11 in Powershell.
-![](images/whoami.png)
+## Permissions (sudo)
+
+Some commands require permissions to enter. You should see an error in the command line
+if the command requires permissions.
+
+In **Windows** you often need to run the Command Prompt
+or Powershell in administrator mode.
+
+For **Mac & Linux** you can preface commands with **sudo**. You'll be prompted for your computer's
+password. You'll notice that `whoami` returns a different value (probably `root`).
+
+Root is the superuser account in Mac and Linux.
+
+```
+$ sudo whoami
+root
+```
 
 ## List Files & Folders
 
+Our computer stores **files** and **folders**. The terms folder and **directory** are interchangeable.
+
+We use the following commands to list files and folders.
+
+* **Windows**: `dir`
+* **Mac or Linux**: `ls`
+
+Mac and Linux hide specific files. For example, files
+starting with `.` are automatically hidden.
+
+You can see hidden files with `ls -a`.
+
+```
+$ ls -a
+```
+
+On **Windows**, all files and folders should display by default.
+
+```
+$ dir
+```
+
+### Your Turn
+
+Use the command line the files and folders in the current working directory. If you are
+on Mac or Linux, use both `ls` and `ls -a` to see the difference.
+
+## Create Files
+
+You can create a file using the following commands
+
+* **Mac & Linux**: `touch`
+* **Windows**: `echo`
+
+**Mac & Linux** Allow you to enter `touch` with the name of a file.
+
+```
+touch ./example_file.txt
+```
+
+**Windows** requires you to enter the content into (`>`) the file.
+
+```
+echo example content > ./example_file.txt
+```
+
+On **Windows**, you can use `type nul` to create an empty file.
+
+```
+echo type nul > ./example_file.txt
+```
+
+`./` represents the current working directory. You can generally omit it.
+
+Here are the same commands without the `./`.
+
+```
+$ touch example_file.txt
+$ echo example content > example_file.txt
+```
+
+### Your turn
+
+Using the command line, create a file called `test.txt`.
+
+On **Mac & Linux** run:
+
+```
+$ touch test.txt
+```
+
+On **Windows** run:
+
+```
+$ type nul > text.txt
+```
+
+## Create Folders
+
+You can create a folder with `mkdir` on every operating system. It's short for **make directory**.
+
+### Your turn
+
+Using the command line, create an `example` folder using `mkdir`.
+
+```
+$ mkdir example
+```
+
+Then use the command line
+to create a file called `in_example.txt` inside of the `example` folder.
+
+On **Mac or Linux** enter:
+
+```
+$ touch example/in_example.txt
+```
+
+On **Windows** enter:
+
+```
+$ echo type nul > example/in_example.txt
+```
+
 ## Navigating the File System
 
-## Create Files & Folders
+You can navigate the file system with `cd` on every operating system.
 
-## Remove Files & Folders
+You navigate through files and folders the same way you would click through the file explorer.
+
+Enter `cd` with the path of the folder to navigate to it. The folder must exist.
+
+```
+$ cd example_folder
+$ cd first_folder/second_folder/third_folder
+```
+
+You can navigate up folders using `../`. You can go up any number of folders by repeating `../`.
+
+```
+$ cd ../
+$ cd ../../../
+```
+
+Let's walk through an example with several nested folders like so.
+
+```
+/top
+  /folder_a
+    /folder_b
+      /folder_c
+  /folder_1
+    /folder_2
+      /folder_3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We use `cd` to navigate between these folders and set the current working directory.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+top --> folder_1 --> folder_2 --> folder_3
+top --> folder_a --> folder_b --> folder_c
+style top fill:lightgreen
+```
+
+For example, we can `cd folder_1/folder_2/` to set the current working directory to `folder_2`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+top_level_folder --> folder_1 --> folder_2 --> folder_3
+top_level_folder --> folder_a --> folder_b --> folder_c
+style folder_2 fill:lightgreen
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+And use `cd ../../folder_a/folder_b/folder_c` to set the current working directory to `folder_c`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+top_level_folder --> folder_1 --> folder_2 --> folder_3
+top_level_folder --> folder_a --> folder_b --> folder_c
+style folder_c fill:lightgreen
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your turn
+
+Using the command line, go into the `example` folder you created earlier. List all of the files in the folder using `ls` or `dir`. You should
+see the `in_example.txt` file from the previous exercise.
+
+```
+$ cd example
+```
+
+## Remove Files
+
+You can remove files using the following commands.
+
+* **Mac & Linux**: `rm`
+* **Windows**: `del`
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Using the command line, delete the `in_example.txt` file from the previous exercise.
+
+On **Mac & Linux** run:
+
+```
+rm example/in_example.txt
+```
+
+On **Windows** run:
+
+```
+del example/in_example.txt
+```
+
+## Remove Folders
+
+You can remove folders using the following commands.
+
+* **Mac & Linux**: `rm -rf`
+* **Windows**: `rmdir`
+
+### Your Turn
+
+Remove the `example` folder from the previous exercise.
+
+On **Mac & Linux** run:
+
+```
+$ rm -rf example
+```
+
+On **Windows** run:
+
+```
+$ rmdir example
+```
+
+## Reading Files
+
+You can read file contents with the following commands.
+
+* **Mac & Linux**: `cat`
+* **Windows**: `type`.
+
+### Your Turn.
+
+Create a new file `read_example.txt` with some text content.
+You can use `echo` on every operating system to create a file with some content. However,
+`type nul` only works on **Windows**.
+
+run:
+
+```
+echo content > read_example.txt
+```
+
+Then read the content.
+
+On **Mac & Linux** run:
+
+```
+cat read_example.txt
+```
+
+On **Windows** run:
+
+```
+type read_example.txt
+```
+
+## Tab Completion
+
+To save time, you can generally use the <kbd>Tab</kbd> button to autocomplete a command or filename.
+
+### Your Turn
+
+Using the command line, create a new folder called `tab_to_folder`.
+
+```
+$ mkdir tab_to_folder
+```
+
+Navigate to the folder using autocompletion. Start typing `tab` then use the <kbd>Tab</kbd> key to autocomplete the folder name.
+
+```
+$ cd tab_to_folder
+```
+
+## With Great Power
+
+The command line is powerful. Therefore the command line is
+also dangerous. For example, a simple command can delete every file on your computer.
+
+Open the dropdown below to see the command. You should **never** run it.
+
+<details>
+<summary>DANGER DO NOT RUN</summary>
+rm -rf *
+</details>
+
+So be careful about running commands on your command line. You may find advice on forums or tutorials
+to enter commands into your command line. It is fine to follow the advice, but try to understand everything you run **before** executing the command.
+
+## Summary
+
+This lesson is a brief primer to the command line. You have learned the following commands.
+
+<!-- livebook:{"break_markdown":true} -->
+
+**Mac & Ubuntu**
+
+* list files and folders: `ls` and `ls -a`.
+* create files: `touch`.
+* create folders: `mkdir`.
+* navigate: `cd`.
+* remove files: `rm`.
+* remove folders: `rm -rf`.
+* read file contents: `cat`.
+
+**Windows**
+
+* list files and folders: `dir`.
+* create files: `echo`.
+* create folders: `mkdir`.
+* navigate: `cd`.
+* remove files: `del`.
+* remove folders: `rmdir`.
+* read file contents: `type`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+You can now handle everyday command line tasks! Expect to learn more about the command line as you encounter more programming challenges.
