@@ -46,7 +46,7 @@ But you can also bind a variable to each element in the tuple with pattern match
 two
 ```
 
-So long as the expression on the left side of match operator `=` matches the pattern of the right side, 
+So long as the expression on the left side of match operator `=` matches the pattern of the right side,
 you can bind variables to values.
 
 Here's the same concept with a list
@@ -66,7 +66,7 @@ to ignore it.
 secret_identity
 ```
 
-However, if the left hand side doesn't match the right hand side, then the code will crash with 
+However, if the left hand side doesn't match the right hand side, then the code will crash with
 a **MatchError**.
 
 ```elixir
@@ -224,7 +224,7 @@ flowchart LR
   S
   T
   end
-  L -- tail --> I --> S --> T 
+  L -- tail --> I --> S --> T
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -257,7 +257,7 @@ flowchart LR
   4[instruction]
 ```
 
-If any of the preconditions fail, the with statement will stop and return the value 
+If any of the preconditions fail, the with statement will stop and return the value
 of the failed pre-condition.
 
 ```mermaid
@@ -361,33 +361,33 @@ If we were to use `case`, here's what that might look like. It's an unclear mess
 
 ```elixir
 sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-recieving_user = %{name: "Robin", email: "boywonder@bat.net"}
+receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
 email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
 
 case sending_user do
   %{is_admin: true, name: sender_name, email: sender_email} ->
-    case recieving_user do
-      %{name: reciever_name, email: reciever_email} ->
+    case receiving_user do
+      %{name: receiver_name, email: receiver_email} ->
         case email do
           %{title: title, body: body} ->
-            "from #{sender_name}:#{sender_email} to #{reciever_name}:#{reciever_email} #{title}, #{body}"
+            "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
         end
     end
 end
 ```
 
-Here's the same code rewritten using `with`. There's still some natural complexity, but it's 
+Here's the same code rewritten using `with`. There's still some natural complexity, but it's
 a fair bit more clear.
 
 ```elixir
 sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-recieving_user = %{name: "Robin", email: "boywonder@bat.net"}
+receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
 email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
 
 with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: reciever_name, email: reciever_email} <- recieving_user,
+     %{name: receiver_name, email: receiver_email} <- receiving_user,
      %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{reciever_name}:#{reciever_email} #{title}, #{body}"
+  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
 end
 ```
 
@@ -396,29 +396,29 @@ if the sender is `nil` we return `nil`
 
 ```elixir
 sending_user = nil
-recieving_user = %{name: "Robin", email: "boywonder@bat.net"}
+receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
 email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
 
 with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: reciever_name, email: reciever_email} <- recieving_user,
+     %{name: receiver_name, email: receiver_email} <- receiving_user,
      %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{reciever_name}:#{reciever_email} #{title}, #{body}"
+  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
 end
 ```
 
-Sometimes it's useful to simply return the value, other times it's useful to handle the error. 
+Sometimes it's useful to simply return the value, other times it's useful to handle the error.
 When we want to handle the error you can use `else`. The else block works like a `case`
 statement here were we match on the return value of the pre-condition.
 
 ```elixir
 sending_user = "batman"
-recieving_user = %{name: "Robin", email: "boywonder@bat.net"}
+receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
 email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
 
 with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: reciever_name, email: reciever_email} <- recieving_user,
+     %{name: receiver_name, email: receiver_email} <- receiving_user,
      %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{reciever_name}:#{reciever_email} #{title}, #{body}"
+  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
 else
   error -> "Email not sent because #{error} did not match expected format"
 end
@@ -428,13 +428,13 @@ Much like a `case` statement, you can match on multiple cases to handle differen
 
 ```elixir
 sending_user = %{name: "Joker", email: "joker@jokesonyou.haha"}
-recieving_user = %{name: "Robin", email: "boywonder@bat.net"}
+receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
 email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
 
 with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: reciever_name, email: reciever_email} <- recieving_user,
+     %{name: receiver_name, email: receiver_email} <- receiving_user,
      %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{reciever_name}:#{reciever_email} #{title}, #{body}"
+  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
 else
   %{name: "Joker"} -> "Get out of here Joker!"
   error -> "Email not sent because #{error} did not match expected format"
@@ -456,7 +456,7 @@ In the Elixir cell below
 
 ## Pin Operator
 
-The **pin operator** allows us to use variables as hard-coded values, 
+The **pin operator** allows us to use variables as hard-coded values,
 rather than rebinding a variable.
 
 Often we use the pin operator when testing our code to assert that the value is correct.
