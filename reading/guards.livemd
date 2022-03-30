@@ -14,7 +14,7 @@ Input --> Guard --> Function
 Guard --> f[Invalid Input]
 ```
 
-This prevents a function from being misused and 
+This prevents a function from being misused and
 provides clearer feedback.
 
 For example, you may have a function like `double/1` which doubles a number.
@@ -29,7 +29,7 @@ end
 Multiplier.double(4)
 ```
 
-You'll notice that we can pass in strings to the `Mutliplier.double/1` function, and the program will error. 
+You'll notice that we can pass in strings to the `Multiplier.double/1` function, and the program will error.
 However, to an outside user, that error could be unclear.
 
 ```elixir
@@ -42,7 +42,7 @@ end
 Multiplier.double("")
 ```
 
-To enforce the function is only called with integers, we can use the built-in `is_integer` guard 
+To enforce the function is only called with integers, we can use the built-in `is_integer` guard
 and the `when` guard operator.
 
 Now when you call the `double/1` function, it will let you know that the function does not exist
@@ -113,14 +113,14 @@ Multiplier.double("example")
 
 You'll notice our program crashes with an error.
 
-We also get a warning 
+We also get a warning
 **this clause for double/1 cannot match because a previous clause at line 2 always matches**.
 Because Elixir catches that the first function clause always matches before the second.
 
 If you move the more generic function lower, then strings will match the
 `is_bitstring/1` version first.
 
-As a side benefit, **Floats** now work as well! 
+As a side benefit, **Floats** now work as well!
 Previously they failed the `is_integer/1` guard.
 
 ```elixir
