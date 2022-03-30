@@ -27,6 +27,7 @@ defmodule Utils do
   @doc """
   iex> Utils.animate(:biggest_integer)
   iex> Utils.animate(:eager_evaluation)
+  iex> Utils.animate(:example)
   iex> Utils.animate(:lazy_evaluation)
   iex> Utils.animate(:remainder)
   iex> Utils.animate(:road_light)
@@ -826,6 +827,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   @doc """
   Create a Data Table
 
+  iex> %Kino.JS.Live{} = Utils.table(:example)
   iex> %Kino.JS.Live{} = Utils.table(:exponential_growth)
   iex> %Kino.JS.Live{} = Utils.table(:factorial_complexity)
   iex> %Kino.JS.Live{} = Utils.table(:fib_cache)
@@ -836,6 +838,15 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> %Kino.JS.Live{} = Utils.table(:users_and_photos)
   iex> %Kino.JS.Live{} = Utils.table(:user_photo_foreign_key)
   """
+
+  def table(:example) do
+    Enum.map(1..5, fn each ->
+      %{
+        number: each
+      }
+    end)
+    |> Kino.DataTable.new()
+  end
 
   def table(:exponential_growth) do
     Enum.map(1..100, fn each ->
@@ -945,10 +956,30 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   end
 
   @doc ~S"""
+  iex> Utils.test(:example, 5)
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
   iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
   iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
   """
+  def test(:example, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule Example do
+        @answer answer
+        use ExUnit.Case
+
+        test "example" do
+          assert @answer === 5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
   def test(:string_concatenation, answer) do
     if answer do
       ExUnit.start(auto_run: false)

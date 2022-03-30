@@ -1,0 +1,225 @@
+# Livebook
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Livebook
+
+This lesson is going to be very meta. We're talking about
+Livebook within a Livebook.
+
+Livebook is an interactive and collaborative code notebook for Elixir.
+It's commonly used as a documentation tool and this is
+the first course to use it so extensively for teaching Elixir.
+
+Inside of these interactive notebooks we can write formatted content (like you're reading right now)
+and execute Elixir code.
+
+## Markdown
+
+Livebook allows us to create `.livemd` files which power
+the interactive notebooks that you've read so far!
+
+`.livemd` stands for **live markdown**. Markdown is
+a lightweight markup language that allows you to write
+formatted content using only special symbols. It's like writing a formatted google document with only text.
+
+```markdown
+# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+**bold**
+*italic*
+1. First item
+2. Second item
+3. Third item
+```
+
+You can view the [Markdown cheat-sheet](https://www.markdownguide.org/cheat-sheet/) for
+an overview of markdown syntax.
+
+You'll see markdown everywhere! It's even valid input for chat apps like Slack and Discord.
+
+## Cells
+
+Livebooks are split into **cells**. There are **markdown cell** a
+As you hover and click your cursor <i class="ri-cursor-fill"></i> on a markdown cell. You'll notice each
+has a <span style="color: rgba(101,131,255,.5)">blue</span> highlight on the left
+and some controls.
+
+You can edit <i class="ri-pencil-line"></i>, move up<i class="ri-arrow-up-s-line"></i>,
+move down <i class="ri-arrow-down-s-line"></i>, and delete <i class="ri-delete-bin-line"></i> cells.
+
+You can also upload images <i class="ri-image-add-line"></i>.
+
+While completing interactive reading material and exercises, you generally do not need to use any of these controls.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Hover and click on this markdown cell to see the controls.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Elixir cells contain Elixir code and can be evaluated to show the result.
+
+You can click on an Elixir cell to see the <i class="ri-play-circle-fill"></i> Evaluate button.
+Alternatively you can evaluate an Elixir cell by clicking on it the cell and pressing <kbd>CTRL</kbd>+<kbd>Enter</kbd>.
+
+Click on the Elixir cell below and then click <i class="ri-play-circle-fill"></i> Evaluate to see the result. You
+should see `10` because `5 + 5` equals `10`.
+
+```elixir
+5 + 5
+```
+
+You can also evaluate every Elixir cell in a notebook by pressing <kbd>e</kbd> and then <kbd>a</kbd>. You need to be
+in **Navigation mode**. Navigation mode is the default mode. If you are editing a markdown cell or
+Elixir cell then you are in **Insert mode**.
+
+Click on the keyboard shortcuts <i class="ri-keyboard-box-line"></i> icon on the sidebar to view
+available Livebook shortcuts depending on the current mode.
+
+## Evaluation
+
+By default, Elixir cells evaluate in order when you run the `ea` command. Cells above
+automatically evaluate when you evaluate a cell below.
+
+Here are two empty Elixir cells. By default, an empty cell returns `nil`.
+
+```elixir
+
+```
+
+```elixir
+
+```
+
+Evaluate the first cell and notice that the cell below becomes **Stale**.
+
+This means that if the second cell relies on any value in the first cell, it is now outdated.
+
+If you change a cell, **Evaluated** changes to *Evaluated** to indicate that the cell has changed
+since the last time it was evaluated.
+
+Try changing `5` to `4` in the Elixir cell below to see this change.
+
+```elixir
+5
+```
+
+## Utils
+
+We use a `Utils` project to power certain functionality.
+
+For example, we use Utils to display graphs.
+
+```elixir
+Utils.table(:example)
+```
+
+You can generally ignore the `Utils` project, however you should not edit any references to Utils.
+
+Utils also provides feedback for exercises. Under the hood it uses a project for
+writing tests called `ExUnit`.
+
+ExUnit is the same tool that you will eventually use to test
+your Elixir code, so you'll want to get used to reading this kind of message.
+
+Evaluate the Elixir cell below to see a failing test. Then change `4` to `5` to see a passing test.
+
+```elixir
+example = 4
+
+# You should not edit this code below
+Utils.test(:example, example)
+```
+
+Let's break down everything we see.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  1) test example (Utils.Example)
+     utils/lib/utils.ex:972
+     Assertion with === failed
+     code:  assert @answer === 5
+     left:  4
+     right: 5
+     stacktrace:
+       utils/lib/utils.ex:973: (test)
+
+
+
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 1 failure
+
+Randomized with seed 613714
+```
+
+We can see the name of this test is simply `example`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  1) test example (Utils.Example)
+```
+
+ExUnit tells you that the test failed.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Assertion with === failed
+```
+
+Then it may provide information about the test being run. You may not be familiar with
+this code, and that's perfectly OK.
+
+For this example, it means that the test asserted that the answer should have been 5.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+     code:  assert @answer === 5
+```
+
+Generally **left** is the answer provided and **right** is the answer expected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+     left:  4
+     right: 5
+```
+
+Other information can generally be ignored for our purposes.
+
+Passing tests are more straightforward. Each `.` is a passing test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+.
+
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 736220
+
+```

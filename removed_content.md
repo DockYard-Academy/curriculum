@@ -2028,3 +2028,21 @@ Turn off this advice by setting config variable advice.detachedHead to false
 
 HEAD is now at 2d4b114 add new file content
 ```
+
+You'll also see some patterns for this course. For example, many notebooks will have a
+**Setup** section with the following Elixir code.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+This Elixir code installs some tools used in the notebook. You can generally ignore it and
+do not need to understand it yet.
