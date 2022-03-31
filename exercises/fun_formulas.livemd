@@ -1,0 +1,137 @@
+# Fun Formulas
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Fun Formulas
+
+As developer's it's our job to translate business requirements into something that the computer understands.
+
+These exercises will have you convert a common formula into an Elixir program.
+
+## Percentage
+
+Let's say we're building a program with a loading bar.
+
+Users download items, and you need to display the current percentage that the download has finished.
+
+You can calculate the percentage with $\frac{completed\ items}{total\ items}\times100$
+
+In the Elixir cell below, calculate the percentage given `completed_items` and `total_items`.
+
+Replace `nil` with your answer.
+
+```elixir
+completed_items = 10
+total_items = 100
+percentage = nil
+
+Utils.test(:percentage, [completed_items, total_items, percentage])
+```
+
+Given a random number of completed_items and total_items, calculate the percentage.
+
+Replace `nil` with your answer.
+
+```elixir
+completed_items = Utils.random(1..100)
+total_items = Utils.random(completed_items..100)
+
+percentage = nil
+
+Utils.test(:percentage, [completed_items, total_items, percentage])
+```
+
+## Rocket Ship
+
+We're building a rocket ship app to teach people about physics.
+
+Users can enter the `mass` and `acceleration` of a ship to visualize the `force` generated.
+
+Given that ${mass} * {acceleration} = force$, calculate force. Replace `nil` with your answer.
+
+```elixir
+mass = 10
+acceleration = 2
+
+force = nil
+
+Utils.test(:rocket_ship, force)
+```
+
+## What do you tip?
+
+Let's build a program to determine how much you should tip your server when you buy a meal.
+
+The formula for calculating a tip is $cost\ of\ the\ meal * tip\ rate = tip\ amount$ where `tip_rate` is the rate you
+would like to tip as a decimal. so `15%` would be `0.15` and `20%` would be `0.2`.
+
+In the Elixir cell below, Use floats to set the `cost_of_the_meal` to represent `$55.50` and the `tip_rate` to represent `20%`.
+Then calculate the `tip_amount`.
+
+Replace `nil` with your answers.
+
+```elixir
+cost_of_the_meal = nil
+tip_rate = nil
+
+tip_amount = nil
+
+Utils.test(:tip_amount, [cost_of_the_meal, tip_rate, tip_amount])
+```
+
+## Pythagorean Theorum
+
+To calculate the longest side of a triangle we use $a^2 + b^2 = c^2$
+
+First, given `a` and `b`, calculate `c_square` where `c_square` is $c^2$.
+
+```elixir
+a = 10
+b = 10
+
+c_square = nil
+
+Utils.test(:pythagorean_c_square, c_square)
+```
+
+### Bonus!
+
+<!-- livebook:{"break_markdown":true} -->
+
+This is a bonus challenge that requires going beyond what you've already learned.
+
+You need to figure out how to find the square root of a number in Elixir.
+
+Given `c_square`, calculate `c`. Replace `nil` with your answer.
+
+<details>
+<summary>Hint</summary>
+check out `:math.sqrt`
+</details>
+
+```elixir
+c_square = 200
+
+c = nil
+
+Utils.test(:pythagorean_c, c)
+```

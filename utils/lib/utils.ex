@@ -959,16 +959,25 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   @doc ~S"""
   iex> Utils.test(:card_count_four, 1)
   iex> Utils.test(:card_count_king, 4)
-  iex> Utils.test(:card_count_random, 2, 1)
-  iex> Utils.test(:card_count_random, 6, 1)
-  iex> Utils.test(:card_count_random, 7, 0)
-  iex> Utils.test(:card_count_random, 9, 0)
-  iex> Utils.test(:card_count_random, 10, -1)
-  iex> Utils.test(:card_count_random, 14, -1)
+  iex> Utils.test(:card_count_random, [2, 1])
+  iex> Utils.test(:card_count_random, [6, 1])
+  iex> Utils.test(:card_count_random, [7, 0])
+  iex> Utils.test(:card_count_random, [9, 0])
+  iex> Utils.test(:card_count_random, [10, -1])
+  iex> Utils.test(:card_count_random, [14, -1])
   iex> Utils.test(:example, 5)
+  iex> Utils.test(:percentage, [10, 100, 10 / 100 * 100])
+  iex> completed_items = Enum.random(1..100)
+  ...> total_items = Enum.random(completed_items..100)
+  ...> Utils.test(:percentage, [completed_items, total_items, completed_items / total_items * 100])
+  iex> Utils.test(:pythagorean_c_square, 10 ** 2 + 10 ** 2)
+  iex> Utils.test(:pythagorean_c, :math.sqrt(200))
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
+  iex> Utils.test(:rocket_ship, 10 * 2)
   iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
   iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
+  iex> Utils.test(:tip_amount, [55.50, 0.20, 55.50 * 0.20])
+  iex> Utils.test(:tip_amount, [55.5, 0.2, 55.5 * 0.2])
   """
   def test(:card_count_four, answer) do
     if answer do
@@ -1008,7 +1017,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     end
   end
 
-  def test(:card_count_random, card, next_count) do
+  def test(:card_count_random, [card, next_count]) do
     if card && next_count do
       ExUnit.start(auto_run: false)
 
@@ -1059,16 +1068,108 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     end
   end
 
-  def test(:example, answer) do
-    if answer do
+  def test(:naming_numbers, convert_to_named_integer) do
+    ExUnit.start(auto_run: false)
+
+    :persistent_term.put(:convert_to_named_integer, convert_to_named_integer)
+
+    defmodule NamingNumbers do
+      use ExUnit.Case
+
+      test "convert_to_named_integer" do
+        answer_key = [
+          {0, "zero"},
+          {1, "one"},
+          {2, "two"},
+          {3, "three"},
+          {4, "four"},
+          {5, "five"},
+          {6, "six"},
+          {7, "seven"},
+          {8, "eight"},
+          {9, "nine"}
+        ]
+
+        convert_to_named_integer = :persistent_term.get(:convert_to_named_integer)
+
+        Enum.each(answer_key, fn {key, value} ->
+          assert convert_to_named_integer.(key) === value
+        end)
+      end
+    end
+
+    ExUnit.run()
+  end
+
+  def test(:percentage, [completed_items, total_items, percentage]) do
+    if percentage && completed_items && total_items do
       ExUnit.start(auto_run: false)
 
-      defmodule Example do
-        @answer answer
+      defmodule Percentage do
+        @completed_items completed_items
+        @total_items total_items
+        @percentage percentage
         use ExUnit.Case
 
-        test "example" do
-          assert @answer === 5
+        test "percentage" do
+          assert @percentage === @completed_items / @total_items * 100
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c_square, c_square) do
+    if c_square do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanCSquare do
+        @c_square c_square
+        use ExUnit.Case
+
+        test "c_square" do
+          assert @c_square == 10 ** 2 + 10 ** 2
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c_square, c_square) do
+    if c_square do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanCSquare do
+        @c_square c_square
+        use ExUnit.Case
+
+        test "c_square" do
+          assert c_square == 10 ** 2 + 10 ** 2
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c, c) do
+    if c do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanC do
+        @c c
+        use ExUnit.Case
+
+        test "c" do
+          assert @c == :math.sqrt(200)
         end
       end
 
@@ -1128,37 +1229,48 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     end
   end
 
-  def test(:naming_numbers, convert_to_named_integer) do
-    ExUnit.start(auto_run: false)
+  def test(:tip_amount, [cost_of_the_meal, tip_rate, tip_amount]) do
+    if tip_amount && tip_rate && cost_of_the_meal do
+      ExUnit.start(auto_run: false)
 
-    :persistent_term.put(:convert_to_named_integer, convert_to_named_integer)
+      defmodule TipAmount do
+        @tip_amount tip_amount
+        @tip_rate tip_rate
+        @cost_of_the_meal cost_of_the_meal
+        use ExUnit.Case
 
-    defmodule NamingNumbers do
-      use ExUnit.Case
+        test "tip_amount when tip_rate is 20% and cost_of_the_meal is $55.50" do
+          assert @tip_rate === 0.20, "tip rate should be 0.20."
+          assert @cost_of_the_meal === 55.50, "cost_of_the_meal should be 55.50."
 
-      test "convert_to_named_integer" do
-        answer_key = [
-          {0, "zero"},
-          {1, "one"},
-          {2, "two"},
-          {3, "three"},
-          {4, "four"},
-          {5, "five"},
-          {6, "six"},
-          {7, "seven"},
-          {8, "eight"},
-          {9, "nine"}
-        ]
-
-        convert_to_named_integer = :persistent_term.get(:convert_to_named_integer)
-
-        Enum.each(answer_key, fn {key, value} ->
-          assert convert_to_named_integer.(key) === value
-        end)
+          assert @tip_amount === @cost_of_the_meal * @tip_rate,
+                 "tip_amount should be cost_of_the_meal * tip_rate."
+        end
       end
-    end
 
-    ExUnit.run()
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rocket_ship, force) do
+    if force do
+      ExUnit.start(auto_run: false)
+
+      defmodule RocketShip do
+        @force force
+        use ExUnit.Case
+
+        test "mass * acceleration = force" do
+          assert @force === 20, "force should be acceleration * mass"
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
   end
 
   def test(:file_copy_challenge) do
