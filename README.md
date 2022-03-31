@@ -9,7 +9,7 @@ Contributors and beta testers are welcome to go through the course, raise issues
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at @BrooklinJMyers on Twitter if you would like more information.
 
 # QuickStart
-1. install a compatable Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+1. install a compatible Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 2. Install livebook main `mix escript.install github livebook-dev/livebook`.
 3. From the project folder run `livebook server start.livemd`. This opens the navigation page where you can find the course reading material and associated exercises.
 
