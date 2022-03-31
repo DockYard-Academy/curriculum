@@ -8,9 +8,9 @@
 
 > In Elixir, all code runs inside processes.
 > Processes are isolated from each other, run concurrent to one another
-> and communicate via message passing. Processes are not only the basis for concurrency in Elixir, 
+> and communicate via message passing. Processes are not only the basis for concurrency in Elixir,
 > but they also provide the means for building distributed and fault-tolerant programs.
-> 
+>
 > * [Elixir Documentation](https://elixir-lang.org/getting-started/processes.html#:~:text=In%20Elixir%2C%20all%20code%20runs,distributed%20and%20fault%2Dtolerant%20programs.)
 
 So all Elixir code runs inside of a process.
@@ -49,7 +49,7 @@ It even has a **pid** (personal identifier) that we can see with `self()`.
 self()
 ```
 
-We can `send/2` and `recieve/1` messages between processes by using their **pid**. Likewise, a process can send its `self()` a message.
+We can `send/2` and `receive/1` messages between processes by using their **pid**. Likewise, a process can send its `self()` a message.
 
 ```elixir
 send(self(), "message")
@@ -59,7 +59,7 @@ receive do
 end
 ```
 
-The left-hand side of the receive expression can pattern match on any value. 
+The left-hand side of the receive expression can pattern match on any value.
 It's much like a `case` statement.
 
 ```elixir
@@ -75,7 +75,7 @@ We can `spawn/1` a new process and get its pid.
 ```mermaid
 sequenceDiagram
     Parent Process->>Child Process: spawns
-    activate Child Process 
+    activate Child Process
     Child Process-->>Parent Process: pid
     deactivate Child Process
 ```
@@ -119,14 +119,14 @@ Processes are isolated from each other. That means that when a child process rai
 ```mermaid
 sequenceDiagram
     Parent Process->>Child Process: spawns
-    activate Child Process 
+    activate Child Process
     Child Process-->>Parent Process: pid
     Child Process->>Child Process: raise
-    activate Child Process 
+    activate Child Process
     Child Process->>Parent Process: logs termination
-    deactivate Child Process 
+    deactivate Child Process
     Child Process->>Child Process: dies
-    deactivate Child Process 
+    deactivate Child Process
 ```
 
 ```elixir
@@ -179,7 +179,7 @@ Comment out your solution when complete to avoid continuously crashing the liveb
 
 ## Message Passing
 
-By spawning two processes, they can communicate back and forth with `send/2` and `recieve/1`.
+By spawning two processes, they can communicate back and forth with `send/2` and `receive/1`.
 Let's spawn a process in one cell and send a message in another.
 
 ```mermaid
@@ -216,7 +216,7 @@ send(pid1, "message")
 
 ### Your Turn
 
-In the Elixir cell below, spawn a new process and send it a message `{:hello, "world"}`. 
+In the Elixir cell below, spawn a new process and send it a message `{:hello, "world"}`.
 `IO.puts` the message's payload where `"world"` is the payload.
 
 ```elixir

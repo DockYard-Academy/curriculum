@@ -4,12 +4,12 @@ The DockYard Academy curriculum is an open source curriculum to help students le
 The `beta_curriculum` is a work in progress effort available for feedback and contribution.
 When launched, this curriculum will be used as the primary teaching material in DockYard Academy.
 
-Contributers and beta testers are welcome to go through the course, raise issues, and make PRs.
+Contributors and beta testers are welcome to go through the course, raise issues, and make PRs.
 
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at @BrooklinJMyers on Twitter if you would like more information.
 
 # QuickStart
-1. install a compatable Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+1. install a compatible Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 2. Install livebook main `mix escript.install github livebook-dev/livebook`.
 3. From the project folder run `livebook server start.livemd`. This opens the navigation page where you can find the course reading material and associated exercises.
 
@@ -71,7 +71,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Week 7
 1. Phoenix Authentication & Permissions
 2. LiveView (+ Testing Patterns)
-3. JavaScript & JS Interoptability & AlpineJS
+3. JavaScript & JS Interoperability & AlpineJS
 4. PubSub & Channels
 5. GraphQL & Absinthe (+ Testing Patterns)
 
@@ -86,7 +86,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 1. Software & Product Management (Agile, StandUps)
 2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 3. Advanced Livebook (Graphs, Tables, Connecting Projects)
-4. Collaborative Github Patterns (PRs, Forking, Cloning, Issues)
+4. Collaborative GitHub Patterns (PRs, Forking, Cloning, Issues)
 5. 
 
 ## Week 10
