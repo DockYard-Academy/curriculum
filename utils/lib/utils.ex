@@ -966,6 +966,14 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> Utils.test(:card_count_random, [10, -1])
   iex> Utils.test(:card_count_random, [14, -1])
   iex> Utils.test(:example, 5)
+  iex> Utils.test(:habit_tracker_definition, [5, 20, 30])
+  iex> Utils.test(:habit_tracker_add, 5 + 20)
+  iex> Utils.test(:habit_tracker_percentage, (5 + 20) / 40 * 100)
+  iex> Utils.test(:habit_tracker_penalties_1, 5 + 20 + (30 * 0.5))
+  iex> Utils.test(:habit_tracker_penalties_1, 5 + 20 + (30 / 2))
+  iex> Utils.test(:habit_tracker_penalties_2, 5 / 2 * 3 + 20 / 2 * 3)
+  iex> Utils.test(:habit_tracker_penalties_2, 5 * 1.5 + 20 * 1.5)
+  iex> Utils.test(:habit_tracker_rewards, 20 * 1.6 + 5 * 1.6 + 30 * 0.5)
   iex> Utils.test(:percentage, [10, 100, 10 / 100 * 100])
   iex> completed_items = Enum.random(1..100)
   ...> total_items = Enum.random(completed_items..100)
@@ -1040,6 +1048,130 @@ Enum.reduce([], fn 4, 6 -> 10  end)
             true ->
               raise "something went wrong, please reset the exercise with the help of your teacher."
           end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_definition, [small, medium, large] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerDefinition do
+        @small small
+        @medium medium
+        @large large
+        use ExUnit.Case
+
+        test "small" do
+          assert @small === 5
+        end
+
+        test "medium" do
+          assert @medium === 20
+        end
+
+        test "large" do
+          assert @large === 30
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_add, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerAdd do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "habit tracker add small and medium" do
+          assert @total_points == 20 + 5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_percentage, percentage) do
+    if percentage do
+      ExUnit.start(auto_run: false)
+
+      defmodule Example do
+        @percentage percentage
+        use ExUnit.Case
+
+        test "percentage" do
+          assert @percentage === (5 + 20) / 40 * 100
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_penalties_1, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerPenalties do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 5 + 20 + 30 * 0.5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_penalties_2, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerPenalties do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 5 / 2 * 3 + 20 / 2 * 3
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_rewards, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerRewards do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 20 * 1.6 + 5 * 1.6 + 30 * 0.5
         end
       end
 

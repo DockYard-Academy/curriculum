@@ -1,0 +1,146 @@
+# Habit Tracker
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Habit Tracker
+
+We are building a habit tracking app.
+
+Each task has been assigned a different point value. Users earn points based on the tasks they complete and track progress on daily goals.
+
+```mermaid
+flowchart
+  A["Large (30 points)"]
+  B["Medium (20 points)"]
+  C["Small (5 points)"]
+```
+
+### Define Tasks
+
+Bind a variable `small`, `medium`, and `large` to represent the point value as an integer (see above) for each task.
+
+Replace `nil` with your answers.
+
+```elixir
+small = nil
+medium = nil
+large = nil
+
+Utils.test(:habit_tracker_definition, [small, medium, large])
+```
+
+### Add Tasks
+
+Given a user has completed a small and medium task, how many points do the have?
+
+Use the `small` and `medium` variables to calculate your answer.
+
+Replace `nil` with your answer below.
+
+```elixir
+total_points = nil
+
+Utils.test(:habit_tracker_add, total_points)
+```
+
+### Point Goal Percentages
+
+Users define a number of points they would like to earn each day.
+
+What percentage progress have they made if they would like to earn `40` points and have 
+completed a `small` and a `medium` task?
+
+Remember that you can calculate percentage with $\frac{points}{point\ goal} * 100$
+
+Replace `nil` with your answer below.
+
+```elixir
+point_goal = 40
+
+percentage = nil
+
+Utils.test(:habit_tracker_percentage, percentage)
+```
+
+### New Feature Added - Penalties
+
+A new feature is added. Users now must complete tasks within a time limit or recieve a penalty.
+
+Late tasks earn `50%` their normal value. So a task worth `10` points is now worth `5` when late.
+
+A user has completed
+
+* a medium task
+* a small task
+* a late large task
+
+What is their total point score? Replace `nil` with your answer.
+
+```elixir
+total_points = nil
+
+Utils.test(:habit_tracker_penalties_1, total_points)
+```
+
+A user has completed
+
+* three late `medium` tasks
+* three late `small` tasks.
+
+What is their total point score? Replace `nil` with your answer.
+
+```elixir
+total_points = nil
+
+Utils.test(:habit_tracker_penalties_2, total_points)
+```
+
+### New Feature Added - Rewards
+
+<!-- livebook:{"break_markdown":true} -->
+
+A new feature is added. Users now must complete tasks within a time limit or recieve a penalty.
+
+Early tasks earn an additional `60%` of their normal value. So a task worth `10` points is now worth `16` when early.
+
+A user has completed:
+
+* one early medium task
+* one early small
+* one late large task
+
+What is their total point score? Replace `nil` with your answer.
+
+```elixir
+total_points = nil
+
+Utils.test(:habit_tracker_rewards, total_points)
+```
+
+### (BONUS): Add Your Own Feature
+
+Add your own feature to the habit tracking app. Use comments to describe your feature and show
+how it would affect calculating the total score and or the total percentage of completed tasks.
+
+```elixir
+
+```
