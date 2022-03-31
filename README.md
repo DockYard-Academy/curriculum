@@ -50,7 +50,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Week 4 (Dev Setup)
 1. Mix Tooling (Credo, Dialyzer, Config, Deps, Documentation, ExUnit)
 2. Supervisor Basics and Fault Tolerance (+Task)
-3. BEAM, Nodes and Distributed Elixir
+3. BEAM
 4. Ecto & Database Basics
 5. 
 
@@ -94,13 +94,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Stripe
 3. Oban
 4. RabbitMQ
-5. Mnesia
+5. Kafka
 
 ## Week 11
 1. Umbrella Projects
 2. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
 3. Nodes, Clustering
-4. Deployment w/ Kubernetes & Distillery
+4. 
 5. 
 
 
