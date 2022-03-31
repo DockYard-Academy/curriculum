@@ -23,25 +23,23 @@ Mix.install([
 
 ## Source Control
 
-Source control allows us to maintain several different versions of a codebase. This makes it easier
+Source control allows us to maintain several different versions of a codebase. Source control makes it easier
 to share and collaborate on code.
 
 Projects share a **main** branch. Then developers working on the project can submit changes to the main branch.
 These changes are called a **commit**.
 
-This allows several developers to work on a project at once and stay up to date with eachother.
-
 Source control also provides a **history** of the changes made to a project along
 with associated descriptions of the change.
 
-There are many source control tools. The industry standard is **git** and **github**.
+There are many source control tools. The industry standard is **Git** and **GitHub**.
 
 ## Git
 
 Git is a locally installed program on your computer. If you installed [GitHub Desktop](https://desktop.github.com/)
-you should already have git installed on your computer.
+you should already have Git installed on your computer.
 
-Enter the following into the command line to confirm you have git installed. You should see a similar output.
+Enter the following into the command line to confirm you have Git installed. You should see a similar output.
 
 ```
 $ git --version
@@ -52,16 +50,13 @@ You can use Github Desktop, the command line, or a source control extension in y
 
 ## GitHub
 
-[Github](https://github.com/) hosts your git projects. It stores code and adds additional tools to
-make it easier to work with git and contribute to projects. It provides a UI (User Interface) for
-interacting with git.
+[Github](https://github.com/) hosts your git projects and provides tools for easier collaboration with Git. 
 
-Some git work still needs to occur locally but github handles most of the collaborative work such as reviewing
-and merging code changes and tracking issues.
+For example, this entire project is on GitHub. It is a **public** repository meaning that anyone can view the code and
+request to make a pull request. However, only **contributors** with valid permission can approve those changes. 
 
-For example, this entire project is stored on github. It is a **public** repository meaning that anyone can view the code and
-request to make a pull request. However only **contributers** with valid permission can approve those changes. **public** repositories
-are generally called **open source projects** if they accept changes from other developers.
+**public** repositories
+are generally called **open-source projects** if they accept changes from other developers.
 
 Alternatively **private** repositories can only be seen and modified by authorized users.
 
@@ -70,14 +65,14 @@ Alternatively **private** repositories can only be seen and modified by authoriz
 Anyone can raise an issue on a public GitHub project. For example, you can [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues) by going to
 the issues tab on the [GitHub Page](https://github.com/DockYard-Academy/beta_curriculum) of this curriculum and clicking **New Issue**.
 
-Please raise an issue to get support if there is any problem with the curriculum, or if you find a bug!
+Please raise an issue if you encounter a problem with the curriculum.
 
 ## Initializing A Local Repository
 
-Git manages a specific folder that you tell it to. It creates a `.git` folder which stores the necessary folders 
-and files to manage the source control of the project. We call this git-managed folder a **repository**.
+Git uses a `.git` folder that stores the necessary folders 
+and files to manage the project's source control. We call this git-managed folder a **repository**.
 
-Using the command line, you can initialize git in your current working directory by running:
+Using the command line, you can initialize Git in your current working directory by running:
 
 ```
 git init
@@ -87,10 +82,9 @@ git init
 
 ### Your Turn
 
-Using either the command line to create a new git managed project called `git_example`.
+Use the command line to create a new git managed project called `git_example`.
 
-You can use `git status` from the command line while in the `git_example` folder to verify that the folder
-is managed by git. Like so:
+You can use `git status` from the command line from the `git_example` folder to verify that git manages the folder. Like so:
 
 ```
 $ git init
@@ -105,14 +99,12 @@ nothing to commit (create/copy files and use "git add" to track)
 
 ## Saving Changes
 
-Git allows you to save your changes in a commit. Changes go from **untracked** to **staged** to **commited**.
+Git allows you to save your changes in a commit. Changes go from **untracked** to **staged** to **committed**.
 
 ```mermaid
 flowchart LR
   Untracked --git add--> Staged --git commit--> Commited
 ```
-
-This way we can decide which changes we want to save and commit, and what changes are unfinished.
 
 You'll use some common commands for saving changes in git.
 
@@ -121,7 +113,7 @@ You'll use some common commands for saving changes in git.
 * `git commit`: Save staged changes into a commit.
 
 We can use `git add` from the command line to stage changes. We can stage a single file
-with `git add <filename>` or all of the files and folders in the current working directory
+with `git add <filename>`  or all of the files and folders in the current working directory
 with `git add .`.
 
 Then we can use `git commit` from the command line to commit all staged changes.
@@ -130,7 +122,7 @@ Then we can use `git commit` from the command line to commit all staged changes.
 
 ### Your Turn
 
-In the `github_example` create and empty file named `finished.txt`.
+In the `github_example` create an empty file named `finished.txt`.
 
 Use `git status` to see that the file is untracked.
 
@@ -153,7 +145,7 @@ Now, stage `finished.txt` to prepare it to be committed.
 $ git add finished.txt
 ```
 
-If you use `git status` again, you'll see it's been staged.
+Use `git status` again and see the file is staged.
 
 ```
 $ git status
@@ -170,12 +162,12 @@ Now we'll use `git commit` to commit the staged changes. We use the `-m` flag an
 a message in quotations. `"example commit message"` can be any description you want.
 
 ```
-$ git commit -m "example commit message"
+$ Git commit -m "example commit message"
 ```
 
 ## Pushing Changes
 
-You've so far used git locally. Now in order to share code and collaborate with other developers, we
+You've so far used git locally. Now to share code and collaborate with other developers, we
 push code to a remote git repository on **GitHub**.
 
 ```mermaid
@@ -189,12 +181,12 @@ We use `git push` to push changes to the remote repository.
 
 ### Your Turn
 
-Run `git push` now and you'll notice the following error.
+Run `git push` now, and you'll notice the following error.
 
 ```
-$ git push
+$ Git push
 fatal: No configured push destination.
-Either specify the URL from the command-line or configure a remote repository using
+Either specify the URL from the command line or configure a remote repository using
 
     git remote add <name> <url>
 
@@ -227,8 +219,7 @@ the instructions for **push an existing repository from the command line**.
 
 * `git remote add origin <githuburl>` Tell your local git project where to find the remote git repository.
 * `git branch -M main` Rename the default branch to main.
-* `git push -u origin main` Push local commits to the remote repository. Set the remote repository as the default
-  branch so that future changes can be pushed with only `git push`.
+* `git push -u origin main` Push local commits to the remote repository. This command sets the default remote repository, so only `git push` is necessary for future commits.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -261,7 +252,7 @@ There are many methods for cloning a remote repository onto your computer.
 [Github Desktop](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/adding-and-cloning-repositories/cloning-and-forking-repositories-from-github-desktop)
 is the most straightforward way to clone a repository.
 
-On a Github repository click the **Code** button to see your options for cloning.
+On a Github repository, click the **Code** button to see your options for cloning.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -297,13 +288,13 @@ You can find instructions for each method on GitHub:
 
 #### HTTPS
 
-HTTPS (Hypertext Transfer Protocol Secure) is method of transfering data. 
-In this case we use it to copy files from the GitHub remote repository onto our local computer.
+HTTPS (Hypertext Transfer Protocol Secure) is a method of transferring data. 
+In this case, we use it to copy files from the GitHub remote repository onto our local computer.
 
-More practically, it's the easiest command line method, however the downside is it's less secure, and requires
-you to enter in your github credentials every time you use a git command.
+More practically, it's the easiest method for the command line however the downside is it's less secure and requires
+you to enter your GitHub credentials every time you use a git command.
 
-We use `git clone` with the url provided by GitHub to clone the repo with HTTPS.
+We use `git clone` with the URL provided by GitHub to clone the repo with HTTPS.
 ![](images/git_clone_https_github.png)
 
 ```
@@ -327,7 +318,7 @@ It's pretty tedious for projects that you use regularly.
 
 ### SSH
 
-SSH is more secure than HTTPS, and doesn't require a username or password for authentication. Instead
+SSH is more secure than HTTPS and doesn't require a username or password for authentication. Instead
 it uses an SSH Key stored locally on your computer.
 
 However, it's more complex to setup. If you wish to use SSH, follow the instructions
@@ -354,7 +345,7 @@ $ git clone git@github.com:BrooklinJazz/github_example.git
 
 ### Github CLI
 
-The github CLI provides some conveniences for working with git and GitHub.
+The github CLI provides some conveniences for working with Git and GitHub.
 It allows you to use the command line
 to accomplish tasks that would normally require GitHub.
 
@@ -364,9 +355,9 @@ It's beyond the scope of this course, but you can [learn more here](https://gith
 
 ### Your Turn
 
-Clone your `github_example` project onto your computer. Clone it under a new name `github_example2`.
+Clone your `github_example` project onto your computer under a new name `github_example2`.
 
-To clone a project under a new name either select a new location in the GitHub desktop UI or provide
+To clone a project under a new name, either select a new location in the GitHub desktop UI or provide
 a new name to `git clone`.
 
 ```
@@ -375,10 +366,9 @@ $ git clone <url> github_example2
 
 ## Trunk Based Development
 
-Source control allows use to store different versions of the project. Typically there
-is a main branch storing the latest version of the project.
+Source control allows us to store different versions of the project. Typically there is a main branch for the latest version of the project.
 
-The simplest source control only uses a main branch. Developers can push and pull from the main branch to get
+The most straightforward source control strategy only uses a main branch. Developers can push and pull from the main branch to get
 the latest changes.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -396,7 +386,7 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-It's convenient and fast. However it lacks any review system for code changes. Therefore it's potentially
+It's convenient and fast. However, it lacks any review system for code changes. Therefore it's potentially
 excellent for small projects with highly trusted team members, but less effective for large projects requiring
 code review.
 
@@ -409,7 +399,7 @@ GitHub Desktop allows you to pull changes through the UI.
 
 ![](images/github_desktop_pull.png)
 
-Alternatively you can use the command line with `git pull` from the project folder.
+Alternatively, you can use the command line with `git pull` from the project folder.
 
 ```
 $ git pull
@@ -424,7 +414,7 @@ We're going to simulate pulling changes on your `github_example` project.
 Create a new file called `pull.txt` in your `github_example2` project. 
 **Not** your `github_example` project.
 
-Stage, commit, and push the `pull.txt` file from github_example2.
+Stage, commit and push the `pull.txt` file from github_example2.
 
 ```
 $ git add pull.txt
@@ -442,12 +432,12 @@ You should see `pull.txt` is now part of the `github_example` project.
 
 ## Branching Strategies
 
-As an alternative to trunk based development you can use branching strategies for your git workflow.
+You can use branching strategies for your git workflow as an alternative to trunk-based development.
 
-You create a branch for a feature from the main branch, and then make a pull request which is 
+You create a branch for a feature from the main branch and then make a pull request which is 
 reviewed and merged back into the main branch.
 
-These strategies vary in complexity. For example, you could simply make a pr for a feature, and then
+These strategies vary in complexity. For example, you could simply make a pr for a feature and then
 merge those changes directly into the main branch.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -472,12 +462,12 @@ sequenceDiagram
 Alternatively, many git branching strategies have a pipeline for changes to be reviewed and tested.
 
 There is no universal strategy. Each project may have a different pipeline.
-However some common steps include:
+However, some common steps include:
 
 * **Feature Branch**: A branch containing one specific change.
 * **Development**: Developer testing and integration branch.
 * **Quality Assurance (QA)**: Quality Assurance testing branch.
-* **Staging**: Approved changes ready for production, but not yet deployed.
+* **Staging**: Approved changes ready for production but not yet deployed.
 * **Main**: The latest available version of the project.
 
 ```mermaid
@@ -494,16 +484,16 @@ flowchart LR
 
 ### Your Turn
 
-We're going to create a new branch on your `github_example` project.
+We will create a new branch on your `github_example` project.
 
-On the command line you can run:
+On the command line run:
 
 ```
 $ git checkout -b <branchname>
 ```
 
 Where `<branchname>` is the name of the branch with no spaces.
-Each branch must have a name with no spaces. For example, you could create a branch called `my-branch`
+Each branch must have a name with no spaces. For example, you could create a branch called `my-branch`.
 
 ```
 $ git checkout -b my-branch
@@ -593,7 +583,7 @@ and for `github_example2`
 conflicting github_example2 version of finished.txt
 ```
 
-Stage and commit both versions of the project. By having two versions you are simulating two
+Stage and commit both versions of the project. By having two versions, you are simulating two
 developers working on the same project.
 
 Push `github_example` and attempt to pull from `github_example2`.
