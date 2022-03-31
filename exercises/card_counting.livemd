@@ -1,0 +1,93 @@
+# Card Counting
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Card Counting
+
+Card counting is a blackjack strategy used to determine whether the player or the dealer has an advantage on the next hand.
+
+The most common strategy is the **Hi-Lo** strategy where we keep a running total based on the cards
+dealt. We either add 1, subtract 1, or do nothing based on the card's value.
+
+Card values are as follows:
+
+* 2-6 = `+1`
+* 7-9 = `0`
+* 10-14= `-1` (for 10 -> Ace)
+
+### Card 4
+
+When the current card is `4` and the current count is `0` what is the next count? 
+Replace `nil` with your answer.
+
+```elixir
+card = 4
+count = 0
+
+next_count = nil
+
+Utils.test(:card_count_four, next_count)
+```
+
+### Card King (13)
+
+When the current card is a King `(13)` and the current count is `5` what is the next count?
+Replace `nil` with your answer.
+
+```elixir
+card = 4
+count = 5
+
+next_count = nil
+
+Utils.test(:card_count_king, next_count)
+```
+
+Now the current card is a random card between `2` and `14`. We've used the `Utils` project to generate a random number.
+
+Use comparison operators to determine `next_count`.
+
+Remember that you can check if a comparison is true, and then return a value using `&&`.
+
+i.e.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+card = 4
+count = 0
+next_count = card <= 6 && count + 1 # returns 1
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Replace `nil` with your answer.
+
+```elixir
+random_card = Utils.random(2..14)
+
+count = 0
+
+next_count = nil
+
+Utils.test(:card_count_random, random_card, next_count)
+```

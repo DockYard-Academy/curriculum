@@ -27,7 +27,6 @@ defmodule Utils do
   @doc """
   iex> Utils.animate(:biggest_integer)
   iex> Utils.animate(:eager_evaluation)
-  iex> Utils.animate(:example)
   iex> Utils.animate(:lazy_evaluation)
   iex> Utils.animate(:remainder)
   iex> Utils.animate(:road_light)
@@ -452,6 +451,8 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
     Kino.VegaLite.push_many(widget, n4)
     widget
   end
+
+  defdelegate random(range), to: Enum
 
   @doc """
   Display a list of slides.
@@ -956,11 +957,108 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   end
 
   @doc ~S"""
+  iex> Utils.test(:card_count_four, 1)
+  iex> Utils.test(:card_count_king, 4)
+  iex> Utils.test(:card_count_random, 2, 1)
+  iex> Utils.test(:card_count_random, 6, 1)
+  iex> Utils.test(:card_count_random, 7, 0)
+  iex> Utils.test(:card_count_random, 9, 0)
+  iex> Utils.test(:card_count_random, 10, -1)
+  iex> Utils.test(:card_count_random, 14, -1)
   iex> Utils.test(:example, 5)
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
   iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
   iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
   """
+  def test(:card_count_four, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule CardCount do
+        @answer answer
+        use ExUnit.Case
+
+        test "next count when card is four" do
+          assert @answer === 1
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:card_count_king, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule CardCount do
+        @answer answer
+        use ExUnit.Case
+
+        test "next count when card is king and count is five" do
+          assert @answer === 4
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:card_count_random, card, next_count) do
+    if card && next_count do
+      ExUnit.start(auto_run: false)
+
+      defmodule CardCount do
+        @card card
+        @next_count next_count
+        use ExUnit.Case
+
+        test "next count when card is #{card} and count is 0" do
+          cond do
+            @card in 2..6 ->
+              assert @next_count === 1
+
+            @card in 7..9 ->
+              assert @next_count === 0
+
+            @card in 10..14 ->
+              assert @next_count === -1
+
+            true ->
+              raise "something went wrong, please reset the exercise with the help of your teacher."
+          end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:example, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule Example do
+        @answer answer
+        use ExUnit.Case
+
+        test "example" do
+          assert @answer === 5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
   def test(:example, answer) do
     if answer do
       ExUnit.start(auto_run: false)
