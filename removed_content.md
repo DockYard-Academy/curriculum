@@ -1017,8 +1017,8 @@ If the module attribute value changes, you only need to change the module attrib
 
 ```elixir
 defmodule Hero do
-  @name "IronMan"
-  @nemesis "Mandarin"
+  @name "Iron Man"
+  @nemesis "Iron Monger"
 
   def catchphrase do
     "I am #{@name}."
@@ -1946,3 +1946,103 @@ Students will not receive a number or letter grade for this course. Due to the n
 this course will be completion-based and rely on the intrinsic motivation of learning and self-improvement rather than carrot and stick motivation.
 
 For more on this see [Mark Rober's Talk](https://www.youtube.com/watch?v=9vJRopau0g0&ab_channel=TEDxTalks).
+
+### Recover after a commit
+
+If you create a commit with some undesired changes fixing them can be a bit harder.
+
+To avoid losing work, it's best to reach out to your teacher to ensure you fix this issue safely.
+
+However, this is a common problem when doing development, so we'll practice it now.
+
+First, ensure you don't have any active changes.
+
+```
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+```
+
+If you have changes, stage and commit them first.
+
+```
+$ git add .
+$ git commit -m "add latest changes"
+```
+
+Now delete the content in the following Elixir cell.
+
+```elixir
+"delete me and recover me!"
+```
+
+Stage and commit this change.
+
+```
+$ git add .
+$ git commit -m "remove elixir cell for livebook exercise"
+```
+
+Now you can use `git log` to view all of your commits.
+
+```
+$ git log
+commit 27131ad551555c1a89c7df1b0c4fd647f2dbc346 (HEAD -> main, origin/main, origin/HEAD)
+Author: USER <email@gmail.com>
+Date:   Mon Mar 28 21:51:16 2022 -0700
+
+    remove elixir cell for livebook exercise
+
+commit 2d4b114519ae5db57c5fa2b8ace055e0a71c8b7a
+Author: USER <email@gmail.com>
+Date:   Mon Mar 28 21:48:26 2022 -0700
+
+    add latest changes
+```
+
+You can then use `git checkout` to set the current local branch back to a previous commit.
+Replace `2d4b114519ae5db57c5fa2b8ace055e0a71c8b7a` with the value displayed for your `add latest changes`
+commit.
+
+```
+$ git checkout 2d4b114519ae5db57c5fa2b8ace055e0a71c8b7a
+c8b7a
+Note: switching to '2d4b114519ae5db57c5fa2b8ace055e0a71c8b7a'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at 2d4b114 add new file content
+```
+
+You'll also see some patterns for this course. For example, many notebooks will have a
+**Setup** section with the following Elixir code.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+This Elixir code installs some tools used in the notebook. You can generally ignore it and
+do not need to understand it yet.

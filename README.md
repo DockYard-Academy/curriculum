@@ -9,7 +9,7 @@ Contributors and beta testers are welcome to go through the course, raise issues
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at @BrooklinJMyers on Twitter if you would like more information.
 
 # QuickStart
-1. install a compatable Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+1. install a compatible Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 2. Install livebook main `mix escript.install github livebook-dev/livebook`.
 3. From the project folder run `livebook server start.livemd`. This opens the navigation page where you can find the course reading material and associated exercises.
 
@@ -37,7 +37,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 1. Problem Solving & Enumeration (ranges, map, filter, all, any, count, find, random)
 2. Comprehensions, Enum.reduce
 3. Built-In Modules (Map, Tuple, List, Date & Time)
-4.  Guards, Pattern Matching
+4. Guards, Pattern Matching
 5. String Manipulation (Regex, Charlist vs Strings)
 
 ## Week 3
@@ -50,7 +50,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Week 4 (Dev Setup)
 1. Mix Tooling (Credo, Dialyzer, Config, Deps, Documentation, ExUnit)
 2. Supervisor Basics and Fault Tolerance (+Task)
-3. BEAM, Nodes and Distributed Elixir
+3. BEAM
 4. Ecto & Database Basics
 5. 
 
@@ -94,13 +94,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Stripe
 3. Oban
 4. RabbitMQ
-5. Mnesia
+5. Kafka
 
 ## Week 11
 1. Umbrella Projects
 2. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
 3. Nodes, Clustering
-4. Deployment w/ Kubernetes & Distillery
+4. 
 5. 
 
 

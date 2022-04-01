@@ -453,6 +453,16 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
   end
 
   @doc """
+  Generate random values for exercise input.
+
+  iex> Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
+  true
+  """
+  def random(:rock_paper_scissors), do: Enum.random([:rock, :paper, :scissors])
+
+  defdelegate random(range), to: Enum
+
+  @doc """
   Display a list of slides.
   iex> %Kino.JS.Live{} = Utils.slide(:case)
   iex> %Kino.JS.Live{} = Utils.slide(:cond)
@@ -826,6 +836,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   @doc """
   Create a Data Table
 
+  iex> %Kino.JS.Live{} = Utils.table(:example)
   iex> %Kino.JS.Live{} = Utils.table(:exponential_growth)
   iex> %Kino.JS.Live{} = Utils.table(:factorial_complexity)
   iex> %Kino.JS.Live{} = Utils.table(:fib_cache)
@@ -836,6 +847,15 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> %Kino.JS.Live{} = Utils.table(:users_and_photos)
   iex> %Kino.JS.Live{} = Utils.table(:user_photo_foreign_key)
   """
+
+  def table(:example) do
+    Enum.map(1..5, fn each ->
+      %{
+        number: each
+      }
+    end)
+    |> Kino.DataTable.new()
+  end
 
   def table(:exponential_growth) do
     Enum.map(1..100, fn each ->
@@ -945,22 +965,49 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   end
 
   @doc ~S"""
+  iex> Utils.test(:card_count_four, 1)
+  iex> Utils.test(:card_count_king, 4)
+  iex> Utils.test(:card_count_random, [2, 1])
+  iex> Utils.test(:card_count_random, [6, 1])
+  iex> Utils.test(:card_count_random, [7, 0])
+  iex> Utils.test(:card_count_random, [9, 0])
+  iex> Utils.test(:card_count_random, [10, -1])
+  iex> Utils.test(:card_count_random, [14, -1])
+  iex> Utils.test(:example, 5)
+  iex> Utils.test(:habit_tracker_definition, [5, 20, 30])
+  iex> Utils.test(:habit_tracker_add, 5 + 20)
+  iex> Utils.test(:habit_tracker_percentage, (5 + 20) / 40 * 100)
+  iex> Utils.test(:habit_tracker_penalties_1, 5 + 20 + (30 * 0.5))
+  iex> Utils.test(:habit_tracker_penalties_1, 5 + 20 + (30 / 2))
+  iex> Utils.test(:habit_tracker_penalties_2, 5 / 2 * 3 + 20 / 2 * 3)
+  iex> Utils.test(:habit_tracker_penalties_2, 5 * 1.5 + 20 * 1.5)
+  iex> Utils.test(:habit_tracker_rewards, 20 * 1.6 + 5 * 1.6 + 30 * 0.5)
+  iex> Utils.test(:percentage, [10, 100, 10 / 100 * 100])
+  iex> completed_items = Enum.random(1..100)
+  ...> total_items = Enum.random(completed_items..100)
+  ...> Utils.test(:percentage, [completed_items, total_items, completed_items / total_items * 100])
+  iex> Utils.test(:pythagorean_c_square, 10 ** 2 + 10 ** 2)
+  iex> Utils.test(:pythagorean_c, :math.sqrt(200))
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
+  iex> Utils.test(:rock_paper_scissors_ai, [:rock, :paper])
+  iex> Utils.test(:rock_paper_scissors_ai, [:paper, :scissors])
+  iex> Utils.test(:rock_paper_scissors_ai, [:scissors, :rock])
+  iex> Utils.test(:rocket_ship, 10 * 2)
   iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
   iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
+  iex> Utils.test(:tip_amount, [55.50, 0.20, 55.50 * 0.20])
+  iex> Utils.test(:tip_amount, [55.5, 0.2, 55.5 * 0.2])
   """
-  def test(:string_concatenation, answer) do
+  def test(:card_count_four, answer) do
     if answer do
       ExUnit.start(auto_run: false)
 
-      defmodule StringConcatenation do
+      defmodule CardCount do
         @answer answer
         use ExUnit.Case
 
-        test "Hi, name." do
-          assert is_bitstring(@answer), "the answer should be a string."
-          assert "Hi, " <> name = @answer, "the answer should be in the format: Hi, name."
-          assert Regex.match?(~r/Hi, \w+\./, @answer), "the answer should end in a period."
+        test "next count when card is four" do
+          assert @answer === 1
         end
       end
 
@@ -970,26 +1017,191 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     end
   end
 
-  def test(:string_interpolation, answer) do
+  def test(:card_count_king, answer) do
     if answer do
       ExUnit.start(auto_run: false)
 
-      defmodule StringInterpolation do
+      defmodule CardCount do
         @answer answer
         use ExUnit.Case
 
-        test "I have X - 1 classmates." do
-          assert is_bitstring(@answer), "the answer should be a string."
+        test "next count when card is king and count is five" do
+          assert @answer === 4
+        end
+      end
 
-          assert "I have " <> name = @answer,
-                 "the answer should be in the format: I have 10 classmates"
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
 
-          assert Regex.match?(~r/I have \d+/, @answer),
-                 "the answer should contain an integer for classmates."
+  def test(:card_count_random, [card, next_count]) do
+    if card && next_count do
+      ExUnit.start(auto_run: false)
 
-          assert Regex.match?(~r/I have \d+ classmates\./, @answer) ||
-                   @answer === "I have 1 classmate.",
-                 "the answer should end in a period."
+      defmodule CardCount do
+        @card card
+        @next_count next_count
+        use ExUnit.Case
+
+        test "next count when card is #{card} and count is 0" do
+          cond do
+            @card in 2..6 ->
+              assert @next_count === 1
+
+            @card in 7..9 ->
+              assert @next_count === 0
+
+            @card in 10..14 ->
+              assert @next_count === -1
+
+            true ->
+              raise "something went wrong, please reset the exercise with the help of your teacher."
+          end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_definition, [small, medium, large] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerDefinition do
+        @small small
+        @medium medium
+        @large large
+        use ExUnit.Case
+
+        test "small" do
+          assert @small === 5
+        end
+
+        test "medium" do
+          assert @medium === 20
+        end
+
+        test "large" do
+          assert @large === 30
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_add, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerAdd do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "habit tracker add small and medium" do
+          assert @total_points == 20 + 5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_percentage, percentage) do
+    if percentage do
+      ExUnit.start(auto_run: false)
+
+      defmodule Example do
+        @percentage percentage
+        use ExUnit.Case
+
+        test "percentage" do
+          assert @percentage === (5 + 20) / 40 * 100
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_penalties_1, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerPenalties do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 5 + 20 + 30 * 0.5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_penalties_2, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerPenalties do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 5 / 2 * 3 + 20 / 2 * 3
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:habit_tracker_rewards, total_points) do
+    if total_points do
+      ExUnit.start(auto_run: false)
+
+      defmodule HabitTrackerRewards do
+        @total_points total_points
+        use ExUnit.Case
+
+        test "total_points" do
+          assert @total_points === 20 * 1.6 + 5 * 1.6 + 30 * 0.5
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:example, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule Example do
+        @answer answer
+        use ExUnit.Case
+
+        test "example" do
+          assert @answer === 5
         end
       end
 
@@ -1030,6 +1242,239 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     end
 
     ExUnit.run()
+  end
+
+  def test(:percentage, [completed_items, total_items, percentage]) do
+    if percentage && completed_items && total_items do
+      ExUnit.start(auto_run: false)
+
+      defmodule Percentage do
+        @completed_items completed_items
+        @total_items total_items
+        @percentage percentage
+        use ExUnit.Case
+
+        test "percentage" do
+          assert @percentage === @completed_items / @total_items * 100
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c_square, c_square) do
+    if c_square do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanCSquare do
+        @c_square c_square
+        use ExUnit.Case
+
+        test "c_square" do
+          assert @c_square == 10 ** 2 + 10 ** 2
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c_square, c_square) do
+    if c_square do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanCSquare do
+        @c_square c_square
+        use ExUnit.Case
+
+        test "c_square" do
+          assert c_square == 10 ** 2 + 10 ** 2
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:pythagorean_c, c) do
+    if c do
+      ExUnit.start(auto_run: false)
+
+      defmodule PythagoreanC do
+        @c c
+        use ExUnit.Case
+
+        test "c" do
+          assert @c == :math.sqrt(200)
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:string_concatenation, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule StringConcatenation do
+        @answer answer
+        use ExUnit.Case
+
+        test "Hi, name." do
+          assert is_bitstring(@answer), "the answer should be a string."
+          assert "Hi, " <> _name = @answer, "the answer should be in the format: Hi, name."
+          assert Regex.match?(~r/Hi, \w+\./, @answer), "the answer should end in a period."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:string_interpolation, answer) do
+    if answer do
+      ExUnit.start(auto_run: false)
+
+      defmodule StringInterpolation do
+        @answer answer
+        use ExUnit.Case
+
+        test "I have X - 1 classmates." do
+          assert is_bitstring(@answer), "the answer should be a string."
+
+          assert "I have " <> name = @answer,
+                 "the answer should be in the format: I have 10 classmates"
+
+          assert Regex.match?(~r/I have \d+/, @answer),
+                 "the answer should contain an integer for classmates."
+
+          assert Regex.match?(~r/I have \d+ classmates\./, @answer) ||
+                   @answer === "I have 1 classmate.",
+                 "the answer should end in a period."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above."
+    end
+  end
+
+  def test(:tip_amount, [cost_of_the_meal, tip_rate, tip_amount]) do
+    if tip_amount && tip_rate && cost_of_the_meal do
+      ExUnit.start(auto_run: false)
+
+      defmodule TipAmount do
+        @tip_amount tip_amount
+        @tip_rate tip_rate
+        @cost_of_the_meal cost_of_the_meal
+        use ExUnit.Case
+
+        test "tip_amount when tip_rate is 20% and cost_of_the_meal is $55.50" do
+          assert @tip_rate === 0.20, "tip rate should be 0.20."
+          assert @cost_of_the_meal === 55.50, "cost_of_the_meal should be 55.50."
+
+          assert @tip_amount === @cost_of_the_meal * @tip_rate,
+                 "tip_amount should be cost_of_the_meal * tip_rate."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rock_paper_scissors_ai, [player_choice, ai_choice] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule RockPaperScissorsAI do
+        @player_choice player_choice
+        @ai_choice ai_choice
+        use ExUnit.Case
+
+        test "rock paper scissors ai" do
+          case @player_choice do
+            :rock ->
+              assert @ai_choice === :paper,
+                     "when player_choice is :rock, ai_choice should be :paper."
+
+            :paper ->
+              assert @ai_choice === :scissors,
+                     "when player_choice is :paper, ai_choice should be :scissors."
+
+            :scissors ->
+              assert @ai_choice === :rock,
+                     "when player_choice is :scissors, ai_choice should be :rock."
+          end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rock_paper_scissors_two_player, [player1_choice, player2_choice, winner] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule RockPaperScissorsAI do
+        @player1_choice player1_choice
+        @player2_choice player2_choice
+        @winner winner
+        use ExUnit.Case
+
+        test "rock paper scissors ai" do
+          case {@player1_choice, @player2_choice} do
+            {:rock, :scissors} -> assert @winner == :player1
+            {:paper, :rock} -> assert @winner == :player1
+            {:scissors, :paper} -> assert @winner == :player1
+            {:scissors, :rock} -> assert @winner == :player2
+            {:rock, :paper} -> assert @winner == :player2
+            {:paper, :scissors} -> assert @winner == :player2
+            _ -> assert @winner == :draw
+          end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rocket_ship, force) do
+    if force do
+      ExUnit.start(auto_run: false)
+
+      defmodule RocketShip do
+        @force force
+        use ExUnit.Case
+
+        test "mass * acceleration = force" do
+          assert @force === 20, "force should be acceleration * mass"
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
   end
 
   def test(:file_copy_challenge) do

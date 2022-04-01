@@ -1,5 +1,4 @@
 defmodule Kino.SlideTest do
-	use ExUnit.Case
-	doctest Kino.Slide
-
+  use ExUnit.Case
+  doctest Kino.Slide
 end

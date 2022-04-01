@@ -4,29 +4,90 @@
 
 [Return Home](../start.livemd)
 
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
 ## Create the perfect AI
 
 In the Elixir cell below, you're going to create the perfect AI for rock paper scissors.
-You should only need to use `&&`, `=`, `===`, and `||` operators.
 
-* Create a variable `input` and bind it to `"Rock"`.
-* Use **comparison** operators to check if input equals "Rock" then return "Paper"
-* Handle if input equals `"Paper"` then return `"Scissors"`
-* Handle if input equals `"Scissors"` then return `"Rock"`
+```mermaid
+flowchart LR
+scissors --beats--> paper --beats--> rock --beats--> scissors
+```
+
+You are **only** allowed to use boolean operators `&&`, `==`, and `||` and the match operator `=`.
+
+Remember that you can conditionally return a value with:
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+player_choice = :rock
 
+ai_choice = player_choice == :rock && :paper
+```
+
+Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determing the winning
+`ai_choice`.
+
+Replace `nil` with your answer.
+
+```elixir
+# Will be either :rock, :paper, or :scissors
+player_choice = Utils.random(:rock_paper_scissors)
+
+ai_choice = nil
+
+Utils.test(:rock_paper_scissors_ai, [player_choice, ai_choice])
 ```
 
 ## Create Two Player Rock Paper Scissors
 
-In the Elixir cell below, you're going to create a two player game of rock paper scissors. You should
-only need to use the `&&`, `=`, `===`, and `||` operators.
+In the Elixir cell below, you're going to create a two player game of rock paper scissors.
 
-* Create a variable `player1` and bind it to either `"Rock"`, `"Paper"`, or `"Scissors"`.
-* Create a variable `player2` and bind it to either `"Rock"`, `"Paper"`, or `"Scissors"`.
-* Return who won in the format `"Rock beats Paper"` depending on which player won.
+As earlier, you should **only** use the `&&`, `=`, `===`, and `||` operators.
+
+Given `player1_choice` and `player2_choice` are either `:rock`, `:paper`, or `:scissors`.
+Determine the `winner` as either `:player1` or `:player2`.
+
+```mermaid
+flowchart LR
+p1c[player_1_choice]
+p2c[player_2_choice]
+w[winner]
+p1[:player1]
+p2[:player2]
+
+p1c --> w
+p2c --> w
+w --> p1
+w --> p2
+```
+
+Replace `nil` with your answer.
 
 ```elixir
+# Will be either :rock, :paper, or :scissors
+player1_choice = Utils.random(:rock_paper_scissors)
+# Will be either :rock, :paper, or :scissors
+player2_choice = Utils.random(:rock_paper_scissors)
 
+winner = nil
+
+Utils.test(:rock_paper_scissors_two_player, [player1_choice, player2_choice, winner])
 ```
