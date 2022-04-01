@@ -452,6 +452,14 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
     widget
   end
 
+  @doc """
+  Generate random values for exercise input.
+
+  iex> Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
+  true
+  """
+  def random(:rock_paper_scissors), do: Enum.random([:rock, :paper, :scissors])
+
   defdelegate random(range), to: Enum
 
   @doc """
@@ -981,6 +989,9 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> Utils.test(:pythagorean_c_square, 10 ** 2 + 10 ** 2)
   iex> Utils.test(:pythagorean_c, :math.sqrt(200))
   iex> Utils.test(:naming_numbers, fn int -> Enum.at(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"], int) end)
+  iex> Utils.test(:rock_paper_scissors_ai, [:rock, :paper])
+  iex> Utils.test(:rock_paper_scissors_ai, [:paper, :scissors])
+  iex> Utils.test(:rock_paper_scissors_ai, [:scissors, :rock])
   iex> Utils.test(:rocket_ship, 10 * 2)
   iex> Utils.test(:string_concatenation, "Hi, " <> "Peter.")
   iex> Utils.test(:string_interpolation, "I have #{1 - 1} classmates.")
@@ -1321,7 +1332,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
 
         test "Hi, name." do
           assert is_bitstring(@answer), "the answer should be a string."
-          assert "Hi, " <> name = @answer, "the answer should be in the format: Hi, name."
+          assert "Hi, " <> _name = @answer, "the answer should be in the format: Hi, name."
           assert Regex.match?(~r/Hi, \w+\./, @answer), "the answer should end in a period."
         end
       end
@@ -1377,6 +1388,67 @@ Enum.reduce([], fn 4, 6 -> 10  end)
 
           assert @tip_amount === @cost_of_the_meal * @tip_rate,
                  "tip_amount should be cost_of_the_meal * tip_rate."
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rock_paper_scissors_ai, [player_choice, ai_choice] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule RockPaperScissorsAI do
+        @player_choice player_choice
+        @ai_choice ai_choice
+        use ExUnit.Case
+
+        test "rock paper scissors ai" do
+          case @player_choice do
+            :rock ->
+              assert @ai_choice === :paper,
+                     "when player_choice is :rock, ai_choice should be :paper."
+
+            :paper ->
+              assert @ai_choice === :scissors,
+                     "when player_choice is :paper, ai_choice should be :scissors."
+
+            :scissors ->
+              assert @ai_choice === :rock,
+                     "when player_choice is :scissors, ai_choice should be :rock."
+          end
+        end
+      end
+
+      ExUnit.run()
+    else
+      "Please enter an answer above"
+    end
+  end
+
+  def test(:rock_paper_scissors_two_player, [player1_choice, player2_choice, winner] = args) do
+    if Enum.all?(args) do
+      ExUnit.start(auto_run: false)
+
+      defmodule RockPaperScissorsAI do
+        @player1_choice player1_choice
+        @player2_choice player2_choice
+        @winner winner
+        use ExUnit.Case
+
+        test "rock paper scissors ai" do
+          case {@player1_choice, @player2_choice} do
+            {:rock, :scissors} -> assert @winner == :player1
+            {:paper, :rock} -> assert @winner == :player1
+            {:scissors, :paper} -> assert @winner == :player1
+            {:scissors, :rock} -> assert @winner == :player2
+            {:rock, :paper} -> assert @winner == :player2
+            {:paper, :scissors} -> assert @winner == :player2
+            _ -> assert @winner == :draw
+          end
         end
       end
 
