@@ -42,7 +42,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 
 ## Week 3
 1. Polymorphism, Protocols & Behaviors
-2. Performance (Immutability, Streams, Lists Vs Tuples Vs Maps Vs Mapsets, Big O, Benchee, :Timer) & Recursion
+2. Performance (Immutability, Streams, Lists Vs Tuples Vs Maps Vs Mapsets, Big O, Benchee, :timer) & Recursion
 3. 
 4. File, .iex Scripts, Persistence, Data Validation (Ecto Changesets) (+Binary)
 5. Processes (Processes, Generic Server, Genserver, Agents, ETS)
