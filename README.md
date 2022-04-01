@@ -83,7 +83,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 5. Code Coverage, Github Actions & Hooks
 
 ## Week 9 (Group Project)
-1. Software & Product Management (Agile, StandUps)
+1. Software & Product Management (Agile, StandUps, Kanban)
 2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 3. Advanced Livebook (Graphs, Tables, Connecting Projects)
 4. Collaborative GitHub Patterns (PRs, Forking, Cloning, Issues)
