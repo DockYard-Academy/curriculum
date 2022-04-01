@@ -37,7 +37,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 1. Problem Solving & Enumeration (ranges, map, filter, all, any, count, find, random)
 2. Comprehensions, Enum.reduce
 3. Built-In Modules (Map, Tuple, List, Date & Time)
-4.  Guards, Pattern Matching
+4. Guards, Pattern Matching
 5. String Manipulation (Regex, Charlist vs Strings)
 
 ## Week 3

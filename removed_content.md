@@ -1017,8 +1017,8 @@ If the module attribute value changes, you only need to change the module attrib
 
 ```elixir
 defmodule Hero do
-  @name "IronMan"
-  @nemesis "Mandarin"
+  @name "Iron Man"
+  @nemesis "Iron Monger"
 
   def catchphrase do
     "I am #{@name}."
