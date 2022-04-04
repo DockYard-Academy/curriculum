@@ -1,0 +1,80 @@
+# Velocity Graph
+
+## Setup
+
+```elixir
+Mix.install([
+  {:vega_lite, "~> 0.1.3"},
+  {:kino, "~> 0.5.0"}
+])
+```
+
+## 2022-04-04 graph
+
+Week Goals
+
+* Day 1 and Day 2 of Week 4
+* [Stretch Goal] All of Week 4
+* [Maintenance] Week 1 Content Updates
+* [Maintenance] Automated Testing System
+* [Maintenance] Add Licence
+
+General Feedback
+
+* Seems like a lot of content, what can we remove?
+* Remove the custom deployment of self-made server, add deployment later in the course. 
+  What deployment should we use? (Recommendations made to partner with Fly)
+* Potential order changes: Some Week 9 topics could be sooenr
+* adding stretch goals or extra credit sections
+* add a survey of students
+
+```elixir
+weeks = 12
+
+start = Date.new!(2022, 1, 15)
+current = Date.utc_today()
+
+finish = Date.new!(2022, 7, 1)
+past_days = Date.diff(current, start)
+days_until_finish = Date.diff(finish, current)
+
+content_completed_in_days = 15
+remaining_content_in_days = 35
+
+necessary_pace = remaining_content_in_days / days_until_finish
+current_pace = content_completed_in_days / past_days
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "x", type: :quantitative)
+  |> VegaLite.encode_field(:y, "y", type: :quantitative)
+  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+  |> VegaLite.encode_field(:color, "type", title: "V Graph", type: :nominal)
+  |> Kino.VegaLite.new()
+
+IO.inspect(Float.round(necessary_pace * 5), label: "days of content I must finish per week")
+
+current_pace =
+  Enum.map(0..days_until_finish, &%{x: &1, y: &1 * current_pace + 15, type: "current pace"})
+
+baseline =
+  Enum.map(0..days_until_finish, &%{x: &1, y: content_completed_in_days, type: "baseline"})
+
+goal_pace =
+  Enum.map(0..days_until_finish, &%{x: &1, y: &1 * necessary_pace + 15, type: "goal pace"})
+
+Kino.VegaLite.push_many(widget, goal_pace)
+Kino.VegaLite.push_many(widget, current_pace)
+Kino.VegaLite.push_many(widget, baseline)
+widget
+```
+
+## Unknowns
+
+
+
+```elixir
+
+```
