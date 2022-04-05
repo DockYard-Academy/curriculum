@@ -998,6 +998,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> Utils.test(:tip_amount, [55.50, 0.20, 55.50 * 0.20])
   iex> Utils.test(:tip_amount, [55.5, 0.2, 55.5 * 0.2])
   """
+
   def test(:card_count_four, answer) do
     if not is_nil(answer) do
       ExUnit.start(auto_run: false)
