@@ -973,6 +973,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
   iex> Utils.test(:card_count_random, [9, 0])
   iex> Utils.test(:card_count_random, [10, -1])
   iex> Utils.test(:card_count_random, [14, -1])
+  iex> Utils.test(:created_project, "example")
   iex> Utils.test(:example, 5)
   iex> Utils.test(:habit_tracker_definition, [5, 20, 30])
   iex> Utils.test(:habit_tracker_add, 5 + 20)
@@ -1067,6 +1068,22 @@ Enum.reduce([], fn 4, 6 -> 10  end)
     else
       "Please enter an answer above."
     end
+  end
+
+  def test(:created_project, path) do
+    ExUnit.start(auto_run: false)
+
+    defmodule ProjectTest do
+      @path path
+      use ExUnit.Case
+
+      test "project created" do
+        assert File.dir?("../projects/#{@path}"),
+               "Ensure you create a mix project `#{@path}` in the `projects` folder."
+      end
+    end
+
+    ExUnit.run()
   end
 
   def test(:habit_tracker_definition, [small, medium, large] = args) do
@@ -1256,7 +1273,7 @@ Enum.reduce([], fn 4, 6 -> 10  end)
         use ExUnit.Case
 
         test "percentage" do
-          assert @percentage === @completed_items / @total_items * 100
+          assert @percentage == @completed_items / @total_items * 100
         end
       end
 

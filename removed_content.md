@@ -2046,3 +2046,55 @@ Mix.install([
 
 This Elixir code installs some tools used in the notebook. You can generally ignore it and
 do not need to understand it yet.
+
+## Side Effects (Reading)
+
+Since you are working with a persistent file system, it's possible to have persistent
+side-effects that affect your tests. For example, files may already exist.
+
+To avoid this issue, it's often wise to cleanup (delete) any files you create before or after your tests.
+
+If you find this code repetitive, you may consider putting it into a `setup` function like so:
+
+<!-- livebook:{"break_markdown": true} -->
+```elixir
+# journal_test.exs
+setup do
+  File.rm_rf("test_entries")
+  :ok
+end
+```
+
+You can use `on_exit/2` to run the code after the test rather than before it.
+
+<!-- livebook:{"break_markdown": true} -->
+```elixir
+# journal_test.exs
+setup do
+  on_exit(fn -> File.rm_rf("test_entries") end)
+end
+```
+
+### Journal
+```elixir
+  test "main/1 with --tags creates Yaml formatted tags" do
+    Journal.main(["--tags", "tag1,tag2,tag3"])
+    assert {:ok, content} = File.read(@file_path)
+
+    assert content ==
+             "---\ntags: ~w(tag1 tag2 tag3)\n---#{@file_content}"
+  end
+
+  test "main/1 search --tag command finds files with matching tags" do
+    Journal.main(["--tags", "tag1,tag2,tag3", "--title", "tagged_article"])
+    Journal.main(["--title", "untagged_article"])
+
+    logs =
+      capture_log(fn ->
+        Journal.main(["search", "--tags", "tag1"])
+      end)
+
+    assert logs =~ "tagged_article.md"
+    refute logs =~ "untagged_article.md"
+  end
+```
