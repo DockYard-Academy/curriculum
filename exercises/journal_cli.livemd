@@ -53,64 +53,7 @@ Evaluate the cell below to ensure you have correctly created the project.
 Utils.test(:created_project, "journal")
 ```
 
-## Configure Dialyzer
-
-Add the following to your dependencies in `mix.exs`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:dialyxir, "~> 1.0", only: [:dev], runtime: false}
-```
-
-Run the following in the command line to ensure Dialyzer is working correctly:
-
-```
-mix deps.get
-mix dialyzer
-```
-
-## Configure Credo
-
-Add the following to your dependencies in `mix.exs`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:credo, "~> 1.6", only: [:dev, :test], runtime: false}
-```
-
-Run the following in the command line to ensure Credo is working correctly:
-
-```
-mix deps.get
-mix credo
-```
-
-## Configure ExDoc
-
-Add the following to your dependencies in `mix.exs`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ex_doc, "~> 0.27", only: :dev, runtime: false}
-```
-
-Run the following in the command line to ensure `ExDoc` is working correctly.
-
-```
-mix deps.get
-mix docs
-```
-
-Then open the generated `doc/index.html` to see the project documentation. You will need
-to re-run `mix docs` if you wish to update the documentation.
-
-<!-- livebook:{"break_markdown":true} -->
-
-TODO Fix this Image to match the project.
-![](images/ex_doc_mix_math_example.png)
+Dialyzer, Credo, and HexDocs are optional for this project.
 
 ## Configure The Project For The Command Line
 
@@ -262,20 +205,30 @@ Now `opts` for the following command would be: `[folder: "example"]`.
 Test and implement the `--folder` switch to store journal entries in a different folder.
 Still use `test_entries` if the `--folder` switch is not provided.
 
-## Add the --title switch
+## Add the --file switch
 
-Test and implement the `--title` switch, which should override the default file name.
+Test and implement the `--file` switch, which should override the default file name.
 
 So the following would create a new file `test.md`.
 
 ```
-./journal --title test
+./journal --file test
 ```
 
-The title of the file should also be test.
+## Add the --title switch
+
+Test and implement the `--title` switch, which should override the default file title.
+
+So the following would create a new file `test.md`.
+
+```
+./journal --file test --title "My Title"
+```
+
+With the following content:
 
 ```md
-# Test
+# My Title
 ```
 
 ## Use the --template switch
@@ -304,26 +257,34 @@ Today I will
 - 
 ```
 
-## (Bonus) Provide Custom Values in Templates
-
-If a template defines some content in the format `YYYY-MM-DD`,
-replace that content with todays date.
-
-```md
-<!-- in templates/daily.md -->
-# YYYY-MM-DD
-YYYY-MM-DD will be replaced with todays date. Either the `--title` switch value or today's date.
-```
-
-If a template defines some content in the format TITLE.
-replace that content with the `--title`
-
-## (Bonus) Handle An Existing Daily Journal
+## Handle An Existing Daily Journal
 
 Use `Logger.error` to warn the user if they already have an existing daily journal or journal with the same name.
 You can use `capture_log` from `ExUnit` to test this feature.
 ```
 Error, daily journal already exists. Open test_entries/yyyy-mm-dd.md to see todays journal.
+```
+
+## Provide Custom Values in Templates
+
+If a template defines some content in the format `{DATE}`,
+replace that content with todays date.
+
+If a template defines some content in the format `{TITLE}` replace that value
+with the `--title` switch if it exists. If it does not exist, replace the `{TITLE}` with an empty string.
+
+For example:
+
+```md
+# {TITLE}
+Created on {DATE}
+```
+
+When provided `--title "My Title"` Would become:
+
+```md
+# My Title
+Created on 2022-04-06
 ```
 
 ## (Bonus) Search Entries

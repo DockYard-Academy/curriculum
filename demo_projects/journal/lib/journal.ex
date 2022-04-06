@@ -7,28 +7,27 @@ defmodule Journal do
   require Logger
 
   def main(["search" | args]) do
-    options = [switches: [folder: :string, tags: :string]]
+    options = [switches: [folder: :string]]
     {opts, args, _} = OptionParser.parse(args, options)
 
     folder = Keyword.get(opts, :folder, @default_folder)
-    tags = Keyword.get(opts, :tags)
 
-    search = Enum.at(args, 0)
+    search_text = Enum.at(args, 0)
     files = File.ls!(folder)
 
-    files |> filter_by_search(search) |> Logger.info()
+    files |> filter_by_search(search_text) |> Logger.info()
   end
 
   def main(args) do
-    options = [switches: [folder: :string, title: :string, template: :string, tags: :string]]
+    options = [switches: [folder: :string, file: :string, title: :string, template: :string]]
     {opts, _, _} = OptionParser.parse(args, options)
     maybe_create_dir(opts)
     create_journal(opts)
   end
 
-  def filter_by_search(files, search) do
-    if search do
-      Enum.filter(files, fn each -> String.contains?(each, search) end)
+  def filter_by_search(files, search_text) do
+    if search_text do
+      Enum.filter(files, fn each -> String.contains?(each, search_text) end)
     else
       files
     end
@@ -52,36 +51,70 @@ defmodule Journal do
     end
   end
 
+  @doc ~S"""
+  Generates the file path.
+
+  ## Examples
+
+    iex> Journal.file_path([file: "file_name"])
+    "test_entries/file_name.md"
+  """
   def file_path(opts) do
     folder = Keyword.get(opts, :folder, @default_folder)
     "#{folder}/#{file_name(opts)}"
   end
 
+  @doc ~S"""
+  Generates journal content based on the default daily content,
+  Or a template.
+
+  ## Examples
+
+    iex> Journal.journal_content([title: "My Title"])
+    "# My Title"
+  """
   def journal_content(opts) do
+    template_content(opts) || default_content(opts)
+  end
+
+  defp default_content(opts) do
+    "# #{title(opts)}"
+  end
+
+  defp template_content(opts) do
     template = Keyword.get(opts, :template)
-    tags = Keyword.get(opts, :tags)
 
-    body =
-      if template do
-        File.read!("#{@template_folder}/#{template}.md")
-      else
-        "# #{title(opts)}"
-      end
-
-    if tags do
-      tag_list = String.split(tags, ",") |> Enum.join(" ")
-      head = "---\ntags: ~w(#{tag_list})\n---"
-      head <> body
-    else
-      body
+    if template do
+      content = File.read!("#{@template_folder}/#{template}.md")
+      String.replace(content, "{DATE}", date()) |> String.replace("{TITLE}", title(opts))
     end
   end
 
+  @doc ~S"""
+  Generate the file name without extension.
+
+  ## Examples
+
+    iex> Journal.title([title: "my_example"])
+    "my_example"
+  """
   def title(opts) do
-    Keyword.get(opts, :title, Calendar.strftime(Date.utc_today(), "%y-%m-%d"))
+    Keyword.get(opts, :title, date())
   end
 
+  def date do
+    Calendar.strftime(Date.utc_today(), "%y-%m-%d")
+  end
+
+  @doc ~S"""
+  Generate the file name with .md extension.
+
+  ## Examples
+
+    iex> Journal.file_name([file: "my_example"])
+    "my_example.md"
+  """
   def file_name(opts) do
-    title(opts) <> ".md"
+    Keyword.get(opts, :file, date()) <> ".md"
   end
 end
