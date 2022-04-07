@@ -25,7 +25,7 @@ Mix.install([
 
 We're going to create a gold mining simulator game.
 
-This project is designed to learn about Supervisors Fault Taulerance.
+This project is designed to learn about Supervisors Fault Tolerance.
 
 A `MineSupervisor` will supervise a dynamic number of `Mine` workers. Each `Mine` will be a `GenServer`.
 
@@ -41,9 +41,9 @@ flowchart
   MS --> M3
 ```
 
-Each `Mine` will harvest `5` gold every `5` seconds. 
+Each `Mine` will harvest `5` gold every `5` seconds.
 
-Upon harvesting, each `Mine` will send a message to the `ResourceStore` `GenServer` which tracks how much gold has been harvested.
+Upon harvesting, each `Mine` will send a message to the `ResourceStore` `GenServer` to store `5` more gold.
 
 ```mermaid
 flowchart
@@ -76,14 +76,14 @@ The MineSupervisor should be able to dynamically supervise its child `Mine` work
 ## Configure the ResourceStore.
 
 Configure the `ResourceStore` to start in `application.ex`.
-The `ResourceStore` should be a `GenServer` which starts with `200` gold in it's state.
+The `ResourceStore` should be a `GenServer` or `Agent`, which starts with `200` gold in its state.
 
 ## MiningSimulator.new_mine/0
 
 The `MiningSimulator.new_mine/0` function should start a `Mine` `GenServer` under the `MineSupervisor`.
 It should remove `200` gold from the `ResourceStore`.
 
-The `Mine` should start harvesting resources on an interval and send a message to the `ResourceStore` to add gold.
+The `Mine` harvests resources on an interval and sends a message to add gold to the `ResourceStore`.
 
 If there is less than `200` gold in the `ResourceStore`, the `new_mine/0` function should return an error tuple `{:error, :not_enough_funds}`
 
@@ -98,6 +98,6 @@ The `MineSupervisor` should then automatically start up a new `Mine`.
 ## (Bonus) Finite Resources
 
 Each `Mine` should start with a finite amount of resources (A random amount between `500` and `1000` gold).
-Every time the `Mine` harvests resources that amount should decrease by `5`.
+Every time the `Mine` harvests, resources decrease the total gold available by `5`.
 
-When the `Mine` runs out of resources it should terminate without being restarted by the `MineSupervisor`.
+The' Mine' should terminate without being restarted by the `MineSupervisor` when the' Mine' runs out of resources.
