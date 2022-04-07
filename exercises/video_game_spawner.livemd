@@ -1,0 +1,98 @@
+# Mining Simulator
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Video Game Spawner
+
+It's classic in video games for a **spawner** to spawn enemy creatures.
+Typically the spawner has a limit for how many enemy creatures it can spawn. If
+a creature dies, the spawner then re-spawns that creature.
+
+We're going to create a `Spawner` application to simulate a game with enemy spawns.
+
+This project aims to help you learn about supervisors and fault tolerance.
+
+A `SpawnerSupervisor` will supervise four `Creature` `GenServers`s. 
+
+```mermaid
+flowchart
+  S[Spawner]
+  C1[Creature]
+  C2[Creature]
+  C3[Creature]
+
+  S --> C1
+  S --> C2
+  S --> C3
+  S --> C4
+```
+
+When a `Creature` process dies, the `Spawner` supervisor will automatically restart it.
+
+## Create a New Mix Project
+
+Using the command line, create a new supervised project in the `projects` folder called `spawner`.
+
+```
+mix new --sup spawner
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "spawner")
+```
+
+Dialyzer, Credo, and ExDoc are optional for this project.
+
+## Create the Creature GenServer.
+
+Create a Creature GenServer. It should start as a minimal GenServer with no additional functionality for now.
+
+## Configure the Spawner
+
+Configure the Spawner to start in `application.ex`.
+
+## (Optional) Use :observer To view your Spawner and Creature
+
+Start your project
+
+```
+iex -S mix
+```
+Then start the observer.
+
+```
+:observer.start()
+```
+
+Use the observer to kill a `Creature` process. It should be automatically restarted
+by the `Spawner` supervisor.
+
+## :kill
+
+A `Creature` process should be killed when it receives a `:kill` message.
+Create a `Spawner.kill/1` which accepts the `pid` of a `Creature` process and sends it the `:kill` message.
+
+Upon terminating, the `Spawner` supervisor should automatically restart the `Creature` process.
