@@ -1,0 +1,97 @@
+# Bomb Defusal
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Bomb Defusal
+
+We're going to create a bomb defusal game.
+
+There will be multiple bombs that need to be defused. If any of the bombs go off the entire game will be reset.
+
+A `BombSupervisor` will supervise three `Bomb`s. If any of the bombs detonate, every bomb detonates.
+
+```mermaid
+flowchart
+  S[BombSupervisor]
+  C1[Bomb]
+  C2[Bomb]
+  C3[Bomb]
+
+  S --> C1
+  S --> C2
+  S --> C3
+```
+
+That means when a `Bomb` process dies, the `BombSupervisor` will restart every `Bomb` process.
+
+## Create a New Mix Project
+
+Using the command line, create a new supervised project in the `projects` folder called `bomb_defusal`.
+
+```
+mix new --sup bomb_defusal
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "bomb_defusal")
+```
+
+Dialyzer, Credo, and ExDoc are optional for this project.
+
+## Create the Bomb GenServer.
+
+Create a `Bomb` `GenServer`. It should start as a minimal `GenServer` with no functionality. 
+
+## Configure the BombSupervisor
+
+Configure the BombSupervisor to start in `application.ex`.
+It should start with 3 `Bomb` `GenServer`s as children.
+
+## :explode
+
+Send a `Bomb` an `:explode` message. It should handle the message by terminating.
+The `BombSupervisor` should automatically restart all of the `Bomb` processes.
+
+## (Bonus) :cut
+We will defuse bombs by sending them a `:cut` message with a `:red`, `:white`, or `:black` wire.
+
+When a `Bomb` is initialized, it should store a randomized wire of either `:red`, `:white`, or `:black` in
+it's state as the correct wire to defuse the bomb.
+
+If the wire from the `:cut` message is correct, defuse the bomb.
+
+A defused bomb will no longer terminal when sent the `:explode` message.
+
+## (Bonus) Timer
+
+Add a `Timer` `GenServer` under the `BombSupervisor` tree.
+
+The `Timer` should store a `5` minute timer which decrements every second.
+
+Every time a `:cut` message is sent to a bomb with an incorrect value, the `Timer` should decrement by `30` seconds.
+
+When the `Timer` reaches `0` it should terminate the `BombSupervisor` which should automatically restart under
+the application supervisor.
