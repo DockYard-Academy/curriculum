@@ -1,0 +1,415 @@
+# Mix
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Mix
+
+[Mix](https://hexdocs.pm/mix/Mix.html) is a build tool that ships with Elixir that automates tasks for creating, compiling, and testing your application.
+
+We start a new Mix application by running the following in the command line.
+
+```
+mix new app_name
+```
+
+Where `app_name` is the name of the project.
+
+### Your Turn
+
+Create a `hello_world` application in the `projects` folder of this course.
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "hello_world")
+```
+
+You should notice that the command generated several files.
+
+```
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/hello_world.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/hello_world_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd hello_world
+    mix test
+
+Run "mix help" for more commands.
+```
+
+We'll walk through the mix project structure and how you can build Elixir applications.
+
+## lib
+
+The `lib/` folder contains the files for the project. We start out with a single module 
+named after the project. You should have a `HelloWorld` module in the `lib/hello_world.ex` file.
+
+If we want a different name for the project than the top level module, we can use the `--module` option.
+
+For example the following would generate a `hello_world` app where the top level module is `Hello`
+
+```
+mix new hello_world --module Hello
+```
+
+## Running a Mix Project
+
+To execute the Elixir code for our Mix project, you can load the project into the IEx Shell
+by running the following command in the project folder.
+
+```
+iex -S mix
+```
+
+Now you have access all of the modules in the `lib/` folder.
+
+### Your Turn
+
+Load your project into the IEx Shell.
+
+```
+iex -S mix
+```
+
+And run the `hello/0` function.
+
+```
+iex> HelloWorld.hello()
+:world
+```
+
+## mix.exs
+
+The `mix.exs` file is used for configuration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule HelloWorld.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :hello_world,
+      version: "0.1.0",
+      elixir: "~> 1.13",
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
+  end
+
+  # Run "mix help compile.app" to learn about applications.
+  def application do
+    [
+      extra_applications: [:logger]
+    ]
+  end
+
+  # Run "mix help deps" to learn about dependencies.
+  defp deps do
+    [
+      # {:dep_from_hexpm, "~> 0.3.0"},
+      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+    ]
+  end
+end
+```
+
+## Dependencies
+
+We can add other projects as dependencies to our mix project. Any project available
+on GitHub can be installed as a dependency.
+
+To add a dependency, you need to find the current version. Many projects document their current
+version in their `README.md` but it's easy for this version to be out of date.
+
+It's often most reliable to check the project on hex.pm.
+Here's an example for the popular [Faker](https://hex.pm/packages/faker) library.
+
+It includes `mix.exs` installation instructions.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faker_hex.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Add the project to the list in the `deps/0` function in `mix.exs` to add it to the project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  defp deps do
+    [
+      {:faker, "~> 0.17.0"}
+    ]
+  end
+```
+
+### Your Turn
+
+Add the [Faker](https://hex.pm/packages/faker) dependency to your `hello_world` project.
+
+<!-- livebook:{"force_markdown": true} -->
+```elixir
+# mix.exs
+defp deps do
+  [{:faker, "~> 0.17"}]
+end
+```
+
+Ensure that you run `mix deps.get` to update your project dependencies.
+
+Once installed you will have access to the `Faker` module provided.
+
+The [Faker Documentation](https://hexdocs.pm/faker/readme.html)
+Shows how to use the `Faker` module.
+
+`Faker` provides random fake data. It's highly useful for generating test data. 
+
+Use the `Faker.Person.first_name/0` function in your `HelloWorld.hello/0` function.
+
+<!-- livebook:{"force_markdown": true} -->
+```elixir
+def hello do
+  "Hello, #{Faker.Person.first_name()}."
+end
+```
+
+Ensure your `hello/0` function works in the IEx shell.
+
+```
+iex -S mix
+iex> HelloWorld.hello()
+"Hello, Salvador." # The name will be random each time.
+```
+<!-- livebook:{"break_markdown":true} -->
+
+### Versions
+
+Project [Versions](https://hexdocs.pm/elixir/Version.html) are generally represented by 
+`Major.Minor.Patch` numbers.
+
+When we rely on dependencies, we specify a [version requirement](https://hexdocs.pm/elixir/1.13/Version.html#module-requirements).
+We can even specify a version between two numbers using comparison operators. i.e. `>= 2.0.0 and < 2.1.0`,
+
+The `~>` symbol you see in dependencies means it will use the latest version type provided.
+
+The [Version documentation](https://hexdocs.pm/elixir/Version.html) goes into further depth.
+
+You can automatically update project versions with by running the following in your command line.
+
+```
+mix deps.update example_dep
+```
+
+Or with the `--all` option to update all deps.
+
+```
+mix deps.update --all
+```
+
+## Modules & Namespaces
+
+Generally, Elixir projects are organized into modules under the Main namespace.
+
+So all of the modules in the `HelloWorld` application would be grouped under the `HelloWorld` namespace.
+
+For example, a new `Greeting` module would be defined under `HelloWorld.Greeting`.
+
+```elixir
+defmodule HelloWorld.Greeting do
+  def salutations(name) do
+    "Salutations, #{name}!"
+  end
+end
+```
+
+There's no practical limit to how deeply your modules can be nested, however nested modules generally
+relate to each other, often sub modules deal with a more specific application of the higher level module.
+
+```elixir
+defmodule  HelloWorld.Greeting.Formal do
+  def charmed() do
+    "Charmed, I'm sure."
+  end
+end
+```
+
+While not enforced, module structure often relates to the project structure.
+
+For example, the `HelloWorld.Greeting.Formal` module will be in a `formal.ex` file under the `greeting` folder.
+
+```
+lib/
+  greeting.ex
+  hello_world.ex
+  greeting/
+    formal.ex
+```
+
+Modules can call functions from other modules.
+
+```elixir
+defmodule HelloWorld.Names do
+  def random() do
+    Faker.Person.first_name()
+  end
+end
+
+defmodule HelloWorld.Greeting do
+  def hello() do
+    "Hello, #{HelloWorld.Names.random()}"
+  end
+end
+```
+
+### Your Turn
+
+Create the `HelloWorld.Names` in module in `lib/names.ex` and `HelloWorld.Greeting` in `lib/greeting.ex`.
+Copy the same code as seen above.
+
+Run the project in your IEx Shell and run the `HelloWorld.Greeting.hello()` function.
+Ensure it returns `"Hello random_name"`.
+
+## alias
+
+It can be tedious to write the entire namespace every time we use a module's function.
+
+Instead, we can use [alias](https://elixir-lang.org/getting-started/alias-require-and-import.html#alias)
+to set up an alias for any given module name.
+
+For example, here we can `alias HelloWorld.Names` to use `Names` directly.
+
+```elixir
+defmodule HelloWorld.Names do
+  def random() do
+    Faker.Person.first_name()
+  end
+end
+
+defmodule HelloWorld.Greeting do
+  alias HelloWorld.Names
+
+  def hello() do
+    "Hello, #{Names.random()}"
+  end
+end
+```
+
+By default, the module alias will be the last part of the module name. so `alias HelloWorld.Greeting.Formal` would
+be `Formal`.
+
+We can override the default alias by using `as`.
+
+```elixir
+defmodule HelloWorld.Names do
+  def random() do
+    Faker.Person.first_name()
+  end
+end
+
+defmodule HelloWorld.Greeting do
+  alias HelloWorld.Names, as: AmazingAlias
+
+  def hello() do
+    "Hello, #{AmazingAlias.random()}"
+  end
+end
+```
+
+### Your Turn
+
+Alter your code in `HelloWorld.Greeting` to use an `alias` for `HelloWorld.Names`.
+
+## import
+
+Rather than `alias` a module, we can use `import` to import all of it's functions.
+
+This reduced the amount of code we need to write even further.
+
+```elixir
+defmodule Imported do
+  def imported_fn do
+  end
+end
+
+defmodule WillImport do
+  import Imported
+  def my_fn do
+    imported_fn()
+  end
+end
+```
+
+However, consider being cautious when using `import`. It can obscure the origin of your functions.
+
+For example, which module does `imported_fn` come from in this code?
+It's impossible to tell without reading `ImportedModule1` and `ImportedModule2`.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+defmodule Example do
+  import ImportedModule1
+  import ImportedModule2
+  def my_fn() do
+    imported_fn()
+  end
+end
+```
+It can also lead to conflicts if two imported modules have the same functions.
+
+```elixir
+defmodule Imported1 do
+  def imported_fn do
+  end
+end
+
+defmodule Imported2 do
+  def imported_fn do
+  end
+end
+
+defmodule WillImport do
+  import Imported1
+  import Imported2
+  def my_fn do
+    imported_fn()
+  end
+end
+```
+
+### Your Turn
+
+Convert your `alias` in `HelloWorld.Greeting` to `HelloWorld.Names` to use an `import`.
+
+## Mix Tasks
+
