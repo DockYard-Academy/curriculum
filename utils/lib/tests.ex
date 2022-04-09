@@ -1,4 +1,7 @@
 defmodule Utils.Test do
+  require Utils.TestMacros
+  import Utils.TestMacros
+
   def test(module_name, answers) do
     answers_in_list_provided =
       is_list(answers) and Enum.all?(answers, fn each -> not is_nil(each) end)
@@ -11,17 +14,6 @@ defmodule Utils.Test do
       ExUnit.run()
     else
       "Please enter an answer above."
-    end
-  end
-
-  def test_module(:example_test = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        assert true
-      end
     end
   end
 
@@ -293,39 +285,64 @@ defmodule Utils.Test do
     end
   end
 
-  def test_module(:rock_paper_scissors_two_player = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :rock_paper_scissors_two_player do
+    [player1_choice, player2_choice, winner] = get_answers()
 
-      test module_name do
-        [player1_choice, player2_choice, winner] = @answers
-
-        case {player1_choice, player2_choice} do
-          {:rock, :scissors} -> assert winner == :player1
-          {:paper, :rock} -> assert winner == :player1
-          {:scissors, :paper} -> assert winner == :player1
-          {:scissors, :rock} -> assert winner == :player2
-          {:rock, :paper} -> assert winner == :player2
-          {:paper, :scissors} -> assert winner == :player2
-          _ -> assert winner == :draw
-        end
-      end
+    case {player1_choice, player2_choice} do
+      {:rock, :scissors} -> assert winner == :player1
+      {:paper, :rock} -> assert winner == :player1
+      {:scissors, :paper} -> assert winner == :player1
+      {:scissors, :rock} -> assert winner == :player2
+      {:rock, :paper} -> assert winner == :player2
+      {:paper, :scissors} -> assert winner == :player2
+      _ -> assert winner == :draw
     end
   end
 
-  def test_module(:rocket_ship = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        force = @answers
-        assert force == 20
-      end
-    end
+  make_test :rocket_ship do
+    force = get_answers()
+    assert force == 20
   end
 
+  make_test :startup_madlib do
+    [
+      madlib,
+      name_of_company,
+      a_defined_offering,
+      a_defined_audience,
+      solve_a_problem,
+      secret_sauce
+    ] = answers = get_answers()
+
+    assert Enum.all?(answers, fn each -> is_bitstring(each) and String.length(each) > 0 end),
+           "each variable should be bound to a non-empty string"
+
+    assert madlib ==
+             "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
+  end
+
+  make_test :nature_show_madlib do
+    [
+      animal,
+      country,
+      plural_noun,
+      a_food,
+      type_of_screen_device,
+      noun,
+      verb1,
+      verb2,
+      adjective,
+      madlib
+    ] = answers = get_answers()
+
+    assert Enum.all?(answers, fn each -> is_bitstring(each) and String.length(each) > 0 end),
+           "each variable should be bound to a non-empty string"
+
+    assert madlib ==
+             "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
+  end
+
+  # TODO - doesn't need answers
   def test_module(:file_copy_challenge = module_name, answers) do
     defmodule module_name do
       @answers answers
