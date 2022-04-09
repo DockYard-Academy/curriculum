@@ -1,21 +1,16 @@
 defmodule Utils.Test do
-  def test(module_name, answers) when is_list(answers) do
-    if Enum.all?(answers, fn each -> not is_nil(each) end) do
-      ExUnit.start(auto_run: false)
-      test_module(module_name, answers)
-      ExUnit.run()
-    else
-      "Please enter an answer above. Replace each `nil` value with your answers."
-    end
-  end
-
   def test(module_name, answers) do
-    if not is_nil(answers) do
+    answers_in_list_provided =
+      is_list(answers) and Enum.all?(answers, fn each -> not is_nil(each) end)
+
+    answer_provided = not is_list(answers) and not is_nil(answers)
+
+    if answer_provided or answers_in_list_provided do
       ExUnit.start(auto_run: false)
       test_module(module_name, answers)
       ExUnit.run()
     else
-      "Please enter an answer above. Replace `nil` with your answer."
+      "Please enter an answer above."
     end
   end
 
