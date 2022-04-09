@@ -408,6 +408,36 @@ defmodule Utils.Test do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
+  make_test :shopping_list do
+    shopping_list = get_answers()
+    list = [] ++ ["grapes", "walnuts", "apples"]
+    list = list ++ ["blueberries", "chocolate", "pizza"]
+    list = list -- ["grapes", "walnuts"]
+
+    assert is_list(shopping_list), "Ensure shopping_list is still a list."
+
+    assert Enum.sort(shopping_list) == Enum.sort(shopping_list),
+           "Ensure your shopping list has all of the expected items"
+
+    assert shopping_list == list, "Ensure you add and remove items in the expected order"
+  end
+
+  make_test :shopping_list_with_quantities do
+    shopping_list = get_answers()
+    list = [] ++ [milk: 1, eggs: 12]
+    list = list ++ [bars_of_butter: 2, candies: 10]
+    list = list -- [bars_of_butter: 2]
+    list = list -- [candies: 10]
+    list = list ++ [candies: 5]
+
+    assert is_list(shopping_list), "Ensure shopping_list is still a list."
+
+    assert Enum.sort(shopping_list) == Enum.sort(shopping_list),
+           "Ensure your shopping list has all of the expected items"
+
+    assert shopping_list == list, "Ensure you add and remove items in the expected order"
+  end
+
   # test modules names must be the last function in this module
   def test_module_names, do: @test_module_names
 end
