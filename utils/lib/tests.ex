@@ -3,6 +3,9 @@ defmodule Utils.Test do
   require Utils.Macros
   import Utils.Macros
 
+  # Allows for tests that don't require input
+  def test(module_name), do: test(module_name, "")
+
   def test(module_name, answers) do
     answers_in_list_provided =
       is_list(answers) and Enum.all?(answers, fn each -> not is_nil(each) end)
@@ -400,17 +403,10 @@ defmodule Utils.Test do
     end
   end
 
-  # TODO - doesn't need answers
-  # def test_module(:file_copy_challenge = module_name, answers) do
-  #   defmodule module_name do
-  #     @answers answers
-  #     use ExUnit.Case
-
-  #     test module_name do
-  #       assert File.read("data/copied_example") === "Copy me!"
-  #     end
-  #   end
-  # end
+  make_test :copy_file do
+    file_name = get_answers()
+    assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
+  end
 
   # test modules names must be the last function in this module
   def test_module_names, do: @test_module_names

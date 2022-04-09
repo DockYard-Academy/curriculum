@@ -88,9 +88,13 @@ defmodule Utils.Solutions do
     answer = Enum.random(1..9)
 
     correct =
-      (guess == answer && "Correct") || (guess < answer && "Too low!") ||
+      (guess == answer && "Correct!") || (guess < answer && "Too low!") ||
         (guess > answer && "Too high!")
 
     [guess, answer, correct]
+  end
+
+  def copy_file do
+    "copy_example"
   end
 end
