@@ -1,6 +1,7 @@
 defmodule Utils.TestMacros do
   defmacro make_test(module_name, do: assertion) do
     quote do
+      @test_module_names unquote(module_name)
       def test_module(unquote(module_name), answers) do
         :persistent_term.put(:answers, answers)
 

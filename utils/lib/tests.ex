@@ -1,4 +1,5 @@
 defmodule Utils.Test do
+  Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
   require Utils.TestMacros
   import Utils.TestMacros
 
@@ -343,14 +344,17 @@ defmodule Utils.Test do
   end
 
   # TODO - doesn't need answers
-  def test_module(:file_copy_challenge = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  # def test_module(:file_copy_challenge = module_name, answers) do
+  #   defmodule module_name do
+  #     @answers answers
+  #     use ExUnit.Case
 
-      test module_name do
-        assert File.read("data/copied_example") === "Copy me!"
-      end
-    end
-  end
+  #     test module_name do
+  #       assert File.read("data/copied_example") === "Copy me!"
+  #     end
+  #   end
+  # end
+
+  # test modules names must be the last function in this module
+  def test_module_names, do: @test_module_names
 end
