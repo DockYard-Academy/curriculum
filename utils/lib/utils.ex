@@ -145,6 +145,18 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
     ])
   end
 
+  def form(:boolean_diagram1) do
+    Kino.ValidatedForm.new([%{label: "operator", answers: ["or"]}])
+  end
+
+  def form(:boolean_diagram2) do
+    Kino.ValidatedForm.new([%{label: "operator", answers: ["and"]}])
+  end
+
+  def form(:boolean_diagram2) do
+    Kino.ValidatedForm.new([%{label: "operator", answers: ["not"]}])
+  end
+
   def form(:boolean_fill_in_the_blank) do
     ValidatedForm.new([
       %{label: "not ____ and true === false", answers: ["true"]},

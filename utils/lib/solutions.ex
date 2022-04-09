@@ -68,4 +68,29 @@ defmodule Utils.Solutions do
 
     [player1_choice, player2_choice, winner]
   end
+
+  def boolean_diagram1, do: false
+  def boolean_diagram2, do: true
+  def boolean_diagram3, do: false
+  def boolean_diagram4, do: false
+  def boolean_diagram5, do: true
+  def boolean_diagram6, do: true
+
+  def guess_the_word do
+    guess = Enum.random(["answer", "incorrect answer"])
+    answer = "answer"
+    correct = (guess == answer && "Correct!") || "Incorrect."
+    [guess, answer, correct]
+  end
+
+  def guess_the_number do
+    guess = Enum.random(1..9)
+    answer = Enum.random(1..9)
+
+    correct =
+      (guess == answer && "Correct") || (guess < answer && "Too low!") ||
+        (guess > answer && "Too high!")
+
+    [guess, answer, correct]
+  end
 end

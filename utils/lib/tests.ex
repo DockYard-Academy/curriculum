@@ -1,7 +1,7 @@
 defmodule Utils.Test do
   Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
-  require Utils.TestMacros
-  import Utils.TestMacros
+  require Utils.Macros
+  import Utils.Macros
 
   def test(module_name, answers) do
     answers_in_list_provided =
@@ -341,6 +341,63 @@ defmodule Utils.Test do
 
     assert madlib ==
              "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
+  end
+
+  make_test :boolean_diagram1 do
+    answer = get_answers()
+    assert answer == false
+  end
+
+  make_test :boolean_diagram2 do
+    answer = get_answers()
+    assert answer == true
+  end
+
+  make_test :boolean_diagram3 do
+    answer = get_answers()
+    assert answer == false
+  end
+
+  make_test :boolean_diagram4 do
+    answer = get_answers()
+    assert answer == false
+  end
+
+  make_test :boolean_diagram5 do
+    answer = get_answers()
+    assert answer == true
+  end
+
+  make_test :boolean_diagram6 do
+    answer = get_answers()
+    assert answer == true
+  end
+
+  make_test :guess_the_word do
+    [guess, answer, correct] = answers = get_answers()
+
+    assert Enum.all?(answers, &is_bitstring/1),
+           "Ensure `guess`, `answer`, and `correct` are all strings"
+
+    if guess == answer do
+      assert correct == "Correct!"
+    else
+      assert correct == "Incorrect."
+    end
+  end
+
+  make_test :guess_the_number do
+    [guess, answer, correct] = answers = get_answers()
+
+    assert is_integer(guess), "Ensure `guess` is an integer"
+    assert is_integer(answer), "Ensure `answer` is an integer"
+    assert is_bitstring(correct), "Ensure `correct` is a string"
+
+    cond do
+      guess == answer -> assert correct == "Correct!"
+      guess < answer -> assert correct == "Too low!"
+      guess > answer -> assert correct == "Too high!"
+    end
   end
 
   # TODO - doesn't need answers

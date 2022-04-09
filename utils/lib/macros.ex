@@ -1,4 +1,4 @@
-defmodule Utils.TestMacros do
+defmodule Utils.Macros do
   defmacro make_test(module_name, do: assertion) do
     quote do
       @test_module_names unquote(module_name)
