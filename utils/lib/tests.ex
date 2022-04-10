@@ -159,24 +159,6 @@ defmodule Utils.Test do
     end
   end
 
-  def test_module(:naming_numbers = module_name, answers) do
-    :persistent_term.put(:answers, answers)
-
-    defmodule module_name do
-      use ExUnit.Case
-
-      test module_name do
-        convert_to_named_integer = :persistent_term.get(:answers)
-
-        ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-        |> Enum.with_index()
-        |> Enum.each(fn {value, key} ->
-          assert convert_to_named_integer.(key) == value
-        end)
-      end
-    end
-  end
-
   def test_module(:percentage = module_name, answers) do
     defmodule module_name do
       @answers answers
@@ -443,6 +425,52 @@ defmodule Utils.Test do
     family_tree = get_answers()
     assert is_map(family_tree), "Ensure `family_tree is a map."
     assert family_tree == Solutions.family_tree()
+  end
+
+  make_test :naming_numbers do
+    naming_numbers = get_answers()
+
+    assert is_function(naming_numbers),
+           "Ensure you bind `naming_numbers` to an anonymous function."
+
+    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+    Enum.each(1..9, fn integer ->
+      assert naming_numbers.(integer) == Enum.at(list, integer)
+    end)
+  end
+
+  make_test :numbering_names do
+    numbering_names = get_answers()
+
+    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    capital_list = Enum.map(list, &String.capitalize/1)
+
+    assert is_function(numbering_names),
+           "Ensure you bind `naming_numbers` to an anonymous function."
+
+    Enum.each(list, fn name ->
+      assert numbering_names.(name) ==
+               Enum.find_index(list, fn each -> each == String.downcase(name) end)
+    end)
+  end
+
+  def test_module(:naming_numbers = module_name, answers) do
+    :persistent_term.put(:answers, answers)
+
+    defmodule module_name do
+      use ExUnit.Case
+
+      test module_name do
+        convert_to_named_integer = :persistent_term.get(:answers)
+
+        ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+        |> Enum.with_index()
+        |> Enum.each(fn {value, key} ->
+          assert convert_to_named_integer.(key) == value
+        end)
+      end
+    end
   end
 
   # test modules names must be the last function in this module
