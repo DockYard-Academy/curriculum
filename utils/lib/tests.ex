@@ -2,6 +2,7 @@ defmodule Utils.Test do
   Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
   require Utils.Macros
   import Utils.Macros
+  alias Utils.Solutions
 
   # Allows for tests that don't require input
   def test(module_name), do: test(module_name, "")
@@ -436,6 +437,12 @@ defmodule Utils.Test do
            "Ensure your shopping list has all of the expected items"
 
     assert shopping_list == list, "Ensure you add and remove items in the expected order"
+  end
+
+  make_test :family_tree do
+    family_tree = get_answers()
+    assert is_map(family_tree), "Ensure `family_tree is a map."
+    assert family_tree == Solutions.family_tree()
   end
 
   # test modules names must be the last function in this module
