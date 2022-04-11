@@ -603,7 +603,7 @@ defmodule Utils.Test do
              }
 
       assert {battled_pokemon1, battled_pokemon2} =
-               apply(pokemon_battle_module, :battle, [pokemon1, pokemon2])
+               pokemon_battle_module.battle(pokemon1, pokemon2)
 
       {expected_battled_pokemon1, expected_battled_pokemon2} =
         Utils.Solutions.PokemonBattle.battle(pokemon1, pokemon2)
