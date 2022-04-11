@@ -28,9 +28,9 @@ then have them battle.
 Some Elixir cells in this exercise will rely on previous solutions, so ensure that you
 use the `ea` command to evaluate all cells. Otherwise, your prior code may be stale and result in bugs.
 
-### Create a Pokemon Struct
+## Define a Pokemon Struct
 
-In the Elixir cell below, create a `Pokemon` Struct with the keys `:name`, `:type`, `health`, `:attack`, and `:speed`.
+In the Elixir cell below, define a `Pokemon` struct with the keys `:name`, `:type`, `health`, `:attack`, and `:speed`.
 
 * `:name` will be a string.
 * `:type` will be an atom of either `:grass`, `:water`, or `:fire`
@@ -39,10 +39,13 @@ In the Elixir cell below, create a `Pokemon` Struct with the keys `:name`, `:typ
 * `:speed` will be an integer
 
 ```elixir
+defmodule Pokemon do
+end
 
+Utils.test(:define_pokemon_struct, Pokemon)
 ```
 
-### Create 3 Pokemon
+## Create 3 Pokemon
 
 In the Elixir cell below, create 3 variables `charmander`, `bulbasaur`, and `squirtle`.
 bind each variable to a `Pokemon` struct with the following stats.
@@ -71,11 +74,17 @@ charmander = nil
 bulbasaur = nil
 
 squirtle = nil
+
+Utils.test(:pokemon_structs, [charmander, bulbasaur, squirtle])
 ```
 
-### Create an attack/2 function
+## Pokemon Battle
 
-In the Elixir cell below, create an `attack/2` function which:
+Create a `PokemonBattle` module with the following functions:
+
+### attack/2
+
+Create an `attack/2` function which:
 
 * accepts two pokemon structs as parameters
 * return an updated version of the second pokemon struct.
@@ -83,17 +92,16 @@ In the Elixir cell below, create an `attack/2` function which:
 * double the damage dealt if the pokemon has a type advantage.
 * half the damage dealt if the pokemon has a type weakness.
 
-<!-- livebook:{"break_markdown":true} -->
+For example,
 
-```mermaid
-flowchart
-    C["Charmander (5 attack)"]
-    B["Bulbasaur (20 health)"]
-    b["Bulbasaur (10 health)"]
-    
-    C --> attack
-    B --> attack
-    attack --> b
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+squirtle = %Pokemon{name: "Squirtle", type: :water, attack: 10}
+charmander = %Pokemon{name: "Charmander", type: :fire, health: 20}
+
+PokemonBattle.attack(squirtle, charmander)
+%Pokemon{name: "Charmander", type: :fire, health: 0, speed: nil, attack: 5}
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -106,59 +114,43 @@ Use the following type advantages to determine half or double damage.
 
 <!-- livebook:{"break_markdown":true} -->
 
-```mermaid
-flowchart LR
-    f1[Fire]
-    w1[Water]
-    g1[Grass]
-    f2[Fire]
-    w2[Water]
-    g2[Grass]
+### battle/2
 
-    f1 --weak--> w1 --weak--> g1 --weak--> f1
-    f2 --strong--> g2 --strong--> w2 --strong--> f2
-```
+Create a `battle/2` function which:
 
-```elixir
-
-```
-
-### Pokemon Battle
-
-In the Elixir cell below, create a `battle/2` function which:
-
-* Accept two pokemon structs as parameters.
-* `attack/2` with the pokemon that has the higher speed.
+* Accepts two pokemon structs as parameters.
+* `attack/2` with the pokemon that has the higher speed. If their speed is the same attack the second pokemon first.
 * if the attacked pokemon is still above 0 health, attack with the second pokemon.
 * return two updated pokemon structs in a tuple.
 
-```mermaid
-flowchart
-    C["Charmander (5 attack, 20 health)"]
-    B["Bulbasaur (5 attack, 20 health)"]
+For example,
 
-    C --> battle
-    B --> battle
-    battle --> b["{Bulbasaur (10 health), Charmander (17.5 health)}"]
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+charmander = %Pokemon{name: "Charmander", type: :fire, speed: 20}
+squirtle = %Pokemon{name: "Squirtle", type: :water, speed: 10}
+
+PokemonBattle.battle(charmander, squirtle)
+{
+    %Pokemon{name: "Charmander", type: :fire, health: 10, speed: 20, attack: 5},
+    %Pokemon{name: "Squirtle", type: :water, health: 17.5, speed: 10, attack: 5}
+}
+
+charizard = %Pokemon{name: "Charizard", type: :fire, speed: 20, attack: 20}
+blastoise = %Pokemon{name: "Blastoise", type: :water, speed: 10, health: 10}
+
+# the faster pokemon will not receive damage if the slower pokemon's health is 0.
+PokemonBattle.battle(charizard, blastoise)
+{
+    %Pokemon{name: "Charizard", type: :fire, health: 20, speed: 20, attack: 20},
+    %Pokemon{name: "Blastoise", type: :water, health: 0, speed: 10, attack: 5}
+}
 ```
 
 ```elixir
+defmodule PokemonBattle do
+end
 
-```
-
-### Pokemon Simulator
-
-In the Elixir cell below, bring all of the prior functionality into a single
-`Pokemon` module.
-
-* Define a `Pokemon` struct the same as before.
-* add the named functions `attack/2` and `battle/2`.
-* set `@charmander`, `@bulbasaur`, and `@squirtle` as module attributes.
-* create a `simulate/2` function that takes in two pokemon names as strings `"Bulbasaur"`, `"Squirtle"`, or `"Charmander"`.
-* make the pokemon `battle/2` each other three times. Ensure that you use the updated pokemon structs in the next battle.
-* if both pokemon still have health, return `"it's a draw"`
-* if one pokemon has less than 1 health, return `"#{pokemon.name} wins!"`
-
-```elixir
-
+Utils.test(:pokemon_battle, [PokemonBattle, Pokemon])
 ```

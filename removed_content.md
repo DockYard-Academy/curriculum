@@ -2099,3 +2099,21 @@ end
     refute logs =~ "untagged_article.md"
   end
 ```
+
+
+### Pokemon Simulator
+
+In the Elixir cell below, bring all of the prior functionality into a single
+`Pokemon` module.
+
+* Define a `Pokemon` struct the same as before.
+* add the named functions `attack/2` and `battle/2`.
+* set `@charmander`, `@bulbasaur`, and `@squirtle` as module attributes.
+* create a `simulate/2` function that takes in two pokemon names as strings `"Bulbasaur"`, `"Squirtle"`, or `"Charmander"`.
+* make the pokemon `battle/2` each other three times. Ensure that you use the updated pokemon structs in the next battle.
+* if both pokemon still have health, return `"it's a draw"`
+* if one pokemon has less than 1 health, return `"#{pokemon.name} wins!"`
+
+```elixir
+
+```

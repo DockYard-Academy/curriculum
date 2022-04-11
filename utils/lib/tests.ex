@@ -1,4 +1,19 @@
 defmodule Utils.Test do
+  @moduledoc """
+  Utils.Test defines tests using the `make_test` macro.
+  Each `make_test` macro creates an associated function.
+
+  ## Examples
+
+  ```elixir
+  make_test :example do
+    answer = get_answers()
+    assert answer == 5
+  end
+  ```
+
+  Creates a a Utils.test(:example, answers) function clause.
+  """
   Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
   require Utils.Macros
   import Utils.Macros
@@ -521,6 +536,80 @@ defmodule Utils.Test do
         end
 
       assert apply(dialogue_module, :matching_weapon, [character]) == matching_weapon_dialogue
+    end)
+  end
+
+  make_test :define_pokemon_struct do
+    pokemon_module = get_answers()
+
+    assert Keyword.get(pokemon_module.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`."
+
+    assert match?(%{name: nil, type: nil, speed: nil}, struct(pokemon_module)),
+           "Ensure you use `defstruct` with :name, :type, :health, :attack, and :speed."
+
+    assert match?(%{health: 20, attack: 5}, struct(pokemon_module)),
+           "Ensure :health has a default value of 20 and :attack has a default value of 5."
+  end
+
+  make_test :pokemon_structs do
+    [charmander, bulbasaur, squirtle] = get_answers()
+    assert is_struct(charmander), "Ensure `charmander` is a struct."
+    assert is_struct(squirtle), "Ensure `squirtle` is a struct."
+    assert is_struct(bulbasaur), "Ensure `bulbasaur` is a struct."
+
+    assert %{name: "Charmander", type: :fire, attack: 5, health: 20, speed: 20} = charmander
+    assert %{name: "Bulbasaur", type: :grass, attack: 5, health: 20, speed: 15} = bulbasaur
+    assert %{name: "Squirtle", type: :water, attack: 5, health: 20, speed: 10} = squirtle
+  end
+
+  make_test :pokemon_battle do
+    [pokemon_battle_module, pokemon_module] = get_answers()
+
+    assert Keyword.get(pokemon_module.__info__(:functions), :__struct__),
+           "Ensure you complete the `Pokemon` module above first."
+
+    assert match?(
+             %{name: nil, type: nil, speed: nil, health: 20, attack: 5},
+             struct(pokemon_module)
+           ),
+           "Ensure you complete the `Pokemon` module above first."
+
+    pokemon_types =
+      for speed <- 10..30//5,
+          type <- [:water, :fire, :grass],
+          attack <- 5..40//5,
+          health <- 5..20//5 do
+        struct(pokemon_module, %{
+          name: "#{Atom.to_string(type)} pokemon",
+          speed: speed,
+          attack: attack,
+          health: health
+        })
+      end
+
+    pokemon_types
+    |> Enum.shuffle()
+    |> Enum.take(2)
+    |> Enum.chunk_every(2)
+    |> Enum.each(fn [pokemon1, pokemon2] ->
+      attacked_pokemon = apply(pokemon_battle_module, :attack, [pokemon1, pokemon2])
+
+      multiplier = Utils.Solutions.PokemonBattle.multiplier(pokemon1, pokemon2)
+
+      assert attacked_pokemon == %{
+               pokemon2
+               | health: pokemon2.health - pokemon2.attack * multiplier
+             }
+
+      assert {battled_pokemon1, battled_pokemon2} =
+               apply(pokemon_battle_module, :battle, [pokemon1, pokemon2])
+
+      {expected_battled_pokemon1, expected_battled_pokemon2} =
+        Utils.Solutions.PokemonBattle.battle(pokemon1, pokemon2)
+
+      assert battled_pokemon1 == expected_battled_pokemon1
+      assert battled_pokemon2 == expected_battled_pokemon2
     end)
   end
 
