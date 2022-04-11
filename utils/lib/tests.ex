@@ -3,11 +3,13 @@ defmodule Utils.Test do
   require Utils.Macros
   import Utils.Macros
   alias Utils.Solutions
+  alias Utils.Factory
 
   # Allows for tests that don't require input
-  def test(module_name), do: test(module_name, "")
+  def test(test_name), do: test(test_name, "")
+  def test({:module, _, _, _} = module, test_name), do: test(test_name, module)
 
-  def test(module_name, answers) do
+  def test(test_name, answers) do
     answers_in_list_provided =
       is_list(answers) and Enum.all?(answers, fn each -> not is_nil(each) end)
 
@@ -15,7 +17,7 @@ defmodule Utils.Test do
 
     if answer_provided or answers_in_list_provided do
       ExUnit.start(auto_run: false)
-      test_module(module_name, answers)
+      test_module(test_name, answers)
       ExUnit.run()
     else
       "Please enter an answer above."
@@ -455,22 +457,71 @@ defmodule Utils.Test do
     end)
   end
 
-  def test_module(:naming_numbers = module_name, answers) do
-    :persistent_term.put(:answers, answers)
+  make_test :define_character_struct do
+    character_module = get_answers()
 
-    defmodule module_name do
-      use ExUnit.Case
+    assert Keyword.get(character_module.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`"
 
-      test module_name do
-        convert_to_named_integer = :persistent_term.get(:answers)
+    assert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),
+           "Ensure you use `defstruct` with :name, :class, and :weapon"
 
-        ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-        |> Enum.with_index()
-        |> Enum.each(fn {value, key} ->
-          assert convert_to_named_integer.(key) == value
-        end)
-      end
+    assert_raise ArgumentError, fn ->
+      struct!(character_module, %{weapon: "", class: ""})
     end
+  end
+
+  make_test :character_structs do
+    [arthur, gandalf, jarlaxle] = get_answers()
+    assert is_struct(arthur), "Ensure `arthur` is a struct."
+    assert is_struct(gandalf), "Ensure `gandalf` is a struct."
+    assert is_struct(jarlaxle), "Ensure `jarlaxle` is a struct."
+
+    assert %{name: "Arthur", weapon: "sword", class: "warrior"} = arthur
+    assert %{name: "Gandalf", weapon: "staff", class: "wizard"} = gandalf
+    assert %{name: "Jarlaxle", weapon: "daggers", class: "rogue"} = jarlaxle
+  end
+
+  make_test :character_dialogue do
+    dialogue_module = get_answers()
+
+    character_permutations =
+      for class <- ["wizard", "rogue", "warrior", nil],
+          weapon <- ["daggers", "sword", "staff", nil],
+          name <- [Factory.name(), nil] do
+        %{class: class, weapon: weapon, name: name}
+      end
+
+    enemy = Factory.name()
+
+    Enum.each(character_permutations, fn character ->
+      assert apply(dialogue_module, :greet, [character]) ==
+               "Hello, my name is #{character.name}."
+
+      assert apply(dialogue_module, :attack, [character, enemy]) ==
+               "#{character.name} attacks #{enemy} with a #{character.weapon}."
+
+      relinquish_weapon_dialogue =
+        case character.class do
+          "rogue" -> "Fine, have my #{character.weapon}. I have more hidden anyway."
+          "wizard" -> "You would not part an old man from his walking stick?"
+          "warrior" -> "Have my #{character.weapon} then!"
+          _ -> "My precious!"
+        end
+
+      assert apply(dialogue_module, :relinquish_weapon, [character]) == relinquish_weapon_dialogue
+
+      matching_weapon_dialogue =
+        case {character.class, character.weapon} do
+          {"wizard", "staff"} -> "My lovely magical staff"
+          {"rogue", "daggers"} -> "Hidden and deadly."
+          {"warrior", "sword"} -> "My noble sword!"
+          {_, nil} -> "I'm unarmed!"
+          {_, _} -> "I'm not sure a #{character.weapon} suits a #{character.class}."
+        end
+
+      assert apply(dialogue_module, :matching_weapon, [character]) == matching_weapon_dialogue
+    end)
   end
 
   # test modules names must be the last function in this module

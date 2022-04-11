@@ -2040,6 +2040,7 @@ Mix.install([
   {:benchee, "~> 0.1"},
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
   {:utils, path: "utils"}
 ])
 ```

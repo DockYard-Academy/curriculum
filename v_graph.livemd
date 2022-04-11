@@ -68,6 +68,8 @@ goal_pace =
 Kino.VegaLite.push_many(widget, goal_pace)
 Kino.VegaLite.push_many(widget, current_pace)
 Kino.VegaLite.push_many(widget, baseline)
+
+week(1 = %{x: 7})
 widget
 ```
 
@@ -78,3 +80,73 @@ What can we effectively remove?
 ## Takeaway
 
 Will add restrictions to README when licence found.
+
+## 2022-04-11
+
+### Review
+
+* [X] [Maintenance] Week 1 Content Updates & Tests
+* [X] [Maintenance] Automated Testing System
+* [Some reading material to finish] Day 1 and Day 2 of Week 4
+* [X] (holding off) [Maintenance] Add Licence
+* [ ] [Stretch Goal] All of Week 4
+
+Additionally
+
+* Added new Setup Section
+
+### Goals
+
+* [ ] [Maintenance] Week 2 Content Updates & Tests
+* [ ] Day 3 and Day 4 of Week 4
+* [ ] Week 4 Day 1 & 2 Reading material
+* [ ]
+
+```elixir
+weeks = 12
+
+start = Date.new!(2022, 4, 4)
+current = Date.utc_today()
+
+finish = Date.new!(2022, 7, 1)
+# past_days = Date.diff(current, start)
+days_until_finish = Date.diff(finish, start)
+# days_until_finish = Date.diff(finish, current)
+weeks_until_finish = div(days_until_finish, 7)
+
+content_days = 11 * 5
+
+week1 = 15
+week2 = 17
+
+weekly_pace = week2 - week1
+
+necessary_pace = (content_days - week1) / weeks_until_finish
+
+size = 600
+# 2022-04-04
+week1 = %{x: 0, y: 15, type: "actual_pace"}
+# 2022-04-11
+week2 = %{x: 1, y: 17, type: "actual_pace"}
+
+velocity =
+  for week <- 1..weeks_until_finish, do: %{x: week, y: week * weekly_pace + 15, type: "velocity"}
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "x", type: :quantitative)
+  |> VegaLite.encode_field(:y, "y", type: :quantitative)
+  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+  |> VegaLite.encode_field(:color, "type", title: "V Graph", type: :nominal)
+  |> Kino.VegaLite.new()
+
+goal_pace =
+  Enum.map(0..weeks_until_finish, &%{x: &1, y: &1 * necessary_pace + 15, type: "goal pace"})
+
+Kino.VegaLite.push_many(widget, goal_pace)
+Kino.VegaLite.push_many(widget, velocity)
+Kino.VegaLite.push_many(widget, [week1, week2])
+
+widget
+```
