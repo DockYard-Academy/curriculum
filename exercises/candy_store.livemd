@@ -1,0 +1,113 @@
+# Candy Store
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Create a New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `candy_store`.
+
+```
+mix new item_search
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "candy_store")
+```
+
+## Candy Store
+
+In this exercise, you will build a candy store application which searches and filters candy products from existing products.
+Each product should be a struct with a `:name`, `:cost`, and `:type`.
+
+The `:name` will be a string. The `:cost` will be an integer (in cents). The `:type` will be an atom.
+
+```mermaid
+classDiagram
+  Product {
+    name: :string,
+    cost: :integer,
+    type: :atom
+  }
+```
+
+## Create an Item Struct
+
+Create a `CandyStore.Item` module in a `lib/item.ex` file. 
+It should be a struct with the `:name`, `:cost`, and `:type` fields.
+
+`:name`, `:cost`, and `:type` should be enforced.
+
+Create the following test cases for `CandyStore.Item`.
+
+### Test the Item Struct
+
+Create a `CandyStore.ItemTest` module in `tests/item_test.ex`.
+
+Create the following test cases for the following:
+- given a `:name`, `:cost`, and `:type` field it should create an Item struct.
+- The Item struct should enforce the `:name` and `:type` fields. 
+
+## Create the CandyStore.search/2 function.
+
+The `CandyStore.search/2` function should take a list of items, and the a search query to filter them by.
+For example,
+
+```elixir
+items = [%Item{name: "AAA", type: :candy_bar, cost: 120}, %Item{name: "BBB", type: :candy_bar, cost: 120}, ]
+query = %{name: "A", type: :candy_bar, cost: 120}
+CandyStore.search(items, query)
+%Item{name: "AAA", type: :candy_bar, cost: 120}
+```
+
+Create a `CandyStore.search/2` function and the following test cases:
+(You may use any test names, so long as your tests cover the following functionality)
+
+- given a list of items, when searching the full name of one item, then it should only find matching items.
+- given a list of items, when searching the partial name of one item, then it should only find matching items.
+- given a list of items, when searching the a non matching name, it should find no items.
+- given a list of items, when searching by type, it should find matching items.
+- given a list of items, when searching by a non-matching type, it should find no items.
+- given a list of items, when searching by exact cost, it should find matching items.
+- given a list of items, when searching by all filters (:type, :cost, and :name) it should find matching items.
+
+Ensure all tests pass.
+
+## (Bonus) Search by price.
+
+Add the following functionality and cases to allow users to search by price:
+- given a list of items, when searching by `:max_cost`, it should find items below the max cost.
+- given a list of items, when searching by `:min_cost`, it should find items below the max cost.
+- given a list of items, when searching by `:cost` with a range, it should find items within the range.
+
+## (Bonus) Item Validation
+
+Use `Ecto Changesets` validate the `Item` struct in an `Item.new/1` function.
+`:name` must be a string.
+`:type` must be an atom.
+`:cost` must be an integer.
+
+Then create the following test cases:
+
+- `Item.new/1` should return a changeset error if `:name` is not a string.
+- `Item.new/1` should return a changeset error if `:type` is not an atom.
+- `Item.new/1` should return a changeset error if `:cost` is not a integer.
+- `Item.new/1` should return a struct if `:name`, `:type`, and `:cost` are all valid.
