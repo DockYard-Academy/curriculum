@@ -2117,3 +2117,12 @@ In the Elixir cell below, bring all of the prior functionality into a single
 ```elixir
 
 ```
+
+### 3. BEAM, Nodes and Distributed Elixir
+
+* Reading
+  * BEAM Scheduler
+  * Nodes
+* Exercises
+  * [Distributed Rock Paper Scissors](exercises/distributed_rock_paper_scissors.livemd)
+  * Distributed Chat App
