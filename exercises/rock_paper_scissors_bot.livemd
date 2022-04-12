@@ -1,0 +1,70 @@
+# Rock Paper Scissors Bot
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Create a New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `rock_paper_scissors_bot`.
+
+```
+mix new rock_paper_scissors_bot
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "rock_paper_scissors_bot ")
+```
+
+## Create a Rock Paper Scissors Bot
+
+You should be able to start your project by running the following from the `rock_paper_scissors_bot` folder in
+the command line.
+
+```
+iex -S mix
+```
+
+Your goal is to create a Rock Paper Scissors bot to play against.
+You should be able to enter `:rock`, `:paper`, or `:scissors`. Randomly
+generate a choice for the bot to play, and then print the result.
+
+```elixir
+RockPaperScissors.play(:rock) # bot generated :paper.
+":rock beats :paper"
+```
+
+```elixir
+RockPaperScissors.play(:paper) # bot generated :paper.
+"It's a tie!"
+```
+
+## (Bonus) Save Score
+
+Ever time you play, you should save a running total of your wins, loses, and draws.
+You should be able to retrieve the current tally like so:
+
+```elixir
+RockPaperScissors.score()
+%{wins: 1, loses: 1, draws: 0}
+```
+
+You may choose to persist the score between sessions, or only keep a running tally every time you start
+the project with `iex -S mix`.
