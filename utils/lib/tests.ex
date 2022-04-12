@@ -510,10 +510,9 @@ defmodule Utils.Test do
     enemy = Factory.name()
 
     Enum.each(character_permutations, fn character ->
-      assert apply(dialogue_module, :greet, [character]) ==
-               "Hello, my name is #{character.name}."
+      assert dialogue_module.greet(character) == "Hello, my name is #{character.name}."
 
-      assert apply(dialogue_module, :attack, [character, enemy]) ==
+      assert dialogue_module.attack(character, enemy) ==
                "#{character.name} attacks #{enemy} with a #{character.weapon}."
 
       relinquish_weapon_dialogue =
@@ -524,7 +523,7 @@ defmodule Utils.Test do
           _ -> "My precious!"
         end
 
-      assert apply(dialogue_module, :relinquish_weapon, [character]) == relinquish_weapon_dialogue
+      assert dialogue_module.relinquish_weapon(character) == relinquish_weapon_dialogue
 
       matching_weapon_dialogue =
         case {character.class, character.weapon} do
@@ -535,7 +534,7 @@ defmodule Utils.Test do
           {_, _} -> "I'm not sure a #{character.weapon} suits a #{character.class}."
         end
 
-      assert apply(dialogue_module, :matching_weapon, [character]) == matching_weapon_dialogue
+      assert dialogue_module.matching_weapon(character) == matching_weapon_dialogue
     end)
   end
 
@@ -593,7 +592,7 @@ defmodule Utils.Test do
     |> Enum.take(2)
     |> Enum.chunk_every(2)
     |> Enum.each(fn [pokemon1, pokemon2] ->
-      attacked_pokemon = apply(pokemon_battle_module, :attack, [pokemon1, pokemon2])
+      attacked_pokemon = pokemon_battle_module.attack(pokemon1, pokemon2)
 
       multiplier = Utils.Solutions.PokemonBattle.multiplier(pokemon1, pokemon2)
 
@@ -610,6 +609,47 @@ defmodule Utils.Test do
 
       assert battled_pokemon1 == expected_battled_pokemon1
       assert battled_pokemon2 == expected_battled_pokemon2
+    end)
+  end
+
+  make_test :rock_paper_scissors_lizard_spock do
+    module = get_answers()
+
+    assert Keyword.has_key?(module.__info__(:functions), :play),
+           "Ensure you define the `play/2` function"
+
+    game_permutations =
+      for player1 <- [:rock, :paper, :scissors, :lizard, :spock],
+          player2 <- [:rock, :paper, :scissors, :lizard, :spock] do
+        {player1, player2}
+      end
+
+    beats? = fn player1, player2 ->
+      {player1, player2} in [
+        {:rock, :paper},
+        {:paper, :rock},
+        {:scissors, :paper},
+        {:rock, :lizard},
+        {:lizard, :spock},
+        {:scissors, :lizard},
+        {:lizard, :paper},
+        {:paper, :spock},
+        {:spock, :rock}
+      ]
+    end
+
+    Enum.each(game_permutations, fn {p1, p2} ->
+      expected_result =
+        cond do
+          beats?.(p1, p2) -> "#{p1} beats #{p2}."
+          beats?.(p2, p1) -> "#{p2} beats #{p1}."
+          true -> "tie game, play again?"
+        end
+
+      actual = module.play(p1, p2)
+
+      assert actual == expected_result,
+             "Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2})."
     end)
   end
 
