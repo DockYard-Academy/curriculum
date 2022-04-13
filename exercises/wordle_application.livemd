@@ -1,0 +1,102 @@
+# Wordle
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Create a New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `wordle`.
+
+```
+mix new wordle
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "wordle")
+```
+
+## Wordle
+
+In this exercise, you will build a Wordle application. Wordle is a game where users guess a five letter word.
+They have 6 guesses and are provided hints based on their previous guesses.
+
+If a letter is in the correct position in the guess, it will highlight green.
+
+If a letter is in the word, but in the incorrect position, it will highlight yellow.
+
+You should be able to start the application using `iex -S mix`
+
+```
+$ iex -S mix
+```
+
+Then start playing a Wordle game with `Wordle.play()`.
+the Wordle game will randomly generate a word and store the state of the player's game.
+Likely, you will rely on a `GenServer`.
+
+```
+iex> game = Wordle.play()
+```
+
+The player can type in their guess. it should be a five letter string such as `hello`
+
+The game should then give them feedback on their answer. `G` will mean green, so the letter
+is in the correct spot, and `Y` will mean yellow, so the letter is in the word but in the wrong spot.
+Incorrect letters will be marked with an underscore `_`.
+
+```
+iex> Wordle.guess(game, "hello")
+H E L L 0
+_ _ _ G Y
+```
+
+When the player enters the correct guess, end the game.
+
+```
+iex> Wordle.guess(game, "world")
+W O R L D
+Y Y Y Y Y
+
+iex> Process.alive?(game)
+false
+
+iex> Wordle.guess(game, "")
+{:error, :game_not_found}
+```
+
+If a player guesses more than 6 times, the game should end with them losing.
+
+## Test Cases
+
+Cover the following test cases and ensure your code passes the tests.
+
+- A player guesses the correct word
+- A player guesses a completely incorrect word
+- A player guesses a partially correct word
+- A player guesses 6 times and loses
+
+## (BONUS) Edge Cases
+
+Wordle has a number of edge cases with words that will make providing feedback more difficult.
+Add the following additional test cases and ensure you code passes.
+- A player guesses a word with similar letters and one is in the correct position (i.e "HELLO" vs "WORLD")
+- A player guesses a word with similar letters and both are not in the correct position (i.e "HELLO" vs "LEGAL")
+- A player guesses a word with similar letters and only one should be yellow  (i.e "HELLO" vs "GLOBE")
