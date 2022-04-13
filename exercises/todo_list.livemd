@@ -1,0 +1,216 @@
+# Todo List
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Create a New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `candy_store`.
+
+```
+mix new todo_list --sup
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "todo_list")
+```
+
+## Install Ecto Dependencies
+
+Add the following to your list of dependencies in `mix.exs`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ecto_sql, "~> 3.0"},
+{:postgrex, ">= 0.0.0"}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Install dependencies with `mix deps.get`.
+
+## Generate the Repo
+
+Set up the Ecto configuration by running the following from the project folder.
+
+```
+mix ecto.gen.repo -r TodoList.Repo
+```
+
+You may need to change your `config/config.exs` file to match the username and password of your local PostgreSQL installation.
+
+For debugging instructions see the [Ecto Documentation](https://hexdocs.pm/ecto/getting-started.html).
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :todo_list, TodoList.Repo,
+  database: "friends",
+  username: "user",
+  password: "pass",
+  hostname: "localhost"
+```
+
+```elixir
+
+```
+
+Add the following to your `config/config.exs` file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :todo_list,
+  ecto_repos: [TodoList.Repo]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Add the Repo to the applications supervision tree in `application.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{TodoList.Repo, []}
+```
+
+## Set up the Database
+
+In the project folder, run the following from the command line.
+This will create the corresponding database for your application.
+
+```
+mix ecto.create
+```
+
+Hopefully everything should run and you will see:
+
+```
+The database for TodoList.Repo has been created
+```
+
+However, it's possible that you encounter a bug at this stage.
+Here are some debugging tips to consider.
+
+* Ensure that the postgresql service is running.
+* Ensure that your postgresql username and password match.
+
+If you are stuck, you can speak with your teacher or classmates. You can also [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+on the DockYard Academy github with an explanation of your error.
+
+## Todo List
+
+Now that a mix project connected to ecto, you are going to create a todo list application.
+We should be able to:
+
+* create a todo item
+* get all todo items
+* update a todo item
+* delete a todo item
+
+## Create an Item migration
+
+We can generate a new migration for items with:
+
+```
+mix ecto.gen.migration create_items
+```
+
+Define an `:items` table. each item should have a `:title` which is a `:string`.
+
+## Define an Item Schema
+
+Define a `TodoList.Item` Schema. Each `TodoList.Item` should have a `:title` which is a `:string`.
+
+## Create an Item
+
+Define a `TodoList.create_item/1` function which should accept a map to create a `TodoList.Item`.
+The created `TodoList.Item` should persist in the database.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.create_item(%{title: "My Title"})
+{:ok, %TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1})
+```
+
+## Get Items
+
+Define a `TodoList.all_items/0` function which should retrieve all created `TodoList.Item`s from the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.all_items()
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1}])
+```
+
+## Update Item
+
+Define a `TodoList.update_item/2` function. It should update an existing `TodoList.Item`.
+It should accept the `id` of an item, and a map of fields to update.
+
+This new item should persist with the changes in the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.update_item(1, %{title: "My New Title"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My New Title", id: 1}])
+```
+
+## Delete Item
+
+Define a `TodoList.delete_item/1` function. It should delete an existing `TodoList.Item` from the
+database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.update_item(1, %{title: "My New Title"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My New Title", id: 1}])
+```
+
+## (Bonus) Filter Items
+
+Define a `TodoList.all_items/1` function which accepts a `map` of params to search for.
+It should be able to search by the `:title`. It should also search by partially matching titles.
+
+So `"My"` would find `"My Title"`
+
+<details>
+  <summary>Hint</summary>
+  You could filter using the `Enum` module, however, it will be more performant to rely on `Ecto.Query.`.
+</details>
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.all_items(%{"My"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1}])
+```

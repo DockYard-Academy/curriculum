@@ -17,40 +17,10 @@ Mix.install([
 
 [Return Home](../start.livemd)
 
-## Setup
+## Ecto
 
-Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
-you can evaluate the Elixir cells as you read.
+Ecto provides a standard API layer for communicating with the Database of an Elixir application.
 
+By default, Ecto will communicate with a Postgres Database.
 
-```elixir
-defmodule Sample.Weather do
-  use Ecto.Schema
-
-  schema "weather" do
-    field(:temp_lo, :integer)
-    field(:temp_hi, :integer)
-    field(:prcp, :float, default: 0.0)
-  end
-end
-
-w = %Sample.Weather{temp_hi: 2, temp_lo: 2}
-
-File.write("delete_this_brooklin", :erlang.term_to_binary(Map.from_struct(w)))
-
-File.read!("delete_this_brooklin") |> :erlang.binary_to_term()
-```
-
-```elixir
-defmodule Test do
-  import Ecto.Query, only: [from: 2]
-
-  def test do
-    query =
-      from(u in "users",
-        where: u.age > 18 or is_nil(u.email),
-        select: u
-      )
-  end
-end
-```
+We can add Ecto to an application by following the [Ecto Getting Started Guide](https://hexdocs.pm/ecto/getting-started.html) guide.
