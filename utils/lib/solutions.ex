@@ -98,6 +98,7 @@ defmodule Utils.Solutions do
     shopping_list = [] ++ ["grapes", "walnuts", "apples"]
     shopping_list = shopping_list ++ ["blueberries", "chocolate", "pizza"]
     shopping_list = shopping_list -- ["grapes", "walnuts"]
+    shopping_list = shopping_list ++ ["banana", "banana", "banana"]
     shopping_list
   end
 
