@@ -2126,3 +2126,36 @@ In the Elixir cell below, bring all of the prior functionality into a single
 * Exercises
   * [Distributed Rock Paper Scissors](exercises/distributed_rock_paper_scissors.livemd)
   * Distributed Chat App
+
+### Breaking Down Problems As Input And Output
+
+We've shown some examples of how to convert non-enumerable data into
+an enumerable as a list. This highlights the critical ability as a developer to
+manipulate the shape of data from one form to another.
+
+If you think about your program as the input of data and the output of data,
+you can model your desired functionality even if you don't understand how you're 
+going to implement it.
+
+```mermaid
+flowchart LR
+  Input --> B[Black Box] --> Output
+```
+
+Then you could break that problem down further into a series of
+transformations.
+
+```mermaid
+flowchart LR
+Input --> 1[Transformation] --> 2[Transformation] --> 3[Transformation] --> Output
+```
+
+Often, you need to solve problems that you don't know the answer to.
+
+Whenever this occurs, you should ask yourself if you can break that problem down even further.
+If you can't solve one problem, try to solve an easier problem that will build your knowledge
+for how to solve the harder problem.
+
+For example: imagine you want to count how many times the letter "e" occurs in a string. If you
+know how to count how many times it occurs in a list, you can start by converting the string to
+a list.

@@ -416,7 +416,7 @@ defmodule Utils.Solutions do
     end
 
     def convert_choice(game, choice) do
-      %{rock: rock, paper: paper, scissors: scissors} = game.rock
+      %{rock: rock, paper: paper, scissors: scissors} = game
 
       case choice do
         ^rock -> :rock
@@ -436,10 +436,10 @@ defmodule Utils.Solutions do
     def play(game, player1, player2) do
       cond do
         beats?(game, player1, player2) ->
-          "#{player1} beats #{player2}."
+          "#{player1} beats #{player2}"
 
         beats?(game, player2, player1) ->
-          "#{player2} beats #{player1}."
+          "#{player2} beats #{player1}"
 
         true ->
           "draw"
@@ -449,5 +449,22 @@ defmodule Utils.Solutions do
 
   def custom_rps do
     CustomGame
+  end
+
+  defmodule FizzBuzz do
+    def run(range) do
+      Enum.map(range, fn integer ->
+        cond do
+          rem(integer, 15) == 0 -> "fizzbuzz"
+          rem(integer, 5) == 0 -> "buzz"
+          rem(integer, 3) == 0 -> "fizz"
+          true -> integer
+        end
+      end)
+    end
+  end
+
+  def fizz_buzz do
+    FizzBuzz
   end
 end
