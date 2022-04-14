@@ -15,7 +15,7 @@ defmodule Utils.Feedback do
 
   Creates a a Utils.feedback(:example, answers) function clause.
   """
-  Module.register_attribute(__MODULE__, :test_names, accumulate: true)
+  Module.register_attribute(Utils.Feedback, :test_names, accumulate: true)
   require Utils.Macros
   import Utils.Macros
 
@@ -291,10 +291,11 @@ defmodule Utils.Feedback do
     list = [] ++ ["grapes", "walnuts", "apples"]
     list = list ++ ["blueberries", "chocolate", "pizza"]
     list = list -- ["grapes", "walnuts"]
+    list = list ++ ["banana", "banana", "banana"]
 
     assert is_list(shopping_list), "Ensure shopping_list is still a list."
 
-    assert Enum.sort(shopping_list) == Enum.sort(shopping_list),
+    assert Enum.sort(list) == Enum.sort(shopping_list),
            "Ensure your shopping list has all of the expected items"
 
     assert shopping_list == list, "Ensure you add and remove items in the expected order"
