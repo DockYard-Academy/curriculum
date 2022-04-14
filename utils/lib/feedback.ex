@@ -609,6 +609,25 @@ defmodule Utils.Feedback do
     assert fizz_buzz_module.run(1..100) == Utils.Solutions.FizzBuzz.run(1..100)
   end
 
+  feedback :voter_count do
+    voter_count = get_answers()
+
+    assert voter_count.count([], :test), "Implement the `count` function."
+
+    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :dogs) == 3,
+           "failed on ([:dogs, :dogs, :dogs, :cats], :dogs)"
+
+    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :cats) == 1,
+           "Failed on ([:dogs, :dogs, :dogs, :cats], :cats)"
+
+    assert voter_count.count([:apples, :oranges, :apples, :cats], :birds) == 0,
+           "Failed on ([:apples, :oranges, :apples, :cats], :birds)"
+
+    list = Enum.map(1..10, fn _ -> Enum.random([:cat, :dog, :bird, :apple, :orange]) end)
+    choice = Enum.random([:cat, :dog, :bird, :apple, :orange])
+    assert voter_count.count(list, choice) == Enum.count(list, fn each -> each == choice end)
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 
