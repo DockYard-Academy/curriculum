@@ -6,4 +6,48 @@ defmodule Utils.Factory do
   def string do
     Faker.String.base64()
   end
+
+  def integer(range \\ 0..1000) do
+    Enum.random(range)
+  end
+
+  def item_type do
+    Enum.random([
+      "sword",
+      "halberd",
+      "crossbow",
+      "hammer",
+      "mace",
+      "longsword",
+      "shortsword",
+      "longbow"
+    ])
+  end
+
+  def item_effect do
+    Enum.random([
+      "protection",
+      "healing",
+      "speed",
+      "power",
+      "jump"
+    ])
+  end
+
+  def item_style do
+    Enum.random(["holy", "dark", "heroic", "crude", "mundane", "lavish"])
+  end
+
+  def item(override \\ %{}) do
+    Map.merge(
+      %Utils.Solutions.Item{
+        type: item_type(),
+        effect: item_effect(),
+        style: item_style(),
+        size: integer(1..10),
+        level: integer(1..100)
+      },
+      override
+    )
+  end
 end

@@ -696,14 +696,107 @@ defmodule Utils.Feedback do
 
     assert length(result) == 51, "There should be 51 total verses."
 
-    assert Enum.at(result, 47) ==
+    assert Enum.at(result, 48) ==
              "2 cans of pop on the wall.\n2 cans of pop.\nTake one down, pass it around.\n1 can of pop on the wall."
 
-    assert Enum.at(result, 48) ==
-             "1 can of pop on the wall.\n1 can of pop.\nTake one down, pass it around.\n0 cans of soda on the wall."
-
     assert Enum.at(result, 49) ==
+             "1 can of pop on the wall.\n1 can of pop.\nTake one down, pass it around.\n0 cans of pop on the wall."
+
+    assert Enum.at(result, 50) ==
              "No more cans of pop on the wall, no more cans of pop.\nGo to the store and buy some more, 99 cans of pop on the wall."
+  end
+
+  feedback :item_generator_item do
+    item = get_answers()
+
+    assert Keyword.get(item.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`."
+
+    assert match?(%{type: nil, effect: nil, level: nil, size: nil, style: nil}, struct(item)),
+           "Ensure you use `defstruct` with :type, :effect, :level, :size, and :style."
+  end
+
+  feedback :item_generator do
+    items = get_answers()
+
+    assert is_list(items), "`items` should be a list."
+
+    expected_items = Utils.Solutions.item_generator()
+
+    expected_length = length(expected_items)
+
+    assert length(items) == expected_length,
+           "There should be #{expected_length} permutations of items."
+
+    Enum.each(items, fn item ->
+      assert is_struct(item), "Each item should be an `Item` struct."
+      assert match?(%{type: _, effect: _, style: _, size: _, level: _, __struct__: _}, item)
+    end)
+  end
+
+  feedback :item_generator_search do
+    search = get_answers()
+    items = [Utils.Factory.item(%{}), Utils.Factory.item()]
+    result = search.all_items(items, [])
+    assert result, "Implement the `all_items/2` function."
+    assert is_list(result), "`all_items/2` should return a list."
+
+    assert length(result) == 2,
+           "`all_items/2` should return all items when no filters are provided."
+
+    assert length(result) == 2,
+           "`all_items/2` should return all items when no filters are provided."
+
+    assert Enum.sort(items) == Enum.sort(result),
+           "`all_items/2` should return all items when no filters are provided."
+
+    [item1, _] = items = [Utils.Factory.item(%{type: "a"}), Utils.Factory.item(%{type: "b"})]
+    result = search.all_items(items, type: "a")
+    assert result == [item1], "`all_items/2` should filter by type."
+
+    [item1, _] = items = [Utils.Factory.item(%{effect: "a"}), Utils.Factory.item(%{effect: "b"})]
+
+    result = search.all_items(items, effect: "a")
+    assert result == [item1], "`all_items/2` should filter by type."
+
+    [item1, _] = items = [Utils.Factory.item(%{style: "a"}), Utils.Factory.item(%{style: "b"})]
+
+    result = search.all_items(items, style: "a")
+    assert result == [item1], "`all_items/2` should filter by style."
+
+    [item1, _] = items = [Utils.Factory.item(%{size: 1}), Utils.Factory.item(%{size: 2})]
+    result = search.all_items(items, size: 1)
+    assert result == [item1], "`all_items/2` should filter by size."
+
+    [item1, _] = items = [Utils.Factory.item(%{level: 1}), Utils.Factory.item(%{level: 2})]
+    result = search.all_items(items, level: 1)
+    assert result == [item1], "`all_items/2` should filter by level."
+
+    [item1, item2] = items = [Utils.Factory.item(), Utils.Factory.item(%{level: 2})]
+
+    result =
+      search.all_items(items,
+        type: item1.type,
+        effect: item1.effect,
+        style: item1.style,
+        size: item1.size,
+        level: item1.level
+      )
+
+    assert result == [item1], "`all_items/2` should work with multiple filters."
+
+    result =
+      search.all_items(items,
+        type: item1.type,
+        effect: item1.effect,
+        style: item1.style,
+        size: item1.size,
+        level: item2.level,
+        inclusive: true
+      )
+
+    assert Enum.sort(result) == Enum.sort([item1, item2]),
+           "`all_items/2` should work with multiple inclusive filters."
   end
 
   # test names must be after tests that require a solution.

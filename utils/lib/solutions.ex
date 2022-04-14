@@ -529,4 +529,69 @@ defmodule Utils.Solutions do
   def bottles_of_blank do
     BottlesOfSoda
   end
+
+  defmodule Item do
+    defstruct [:type, :effect, :level, :size, :style]
+  end
+
+  def item_generator_item do
+    Item
+  end
+
+  def item_generator do
+    types = [
+      "sword",
+      "halberd",
+      "crossbow",
+      "hammer",
+      "mace",
+      "longsword",
+      "shortsword",
+      "longbow"
+    ]
+
+    effects = [
+      "protection",
+      "healing",
+      "speed",
+      "power",
+      "jump"
+    ]
+
+    styles = ["holy", "dark", "heroic", "crude", "mundane", "lavish"]
+    sizes = 1..10
+    levels = 1..100
+
+    for type <- types, effect <- effects, style <- styles, size <- sizes, level <- levels do
+      %Item{type: type, effect: effect, style: style, size: size, level: level}
+    end
+  end
+
+  defmodule Search do
+    def all_items(items, filters) do
+      inclusive = Keyword.get(filters, :inclusive)
+
+      if inclusive do
+        inclusive_filter(items, Keyword.delete(filters, :inclusive))
+      else
+        exclusive_filter(items, Keyword.delete(filters, :inclusive))
+      end
+    end
+
+    defp exclusive_filter(items, filters) do
+      Enum.filter(items, fn each ->
+        Enum.all?(filters, fn {filter, value} -> Map.get(each, filter) == value end)
+      end)
+    end
+
+    defp inclusive_filter(items, filters) do
+      Enum.filter(items, fn each ->
+        Enum.any?(filters, fn {filter, value} -> Map.get(each, filter) == value end)
+      end)
+    end
+  end
+
+  def item_generator_search do
+    Search
+  end
 end

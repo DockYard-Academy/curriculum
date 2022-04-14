@@ -2159,3 +2159,120 @@ for how to solve the harder problem.
 For example: imagine you want to count how many times the letter "e" occurs in a string. If you
 know how to count how many times it occurs in a list, you can start by converting the string to
 a list.
+
+# Character Generator
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Character Generator
+
+You are building a text RPG game where players can create a character.
+In the Elixir cell below,
+
+* Create a `Character` struct
+* `Character`s should have `health`, `class`, `description`, `name`, `level`, and `attack` fields.
+* `health` should be a **float**.
+* `class` should be an **atom** of either `:wizard`, `:warrior`, or `:ranger`.
+* `name` should be a **string**.
+* `description` should be a **string**.
+* `level` should be an integer defaulted to `1`
+* `attack` should be an integer defaulted to `5`
+
+```elixir
+defmodule Character do
+end
+```
+
+## Character Validation
+
+* Create a `Character.new/1` function which validates the parameters given to character.
+* `level` should not be used to create a character, all characters start at `1`
+* `attack` should not be used to create a character, all characters start at `5`
+* `health` should not be used to create a character, wizards start with `10` health, rangers `15`, and warriors `20`.
+* enforce that `class` one of the three correct atoms
+* enforce that `name` is a string
+* enforce that `description` is a string
+
+```elixir
+
+```
+
+## Character Randomizer
+
+* Create a `Character.randomize/1` function which accepts an existing `Character` struct and randomizes
+  the `class`, `name`, and `description`.
+* a **random** `class` should be one of `:wizard`, `:warrior`, and `:ranger`
+* a **random** `name` should be a random `7` to `14` letter string of random alphabetical characters.
+* a **random** `description` should be a random `100` to `200` letter string of random alphabetical characters.
+* `attack` should be updated to match the random `class`.
+* `level` and `attack` should be unchanged.
+
+## Character Form
+
+### Kino Inputs
+
+In order to complete this exercise, you're going to use `Kino`. Kino is a library specifically for
+Livebook - the program you're using to run this course.
+
+```elixir
+text_input = Kino.Input.text("the label of your input")
+```
+
+Then you can access the value inside of the text input with `Kino.Input.read/1`
+
+```elixir
+text_input_value = Kino.Input.read(text_input)
+```
+
+You can also create select inputs with `Kino.Input.select`
+
+```elixir
+Kino.Input.select("Language", [{"key1", :value1}, {"key2", :value2}])
+```
+
+### Create A Character Form
+
+In the Elixir cell below, Create a `name` input using `Kino.Input.text/1`
+
+```elixir
+
+```
+
+Create a `description` input using `Kino.Input.text/1`
+
+```elixir
+
+```
+
+Create a `class` input using `Kino.Input.select/1`. It should have `:wizard`, `:warrior`, and `:ranger` as options.
+
+```elixir
+
+```
+
+In the Elixir cell below, use the inputs you defined above and `Kino.Input.read/1` to create
+an instance of a `Character` struct i.e. `%Character{params}`.
+
+```elixir
+
+```
