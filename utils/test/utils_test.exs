@@ -43,12 +43,12 @@ defmodule UtilsTest do
     assert Utils.random(1..9) in 1..9
   end
 
-  test "test/2" do
-    Enum.each(Utils.Test.test_module_names(), fn each ->
+  test "feedback/2" do
+    Enum.each(Utils.Feedback.test_names(), fn each ->
       assert Keyword.has_key?(Solutions.__info__(:functions), each),
              "define a Solutions.#{Atom.to_string(each)} function."
 
-      Utils.test(each, apply(Solutions, each, []))
+      Utils.feedback(each, apply(Solutions, each, []))
     end)
   end
 end

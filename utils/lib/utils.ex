@@ -30,5 +30,5 @@ defmodule Utils do
 
   def table(table_name), do: Kino.DataTable.new(apply(Utils.Table, table_name, []))
 
-  def test(module_name, answers), do: Utils.Test.test(module_name, answers)
+  def feedback(module_name, answers), do: Utils.Feedback.test(module_name, answers)
 end

@@ -1,20 +1,21 @@
-defmodule Utils.Test do
+defmodule Utils.Feedback do
   @moduledoc """
-  Utils.Test defines tests using the `make_test` macro.
-  Each `make_test` macro creates an associated function.
+  Utils.Feedback defines tests using the `feedback` macro.
+  Each `feedback` macro creates an associated Utils.feedback function and
+  ensures that each has a corresponding solution in Utils.Solutions.
 
   ## Examples
 
   ```elixir
-  make_test :example do
+  feedback :example do
     answer = get_answers()
     assert answer == 5
   end
   ```
 
-  Creates a a Utils.test(:example, answers) function clause.
+  Creates a a Utils.feedback(:example, answers) function clause.
   """
-  Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
+  Module.register_attribute(__MODULE__, :test_names, accumulate: true)
   require Utils.Macros
   import Utils.Macros
 
@@ -37,17 +38,17 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :card_count_four do
+  feedback :card_count_four do
     next_count = get_answers()
     assert next_count == 1
   end
 
-  make_test :card_count_king do
+  feedback :card_count_king do
     next_count = get_answers()
     assert next_count === 4
   end
 
-  make_test :card_count_random do
+  feedback :card_count_random do
     [card, next_count] = get_answers()
 
     cond do
@@ -65,39 +66,39 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :habit_tracker_definition do
+  feedback :habit_tracker_definition do
     [small, medium, large] = get_answers()
     assert small == 5
     assert medium == 20
     assert large == 30
   end
 
-  make_test :habit_tracker_add do
+  feedback :habit_tracker_add do
     total_points = get_answers()
     assert total_points == 20 + 5
   end
 
-  make_test :habit_tracker_percentage do
+  feedback :habit_tracker_percentage do
     percentage = get_answers()
     assert percentage == (5 + 20) / 40 * 100
   end
 
-  make_test :habit_tracker_penalties_1 do
+  feedback :habit_tracker_penalties_1 do
     total_points = get_answers()
     assert total_points == 5 + 20 + 30 * 0.5
   end
 
-  make_test :habit_tracker_penalties_2 do
+  feedback :habit_tracker_penalties_2 do
     total_points = get_answers()
     assert total_points == 5 / 2 * 3 + 20 / 2 * 3
   end
 
-  make_test :habit_tracker_rewards do
+  feedback :habit_tracker_rewards do
     total_points = get_answers()
     assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
   end
 
-  make_test :percentage do
+  feedback :percentage do
     [completed_items, total_items, percentage] = get_answers()
 
     assert completed_items == 10,
@@ -107,24 +108,24 @@ defmodule Utils.Test do
     assert percentage == completed_items / total_items * 100
   end
 
-  make_test :pythagorean_c_square do
+  feedback :pythagorean_c_square do
     c_square = get_answers()
     assert c_square == 10 ** 2 + 10 ** 2
   end
 
-  make_test :pythagorean_c do
+  feedback :pythagorean_c do
     c = get_answers()
     assert c == :math.sqrt(200)
   end
 
-  make_test :string_concatenation do
+  feedback :string_concatenation do
     answer = get_answers()
     assert is_bitstring(answer), "the answer should be a string."
     assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
     assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
   end
 
-  make_test :string_interpolation do
+  feedback :string_interpolation do
     answer = get_answers()
     assert is_bitstring(answer), "the answer should be a string."
 
@@ -139,7 +140,7 @@ defmodule Utils.Test do
            "the answer should end in a period."
   end
 
-  make_test :tip_amount do
+  feedback :tip_amount do
     [cost_of_the_meal, tip_rate, tip_amount] = get_answers()
     assert tip_rate == 0.20, "tip rate should be 0.2."
     assert cost_of_the_meal == 55.5, "cost_of_the_meal should be 55.5."
@@ -148,7 +149,7 @@ defmodule Utils.Test do
            "tip_amount should be cost_of_the_meal * tip_rate."
   end
 
-  make_test :rock_paper_scissors_ai do
+  feedback :rock_paper_scissors_ai do
     [player_choice, ai_choice] = get_answers()
 
     case player_choice do
@@ -166,7 +167,7 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :rock_paper_scissors_two_player do
+  feedback :rock_paper_scissors_two_player do
     [player1_choice, player2_choice, winner] = get_answers()
 
     case {player1_choice, player2_choice} do
@@ -180,12 +181,12 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :rocket_ship do
+  feedback :rocket_ship do
     force = get_answers()
     assert force == 20
   end
 
-  make_test :startup_madlib do
+  feedback :startup_madlib do
     [
       madlib,
       name_of_company,
@@ -202,7 +203,7 @@ defmodule Utils.Test do
              "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
   end
 
-  make_test :nature_show_madlib do
+  feedback :nature_show_madlib do
     [
       animal,
       country,
@@ -223,37 +224,37 @@ defmodule Utils.Test do
              "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
   end
 
-  make_test :boolean_diagram1 do
+  feedback :boolean_diagram1 do
     answer = get_answers()
     assert answer == false
   end
 
-  make_test :boolean_diagram2 do
+  feedback :boolean_diagram2 do
     answer = get_answers()
     assert answer == true
   end
 
-  make_test :boolean_diagram3 do
+  feedback :boolean_diagram3 do
     answer = get_answers()
     assert answer == false
   end
 
-  make_test :boolean_diagram4 do
+  feedback :boolean_diagram4 do
     answer = get_answers()
     assert answer == false
   end
 
-  make_test :boolean_diagram5 do
+  feedback :boolean_diagram5 do
     answer = get_answers()
     assert answer == true
   end
 
-  make_test :boolean_diagram6 do
+  feedback :boolean_diagram6 do
     answer = get_answers()
     assert answer == true
   end
 
-  make_test :guess_the_word do
+  feedback :guess_the_word do
     [guess, answer, correct] = answers = get_answers()
 
     assert Enum.all?(answers, &is_bitstring/1),
@@ -266,7 +267,7 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :guess_the_number do
+  feedback :guess_the_number do
     [guess, answer, correct] = get_answers()
 
     assert is_integer(guess), "Ensure `guess` is an integer"
@@ -280,12 +281,12 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :copy_file do
+  feedback :copy_file do
     file_name = get_answers()
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  make_test :shopping_list do
+  feedback :shopping_list do
     shopping_list = get_answers()
     list = [] ++ ["grapes", "walnuts", "apples"]
     list = list ++ ["blueberries", "chocolate", "pizza"]
@@ -299,7 +300,7 @@ defmodule Utils.Test do
     assert shopping_list == list, "Ensure you add and remove items in the expected order"
   end
 
-  make_test :shopping_list_with_quantities do
+  feedback :shopping_list_with_quantities do
     shopping_list = get_answers()
     list = [] ++ [milk: 1, eggs: 12]
     list = list ++ [bars_of_butter: 2, candies: 10]
@@ -315,7 +316,7 @@ defmodule Utils.Test do
     assert shopping_list == list, "Ensure you add and remove items in the expected order"
   end
 
-  make_test :family_tree do
+  feedback :family_tree do
     family_tree = get_answers()
     assert is_map(family_tree), "Ensure `family_tree` is a map."
     assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
@@ -326,7 +327,7 @@ defmodule Utils.Test do
     assert family_tree == Utils.Solutions.family_tree()
   end
 
-  make_test :naming_numbers do
+  feedback :naming_numbers do
     naming_numbers = get_answers()
 
     assert is_function(naming_numbers),
@@ -339,7 +340,7 @@ defmodule Utils.Test do
     end)
   end
 
-  make_test :numbering_names do
+  feedback :numbering_names do
     numbering_names = get_answers()
 
     list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
@@ -359,7 +360,7 @@ defmodule Utils.Test do
     end)
   end
 
-  make_test :define_character_struct do
+  feedback :define_character_struct do
     character_module = get_answers()
 
     assert Keyword.get(character_module.__info__(:functions), :__struct__),
@@ -373,7 +374,7 @@ defmodule Utils.Test do
     end
   end
 
-  make_test :character_structs do
+  feedback :character_structs do
     [arthur, gandalf, jarlaxle] = get_answers()
     assert is_struct(arthur), "Ensure `arthur` is a struct."
     assert is_struct(gandalf), "Ensure `gandalf` is a struct."
@@ -384,7 +385,7 @@ defmodule Utils.Test do
     assert %{name: "Jarlaxle", weapon: "daggers", class: "rogue"} = jarlaxle
   end
 
-  make_test :character_dialogue do
+  feedback :character_dialogue do
     dialogue_module = get_answers()
 
     character_permutations =
@@ -425,7 +426,7 @@ defmodule Utils.Test do
     end)
   end
 
-  make_test :define_pokemon_struct do
+  feedback :define_pokemon_struct do
     pokemon_module = get_answers()
 
     assert Keyword.get(pokemon_module.__info__(:functions), :__struct__),
@@ -438,7 +439,7 @@ defmodule Utils.Test do
            "Ensure :health has a default value of 20 and :attack has a default value of 5."
   end
 
-  make_test :pokemon_structs do
+  feedback :pokemon_structs do
     [charmander, bulbasaur, squirtle] = get_answers()
     assert is_struct(charmander), "Ensure `charmander` is a struct."
     assert is_struct(squirtle), "Ensure `squirtle` is a struct."
@@ -449,7 +450,7 @@ defmodule Utils.Test do
     assert %{name: "Squirtle", type: :water, attack: 5, health: 20, speed: 10} = squirtle
   end
 
-  make_test :pokemon_battle do
+  feedback :pokemon_battle do
     [pokemon_battle_module, pokemon_module] = get_answers()
 
     assert Keyword.get(pokemon_module.__info__(:functions), :__struct__),
@@ -499,7 +500,7 @@ defmodule Utils.Test do
     end)
   end
 
-  make_test :rock_paper_scissors_lizard_spock do
+  feedback :rock_paper_scissors_lizard_spock do
     module = get_answers()
 
     assert Keyword.has_key?(module.__info__(:functions), :play),
@@ -540,11 +541,11 @@ defmodule Utils.Test do
     end)
   end
 
-  # test modules names must be after tests that require a solution.
-  def test_module_names, do: @test_module_names
+  # test names must be after tests that require a solution.
+  def test_names, do: @test_names
 
   # created_project test does not require solution
-  make_test :created_project do
+  feedback :created_project do
     path = get_answers()
 
     assert File.dir?("../projects/#{path}"),
