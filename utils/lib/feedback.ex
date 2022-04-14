@@ -799,6 +799,30 @@ defmodule Utils.Feedback do
            "`all_items/2` should work with multiple inclusive filters."
   end
 
+  feedback :custom_enum do
+    list = Enum.to_list(1..10)
+
+    custom_enum = get_answers()
+    assert custom_enum.map(list, & &1), "Implement the `map/2` funtion."
+    assert is_list(custom_enum.map(list, & &1)), "`map/2` should return a list."
+
+    assert custom_enum.map(list, &(&1 * 2)) == Enum.map(list, &(&1 * 2)),
+           "`map/2` should call the function on each element and return a new list."
+
+    assert custom_enum.each(list, & &1), "Implement the `each/2` funtion."
+    assert custom_enum.each(list, & &1) == :ok, "`each/2` should return :ok."
+
+    assert custom_enum.filter(list, & &1), "Implement the `filter/2` funtion."
+    assert is_list(custom_enum.filter(list, & &1)), "`each/2` should return a list."
+
+    assert custom_enum.filter(list, &(&1 < 5)) == Enum.filter(list, &(&1 < 5))
+
+    assert custom_enum.sum(list), "Implement the `sum/1` funtion."
+    assert is_integer(custom_enum.sum(list)), "`sum/1` should return an integer."
+
+    assert custom_enum.sum(list) == Enum.sum(list)
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 
