@@ -1,0 +1,59 @@
+# Journal
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Create a New Mix Project
+
+Create a new project in the `projects` folder called `journal` using the command line.
+
+```
+mix new journal --sup
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Evaluate the cell below to ensure you have correctly created the project.
+
+```elixir
+Utils.test(:created_project, "todo_list")
+```
+
+Configure your mix project with Ecto by following the [Ecto Getting Started](https://hexdocs.pm/ecto/getting-started.html) guide.
+
+## Journal
+
+Now that we have a mix project with Ecto, you will create a journal application.
+
+You will be able to create many different journals. Each journal will have many entries.
+
+```mermaid
+classDiagram
+class Journal {
+  title: :string
+  description: :text
+  entries: [Entry]
+}
+
+class Entry {
+  title: :string
+  content: :text
+  journal: Journal
+}
+```
+
+## WIP 
