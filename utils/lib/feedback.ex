@@ -823,6 +823,34 @@ defmodule Utils.Feedback do
     assert custom_enum.sum(list) == Enum.sum(list)
   end
 
+  feedback :voter_tally do
+    voter_tally = get_answers()
+    assert voter_tally.tally([]), "Implement the `tally/1` function."
+    assert is_map(voter_tally.tally([])), "`tally/1` should return a map."
+    assert voter_tally.tally([:dogs, :cats]) == %{dogs: 1, cats: 1}
+    assert voter_tally.tally([:dogs, :dogs, :cats]) == %{dogs: 2, cats: 1}
+
+    votes = Enum.map(1..10, fn _ -> Enum.random([:cats, :dogs, :birds]) end)
+
+    expected_result =
+      Enum.reduce(votes, %{}, fn each, acc ->
+        Map.update(acc, each, 1, fn existing_value -> existing_value + 1 end)
+      end)
+
+    assert voter_tally.tally(votes) == expected_result
+  end
+
+  feedback :voter_power do
+    voter_tally = get_answers()
+    assert voter_tally.tally([]), "Implement the `tally/1` function."
+    assert is_map(voter_tally.tally([])), "`tally/1` should return a map."
+    assert voter_tally.tally(dogs: 2) == %{dogs: 2}
+    assert voter_tally.tally(dogs: 2, cats: 1) == %{dogs: 2, cats: 1}
+    assert voter_tally.tally([:cats, dogs: 2]) == %{dogs: 2, cats: 1}
+
+    assert voter_tally.tally([:dogs, :cats, birds: 3, dogs: 10]) == %{dogs: 11, cats: 1, birds: 3}
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 

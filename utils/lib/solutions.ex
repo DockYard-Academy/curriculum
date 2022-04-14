@@ -629,4 +629,24 @@ defmodule Utils.Solutions do
   def custom_enum do
     CustomEnum
   end
+
+  defmodule VoterTally do
+    def tally(votes) do
+      Enum.reduce(votes, %{}, fn
+        {each, value}, acc ->
+          Map.update(acc, each, value, fn existing_value -> existing_value + value end)
+
+        each, acc ->
+          Map.update(acc, each, 1, fn existing_value -> existing_value + 1 end)
+      end)
+    end
+  end
+
+  def voter_tally do
+    VoterTally
+  end
+
+  def voter_power do
+    VoterTally
+  end
 end

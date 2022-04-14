@@ -21,20 +21,27 @@ Mix.install([
 
 In the Elixir cell below,
 
-* Create a module `VoterCount` with a `tally/1` function.
+* Create a module `VoterTally` with a `tally/1` function.
 * The `tally/1` function will accept a list of any atoms as the parameter.
 * The atoms represent the votes for each party.
 * return a map with the number of votes for each party.
 
 For example:
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-VoterCount.tally([:pink, :indigo, :purple, :pink])
+VoterTally.tally([:pink, :indigo, :purple, :pink])
 %{pink: 2, indigo: 1, purple: 1}
 ```
 
 ```elixir
+defmodule VoterTally do
+  def tally(votes) do
+  end
+end
 
+Utils.feedback(:voter_tally, VoterTally)
 ```
 
 ## Voting Power
@@ -43,15 +50,27 @@ The system changes again to allow certain individuals/groups more
 voting power. Votes will now come in as a keyword list
 with the number of votes for the `tally/1` function.
 
-For example
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-VoteCount.tally([dogs: 10, dogs: 20, cats: 2])
+VoterPower.tally([dogs: 10, dogs: 20, cats: 2])
 %{dogs: 30, cats: 2}
 ```
 
-Enter your updated answer in the Elixir cell below:
+You will also need to handle atoms within the list.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+VoterPower.tally([:dogs, :dogs, dogs: 2, :cats])
+%{dogs: 4, cats: 1}
+```
 
+```elixir
+defmodule VoterPower do
+  def tally(votes) do
+  end
+end
+
+Utils.feedback(:voter_power, VoterPower)
 ```
