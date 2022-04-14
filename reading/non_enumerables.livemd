@@ -64,14 +64,18 @@ Tuple.to_list({1, 2, 3})
 
 ### Strings
 
-Strings are not enumerable, however they can be converted into lists with either `String.graphemes/1`
-or `String.codepoints/1`.
+Strings are not enumerable, however there are several methods to convert strings to lists.
 
-#### `String.codepoints/1`
+Strings can be converted into lists with either `String.graphemes/1`
+or `String.codepoints/1`.
 
 Under the hood, strings are represented with a **codepoint**. A codepoint is an integer that represents
 the character. Each character such as `"a"` has a corresponding codepoint. That's why the
 function is called `String.codepoints/1`.
+
+```elixir
+String.split("abc", "", trim: true)
+```
 
 ```elixir
 String.codepoints("abcdefghijklmnopqrstuvwxyz")
@@ -115,11 +119,31 @@ formed from multiple codepoints.
 String.graphemes("é")
 ```
 
+Alternatively, you can use `String.split/3` to split a string based on some value.
+For example, we can split a string by every comma like so:
+
+```elixir
+String.split("a,b,c,d", ",")
+```
+
+You can use this to accomplish the same behavior as `String.graphemes/1` by passing a string as the second argument. 
+However this leaves whitespace from the start and end of the string in.
+
+```elixir
+String.split("abcde", "")
+```
+
+You can trim whitespace using the `[trim: true]` option.
+
+```elixir
+String.split("abcde", "", trim: true)
+```
+
 Now your string is an enumerable list of characters.
 
 ### Your Turn
 
-In the Elixir cell below, convert the string `"Hello, world!"` into a list.
+In the Elixir cell below, convert the string `"Hello, world!"` into a list of single characters.
 
 ```elixir
 
