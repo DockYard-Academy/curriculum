@@ -2276,3 +2276,6 @@ an instance of a `Character` struct i.e. `%Character{params}`.
 ```elixir
 
 ```
+
+### Enum Questions
+* Given a set of movement instructions, what is your final position? (0, 0) :up :right (1, 1)

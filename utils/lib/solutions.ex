@@ -649,4 +649,47 @@ defmodule Utils.Solutions do
   def voter_power do
     VoterTally
   end
+
+  defmodule Measurements do
+    def increased(measurements) do
+      [head | tail] = measurements
+
+      {_prev, sum} =
+        Enum.reduce(tail, {head, 0}, fn each, {prev, acc} ->
+          {each, (prev < each && acc + 1) || acc}
+        end)
+
+      sum
+    end
+
+    def increased_by(measurements) do
+      [head | tail] = measurements
+
+      {_prev, sum} =
+        Enum.reduce(tail, {head, 0}, fn each, {prev, acc} ->
+          {each, (prev < each && acc + each - prev) || acc}
+        end)
+
+      sum
+    end
+
+    def increments(measurements) do
+      [head | tail] = measurements
+
+      {_prev, acc} =
+        Enum.reduce(tail, {head, []}, fn each, {prev, acc} ->
+          {each, [each - prev | acc]}
+        end)
+
+      Enum.reverse(acc)
+    end
+
+    def average(measurements) do
+      Enum.sum(measurements) / length(measurements)
+    end
+  end
+
+  def measurements do
+    Measurements
+  end
 end

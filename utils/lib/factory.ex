@@ -7,8 +7,12 @@ defmodule Utils.Factory do
     Faker.String.base64()
   end
 
-  def integer(range \\ 0..1000) do
+  def integer(range \\ 0..100) do
     Enum.random(range)
+  end
+
+  def integers(range \\ 0..10) do
+    Enum.map(range, fn _ -> integer() end)
   end
 
   def item_type do

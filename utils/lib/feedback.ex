@@ -851,6 +851,31 @@ defmodule Utils.Feedback do
     assert voter_tally.tally([:dogs, :cats, birds: 3, dogs: 10]) == %{dogs: 11, cats: 1, birds: 3}
   end
 
+  feedback :measurements do
+    measurements = get_answers()
+    list = Utils.Factory.integers()
+
+    assert measurements.increased([1, 1]), "Implement the `increased` function."
+    assert measurements.increased([1, 2, 1]) == 1
+    assert measurements.increased([1, 1, 2, 3, 1]) == 2
+    assert measurements.increased(list) == Utils.Solutions.Measurements.increased(list)
+
+    assert measurements.increased_by([1, 1]), "Implement the `increased_by` function."
+    assert measurements.increased_by([100, 150, 120, 130]) == 60
+    assert measurements.increased_by([10, 20, 10, 40]) == 40
+    assert measurements.increased_by(list) == Utils.Solutions.Measurements.increased_by(list)
+
+    assert measurements.increments([1, 2]), "Implement the `increments` function."
+    assert measurements.increments([100, 150, 120, 130]) == [50, -30, 10]
+    assert measurements.increments([10, 20, 10, 40]) == [10, -10, 30]
+    assert measurements.increments(list) == Utils.Solutions.Measurements.increments(list)
+
+    assert measurements.average([1, 1]), "Implement the `average` function."
+    assert measurements.average([4, 5, 6]) == 5
+    assert measurements.average([2, 10]) == 6
+    assert measurements.average(list) == Utils.Solutions.Measurements.average(list)
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 
