@@ -659,6 +659,53 @@ defmodule Utils.Feedback do
     assert Enum.sort(result) == Enum.sort(anagrams), "filter_anagrams/2 failed to filter anagrams"
   end
 
+  feedback :bottles_of_soda do
+    bottles_of_soda = get_answers()
+    result = bottles_of_soda.on_the_wall()
+    assert result, "Implement the `on_the_wall/0` function."
+    assert is_list(result), "`on_the_wall/0` should return a list."
+
+    assert Enum.at(result, 0) ==
+             "99 bottles of soda on the wall.\n99 bottles of soda.\nTake one down, pass it around.\n98 bottles of soda on the wall."
+
+    assert length(result) == 100, "There should be 100 total verses."
+
+    assert Enum.at(result, 97) ==
+             "2 bottles of soda on the wall.\n2 bottles of soda.\nTake one down, pass it around.\n1 bottle of soda on the wall."
+
+    assert Enum.at(result, 98) ==
+             "1 bottle of soda on the wall.\n1 bottle of soda.\nTake one down, pass it around.\n0 bottles of soda on the wall."
+
+    assert Enum.at(result, 99) ==
+             "No more bottles of soda on the wall, no more bottles of soda.\nGo to the store and buy some more, 99 bottles of soda on the wall."
+
+    assert result == Utils.Solutions.BottlesOfSoda.on_the_wall()
+  end
+
+  feedback :bottles_of_blank do
+    bottles_of_soda = get_answers()
+
+    result = bottles_of_soda.on_the_wall(50..0, "pop", "cans")
+
+    assert result, "Implement the `on_the_wall/3` function."
+
+    assert is_list(result), "`on_the_wall/3` should return a list."
+
+    assert Enum.at(result, 0) ==
+             "50 cans of pop on the wall.\n50 cans of pop.\nTake one down, pass it around.\n49 cans of pop on the wall."
+
+    assert length(result) == 51, "There should be 51 total verses."
+
+    assert Enum.at(result, 47) ==
+             "2 cans of pop on the wall.\n2 cans of pop.\nTake one down, pass it around.\n1 can of pop on the wall."
+
+    assert Enum.at(result, 48) ==
+             "1 can of pop on the wall.\n1 can of pop.\nTake one down, pass it around.\n0 cans of soda on the wall."
+
+    assert Enum.at(result, 49) ==
+             "No more cans of pop on the wall, no more cans of pop.\nGo to the store and buy some more, 99 cans of pop on the wall."
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 

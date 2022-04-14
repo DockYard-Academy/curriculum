@@ -1,6 +1,5 @@
 # Bottles Of Soda
 
-
 ```elixir
 Mix.install([
   {:kino, github: "livebook-dev/kino", override: true},
@@ -21,93 +20,90 @@ Mix.install([
 ## Bottles of Soda
 
 In the Elixir cell below create a module `BottlesOfSoda` with a function `on_the_wall/0`.
-See further instructions below, you should implement each step one by one on the `BottlesOfSoda` module
+
+It should return a list with the following lyrics from `99` to `0`.
+Ensure you handle the special cases for `2`, `1` and `0`.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-
-```
-
-### Step 1
-
-`on_the_wall/0` should
-
-* From 99 to 0 return a list with the string
-
-```elixir
-"
-X bottles of soda on the wall.
-X bottles of soda.
+BottlesOfSoda.on_the_wall()
+[
+"99 bottles of soda on the wall.
+99 bottles of soda.
 Take one down, pass it around.
-X - 1 bottles of soda on the wall.
-"
-```
+98 bottles of soda on the wall.",
 
-Where the `X` is the number of bottles of soda remaining.
+  # ... and so on until you reach 2 where the grammar changes
+"2 bottles of soda on the wall.
+2 bottle of soda.
+Take one down, pass it around.
+1 bottle of soda on the wall.",
 
-### Step 2
-
-* when X is 1, use the correct grammar:
-
-```elixir
-"
-1 bottle of soda on the wall.
+  "1 bottle of soda on the wall.
 1 bottle of soda.
 Take one down, pass it around.
-0 bottles of soda on the wall.
-"
+0 bottles of soda on the wall.",
+
+"No more bottles of soda on the wall, no more bottles of soda.
+Go to the store and buy some more, 99 bottles of soda on the wall."
+]
 ```
 
-### Step 3
-
-* When X is 0, use the following phrase:
-
 ```elixir
-"
-No more bottles of soda on the wall, no more bottles of soda.
-Go to the store and buy some more, 0 bottle of soda on the wall.
-"
+defmodule BottlesOfSoda do
+  def on_the_wall do
+  end
+end
+
+Utils.feedback(:bottles_of_soda, BottlesOfSoda)
 ```
 
-### Step 4
+## (Bonus) Bottles of ???
 
-* Create an `on_the_wall/1` function which takes in a positive **integer** for the `number_of_bottles` of soda on the wall.
-* From `number_of_bottles` to `0`, repeat the expected song lyrics.
+Make a new `BottlesOfBlank` module below with the following modifications.
 
-### Step 5
+* It should be able to accept a custom drink instead of `"soda"`.
+* It should be able to accept a custom container instead of `"bottles"`.
+* It should be able to accept a range of lyrics, and only return than range of lyrics.
 
-* Allow the `on_the_wall/1` function to also accept a descending **range** to perform the rhyme from.
-  i.e. `BottlesOfSoda.on_the_wall(99..50)`.
+For example,
 
-### Step 6
-
-* Create an `on_the_wall/2` function which accepts an **integer** or a **range** for the first parameter.
-* For the second parameter, the function should accept a "string" for the type of beverage.
-
-For example `BottlesOfSoda.on_the_wall(99, "pop")` would start with:
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-"
-99 bottles of pop on the wall.
-99 bottles of pop.
+BottlesOfBlank.on_the_wall(3..0, "pop", "cans")
+[
+"3 cans of pop on the wall.
+3 cans of pop.
 Take one down, pass it around.
-98 bottles of pop on the wall.
+2 cans of pop on the wall.",
+
+"2 cans of pop on the wall.
+2 cans of pop.
+Take one down, pass it around.
+1 can of pop on the wall.",
+
+"1 can of pop on the wall.
+1 can of pop.
+Take one down, pass it around.
+0 cans of pop on the wall.",
+
+"No more cans of pop on the wall, no more cans of pop.
+Go to the store and buy some more, 99 cans of pop on the wall.
 "
+]
 ```
 
-### Step 7
-
-* Create an `on_the_wall/3` function which accepts an **integer** or a **range** for the first parameter.
-* For the second parameter, the function should accept a **string** for the type of beverage.
-* For the third parameter, the function should accept a **string** for the beverage container.
-* Ensure that `on_the_wall/3` function remains grammatically correct for `0` and `1` beverage container.
-
-For example `BottlesOfSoda.on_the_wall(99, "pop", "can")` would start with:
+You can assume any container will be provided in it's plural form so a `"can"` will always
+be passed into the function as `"cans"`. You only need to worry about containers whose plural form
+ends in an `s`.
 
 ```elixir
-"
-99 cans of pop on the wall.
-99 cans of pop.
-Take one down, pass it around.
-98 cans of pop on the wall.
-"
+defmodule BottlesOfBlank do
+  def on_the_wall(range, beverage, container) do
+  end
+end
+
+Utils.feedback(:bottles_of_blank, BottlesOfBlank)
 ```

@@ -495,4 +495,38 @@ defmodule Utils.Solutions do
   def is_anagram do
     Anagram
   end
+
+  defmodule BottlesOfSoda do
+    def singular(container) do
+      String.slice(container, 0..(String.length(container) - 2))
+    end
+
+    def verse(2, beverage, container) do
+      "2 #{container} of #{beverage} on the wall.\n2 #{container} of #{beverage}.\nTake one down, pass it around.\n1 #{singular(container)} of #{beverage} on the wall."
+    end
+
+    def verse(1, beverage, container) do
+      "1 #{singular(container)} of #{beverage} on the wall.\n1 #{singular(container)} of #{beverage}.\nTake one down, pass it around.\n0 #{container} of #{beverage} on the wall."
+    end
+
+    def verse(0, beverage, container) do
+      "No more #{container} of #{beverage} on the wall, no more #{container} of #{beverage}.\nGo to the store and buy some more, 99 #{container} of #{beverage} on the wall."
+    end
+
+    def verse(line, beverage, container) do
+      "#{line} #{container} of #{beverage} on the wall.\n#{line} #{container} of #{beverage}.\nTake one down, pass it around.\n#{line - 1} #{container} of #{beverage} on the wall."
+    end
+
+    def on_the_wall(range \\ 99..0, beverage \\ "soda", container \\ "bottles") do
+      Enum.map(range, fn line -> verse(line, beverage, container) end)
+    end
+  end
+
+  def bottles_of_soda do
+    BottlesOfSoda
+  end
+
+  def bottles_of_blank do
+    BottlesOfSoda
+  end
 end
