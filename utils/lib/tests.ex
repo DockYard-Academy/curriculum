@@ -17,8 +17,6 @@ defmodule Utils.Test do
   Module.register_attribute(Utils.Test, :test_module_names, accumulate: true)
   require Utils.Macros
   import Utils.Macros
-  alias Utils.Solutions
-  alias Utils.Factory
 
   # Allows for tests that don't require input
   def test(test_name), do: test(test_name, "")
@@ -30,7 +28,7 @@ defmodule Utils.Test do
 
     answer_provided = not is_list(answers) and not is_nil(answers)
 
-    if answer_provided or answers_in_list_provided do
+    if answer_provided or answers_in_list_provided or Mix.env() == :test do
       ExUnit.start(auto_run: false)
       test_module(test_name, answers)
       ExUnit.run()
@@ -39,253 +37,132 @@ defmodule Utils.Test do
     end
   end
 
-  def test_module(:card_count_four = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :card_count_four do
+    next_count = get_answers()
+    assert next_count == 1
+  end
 
-      test module_name do
-        next_count = @answers
-        assert next_count == 1
-      end
+  make_test :card_count_king do
+    next_count = get_answers()
+    assert next_count === 4
+  end
+
+  make_test :card_count_random do
+    [card, next_count] = get_answers()
+
+    cond do
+      card in 2..6 ->
+        assert next_count === 1
+
+      card in 7..9 ->
+        assert next_count === 0
+
+      card in 10..14 ->
+        assert next_count === -1
+
+      true ->
+        raise "Something went wrong. Please reset the exercise."
     end
   end
 
-  def test_module(:card_count_king = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        next_count = @answers
-        assert next_count === 4
-      end
-    end
+  make_test :habit_tracker_definition do
+    [small, medium, large] = get_answers()
+    assert small == 5
+    assert medium == 20
+    assert large == 30
   end
 
-  def test_module(:card_count_random = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        [card, next_count] = @answers
-
-        cond do
-          card in 2..6 ->
-            assert next_count === 1
-
-          card in 7..9 ->
-            assert next_count === 0
-
-          card in 10..14 ->
-            assert next_count === -1
-
-          true ->
-            raise "something went wrong, please reset the exercise with the help of your teacher."
-        end
-      end
-    end
+  make_test :habit_tracker_add do
+    total_points = get_answers()
+    assert total_points == 20 + 5
   end
 
-  def test_module(:created_project = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        path = @answers
-
-        assert File.dir?("../projects/#{path}"),
-               "Ensure you create a mix project `#{path}` in the `projects` folder."
-      end
-    end
+  make_test :habit_tracker_percentage do
+    percentage = get_answers()
+    assert percentage == (5 + 20) / 40 * 100
   end
 
-  def test_module(:habit_tracker_definition = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        [small, medium, large] = @answers
-        assert small = 5
-        assert medium = 20
-        assert large = 20
-      end
-    end
+  make_test :habit_tracker_penalties_1 do
+    total_points = get_answers()
+    assert total_points == 5 + 20 + 30 * 0.5
   end
 
-  def test_module(:habit_tracker_add = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        total_points = @answers
-        assert total_points == 20 + 5
-      end
-    end
+  make_test :habit_tracker_penalties_2 do
+    total_points = get_answers()
+    assert total_points == 5 / 2 * 3 + 20 / 2 * 3
   end
 
-  def test_module(:habit_tracker_percentage = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        percentage = @answers
-        assert percentage == (5 + 20) / 40 * 100
-      end
-    end
+  make_test :habit_tracker_rewards do
+    total_points = get_answers()
+    assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
   end
 
-  def test_module(:habit_tracker_penalties_1 = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :percentage do
+    [completed_items, total_items, percentage] = get_answers()
 
-      test module_name do
-        total_points = @answers
-        assert total_points === 5 + 20 + 30 * 0.5
-      end
-    end
+    assert completed_items == 10,
+           "completed_items should always be 10. Please reset the exercise."
+
+    assert total_items == 100, "total_items should always be 100. Please reset the exercise."
+    assert percentage == completed_items / total_items * 100
   end
 
-  def test_module(:habit_tracker_penalties_2 = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        total_points = @answers
-        assert total_points === 5 / 2 * 3 + 20 / 2 * 3
-      end
-    end
+  make_test :pythagorean_c_square do
+    c_square = get_answers()
+    assert c_square == 10 ** 2 + 10 ** 2
   end
 
-  def test_module(:habit_tracker_rewards = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        total_points = @answers
-        assert total_points === 20 * 1.6 + 5 * 1.6 + 30 * 0.5
-      end
-    end
+  make_test :pythagorean_c do
+    c = get_answers()
+    assert c == :math.sqrt(200)
   end
 
-  def test_module(:percentage = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        [completed_items, total_items, percentage] = @answers
-        assert percentage == completed_items / total_items * 100
-      end
-    end
+  make_test :string_concatenation do
+    answer = get_answers()
+    assert is_bitstring(answer), "the answer should be a string."
+    assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
+    assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
   end
 
-  def test_module(:pythagorean_c_square = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :string_interpolation do
+    answer = get_answers()
+    assert is_bitstring(answer), "the answer should be a string."
 
-      test module_name do
-        c_square = @answers
-        assert c_square == 10 ** 2 + 10 ** 2
-      end
-    end
+    assert Regex.match?(~r/I have/, answer),
+           "the answer should be in the format: I have 10 classmates"
+
+    assert Regex.match?(~r/I have \d+/, answer),
+           "the answer should contain an integer for classmates."
+
+    assert Regex.match?(~r/I have \d+ classmates\./, answer) ||
+             answer === "I have 1 classmate.",
+           "the answer should end in a period."
   end
 
-  def test_module(:pythagorean_c = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :tip_amount do
+    [cost_of_the_meal, tip_rate, tip_amount] = get_answers()
+    assert tip_rate == 0.20, "tip rate should be 0.2."
+    assert cost_of_the_meal == 55.5, "cost_of_the_meal should be 55.5."
 
-      test module_name do
-        c = @answers
-        assert c == :math.sqrt(200)
-      end
-    end
+    assert tip_amount === cost_of_the_meal * tip_rate,
+           "tip_amount should be cost_of_the_meal * tip_rate."
   end
 
-  def test_module(:string_concatenation = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+  make_test :rock_paper_scissors_ai do
+    [player_choice, ai_choice] = get_answers()
 
-      test module_name do
-        answer = @answers
-        assert is_bitstring(answer), "the answer should be a string."
-        assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
-        assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
-      end
-    end
-  end
+    case player_choice do
+      :rock ->
+        assert ai_choice === :paper,
+               "when player_choice is :rock, ai_choice should be :paper."
 
-  def test_module(:string_interpolation = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
+      :paper ->
+        assert ai_choice === :scissors,
+               "when player_choice is :paper, ai_choice should be :scissors."
 
-      test module_name do
-        answer = @answers
-        assert is_bitstring(answer), "the answer should be a string."
-
-        assert "I have " <> name = answer,
-               "the answer should be in the format: I have 10 classmates"
-
-        assert Regex.match?(~r/I have \d+/, answer),
-               "the answer should contain an integer for classmates."
-
-        assert Regex.match?(~r/I have \d+ classmates\./, answer) ||
-                 answer === "I have 1 classmate.",
-               "the answer should end in a period."
-      end
-    end
-  end
-
-  def test_module(:tip_amount = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        [cost_of_the_meal, tip_rate, tip_amount] = @answers
-        assert tip_rate === 0.20, "tip rate should be 0.20."
-        assert cost_of_the_meal === 55.50, "cost_of_the_meal should be 55.50."
-
-        assert tip_amount === cost_of_the_meal * tip_rate,
-               "tip_amount should be cost_of_the_meal * tip_rate."
-      end
-    end
-  end
-
-  def test_module(:rock_paper_scissors_ai = module_name, answers) do
-    defmodule module_name do
-      @answers answers
-      use ExUnit.Case
-
-      test module_name do
-        [player_choice, ai_choice] = @answers
-
-        case player_choice do
-          :rock ->
-            assert ai_choice === :paper,
-                   "when player_choice is :rock, ai_choice should be :paper."
-
-          :paper ->
-            assert ai_choice === :scissors,
-                   "when player_choice is :paper, ai_choice should be :scissors."
-
-          :scissors ->
-            assert ai_choice === :rock,
-                   "when player_choice is :scissors, ai_choice should be :rock."
-        end
-      end
+      :scissors ->
+        assert ai_choice === :rock,
+               "when player_choice is :scissors, ai_choice should be :rock."
     end
   end
 
@@ -390,7 +267,7 @@ defmodule Utils.Test do
   end
 
   make_test :guess_the_number do
-    [guess, answer, correct] = answers = get_answers()
+    [guess, answer, correct] = get_answers()
 
     assert is_integer(guess), "Ensure `guess` is an integer"
     assert is_integer(answer), "Ensure `answer` is an integer"
@@ -440,8 +317,13 @@ defmodule Utils.Test do
 
   make_test :family_tree do
     family_tree = get_answers()
-    assert is_map(family_tree), "Ensure `family_tree is a map."
-    assert family_tree == Solutions.family_tree()
+    assert is_map(family_tree), "Ensure `family_tree` is a map."
+    assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
+
+    assert %{name: "Arthur", parents: _list} = family_tree,
+           "Ensure Arthur in `family_tree` has a list of parents."
+
+    assert family_tree == Utils.Solutions.family_tree()
   end
 
   make_test :naming_numbers do
@@ -467,6 +349,11 @@ defmodule Utils.Test do
            "Ensure you bind `naming_numbers` to an anonymous function."
 
     Enum.each(list, fn name ->
+      assert numbering_names.(name) ==
+               Enum.find_index(list, fn each -> each == String.downcase(name) end)
+    end)
+
+    Enum.each(capital_list, fn name ->
       assert numbering_names.(name) ==
                Enum.find_index(list, fn each -> each == String.downcase(name) end)
     end)
@@ -503,11 +390,11 @@ defmodule Utils.Test do
     character_permutations =
       for class <- ["wizard", "rogue", "warrior", nil],
           weapon <- ["daggers", "sword", "staff", nil],
-          name <- [Factory.name(), nil] do
+          name <- [Utils.Factory.name(), nil] do
         %{class: class, weapon: weapon, name: name}
       end
 
-    enemy = Factory.name()
+    enemy = Utils.Factory.name()
 
     Enum.each(character_permutations, fn character ->
       assert dialogue_module.greet(character) == "Hello, my name is #{character.name}."
@@ -653,6 +540,14 @@ defmodule Utils.Test do
     end)
   end
 
-  # test modules names must be the last function in this module
+  # test modules names must be after tests that require a solution.
   def test_module_names, do: @test_module_names
+
+  # created_project test does not require solution
+  make_test :created_project do
+    path = get_answers()
+
+    assert File.dir?("../projects/#{path}"),
+           "Ensure you create a mix project `#{path}` in the `projects` folder."
+  end
 end
