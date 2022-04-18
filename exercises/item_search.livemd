@@ -1,0 +1,69 @@
+# Item Finder
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Item Search
+
+You are building a game with a search feature for a massive list of magical items.
+
+Players should be able to search for items that match certain properties. They should be able to 
+search by `type`, `effect`, `level`, `size`, and `style` in a keyword list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+By default, `all_items/2` should find items that match all filters. If there are
+no filters it should find all items.
+
+```elixir
+items = [
+  %{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"},
+  %{type: "mace", effect: "protection", level: 2, size: 3, style: "dark"},
+]
+
+Search.all_items(items, [])
+[
+  %{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"},
+  %{type: "mace", effect: "protection", level: 2, size: 3, style: "dark"},
+]
+
+Search.all_items(items, type: "sword", effect: "healing")
+[%{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
+```
+
+Users should be able to enter an `inclusive: true` filter to find items that match any of
+the properties.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Search.all_items(items, type: "sword", effect: "speed", inclusive: true)
+[%Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your answer in the Elixir cell below.
+
+```elixir
+defmodule Search do
+  def all_items(items, filters) do
+  end
+end
+
+Utils.feedback(:item_generator_search, Search)
+```

@@ -44,7 +44,7 @@ defmodule Utils.Factory do
 
   def item(override \\ %{}) do
     Map.merge(
-      %Utils.Solutions.Item{
+      %{
         type: item_type(),
         effect: item_effect(),
         style: item_style(),

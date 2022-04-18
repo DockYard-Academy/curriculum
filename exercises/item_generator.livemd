@@ -1,4 +1,4 @@
-# Item Finder
+# Item Generator
 
 ```elixir
 Mix.install([
@@ -68,53 +68,4 @@ levels = 1..100
 items = nil
 
 Utils.feedback(:item_generator, items)
-```
-
-## Search Items
-
-Players should be able to search for items that match certain properties. They should be able to 
-search by `type`, `effect`, `level`, `size`, and `style` in a keyword list.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-items = [
-  %Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"},
-  %Item{type: "mace", effect: "protection", level: 2, size: 3, style: "dark"},
-  ]
-
-Search.all_items(items, type: "sword", effect: "healing")
-[%Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
-```
-
-By default, `all_items/2` should find items that match all filters.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Search.all_items(items, type: "sword", effect: "speed")
-[]
-```
-
-Users should be able to enter an `inclusive: true` filter to find items that match any of
-the properties.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Search.all_items(items, type: "sword", effect: "speed", inclusive: true)
-[%Item{type: "sword", effect: "healing", level: 1, size: 1, style: "holy"}]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Enter your answer in the Elixir cell below.
-
-```elixir
-defmodule Search do
-  def all_items(items, filters) do
-  end
-end
-
-Utils.feedback(:item_generator_search, Search)
 ```
