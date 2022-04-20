@@ -69,95 +69,120 @@ though, not a colon `:`. `=>` is an equals sign `=` and a greater than symbol `>
 %{1 => "value"}
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
-In the Elixir cell below, create a map with string keys and any value.
+In the Elixir cell below, create a map with string keys and any value. Replace `nil` with your answer.
 
 ```elixir
+map = nil
 
+Utils.feedback(:string_key_map, map)
 ```
 
-Create a map with atom keys and any value.
+Create a map with atom keys and any value. Replace `nil` with your answer.
 
 ```elixir
+map = nil
 
+Utils.feedback(:atom_key_map, map)
 ```
 
-Create a map with a non-string or atom key and any value.
+Create a map with a non-string or atom key and any value. Replace `nil` with your answer.
 
 ```elixir
+map = nil
 
+Utils.feedback(:non_standard_key_map, map)
 ```
 
 ## Manipulating Maps
 
 Unlike the other data types, there aren't specific map operators. To manipulate maps we
-use a different tool called the **Map** module, which you will learn more about in a future lesson.
+use a different tool called the [Map](https://hexdocs.pm/elixir/1.13.4/Map.html) module, which you will learn more about in a future lesson.
 
 For now, it's enough to know that you can access values in an atom-key map using a few different methods.
 
 ### Accessing Map Values.
 
-You can retrieve values in a map using **map.key** notation like so.
+You can retrieve values in a map using **map.key** notation like so. This only works for maps with
+atom keys.
 
 ```elixir
-map = %{example_key: "value"}
+%{key: "value"}.key
+```
 
-map.example_key
+Alternatively, you can access the map value using square bracket notation `[key]`.
+
+```elixir
+%{key: "value"}[:key]
+```
+
+Bracket notation is especially useful for maps with non-atom keys.
+
+```elixir
+%{"key" => "value"}["key"]
+```
+
+```elixir
+%{1 => "value"}[1]
 ```
 
 With **map.key** notation, your program will throw an error if your map doesn't have the expected value.
 
 ```elixir
-map = %{example_key: "value"}
-map.non_existing_key
+%{}.key
 ```
 
-You can also use **map[key]** syntax to access values in a map.
+Bracket notation will return `nil` if the key doesn't exist rather than throwing an error.
 
 ```elixir
-map = %{"test" => "value"}
-map["test"]
+%{}[:key]
+```
+
+We can access deeply nested values with both dot notation and bracket notation.
+
+```elixir
+%{key1: %{key2: %{key3: "value"}}}.key1.key2.key3
 ```
 
 ```elixir
-map = %{1 => "value"}
-map[1]
+%{1 => %{2 => %{3 => "value"}}}[1][2][3]
+```
+
+Bracket notation is especially useful for accessing deeply nested values without causing a crash
+if the value doesn't exist.
+
+```elixir
+%{}[1][2][3]
+```
+
+You can accomplish all of the same behavior above by binding the map to a variable rather 
+than accessing values from the map directly.
+
+```elixir
+map = %{key: "value"}
+map.key
 ```
 
 ```elixir
-map = %{%{} => "value"}
-map[%{}]
-```
-
-Unlike **map.key** notation, **map[key]** syntax will return `nil` rather
-than throwing an error if the key is not defined.
-
-```elixir
-map = %{}
-map["non_existing_key"]
+map = %{key: "value"}
+map[:key]
 ```
 
 ### Your Turn
 
-In the Elixir cell below, retrieve the value of `:example` using both **map[key]** and **map.key** notation.
+In the Elixir cell below, access the `:hello` key in `map`.
+Retrieve the value using both **map[key]** and **map.key** notation.
+Replace `nil` with your answer.
 
 ```elixir
-%{example: "value"}
-```
+map = %{hello: "world"}
 
-Create a map `%{hello: "world"}` and bind it to a variable `map`. Use **map.key** notation
-to access the `:hello` key. The cell should output `"world"`
+value = nil
 
-```elixir
-
-```
-
-Create a map `%{"one" =>  1}` and bind it to a variable `map`. Use **map[key]** syntax to access
-the key `"one"`. It should return `1`.
-
-```elixir
-
+Utils.feedback(:access_map, value)
 ```
 
 ### Updating Maps
@@ -181,14 +206,32 @@ You can instead store a new variable for the updated map.
 
 ```elixir
 updated = %{initial | key: "new value"}
+updated
 ```
 
 Or rebind the existing `initial` variable.
 
 ```elixir
 initial = %{initial | key: "new value"}
+initial
 ```
 
+You can only update existing atom key values in a map, otherwise it will cause an error.
+
 ```elixir
-initial
+initial = %{}
+%{initial | new_key: "value"}
+```
+
+### Your Turn
+
+Update the `example_key` in the `initial_map` below. Replace `nil` with your answer.
+Change `"value"` to any other value.
+
+```elixir
+initial_map = %{example_key: "value"}
+
+updated_map = nil
+
+Utils.feedback(:update_map, updated_map)
 ```

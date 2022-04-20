@@ -876,6 +876,72 @@ defmodule Utils.Feedback do
     assert measurements.average(list) == Utils.Solutions.Measurements.average(list)
   end
 
+  feedback :keyword_list_hero do
+    hero = get_answers()
+
+    assert [name: _, secret_identity: _] = hero,
+           "Ensure hero is a keyword list with :name and :secret_identity."
+  end
+
+  feedback :string_key_map do
+    map = get_answers()
+
+    assert is_map(map), "Ensure you use %{} to create a map."
+    assert map_size(map) > 0, "Ensure your map is not empty."
+    assert Enum.all?(Map.keys(map), &is_bitstring/1), "Ensure your map contains only string keys."
+  end
+
+  feedback :atom_key_map do
+    map = get_answers()
+
+    assert is_map(map), "Ensure you use %{} to create a map."
+    assert map_size(map) > 0, "Ensure your map is not empty."
+    assert Enum.all?(Map.keys(map), &is_atom/1), "Ensure your map contains only atom keys."
+  end
+
+  feedback :non_standard_key_map do
+    map = get_answers()
+
+    assert is_map(map), "Ensure you use %{} to create a map."
+    assert map_size(map) > 0, "Ensure your map is not empty."
+
+    assert Enum.all?(Map.keys(map), fn key -> !is_atom(key) and !is_bitstring(key) end),
+           "Ensure your map contains only non-atom and non-string keys."
+  end
+
+  feedback :access_map do
+    value = get_answers()
+    assert value == "world"
+  end
+
+  feedback :update_map do
+    updated_map = get_answers()
+    assert is_map(updated_map), "Ensure `updated_map` is a map."
+
+    assert Map.has_key?(updated_map, :example_key),
+           "Ensure `updated_map` still has the `:example_key`"
+
+    assert %{example_key: _} = updated_map
+
+    assert updated_map.example_key !== "value",
+           "Ensure you update the :example_key with a changed value."
+  end
+
+  feedback :remainder do
+    remainder = get_answers()
+    assert remainder == rem(10, 3)
+  end
+
+  feedback :exponents do
+    result = get_answers()
+    assert result == 10 ** 214
+  end
+
+  feedback :bedmas do
+    answer = get_answers()
+    assert answer == (20 + 20) * 20
+  end
+
   # test names must be after tests that require a solution.
   def test_names, do: @test_names
 

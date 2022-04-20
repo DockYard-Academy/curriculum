@@ -692,4 +692,44 @@ defmodule Utils.Solutions do
   def measurements do
     Measurements
   end
+
+  def keyword_list_hero do
+    [name: "", secret_identity: ""]
+  end
+
+  def non_standard_key_map do
+    %{1 => 2, %{} => :example}
+  end
+
+  def atom_key_map do
+    %{key: "value"}
+  end
+
+  def string_key_map do
+    %{"key" => "value"}
+  end
+
+  def access_map do
+    map = %{hello: "world"}
+    value = map.hello
+    value
+  end
+
+  def update_map do
+    initial_map = %{example_key: "value"}
+    updated_map = %{initial_map | example_key: "new value"}
+    updated_map
+  end
+
+  def remainder do
+    rem(10, 3)
+  end
+
+  def exponents do
+    10 ** 214
+  end
+
+  def bedmas do
+    (20 + 20) * 20
+  end
 end
