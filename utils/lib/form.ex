@@ -38,7 +38,7 @@ defmodule Utils.Form do
     %{label: "operator", answers: ["and"]}
   end
 
-  def boolean_diagram2 do
+  def boolean_diagram3 do
     [%{label: "operator", answers: ["not"]}]
   end
 
