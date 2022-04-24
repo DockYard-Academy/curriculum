@@ -19,25 +19,6 @@ defmodule Utils.Feedback do
   require Utils.Macros
   import Utils.Macros
 
-  # Allows for tests that don't require input
-  def test(test_name), do: test(test_name, "")
-  def test({:module, _, _, _} = module, test_name), do: test(test_name, module)
-
-  def test(test_name, answers) do
-    answers_in_list_provided =
-      is_list(answers) and Enum.all?(answers, fn each -> not is_nil(each) end)
-
-    answer_provided = not is_list(answers) and not is_nil(answers)
-
-    if answer_provided or answers_in_list_provided or Mix.env() == :test do
-      ExUnit.start(auto_run: false)
-      test_module(test_name, answers)
-      ExUnit.run()
-    else
-      "Please enter an answer above."
-    end
-  end
-
   feedback :card_count_four do
     next_count = get_answers()
     assert next_count == 1
@@ -942,7 +923,81 @@ defmodule Utils.Feedback do
     assert answer == (20 + 20) * 20
   end
 
-  # test names must be after tests that require a solution.
+  feedback :gcd do
+    gcd = get_answers()
+    assert gcd == Integer.gcd(10, 15)
+  end
+
+  feedback :string_at do
+    answer = get_answers()
+    assert answer == "l"
+  end
+
+  feedback :merged_map do
+    merged_map = get_answers()
+    assert merged_map == %{one: 1, two: 2}
+  end
+
+  feedback :bingo_winner do
+    bingo_winner = get_answers()
+
+    row_win = ["X", "X", "X"]
+    row_lose = [nil, nil, nil]
+
+    # full board
+    assert bingo_winner.is_winner?([row_win, row_win, row_win])
+
+    # empty (losing) board
+    refute bingo_winner.is_winner?([row_lose, row_lose, row_lose])
+
+    # rows
+    assert bingo_winner.is_winner?([row_win, row_lose, row_lose])
+    assert bingo_winner.is_winner?([row_lose, row_win, row_lose])
+    assert bingo_winner.is_winner?([row_lose, row_lose, row_win])
+
+    # colums
+    assert bingo_winner.is_winner?([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    assert bingo_winner.is_winner?([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    assert bingo_winner.is_winner?([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+
+    # diagonals
+    assert bingo_winner.is_winner?([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    assert bingo_winner.is_winner?([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+
+    # losing boards (not fully comprehensive)
+    losing_board =
+      ["X", "X", nil, nil, nil, nil, nil, nil, nil] |> Enum.shuffle() |> Enum.chunk_every(3)
+
+    refute bingo_winner.is_winner?(losing_board)
+  end
+
+  feedback :bingo do
+    bingo = get_answers()
+
+    numbers = Enum.map(1..9, fn _ -> Enum.random(1..9) end)
+    [row1, row2, row3] = board = Enum.chunk_every(numbers, 3)
+    [r1c1, r1c2, r1c3] = row1
+    [r2c1, r2c2, r2c3] = row2
+    [r3c1, r3c2, r3c3] = row3
+    # rows
+    assert bingo.is_winner?(board, row1)
+    assert bingo.is_winner?(board, row2)
+    assert bingo.is_winner?(board, row3)
+
+    # columns
+    assert bingo.is_winner?(board, [r1c1, r2c1, r3c1])
+    assert bingo.is_winner?(board, [r1c2, r2c2, r3c2])
+    assert bingo.is_winner?(board, [r1c3, r2c3, r3c3])
+
+    # diagonals
+    assert bingo.is_winner?(board, [r1c1, r2c2, r3c3])
+    assert bingo.is_winner?(board, [r3c1, r2c2, r1c3])
+
+    # losing (not fully comprehensive)
+    refute bingo.is_winner?(board, numbers |> Enum.shuffle() |> Enum.take(2))
+  end
+
+  # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
   feedback :created_project do
@@ -950,5 +1005,31 @@ defmodule Utils.Feedback do
 
     assert File.dir?("../projects/#{path}"),
            "Ensure you create a mix project `#{path}` in the `projects` folder."
+  end
+
+  # Allows for tests that don't require input
+  def test(test_name), do: test(test_name, "")
+
+  def test(test_name, answers) do
+    cond do
+      test_name not in @test_names ->
+        "Something went wrong, feedback does not exist for #{test_name}."
+
+      Mix.env() == :test ->
+        ExUnit.start(auto_run: false)
+        test_module(test_name, answers)
+        ExUnit.run()
+
+      is_nil(answers) ->
+        "Please enter your answer above."
+
+      is_list(answers) and not Enum.all?(answers) ->
+        "Please enter an answer above."
+
+      true ->
+        ExUnit.start(auto_run: false)
+        test_module(test_name, answers)
+        ExUnit.run()
+    end
   end
 end

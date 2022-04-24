@@ -2,6 +2,7 @@ defmodule UtilsTest do
   use ExUnit.Case
   doctest Utils
   alias Utils.Solutions
+  alias Utils.Factory
 
   test "slide/1" do
     Utils.Slide.__info__(:functions)
@@ -50,5 +51,12 @@ defmodule UtilsTest do
 
       Utils.feedback(each, apply(Solutions, each, []))
     end)
+  end
+
+  test "feedback/2 with invalid atom" do
+    atom = Factory.string() |> String.to_atom()
+
+    assert Utils.feedback(atom, "non-nil answer") ==
+             "Something went wrong, feedback does not exist for #{atom}."
   end
 end

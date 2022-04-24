@@ -732,4 +732,51 @@ defmodule Utils.Solutions do
   def bedmas do
     (20 + 20) * 20
   end
+
+  def gcd do
+    Integer.gcd(10, 15)
+  end
+
+  def string_at do
+    String.at("hello", 2)
+  end
+
+  def merged_map do
+    Map.merge(%{one: 1}, %{two: 2})
+  end
+
+  defmodule BingoWinner do
+    def is_winner?(board) do
+      Enum.any?(board, fn row -> row == ["X", "X", "X"] end) ||
+        Enum.all?(board, fn row -> row == ["X", nil, nil] end) ||
+        Enum.all?(board, fn row -> row == [nil, "X", nil] end) ||
+        Enum.all?(board, fn row -> row == [nil, nil, "X"] end) ||
+        board == [["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]] ||
+        board == [[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]]
+    end
+  end
+
+  def bingo_winner do
+    BingoWinner
+  end
+
+  defmodule Bingo do
+    def is_winner?(board, called_numbers) do
+      [row1, row2, row3] = board
+      [r1c1, _, r1c3] = row1
+      [_, r2c2, _] = row2
+      [r3c1, _, r3c3] = row3
+
+      Enum.any?(board, fn row -> Enum.all?(row, fn number -> number in called_numbers end) end) ||
+        Enum.all?(board, fn row -> Enum.at(row, 0) in called_numbers end) ||
+        Enum.all?(board, fn row -> Enum.at(row, 1) in called_numbers end) ||
+        Enum.all?(board, fn row -> Enum.at(row, 2) in called_numbers end) ||
+        (r1c1 in called_numbers && r2c2 in called_numbers && r3c3 in called_numbers) ||
+        (r3c1 in called_numbers && r2c2 in called_numbers && r1c3 in called_numbers)
+    end
+  end
+
+  def bingo do
+    Bingo
+  end
 end

@@ -1,0 +1,139 @@
+# Bingo Winner
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Bingo Winner
+
+Bingo is a game where players are given a board of numbers.
+
+Provided a bingo board, determine if the board is a winner.
+
+Numbers are called, and players fill out the matching numbers on their board.
+
+A board is a winner if it has any row, column, or diagonal completely filled.
+
+For example, let's say we have an empty board like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  [nil, nil, nil],
+  [nil, nil, nil],
+  [nil, nil, nil],
+]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We'll mark matching numbers using `"X"`.
+
+A winning board would look like:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# example win on row
+[
+  ["X", "X", "X"],
+  [nil, nil, nil],
+  [nil, nil, nil]
+]
+
+# example win on column.
+[
+  ["X", nil, nil],
+  ["X", nil, nil],
+  ["X", nil, nil],
+]
+
+# example win on diagonal
+[
+  ["X", nil, nil],
+  [nil, "X", nil],
+  [nil, nil, "X"],
+]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Create a `BingoWinner` module below with an `is_winner?/1` function. It should
+determine if a board is a winner and return either `false` or `true`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+board = [
+  [nil, nil, "X"],
+  [nil, "X", nil],
+  ["X", nil, nil],
+]
+
+BingoWinner.is_winner?(board)
+true
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your answer below.
+
+```elixir
+defmodule BingoWinner do
+  def is_winner?(board) do
+  end
+end
+
+Utils.feedback(:bingo_winner, BingoWinner)
+```
+
+## Play Bingo
+
+The Bingo game will now use integers instead of `"X"` and `nil`.
+
+The `Bingo` game will take a list of called numbers and a board.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+board = [
+  [3, 2, 5],
+  [1, 6, 7],
+  [4, 8, 9],
+]
+
+called_numbers = [1, 2, 3]
+
+Bingo.is_winner?l(board, called_numbers)
+false
+
+called_numbers = [1, 3, 4]
+
+BingoWinner.is_winner?(board, called_numbers)
+true
+```
+
+Enter your answer below.
+
+```elixir
+defmodule Bingo do
+  def is_winner?(board, called_numbers) do
+  end
+end
+
+Utils.feedback(:bingo, Bingo)
+```
