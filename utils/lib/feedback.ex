@@ -997,8 +997,132 @@ defmodule Utils.Feedback do
     refute bingo.is_winner?(board, numbers |> Enum.shuffle() |> Enum.take(2))
   end
 
+  feedback :is_type do
+    [
+      is_a_map,
+      is_a_bitstring,
+      is_a_integer,
+      is_a_float,
+      is_a_boolean,
+      is_a_list,
+      is_a_tuple
+    ] = get_answers()
+
+    assert is_a_map, "Use the Kernel.is_map/1 function on `map`"
+    assert is_a_bitstring, "Use the Kernel.is_bitstring/1 function on `bitstring`"
+    assert is_a_integer, "Use the Kernel.is_integer/1 function on `integer`"
+    assert is_a_float, "Use the Kernel.is_float/1 function on `float`"
+    assert is_a_boolean, "Use the Kernel.is_boolean/1 function on `boolean`"
+    assert is_a_list, "Use the Kernel.is_list/1 function on `list`"
+    assert is_a_tuple, "Use the Kernel.is_tuple/1 function on `tuple`"
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
+
+  feedback :integer_parse do
+    parsed = get_answers()
+
+    assert parsed == Integer.parse("2")
+  end
+
+  feedback :integer_digits do
+    digits = get_answers()
+
+    assert digits == Integer.digits(123_456_789)
+  end
+
+  feedback :string_contains do
+    answer = get_answers()
+
+    assert answer == String.contains?("Hello", "lo")
+  end
+
+  feedback :string_capitalize do
+    answer = get_answers()
+
+    assert answer == String.capitalize("hello")
+  end
+
+  feedback :string_split do
+    words = get_answers()
+    string = "have,a,great,day"
+
+    assert words == String.split(string, ",")
+  end
+
+  feedback :string_trim do
+    trimmed_string = get_answers()
+    string = "  hello!  "
+
+    assert trimmed_string == String.trim(string)
+  end
+
+  feedback :string_upcase do
+    uppercase_string = get_answers()
+    string = "hello"
+
+    assert uppercase_string == String.upcase(string)
+  end
+
+  feedback :map_get do
+    retrieved_value = get_answers()
+    map = %{hello: "world"}
+    assert retrieved_value == Map.get(map, :hello)
+  end
+
+  feedback :map_put do
+    new_map = get_answers()
+    map = %{one: 1}
+    assert new_map == Map.put(map, :two, 2)
+  end
+
+  feedback :map_keys do
+    keys = get_answers()
+    map = %{key1: 1, key2: 2, key3: 3}
+    assert keys == Map.keys(map)
+  end
+
+  feedback :map_delete do
+    new_map = get_answers()
+    map = %{key1: 1, key2: 2, key3: 3}
+    assert new_map == Map.delete(map, :key1)
+  end
+
+  feedback :map_values do
+    values = get_answers()
+    map = %{key1: 1, key2: 2, key3: 3}
+    assert values == Map.values(map)
+  end
+
+  feedback :date_compare do
+    [today, tomorrow, comparison] = get_answers()
+    assert today, "Ensure today is defined"
+    assert today == Date.utc_today()
+    assert tomorrow, "Ensure tomorrow is defined"
+    assert tomorrow == Date.add(today, 1)
+    assert comparison, "Ensure comparison is defined"
+    assert comparison == Date.compare(today, tomorrow)
+  end
+
+  feedback :date_sigil do
+    today = get_answers()
+    assert today == Date.utc_today()
+  end
+
+  feedback :date_difference do
+    [date1, date2, difference] = get_answers()
+
+    assert is_struct(date1), "date1 should be a `Date` struct."
+    assert date1.__struct__ == Date, "date1 should be a `Date` struct."
+    assert date1 == %Date{year: 1995, month: 4, day: 28}
+
+    assert is_struct(date2), "date2 should be a `Date` struct."
+    assert date2.__struct__ == Date, "date2 should be a `Date` struct."
+    assert date2 == %Date{year: 1915, month: 4, day: 17}
+
+    assert difference == Date.diff(date2, date1)
+  end
 
   feedback :created_project do
     path = get_answers()
@@ -1023,7 +1147,7 @@ defmodule Utils.Feedback do
       is_nil(answers) ->
         "Please enter your answer above."
 
-      is_list(answers) and not Enum.all?(answers) ->
+      is_list(answers) and not Enum.any?(answers) ->
         "Please enter an answer above."
 
       true ->

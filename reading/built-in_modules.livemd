@@ -18,32 +18,33 @@ Mix.install([
 [Return Home](../start.livemd)
 
 ## Overview
+
 Elixir provides a great deal of built-in behavior in common modules.
 
-There is far to much available for you to master each module in depth. However, it's useful to
-be aware of them and where to look when you're reaching for some specific functionality.
+Each built-in module contains many related functions. In general, each data type has its own
+built-in module.
 
-Modules group related functions together, and in general, each data type has a module
-associated with it where elixir provides a variety of functions for that data type.
-
-<!-- livebook:{"break_markdown":true} -->
+While it is not necessary to memorize every function in every module (that would be a real accomplishment!) you
+should try to develop enough familiarity with the modules to know when you should reach for them.
 
 ## The Kernel Module
 
-The [Kernel](https://hexdocs.pm/elixir/1.13.2/Kernel.html#functions) is the core of everything Elixir. It provides all of functionality that
-Elixir is built upon.
+The [Kernel](https://hexdocs.pm/elixir/1.13.2/Kernel.html#functions) is the core of everything Elixir.
 
-Even the basic operators that you've been using are simply an alternative syntax to using functions in
+Even the operators that you've been using are simply an alternative syntax to using functions in
 the Kernel.
 
 ```elixir
 Kernel.+(3, 3)
 ```
 
-The Kernel has many useful functions for determining a value's type such as `is_map/1`.
+`Kernel` contains many functions for determining a values type such as `is_atom/1`, `is_bitstring/1`, `is_map/1`, and `is_integer/1`.
 
 ```elixir
-Kernel.is_map(%{})
+true = Kernel.is_map(%{})
+true = Kernel.is_atom(:an_atom)
+true = Kernel.is_bitstring("")
+true = Kernel.is_integer(1)
 ```
 
 Functions in the Kernel module can be accessed directly without using the `Kernel.` namespace.
@@ -52,85 +53,113 @@ Functions in the Kernel module can be accessed directly without using the `Kerne
 is_map(%{})
 ```
 
-The Kernel is fairly large and overwhelming to look at. Remember, your goal for this section is not
+The `Kernel` is fairly large and overwhelming to look at. Remember, your goal for this section is not
 to remember every function of every module. Instead, you'll develop familiarity over time and with
 practice.
-
-It's more important to know that the Elixir standard library exists, and that you use
-its many useful functions and modules.
-
-Every developers most fundamental skill is the ability to learn and lookup information
-when you need it, not memorize a list of functions.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-Try using the `is_atom/1`, `is_bitstring/1`, and `is_integer/1` functions.
-use `%{}`, `"hello"`, and `2` as an argument to each.
+In the Elixir cell below, use the correct function from `Kernel` to determine if each value below matches its type.
+The first `is_a_atom` value is filled in to demonstrate the goal.
+
+Replace `nil` with your answers.
 
 ```elixir
+atom = :example
+map = %{}
+bitstring = ""
+integer = 1
+float = 1.0
+boolean = true
+list = []
+tuple = {}
 
+is_a_atom = is_atom(atom)
+is_a_map = nil
+is_a_bitstring = nil
+is_a_integer = nil
+is_a_float = nil
+is_a_boolean = nil
+is_a_list = nil
+is_a_tuple = nil
+
+Utils.feedback(:is_type, [
+  is_a_map,
+  is_a_bitstring,
+  is_a_integer,
+  is_a_float,
+  is_a_boolean,
+  is_a_list,
+  is_a_tuple
+])
 ```
 
 ## The Integer Module
 
 The [Integer](https://hexdocs.pm/elixir/1.13.2/Integer.html#functions) module contains functionality related to Integers.
 
-It's time to confess, we've been making you determine if a number is even or odd the hard way.
+Here are a few functions to get you started.
 
-Integer provides an `is_even/1` and `is_odd/1` function.
+* `parse/2` parses integers from strings.
+* `digits/2` splits an integer into a list of digits.
+* `gcd/2` find the greatest common divisor between two integers.
 
-```elixir
-Integer.is_even(3)
-```
-
-```elixir
-Integer.is_odd(3)
-```
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-Use the `Integer.to_string/1` function to convert `"2"` to an integer.
+Use the `Integer.parse/2` function to convert `"2"` to an integer. Notice that the return value should
+be `{2, ""}` Because `Integer.parse/2` returns a tuple with the parsed integer and the remaining string.
+
+Replace `nil` with your answer.
 
 ```elixir
+parsed = Integer.parse("2")
 
+Utils.feedback(:integer_parse, parsed)
 ```
 
-Try using the `Integer.gcd/2` function to determine the greatest common denominator of
+Use the `Integer.digits/2` function to split `123456789` into a list of integers.
+
+replace `nil` with your answer.
+
+```elixir
+digits = nil
+
+Utils.feedback(:integer_digits, digits)
+```
+
+Use the `Integer.gcd/2` function to determine the greatest common denominator of
 `10` and `15`. The greatest common divisor (GCD) is the largest
 positive integer that divides both 10 and 15 evenly.
 
-<details>
-<summary>Hint</summary>
-the result of `Integer.gcd(10, 15) should be 5
-</details>
+Replace `nil` with your answer.
 
 ```elixir
+gcd = nil
 
+Utils.feedback(:gcd, gcd)
 ```
 
 ## The String Module
 
-<!-- livebook:{"break_markdown":true} -->
-
 The [String](https://hexdocs.pm/elixir/1.13.2/String.html#functions) module contains functionality related to strings.
 
-Here's a few common functions to get you started.
+Here are a few common functions to get you started.
 
-* `at/2` get the value at the index of a string.
+* `at/2` gets the value at the index of a string.
 * `contains?/2` check if a string contains a value
-* `capitalize/2` capitalize first word in a string and leaves the rest lowercase.
-* `split/1` split the string into a list of words.
-* `trim/2` remove whitespace from a string.
-* `upcase/2` upcase a string so it is ALL CAPS
+* `capitalize/2` capitalize the first word in a string and leaves the rest lowercase.
+* `split/3` split the string into a list of words.
+* `trim/1` remove whitespace from a string.
+* `upcase/1` convert a string to ALL CAPS.
 
-### Your turn
+### Indexes
 
-Use the `String.at/2` function to get the character at index 2 of "hello".
-
-You might not yet be familiar with strings and indexes.
-You can imagine a string like a list of characters.
+You can imagine a string like a list of characters. However, be warned this is only a mental model,
+Strings are not actually implemented as lists.
 
 ```mermaid
 flowchart TB
@@ -153,10 +182,7 @@ flowchart TB
   end
 ```
 
-Notice that the index starts with 0, not 1.
-Think of it as "how far is this character from the start of the string?"
-The first character is 0 away from the start, the second is 1 away, etc.
-(Americans count age this way: on your 1st birthday, you are 1 year away from birth.)
+Notice that the index starts with 0, not 1, just like lists.
 
 So the character at index 1 in `"hello"` would be `"e"`.
 
@@ -181,17 +207,73 @@ flowchart TB
 
 <!-- livebook:{"break_markdown":true} -->
 
-Enter your answer in the Elixir cell below.
+### Your Turn
+
+Use the `String.at/2` function to get the character at index `2` of `"hello"`. 
+The result should be the character `l`.
+
+Replace `nil` with your answer.
 
 ```elixir
+answer = nil
 
+Utils.feedback(:string_at, answer)
+```
+
+Use the `String.contains?/2` function to determine if `"Hello"` contains `"lo"`. Replace `nil` with your answer.
+
+```elixir
+answer = nil
+
+Utils.feedback(:string_contains, answer)
+```
+
+Use `String.capitalize/2` to capitalize `"hello"`. Replace `nil` with your answer.
+
+```elixir
+answer = nil
+
+Utils.feedback(:string_capitalize, answer)
+```
+
+Use `String.split/3` to split the following comma-separated list of strings into a list of words.
+Replace `nil` with your answer.
+
+```elixir
+string = "have,a,great,day"
+
+words = nil
+
+Utils.feedback(:string_split, words)
+```
+
+Use `String.trim/1` to remove whitespace from the following string. 
+Replace `nil` with your answer.
+
+```elixir
+string = "  hello!  "
+
+trimmed_string = nil
+
+Utils.feedback(:string_trim, trimmed_string)
+```
+
+Use `String.upcase/1` to convert the following string to all caps.
+Replace `nil` with your answer.
+
+```elixir
+string = "hello"
+
+uppercase_string = nil
+
+Utils.feedback(:string_upcase, uppercase_string)
 ```
 
 ## The Map Module
 
 The [Map](https://hexdocs.pm/elixir/1.13.2/Map.html#functions) module contains functionality related to maps.
 
-Here's a few common functions to get you started.
+Here are a few common functions to get you started.
 
 * `get/3` retrieve values in a map.
 * `put/3` put a value into a map.
@@ -200,75 +282,105 @@ Here's a few common functions to get you started.
 * `merge/2` merge two maps together.
 * `values/1` list the values in a map.
 
+Keep in mind operations do not mutate a value.
+
+For example, if we use `Map.put/3` to put a new value in a map, the original variable is not
+changed. Functions return a new value, rather than modifying the original one.
+
+```elixir
+original_map = %{}
+
+new_map = Map.put(original_map, :key, "value")
+```
+
+So the `original_map` is still an empty map `%{}`.
+
+```elixir
+original_map
+```
+
+And the `new_map` has been bound to the result of `Map.put/3`.
+
+```elixir
+new_map
+```
+
 ### Your turn
-
-Try using `Map.merge/2` to combine `%{one: 1}` and `%{two: 2}`.
-
-```elixir
-
-```
-
-## Date and DateTime
-
-Elixir provides useful built-in structs. You'll become familiar with the `Date` and `DateTime` modules
-if you ever need to work with time in your programs.
-
-Both represent a date in a calendar, however `DateTime` provides increased specificity by also
-storing the time of the day. Thus `Date` and `DateTime`.
-
-You can create a new `Date` the same way you would create any struct. It accepts a `:year`, `:month`,
-and `:day`
-
-```elixir
-%Date{year: 2001, month: 8, day: 10}
-```
-
-### Your Turn
-
-Try creating a `Date` for your birthday, if you don't want to use your birthday you can use
-any day you like.
-
-```elixir
-
-```
-
-## Sigils
-
-Woah, what is `~D[2001-08-10]`? Well that's how Elixir internally represents dates.
-It uses a construct called a `sigil`. A sigil is an alternative syntax for working with
-certain types of values.
-
-You don't yet need to be deeply familiar with how sigils work, but it's useful to be aware of them.
-A sigil is defined with a tilde `~` character followed by a character. In this case the `~D`
-is for a `Date`. You can create a Date directly with this syntax.
-
-```elixir
-~D[2001-08-10]
-```
-
-### Your Turn
-
-Create the same data as you did above. This time, use the `~D[]` syntax.
-
-```elixir
-
-```
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Date.new/4
-
-Often when creating dates, it's beneficial to use the built-in `Date.new/4` function which
-validates the date when creating it.
-
-Otherwise, you can create some pretty wacky dates!
+Use `Map.get/3` to retrieve the value for the `:hello` key in the following map.
+Replace `nil` with your answer.
 
 ```elixir
-%Date{year: 20222, month: 143, day: 123}
+map = %{hello: "world"}
+
+retrieved_value = nil
+
+Utils.feedback(:map_get, retrieved_value)
 ```
 
-You can see the above is not valid when using `Date.new/4`. it returns `{:error, :invalid_date}`
+Use `Map.put/3` to add the key `:two` with the value `2` to the following map. Replace `nil` with your answer.
 
 ```elixir
-Date.new(20222, 143, 123)
+map = %{one: 1}
+
+new_map = nil
+
+Utils.feedback(:map_put, new_map)
 ```
+
+Use `Map.keys/1` to retrieve the keys for the following map. Replace `nil` with your answer.
+
+```elixir
+map = %{key1: 1, key2: 2, key3: 3}
+
+keys = nil
+
+Utils.feedback(:map_keys, keys)
+```
+
+Use `Map.delete/2` to remove `:key1` from the following map.
+
+```elixir
+map = %{key1: 1, key2: 2, key3: 3}
+
+new_map = nil
+
+Utils.feedback(:map_delete, new_map)
+```
+
+Use `Map.merge/2` to combine `%{one: 1}` and `%{two: 2}`. Replace `nil` with your answer.
+
+```elixir
+merged_map = nil
+
+Utils.feedback(:merged_map, merged_map)
+```
+
+Use `Map.values/1` to retrieve the values in the following map. Replace `nil` with your answer.
+
+```elixir
+map = %{key1: 1, key2: 2, key3: 3}
+
+values = nil
+
+Utils.feedback(:map_values, values)
+```
+
+## Further Reading
+
+There are more built-in modules and functions beyond the scope of this introductory reading. 
+You can learn more on the Elixir documentation.
+
+* [Kernel](https://hexdocs.pm/elixir/Kernel.html)
+* [Integer](https://hexdocs.pm/elixir/Integer.html)
+* [String](https://hexdocs.pm/elixir/String.html)
+* [List](https://hexdocs.pm/elixir/List.html)
+* [Map](https://hexdocs.pm/elixir/Map.html)
+* [Keyword](https://hexdocs.pm/elixir/Keyword.html)
+* [Date](https://hexdocs.pm/elixir/Date.html)
+* [Time](https://hexdocs.pm/elixir/Time.html)
+* [DateTime](https://hexdocs.pm/elixir/DateTime.html)
+* [Calendar](https://hexdocs.pm/elixir/Calendar.html)
+* [Tuple](https://hexdocs.pm/elixir/Tuple.html)
