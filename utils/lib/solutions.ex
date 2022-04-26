@@ -779,4 +779,27 @@ defmodule Utils.Solutions do
   def bingo do
     Bingo
   end
+
+  def is_type do
+    [
+      is_map(%{}),
+      is_bitstring(""),
+      is_integer(1),
+      is_float(1.0),
+      is_boolean(true),
+      is_list([]),
+      is_tuple({})
+    ]
+  end
+
+  def pipe_operator do
+    add = fn int1, int2 -> int1 + int2 end
+    multiply = fn int1, int2 -> int1 * int2 end
+    subtract = fn int1, int2 -> int1 - int2 end
+
+    10
+    |> add.(2)
+    |> multiply.(5)
+    |> subtract.(4)
+  end
 end

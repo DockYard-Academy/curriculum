@@ -974,7 +974,7 @@ defmodule Utils.Feedback do
   feedback :bingo do
     bingo = get_answers()
 
-    numbers = Enum.map(1..9, fn _ -> Enum.random(1..9) end)
+    numbers = Enum.to_list(1..9)
     [row1, row2, row3] = board = Enum.chunk_every(numbers, 3)
     [r1c1, r1c2, r1c3] = row1
     [r2c1, r2c2, r2c3] = row2
@@ -1015,6 +1015,13 @@ defmodule Utils.Feedback do
     assert is_a_boolean, "Use the Kernel.is_boolean/1 function on `boolean`"
     assert is_a_list, "Use the Kernel.is_list/1 function on `list`"
     assert is_a_tuple, "Use the Kernel.is_tuple/1 function on `tuple`"
+  end
+
+  feedback :pipe_operator do
+    answer = get_answers()
+    assert answer
+    assert is_integer(answer), "answer should be an integer"
+    assert answer == 56
   end
 
   # test_names must be after tests that require a solution.
@@ -1122,6 +1129,45 @@ defmodule Utils.Feedback do
     assert date2 == %Date{year: 1915, month: 4, day: 17}
 
     assert difference == Date.diff(date2, date1)
+  end
+
+  feedback :calculate_force do
+    calculate_force = get_answers()
+
+    assert calculate_force
+    assert is_function(calculate_force), "calculate_force should be a function."
+
+    assert is_function(calculate_force, 2),
+           "calculate_force should be a function with arity of 2."
+
+    assert calculate_force.(10, 5), "calculate_force should return a value."
+    assert is_integer(calculate_force.(10, 5)), "calculate_force should return an integer."
+    assert calculate_force.(10, 5) == 10 * 5, "calculate_force should return mass * acceleration"
+  end
+
+  feedback :is_even? do
+    is_even? = get_answers()
+    assert is_even?
+    assert is_function(is_even?), "is_even? should be a function."
+    assert is_function(is_even?, 1), "is_even? should be a function with a single parameter."
+
+    even_number = Enum.random(2..10//2)
+    odd_number = Enum.random(1..9//2)
+    refute is_even?.(odd_number), "is_even? should return false for odd numbers."
+    assert is_even?.(even_number), "is_even? should return true for even numbers."
+  end
+
+  feedback :call_with_20 do
+    call_with_20 = get_answers()
+
+    assert call_with_20
+    assert is_function(call_with_20), "call_with_20 should be a function."
+
+    assert is_function(call_with_20, 1),
+           "call_with_20 should be a function with a single parameter."
+
+    assert call_with_20.(fn int -> int * 2 end) == 20 * 2
+    assert call_with_20.(fn int -> int * 10 end) == 20 * 10
   end
 
   feedback :created_project do
