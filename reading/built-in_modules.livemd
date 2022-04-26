@@ -368,6 +368,81 @@ values = nil
 Utils.feedback(:map_values, values)
 ```
 
+## The Keyword Module
+
+The [Keyword](https://hexdocs.pm/elixir/Keyword.html#functions) module contains functionality related to maps.
+
+Here are a few common functions to get you started.
+
+* `get/3` retrieve values in a keyword list.
+* `keys/1` list the keys in a keyword list.
+* `keyword?/1` check if some data is a keyword list.
+
+Keyword lists are often used for optional arguments. You may have already encountered this pattern.
+For example, `IO.inspect/2` has [many optional arguments](https://hexdocs.pm/elixir/Inspect.Opts.html)
+Including `:label`.
+
+```elixir
+IO.inspect("world", label: "hello")
+```
+
+Under the hood, these functions may use `Keyword.get/3` to retrieve optional arguments or provide
+default arguments.
+
+```elixir
+defmodule MyIO do
+  def inspect(value, opts \\ []) do
+    label = Keyword.get(opts, :label, "default label")
+    "#{label}: #{value}"
+  end
+end
+```
+
+```elixir
+MyIO.inspect("world")
+```
+
+```elixir
+MyIO.inspect("world", label: "hello")
+```
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+Use `Keyword.get/3` to access the value for the `:color` key in the following keyword list.
+Replace `nil`  with your answer.
+
+```elixir
+options = [color: "red"]
+
+color = nil
+
+Utils.feedback(:keyword_get, color)
+```
+
+Use the `Keyword.keys/1` function to list all of the keys in the following keyword list. 
+Replace `nil` with your answer.
+
+```elixir
+options = [one: 1, two: 2, three: 3]
+
+keys = nil
+
+Utils.feedback(:keyword_keys, keys)
+```
+
+Use the `Keyword.keyword?/1`. function to determine if the following is a keyword list. 
+Replace `nil` with your answer.
+
+```elixir
+keyword_list = [key: "value"]
+
+is_keyword_list = nil
+
+Utils.feedback(:keyword_keyword?, is_keyword_list)
+```
+
 ## Further Reading
 
 There are more built-in modules and functions beyond the scope of this introductory reading. 
@@ -379,8 +454,4 @@ You can learn more on the Elixir documentation.
 * [List](https://hexdocs.pm/elixir/List.html)
 * [Map](https://hexdocs.pm/elixir/Map.html)
 * [Keyword](https://hexdocs.pm/elixir/Keyword.html)
-* [Date](https://hexdocs.pm/elixir/Date.html)
-* [Time](https://hexdocs.pm/elixir/Time.html)
-* [DateTime](https://hexdocs.pm/elixir/DateTime.html)
-* [Calendar](https://hexdocs.pm/elixir/Calendar.html)
 * [Tuple](https://hexdocs.pm/elixir/Tuple.html)

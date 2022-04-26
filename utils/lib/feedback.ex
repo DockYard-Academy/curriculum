@@ -1041,6 +1041,25 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
+  feedback :keyword_get do
+    color = get_answers()
+    options = [color: "red"]
+    assert color == Keyword.get(options, :color)
+  end
+
+  feedback :keyword_keys do
+    options = [one: 1, two: 2, three: 3]
+    keys = get_answers()
+    assert keys == Keyword.keys(options)
+  end
+
+  feedback :keyword_keyword? do
+    is_keyword_list = get_answers()
+    keyword_list = [key: "value"]
+
+    assert is_keyword_list == Keyword.keyword?(keyword_list)
+  end
+
   feedback :integer_parse do
     parsed = get_answers()
 
