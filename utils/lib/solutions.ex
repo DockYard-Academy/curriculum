@@ -802,4 +802,39 @@ defmodule Utils.Solutions do
     |> multiply.(5)
     |> subtract.(4)
   end
+
+  defmodule Filter do
+    def integers(list) do
+      Enum.filter(list, &is_integer/1)
+    end
+
+    def floats(list) do
+      Enum.filter(list, &is_float/1)
+    end
+
+    # both floats and integers
+    def numbers(list) do
+      Enum.filter(list, &is_number/1)
+    end
+
+    def atoms(list) do
+      Enum.filter(list, &is_atom/1)
+    end
+
+    def lists(list) do
+      Enum.filter(list, &is_list/1)
+    end
+
+    def maps(list) do
+      Enum.filter(list, &is_map/1)
+    end
+
+    def keyword_lists(list) do
+      Enum.filter(list, &Keyword.keyword?/1)
+    end
+  end
+
+  def filter_by_type do
+    Filter
+  end
 end

@@ -1024,6 +1024,20 @@ defmodule Utils.Feedback do
     assert answer == 56
   end
 
+  feedback :filter_by_type do
+    filter = get_answers()
+
+    input = [1, 2, 1.0, 2.0, :one, :two, [], [1], [1, 2], %{}, %{one: 1}, [one: 1], [two: 2]]
+
+    assert filter.integers(input) == [1, 2]
+    assert filter.floats(input) == [1.0, 2.0]
+    assert filter.numbers(input) == [1, 2, 1.0, 2.0]
+    assert filter.atoms(input) == [:one, :two]
+    assert filter.lists(input) == [[], [1], [1, 2], [one: 1], [two: 2]]
+    assert filter.maps(input) == [%{}, %{one: 1}]
+    assert filter.keyword_lists(input) == [[], [one: 1], [two: 2]]
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
