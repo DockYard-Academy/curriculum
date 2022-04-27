@@ -23,35 +23,36 @@ You're going to create a game of tic tak toe.
 
 In tic tak toe, players take turns placing either an `X` or an `O` onto a 3 by 3 grid.
 
-In the Elixir cell below,
+The grid will be represented with the following coordinates.
 
-* Create a `TicTakToe` module with a `play/3` function.
+![](images/tic_tac_toe_coordinates.png)
 
-* `play/3` should accept a game board as the first parameter.
+In this game, the player will say the coordinate they want to play, and either an `"X"` or an `"O"` like so:
+This should return a new version of the board with that coordinate filled in.
 
-* `play/3` should accept a tuple for coordinates as the second parameter.
-  The coordinates should match the following.
-  ![](images/tic_tac_toe_coordinates.png)
+<!-- livebook:{"force_markdown":true} -->
 
-* `play/3` should accept a string of either `"X"` or `"O"` for the third parameter.
+```elixir
+board = [
+  [nil, nil, nil],
+  [nil, nil, nil],
+  [nil, nil, nil]
+]
 
-* `play/3` should return a new updated game board
+move1 = TicTakToe.play(board, {0, 0}, "X")
+[
+  ["X", nil, nil],
+  [nil, nil, nil],
+  [nil, nil, nil]
+]
 
-* A game board should be a list of lists like so
-
-  ```elixir
-  [
-    [nil, nil, nil],
-    [nil, nil, nil],
-    [nil, nil, nil],
-  ]
-  ```
-
-Which would represent the following tic tac toe board.
-
-![](images/empty_tic_tac_toe.png)
-
-* `play/3` should return a new game board with the `nil` replaced with either an `X` or an `O`.
+TicTakToe.play(move1, {1, 1}, "O")
+[
+  ["X", nil, nil],
+  [nil, "O", nil],
+  [nil, nil, nil]
+]
+```
 
 * **BONUS**: Ensure that the same player cannot play twice in a row.
 
@@ -60,36 +61,13 @@ Which would represent the following tic tac toe board.
 * **BONUS**: Omit the `"X"` and `"O"` parameter and instead automatically figure out who's turn it is.
   (X always plays first)
 
-Putting that together you would get:
-
-<!-- livebook:{"force_markdown":true} -->
+Enter your answer below.
 
 ```elixir
-board = [
-    [nil, nil, nil],
-    [nil, nil, nil],
-    [nil, nil, nil],
-]
+defmodule TicTakToe do
+  def play(board, coordinate, symbol) do
+  end
+end
 
-move_1 = TicTakToe.play(board, {0, 2}, "X")
-[
-    [nil, nil, "X"],
-    [nil, nil, nil],
-    [nil, nil, nil],
-]
-
-move_2 = TicTakToe.play(board, {1, 1}, "O")
-[
-    [nil, nil, "X"],
-    [nil, "O", nil],
-    [nil, nil, nil],
-]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Solution:
-
-```elixir
-
+Utils.feedback(:tic_tak_toe, TicTakToe)
 ```

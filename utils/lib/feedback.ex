@@ -1038,8 +1038,67 @@ defmodule Utils.Feedback do
     assert filter.keyword_lists(input) == [[], [one: 1], [two: 2]]
   end
 
+  feedback :tic_tak_toe do
+    tic_tak_toe = get_answers()
+
+    board = [
+      [nil, nil, nil],
+      [nil, nil, nil],
+      [nil, nil, nil]
+    ]
+
+    assert tic_tak_toe.play(board, {0, 0}, "X"), "Ensure you implement the `play/3` function."
+
+    assert tic_tak_toe.play(board, {0, 0}, "X") == [
+             ["X", nil, nil],
+             [nil, nil, nil],
+             [nil, nil, nil]
+           ]
+
+    assert tic_tak_toe.play(board, {0, 2}, "X") == [
+             [nil, nil, "X"],
+             [nil, nil, nil],
+             [nil, nil, nil]
+           ]
+
+    assert tic_tak_toe.play(board, {1, 1}, "X") == [
+             [nil, nil, nil],
+             [nil, "X", nil],
+             [nil, nil, nil]
+           ]
+
+    assert tic_tak_toe.play(board, {2, 2}, "X") == [
+             [nil, nil, nil],
+             [nil, nil, nil],
+             [nil, nil, "X"]
+           ]
+
+    assert board
+           |> tic_tak_toe.play({0, 0}, "X")
+           |> tic_tak_toe.play({1, 1}, "O")
+           |> tic_tak_toe.play({2, 2}, "X")
+           |> tic_tak_toe.play({2, 1}, "O") ==
+             [
+               ["X", nil, nil],
+               [nil, "O", nil],
+               [nil, "O", "X"]
+             ]
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
+
+  feedback :number_wordle do
+    number_wordle = get_answers()
+
+    assert number_wordle.feedback(1111, 9999), "Ensure you implement the feedback/2 function."
+
+    assert number_wordle.feedback(1111, 1111) == [:green, :green, :green, :green]
+    assert number_wordle.feedback(1111, 2222) == [:gray, :gray, :gray, :gray]
+    assert number_wordle.feedback(1111, 1122) == [:green, :green, :gray, :gray]
+    assert number_wordle.feedback(1112, 2333) == [:gray, :gray, :gray, :yellow]
+    assert number_wordle.feedback(2221, 1222) == [:yellow, :green, :green, :yellow]
+  end
 
   feedback :keyword_get do
     color = get_answers()
