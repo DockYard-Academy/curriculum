@@ -834,9 +834,7 @@ defmodule Utils.Solutions do
     end
   end
 
-  def filter_by_type do
-    Filter
-  end
+  def filter_by_type, do: Filter
 
   defmodule TicTakToe do
     def play(board, coordinate, symbol) do
@@ -845,7 +843,22 @@ defmodule Utils.Solutions do
     end
   end
 
-  def tic_tak_toe do
-    TicTakToe
+  def tic_tak_toe, do: TicTakToe
+
+  def datetime_new, do: DateTime.new!(~D[1938-04-18], ~T[12:00:00])
+
+  def datetime_today, do: DateTime.utc_now()
+  def datetime_tomorrow, do: DateTime.utc_now() |> DateTime.add(60 * 60 * 24, :second)
+
+  def datetime_compare do
+    date = DateTime.new!(~D[1938-04-18], ~T[12:00:00])
+    DateTime.compare(DateTime.utc_now(), date)
+  end
+
+  def datetime_diff do
+    date1 = DateTime.new!(~D[2000-01-01], ~T[12:00:00])
+    date2 = DateTime.new!(~D[2010-02-02], ~T[12:00:00])
+
+    DateTime.diff(date2, date1)
   end
 end

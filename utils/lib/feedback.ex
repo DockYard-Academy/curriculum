@@ -1085,6 +1085,50 @@ defmodule Utils.Feedback do
              ]
   end
 
+  feedback :datetime_new do
+    date = get_answers()
+    assert date == DateTime.new!(~D[1938-04-18], ~T[12:00:00])
+  end
+
+  feedback :datetime_today do
+    today = get_answers()
+
+    now = DateTime.utc_now()
+    assert today.year == now.year
+    assert today.month == now.month
+    assert today.day == now.day
+    assert today.hour == now.hour
+    assert today.minute == now.minute
+    assert today.second == now.second
+  end
+
+  feedback :datetime_tomorrow do
+    today = get_answers()
+
+    now = DateTime.utc_now()
+    assert today.year == now.year
+    assert today.month == now.month
+    assert today.day == now.day + 1
+    assert today.hour == now.hour
+    assert today.minute == now.minute
+    assert today.second == now.second
+  end
+
+  feedback :datetime_compare do
+    comparison = get_answers()
+
+    assert comparison == :gt
+  end
+
+  feedback :datetime_diff do
+
+    difference = get_answers()
+
+    assert is_integer(difference), "`difference` should be a positive integer."
+    assert difference != -318384000, "Ensure your arguments are in the correct order."
+    assert difference == 318384000
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 

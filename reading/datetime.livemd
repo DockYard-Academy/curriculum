@@ -1,0 +1,265 @@
+# Dates and Times
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:timex, "~> 3.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Overview
+
+Time and timezones can get very complicated. It's not within the scope of this course to delve
+deeply into that complexity.
+
+This reading is intended as a primer to working with dates, times, and timezones. You will
+need to consult the documentation and do you own research to go deeper.
+
+```elixir
+Kino.YouTube.new("-5wpm-gesOY")
+```
+
+Generally, we deal with utc (Coordinated Universal Time) which is a standardized timezone,
+and then convert utc time to the client's timezone only when necessary.
+
+If you work the other way around, constantly dealing with many different timezones, it's easy to make
+mistakes converting them from one to another.
+
+There are many built-in modules for dealing with time, in addition to common external libraries such
+as [Timex](https://github.com/bitwalker/timex).
+
+Generally, you will most commonly work with the [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct.
+
+A `DateTime` struct is a snapshot of a date and time in a given timezone.
+
+You can retrieve the current `DateTime` with `DateTime.utc_now/0`.
+
+```elixir
+DateTime.utc_now()
+```
+
+You'll notice a string output similar to `~U[2022-04-27 02:13:29.306614Z]`. This is a sigil.
+
+Sigils are a textual representation of data. You can find a full
+explanation of sigils on the [Elixir Lang Sigil Getting Started Guide](https://elixir-lang.org/getting-started/sigils.html)
+
+Sigils use a tilda `~` and a character for the type of data they represent. For example,
+the date above uses the `~U` sigil to represent a utc datetime.
+
+Under the hood, `DateTime` is a struct, we can see the full data contained in the struct below.
+
+`DateTime` contains date information such as `:day`, `:month`, and `:year`. `DateTime` also contains time information such as `:hour`, `:minute`, `:second`
+and even `:microsecond`.
+
+```elixir
+Map.from_struct(DateTime.utc_now())
+```
+
+## DateTime
+
+In order to understand `DateTime`, we also need to consider two other structs
+[Date](https://hexdocs.pm/elixir/Date.html) and [Time](https://hexdocs.pm/elixir/Time.html).
+
+A `DateTime` struct is built using a both a `Date` and a `Time` struct. `Date` represents the calendar
+date with `:year`, `:month`, and `:day`. `Time` represents the time of day with `:hour`, `:minute`, and `:second`.
+
+```elixir
+{:ok, date} = Date.new(2022, 6, 24)
+```
+
+```elixir
+{:ok, time} = Time.new(12, 30, 0)
+```
+
+```elixir
+{:ok, datetime} = DateTime.new(date, time)
+```
+
+Here we can see the `DateTime` struct contains all of the information from the `time` and `date` we created above, as
+well as utc timezone information.
+
+```elixir
+Map.from_struct(datetime)
+```
+
+`DateTime` is also timezone aware unlike it's counterpart [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html). You can
+see that `NaiveDateTime` is missing timezone information such as `:time_zone` and `:zone_abbr`.
+
+```elixir
+{:ok, naive_datetime} = NaiveDateTime.new(date, time)
+```
+
+```elixir
+Map.from_struct(naive_datetime)
+```
+
+As a shorter syntax, it's common to use the `~T` sigil for the `Time` struct and the `~D` sigil for the `Date` struct.
+
+```elixir
+{:ok, datetime} = DateTime.new(~D[2022-06-24], ~T[12:30:00])
+```
+
+You could also create the `DateTime` directly using the `~U` sigil.
+
+```elixir
+datetime = ~U[2022-06-24 12:30:00Z]
+```
+
+Under the hood, this is still the same `DateTime` struct.
+
+```elixir
+Map.from_struct(datetime)
+```
+
+And like any struct, you can access all of these properties directly.
+
+```elixir
+datetime.year
+```
+
+## Display The Current Date
+
+When you want to display time information you can use the [Calendar](https://hexdocs.pm/elixir/Calendar.html) module's `strftime/3` function.
+
+```elixir
+Calendar.strftime(DateTime.utc_now(), "%y-%m-%d %I:%M:%S %p")
+```
+
+The `strftime/3` function accepts a `Date`, `Time`, `DateTime`, or `NaiveDateTime` and uses the
+information in the struct to display a formatted string.
+
+You can use a percent `%` symbol and then one of the [accepted format options](https://hexdocs.pm/elixir/1.13/Calendar.html#strftime/3-accepted-formats)
+to display information from the given struct.
+
+For example, you could display the current month with `%B`.
+
+```elixir
+Calendar.strftime(DateTime.utc_now(), "%B")
+```
+
+By default, Elixir does not have any timezone data. You'll notice that the current DateTime is
+for utc, not your local timezone, so the time displayed likely doesn't match your own.
+
+```elixir
+Calendar.strftime(DateTime.utc_now(), "%c")
+```
+
+Elixir can be configured with timezone data, however it is beyond the scope of this current lesson.
+
+For more information, you can check out the publically available Elixir School's lesson on [Working with timezones](https://elixirschool.com/en/lessons/basics/date_time#working-with-timezones-4).
+
+## DateTime Module Functions
+
+The [DateTime](https://hexdocs.pm/elixir/DateTime.html) module contains functions for timezone aware dates and times.
+
+Here are a few common functions to get you started.
+
+* `add/4` add time to an existing `DateTime` struct.
+* `compare/2` compare two `DateTime` structs to see if one is before, after, or the same as another.
+* `diff/3` determine the time between two `DateTime` structs.
+* `new/4` create a new `DateTime` struct and return an `{:ok, datetime}` tuple.
+* `new!/4` create a new `DateTime` struct or raise an error.
+* `utc_now/2` get the current utc `DateTime`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+use `DateTime.new!/4` to Create a `DateTime` for April 18, 1938 at noon. Replace `nil` with your answer.
+
+```elixir
+date = nil
+
+Utils.feedback(:datetime_new, date)
+```
+
+Create a `DateTime` for today at the current time.
+Replace `nil` with your answer.
+
+```elixir
+today = nil
+
+Utils.feedback(:datetime_today, today)
+```
+
+Create a `DateTime` for tomorrow at the current time. You may wish to use `DateTime.add/4`.
+
+```elixir
+tomorrow = nil
+
+Utils.feedback(:datetime_tomorrow, tomorrow)
+```
+
+Use `DateTime.compare/2` to check if the current time is greater than the `datetime` below. `comparison` should be either `:lt` or `:gt`.
+
+Replace `nil` with your answer.
+
+```elixir
+date = DateTime.new!(~D[1938-04-18], ~T[12:00:00])
+
+comparison = nil
+
+Utils.feedback(:datetime_compare, comparison)
+```
+
+Use `DateTime.diff/3` to find the time difference from the first date to the second date. Your answer should
+be a positive integer. Keep in mind that `DateTime.diff/3` Subtracts the first argument by the second argument.
+
+Replace `nil` with your answer.
+
+```elixir
+date1 = DateTime.new!(~D[2000-01-01], ~T[12:00:00])
+date2 = DateTime.new!(~D[2010-02-02], ~T[12:00:00])
+
+difference = nil
+
+Utils.feedback(:datetime_diff, difference)
+```
+
+## Timex
+
+The [Timex](https://hexdocs.pm/timex/Timex.html) external library provides a number of useful features
+for working with dates in Elixir. It is not built-in to Elixir and needs to be installed in a project.
+
+`Timex` is not currently within the scope of this course, however we have installed `Timex` specifically
+in this livebook file only. You will not normally have access to `Timex` as the purpose of this section is to build familiarity
+with `DateTime`.
+
+`Timex` uses the [tzdata](https://github.com/lau/tzdata) timezone database for Elixir.
+You can create a timezone aware `DateTime` using `Timex.now/1` and the name of a timezone.
+
+```elixir
+Timex.now("Asia/Kabul")
+```
+
+You can find the full list of available timezones using `Tzdata.zone_list/0`.
+
+```elixir
+Tzdata.zone_list()
+```
+
+Many websites host the full list of timezones such as [timezonedb.com](https://timezonedb.com/time-zones)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Use `Timex.now/1` to create a datetime for your current timezone. Compare it with your local time
+to ensure it is correct.
+
+```elixir
+
+```
