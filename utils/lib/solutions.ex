@@ -861,4 +861,20 @@ defmodule Utils.Solutions do
 
     DateTime.diff(date2, date1)
   end
+
+  defmodule Itinerary do
+    def has_time?(start, finish, activities) do
+      time_between = DateTime.diff(finish, start)
+
+      seconds_of_activities =
+        Enum.reduce(activities, 0, fn
+          {:minute, int}, acc -> acc + int * 60
+          {:hour, int}, acc -> acc + int * 60 * 60
+        end)
+
+      time_between >= seconds_of_activities
+    end
+  end
+
+  def itinerary, do: Itinerary
 end

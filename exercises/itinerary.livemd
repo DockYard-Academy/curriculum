@@ -1,0 +1,63 @@
+# Itinerary
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Itinerary
+
+You are building a day planning application. Users will provide a list of expected
+times for activities and you will determine if they have enough time in the day to fit those activities.
+
+Activities are provided as a keyword lists of times using only `:minutes`, and `:hours`.
+
+Given a start time and and end time, your `Itinerary` should determine if they have enough time
+to complete all of their activities.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+activities = [hours: 2, minutes: 30, hours: 4.5, minutes: 10] # ~430 minutes of activites
+start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
+finish = DateTime.new!(~D[2022-04-24], ~T[20:00:00]) # 8 hours or 480 minutes of time
+
+Itinerary.has_time?(start, finish, activites)
+true
+```
+
+`has_time?/3` should be inclusive, so one hour of activities should fit into one hour of time.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+activities = [hours: 1]
+start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
+finish = DateTime.new!(~D[2022-04-24], ~T[13:00:00])
+
+Itinerary.has_time?(start, finish, activites)
+true
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Itinerary do
+  def has_time?(start, finish, activities) do
+  end
+end
+
+Utils.feedback(:itinerary, Itinerary)
+```

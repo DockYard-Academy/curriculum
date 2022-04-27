@@ -1121,12 +1121,28 @@ defmodule Utils.Feedback do
   end
 
   feedback :datetime_diff do
-
     difference = get_answers()
 
     assert is_integer(difference), "`difference` should be a positive integer."
-    assert difference != -318384000, "Ensure your arguments are in the correct order."
-    assert difference == 318384000
+    assert difference != -318_384_000, "Ensure your arguments are in the correct order."
+    assert difference == 318_384_000
+  end
+
+  feedback :itinerary do
+    itinerary = get_answers()
+
+    start = DateTime.utc_now()
+    # four hours
+    finish = DateTime.add(start, 60 * 60 * 4)
+
+    assert itinerary.has_time?(start, finish, [])
+    assert itinerary.has_time?(start, finish, hour: 0)
+    assert itinerary.has_time?(start, finish, hour: 0, minute: 0)
+    assert itinerary.has_time?(start, finish, hour: 3, minute: 59)
+    assert itinerary.has_time?(start, finish, hour: 4)
+
+    refute itinerary.has_time?(start, finish, hour: 5)
+    refute itinerary.has_time?(start, finish, hour: 4, minute: 1)
   end
 
   # test_names must be after tests that require a solution.
