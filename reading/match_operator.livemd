@@ -1,4 +1,4 @@
-# Variable Binding
+# Match Operator
 
 ```elixir
 Mix.install([
@@ -17,7 +17,7 @@ Mix.install([
 
 [Return Home](../start.livemd)
 
-## Lesson
+## Variable Binding
 
 The match operator `=` is a way of binding some data to a named **variable** that we can
 use in place of that data throughout the rest of a program.
@@ -38,13 +38,6 @@ as long as it doesn't break certain rules.
 a_different_variable_name = 9
 a_different_variable_name + 1
 ```
-
-In Elixir, the `=` sign is the match operator. In other programming languages, you may call it the assignment operator.
-
-Elixir calls `=` the match operator because it can do more than assign values to a variable.
-
-You'll learn more about that in future lessons. For now, this lesson will focus on using `=`
-the same way we would assign variables a value in other languages.
 
 Why is storing a value in a variable useful? Imagine you have a program that runs several calculations on a number.
 Let's say the number 8.
@@ -163,10 +156,12 @@ you're using an unbound variable.
 
 ### Your Turn
 
-In the Elixir cell below, create a variable `hello` and bind it to the value `"world"`
+In the Elixir cell below, create a variable `hello` and bind it to the value `"world"`. Replace `nil` with your answer.
 
 ```elixir
+hello = nil
 
+Utils.feedback(:hello, hello)
 ```
 
 ### Mutation
@@ -211,3 +206,68 @@ That's why we call data in Elixir **immutable**.
 It may not be clear why this matters, and that's ok. For now, it's enough to 
 be aware that data is immutable, as you will have more opportunities to see the impact of
 immutability in future lessons.
+
+## Pattern Matching
+
+In Elixir, the `=` sign is the match operator. In other programming languages, you may call it the assignment operator.
+
+Elixir calls `=` the match operator because it uses pattern matching to bind variables.
+
+What is pattern matching? Well rather than simply assigning values to variables, Elixir allows
+you to bind variables on the left-hand side of the `=`. So long as it matches the same shape of the
+right hand side of the `=`.
+
+What does that mean? Well, we already know we can use `=` to bind the right hand side value to a variable.
+
+```elixir
+my_tuple = {1, 2, 3}
+```
+
+But you can also use pattern matching to bind values within a data type.
+
+```elixir
+{one, two, three} = {1, 2, 3}
+
+two
+```
+
+So long as the expression on the left side of match operator `=` matches the pattern of the right side,
+you can bind variables to values.
+
+Here's the same concept with a list
+
+```elixir
+[hero, secret_identity] = ["Spider Man", "Peter Parker"]
+
+hero
+```
+
+This binds a new variable. If you aren't concerned about a value then you can use underscore `_`
+to ignore it.
+
+```elixir
+[_, secret_identity] = ["Spider Man", "Peter Parker"]
+
+secret_identity
+```
+
+However, if the left hand side doesn't match the right hand side, then the code will crash with
+a **MatchError**.
+
+```elixir
+# The following crashes because a list with 1 element does not match a list with two elements.
+[name] = ["Spider Man", "Peter Parker"]
+```
+
+You can pattern match with any kind of data. So long as the left side matches the right side.
+
+### Your Turn
+
+Use pattern matching to bind `"jewel"` to a variable called `jewel`.
+Replace `jewel` with your answer.
+
+```elixir
+jewel = [1, 2, "jewel"]
+
+Utils.feedback(:jewel, jewel)
+```

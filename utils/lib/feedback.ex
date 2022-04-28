@@ -1295,6 +1295,17 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
+  feedback :hello do
+    hello = get_answers()
+    assert hello == "world"
+  end
+
+  feedback :jewel do
+    jewel = get_answers()
+    assert jewel != [1, 2, "jewel"], "Ensure you use pattern matching to bind `jewel`"
+    assert jewel == "jewel"
+  end
+
   feedback :number_wordle do
     number_wordle = get_answers()
 

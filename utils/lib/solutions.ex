@@ -936,4 +936,20 @@ defmodule Utils.Solutions do
 
   def school_must_register, do: School
   def school_grades, do: School
+
+  defmodule Percent do
+    def display(percent) when percent > 0 and percent <= 100 do
+      "#{percent}%"
+    end
+  end
+
+  def percent, do: Percent
+
+  defmodule Say do
+    def hello(name) when is_bitstring(name) do
+      "Hello, #{name}."
+    end
+  end
+
+  def say_guards, do: Say
 end
