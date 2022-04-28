@@ -903,4 +903,37 @@ defmodule Utils.Solutions do
   end
 
   def timeline, do: Timeline
+
+  defmodule School do
+    def must_register(students, year) do
+      latest_birthday = Date.new!(year - 5, 12, 31)
+      earliest_birthday = Date.new!(year - 16, 1, 1)
+
+      Enum.filter(
+        students,
+        fn each ->
+          Date.compare(each.birthday, earliest_birthday) in [:gt, :eq] and
+            Date.compare(each.birthday, latest_birthday) in [:lt, :eq]
+        end
+      )
+    end
+
+    def grades(students, year) do
+      Enum.reduce(students, %{}, fn each, acc ->
+        grade =
+          case year - each.birthday.year do
+            6 -> :grade1
+            7 -> :grade2
+            8 -> :grade3
+            9 -> :grade4
+            10 -> :grade5
+          end
+
+        Map.update(acc, grade, [each], fn list -> list ++ [each] end)
+      end)
+    end
+  end
+
+  def school_must_register, do: School
+  def school_grades, do: School
 end

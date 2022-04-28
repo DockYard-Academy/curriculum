@@ -1155,6 +1155,111 @@ defmodule Utils.Feedback do
     assert timeline.generate(["2022-04-24", "2023-05-24"]) == [395]
   end
 
+  feedback :school_must_register do
+    school_grades = get_answers()
+    name = Faker.Person.first_name()
+
+    assert school_grades.must_register([], 2022) == []
+
+    assert school_grades.must_register([%{name: name, birthday: Date.new!(2017, 12, 31)}], 2022) ==
+             [%{name: name, birthday: Date.new!(2017, 12, 31)}]
+
+    assert school_grades.must_register([%{name: name, birthday: Date.new!(2018, 1, 1)}], 2022) ==
+             []
+
+    assert school_grades.must_register([%{name: name, birthday: Date.new!(2005, 12, 31)}], 2022) ==
+             []
+
+    assert school_grades.must_register([%{name: name, birthday: Date.new!(2006, 1, 1)}], 2022) ==
+             [
+               %{name: name, birthday: Date.new!(2006, 1, 1)}
+             ]
+  end
+
+  feedback :school_grades do
+    school = get_answers()
+    name = Faker.Person.first_name()
+
+    assert school.grades([], 2022), "Implement the `grades/2` function."
+    assert school.grades([], 2022) == %{}
+
+    assert school.grades([%{name: name, birthday: ~D[2016-01-01]}], 2022) == %{
+             grade1: [%{name: name, birthday: ~D[2016-01-01]}]
+           }
+
+    assert school.grades([%{name: name, birthday: ~D[2015-01-01]}], 2022) == %{
+             grade2: [%{name: name, birthday: ~D[2015-01-01]}]
+           }
+
+    assert school.grades([%{name: name, birthday: ~D[2014-01-01]}], 2022) == %{
+             grade3: [%{name: name, birthday: ~D[2014-01-01]}]
+           }
+
+    assert school.grades([%{name: name, birthday: ~D[2013-01-01]}], 2022) == %{
+             grade4: [%{name: name, birthday: ~D[2013-01-01]}]
+           }
+
+    assert school.grades([%{name: name, birthday: ~D[2012-01-01]}], 2022) == %{
+             grade5: [%{name: name, birthday: ~D[2012-01-01]}]
+           }
+
+    students = [
+      %{name: "Name1", birthday: ~D[2016-01-01]},
+      %{name: "Name2", birthday: ~D[2016-12-31]},
+      %{name: "Name3", birthday: ~D[2015-01-01]},
+      %{name: "Name4", birthday: ~D[2015-12-31]},
+      %{name: "Name5", birthday: ~D[2014-01-01]},
+      %{name: "Name6", birthday: ~D[2014-12-31]},
+      %{name: "Name7", birthday: ~D[2013-01-01]},
+      %{name: "Name8", birthday: ~D[2013-12-31]},
+      %{name: "Name9", birthday: ~D[2012-01-01]},
+      %{name: "Name10", birthday: ~D[2012-12-31]}
+    ]
+
+    assert school.grades(students, 2022) ==
+             %{
+               grade1: [
+                 %{name: "Name1", birthday: ~D[2016-01-01]},
+                 %{name: "Name2", birthday: ~D[2016-12-31]}
+               ],
+               grade2: [
+                 %{name: "Name3", birthday: ~D[2015-01-01]},
+                 %{name: "Name4", birthday: ~D[2015-12-31]}
+               ],
+               grade3: [
+                 %{name: "Name5", birthday: ~D[2014-01-01]},
+                 %{name: "Name6", birthday: ~D[2014-12-31]}
+               ],
+               grade4: [
+                 %{name: "Name7", birthday: ~D[2013-01-01]},
+                 %{name: "Name8", birthday: ~D[2013-12-31]}
+               ],
+               grade5: [
+                 %{name: "Name9", birthday: ~D[2012-01-01]},
+                 %{name: "Name10", birthday: ~D[2012-12-31]}
+               ]
+             }
+
+    assert school.grades(Enum.take(students, 8), 2023) == %{
+             grade2: [
+               %{name: "Name1", birthday: ~D[2016-01-01]},
+               %{name: "Name2", birthday: ~D[2016-12-31]}
+             ],
+             grade3: [
+               %{name: "Name3", birthday: ~D[2015-01-01]},
+               %{name: "Name4", birthday: ~D[2015-12-31]}
+             ],
+             grade4: [
+               %{name: "Name5", birthday: ~D[2014-01-01]},
+               %{name: "Name6", birthday: ~D[2014-12-31]}
+             ],
+             grade5: [
+               %{name: "Name7", birthday: ~D[2013-01-01]},
+               %{name: "Name8", birthday: ~D[2013-12-31]}
+             ]
+           }
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
