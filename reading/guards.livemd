@@ -24,51 +24,95 @@ Guards allow you to guard your functions to only accept certain input.
 ```mermaid
 flowchart LR
 Input --> Guard --> Function
-Guard --> f[Invalid Input]
+Guard --> f[Invalid Input] --> fc[FunctionClauseError]
 ```
 
 This prevents a function from being misused and
 provides clearer feedback.
 
-For example, you may have a function like `double/1` which doubles a number.
+Guards start with a `when` keyword followed by a boolean expression. For example,
 
 ```elixir
 defmodule Multiplier do
-  def double(num1) do
-    num1 * 2
+  def double(int) when is_integer(int) do
+    int * 2
   end
 end
 
-Multiplier.double(4)
+Multiplier.double(2)
 ```
 
-You'll notice that we can pass in strings to the `Multiplier.double/1` function, and the program will error.
-However, to an outside user, that error could be unclear.
+The `Multiplier` module above will only accept integers, so it will crash with a `FunctionClauseError` if we
+provide it a float.
+
+```elixir
+Multiplier.double(1.5)
+```
+
+You can use multiple guards together in the same function head. For example, we could
+use both `is_integer/1` and `is_float/1` in the same `double/1` function.
 
 ```elixir
 defmodule Multiplier do
-  def double(num1) do
-    num1 * 2
-  end
-end
-
-Multiplier.double("")
-```
-
-To enforce the function is only called with integers, we can use the built-in `is_integer` guard
-and the `when` guard operator.
-
-Now when you call the `double/1` function, it will let you know that the function does not exist
-for string arguments.
-
-```elixir
-defmodule Multiplier do
-  def double(value) when is_integer(value) do
+  def double(value) when is_integer(value) or is_float(value) do
     value * 2
   end
 end
 
-Multiplier.double("")
+Multiplier.double(1.3)
+```
+
+While useful for demonstration, we should realistically use the `is_number/1` guard instead.
+
+```elixir
+defmodule Multiplier do
+  def double(value) when is_number(value) do
+    value * 2
+  end
+end
+
+Multiplier.double(1.3)
+```
+
+Guards must return `true` or `false` values and be pure input and output.
+
+You can reference the [Guard Documentation](https://hexdocs.pm/elixir/master/patterns-and-guards.html#guards) for a full list.
+
+* [Comparison Operators](./comparison_operators.livemd) (`==`, `!=`, `===`, `!==`, `<`, `<=`, `>`, `>=`)
+* [Boolean Operators](./boolean_operators.livemd) (`and`, `or`, `not`).
+* [Arithmetic Operators](./arithmetic_operators.livemd) (`+`, `-`, `*`, `/`)
+* Membership Operator `in`.
+* "type-check" functions (`is_list/1`, `is_number/1`, `is_map/1`, `is_bitstring/1`, `is_integer/1` etc)
+* functions that work on built-in datatypes (`hd/1`, `tail/1`, `length/1` and others)
+
+## defguard
+
+You can define your own custom guard with `defguard`. For example, let's say
+we're building a rock paper scissors game which should only accept `:rock`, `:paper`, and `:scissors` as
+valid guesses.
+
+We could create a `is_guess/1` guard which checks that the guess is valid.
+
+```elixir
+defmodule RPS do
+  defguard is_guess(guess) when guess in [:rock, :paper, :scissors]
+
+  def play(guess) when is_guess(guess) do
+    case guess do
+      :rock -> :paper
+      :scissors -> :rock
+      :paper -> :rock
+    end
+  end
+end
+
+RPS.play(:rock)
+```
+
+Invalid guesses will now raise a `FunctionClauseError`.
+
+```elixir
+RPS.play("rock")
 ```
 
 ## Polymorphic Functions With Guards
@@ -89,7 +133,7 @@ We can use the built-in `is_bitstring` guard to check if the variable is a strin
 
 ```elixir
 defmodule Multiplier do
-  def double(num) when is_integer(num) do
+  def double(num) when is_number(num) do
     num * 2
   end
 
@@ -107,7 +151,7 @@ There are many guards available in Elixir. If you ever need a specific guard, yo
 Function order matters. The first function who's function head matches the input executes.
 
 For example. if you remove
-the `is_integer/1` guard. Now the first function expects any type of input, so it will always
+the `is_number/1` guard. Now the first function expects any type of input, so it will always
 execute instead of the `is_bitstring/1` version.
 
 ```elixir
@@ -125,16 +169,13 @@ Multiplier.double("example")
 ```
 
 You'll notice our program crashes with an error.
+Elixir also provides a handy warning to let us know that the first function clause always matches
+so the second will never execute.
 
-We also get a warning
-**this clause for double/1 cannot match because a previous clause at line 2 always matches**.
-Because Elixir catches that the first function clause always matches before the second.
+> **this clause for double/1 cannot match because a previous clause at line 2 always matches**.
 
 If you move the more generic function lower, then strings will match the
 `is_bitstring/1` version first.
-
-As a side benefit, **Floats** now work as well!
-Previously they failed the `is_integer/1` guard.
 
 ```elixir
 defmodule Multiplier do
@@ -160,12 +201,49 @@ Multiplier.double(2.5)
 
 ### Your Turn
 
-In the Elixir cell below,
+Create a `Say.hello/1` function which only accepts a string as it's input.
 
-* Create a module `Math` with an `add/2` function that only accepts integers.
-* Create another `Math.add/2` version to add two strings.
-* Create another `Math.add/2` version to add two lists.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+Say.hello("Brian")
+"Hello, Brian."
+```
 
+```elixir
+defmodule Say do
+  def hello(name) do
+  end
+end
+
+Utils.feedback(:say_guards, Say)
+```
+
+Create a `Percent.display/1` function which accepts an integer and returns a string with a percent.
+Use guards to ensure the percent is between 0 (exclusive) and 100 (inclusive)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Percent.display(0.1)
+"0.1%"
+
+Percent.display(100)
+"100%"
+
+Percent.display(0)
+** (FunctionClauseError) no function clause matching in Percent.display/1    
+
+
+Percent.display(101)
+** (FunctionClauseError) no function clause matching in Percent.display/1    
+```
+
+```elixir
+defmodule Percent do
+  def display(percent) do
+  end
+end
+
+Utils.feedback(:percent, Percent)
 ```

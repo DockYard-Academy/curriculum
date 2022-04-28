@@ -1260,6 +1260,38 @@ defmodule Utils.Feedback do
            }
   end
 
+  feedback :say_guards do
+    say = get_answers()
+
+    name = Faker.Person.first_name()
+    assert say.hello(name), "Ensure you implement the `hello/1` function"
+    assert say.hello(name) == "Hello, #{name}."
+
+    assert_raise FunctionClauseError, fn ->
+      say.hello(1) && flunk("Ensure you guard against non string values.")
+    end
+  end
+
+  feedback :percent do
+    percent = get_answers()
+
+    assert percent.display(1), "Ensure you implement the `display/1` function"
+    assert percent.display(0.1) == "0.1%"
+    assert percent.display(100) == "100%"
+
+    assert_raise FunctionClauseError, fn ->
+      percent.display(0) && flunk("Ensure you guard against 0.")
+    end
+
+    assert_raise FunctionClauseError, fn ->
+      percent.display(-1) && flunk("Ensure you guard negative numbers.")
+    end
+
+    assert_raise FunctionClauseError, fn ->
+      percent.display(101) && flunk("Ensure you guard against numbers greater than 100.")
+    end
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
