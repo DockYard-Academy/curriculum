@@ -1145,6 +1145,16 @@ defmodule Utils.Feedback do
     refute itinerary.has_time?(start, finish, hour: 4, minute: 1)
   end
 
+  feedback :timeline do
+    timeline = get_answers()
+
+    assert timeline.generate(["2022-04-24", "2022-04-24"]) == [0]
+    assert timeline.generate(["2022-04-24", "2022-04-25"]) == [1]
+    assert timeline.generate(["2022-04-24", "2022-05-24"]) == [30]
+    assert timeline.generate(["2022-04-24", "2023-04-24"]) == [365]
+    assert timeline.generate(["2022-04-24", "2023-05-24"]) == [395]
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 

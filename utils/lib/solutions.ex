@@ -877,4 +877,30 @@ defmodule Utils.Solutions do
   end
 
   def itinerary, do: Itinerary
+
+  defmodule Timeline do
+    def generate(dates) do
+      dates |> dates_to_datetimes() |> datetimes_to_days()
+    end
+
+    defp datetimes_to_days(datetimes) do
+      {_, day_list} =
+        Enum.reduce(tl(datetimes), {hd(datetimes), []}, fn current, {prev, acc} ->
+          diff_in_days = DateTime.diff(current, prev) / 60 / 60 / 24
+          {current, [diff_in_days | acc]}
+        end)
+
+      Enum.reverse(day_list)
+    end
+
+    defp dates_to_datetimes(dates) do
+      Enum.map(dates, fn each ->
+        [year, month, day] = each |> String.split("-") |> Enum.map(&String.to_integer/1)
+
+        DateTime.new!(Date.new!(year, month, day), Time.utc_now())
+      end)
+    end
+  end
+
+  def timeline, do: Timeline
 end
