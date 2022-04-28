@@ -952,4 +952,33 @@ defmodule Utils.Solutions do
   end
 
   def say_guards, do: Say
+
+  def case_match do
+    case [1, 2, 3] do
+      [_, _, 3] -> "A"
+      _ -> "default"
+    end
+  end
+
+  defmodule Hello do
+    def everyone([_, _, _ | _tail]) do
+      "Hello, everyone!"
+    end
+  end
+
+  def hello_match, do: Hello
+
+  defmodule Points do
+    def tally(scores) do
+      with [one, two] <- scores,
+           true <- is_integer(one) and is_integer(two),
+           true <- one >= 10 and two >= 10 do
+        one + two
+      else
+        _ -> {:error, :invalid}
+      end
+    end
+  end
+
+  def with_points, do: Points
 end

@@ -24,12 +24,15 @@ you can evaluate the Elixir cells as you read.
 
 ## Pattern Matching
 
-In many other programming languages, the match operator `=` is called an assignment operator.
+We've already used pattern matching for matching values in a data structure.
 
-That makes sense, because so far you've only seen the `=` used to bind values to variables.
-However Elixir actually uses **pattern matching** and binding instead of assignment.
+```elixir
+[_, two, _] = [1, 2, 3]
 
+two
+```
 
+We can use pattern matching in a wide variety of other cases.
 
 ## Pattern Matching with Case
 
@@ -54,23 +57,22 @@ end
 
 ### Your turn
 
-Trigger the `"A"`, `"B"`, `"C"`, and `"D"` cases by changing `my_variable`.
+Trigger the `"A"` case. Replace `nil` with your answer.
 
 ```elixir
-my_variable = []
+case_match =
+  case nil do
+    [_, _, 3] -> "A"
+    _ -> "default"
+  end
 
-case my_variable do
-  [] -> nil
-  [1, 2, 3] -> "A"
-  %{one: _} -> "B"
-  {1, _, _, %{hello: _}} -> "C"
-  _ -> "D"
-end
+Utils.feedback(:case_match, case_match)
 ```
 
 ## Pattern Matching Multi-Clause Functions
 
-You've already learned about using multi-clause functions with different arity's or different guards.
+You've already learned about using multi-clause functions with different arities or different guards to create polymorphic behavior.
+
 You can also create multi-clause functions with pattern matching.
 
 ```elixir
@@ -101,83 +103,180 @@ Greeter.greet(["Peter", "Bruce"])
 Greeter.greet(%{name: "Batman", identity: "Bruce Wayne"})
 ```
 
-## Pattern Matching Lists
-
-Sometimes a collection is large, and it's unreasonable to pattern match on every element.
-
-Maps don't have this problem so much, because you don't need to include every key in the match
-
-```elixir
-%{key1: value} = %{key1: "value1", key2: "value2"}
-value
-```
-
-This poses an issue for lists though who seem to require a match for every element.
-
-```elixir
-[one] = [1, 2]
-```
-
-To get around this, you can use the `[head | tail]` syntax for prepending elements to a list.
-
-The **head** is the first element of the list.
-
-```elixir
-[head | _tail] = [1, 2, 3, 4, 5, 6, 7]
-head
-```
-
-The **tail** is rest of the elements in the list.
-
-```elixir
-[_head | tail] = [1, 2, 3, 4, 5, 6, 7]
-tail
-```
-
-You can access multiple elements at the start of the list separated by commas `,`.
-
-```elixir
-[one, two | _tail] = [1, 2, 3, 4, 5, 6, 7]
-{one, two}
-```
-
-Why head and tail? That's because under the hood lists in Elixir are a [linked list](reading/linked_list_vs_tuples).
-Essentially each element in the list knows the location of the next element in memory.
-
-The **head** is the current element in the list, and the **tail** is the link to the remaining elements.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-  subgraph Head
-  L
-  end
-  subgraph Tail
-  I
-  S
-  T
-  end
-  L -- tail --> I --> S --> T
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
 ### Your Turn
 
-Pattern match on only the first element in this list using `[head | tail]` syntax.
-Replace `nil` with your answer.
+Use pattern matching to create a `Hello.everyone/1` function which only accepts a list with three or more elements.
+Remember that you can use the `[head | tail]` syntax with a list.
+
+Replace `nil` with your pattern match statement.
+
+<details>
+<summary>Hint</summary>
+[one, two, three | tail] = list
+</details>
 
 ```elixir
-[1, 2, 3]
+defmodule Hello do
+  def everyone(nil) do
+    "Hello, everyone!"
+  end
+end
+
+Utils.feedback(:hello_match, Hello)
 ```
+
+## Pattern Matching In Anonymous Functions
+
+We can use pattern matching in anonymous functions.
+
+```elixir
+hello = fn
+  "Peter" -> "Hey Spidey!"
+  name -> "Hello, #{name}."
+end
+
+hello.("Bruce")
+```
+
+```elixir
+hello.("Peter")
+```
+
+Pattern matching becomes seriously powerful when leveraged with the `Enum` module.
+
+```elixir
+list = [1, 2, 3]
+
+Enum.map(list, fn
+  1 -> "one"
+  int -> int * 2
+end)
+```
+
+Now we can enumerate and handle different patterns of data separately.
+
+```elixir
+list = [{:add, 4}, {:subtract, 2}, {:multiply, 2}, 10, %{add: 2}]
+
+Enum.reduce(list, 0, fn
+  {:add, int}, acc -> acc + int
+  {:subtract, int}, acc -> acc - int
+  {:multiply, int}, acc -> acc * int
+  %{add: int}, acc -> acc + int
+  int, acc -> acc + int
+end)
+```
+
+## Pattern Matching vs. If
+
+Often we have many tools to accomplish the same action.
+For example, let's say we're building an application where users send each other messages.
+However, only admin users are allowed to send messages.
+
+Using `if`, we could write the following.
+
+```elixir
+defmodule Message do
+  def send(user, message) do
+    if user.is_admin do
+      message
+    else
+      {:error, :not_authorized}
+    end
+  end
+end
+```
+
+Let's say we also need to handle empty messages.
+
+```elixir
+defmodule Message do
+  def send(user, message) do
+    if user.is_admin do
+      if message == "" do
+        {:error, :empty_message}
+      else
+        message
+      end
+    else
+      {:error, :not_authorized}
+    end
+  end
+end
+
+Message.send(%{is_admin: true}, "")
+```
+
+Nested `if` statements are generally a cue that we should consider an alternative implementation.
+
+Let's see how we could solve this problem with pattern matching.
+
+```elixir
+defmodule Message do
+  def send(%{is_admin: true}, "") do
+    {:error, :empty_message}
+  end
+
+  def send(%{is_admin: true}, message) do
+    message
+  end
+
+  def send(%{is_admin: false}, _) do
+    {:error, :not_authorized}
+  end
+end
+
+Message.send(%{is_admin: true}, "")
+```
+
+Pattern matching can help reduce the complexity of our control flow.
+
+This implementation uses function clauses, but let's dive deep into the 
+options we have for how to write this same code.
+
+We could also use a `case` statement with pattern matching.
+
+```elixir
+defmodule Message do
+  def send(user, message) do
+    case {user, message} do
+      {%{is_admin: true}, ""} -> {:error, :empty_message}
+      {%{is_admin: true}, message} -> message
+      {%{is_admin: false}, _} -> {:error, :not_authorized}
+    end
+  end
+end
+```
+
+We could even implement a solution with guards.
+
+```elixir
+defmodule Guards do
+  def send(user, message) when user.is_admin and message == "" do
+    {:error, :empty_message}
+  end
+
+  def send(user, message) when user.is_admin do
+    message
+  end
+
+  def send(user) do
+    {:error, :not_authorized}
+  end
+end
+```
+
+By showing you alternative solutions, we hope to bring your attention to the options you have so that you can make informed decisions about improving code clarity.
+
+We do not hope to tell you that one solution is always better than another.
+Context matters!
 
 ## With
 
-`with` is often used together with pattern matching to create "happy path" code.
+`with` is often used with pattern matching to create "happy path" code.
 It's useful whenever you have a series of cases or values that rely on each other.
 
-You can use with to create check some pre-conditions before executing instructions.
+You can use `with` to check some preconditions before executing instructions.
 
 ```mermaid
 flowchart LR
@@ -192,7 +291,7 @@ flowchart LR
 ```
 
 If any of the preconditions fail, the with statement will stop and return the value
-of the failed pre-condition.
+of the failed precondition.
 
 ```mermaid
 flowchart LR
@@ -229,7 +328,7 @@ flowchart LR
 
 <!-- livebook:{"break_markdown":true} -->
 
-Here's a minimal example `with` with a single pre-condition.
+Here's a minimal example with a single precondition. `is_admin` must be true to delete a user. We're using pseudo-code and simply returning the `"delete user"` string.
 
 ```elixir
 is_admin = true
@@ -240,7 +339,7 @@ end
 ```
 
 The `with` statement checks is_admin. if `true`, it returns `"delete_user"`.
-if any other value, it returns the value of is_admin.
+If any other value, it returns the value of is_admin.
 
 ```mermaid
 flowchart LR
@@ -251,7 +350,7 @@ flowchart LR
 <!-- livebook:{"break_markdown":true} -->
 
 `with` uses pattern matching to check if the left side of the `<-` matches the right side.
-The example above is probably better served using a simple `if` statement, so let's make the example
+The example above is probably better served using a simple `if` statement, so let's make it
 more realistic and store `is_admin` in a boolean on a user map.
 
 ```elixir
@@ -278,20 +377,22 @@ Great! That's working. But this is still probably better handled by an `if` or `
 ```elixir
 user = %{is_admin: true}
 
-if user === %{is_admin: true} do
+if user.is_admin do
   "delete user"
 end
 ```
 
-With is specifically really good for checking a series of pre-conditions.
-Let's change our example to sending an email. To send an email we need to ensure:
+`with` is ideal for checking a series of preconditions.
 
-* the sending user is an admin
-* the receiving user has an email
-* the email has a title and a body
+Let's change our example to sending an email. To send an email, we need to ensure:
 
-We also need the `name` of the sender and receiver, and their emails.
-If we were to use `case`, here's what that might look like. It's an unclear mess!
+* The sending user is an admin.
+* The receiving user has an email.
+* The email has a title and a body.
+
+We also need the `name` of the sender and receiver and their emails.
+Here's how we can handle this with `case`. Arguably the
+nested `case` statements reduce the clarity of the code.
 
 ```elixir
 sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
@@ -310,8 +411,9 @@ case sending_user do
 end
 ```
 
-Here's the same code rewritten using `with`. There's still some natural complexity, but it's
-a fair bit more clear.
+`with` replaces the need for nested case statements.
+
+Here's the same code using `with`. There's still some natural complexity, but `with` improved the code clarity.
 
 ```elixir
 sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
@@ -325,8 +427,8 @@ with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
 end
 ```
 
-Right now, if a value doesn't match the precondition, it returns the value. for example,
-if the sender is `nil` we return `nil`
+Right now, if a value doesn't match the precondition, it returns the value. For example,
+if the sender is `nil`, we return `nil`.
 
 ```elixir
 sending_user = nil
@@ -340,9 +442,7 @@ with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
 end
 ```
 
-Sometimes it's useful to simply return the value, other times it's useful to handle the error.
-When we want to handle the error you can use `else`. The else block works like a `case`
-statement here were we match on the return value of the pre-condition.
+Sometimes we want to return the value. Other times we want to handle the error in an `else` block.
 
 ```elixir
 sending_user = "batman"
@@ -358,12 +458,12 @@ else
 end
 ```
 
-Much like a `case` statement, you can match on multiple cases to handle different errors.
+You can match multiple cases to handle different errors.
 
 ```elixir
 sending_user = %{name: "Joker", email: "joker@jokesonyou.haha"}
 receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
+email = %{title: "HAHA!", body: "HAHAHAHAHA"}
 
 with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
      %{name: receiver_name, email: receiver_email} <- receiving_user,
@@ -375,17 +475,51 @@ else
 end
 ```
 
-### Your turn
-
-In the Elixir cell below
-
-* create a variable scores that is a list `[5, 10, 20]`
-* create a with statement that checks that `scores` has 3 elements and through pattern matching
-  binds each to a variable.
-* in the body of the with statement, add each number together.
+`with` statements can use values from previous conditions in future conditions.
 
 ```elixir
+triangle = [3, 3, 3]
 
+with [side1, side2, side3] <- triangle, true <- side1 == side2 && side2 == side3 do
+  "all sides are equal!"
+end
+```
+
+### Your turn
+
+Use `with` to check that `scores`:
+
+* Has two elements
+* Each element is an integer.
+* Each element is ten or above.
+
+If so, sum the two scores together. If not, return `{:error, :invalid}`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Points.tally([10, 20])
+30
+
+Points.tally(10)
+{:error, :invalid}
+
+
+Points.tally([1, 10])
+{:error, :invalid}
+
+
+Points.tally([10, 20, 30])
+{:error, :invalid}
+```
+
+```elixir
+defmodule Points do
+  def tally(scores) do
+  end
+end
+
+Utils.feedback(:with_points, Points)
 ```
 
 ## Pin Operator
@@ -395,7 +529,7 @@ rather than rebinding a variable.
 
 Often we use the pin operator when testing our code to assert that the value is correct.
 
-For example, the following will rebind the **received** variable to `[1, 2, 3]`
+For example, the following will rebind the **received** variable to `[1, 2, 3]`.
 
 ```elixir
 received = [1, 2]
@@ -414,7 +548,7 @@ expected = [1, 2, 3]
 ^received = expected
 ```
 
-By using the pin operator above, we accomplish the same as if we had wrote:
+By using the pin operator above, we accomplish the same as if we had written:
 
 ```elixir
 [1, 2] = [1, 2, 3]
@@ -429,13 +563,23 @@ actual = [2, 2, 3]
 [^first, 2, 3] = actual
 ```
 
+Andthe following is the same as `[1, 2, 3] = [1, 2, 3]`
+
+```elixir
+first = 1
+actual = [1, 2, 3]
+[^first, 2, 3] = actual
+```
+
 ### Your Turn
 
 <!-- livebook:{"break_markdown":true} -->
 
-In the Elixir cell below, use the pin operator to avoid rebinding a variable and instead check
-that one value matches a pattern.
+Use the pin operator to make the following code crash with a `MatchError`.
 
 ```elixir
+expected = {"hello"}
+actual = {"hello", "hi"}
 
+expected = actual
 ```

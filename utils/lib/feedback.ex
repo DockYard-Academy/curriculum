@@ -1292,6 +1292,51 @@ defmodule Utils.Feedback do
     end
   end
 
+  feedback :case_match do
+    case_match = get_answers()
+
+    assert case_match != "default", "Ensure you replace `nil` with a value that matches [_, 2, 3]"
+    assert case_match == "A"
+  end
+
+  feedback :hello_match do
+    hello = get_answers()
+
+    assert_raise FunctionClauseError, fn ->
+      hello.everyone(nil) && flunk("Replace `nil` with your answer.")
+    end
+
+    assert hello.everyone(["name", "name", "name"]) == "Hello, everyone!"
+
+    assert hello.everyone(["name", "name", "name", "name"]) == "Hello, everyone!",
+           "list with 4 elements should match."
+
+    assert_raise FunctionClauseError, fn ->
+      hello.everyone([]) && flunk("Empty list should not match.")
+    end
+
+    assert_raise FunctionClauseError, fn ->
+      hello.everyone(["name"]) && flunk("list with one element should not match.")
+    end
+
+    assert_raise FunctionClauseError, fn ->
+      hello.everyone(["name", "name"]) && flunk("list with two elements should not match.")
+    end
+  end
+
+  feedback :with_points do
+    points = get_answers()
+
+    assert points.tally([10, 20]) == 30
+    assert points.tally([20, 20]) == 40
+    assert points.tally(10) == {:error, :invalid}
+    assert points.tally([]) == {:error, :invalid}
+    assert points.tally([10]) == {:error, :invalid}
+    assert points.tally([10, 20, 30]) == {:error, :invalid}
+    assert points.tally([10, ""]) == {:error, :invalid}
+    assert points.tally([1, 10]) == {:error, :invalid}
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
