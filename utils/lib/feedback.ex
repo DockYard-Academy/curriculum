@@ -1337,6 +1337,11 @@ defmodule Utils.Feedback do
     assert points.tally([1, 10]) == {:error, :invalid}
   end
 
+  feedback :jewel do
+    jewel = get_answers()
+    assert jewel == "jewel"
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
