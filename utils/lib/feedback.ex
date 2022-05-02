@@ -1375,6 +1375,42 @@ defmodule Utils.Feedback do
     end
   end
 
+  feedback :metric_measurements do
+    measurement = get_answers()
+
+    conversion = [
+      millimeter: 0.1,
+      meter: 100,
+      kilometer: 100_000,
+      inch: 2.54,
+      feet: 30,
+      yard: 91,
+      mile: 160_000
+    ]
+
+    assert measurement.convert({:milimeter, 1}, :centimeter),
+           "Ensure you implement the `convert/2` function."
+
+    assert measurement.convert({:milimeter, 1}, :centimeter) == {:centimeter, 0.1}
+
+    # from centimeter
+    Enum.each(conversion, fn {measure, amount} ->
+      assert measurement.convert({:centimeter, 1}, measure) == {measure, 1 / amount}
+    end)
+
+    # to centimeter
+    Enum.each(conversion, fn {measure, amount} ->
+      assert measurement.convert({measure, 1}, :centimeter) == {:centimeter, amount}
+    end)
+
+    # from anything to anything
+    Enum.each(conversion, fn {measure1, amount1} ->
+      Enum.each(conversion, fn {measure2, amount2} ->
+        assert measurement.convert({measure1, 1}, measure2) == {measure2, amount1 / amount2}
+      end)
+    end)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
