@@ -1337,13 +1337,51 @@ defmodule Utils.Feedback do
     assert points.tally([1, 10]) == {:error, :invalid}
   end
 
-  feedback :jewel do
-    jewel = get_answers()
-    assert jewel == "jewel"
+  feedback :money do
+    money = get_answers()
+
+    assert Keyword.get(money.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`"
+
+    assert match?(%{amount: nil, currency: nil}, struct(money)),
+           "Ensure you use `defstruct` with :amount and :currency without enforcing keys."
+
+    assert money.new(500, :CAD), "Ensure you implement the `new/1` function"
+    assert is_struct(money.new(500, :CAD)), "Money.new/2 should return a `Money` struct"
+
+    assert %{amount: 500, currency: :CAD} = money.new(500, :CAD),
+           "Money.new(500, :CAD) should create a %Money{amount: 500, currency: :CAD} struct"
+
+    assert %{amount: 500, currency: :EUR} = money.new(500, :EUR),
+           "Money.new(500, :EUR) should create a %Money{amount: 500, currency: :EUR} struct"
+
+    assert %{amount: 500, currency: :US} = money.new(500, :US),
+           "Money.new(500, :US) should create a %Money{amount: 500, currency: :US} struct"
+
+    assert money.convert(money.new(500, :CAD), :EUR) == money.new(round(500 * 1.39), :EUR)
+
+    assert %{amount: 10000, currency: :CAD} =
+             money.add(money.new(500, :CAD), money.new(500, :CAD))
+
+    assert money.subtract(money.new(10000, :US), 100) == money.new(9900, :US)
+
+    assert = money.multiply(money.new(100, :CAD), 10) == money.new(1000, :CAD)
+
+    assert_raise FunctionClauseError, fn ->
+      money.add(money.new(500, :CAD), money.new(100, :US)) &&
+        flunk(
+          "Money.add/2 should only accept the same currency type or throw a FunctionClauseError."
+        )
+    end
   end
 
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
+
+  feedback :jewel do
+    jewel = get_answers()
+    assert jewel == "jewel"
+  end
 
   feedback :hello do
     hello = get_answers()

@@ -1,0 +1,97 @@
+# Currency Conversion
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Currency Conversion
+
+You are building an app which accepts payments. Originally, your app was built assuming it would only
+accept a single currency, however it expands to accept multiple currencies.
+
+You are tasked with the assignment of converting one currency to another according to the
+following conversion rates.
+
+* Canadian Dollar (`:CAD`): $1.00
+* US Dollar (`:US`): $1.29
+* European Euro (`:EUR`): $1.39
+
+While not a perfect solution, you may round currency conversions using `round/1`.
+
+For example, `500` `:EUR` would become `360` `:CAD`.
+
+```elixir
+round(500 / 1.39)
+```
+
+Remember that currency should not be stored in a float, 
+instead money will be stored in a `Money` struct.
+
+> "If I had a dime for every time I've seen someone use FLOAT to store currency, I'd have $999.997634" -- Bill Karwin
+
+Create a `Money` module which will also be a struct with `:amount` and `:currency` to handle money conversion.
+It should be able to handle creating a money struct, adding money, subtracting money, and multiplying money.
+
+Adding `Money` structs should only be allowed for the same currency.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+five_eur = Money.new(500, :EUR)
+%Money{amount: 500, currency: :EUR}
+
+Money.convert(five_eur, :CAD)
+%Money{amount: 360, currency: :EUR}
+
+ten_eur = Money.add(five_eur, five_eur)
+%Money{amount: 10_00, currency: :EUR}
+
+hundred_eur = Money.multiply(ten_eur, 10)
+%Money{amount: 100_00, currency: :EUR}
+
+ninety_nine_eur = Money.subtract(hundred_eur, 100)
+%Money{amount: 99_00, currency: :EUR}
+
+Money.add(%Money{amount: 500, :EUR}, %Money{amount: 500, :CAD})
+** (FunctionClauseError) no function clause matching in Money.add/2 
+```
+
+```elixir
+defmodule Money do
+  defstruct []
+
+  def new(amount, currency) do
+  end
+
+  def convert(money, currency) do
+  end
+
+  def add(money1, money2) do
+  end
+
+  def multiply(money1, money2) do
+  end
+
+  def subtract(money1, money2) do
+  end
+end
+
+Utils.feedback(:money, Money)
+```
+
+This exercise is inspired by the Elixir [Money](https://github.com/elixirmoney/money) library.
