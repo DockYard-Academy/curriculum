@@ -1429,6 +1429,17 @@ defmodule Utils.Feedback do
     end)
   end
 
+  feedback :cypher do
+    cypher = get_answers()
+
+    assert cypher.shift("a"), "Ensure you implement the `shift/1` function."
+    assert cypher.shift("a") == "b"
+    assert cypher.shift("b") == "c"
+    assert cypher.shift("abc") == "bcd"
+    assert cypher.shift("z") == "a", "Ensure you handle the z special case. It should wrap around to a."
+    assert cypher.shift("abcdefghijklmnopqrstuvwxyz") == "bcdefghijklmnopqrstuvwxyza"
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
@@ -1452,6 +1463,12 @@ defmodule Utils.Feedback do
     hexadecimal = get_answers()
     assert hexadecimal == "\u0061"
   end
+
+  feedback :codepoint_z do
+    z = get_answers()
+    assert z == ?z
+  end
+
   feedback :jewel do
     jewel = get_answers()
     assert jewel == "jewel"
