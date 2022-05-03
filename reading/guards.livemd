@@ -82,7 +82,7 @@ You can reference the [Guard Documentation](https://hexdocs.pm/elixir/master/pat
 * [Boolean Operators](./boolean_operators.livemd) (`and`, `or`, `not`).
 * [Arithmetic Operators](./arithmetic_operators.livemd) (`+`, `-`, `*`, `/`)
 * Membership Operator `in`.
-* "type-check" functions (`is_list/1`, `is_number/1`, `is_map/1`, `is_bitstring/1`, `is_integer/1` etc)
+* "type-check" functions (`is_list/1`, `is_number/1`, `is_map/1`, `is_binary/1`, `is_integer/1` etc)
 * functions that work on built-in datatypes (`hd/1`, `tail/1`, `length/1` and others)
 
 ## defguard
@@ -129,7 +129,8 @@ flowchart LR
   hello --> b[double] --> hellohello
 ```
 
-We can use the built-in `is_bitstring` guard to check if the variable is a string.
+We can use the built-in `is_binary` guard to check if the variable is a string. 
+That's because internally strings in Elixir are represented as binaries.
 
 ```elixir
 defmodule Multiplier do
@@ -137,7 +138,7 @@ defmodule Multiplier do
     num * 2
   end
 
-  def double(string) when is_bitstring(string) do
+  def double(string) when is_binary(string) do
     string <> string
   end
 end
@@ -152,7 +153,7 @@ Function order matters. The first function who's function head matches the input
 
 For example. if you remove
 the `is_number/1` guard. Now the first function expects any type of input, so it will always
-execute instead of the `is_bitstring/1` version.
+execute instead of the `is_binary/1` version.
 
 ```elixir
 defmodule Multiplier do
@@ -160,7 +161,7 @@ defmodule Multiplier do
     num * 2
   end
 
-  def double(string) when is_bitstring(string) do
+  def double(string) when is_binary(string) do
     string <> string
   end
 end
@@ -175,11 +176,11 @@ so the second will never execute.
 > **this clause for double/1 cannot match because a previous clause at line 2 always matches**.
 
 If you move the more generic function lower, then strings will match the
-`is_bitstring/1` version first.
+`is_binary/1` version first.
 
 ```elixir
 defmodule Multiplier do
-  def double(string) when is_bitstring(string) do
+  def double(string) when is_binary(string) do
     string <> string
   end
 

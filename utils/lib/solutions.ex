@@ -783,7 +783,7 @@ defmodule Utils.Solutions do
   def is_type do
     [
       is_map(%{}),
-      is_bitstring(""),
+      is_binary(""),
       is_integer(1),
       is_float(1.0),
       is_boolean(true),
@@ -946,7 +946,7 @@ defmodule Utils.Solutions do
   def percent, do: Percent
 
   defmodule Say do
-    def hello(name) when is_bitstring(name) do
+    def hello(name) when is_binary(name) do
       "Hello, #{name}."
     end
   end

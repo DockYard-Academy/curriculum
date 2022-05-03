@@ -101,14 +101,14 @@ defmodule Utils.Feedback do
 
   feedback :string_concatenation do
     answer = get_answers()
-    assert is_bitstring(answer), "the answer should be a string."
+    assert is_binary(answer), "the answer should be a string."
     assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
     assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
   end
 
   feedback :string_interpolation do
     answer = get_answers()
-    assert is_bitstring(answer), "the answer should be a string."
+    assert is_binary(answer), "the answer should be a string."
 
     assert Regex.match?(~r/I have/, answer),
            "the answer should be in the format: I have 10 classmates"
@@ -165,7 +165,9 @@ defmodule Utils.Feedback do
   feedback :rock_paper_scissors_pattern_matching do
     rock_paper_scissors = get_answers()
 
-    assert rock_paper_scissors.play(:rock, :rock) == "draw", "Ensure you implement the RockPaperScissors.play/2 function."
+    assert rock_paper_scissors.play(:rock, :rock) == "draw",
+           "Ensure you implement the RockPaperScissors.play/2 function."
+
     assert rock_paper_scissors.play(:paper, :paper) == "draw"
     assert rock_paper_scissors.play(:scissors, :scissors) == "draw"
 
@@ -193,7 +195,7 @@ defmodule Utils.Feedback do
       secret_sauce
     ] = answers = get_answers()
 
-    assert Enum.all?(answers, fn each -> is_bitstring(each) and String.length(each) > 0 end),
+    assert Enum.all?(answers, fn each -> is_binary(each) and String.length(each) > 0 end),
            "each variable should be bound to a non-empty string"
 
     assert madlib ==
@@ -214,7 +216,7 @@ defmodule Utils.Feedback do
       madlib
     ] = answers = get_answers()
 
-    assert Enum.all?(answers, fn each -> is_bitstring(each) and String.length(each) > 0 end),
+    assert Enum.all?(answers, fn each -> is_binary(each) and String.length(each) > 0 end),
            "each variable should be bound to a non-empty string"
 
     assert madlib ==
@@ -254,7 +256,7 @@ defmodule Utils.Feedback do
   feedback :guess_the_word do
     [guess, answer, correct] = answers = get_answers()
 
-    assert Enum.all?(answers, &is_bitstring/1),
+    assert Enum.all?(answers, &is_binary/1),
            "Ensure `guess`, `answer`, and `correct` are all strings"
 
     if guess == answer do
@@ -269,7 +271,7 @@ defmodule Utils.Feedback do
 
     assert is_integer(guess), "Ensure `guess` is an integer"
     assert is_integer(answer), "Ensure `answer` is an integer"
-    assert is_bitstring(correct), "Ensure `correct` is a string"
+    assert is_binary(correct), "Ensure `correct` is a string"
 
     cond do
       guess == answer -> assert correct == "Correct!"
@@ -885,7 +887,7 @@ defmodule Utils.Feedback do
 
     assert is_map(map), "Ensure you use %{} to create a map."
     assert map_size(map) > 0, "Ensure your map is not empty."
-    assert Enum.all?(Map.keys(map), &is_bitstring/1), "Ensure your map contains only string keys."
+    assert Enum.all?(Map.keys(map), &is_binary/1), "Ensure your map contains only string keys."
   end
 
   feedback :atom_key_map do
@@ -902,7 +904,7 @@ defmodule Utils.Feedback do
     assert is_map(map), "Ensure you use %{} to create a map."
     assert map_size(map) > 0, "Ensure your map is not empty."
 
-    assert Enum.all?(Map.keys(map), fn key -> !is_atom(key) and !is_bitstring(key) end),
+    assert Enum.all?(Map.keys(map), fn key -> !is_atom(key) and !is_binary(key) end),
            "Ensure your map contains only non-atom and non-string keys."
   end
 
@@ -1025,7 +1027,7 @@ defmodule Utils.Feedback do
     ] = get_answers()
 
     assert is_a_map, "Use the Kernel.is_map/1 function on `map`"
-    assert is_a_bitstring, "Use the Kernel.is_bitstring/1 function on `bitstring`"
+    assert is_a_bitstring, "Use the Kernel.is_binary/1 function on `bitstring`"
     assert is_a_integer, "Use the Kernel.is_integer/1 function on `integer`"
     assert is_a_float, "Use the Kernel.is_float/1 function on `float`"
     assert is_a_boolean, "Use the Kernel.is_boolean/1 function on `boolean`"
@@ -1430,6 +1432,26 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
+  feedback :binary_150 do
+    binary = get_answers()
+    assert binary == 10_010_110
+  end
+
+  feedback :graphemes do
+    graphemes = get_answers()
+    assert graphemes == String.graphemes("hello")
+  end
+
+
+  feedback :hexadecimal_4096 do
+    hexadecimal = get_answers()
+    assert hexadecimal == 0x1000
+  end
+
+  feedback :hexadecimal_a do
+    hexadecimal = get_answers()
+    assert hexadecimal == "\u0061"
+  end
   feedback :jewel do
     jewel = get_answers()
     assert jewel == "jewel"

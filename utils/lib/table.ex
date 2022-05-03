@@ -121,4 +121,27 @@ defmodule Utils.Table do
       [unit: :mile, value: 1, centimeter: 160_000]
     ]
   end
+
+  def code_points do
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    |> String.codepoints()
+    |> Enum.map(fn char ->
+      <<code_point::utf8>> = char
+      %{character: char, code_point: code_point}
+    end)
+  end
+
+  def base_2_10_comparison do
+      Enum.map(1..500, fn integer ->
+        binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
+        %{base10: integer, base2: binary}
+      end)
+  end
+
+  def hexadecimal do
+    "1,2,3,4,5,6,7,8,9,10,a,b,c,d,e,f"
+    |> String.split(",")
+    |> Enum.with_index()
+    |> Enum.map(fn {symbol, index} -> %{integer: "#{index}", hexadecimal: symbol} end)
+  end
 end

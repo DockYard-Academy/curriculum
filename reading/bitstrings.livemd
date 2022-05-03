@@ -1,0 +1,352 @@
+# Bitstrings
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Strings and Binaries
+
+Strings are a common data type in most programming languages.
+
+To check if a value is a string, we use the `is_binary/1` function. That's because
+strings in Elixir are represented internally as binaries.
+
+```elixir
+is_binary("hello")
+```
+
+A binary is a sequence of bytes. bytes are a grouping of eight bits.
+
+A bit is a single value represented as `0` or `1`. `0` and `1` correspond to on and off for an electrical signal.
+
+Here we see a visual of a byte in memory.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/byte.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Bytes can represent integers with a base2 counting system where each bit represents
+the next placeholder.
+
+![](images/byte_base2.png)
+
+This means the maximum integer a single byte can represent is `255`.
+
+```elixir
+128 + 64 + 32 + 16 + 8 + 4 + 2 + 1
+```
+
+By counting the placeholders in each byte we can determine the bytes value. These are binary numbers.
+
+Integers are represented using a base 10 counting system compared to the base 2 counting system
+for binary numbers. As the value in the rightmost placeholder grows, it shifts to
+the left when it reaches `10` in base 10 or `2` in base 2.
+
+![](images/base2_vs_base10.png)
+
+Here's a table of binary numbers and their corresponding integer values.
+
+```elixir
+Utils.table(:base_2_10_comparison)
+```
+
+Each byte stores a binary number. Integers between `1` and `255` can be represented in a single byte.
+
+### Your Turn
+
+In the elixir cell below, enter an integer for the binary representation of `150`. Replace `nil` with your answer.
+
+```elixir
+binary = nil
+
+Utils.feedback(:binary_150, binary)
+```
+
+## Unicode Code Points
+
+To represent strings, each character is given a unique numerical index called a code point.
+The [Unicode Standard](https://unicode.org/standard/standard.html) contains the complete registry of all possible characters and their numerical index.
+
+You can find the code point of a character using `?` in Elixir. For example the code point of `h` is `104`.
+
+```elixir
+?h
+```
+
+Here we can see a table of alphabetical characters and their code points. Notice that capital letters and 
+lowercase letters have different code points.
+
+```elixir
+Utils.table(:code_points)
+```
+
+To represent strings as binaries, each byte in the binary represents a code point.
+
+For example, the code point for the the character `h` is `104` or `01101000` in a byte.
+
+![](images/letter_h_binary.png)
+
+```elixir
+64 + 32 + 8
+```
+
+Using `byte_size/1` and `bit_size/1` We can see that (generally) each character in a string is a single byte or eight bits.
+
+```elixir
+byte_size("h")
+```
+
+```elixir
+bit_size("h")
+```
+
+So a string with five characters would have five bytes or forty bits.
+
+```elixir
+bit_size("hello")
+```
+
+```elixir
+byte_size("hello")
+```
+
+We can use `IO.inspect/2` with the `:as_binaries` option to display a value as it's binary
+representation.
+
+Notice these are the code points for each character.
+
+```elixir
+IO.inspect("hello", binaries: :as_binaries)
+
+?h = 104
+?e = 101
+?l = 108
+?l = 108
+?o = 111
+```
+
+### UTF-8
+
+As of Unicode version 14.0, there are 144,697 characters with code points. Since a single byte can
+only store an integer up to `255` some characters must use multiple bytes.
+
+Elixir uses UTF-8 to encode it's strings, meaning that each code point is encoded as a series of 8-bit bytes.
+
+UTF-8 uses between one and four bytes to store each code point. For example the `é` character
+uses two bytes.
+
+```elixir
+byte_size("é")
+```
+
+UTF-8 also uses graphemes. Graphemes may consist of multiple characters percieved as one.
+
+We can see the underlaying characters of a grapheme with `String.codepoints/1`.
+
+For example, the character can be represented as the "e with acute" code point or as the letter "e" followed by a "combining acute accent".
+
+You can see below that while both have the same appearance, they have different code points.
+
+```elixir
+String.codepoints("é")
+```
+
+```elixir
+String.codepoints("é")
+```
+
+When splitting a string into characters for the sake of enumeration, it's important to know if you want to enumerate through the
+graphemes or the code points.
+
+If you want to enumerate through each grapheme, rather than the underlaying code points, then
+you can use `String.graphemes/1`.
+
+```elixir
+String.graphemes("é")
+```
+
+### Your Turn
+
+Use `String.graphemes/1` to convert the string `"hello"` to a list of graphemes.
+Replace `nil` with your answer.
+
+```elixir
+graphemes = nil
+
+Utils.feedback(:graphemes, graphemes)
+```
+
+## Hexadecimal
+
+Since binary is cumbersome for representing large numbers, we use hexadecimal for a more
+human friendly representation of binary values.
+
+Hexadecimal is a base 16 counting system.
+
+If base 10 uses ten symbols (0-9) and base 2 uses two symbols (0, 1), then Hexadecimal uses
+sixteen symbols.
+
+Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the letters `a` to `f` as
+you can see in the following table.
+
+```elixir
+Utils.table(:hexadecimal)
+```
+
+As the rightmost placeholder grows, it shifts to the left when it reaches `16`.
+![](images/hex_counting.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+You may already be familiar with hexadecimal for color codes. For example, the color white is `ffffff`.
+This is actually the hexadecimal code for `16777215`. you can add the placeholder values to find the hexadecimal
+value like so:
+
+```elixir
+1_048_576 * 15 + 65536 * 15 + 4096 * 15 + 256 * 15 + 16 * 15 + 15
+```
+
+In Elixir, we can represent Hexadecimal integers using `0x` syntax. They are
+equivalent to their integer counterpart.
+
+```elixir
+15 = 0xF
+255 = 0xFF
+4090 = 0xFFA
+```
+
+We can also represent the code point for a string using hexadecimal with `\u` syntax.
+
+For example, `"\u0065"` is the character `"e"`
+
+```elixir
+"\u0065"
+```
+
+The codepoint for `e` is `101`
+
+```elixir
+?e
+```
+
+And the hexadecimal value `0x65` represents `101`. So, `\u0065` corresponds to the code point for `"e"`.
+
+```elixir
+0x65 = ?e
+```
+
+Which is why `"\u0065"` is the character `"e"`.
+
+```elixir
+"\u0065" = "e"
+```
+
+### Your Turn
+
+Use hexadecimal `0x` syntax to represent the number `4096`.
+
+```elixir
+hexadecimal = nil
+
+Utils.feedback(:hexadecimal_4096, hexadecimal)
+```
+
+Use hexadecimal `\u` syntax to represent the character `a`.
+
+```elixir
+hexadecimal = nil
+
+Utils.feedback(:hexadecimal_a, hexadecimal)
+```
+
+## Bitstrings
+
+The codepoints for characters are represented with a UTF-8 encoded series of bytes. These
+bytes are stored in a bitstring.
+
+A bitstring is a contiguous sequence of bits in memory. A binary is a bitstring where the number
+of bits is divisible by 8.
+
+The `<<>>` syntax defines a new bitstring.
+
+Strings in Elixir are actually bitstrings. For example, when we create a bitstring of
+codepoints matching `"hello"` we create the `"hello"` string.
+
+```elixir
+#  h    e    l    l    o
+<<104, 101, 108, 108, 111>>
+```
+
+It's fairly rare that you'll need to work directly with bitstrings for most applications. If you'd like to learn more, you can reference the [Elixir Documentation](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#%3C%3C%3E%3E/1).
+
+## Charlists
+
+You may have noticed that occasionally lists of integers in elixir will display unexpected 
+characters.
+
+```elixir
+[97, 98, 99]
+```
+
+That's because they are interpreted as a charlist. A charlist is a list of integers that
+are all valid code points. If any integer in a list is not a valid codepoint, the list will
+not be interpreted as a charlist.
+
+```elixir
+# a   b   c  _
+[97, 98, 99, 1]
+```
+
+You can define a charlist using single quotes `''`.
+
+```elixir
+'hello'
+```
+
+This charlist is equivalent to a list of the code points for a string.
+
+```elixir
+[?h, ?e, ?l, ?l, ?o]
+```
+
+Charlists are a list of integers, so they can be enumerated through and will return a new
+charlist. Here's how we could shift each character up one code point.
+
+```elixir
+Enum.map('abcde', fn each -> each + 1 end)
+```
+
+You can convert a charlist back into a string with `List.to_string/1`.
+
+```elixir
+List.to_string('hello')
+```
+
+Or convert a string into a charlist with `String.to_charlist/1`.
+
+```elixir
+String.to_charlist("hello")
+```
+
+Like bitstrings, you will likely not need to use charlists frequently, however they can be useful
+for certain string manipulation or when working with certain libraries.

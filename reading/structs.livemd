@@ -134,7 +134,7 @@ end
 So you can imagine it's useful to validate the data in a struct upon creation.
 It's a common pattern to create a `new` function in the struct that handles creation and validation.
 
-Here's how we could use the `is_bitstring/1` guard from earlier to ensure that name is only ever a string.
+Here's how we could use the `is_binary/1` guard from earlier to ensure that name is only ever a string.
 You'll notice we return a tuple with `:ok` and the struct. This is part of a common pattern to
 communicate with code that the `Person` was created successfully.
 
@@ -144,7 +144,7 @@ Now, our code will give us an error if we misuse the `Person` struct! Excellent.
 defmodule Person do
   defstruct [:name]
 
-  def new(name) when is_bitstring(name) do
+  def new(name) when is_binary(name) do
     {:ok, %Person{name: name}}
   end
 end

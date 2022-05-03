@@ -2279,3 +2279,48 @@ an instance of a `Character` struct i.e. `%Character{params}`.
 
 ### Enum Questions
 * Given a set of movement instructions, what is your final position? (0, 0) :up :right (1, 1)
+
+## FizzBuzz
+
+Not all programming languages include pattern matching, and it changes the way we can think about problems. For example, let's take the common programming challenge FizzBuzz.
+
+In FizzBuzz, we enumerate through a list of numbers and return `"fizz"` for numbers divisible
+by `3`, `"buzz"` for numbers divisible by `5`, and `"fizzbuzz"` for numbers divisible by `5` and `3`.
+
+Typically to solve FizzBuzz, we could use some control flow statement such as `cond`.
+
+```elixir
+defmodule Conditional do
+  def fizz_buzz(list) do
+    Enum.map(list, fn int ->
+      cond do
+        rem(int, 15) == 0 -> "fizzbuzz"
+        rem(int, 5) == 0 -> "buzz"
+        rem(int, 3) == 0 -> "fizz"
+        int -> int
+      end
+    end)
+  end
+end
+
+Conditional.fizz_buzz(1..15)
+```
+
+Or we can instead rely on pattern matching to solve fizz buzz with no conditional logic.
+
+```elixir
+defmodule PatternMatching do
+  def fizz_buzz(list) do
+    print = fn
+      _, 0, 0 -> "fizzbuzz"
+      _, 0, _ -> "fizz"
+      _, _, 0 -> "buzz"
+      int, _, _ -> int
+    end
+
+    Enum.map(list, fn int -> print.(rem(int, 15), rem(int, 3), rem(int, 5)) end)
+  end
+end
+
+PatternMatching.fizz_buzz(1..15)
+```
