@@ -1,0 +1,66 @@
+# Classified
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Classified
+
+You have been hired to hide confidential information in certain documents.
+
+confidential information should be replaced with `REDACTED`.
+
+Confidential information includes:
+
+* The words: `Peter Parker`, `Bruce Wayne`, `Clark Kent`.
+* Any phone number in the format: `999-999-9999`.
+* Any email in the format: `string@string.string`.
+* Any four digit codes: i.e. `4444` or `1234`.
+
+For example,
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Classified.redact("Spiderman is Peter Parker.")
+"Spiderman is REDACTED."
+
+Classified.redact("Batman is Bruce Wayne.")
+"Batman is REDACTED."
+
+Classified.redact("Superman is Clark Kent.")
+"Superman is REDACTED."
+
+Classified.redact("Call 555-555-5555 for the secret info.")
+"Call REDACTED for the secret info"
+
+Classified.redact("Email super@secret.shh for the private data.")
+"Email REDACTED for the private data."
+
+Classified.redact("The password is 4525")
+"The password is REDACTED"
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Classified do
+  def redact(string) do
+  end
+end
+
+Utils.feedback(:classified, Classified)
+```

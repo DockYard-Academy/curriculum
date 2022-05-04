@@ -1512,6 +1512,52 @@ defmodule Utils.Feedback do
 "
   end
 
+  feedback :classified do
+    classified = get_answers()
+
+    assert classified.redact(""), "Ensure you implement the `redact/1` function."
+    assert classified.redact("Peter Parker") == "REDACTED"
+    assert classified.redact("Bruce Wayne") == "REDACTED"
+    assert classified.redact("Clark Kent") == "REDACTED"
+    assert classified.redact("1234") == "REDACTED"
+    assert classified.redact("111-111-1111") == "REDACTED"
+    assert classified.redact("email@mail.com") == "REDACTED"
+    assert classified.redact("1234 123-123-1234") == "REDACTED REDACTED"
+
+    assert classified.redact("@mail.com") == "@mail.com"
+    assert classified.redact("12345") == "12345"
+    assert classified.redact(".com") == ".com"
+    assert classified.redact("12341234") == "12341234"
+    assert classified.redact("-1234-") == "-REDACTED-"
+
+    text = "
+    Peter Parker
+    Bruce Wayne
+    Clark Kent
+    1234
+    4567
+    9999
+    123-123-1234
+    456-456-4567
+    999-999-9999
+    email@mail.com
+    name@gmail.ca
+    "
+    assert classified.redact(text) == "
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    REDACTED
+    "
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
