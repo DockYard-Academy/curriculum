@@ -1,0 +1,70 @@
+# Email Validation
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Email Validation
+
+Most applications and websites with users have a sign up form with an email input.
+
+Generally, we validate this input to ensure that users enter a valid email.
+
+You are going to build an `Email.validate/1` function which checks if an email address is valid or not.
+
+```elixir
+Email.validate("mail@mail.com")
+true
+```
+
+Emails are generally in the format:
+
+`"recipientname@domainname.topleveldomain"`
+
+For the sake of simplicity, 
+we're going to allow any string for the recipient name, domain name, and top level domain.
+
+So, `"string@string.string"`
+
+Here's a few examples.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+true = Email.validate("peter.parker@spider.web")
+true = Email.validate("bruce@wayne.tech")
+true = Email.validate("123@456.789")
+
+# This would normally not be a valid email, but will pass our simple validation
+true = Email.validate("!#$@*&().&&&") 
+```
+
+Enter your solution below
+
+```elixir
+defmodule Email do
+  def validate(email) do
+  end
+end
+
+Utils.feedback(:email_validation, Email)
+```
+
+This simple validation works for many use cases, however there are more comprehensive rules for email
+validation.
+
+Generally applications send users a verification email to further ensure that the email address
+exists and belongs to them.

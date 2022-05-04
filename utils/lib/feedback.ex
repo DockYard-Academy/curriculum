@@ -1436,8 +1436,52 @@ defmodule Utils.Feedback do
     assert cypher.shift("a") == "b"
     assert cypher.shift("b") == "c"
     assert cypher.shift("abc") == "bcd"
-    assert cypher.shift("z") == "a", "Ensure you handle the z special case. It should wrap around to a."
+
+    assert cypher.shift("z") == "a",
+           "Ensure you handle the z special case. It should wrap around to a."
+
     assert cypher.shift("abcdefghijklmnopqrstuvwxyz") == "bcdefghijklmnopqrstuvwxyza"
+  end
+
+  feedback :email_validation do
+    email = get_answers()
+
+    assert email.validate("mail@mail.com"), "Ensure you implement the `validate/1` function."
+    assert email.validate("bruce@wayne.tech")
+    assert email.validate("name@domain.ca")
+    assert email.validate("***@#@$.!@#")
+    assert email.validate("123@123.123")
+
+    refute email.validate("")
+    refute email.validate("recipient")
+    refute email.validate("123")
+    refute email.validate("@.")
+    refute email.validate("@domain.")
+    refute email.validate("name@domain")
+    refute email.validate("name@domain.")
+    refute email.validate("domain.com")
+    refute email.validate("@domain.com")
+  end
+
+  feedback :obfuscate_phone do
+    obfuscate = get_answers()
+
+    assert is_function(obfuscate), "Ensure obfuscate is a function."
+    assert obfuscate.(""), "Ensure you implement the obfuscate function."
+    assert obfuscate.("111-111-1111") == "XXX-111-XXXX"
+    assert obfuscate.("123-111-1234") == "XXX-111-XXXX"
+    assert obfuscate.("123-123-1234") == "XXX-123-XXXX"
+    assert obfuscate.("123-123-1234 123-123-1234") == "XXX-123-XXXX XXX-123-XXXX"
+  end
+
+  feedback :convert_phone do
+    convert = get_answers()
+
+    assert convert.("#1231231234"), "Ensure you implement the `convert/1` function."
+    assert convert.("#1231231234") == "#123-123-1234"
+    assert convert.("#1231231234 #1231231234") == "#123-123-1234 #123-123-1234"
+    assert convert.("#1231231234 1231231234") == "#123-123-1234 1231231234"
+    assert convert.("#999-999-9999 #9999999999") == "#999-999-9999 #999-999-9999"
   end
 
   # test_names must be after tests that require a solution.
@@ -1452,7 +1496,6 @@ defmodule Utils.Feedback do
     graphemes = get_answers()
     assert graphemes == String.graphemes("hello")
   end
-
 
   feedback :hexadecimal_4096 do
     hexadecimal = get_answers()
