@@ -1484,6 +1484,34 @@ defmodule Utils.Feedback do
     assert convert.("#999-999-9999 #9999999999") == "#999-999-9999 #999-999-9999"
   end
 
+  feedback :phone_number_parsing do
+    phone_number = get_answers()
+
+    assert phone_number.parse("1231231234"), "Ensure you implement the `parse/1` function."
+    assert phone_number.parse("1231231234") == "123-123-1234"
+    assert phone_number.parse("123 123 1234") == "123-123-1234"
+    assert phone_number.parse("(123)-123-1234") == "123-123-1234"
+    assert phone_number.parse("(123) 123 1234") == "123-123-1234"
+
+    assert phone_number.parse("(123)123-1234") == "123-123-1234"
+
+    text = "
+1231231234
+123 123 1234
+(123)-123-1234
+(123) 123 1234
+(123)123-1234
+"
+
+    assert phone_number.parse(text) == "
+123-123-1234
+123-123-1234
+123-123-1234
+123-123-1234
+123-123-1234
+"
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
