@@ -1558,6 +1558,36 @@ defmodule Utils.Feedback do
     "
   end
 
+  feedback :caesar_cypher do
+    caesar_cypher = get_answers()
+
+    assert caesar_cypher.encode("", 1), "Ensure you implement the `encode/2` function."
+    assert caesar_cypher.encode("", 1) == ""
+    assert caesar_cypher.encode("a", 1) == "b"
+    assert caesar_cypher.encode("a", 14) == "o"
+    assert caesar_cypher.encode("a", 25) == "z"
+    assert caesar_cypher.encode("z", 1) == "a"
+    assert caesar_cypher.encode("z", 14) == "n"
+    assert caesar_cypher.encode("z", 25) == "y"
+    assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 1) == "bcdefghijklmnopqrstuvwxyza"
+    assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 14) == "opqrstuvwxyzabcdefghijklmn"
+    assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 25) == "zabcdefghijklmnopqrstuvwxy"
+    assert caesar_cypher.encode("Et tu, Brute?", 2) == "Gv vw, Dtwvg?"
+
+    assert caesar_cypher.decode("", 1), "Ensure you implement the `decode/2` function."
+    assert caesar_cypher.decode("", 1) == ""
+    assert caesar_cypher.decode("b", 1) == "a"
+    assert caesar_cypher.decode("o", 14) == "a"
+    assert caesar_cypher.decode("z", 14) == "a"
+    assert caesar_cypher.decode("a", 1) == "z"
+    assert caesar_cypher.decode("n", 14) == "z"
+    assert caesar_cypher.decode("y", 25) == "z"
+    assert caesar_cypher.encode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.encode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.encode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.encode("Gv vw, Dtwvg?", 2) == "Et tu, Brute?"
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
