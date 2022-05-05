@@ -1588,6 +1588,51 @@ defmodule Utils.Feedback do
     assert caesar_cypher.encode("Gv vw, Dtwvg?", 2) == "Et tu, Brute?"
   end
 
+  feedback :rollable_expressions do
+    rollable = get_answers()
+
+    assert rollable.replace(""), "Ensure you implement the `replace/1` function."
+    assert rollable.replace("") == ""
+    assert rollable.replace("1d4") == "[1d4](https://www.google.com/search?q=roll+1d4)"
+    assert rollable.replace("1d6") == "[1d6](https://www.google.com/search?q=roll+1d6)"
+    assert rollable.replace("1d8") == "[1d8](https://www.google.com/search?q=roll+1d8)"
+    assert rollable.replace("1d12") == "[1d12](https://www.google.com/search?q=roll+1d12)"
+    assert rollable.replace("1d20") == "[1d20](https://www.google.com/search?q=roll+1d20)"
+
+    assert rollable.replace("2d4") == "[2d4](https://www.google.com/search?q=roll+2d4)"
+    assert rollable.replace("10d4") == "[10d4](https://www.google.com/search?q=roll+10d4)"
+    assert rollable.replace("99d4") == "[99d4](https://www.google.com/search?q=roll+99d4)"
+    assert rollable.replace("10d20") == "[10d20](https://www.google.com/search?q=roll+10d20)"
+    assert rollable.replace("99d20") == "[99d20](https://www.google.com/search?q=roll+99d20)"
+
+    for sides <- ["4", "6", "8", "12", "20"], dice <- 1..99 do
+      assert rollable.replace("Fireball: deal #{sides}d#{dice} fire damage.") ==
+               "Fireball: deal [#{sides}d#{dice}](https://www.google.com/search?q=roll+#{sides}d#{dice}) fire damage."
+    end
+
+    rollable.replace("Click the following to test your solution: 1d4")
+    |> Kino.Markdown.new()
+    |> Kino.render()
+  end
+
+  feedback :custom_enum_map do
+    custom_enum = get_answers()
+
+    assert custom_enum.map(1..10, fn each -> each end),
+           "Ensure you implement the `map/2` function"
+
+    assert custom_enum.map(1..5, fn each -> each end) == [1, 2, 3, 4, 5]
+
+    assert custom_enum.map(1..10, fn each -> each * 2 end) ==
+             Enum.map(1..10, fn each -> each * 2 end)
+
+    assert custom_enum.map(1..10, fn each -> each + 2 end) ==
+             Enum.map(1..10, fn each -> each + 2 end)
+
+    assert custom_enum.map(1..10, fn each -> each - 2 end) ==
+             Enum.map(1..10, fn each -> each - 2 end)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
