@@ -4,6 +4,9 @@ defmodule UtilsTest do
   alias Utils.Solutions
   alias Utils.Factory
 
+  import ExUnit.CaptureLog
+  require Logger
+
   test "slide/1" do
     Utils.Slide.__info__(:functions)
     |> Enum.each(fn {slide_name, _arity} ->
