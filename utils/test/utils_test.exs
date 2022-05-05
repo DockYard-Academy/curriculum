@@ -4,9 +4,6 @@ defmodule UtilsTest do
   alias Utils.Solutions
   alias Utils.Factory
 
-  import ExUnit.CaptureLog
-  require Logger
-
   test "slide/1" do
     Utils.Slide.__info__(:functions)
     |> Enum.each(fn {slide_name, _arity} ->
@@ -49,11 +46,14 @@ defmodule UtilsTest do
 
   test "feedback/2" do
     Enum.each(Utils.Feedback.test_names(), fn each ->
-      assert Keyword.has_key?(Solutions.__info__(:functions), each),
-             "define a Solutions.#{Atom.to_string(each)} function."
+      exists = Keyword.has_key?(Solutions.__info__(:functions), each)
 
-      Utils.feedback(each, apply(Solutions, each, []))
+      if !exists do
+        raise "define a Solutions.#{Atom.to_string(each)} function."
+      end
     end)
+
+    execute_tests_until_failure(Utils.Feedback.test_names())
   end
 
   test "feedback/2 with invalid atom" do
@@ -61,5 +61,15 @@ defmodule UtilsTest do
 
     assert Utils.feedback(atom, "non-nil answer") ==
              "Something went wrong, feedback does not exist for #{atom}."
+  end
+
+  defp execute_tests_until_failure([]), do: nil
+
+  defp execute_tests_until_failure([test | tail]) do
+    test_failed = Utils.feedback(test, apply(Solutions, test, [])).failures > 0
+
+    unless test_failed do
+      execute_tests_until_failure(tail)
+    end
   end
 end

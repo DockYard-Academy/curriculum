@@ -994,4 +994,78 @@ defmodule Utils.Solutions do
   def custom_enum_map do
     CustomEnum
   end
+
+  defmodule LucasNumbers do
+    def l(1), do: 2
+    def l(2), do: 1
+    def l(n), do: l(n - 1) + l(n - 2)
+
+    def generate(n) do
+      Enum.map(1..n, fn each -> l(each) end)
+    end
+  end
+
+  def lucas_numbers do
+    LucasNumbers
+  end
+
+  defmodule Pascal do
+    def row(1), do: [1]
+    def row(2), do: [1, 1]
+
+    def generate_row(previous_row, acc \\ []) do
+      case previous_row do
+        [first, second | tail] -> generate_row([second | tail], [first + second | acc])
+        _ -> [1 | acc]
+      end
+    end
+
+    def row(n) do
+      generate_row(row(n - 1), [1])
+    end
+
+    def of(n) do
+      Enum.map(1..n, &row/1)
+    end
+  end
+
+  def pascal do
+    Pascal
+  end
+
+  def enum_recursion do
+  end
+
+  def rollable_expressions do
+  end
+
+  def caesar_cypher do
+  end
+
+  def classified do
+  end
+
+  def phone_number_parsing do
+  end
+
+  def convert_phone do
+  end
+
+  def obfuscate_phone do
+  end
+
+  def email_validation do
+  end
+
+  def cypher do
+  end
+
+  def metric_measurements do
+  end
+
+  def money do
+  end
+
+  def rock_paper_scissors_pattern_matching do
+  end
 end
