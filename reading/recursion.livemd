@@ -170,20 +170,113 @@ For example, we could use recursion to enumerate through and sum the elements in
 
 ```elixir
 defmodule Recursion do
-  def sum([], accumulator), do: accumulator
-
-  def sum([head | tail], accumulator) do
-    sum(tail, accumulator + head)
+  def sum(list, accumulator \\ 0) do
+    case list do
+      [] -> accumulator
+      [head | tail] -> sum(tail, accumulator + head)
+    end
   end
 end
 
-Recursion.sum([4, 5, 6], 0)
+Recursion.sum([1, 2, 3], `0`)
 ```
 
-Let's break down how that works in the slide below.
+We enumerate through the list by recursively calling `sum/2` on the tail of the list and building
+an accumulator. In this case, the initial accumulator is `0`.
+
+Each element in the list adds to the accumulator. `1` + `2` + `3` = `6` so the function returns `6`.
+
+```mermaid
+flowchart LR
+sum1["sum([1, 2, 3], 0)"]
+sum2["sum([2, 3], 1)"]
+sum3["sum([3], 3)"]
+sum4["sum([], 6)"]
+
+sum1 --> sum2 --> sum3 --> sum4 --> 6
+```
+
+Walking through the function we bind `list` to `[1, 2, 3]` and accumulator to 0.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Utils.slide(:recursion)
+  def sum(list, accumulator) do
+    case list do
+      # [] -> accumulator
+      [head | tail] -> sum(tail, accumulator + head)
+    end
+  end
+```
+
+`list` is not empty so the program recusively calls `sum([2, 3], 0 + 1)`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def sum([1, 2, 3], 0) do
+    case [1, 2, 3] do
+      # [] -> accumulator
+      [1 | [2, 3]] -> sum([2, 3], 0 + 1)
+    end
+  end
+```
+
+`list` is still not empty, so the program recursively calls `sum([3], 1 + 2)`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def sum([2, 3], 1) do
+    case [2, 3] do
+      # [] -> accumulator
+      [2 | [3]] -> sum([3], 1 + 2)
+    end
+  end
+```
+
+`list` is still not empty, so the program recursively calls `sum([], 3 + 3)`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def sum([3], 3) do
+    case [3] do
+      # [] -> accumulator
+      [3 | []] -> sum([], 3 + 3)
+    end
+  end
+```
+
+`list` is empty, so the program returns the accumulator (`6`).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def sum([],  6) do
+    case [] do
+      [] -> 6
+      # [head | tail] -> sum(tail, accumulator + head)
+    end
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Rather than using case statements, it's common to use different function clauses
+to handle the base case. The base case is when the function returns a value instead of making a recursive call.
+
+In the `Recursion` module, the base case is when the `list` is empty and `sum/2` returns the `accumulator`.
+
+With multiple function clauses, the `Recursion` module could instead be implemented like so:
+
+```elixir
+defmodule Recursion do
+  def sum([], accumulator), do: accumulator
+  def sum([head | tail], accumulator), do: sum(tail, accumulator + head)
+end
+
+Recursion.sum([1, 2, 3], 0)
 ```
 
 ### Your Turn
