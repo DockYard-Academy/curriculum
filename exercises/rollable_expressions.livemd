@@ -1,0 +1,81 @@
+# Rollable Expressions
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Rollable Expressions
+
+Many games such as Dungeons & Dragons require rolling dice to determine the effects of player actions.
+You will build a program which makes it easier for players to automatically roll dice online.
+
+Dice expressions are in the form `1d6` which means [roll one six-sided die](https://www.google.com/search?q=roll+1d6).
+
+Provided a text with a dice expression, replace the expression with a clickable link.
+
+In markdown, a clickable link is in the format `[link name](url)`.
+
+Google allows you to roll multi sided dice by searching `roll 1d6`.
+The url for this is `https://www.google.com/search?q=roll+1d6`.
+
+### Example
+
+> Fireball: deal 8d6 fire damage.
+
+Becomes
+
+> Fireball: deal [8d6](https://www.google.com/search?q=roll+8d6) fire damage.
+
+Replace any rollable expressions like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RollableExpression.clickable("8d6")
+"[8d6](https://www.google.com/search?q=roll+8d6)"
+```
+
+Ensure you handle `4`, `6`, `8`, `12`, and `20` sided dice and
+be able to roll between `1` and `99` dice.
+
+For example,
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Rollable.replace("Fireball: deal 8d6 fire damage.")
+"Fireball: deal [8d6](https://www.google.com/search?q=roll+8d6) fire damage."
+
+Rollable.replace("Ice Shard: deal 12d4 ice damage.")
+"Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
+
+Rollable.replace("99d20")
+"[99d20](https://www.google.com/search?q=roll+99d20)"
+
+Rollable.replace("1d4")
+"[1d4](https://www.google.com/search?q=roll+1d4)"
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Rollable do
+  def replace(string) do
+  end
+end
+
+Utils.feedback(:rollable_expressions, Rollable)
+```
