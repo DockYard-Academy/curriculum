@@ -28,9 +28,9 @@ jobs:
         path: deps
         key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
         restore-keys: ${{ runner.os }}-mix-
-    - name: Enter Utils Project
-      run: cd utils
     - name: Install dependencies
+      working-directory: ./utils
       run: mix deps.get
     - name: Run tests
+      working-directory: ./utils
       run: mix test
