@@ -1670,6 +1670,35 @@ defmodule Utils.Feedback do
     assert custom_enum.filter([1..5], fn each -> each >= 3 end) == [1, 2, 3]
   end
 
+  feedback :pascal do
+    pascal = get_answers()
+
+    assert pascal.of(1), "Ensure you implement the `pascal/1` function."
+    assert pascal.of(1) == [[1]]
+    assert pascal.of(2) == [[1], [1, 2]]
+
+    assert pascal.of(5) == [
+             [1],
+             [1, 1],
+             [1, 2, 1],
+             [1, 3, 3, 1],
+             [1, 3, 6, 3, 1]
+           ]
+
+    assert pascal.of(8) == [
+             [1],
+             [1, 1],
+             [1, 2, 1],
+             [1, 3, 3, 1],
+             [1, 3, 6, 3, 1],
+             [1, 5, 10, 10, 5, 1],
+             [1, 6, 15, 20, 15, 6, 1],
+             [1, 7, 21, 35, 35, 21, 7, 1]
+           ]
+
+    assert length(pascal.of(50)) == 50
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
