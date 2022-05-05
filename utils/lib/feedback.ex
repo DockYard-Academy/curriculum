@@ -19,6 +19,9 @@ defmodule Utils.Feedback do
   require Utils.Macros
   import Utils.Macros
 
+  import ExUnit.CaptureLog
+  require Logger
+
   feedback :card_count_four do
     next_count = get_answers()
     assert next_count == 1
@@ -1631,6 +1634,40 @@ defmodule Utils.Feedback do
 
     assert custom_enum.map(1..10, fn each -> each - 2 end) ==
              Enum.map(1..10, fn each -> each - 2 end)
+  end
+
+  feedback :enum_recursion do
+    custom_enum = get_answers()
+
+    assert custom_enum.map(1..10), "Ensure you implement the `map/2` function."
+    assert custom_enum.map(1..10, fn each -> each end) == Enum.to_list(1..10)
+    assert custom_enum.map(1..10, fn each -> each * 2 end) == Enum.to_list(2..20//2)
+
+    assert custom_enum.reverse(1..10), "Ensure you implement the `reverse/2` function."
+    assert custom_enum.map(1..10) == Enum.to_list(10..1)
+    assert custom_enum.map(4..20) == Enum.to_list(20..4)
+
+    assert custom_enum.reduce(1..5, 0, fn each, acc -> each end),
+           "Ensure you implement the `reduce/3` function."
+
+    assert custom_enum.reduce(1..5, 0, fn each, acc -> acc + each end) == 15
+
+    assert custom_enum.each(1..5, fn _ -> nil end), "Ensure you implement the `each/2` function."
+
+    assert custom_enum.each(1..5, fn _ -> nil end) == :ok,
+           "The `each/2` function should return :ok"
+
+    assert capture_log(fn ->
+             custom_enum.each(["log message"], fn each -> Logger.error(each) end)
+           end) =~ "log message"
+
+    assert custom_enum.filter([], fn _ -> true end) == [],
+           "Ensure you implement the `filter/2` function."
+
+    assert custom_enum.filter(1..5, fn _ -> true end) == [1, 2, 3, 4, 5]
+    assert custom_enum.filter(1..5, fn _ -> false end) == []
+    assert custom_enum.filter([true, false, true], fn each -> each end) == [true, true]
+    assert custom_enum.filter([1..5], fn each -> each >= 3 end) == [1, 2, 3]
   end
 
   # test_names must be after tests that require a solution.
