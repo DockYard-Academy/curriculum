@@ -1700,6 +1700,54 @@ defmodule Utils.Feedback do
     assert length(pascal.of(50)) == 50
   end
 
+  feedback :lucas_numbers do
+    lucas_numbers = get_answers()
+
+    assert lucas_numbers.generate(1), "Ensure you implement the `generate/1` function."
+    assert lucas_numbers.generate(1) == [2]
+
+    assert lucas_numbers.generate(2) == [2, 1]
+
+    assert lucas_numbers.generate(3) == [2, 1, 3]
+
+    sequence = [
+      2,
+      1,
+      3,
+      4,
+      7,
+      11,
+      18,
+      29,
+      47,
+      76,
+      123,
+      199,
+      322,
+      521,
+      843,
+      1364,
+      2207,
+      3571,
+      5778,
+      9349,
+      15127,
+      24476,
+      39603,
+      64079,
+      103_682,
+      167_761,
+      271_443,
+      439_204,
+      710_647,
+      1_149_851
+    ]
+
+    assert lucas_numbers.generate(10) == Enum.take(sequence, 10)
+    assert lucas_numbers.generate(20) == Enum.take(sequence, 20)
+    assert lucas_numbers.generate(30) == Enum.take(sequence, 30)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
