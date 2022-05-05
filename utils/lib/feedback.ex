@@ -1615,7 +1615,8 @@ defmodule Utils.Feedback do
     |> Kino.render()
   end
 
-  feedback :custom_enum_map do
+  # saved from changed exercise, will be used for CustomEnum exercise.
+  feedback :custom_enum do
     custom_enum = get_answers()
 
     assert custom_enum.map(1..10, fn each -> each end),

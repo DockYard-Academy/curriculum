@@ -981,4 +981,17 @@ defmodule Utils.Solutions do
   end
 
   def with_points, do: Points
+
+  defmodule CustomEnum do
+    def map(list, function, acc \\ []) do
+      case list do
+        [] -> acc
+        [head | tail] -> map(tail, function, [function.(head) | acc])
+      end
+    end
+  end
+
+  def custom_enum_map do
+    CustomEnum
+  end
 end
