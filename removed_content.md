@@ -2324,3 +2324,15 @@ end
 
 PatternMatching.fizz_buzz(1..15)
 ```
+
+## CPU Overview
+
+While computers are incredibly fast and can store vast amounts of data, they do have limits.
+
+While computers are incredibly fast, they do have limits. Certain calculations take time to complete.
+So, we need to be mindful of how to optimize our programs to operate efficiently.
+
+It is possible to build a program which requires too much data in memory, or which provides too many instructions
+for the cpu to handle in a reasonable amount of time.
+
+For example, this statement may take some time due to the large list of ten million integers.
