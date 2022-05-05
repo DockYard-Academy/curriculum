@@ -1636,6 +1636,19 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
+  feedback :timer_tc do
+    result = get_answers()
+
+    assert {_time, _result} = result, "Ensure you use `:timer.tc/1` with `slow_function/0`"
+    assert {time, :ok} = result, "The result of `slow_function/0` should be :ok."
+
+    assert time > 900_000,
+           "It's possible that your computer hardware causes :timer.tc/1 to deviate significantly."
+
+    assert time < 1_100_000,
+           "It's possible that your computer hardware causes :timer.tc/1 to deviate significantly."
+  end
+
   feedback :binary_150 do
     binary = get_answers()
     assert binary == 10_010_110

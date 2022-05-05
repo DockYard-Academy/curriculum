@@ -36,12 +36,12 @@ MergeSort.sort([4, 3, 2])
 
 Now, how might you implement a sorting function from scratch?
 
-Well, let's start easy, and work our way up.
+Well, let's start simple, and work our way up.
 
 ### Sort An Empty List
 
 How could you sort an empty list? 
-Well, by doing nothing! An empty list is already sorted, the same goes for a list with one element.
+By doing nothing! An empty list is already sorted, the same goes for a list with one element.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -253,7 +253,7 @@ lists? You can imagine that visualized step by step as:
 [a, b, c, d]
 ```
 
-To actually implement this, instead of returning `[head_a, head_b]` or `[head_b, head_a]`, we an
+To actually implement this, instead of returning `[head_a, head_b]` or `[head_b, head_a]`, we
 instead, recursively merge the remaining elements.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -268,7 +268,7 @@ def merge(list_a, [head_b | tail_b]) do
 end
 ```
 
-Put together, here's our new `MergeSort` module.
+Put together, here's our new `MergeSort` module. It can now merge two pre-sorted lists.
 
 ```elixir
 defmodule MergeSort do
@@ -303,8 +303,6 @@ MergeSort.sort([4, 2, 3, 1])
 <!-- livebook:{"break_markdown":true} -->
 
 In a divide and conquer algorithm we typically split the collection in half recursively
-
-<!-- livebook:{"break_markdown":true} -->
 
 To split any list in half, we can use the `Enum.split/2` function with the midpoint of the list
 rounded down. To find the midpoint of the list, we can use `Enum.count/1` function to find the length
