@@ -74,7 +74,7 @@ Enum.random(1..20)
 Enum.random(one: 1, two: 2)
 ```
 
-## Create an Adder protocol
+## Protocols on simple data types
 
 Anytime you need a common function for multiple data types or structs, you
 can consider a protocol.
@@ -169,8 +169,89 @@ Adder.add("hello, ", "world")
 
 ### Your turn
 
-In the Elixir cell below, create an implementation of Adder for lists, then call `Adder.add([1], [2])` to ensure it works.
+In the Elixir cell below, create an implementation of Adder for lists.
 
 ```elixir
 
+```
+
+Once complete, re-evaluate the following. It should return `[1, 2]`.
+
+```elixir
+Adder.add([1], [2])
+```
+
+## Protocols with structs
+
+We can create implementations for a protocol based on simple data types such as `integer` and `string`.
+In addition to those simple data types, we can also create an implementation for specific structs.
+
+For example, let's say we're making an old school kids toy that says different animal noises.
+
+we'll create a `Sound` protocol that prints different sounds depending on
+the struct given to it.
+
+```elixir
+defprotocol Sound do
+  def say(struct)
+end
+```
+
+We'll create a `Cat` struct.
+
+```elixir
+defmodule Cat do
+  defstruct [:mood]
+end
+```
+
+Then a `Cat` implementation for the `Sound` protocol.
+
+```elixir
+defimpl Sound, for: Cat do
+  def say(cat) do
+    case cat.mood do
+      :happy -> "Purr"
+      :angry -> "Hiss!"
+    end
+  end
+end
+```
+
+```elixir
+Sound.say(%Cat{mood: :happy})
+```
+
+```elixir
+Sound.say(%Cat{mood: :angry})
+```
+
+### Your Turn
+
+```elixir
+defmodule Dog do
+  defstruct []
+end
+```
+
+Define a `Sound` implementation for the `Dog` struct above.
+When `Sound.say/1` is called with a `Dog` struct it should return `"Woof!"`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Sound.say(%Dog{})
+"Woof!"
+```
+
+Enter your implementation in the following Elixir cell.
+
+```elixir
+
+```
+
+Once complete, re-evaluate the following. It should return `"Woof!"`.
+
+```elixir
+Sound.say(%Dog{})
 ```
