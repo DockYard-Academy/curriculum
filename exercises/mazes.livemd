@@ -124,3 +124,90 @@ path = nil
 
 Utils.feedback(:custom_maze, [custom_maze, nil])
 ```
+
+## Treasure Map
+
+You have been given a treasure map (pun intended). That will lead you to `"gold"`.
+
+Use **map[key]** and/or **map.key** to access the `"gold"` value in the `treasure_map`.
+
+Here's a simple example of how to take the gold:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+treasure_map = %{
+  "ten paces south" => %{
+    10 => "gold"
+  }
+}
+
+path = treasure_map["ten paces south"][10]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Replace `nil` with your answer below.
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+
+path = nil
+
+Utils.feedback(:treasure_map, [treasure_map, path])
+```
+
+### (Bonus) Update the treasure map.
+
+Use map update syntax `%{map | key => "new value"}` or `%{map | key: "new value"}` and update the `treasure_map`
+to show the `"gold"` has been `"taken"`.
+
+For example,
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+treasure_map = %{
+  "ten paces south" => %{
+    10 => "gold"
+  }
+}
+
+updated_map = %{treasure_map | "ten paces south" => %{10 => "taken"}}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Replace `nil` with your answer below.
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+
+updated_map = %{}
+
+Utils.feedback(:update_treasure_map, [treasure_map, updated_map])
+```

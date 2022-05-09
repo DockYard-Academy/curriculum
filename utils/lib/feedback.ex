@@ -1860,6 +1860,70 @@ defmodule Utils.Feedback do
     assert path == "Exit"
   end
 
+  feedback :treasure_map do
+    [treasure_map, path] = get_answers()
+
+    expected_map = %{
+      "south ten paces" => %{
+        10 => %{
+          :"east three paces" => %{
+            [1, 2, 3] => %{
+              {"turn", "right"} => %{
+                :dig => "gold"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    assert treasure_map == expected_map, reset_message()
+    assert path, "Enter a value for `path`."
+
+    assert path != treasure_map,
+           "Use treasure_map[\"south ten paces\"] to get the next value of the `treasure_map`"
+
+    assert path != treasure_map["south ten paces"],
+           "Use treasure_map[\"south ten paces\"][10] to get the next value of the `treasure_map`"
+
+    assert path == "gold",
+           "use treasure_map[key] or treasure_map.key syntax until you reach the gold!"
+  end
+
+  feedback :update_treasure_map do
+    [treasure_map, updated_map] = get_answers()
+
+    expected_map = %{
+      "south ten paces" => %{
+        10 => %{
+          :"east three paces" => %{
+            [1, 2, 3] => %{
+              {"turn", "right"} => %{
+                :dig => "gold"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    assert treasure_map == expected_map, reset_message()
+
+    assert updated_map, "Enter an answer for `updated_map`."
+    assert is_map(updated_map), "`updated_map` should be a map."
+
+    assert updated_map == %{
+             treasure_map
+             | "south ten paces" => %{
+                 10 => %{
+                   :"east three paces" => %{
+                     [1, 2, 3] => %{{"turn", "right"} => %{:dig => "taken"}}
+                   }
+                 }
+               }
+           }
+  end
+
   feedback :timer_tc do
     result = get_answers()
 
