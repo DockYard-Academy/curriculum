@@ -22,24 +22,50 @@ Mix.install([
 Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
-```elixir
-string_maze = Utils.constants(:string_maze)
-atom_maze = Utils.constants(:atom_maze)
-```
-
-## Navigate The Maze
+## Overview
 
 In this exercise, you're going to navigate a maze game.
-The maze is a **map** such that you can navigate it with the **north**, **east**, **south**, and **west**
-map keys.
+
+Each maze is a deeply nested `map`.
 
 If you navigate successfully, your answer will return `"Exit!"`
 
+## The Atom Maze
+
+In the Elixir cell below, use **map.key** notation to navigate the following maze. The maze is
+in an `atom_maze` variable.
+
 <!-- livebook:{"break_markdown":true} -->
 
-### The String Maze `map[key]`
+![](images/atom_key_maze.png)
 
 <!-- livebook:{"break_markdown":true} -->
+
+Replace `nil` with your answer.
+
+```elixir
+atom_maze = %{
+  south: %{
+    west: %{
+      south: %{
+        east: %{
+          south: %{
+            east: %{
+              south: "Exit!"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+path = nil
+
+Utils.feedback(:atom_maze, [atom_maze, path])
+```
+
+## The String Maze
 
 In the Elixir cell below, use **map[key]** notation to get to the end of the following maze.
 The maze is in a `string_maze` variable. Replace `nil` with your answer.
@@ -49,44 +75,52 @@ The maze is in a `string_maze` variable. Replace `nil` with your answer.
 ![](images/string_maze_small.png)
 
 ```elixir
+string_maze = %{
+  "south" => %{
+    "east" => %{
+      "south" => %{
+        "west" => %{
+          "south" => %{
+            "west" => %{
+              "south" => %{
+                "east" => %{
+                  # using string_maze[key] syntax, access this deeply nested value.
+                  "south" => "Exit!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 path = nil
+
+Utils.feedback(:string_maze, [string_maze, path])
 ```
-
-## The Atom Maze
-
-In the Elixir cell below, use **map.key** notation to navigate the following maze. The maze is
-in a `atom_maze` variable.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/atom_maze.png)
-
-```elixir
-atom_maze
-```
-
-## Create Your Own String Maze
-
-In the Elixir cell below, create a **string-key** map that represents the following maze. Then demonstrate
-how to navigate your maze with **map[key]** syntax.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/custom_string_maze.png)
 
 ```elixir
 
 ```
 
-## Create Your Own Atom Maze
+## Create Your Own Maze
 
-In the Elixir cell below, create an **atom-key** map that represents the following maze. Then demonstrate
-how to navigate your maze with **map.key** syntax.
+Generate a maze using the [Online Maze Generator](https://www.mazegenerator.net/). It should be
+atleast a 5 * 5 in width and height.
 
-<!-- livebook:{"break_markdown":true} -->
+* Create a deeply nested map to represent your `custom_maze`. It should have an `"Exit!"` value at the end.
+* Use either **map[key]** notation
+  or **map.key** notation to show how to navigate your maze `path`.
+* BONUS: Use both atom keys and string keys in your `custom_maze`.
 
-![](images/custom_atom_maze.png)
+Replace `nil` with your answers below.
 
 ```elixir
+custom_maze = nil
 
+path = nil
+
+Utils.feedback(:custom_maze, [custom_maze, nil])
 ```

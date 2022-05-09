@@ -1783,6 +1783,83 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 
+  feedback :atom_maze do
+    [atom_maze, path] = get_answers()
+
+    expected_maze = %{
+      south: %{
+        west: %{
+          south: %{
+            east: %{
+              south: %{
+                east: %{
+                  south: "Exit!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    assert expected_maze == atom_maze, reset_message()
+    assert path, "Enter a value for `path`"
+    assert path != atom_maze, "Use atom_maze.south to access the first key of the map."
+    assert path != atom_maze.south, "Use atom_maze.south.west to access next map value."
+
+    assert path != atom_maze.south.west,
+           "Use atom_maze.south.west.south to access next map value."
+
+    assert path == "Exit!", "Continue using atom_maze.key syntax until you reach the Exit!"
+  end
+
+  feedback :string_maze do
+    [string_maze, path] = get_answers()
+
+    expected_maze = %{
+      "south" => %{
+        "east" => %{
+          "south" => %{
+            "west" => %{
+              "south" => %{
+                "west" => %{
+                  "south" => %{
+                    "east" => %{
+                      # using string_maze[key] syntax, access this deeply nested value.
+                      "south" => "Exit!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    assert string_maze == string_maze, reset_message()
+    assert path, "Enter a value for `path`"
+    assert path != string_maze, "Use string_maze[\"south\"] to access the first key of the map."
+
+    assert path != string_maze["south"],
+           "Use string_maze[\"south\"][\"east\"] to access next map value."
+
+    assert path != string_maze["south"]["east"],
+           "Use string_maze[\"south\"][\"east\"][\"south\"] to access next map value."
+
+    assert path == "Exit!", "Continue using string_maze[key] syntax until you reach the Exit!"
+  end
+
+  feedback :custom_maze do
+    [custom_maze, path] = get_answers()
+    assert custom_maze, "Ensure you enter a value for `custom_maze`."
+    assert path, "Ensure you enter a value for path."
+
+    assert is_map(custom_maze), "`custom_maze` should be a map."
+
+    assert path == "Exit"
+  end
+
   feedback :timer_tc do
     result = get_answers()
 

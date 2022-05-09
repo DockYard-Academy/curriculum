@@ -12,6 +12,10 @@ defmodule Utils.Macros do
             :persistent_term.get(:answers)
           end
 
+          def reset_message do
+            "Something went wrong, please reset the exercise or speak to your teacher."
+          end
+
           test unquote(module_name) do
             unquote(assertion)
           end
