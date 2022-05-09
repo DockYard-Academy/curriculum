@@ -180,7 +180,7 @@ defmodule Utils.Feedback do
 
     assert rock_paper_scissors.play(:rock, :paper) == ":paper beats :rock!"
     assert rock_paper_scissors.play(:scissors, :rock) == ":rock beats :scissors!"
-    assert rock_paper_scissors.play(:paper, :scissors) == ":scissors beats :rock!"
+    assert rock_paper_scissors.play(:paper, :scissors) == ":scissors beats :paper!"
   end
 
   feedback :rocket_ship do
@@ -808,8 +808,7 @@ defmodule Utils.Feedback do
     assert custom_enum.map(list, & &1), "Implement the `map/2` funtion."
     assert is_list(custom_enum.map(list, & &1)), "`map/2` should return a list."
 
-    assert custom_enum.map(list, &(&1 * 2)) == Enum.map(list, &(&1 * 2)),
-           "`map/2` should call the function on each element and return a new list."
+    assert custom_enum.map([1, 2, 3], &(&1 * 2)) == [2, 4, 6]
 
     assert custom_enum.each(list, & &1), "Implement the `each/2` funtion."
     assert custom_enum.each(list, & &1) == :ok, "`each/2` should return :ok."
@@ -1113,26 +1112,26 @@ defmodule Utils.Feedback do
 
   feedback :datetime_today do
     today = get_answers()
-
     now = DateTime.utc_now()
     assert today.year == now.year
     assert today.month == now.month
     assert today.day == now.day
+
     assert today.hour == now.hour
-    assert today.minute == now.minute
-    assert today.second == now.second
+    # Allowing 2 second adjustment for possible time delay
+    DateTime.diff(now, today) < 2
   end
 
   feedback :datetime_tomorrow do
-    today = get_answers()
+    tomorrow = get_answers()
 
     now = DateTime.utc_now()
-    assert today.year == now.year
-    assert today.month == now.month
-    assert today.day == now.day + 1
-    assert today.hour == now.hour
-    assert today.minute == now.minute
-    assert today.second == now.second
+    assert tomorrow.year == now.year
+    assert tomorrow.month == now.month
+    assert tomorrow.day == now.day + 1
+    assert tomorrow.hour == now.hour
+    # Allowing 2 second adjustment for possible time delay
+    DateTime.diff(DateTime.add(now, 60 * 60 * 24, :second), tomorrow) < 2
   end
 
   feedback :datetime_compare do
@@ -1379,14 +1378,9 @@ defmodule Utils.Feedback do
     assert %{amount: 500, currency: :US} = money.new(500, :US),
            "Money.new(500, :US) should create a %Money{amount: 500, currency: :US} struct"
 
-    assert money.convert(money.new(500, :CAD), :EUR) == money.new(round(500 * 1.39), :EUR)
+    assert money.convert(money.new(500, :CAD), :EUR) == money.new(round(500 / 1.39), :EUR)
 
-    assert %{amount: 10000, currency: :CAD} =
-             money.add(money.new(500, :CAD), money.new(500, :CAD))
-
-    assert money.subtract(money.new(10000, :US), 100) == money.new(9900, :US)
-
-    assert = money.multiply(money.new(100, :CAD), 10) == money.new(1000, :CAD)
+    assert %{amount: 1000, currency: :CAD} = money.add(money.new(500, :CAD), money.new(500, :CAD))
 
     assert_raise FunctionClauseError, fn ->
       money.add(money.new(500, :CAD), money.new(100, :US)) &&
@@ -1394,6 +1388,18 @@ defmodule Utils.Feedback do
           "Money.add/2 should only accept the same currency type or throw a FunctionClauseError."
         )
     end
+
+    assert money.subtract(money.new(10000, :US), money.new(100, :US)) == money.new(9900, :US)
+
+    assert_raise FunctionClauseError, fn ->
+      money.subtract(money.new(500, :CAD), money.new(100, :US)) &&
+        flunk(
+          "Money.subtract/2 should only accept the same currency type or throw a FunctionClauseError."
+        )
+    end
+
+    assert money.multiply(money.new(100, :CAD), 10) == money.new(1000, :CAD)
+    assert money.multiply(money.new(100, :CAD), 1.1) == money.new(110, :CAD)
   end
 
   feedback :metric_measurements do
@@ -1401,6 +1407,7 @@ defmodule Utils.Feedback do
 
     conversion = [
       millimeter: 0.1,
+      centimeter: 1,
       meter: 100,
       kilometer: 100_000,
       inch: 2.54,
@@ -1409,14 +1416,25 @@ defmodule Utils.Feedback do
       mile: 160_000
     ]
 
-    assert measurement.convert({:milimeter, 1}, :centimeter),
+    assert measurement.convert({:millimeter, 1}, :centimeter),
            "Ensure you implement the `convert/2` function."
 
-    assert measurement.convert({:milimeter, 1}, :centimeter) == {:centimeter, 0.1}
+    assert measurement.convert({:millimeter, 1}, :centimeter) == {:centimeter, 0.1}
+    assert measurement.convert({:centimeter, 1}, :centimeter) == {:centimeter, 1}
+    assert measurement.convert({:meter, 1}, :centimeter) == {:centimeter, 100}
+    assert measurement.convert({:kilometer, 1}, :centimeter) == {:centimeter, 100_000}
+    assert measurement.convert({:inch, 1}, :centimeter) == {:centimeter, 2.54}
+    assert measurement.convert({:feet, 1}, :centimeter) == {:centimeter, 30}
+    assert measurement.convert({:yard, 1}, :centimeter) == {:centimeter, 91}
+    assert measurement.convert({:mile, 1}, :centimeter) == {:centimeter, 160_000}
 
-    # from centimeter
+    assert measurement.convert({:meter, 1}, :millimeter) == {:millimeter, 1000}
+    assert measurement.convert({:meter, 1}, :centimeter) == {:centimeter, 100}
+    assert measurement.convert({:meter, 1}, :meter) == {:meter, 1}
+    assert measurement.convert({:meter, 1}, :kilometer) == {:kilometer, 0.001}
+
     Enum.each(conversion, fn {measure, amount} ->
-      assert measurement.convert({:centimeter, 1}, measure) == {measure, 1 / amount}
+      measurement.convert({:centimeter, 1}, measure) == {measure, 1 / amount}
     end)
 
     # to centimeter
@@ -1491,13 +1509,6 @@ defmodule Utils.Feedback do
     phone_number = get_answers()
 
     assert phone_number.parse("1231231234"), "Ensure you implement the `parse/1` function."
-    assert phone_number.parse("1231231234") == "123-123-1234"
-    assert phone_number.parse("123 123 1234") == "123-123-1234"
-    assert phone_number.parse("(123)-123-1234") == "123-123-1234"
-    assert phone_number.parse("(123) 123 1234") == "123-123-1234"
-
-    assert phone_number.parse("(123)123-1234") == "123-123-1234"
-
     text = "
 1231231234
 123 123 1234
@@ -1512,6 +1523,23 @@ defmodule Utils.Feedback do
 123-123-1234
 123-123-1234
 123-123-1234
+"
+
+    text = "
+5555550150
+555 555 0199
+(555)-555-0120
+(555) 555 0100
+(555)555-0101
+"
+
+    assert phone_number.parse(text) ==
+             "
+555-555-0150
+555-555-0199
+555-555-0120
+555-555-0100
+555-555-0101
 "
   end
 
@@ -1575,20 +1603,20 @@ defmodule Utils.Feedback do
     assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 1) == "bcdefghijklmnopqrstuvwxyza"
     assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 14) == "opqrstuvwxyzabcdefghijklmn"
     assert caesar_cypher.encode("abcdefghijklmnopqrstuvwxyz", 25) == "zabcdefghijklmnopqrstuvwxy"
-    assert caesar_cypher.encode("Et tu, Brute?", 2) == "Gv vw, Dtwvg?"
+    assert caesar_cypher.encode("et tu, brute?", 2) == "gv vw, dtwvg?"
 
     assert caesar_cypher.decode("", 1), "Ensure you implement the `decode/2` function."
     assert caesar_cypher.decode("", 1) == ""
     assert caesar_cypher.decode("b", 1) == "a"
     assert caesar_cypher.decode("o", 14) == "a"
-    assert caesar_cypher.decode("z", 14) == "a"
+    assert caesar_cypher.decode("z", 25) == "a"
     assert caesar_cypher.decode("a", 1) == "z"
     assert caesar_cypher.decode("n", 14) == "z"
     assert caesar_cypher.decode("y", 25) == "z"
-    assert caesar_cypher.encode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
-    assert caesar_cypher.encode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
-    assert caesar_cypher.encode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
-    assert caesar_cypher.encode("Gv vw, Dtwvg?", 2) == "Et tu, Brute?"
+    assert caesar_cypher.decode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.decode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.decode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
+    assert caesar_cypher.decode("gv vw, dtwvg?", 2) == "et tu, brute?"
   end
 
   feedback :rollable_expressions do
@@ -1622,40 +1650,44 @@ defmodule Utils.Feedback do
   feedback :custom_enum do
     custom_enum = get_answers()
 
-    assert custom_enum.map(1..10, fn each -> each end),
+    list = Enum.to_list(1..5)
+
+    assert custom_enum.map(list, fn each -> each end),
            "Ensure you implement the `map/2` function"
 
-    assert custom_enum.map(1..5, fn each -> each end) == [1, 2, 3, 4, 5]
+    assert custom_enum.map(list(fn each -> each end)) == [1, 2, 3, 4, 5]
 
-    assert custom_enum.map(1..10, fn each -> each * 2 end) ==
-             Enum.map(1..10, fn each -> each * 2 end)
+    assert custom_enum.map(list, fn each -> each * 2 end) ==
+             Enum.map(list, fn each -> each * 2 end)
 
     assert custom_enum.map(1..10, fn each -> each + 2 end) ==
-             Enum.map(1..10, fn each -> each + 2 end)
+             Enum.map(list, fn each -> each + 2 end)
 
     assert custom_enum.map(1..10, fn each -> each - 2 end) ==
-             Enum.map(1..10, fn each -> each - 2 end)
+             Enum.map(list, fn each -> each - 2 end)
   end
 
   feedback :enum_recursion do
     custom_enum = get_answers()
 
-    assert custom_enum.map(1..10), "Ensure you implement the `map/2` function."
-    assert custom_enum.map(1..10, fn each -> each end) == Enum.to_list(1..10)
-    assert custom_enum.map(1..10, fn each -> each * 2 end) == Enum.to_list(2..20//2)
+    list = Enum.to_list(1..5)
 
-    assert custom_enum.reverse(1..10), "Ensure you implement the `reverse/2` function."
-    assert custom_enum.map(1..10) == Enum.to_list(10..1)
-    assert custom_enum.map(4..20) == Enum.to_list(20..4)
-
-    assert custom_enum.reduce(1..5, 0, fn each, acc -> each end),
+    assert custom_enum.reduce(list, 0, fn each, acc -> each end),
            "Ensure you implement the `reduce/3` function."
 
-    assert custom_enum.reduce(1..5, 0, fn each, acc -> acc + each end) == 15
+    assert custom_enum.reduce(list, 0, fn each, acc -> acc + each end) == 15
 
-    assert custom_enum.each(1..5, fn _ -> nil end), "Ensure you implement the `each/2` function."
+    assert custom_enum.map(list, fn each -> each end),
+           "Ensure you implement the `map/2` function."
 
-    assert custom_enum.each(1..5, fn _ -> nil end) == :ok,
+    assert custom_enum.map(list, fn each -> each end) == Enum.to_list(list)
+    assert custom_enum.map(list, fn each -> each * 2 end) == Enum.to_list(2..10//2)
+
+    assert custom_enum.reverse(list), "Ensure you implement the `reverse/2` function."
+
+    assert custom_enum.each(list, fn _ -> nil end), "Ensure you implement the `each/2` function."
+
+    assert custom_enum.each(list, fn _ -> nil end) == :ok,
            "The `each/2` function should return :ok"
 
     assert capture_log(fn ->
@@ -1665,10 +1697,10 @@ defmodule Utils.Feedback do
     assert custom_enum.filter([], fn _ -> true end) == [],
            "Ensure you implement the `filter/2` function."
 
-    assert custom_enum.filter(1..5, fn _ -> true end) == [1, 2, 3, 4, 5]
-    assert custom_enum.filter(1..5, fn _ -> false end) == []
+    assert custom_enum.filter(list, fn _ -> true end) == [1, 2, 3, 4, 5]
+    assert custom_enum.filter(list, fn _ -> false end) == []
     assert custom_enum.filter([true, false, true], fn each -> each end) == [true, true]
-    assert custom_enum.filter([1..5], fn each -> each >= 3 end) == [1, 2, 3]
+    assert custom_enum.filter(list, fn each -> each <= 3 end) == [1, 2, 3]
   end
 
   feedback :pascal do

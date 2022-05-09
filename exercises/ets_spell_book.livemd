@@ -24,7 +24,6 @@ We're going to create an app that uses `:ets` to temporarily store these spells.
 
 We should be able to create a `new/1` memorized spell book for the day. We should also include the level of the wizard.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 PreparedSpells.new(:day_1, level: 1)
 :ok
@@ -32,7 +31,6 @@ PreparedSpells.new(:day_1, level: 1)
 
 Then `memorize/2` a prepared spell.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 PreparedSpells.memorize(:day_1, %{name: "Fireball", effect: "Cover in flames"})
 :ok
@@ -40,7 +38,6 @@ PreparedSpells.memorize(:day_1, %{name: "Fireball", effect: "Cover in flames"})
 
 The wizard should be able to `cast/1` only prepared spells which will return their effect.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 PreparedSpells.cast(:day_1, "Fireball")
 "Cover in flames"
@@ -48,7 +45,6 @@ PreparedSpells.cast(:day_1, "Fireball")
 
 If the wizard attempts to cast a spell they haven't prepared then it should fail.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 PreparedSpells.cast(:day_1, "Ice Storm")
 {:error, :not_prepared}
@@ -57,7 +53,6 @@ PreparedSpells.cast(:day_1, "Ice Storm")
 We are also limited by the number of spells we can memorize. For the sake of simplicity a wizard can memorize three times their level
 number of spells. So a level 1 wizard can memorize 3 spells, a level 2 wizard can memorize 6 spells, and so on.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 PreparedSpells.new(:day_2, level: 1)
 :ok
@@ -65,7 +60,12 @@ PreparedSpells.memorize(:day_2, %{name: "Ray Of Frost", effect: "Create A Freezi
 :ok
 PreparedSpells.memorize(:day_2, %{name: "Cone Of Cold", effect: "Create A 15ft Cone Of Ice"})
 :ok
-PreparedSpells.memorize(:day_2, %{name: "Aid", effect: "Bolster your allies with toughness and resolve"})
+
+PreparedSpells.memorize(:day_2, %{
+  name: "Aid",
+  effect: "Bolster your allies with toughness and resolve"
+})
+
 :ok
 
 PreparedSpells.memorize(:day_2, %{name: "Barkskin", effect: "Grow tough bark-like skin"})

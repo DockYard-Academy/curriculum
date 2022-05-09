@@ -2336,3 +2336,21 @@ It is possible to build a program which requires too much data in memory, or whi
 for the cpu to handle in a reasonable amount of time.
 
 For example, this statement may take some time due to the large list of ten million integers.
+
+## Deploying Mix Project
+
+* Publish a Math hex package
+* Publish the HTTP Server
+
+### 4. RabbitMQ
+
+* Reading
+  * Message Queues
+  * RabbitMQ
+* Exercises
+
+### 5. Kafka
+
+* Reading
+  * Kafka
+* Exercises

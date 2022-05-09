@@ -982,7 +982,7 @@ defmodule Utils.Solutions do
 
   def with_points, do: Points
 
-  defmodule CustomEnum do
+  defmodule CustomEnumMap do
     def map(list, function, acc \\ []) do
       case list do
         [] -> acc
@@ -992,7 +992,7 @@ defmodule Utils.Solutions do
   end
 
   def custom_enum_map do
-    CustomEnum
+    CustomEnumMap
   end
 
   defmodule LucasNumbers do
@@ -1033,39 +1033,262 @@ defmodule Utils.Solutions do
     Pascal
   end
 
+  defmodule RecursiveEnum do
+    def reverse(list) do
+      reduce(list, [], fn each, acc -> [each | acc] end)
+    end
+
+    def reduce(list, acc, function) do
+      case list do
+        [head | tail] -> reduce(tail, function.(head, acc), function)
+        [] -> acc
+      end
+    end
+
+    def map(list, function) do
+      list |> reduce([], fn each, acc -> [function.(each) | acc] end) |> reverse()
+    end
+
+    def each(list, function) do
+      case list do
+        [head | tail] ->
+          function.(head)
+          each(tail, function)
+
+        [] ->
+          :ok
+      end
+    end
+
+    def filter(list, function) do
+      list
+      |> reduce([], fn each, acc -> if function.(each), do: [each | acc], else: acc end)
+      |> reverse()
+    end
+  end
+
   def enum_recursion do
+    RecursiveEnum
+  end
+
+  defmodule Rollable do
+    def replace(string) do
+      Regex.replace(~r/\d+d\d+/, string, fn each ->
+        "[#{each}](https://www.google.com/search?q=roll+#{each})"
+      end)
+    end
   end
 
   def rollable_expressions do
+    Rollable
+  end
+
+  defmodule CaesarCypher do
+    def decode(string, key) do
+      String.to_charlist(string)
+      |> Enum.map(fn char ->
+        cond do
+          char < ?a or ?z < char ->
+            char
+
+          char - key < ?a ->
+            ?z - (?a - (char - key)) + 1
+
+          true ->
+            char - key
+        end
+      end)
+      |> List.to_string()
+    end
+
+    def encode(string, key) do
+      String.to_charlist(string)
+      |> Enum.map(fn char ->
+        cond do
+          char < ?a or ?z < char ->
+            char
+
+          char + key > ?z ->
+            ?a + (char + key - ?z) - 1
+
+          true ->
+            char + key
+        end
+      end)
+      |> List.to_string()
+    end
   end
 
   def caesar_cypher do
+    CaesarCypher
+  end
+
+  defmodule Classified do
+    def redact(string) do
+      string
+      |> String.replace(~r/Peter Parker/, "REDACTED")
+      |> String.replace(~r/Bruce Wayne/, "REDACTED")
+      |> String.replace(~r/Clark Kent/, "REDACTED")
+      |> String.replace(~r/\d{3}-\d{3}-\d{4}/, "REDACTED")
+      |> String.replace(~r/\w+@\w+\.\w+/, "REDACTED")
+      |> String.replace(~r/(?<!\d)\d{4}(?!\d)/, "REDACTED")
+    end
   end
 
   def classified do
+    Classified
+  end
+
+  defmodule PhoneNumber do
+    def parse(string) do
+      new = fn _, area, prefix, line_number ->
+        "#{area}-#{prefix}-#{line_number}"
+      end
+
+      string = Regex.replace(~r/(\d{3})(\d{3})(\d{4})/, string, new)
+      string = Regex.replace(~r/(\d{3})\s(\d{3})\s(\d{4})/, string, new)
+      string = Regex.replace(~r/\((\d{3})\)-(\d{3})-(\d{4})/, string, new)
+      string = Regex.replace(~r/\((\d{3})\) (\d{3}) (\d{4})/, string, new)
+      Regex.replace(~r/\((\d{3})\)(\d{3})-(\d{4})/, string, new)
+    end
   end
 
   def phone_number_parsing do
+    PhoneNumber
   end
 
   def convert_phone do
+    fn string ->
+      Regex.replace(~r/(#\d{3})(\d{3})(\d{4})/, string, fn _, area, prefix, line_number ->
+        "#{area}-#{prefix}-#{line_number}"
+      end)
+    end
   end
 
   def obfuscate_phone do
+    fn phone_number ->
+      Regex.replace(~r/\d{3}-(\d{3})-\d{4}/, phone_number, fn _, prefix ->
+        "XXX-#{prefix}-XXXX"
+      end)
+    end
+  end
+
+  defmodule Email do
+    def validate(email) do
+      Regex.match?(~r/\S+@\S+\.\S+/, email)
+    end
   end
 
   def email_validation do
+    Email
+  end
+
+  defmodule Cypher do
+    def shift(string) do
+      string
+      |> String.to_charlist()
+      |> Enum.map(fn
+        ?z -> ?a
+        char -> char + 1
+      end)
+      |> List.to_string()
+    end
   end
 
   def cypher do
+    Cypher
+  end
+
+  defmodule MetricMeasurements do
+    def convert(from, to) do
+      centimeters =
+        case from do
+          {:millimeter, amount} -> amount * 0.1
+          {:centimeter, amount} -> amount
+          {:meter, amount} -> amount * 100
+          {:kilometer, amount} -> amount * 100_000
+          {:inch, amount} -> amount * 2.54
+          {:feet, amount} -> amount * 30
+          {:yard, amount} -> amount * 91
+          {:mile, amount} -> amount * 160_000
+        end
+
+      case to do
+        :millimeter -> {:millimeter, centimeters / 0.1}
+        :centimeter -> {:centimeter, centimeters}
+        :meter -> {:meter, centimeters / 100}
+        :kilometer -> {:kilometer, centimeters / 100_000}
+        :inch -> {:inch, centimeters / 2.54}
+        :feet -> {:feet, centimeters / 30}
+        :yard -> {:yard, centimeters / 91}
+        :mile -> {:mile, centimeters / 160_000}
+      end
+    end
   end
 
   def metric_measurements do
+    MetricMeasurements
+  end
+
+  defmodule Money do
+    defstruct [:amount, :currency]
+
+    def new(amount, currency) do
+      %__MODULE__{amount: amount, currency: currency}
+    end
+
+    def convert(%__MODULE__{amount: amount, currency: from_currency} = money, to_currency) do
+      cad_amount =
+        case from_currency do
+          :CAD -> amount * 1
+          :US -> amount * 1.29
+          :EUR -> amount * 1.39
+        end
+
+      new_currency_amount =
+        case to_currency do
+          :CAD -> cad_amount
+          :US -> cad_amount / 1.29
+          :EUR -> cad_amount / 1.39
+        end
+
+      Money.new(round(new_currency_amount), to_currency)
+    end
+
+    def add(%__MODULE__{} = money1, %__MODULE__{} = money2)
+        when money1.currency == money2.currency do
+      Money.new(money1.amount + money2.amount, money1.currency)
+    end
+
+    def subtract(%__MODULE__{} = money1, %__MODULE__{} = money2)
+        when money1.currency == money2.currency do
+      Money.new(money1.amount - money2.amount, money1.currency)
+    end
+
+    def multiply(%__MODULE__{} = money1, multiplier) do
+      Money.new(round(money1.amount * multiplier), money1.currency)
+    end
   end
 
   def money do
+    Money
+  end
+
+  defmodule RockPaperScissorsPatternMatching do
+    def play(guess1, guess2) do
+      case {guess1, guess2} do
+        {:paper, :rock} -> ":paper beats :rock!"
+        {:scissors, :paper} -> ":scissors beats :paper!"
+        {:rock, :scissors} -> ":rock beats :scissors!"
+        {:rock, :paper} -> ":paper beats :rock!"
+        {:scissors, :rock} -> ":rock beats :scissors!"
+        {:paper, :scissors} -> ":scissors beats :paper!"
+        _ -> "draw"
+      end
+    end
   end
 
   def rock_paper_scissors_pattern_matching do
+    RockPaperScissorsPatternMatching
   end
 end

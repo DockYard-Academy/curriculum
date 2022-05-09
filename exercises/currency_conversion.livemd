@@ -42,15 +42,15 @@ instead money will be stored in a `Money` struct.
 
 > "If I had a dime for every time I've seen someone use FLOAT to store currency, I'd have $999.997634" -- Bill Karwin
 
-Create a `Money` module which will also be a struct with `:amount` and `:currency` to handle money conversion.
-It should be able to handle creating a money struct, adding money, subtracting money, and multiplying money.
+- Create a `Money` struct with `:amount` and `:currency`.
+- Create a `convert/2` function to convert a money struct from one currency to another.
+- Create an `add/2` function to add one money struct of the same currency to another.
+- Create a `subtract/2` function to subtract one money struct of the same currency to another.
+- Create a `multiply` function to multiply one money struct by a number.
 
-Adding `Money` structs should only be allowed for the same currency.
-
-<!-- livebook:{"break_markdown":true} -->
+### Examples
 
 <!-- livebook:{"force_markdown":true} -->
-
 ```elixir
 five_eur = Money.new(500, :EUR)
 %Money{amount: 500, currency: :EUR}
@@ -64,12 +64,14 @@ ten_eur = Money.add(five_eur, five_eur)
 hundred_eur = Money.multiply(ten_eur, 10)
 %Money{amount: 100_00, currency: :EUR}
 
-ninety_nine_eur = Money.subtract(hundred_eur, 100)
-%Money{amount: 99_00, currency: :EUR}
+ninety_nine_eur = Money.subtract(hundred_eur, ten_eur)
+%Money{amount: 90, currency: :EUR}
 
 Money.add(%Money{amount: 500, :EUR}, %Money{amount: 500, :CAD})
 ** (FunctionClauseError) no function clause matching in Money.add/2 
 ```
+
+Enter your solution below.
 
 ```elixir
 defmodule Money do
