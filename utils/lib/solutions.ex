@@ -1291,4 +1291,18 @@ defmodule Utils.Solutions do
   def rock_paper_scissors_pattern_matching do
     RockPaperScissorsPatternMatching
   end
+
+  defmodule Pet do
+    @callback speak() :: String.t()
+  end
+
+  defmodule Dog do
+  end
+
+  defmodule Cat do
+  end
+
+  def behaviours do
+    [Pet, Dog, Cat]
+  end
 end

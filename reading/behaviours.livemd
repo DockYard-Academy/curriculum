@@ -142,15 +142,23 @@ But that's beyond the scope of this lesson.
 
 ### Your Turn
 
-In the Elixir cell below
-
-* Create a behaviour called `Pet`. a `Pet` should have a `@callback` 
-module attribute defining a `speak/0` function that returns a string.
-* Create a module `Dog` that implements the `Pet` behaviour.
-* Implement a `speak` function in the `Dog` module that returns `"woof"`.
-* Create a module `Cat` that implements the `Pet` behaviour.
-* Implement a `speak` function in the `Cat` module that returns `"meow"`.
+In the Elixir cell below, convert the `Pet` module into a behavior.
+The `Pet` behavior should define a `speak/0` function that returns a string.
 
 ```elixir
+defmodule Pet do
+  @callback speak :: String.t()
+end
+```
 
+Once complete, re-evaluate the following module. It should display a warning.
+
+> speak/0 required by behaviour Pet is not implemented (in module Dog)
+
+Add a `speak/0` function to the `Dog` module. When you re-evaluate the cell, the warning should be gone.
+
+```elixir
+defmodule Dog do
+  @behaviour Pet
+end
 ```
