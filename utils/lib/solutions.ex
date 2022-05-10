@@ -1467,4 +1467,22 @@ defmodule Utils.Solutions do
   end
 
   def pokemon_evolution_structs, do: [Charmander, Charmeleon, Charizard]
+
+  defprotocol Evolvable do
+    def evolve(pokemon)
+  end
+
+  defimpl Evolvable, for: Charmander do
+    def evolve(_) do
+      %Charmeleon{}
+    end
+  end
+
+  defimpl Evolvable, for: Charmeleon do
+    def evolve(_) do
+      %Charizard{}
+    end
+  end
+
+  def evolvable, do: [Evolvable, Charmander, Charmeleon, Charizard]
 end

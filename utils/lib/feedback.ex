@@ -1935,6 +1935,25 @@ defmodule Utils.Feedback do
     assert %{hp: 78, attack: 84, defense: 78} = struct(charizard)
   end
 
+  feedback :evolvable do
+    [evolvable, charmander, charmeleon, charizard] = get_answers
+
+    assert Keyword.get(evolvable.__info__(:functions), :evolve),
+           "add the `evolve` function to the `Evolvable` protocol."
+
+    assert %{hp: 39, attack: 52, defense: 43} = struct(charmander),
+           "Create the `Charmander` struct before starting this exercise."
+
+    assert %{hp: 58, attack: 64, defense: 58} = struct(charmeleon),
+           "Create the `Charmeleon` struct before starting this exercise."
+
+    assert %{hp: 78, attack: 84, defense: 78} = struct(charizard),
+           "Create the `Charizard` struct before starting this exercise."
+
+    assert evolvable.evolve(struct(charmander)) == struct(charmeleon)
+    assert evolvable.evolve(struct(charmeleon)) == struct(charizard)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
 
