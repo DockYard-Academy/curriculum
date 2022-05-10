@@ -1453,4 +1453,18 @@ defmodule Utils.Solutions do
   end
 
   def math_module, do: Math
+
+  defmodule Charmander do
+    defstruct hp: 39, attack: 52, defense: 43
+  end
+
+  defmodule Charmeleon do
+    defstruct hp: 58, attack: 64, defense: 58
+  end
+
+  defmodule Charizard do
+    defstruct hp: 78, attack: 84, defense: 78
+  end
+
+  def pokemon_evolution_structs, do: [Charmander, Charmeleon, Charizard]
 end

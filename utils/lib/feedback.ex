@@ -1907,6 +1907,34 @@ defmodule Utils.Feedback do
     assert math.multiply(2..4, 5..10) == 10..40
   end
 
+  feedback :pokemon_evolution_structs do
+    [charmander, charmeleon, charizard] = get_answers()
+
+    assert Keyword.get(charmander.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charmander."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charmander),
+           "Define the :hp, :attack, and :defense keys for Charmander."
+
+    assert %{hp: 39, attack: 52, defense: 43} = struct(charmander)
+
+    assert Keyword.get(charmeleon.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charmeleon."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charmeleon),
+           "Define the :hp, :attack, and :defense keys for Charmeleon."
+
+    assert %{hp: 58, attack: 64, defense: 58} = struct(charmeleon)
+
+    assert Keyword.get(charizard.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charizard."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charizard),
+           "Define the :hp, :attack, and :defense keys for Charizard."
+
+    assert %{hp: 78, attack: 84, defense: 78} = struct(charizard)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
 
