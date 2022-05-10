@@ -2354,3 +2354,66 @@ For example, this statement may take some time due to the large list of ten mill
 * Reading
   * Kafka
 * Exercises
+
+## Math Behaviours
+
+Now you're going to accomplish the same as `Math.Guard`, but in a new `Math.Behaviour` module.
+The
+
+```mermaid
+flowchart
+  M[Math.Behavior]
+  I[Math.Behavior.Integer]
+  L[Math.Behavior.List]
+  T[Math.Behavior.Tuple]
+  maps[Math.Behavior.Map]
+  R[Math.Behavior.Range]
+
+  M --> I
+  M --> L
+  M --> T
+  M --> maps
+  M --> R
+```
+
+In the Elixir cell below, create a behaviour `Math` which defines the common interface
+for `add/2`, `subtract/2`, and `multiply/2` different data types.
+
+```elixir
+
+```
+
+* Create a module `Math.Number` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for integers and floats.
+
+```elixir
+
+```
+
+* Create a module `Math.String` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for strings.
+
+```elixir
+
+```
+
+* Create a module `Math.List` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for lists.
+
+```elixir
+
+```
+
+* Create a module `Math.Map` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+
+```elixir
+
+```
+
+* Create a module `Math.Range` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
+
+```elixir
+
+```

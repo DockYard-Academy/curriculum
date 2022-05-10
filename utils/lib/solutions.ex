@@ -1369,4 +1369,88 @@ defmodule Utils.Solutions do
   end
 
   def rpg_wearable, do: [Wearable, RPGCharacter, Armor]
+
+  # Enter your answer below
+
+  defprotocol Math do
+    def add(a, b)
+    def subtract(a, b)
+    def multiply(a, b)
+  end
+
+  defimpl Math, for: Integer do
+    def add(a, b) do
+      a + b
+    end
+
+    def subtract(a, b) do
+      a - b
+    end
+
+    def multiply(a, b) do
+      a * b
+    end
+  end
+
+  defimpl Math, for: Float do
+    def add(a, b) do
+      a + b
+    end
+
+    def subtract(a, b) do
+      a - b
+    end
+
+    def multiply(a, b) do
+      a * b
+    end
+  end
+
+  defimpl Math, for: List do
+    def add(a, b) do
+      a ++ b
+    end
+
+    def subtract(a, b) do
+      a -- b
+    end
+
+    def multiply(list, integer) do
+      list
+      |> List.duplicate(integer)
+      |> List.flatten()
+    end
+  end
+
+  defimpl Math, for: Range do
+    def add(a1..b1, a2..b2) do
+      (a1 + a2)..(b1 + b2)
+    end
+
+    def subtract(a1..b1, a2..b2) do
+      (a1 - a2)..(b1 - b2)
+    end
+
+    def multiply(a1..b1, a2..b2) do
+      (a1 * a2)..(b1 * b2)
+    end
+  end
+
+  defimpl Math, for: BitString do
+    def add(a, b) do
+      a <> b
+    end
+
+    def subtract(a, b) do
+      Enum.reduce(String.graphemes(b), a, fn each, acc ->
+        String.replace(acc, each, "", global: false)
+      end)
+    end
+
+    def multiply(a, b) do
+      String.graphemes(a) |> Enum.map(fn each -> each ++ String.graphemes(b) end) |> Enum.join()
+    end
+  end
+
+  def math_module, do: Math
 end
