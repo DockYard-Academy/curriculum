@@ -1780,6 +1780,101 @@ defmodule Utils.Feedback do
     assert lucas_numbers.generate(30) == Enum.take(sequence, 30)
   end
 
+  feedback :rpg_character do
+    character = get_answers()
+
+    assert Keyword.get(character.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`."
+
+    assert match?(%{health: 100, speed: 20, class: nil, equipment: []}, struct(character)),
+           "Ensure you use default values for :health, :speed, and :equipment."
+  end
+
+  feedback :rpg_healing_potion do
+    healing_potion = get_answers()
+
+    assert Keyword.get(healing_potion.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`."
+
+    assert match?(%{level: 1}, struct(healing_potion)),
+           "Ensure you use default values for :level."
+  end
+
+  feedback :rpg_armor do
+    armor = get_answers()
+
+    assert Keyword.get(armor.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`."
+
+    assert match?(%{defense: 10}, struct(armor)),
+           "Ensure you use default values for :defense."
+  end
+
+  feedback :rpg_consumable do
+    [consumable, character, healing_potion] = get_answers()
+
+    assert Keyword.get(consumable.__info__(:functions), :consume),
+           "Define a `consume/2` function."
+
+    assert Keyword.get(consumable.__info__(:functions), :consume) == 2,
+           "the `consume/2` function should accept an item and a character."
+
+    character_struct = struct(character, %{class: :wizard})
+    injured_character_struct = struct(character, %{class: :wizard, health: 10})
+    potion_struct = struct(healing_potion)
+    level2_potion_struct = struct(healing_potion, %{level: 2})
+
+    assert match?(
+             %{health: 110, speed: 20, class: :wizard, equipment: []},
+             consumable.consume(potion_struct, character_struct)
+           )
+
+    assert match?(
+             %{health: 120, speed: 20, class: :wizard, equipment: []},
+             consumable.consume(level2_potion_struct, character_struct)
+           )
+
+    assert match?(
+             %{health: 20, speed: 20, class: :wizard, equipment: []},
+             consumable.consume(potion_struct, injured_character_struct)
+           )
+
+    assert match?(
+             %{health: 30, speed: 20, class: :wizard, equipment: []},
+             consumable.consume(level2_potion_struct, injured_character_struct)
+           )
+  end
+
+  feedback :rpg_wearable do
+    # Missing test cases
+    # - adding multiple wearables
+    # - removing multiple wearables
+    [wearable, character, armor] = get_answers()
+
+    assert Keyword.get(wearable.__info__(:functions), :wear),
+           "Define a `wear/2` function."
+
+    assert Keyword.get(wearable.__info__(:functions), :wear) == 2,
+           "the `wear/2` function should accept an item and a character"
+
+    character_struct = struct(character, %{class: :wizard})
+    armor_struct = struct(armor)
+
+    assert match?(
+             %{health: 110, speed: 15, class: :wizard, equipment: [^armor_struct]},
+             wearable.wear(armor_struct, character_struct)
+           )
+
+    assert Keyword.get(wearable.__info__(:functions), :remove),
+           "Define a `remove/2` function."
+
+    assert Keyword.get(wearable.__info__(:functions), :remove) == 2,
+           "the `remove/2` function should accept an item and a character"
+
+    armored_character = wearable.wear(armor_struct, character_struct)
+    assert character_struct == wearable.remove(armor_struct, armored_character)
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @test_names
 

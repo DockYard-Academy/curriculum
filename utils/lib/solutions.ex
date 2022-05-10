@@ -1305,4 +1305,68 @@ defmodule Utils.Solutions do
   def behaviours do
     [Pet, Dog, Cat]
   end
+
+  defmodule RPGCharacter do
+    defstruct [:class, health: 100, speed: 20, equipment: []]
+  end
+
+  def rpg_character do
+    RPGCharacter
+  end
+
+  defmodule HealingPotion do
+    defstruct level: 1
+  end
+
+  def rpg_healing_potion, do: HealingPotion
+
+  defmodule Armor do
+    defstruct defense: 10
+  end
+
+  def rpg_armor, do: Armor
+
+  defprotocol Consumable do
+    def consume(item, character)
+  end
+
+  defimpl Consumable, for: HealingPotion do
+    def consume(%{level: level}, character) do
+      %RPGCharacter{
+        health: character.health + level * 10,
+        speed: character.speed,
+        equipment: character.equipment,
+        class: character.class
+      }
+    end
+  end
+
+  def rpg_consumable, do: [Consumable, RPGCharacter, HealingPotion]
+
+  defprotocol Wearable do
+    def wear(item, character)
+    def remove(item, character)
+  end
+
+  defimpl Wearable, for: Armor do
+    def wear(item, character) do
+      %RPGCharacter{
+        health: character.health + item.defense,
+        speed: character.speed - 5,
+        class: character.class,
+        equipment: [item | character.equipment]
+      }
+    end
+
+    def remove(item, character) do
+      %RPGCharacter{
+        health: character.health - item.defense,
+        speed: character.speed + 5,
+        class: character.class,
+        equipment: character.equipment -- [item]
+      }
+    end
+  end
+
+  def rpg_wearable, do: [Wearable, RPGCharacter, Armor]
 end
