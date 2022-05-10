@@ -1,6 +1,5 @@
 # Battle Map
 
-
 ```elixir
 Mix.install([
   {:kino, github: "livebook-dev/kino", override: true},
@@ -22,12 +21,10 @@ Mix.install([
 
 You're developing a 2D tactical combat game.
 
-Characters in your game fight on an 8 by 8 grid.
+Characters in your game fight on a grid of potentially infinite size.
 ![](images/battle_map.png)
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Character Attack.
+## Character Attack
 
 You're going to create a `Character.can_attack?/3` function 
 that expects the following:
@@ -44,13 +41,25 @@ A <b style="color: purple;">Wizard</b> can attack in straight or diagonal lines 
 
 ![](images/wizard_grid.png)
 
-<!-- livebook:{"break_markdown":true} -->
+We've created a `Wizard` struct below. It does not need to store any information in the struct.
+
+```elixir
+defmodule Wizard do
+  defstruct []
+end
+```
 
 A <b style="color: red;">Barbarian</b> can attack in 2 square radius.
 
 ![](images/barbarian_grid.png)
 
-<!-- livebook:{"break_markdown":true} -->
+We've created a `Barbarian` struct below. It does not need to store any information in the struct.
+
+```elixir
+defmodule Barbarian do
+  defstruct []
+end
+```
 
 You should be able to check if a character can attack a coordinate `{x, y}` given their
 starting location in `{x, y}`.
@@ -75,11 +84,37 @@ true
 
 ![](images/wizard_attack.png)
 
-<!-- livebook:{"break_markdown":true} -->
+Enter your solution between the comments below. You may consider making `Character` a protocol or a module
 
-### Custom Character
+```elixir
+# Enter your solution below
+defprotocol Character do
+  def can_attack?(character, origin, target)
+end
 
-<!-- livebook:{"break_markdown":true} -->
+defimpl Character, for: Wizard do
+  def can_attack?(_character, {init_x, init_y}, {x, y}) do
+    x_diff = init_x - x
+    y_diff = init_y - y
+
+    init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
+  end
+end
+
+defimpl Character, for: Barbarian do
+  def can_attack?(_character, {init_x, init_y}, {x, y}) do
+    x_diff = init_x - x
+    y_diff = init_y - y
+
+    abs(x_diff) <= 2 && abs(y_diff) <= 2
+  end
+end
+
+# Enter your solution above
+Utils.feedback(:battle_map, [Character, Barbarian, Wizard])
+```
+
+## Custom Character (BONUS)
 
 Create your own customer character with an attack pattern than you decide on. It should not
 match the existing characters.
@@ -95,10 +130,4 @@ Character.can_attack?(%Archer{}, {4, 4}, {7, 7})
 true
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Solution
-
-```elixir
-
-```
+Modify the existing solution above to add your custom character.
