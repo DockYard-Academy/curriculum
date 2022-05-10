@@ -26,7 +26,8 @@ defmodule Utils.MixProject do
       {:benchee, "~> 0.1"},
       {:ecto, "~> 3.7"},
       {:math, "~> 0.7.0"},
-      {:faker, "~> 0.17.0"}
+      {:faker, "~> 0.17.0"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 end

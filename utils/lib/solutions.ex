@@ -1240,7 +1240,7 @@ defmodule Utils.Solutions do
     def convert(%__MODULE__{amount: amount, currency: from_currency} = money, to_currency) do
       cad_amount =
         case from_currency do
-          :CAD -> amount * 1
+          :CAD -> amount
           :US -> amount * 1.29
           :EUR -> amount * 1.39
         end

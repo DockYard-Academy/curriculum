@@ -39,11 +39,10 @@ defmodule Utils.Table do
   def factorial_complexity do
     Enum.map(1..10, fn each ->
       equation =
-        Enum.map(each..1, fn
+        Enum.map_join(each..1, fn
           ^each -> "#{each}"
           n -> " * #{n}"
         end)
-        |> Enum.join()
 
       %{"# of elements": each, result: each ** each, equation: equation}
     end)
@@ -132,10 +131,10 @@ defmodule Utils.Table do
   end
 
   def base_2_10_comparison do
-      Enum.map(1..500, fn integer ->
-        binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
-        %{base10: integer, base2: binary}
-      end)
+    Enum.map(1..500, fn integer ->
+      binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
+      %{base10: integer, base2: binary}
+    end)
   end
 
   def hexadecimal do

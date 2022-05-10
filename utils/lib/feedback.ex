@@ -1932,7 +1932,7 @@ defmodule Utils.Feedback do
       }
     }
 
-    assert string_maze == string_maze, reset_message()
+    assert string_maze == expected_maze, reset_message()
     assert path, "Enter a value for `path`"
     assert path != string_maze, "Use string_maze[\"south\"] to access the first key of the map."
 
