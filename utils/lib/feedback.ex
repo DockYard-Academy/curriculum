@@ -539,48 +539,48 @@ defmodule Utils.Feedback do
     end)
   end
 
-  feedback :custom_rps do
-    custom_game_module = get_answers()
+  # feedback :custom_rps do
+  #   custom_game_module = get_answers()
 
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :new),
-           "Ensure you define the `new/3` function"
+  #   assert 3 == Keyword.get(custom_game_module.__info__(:functions), :new),
+  #          "Ensure you define the `new/3` function"
 
-    assert Keyword.get(custom_game_module.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
+  #   assert Keyword.get(custom_game_module.__info__(:functions), :__struct__),
+  #          "Ensure you use `defstruct`."
 
-    assert match?(%{rock: _, paper: _, scissors: _}, struct(custom_game_module)),
-           "Ensure you use `defstruct` with :rock, :paper, and :scissors."
+  #   assert %{rock: _, paper: _, scissors: _} = struct(custom_game_module),
+  #          "Ensure you use `defstruct` with :rock, :paper, and :scissors."
 
-    assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
-             custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
+  #   assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
+  #            custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
 
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :play),
-           "Ensure you define the `play/3` function"
+  #   assert 3 == Keyword.get(custom_game_module.__info__(:functions), :play),
+  #          "Ensure you define the `play/3` function"
 
-    game = custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
+  #   game = custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
 
-    beats? = fn p1, p2 ->
-      {p1, p2} in [
-        {:custom_rock, :custom_scissors},
-        {:custom_paper, :custom_rock},
-        {:custom_scissors, :custom_paper}
-      ]
-    end
+  #   beats? = fn p1, p2 ->
+  #     {p1, p2} in [
+  #       {:custom_rock, :custom_scissors},
+  #       {:custom_paper, :custom_rock},
+  #       {:custom_scissors, :custom_paper}
+  #     ]
+  #   end
 
-    for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
-        player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
-      result = custom_game_module.play(game, player1, player2)
+  #   for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
+  #       player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
+  #     result = custom_game_module.play(game, player1, player2)
 
-      expected_result =
-        cond do
-          beats?.(player1, player2) -> "#{player1} beats #{player2}"
-          beats?.(player2, player1) -> "#{player2} beats #{player1}"
-          true -> "draw"
-        end
+  #     expected_result =
+  #       cond do
+  #         beats?.(player1, player2) -> "#{player1} beats #{player2}"
+  #         beats?.(player2, player1) -> "#{player2} beats #{player1}"
+  #         true -> "draw"
+  #       end
 
-      assert result == expected_result
-    end
-  end
+  #     assert result == expected_result
+  #   end
+  # end
 
   feedback :fizzbuzz do
     fizz_buzz_module = get_answers()
@@ -713,23 +713,23 @@ defmodule Utils.Feedback do
            "Ensure you use `defstruct` with :type, :effect, :level, :size, and :style."
   end
 
-  feedback :item_generator do
-    items = get_answers()
+  # feedback :item_generator do
+  #   items = get_answers()
 
-    assert is_list(items), "`items` should be a list."
+  #   assert is_list(items), "`items` should be a list."
 
-    expected_items = Utils.Solutions.item_generator()
+  #   expected_items = Utils.Solutions.item_generator()
 
-    expected_length = length(expected_items)
+  #   expected_length = length(expected_items)
 
-    assert length(items) == expected_length,
-           "There should be #{expected_length} permutations of items."
+  #   assert length(items) == expected_length,
+  #          "There should be #{expected_length} permutations of items."
 
-    Enum.each(items, fn item ->
-      assert is_struct(item), "Each item should be an `Item` struct."
-      assert match?(%{type: _, effect: _, style: _, size: _, level: _, __struct__: _}, item)
-    end)
-  end
+  #   Enum.each(items, fn item ->
+  #     assert is_struct(item), "Each item should be an `Item` struct."
+  #     assert match?(%{type: _, effect: _, style: _, size: _, level: _, __struct__: _}, item)
+  #   end)
+  # end
 
   feedback :item_generator_search do
     search = get_answers()
@@ -872,12 +872,12 @@ defmodule Utils.Feedback do
     assert measurements.average(list) == Utils.Solutions.Measurements.average(list)
   end
 
-  feedback :keyword_list_hero do
-    hero = get_answers()
+  # feedback :keyword_list_hero do
+  #   hero = get_answers()
 
-    assert [name: _, secret_identity: _] = hero,
-           "Ensure hero is a keyword list with :name and :secret_identity."
-  end
+  #   assert [name: _, secret_identity: _] = hero,
+  #          "Ensure hero is a keyword list with :name and :secret_identity."
+  # end
 
   feedback :string_key_map do
     map = get_answers()
@@ -910,18 +910,18 @@ defmodule Utils.Feedback do
     assert value == "world"
   end
 
-  feedback :update_map do
-    updated_map = get_answers()
-    assert is_map(updated_map), "Ensure `updated_map` is a map."
+  # feedback :update_map do
+  #   updated_map = get_answers()
+  #   assert is_map(updated_map), "Ensure `updated_map` is a map."
 
-    assert Map.has_key?(updated_map, :example_key),
-           "Ensure `updated_map` still has the `:example_key`"
+  #   assert Map.has_key?(updated_map, :example_key),
+  #          "Ensure `updated_map` still has the `:example_key`"
 
-    assert %{example_key: _} = updated_map
+  #   assert %{example_key: _} = updated_map
 
-    assert updated_map.example_key !== "value",
-           "Ensure you update the :example_key with a changed value."
-  end
+  #   assert updated_map.example_key !== "value",
+  #          "Ensure you update the :example_key with a changed value."
+  # end
 
   feedback :remainder do
     remainder = get_answers()
@@ -1505,37 +1505,37 @@ defmodule Utils.Feedback do
 
     assert phone_number.parse("1231231234"), "Ensure you implement the `parse/1` function."
     text = "
-1231231234
-123 123 1234
-(123)-123-1234
-(123) 123 1234
-(123)123-1234
-"
+  1231231234
+  123 123 1234
+  (123)-123-1234
+  (123) 123 1234
+  (123)123-1234
+  "
 
     assert phone_number.parse(text) == "
-123-123-1234
-123-123-1234
-123-123-1234
-123-123-1234
-123-123-1234
-"
+  123-123-1234
+  123-123-1234
+  123-123-1234
+  123-123-1234
+  123-123-1234
+  "
 
     text = "
-5555550150
-555 555 0199
-(555)-555-0120
-(555) 555 0100
-(555)555-0101
-"
+  5555550150
+  555 555 0199
+  (555)-555-0120
+  (555) 555 0100
+  (555)555-0101
+  "
 
     assert phone_number.parse(text) ==
              "
-555-555-0150
-555-555-0199
-555-555-0120
-555-555-0100
-555-555-0101
-"
+  555-555-0150
+  555-555-0199
+  555-555-0120
+  555-555-0100
+  555-555-0101
+  "
   end
 
   feedback :classified do
@@ -1557,31 +1557,31 @@ defmodule Utils.Feedback do
     assert classified.redact("-1234-") == "-REDACTED-"
 
     text = "
-    Peter Parker
-    Bruce Wayne
-    Clark Kent
-    1234
-    4567
-    9999
-    123-123-1234
-    456-456-4567
-    999-999-9999
-    email@mail.com
-    name@gmail.ca
-    "
+      Peter Parker
+      Bruce Wayne
+      Clark Kent
+      1234
+      4567
+      9999
+      123-123-1234
+      456-456-4567
+      999-999-9999
+      email@mail.com
+      name@gmail.ca
+      "
     assert classified.redact(text) == "
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    REDACTED
-    "
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      REDACTED
+      "
   end
 
   feedback :caesar_cypher do
@@ -1819,35 +1819,35 @@ defmodule Utils.Feedback do
            )
   end
 
-  feedback :rpg_wearable do
-    # Missing test cases
-    # - adding multiple wearables
-    # - removing multiple wearables
-    [wearable, character, armor] = get_answers()
+  # feedback :rpg_wearable do
+  #   # Missing test cases
+  #   # - adding multiple wearables
+  #   # - removing multiple wearables
+  #   [wearable, character, armor] = get_answers()
 
-    assert Keyword.get(wearable.__info__(:functions), :wear),
-           "Define a `wear/2` function."
+  #   assert Keyword.get(wearable.__info__(:functions), :wear),
+  #          "Define a `wear/2` function."
 
-    assert Keyword.get(wearable.__info__(:functions), :wear) == 2,
-           "the `wear/2` function should accept an item and a character"
+  #   assert Keyword.get(wearable.__info__(:functions), :wear) == 2,
+  #          "the `wear/2` function should accept an item and a character"
 
-    character_struct = struct(character, %{class: :wizard})
-    armor_struct = struct(armor)
+  #   character_struct = struct(character, %{class: :wizard})
+  #   armor_struct = struct(armor)
 
-    assert match?(
-             %{health: 110, speed: 15, class: :wizard, equipment: [^armor_struct]},
-             wearable.wear(armor_struct, character_struct)
-           )
+  #   assert match?(
+  #            %{health: 110, speed: 15, class: :wizard, equipment: [^armor_struct]},
+  #            wearable.wear(armor_struct, character_struct)
+  #          )
 
-    assert Keyword.get(wearable.__info__(:functions), :remove),
-           "Define a `remove/2` function."
+  #   assert Keyword.get(wearable.__info__(:functions), :remove),
+  #          "Define a `remove/2` function."
 
-    assert Keyword.get(wearable.__info__(:functions), :remove) == 2,
-           "the `remove/2` function should accept an item and a character"
+  #   assert Keyword.get(wearable.__info__(:functions), :remove) == 2,
+  #          "the `remove/2` function should accept an item and a character"
 
-    armored_character = wearable.wear(armor_struct, character_struct)
-    assert character_struct == wearable.remove(armor_struct, armored_character)
-  end
+  #   armored_character = wearable.wear(armor_struct, character_struct)
+  #   assert character_struct == wearable.remove(armor_struct, armored_character)
+  # end
 
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
