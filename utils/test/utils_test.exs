@@ -60,7 +60,7 @@ defmodule UtilsTest do
     atom = Factory.string() |> String.to_atom()
 
     assert Utils.feedback(atom, "non-nil answer") ==
-             "Something went wrong, feedback does not exist for #{atom}."
+             "Something went wrong, feedback does not exist for #{atom}. Please speak to your teacher and/or reset the exercise."
   end
 
   defp execute_tests_until_failure([]), do: nil

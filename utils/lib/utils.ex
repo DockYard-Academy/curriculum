@@ -30,5 +30,11 @@ defmodule Utils do
 
   def table(table_name), do: Kino.DataTable.new(apply(Utils.Table, table_name, []))
 
-  def feedback(module_name, answers), do: Utils.Feedback.test(module_name, answers)
+  def feedback(description, answers) do
+    if description in Utils.Feedback.test_names() do
+      Utils.Feedback.feedback(description, answers)
+    else
+      "Something went wrong, feedback does not exist for #{description}. Please speak to your teacher and/or reset the exercise."
+    end
+  end
 end

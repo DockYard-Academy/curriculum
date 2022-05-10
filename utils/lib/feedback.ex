@@ -15,12 +15,7 @@ defmodule Utils.Feedback do
 
   Creates a a Utils.feedback(:example, answers) function clause.
   """
-  Module.register_attribute(Utils.Feedback, :test_names, accumulate: true)
-  require Utils.Macros
-  import Utils.Macros
-
-  import ExUnit.CaptureLog
-  require Logger
+  use Utils.Feedback.Assertion
 
   feedback :card_count_four do
     next_count = get_answers()
@@ -1646,27 +1641,6 @@ defmodule Utils.Feedback do
     |> Kino.render()
   end
 
-  # saved from changed exercise, will be used for CustomEnum exercise.
-  feedback :custom_enum do
-    custom_enum = get_answers()
-
-    list = Enum.to_list(1..5)
-
-    assert custom_enum.map(list, fn each -> each end),
-           "Ensure you implement the `map/2` function"
-
-    assert custom_enum.map(list(fn each -> each end)) == [1, 2, 3, 4, 5]
-
-    assert custom_enum.map(list, fn each -> each * 2 end) ==
-             Enum.map(list, fn each -> each * 2 end)
-
-    assert custom_enum.map(1..10, fn each -> each + 2 end) ==
-             Enum.map(list, fn each -> each + 2 end)
-
-    assert custom_enum.map(1..10, fn each -> each - 2 end) ==
-             Enum.map(list, fn each -> each - 2 end)
-  end
-
   feedback :enum_recursion do
     custom_enum = get_answers()
 
@@ -1876,7 +1850,7 @@ defmodule Utils.Feedback do
   end
 
   # test_names must be after tests that require a solution.
-  def test_names, do: @test_names
+  def test_names, do: @tests
 
   feedback :atom_maze do
     [atom_maze, path] = get_answers()
@@ -2055,11 +2029,6 @@ defmodule Utils.Feedback do
   feedback :codepoint_z do
     z = get_answers()
     assert z == ?z
-  end
-
-  feedback :jewel do
-    jewel = get_answers()
-    assert jewel == "jewel"
   end
 
   feedback :hello do
@@ -2252,31 +2221,5 @@ defmodule Utils.Feedback do
 
     assert File.dir?("../projects/#{path}"),
            "Ensure you create a mix project `#{path}` in the `projects` folder."
-  end
-
-  # Allows for tests that don't require input
-  def test(test_name), do: test(test_name, "")
-
-  def test(test_name, answers) do
-    cond do
-      test_name not in @test_names ->
-        "Something went wrong, feedback does not exist for #{test_name}."
-
-      Mix.env() == :test ->
-        ExUnit.start(auto_run: false)
-        test_module(test_name, answers)
-        ExUnit.run()
-
-      is_nil(answers) ->
-        "Please enter your answer above."
-
-      is_list(answers) and not Enum.any?(answers) ->
-        "Please enter an answer above."
-
-      true ->
-        ExUnit.start(auto_run: false)
-        test_module(test_name, answers)
-        ExUnit.run()
-    end
   end
 end
