@@ -2,7 +2,8 @@ defmodule Utils.Feedback.Assertion do
   defmacro __using__(_otps) do
     quote do
       import unquote(__MODULE__)
-      Module.register_attribute(__MODULE__, :solutions, accumulate: true)
+      Module.register_attribute(__MODULE__, :feedback_functions, accumulate: true)
+      Module.register_attribute(__MODULE__, :ignored, accumulate: true)
 
       import ExUnit.CaptureLog
       require Logger
@@ -18,14 +19,27 @@ defmodule Utils.Feedback.Assertion do
   defmacro __before_compile__(_env) do
     quote do
       def solutions do
-        @solutions
+        @feedback_functions -- @ignored
+      end
+
+      def feedback_functions do
+        @feedback_functions
+      end
+
+      def ignored do
+        @ignored
       end
     end
   end
 
-  defmacro feedback(description, do: assertion) do
+  defmacro feedback(description, opts \\ [], do: assertion) do
     quote do
-      @solutions unquote(description)
+      @feedback_functions unquote(description)
+
+      if Keyword.get(unquote(opts), :ignore) do
+        @ignored unquote(description)
+      end
+
       def feedback(unquote(description), answers) do
         :persistent_term.put(:answers, answers)
         unquote(assertion)

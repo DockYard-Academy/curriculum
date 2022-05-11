@@ -32,7 +32,8 @@ defmodule Utils do
 
   def feedback(description, answers) do
     try do
-      Utils.Feedback.feedback(description, answers)
+      result = Utils.Feedback.feedback(description, answers)
+      if Mix.env() == :test, do: result, else: Kino.nothing()
     rescue
       FunctionClauseError ->
         "Something went wrong, feedback does not exist for #{description}. Please speak to your teacher and/or reset the exercise."
