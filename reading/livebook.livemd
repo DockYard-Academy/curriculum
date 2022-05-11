@@ -133,6 +133,32 @@ Re-evaluate the cell to see *Evaluated** change to **Evaluated**.
 5
 ```
 
+## Formatting
+
+You can format Elixir code using the <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>F</kbd> Keybinding.
+
+Try uncommenting the following code (Remove the `#` character) then press <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>F</kbd>
+to format the code.
+
+Notice that the `1 + 1` code moves to the left.
+
+```elixir
+#               1 + 1
+```
+
+If you have not evaluated any Elixir code cells, you may see a warning.
+
+> You need to start a runtimg (or evaluate a cell) to enable code formatting.
+
+Ensure you evaluate any elixir cell before attempting to use the code format command.
+
+If you cannot format an Elixir cell, you can use this as a clue that you have a syntax error in your code. For example, the following
+code is invalid. Notice that you cannot use <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>F</kbd> to format the code.
+
+```elixir
+          1 + 
+```
+
 ## Utils
 
 We use a `Utils` project to power certain functionality.
@@ -182,8 +208,8 @@ Let's break down the test feedback.
 ```elixir
   1) test example (Utils.Example)
      utils/lib/utils.ex:972
-     Assertion with === failed
-     code:  assert @answer === 5
+     Assertion with == failed
+     code:  assert example == 5
      left:  4
      right: 5
      stacktrace:
@@ -210,7 +236,7 @@ ExUnit tells you that the test failed.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Assertion with === failed
+Assertion with == failed
 ```
 
 Then it may provide information about the test being run. You may not be familiar with

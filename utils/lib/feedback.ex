@@ -1991,7 +1991,8 @@ defmodule Utils.Feedback do
   def test_names, do: @tests
 
   feedback :example do
-    assert false
+    example = get_answers()
+    assert example == 5
   end
 
   feedback :atom_maze do
