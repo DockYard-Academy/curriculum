@@ -1849,8 +1849,151 @@ defmodule Utils.Feedback do
   #   assert character_struct == wearable.remove(armor_struct, armored_character)
   # end
 
+  feedback :math_module do
+    math = get_answers()
+    assert math, "Ensure you implement a `Math` module or protocol"
+    assert math.__info__(:functions), "Ensure you implement a `Math` module or protocol"
+
+    assert Keyword.get(math.__info__(:functions), :add), "Implement the `add/2` function"
+    assert math.add(1, 2) == 3, "Implement the `add/2` function for integers."
+    assert math.add(3, 2) == 5
+    assert math.add(1.0, 2) == 3.0, "Implement the `add/2` function for floats"
+    assert math.add([1], [1]) == [1, 1], "Implement the `add/2` function for lists."
+    assert math.add([1, 2], [1]) == [1, 2, 1]
+    assert math.add([1, 2], [1, 2]) == [1, 2, 1, 2]
+    assert math.add(1..10, 1..10) == 2..20, "Implement the `add/2` function for ranges."
+    assert math.add(4..5, 1..1) == 5..6
+
+    assert math.add("hello, ", "world!") == "hello, world!",
+           "Implement the `add/2` function for strings."
+
+    assert math.add("a", "b") == "ab"
+
+    assert Keyword.get(math.__info__(:functions), :subtract),
+           "Implement the `subtract/2` function."
+
+    assert math.subtract(2, 2) == 0, "Implement the `subtract/2` function for integers."
+    assert math.subtract(10, 2) == 8
+    assert math.subtract(10, 2.0) == 8.0
+    assert math.subtract(2.0, 1) == 1.0, "Implement the `subtract/2` function for floats."
+    assert math.subtract(10.0, 2.0) == 8.0
+    assert math.subtract([1, 2], [1]) == [2], "Implement the `subtract/2` function for lists."
+    assert math.subtract([1, 2, 3], [1, 2]) == [3]
+    assert math.subtract(5..10, 1..5) == 4..5, "Implement the `subtract/2` function for ranges."
+    assert math.subtract(1..10, 2..5) == -1..5
+
+    assert math.subtract("hello", "he") == "llo",
+           "Implement the `subtract/2` function for ranges."
+
+    assert math.subtract("hi", "i") == "h"
+    assert math.subtract("oooo", "ooo") == "o"
+
+    assert Keyword.get(math.__info__(:functions), :multiply),
+           "Implement the `multiply/2` function"
+
+    assert math.multiply(5, 5) == 25, "Implement the `multiply/2` function for integers."
+    assert math.multiply(10, 10) == 100
+    assert math.multiply(5.0, 10) == 50.0, "Implement the `multiply/2` function for floats."
+    assert math.multiply(2.0, 5.0) == 10.0, "Implement the `multiply/2` function for floats."
+
+    assert math.multiply([1, 2], 3) == [1, 2, 1, 2, 1, 2],
+           "Implement the `multiply/2` function for lists."
+
+    assert math.multiply(["a"], 2) == ["a", "a"]
+
+    assert math.multiply(5..10, 5..10) == 25..100,
+           "Implement the `multiply/2` function for ranges."
+
+    assert math.multiply(2..4, 5..10) == 10..40
+  end
+
+  feedback :pokemon_evolution_structs do
+    [charmander, charmeleon, charizard] = get_answers()
+
+    assert Keyword.get(charmander.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charmander."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charmander),
+           "Define the :hp, :attack, and :defense keys for Charmander."
+
+    assert %{hp: 39, attack: 52, defense: 43} = struct(charmander)
+
+    assert Keyword.get(charmeleon.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charmeleon."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charmeleon),
+           "Define the :hp, :attack, and :defense keys for Charmeleon."
+
+    assert %{hp: 58, attack: 64, defense: 58} = struct(charmeleon)
+
+    assert Keyword.get(charizard.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct` for Charizard."
+
+    assert %{hp: _, attack: _, defense: _} = struct(charizard),
+           "Define the :hp, :attack, and :defense keys for Charizard."
+
+    assert %{hp: 78, attack: 84, defense: 78} = struct(charizard)
+  end
+
+  feedback :evolvable do
+    [evolvable, charmander, charmeleon, charizard] = get_answers
+
+    assert Keyword.get(evolvable.__info__(:functions), :evolve),
+           "add the `evolve` function to the `Evolvable` protocol."
+
+    assert %{hp: 39, attack: 52, defense: 43} = struct(charmander),
+           "Create the `Charmander` struct before starting this exercise."
+
+    assert %{hp: 58, attack: 64, defense: 58} = struct(charmeleon),
+           "Create the `Charmeleon` struct before starting this exercise."
+
+    assert %{hp: 78, attack: 84, defense: 78} = struct(charizard),
+           "Create the `Charizard` struct before starting this exercise."
+
+    assert evolvable.evolve(struct(charmander)) == struct(charmeleon)
+    assert evolvable.evolve(struct(charmeleon)) == struct(charizard)
+  end
+
+  feedback :battle_map do
+    [character, barbarian, wizard] = get_answers()
+
+    wizard = struct(wizard)
+    barbarian = struct(barbarian)
+
+    for init_x <- 1..7, init_y <- 1..7, x <- 1..7, y <- 1..7 do
+      x_diff = init_x - x
+      y_diff = init_y - y
+
+      can_attack = init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
+
+      assert character.can_attack?(wizard, {init_x, init_y}, {x, y}) == can_attack, """
+      Called with: Character.can_attack(%Wizard{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
+      Expected: #{can_attack}
+      Recieved: #{character.can_attack?(wizard, {init_x, init_y}, {x, y})}
+      """
+    end
+
+    for init_x <- 1..7, init_y <- 1..7, x <- 1..7, y <- 1..7 do
+      x_diff = init_x - x
+      y_diff = init_y - y
+
+      can_attack = abs(x_diff) <= 2 && abs(y_diff) <= 2
+
+      assert character.can_attack?(barbarian, {init_x, init_y}, {x, y}) == can_attack, """
+      Called with: Character.can_attack(%Barbarian{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
+      Expected: #{can_attack}
+      Recieved: #{character.can_attack?(barbarian, {init_x, init_y}, {x, y})}
+      """
+    end
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
+
+  feedback :example do
+    example = get_answers()
+    assert example == 5
+  end
 
   feedback :atom_maze do
     [atom_maze, path] = get_answers()

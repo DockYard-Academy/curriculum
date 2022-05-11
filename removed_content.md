@@ -1374,10 +1374,10 @@ we spelled **acceleration** with one **l** instead of two. 🤦‍♂️
 Whatever the reason, unpredictable errors happen. In fact, 
 Elixir has a philosophy of "Let it crash" which you'll learn more about in future lessons.
 
-There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/1.13.2/RuntimeError.html).
+There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/RuntimeError.html).
 A runtime error occurs while the program is running. That's why it's called a runtime error.
 
-The other is a [CompileError](https://hexdocs.pm/elixir/1.13.2/CompileError.html)
+The other is a [CompileError](https://hexdocs.pm/elixir/CompileError.html)
 . A compile error occurs during compile time. 
 What is compile time? Compile time when the Elixir source code that you've written gets converted
 into binary machine code instructions for the computer.
@@ -2354,3 +2354,66 @@ For example, this statement may take some time due to the large list of ten mill
 * Reading
   * Kafka
 * Exercises
+
+## Math Behaviours
+
+Now you're going to accomplish the same as `Math.Guard`, but in a new `Math.Behaviour` module.
+The
+
+```mermaid
+flowchart
+  M[Math.Behavior]
+  I[Math.Behavior.Integer]
+  L[Math.Behavior.List]
+  T[Math.Behavior.Tuple]
+  maps[Math.Behavior.Map]
+  R[Math.Behavior.Range]
+
+  M --> I
+  M --> L
+  M --> T
+  M --> maps
+  M --> R
+```
+
+In the Elixir cell below, create a behaviour `Math` which defines the common interface
+for `add/2`, `subtract/2`, and `multiply/2` different data types.
+
+```elixir
+
+```
+
+* Create a module `Math.Number` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for integers and floats.
+
+```elixir
+
+```
+
+* Create a module `Math.String` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for strings.
+
+```elixir
+
+```
+
+* Create a module `Math.List` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for lists.
+
+```elixir
+
+```
+
+* Create a module `Math.Map` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+
+```elixir
+
+```
+
+* Create a module `Math.Range` which implements the `Math` behavior.
+* handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
+
+```elixir
+
+```
