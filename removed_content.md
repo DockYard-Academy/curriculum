@@ -1374,10 +1374,10 @@ we spelled **acceleration** with one **l** instead of two. 🤦‍♂️
 Whatever the reason, unpredictable errors happen. In fact, 
 Elixir has a philosophy of "Let it crash" which you'll learn more about in future lessons.
 
-There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/1.13.2/RuntimeError.html).
+There are two main categories of errors. The first is a [RuntimeError](https://hexdocs.pm/elixir/RuntimeError.html).
 A runtime error occurs while the program is running. That's why it's called a runtime error.
 
-The other is a [CompileError](https://hexdocs.pm/elixir/1.13.2/CompileError.html)
+The other is a [CompileError](https://hexdocs.pm/elixir/CompileError.html)
 . A compile error occurs during compile time. 
 What is compile time? Compile time when the Elixir source code that you've written gets converted
 into binary machine code instructions for the computer.
