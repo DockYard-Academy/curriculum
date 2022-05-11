@@ -1990,6 +1990,10 @@ defmodule Utils.Feedback do
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
 
+  feedback :example do
+    assert false
+  end
+
   feedback :atom_maze do
     [atom_maze, path] = get_answers()
 
