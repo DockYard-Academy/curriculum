@@ -649,37 +649,28 @@ defmodule Utils.Solutions do
   end
 
   defmodule Measurements do
+    defp make_pairs(list) do
+      list
+      |> Enum.chunk_every(2, 1, :discard)
+    end
+
     def increased(measurements) do
-      [head | tail] = measurements
-
-      {_prev, sum} =
-        Enum.reduce(tail, {head, 0}, fn each, {prev, acc} ->
-          {each, (prev < each && acc + 1) || acc}
-        end)
-
-      sum
+      measurements
+      |> make_pairs
+      |> Enum.count(fn [a, b] -> b > a end)
     end
 
     def increased_by(measurements) do
-      [head | tail] = measurements
-
-      {_prev, sum} =
-        Enum.reduce(tail, {head, 0}, fn each, {prev, acc} ->
-          {each, (prev < each && acc + each - prev) || acc}
-        end)
-
-      sum
+      measurements
+      |> increments
+      |> Enum.filter(fn inc -> inc > 0 end)
+      |> Enum.sum()
     end
 
     def increments(measurements) do
-      [head | tail] = measurements
-
-      {_prev, acc} =
-        Enum.reduce(tail, {head, []}, fn each, {prev, acc} ->
-          {each, [each - prev | acc]}
-        end)
-
-      Enum.reverse(acc)
+      measurements
+      |> make_pairs
+      |> Enum.map(fn [a, b] -> b - a end)
     end
 
     def average(measurements) do

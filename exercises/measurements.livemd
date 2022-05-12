@@ -92,6 +92,9 @@ Measurements.average([2, 10])
 ```elixir
 defmodule Measurements do
   def increased(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.filter(fn [a, b] -> a < b end)
+    |> Enum.count()
   end
 
   def increased_by(measurements) do
@@ -105,4 +108,14 @@ defmodule Measurements do
 end
 
 Utils.feedback(:measurements, Measurements)
+```
+
+```elixir
+list = [82, 71, 60, 26, 68, 1, 56, 15, 30, 100, 78]
+Utils.Solutions.Measurements.increased(list) |> IO.inspect()
+Measurements.increased(list)
+```
+
+```elixir
+Enum.chunk_every([1, 2, 3], 2, 1, :discard)
 ```
