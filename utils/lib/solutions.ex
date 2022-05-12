@@ -47,10 +47,6 @@ defmodule Utils.Solutions do
     ]
   end
 
-  def rocket_ship do
-    20
-  end
-
   def rock_paper_scissors_two_player do
     player1_choice = Utils.random(:rock_paper_scissors)
     player2_choice = Utils.random(:rock_paper_scissors)
@@ -349,36 +345,12 @@ defmodule Utils.Solutions do
     [player_choice, ai_choice]
   end
 
-  def tip_amount do
-    cost_of_the_meal = 55.5
-    tip_rate = 0.2
-
-    tip_amount = cost_of_the_meal * tip_rate
-
-    [cost_of_the_meal, tip_rate, tip_amount]
-  end
-
   def string_interpolation do
     "I have #{1 - 1} classmates."
   end
 
   def string_concatenation do
     "Hi, Peter."
-  end
-
-  def pythagorean_c do
-    :math.sqrt(200)
-  end
-
-  def pythagorean_c_square do
-    10 ** 2 + 10 ** 2
-  end
-
-  def percentage do
-    completed_items = 10
-    total_items = 100
-    percentage = completed_items / total_items * 100
-    [completed_items, total_items, percentage]
   end
 
   defmodule CustomGame do

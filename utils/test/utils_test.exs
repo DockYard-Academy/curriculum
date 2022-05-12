@@ -3,8 +3,6 @@ defmodule UtilsTest do
   doctest Utils
   alias Utils.Factory
 
-  import ExUnit.CaptureIO
-
   test "feedback/2 with invalid atom" do
     atom = Factory.string() |> String.to_atom()
 

@@ -41,26 +41,6 @@ defmodule Utils.Feedback do
     end
   end
 
-  # feedback :percentage do
-  #   [completed_items, total_items, percentage] = get_answers()
-
-  #   assert completed_items == 10,
-  #          "completed_items should always be 10. Please reset the exercise."
-
-  #   assert total_items == 100, "total_items should always be 100. Please reset the exercise."
-  #   assert percentage == completed_items / total_items * 100
-  # end
-
-  # feedback :pythagorean_c_square do
-  #   c_square = get_answers()
-  #   assert c_square == 10 ** 2 + 10 ** 2
-  # end
-
-  # feedback :pythagorean_c do
-  #   c = get_answers()
-  #   assert c == :math.sqrt(200)
-  # end
-
   # feedback :string_concatenation do
   #   answer = get_answers()
   #   assert is_binary(answer), "the answer should be a string."
@@ -81,15 +61,6 @@ defmodule Utils.Feedback do
   #   assert Regex.match?(~r/I have \d+ classmates\./, answer) ||
   #            answer === "I have 1 classmate.",
   #          "the answer should end in a period."
-  # end
-
-  # feedback :tip_amount do
-  #   [cost_of_the_meal, tip_rate, tip_amount] = get_answers()
-  #   assert tip_rate == 0.20, "tip rate should be 0.2."
-  #   assert cost_of_the_meal == 55.5, "cost_of_the_meal should be 55.5."
-
-  #   assert tip_amount === cost_of_the_meal * tip_rate,
-  #          "tip_amount should be cost_of_the_meal * tip_rate."
   # end
 
   # feedback :rock_paper_scissors_ai do
@@ -140,11 +111,6 @@ defmodule Utils.Feedback do
   #   assert rock_paper_scissors.play(:rock, :paper) == ":paper beats :rock!"
   #   assert rock_paper_scissors.play(:scissors, :rock) == ":rock beats :scissors!"
   #   assert rock_paper_scissors.play(:paper, :scissors) == ":scissors beats :paper!"
-  # end
-
-  # feedback :rocket_ship do
-  #   force = get_answers()
-  #   assert force == 20
   # end
 
   # feedback :startup_madlib do

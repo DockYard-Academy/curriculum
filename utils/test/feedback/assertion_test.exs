@@ -2,157 +2,127 @@ defmodule Utils.Feedback.AssertionTest do
   use ExUnit.Case
   doctest Utils.Feedback.Assertion
   alias Utils.Feedback.Assertion
-
-  require Utils.Feedback.Assertion
   import ExUnit.CaptureIO
 
+  require Utils.Feedback.Assertion
+
   test "assert all checks passed" do
-    assert capture_io(fn ->
-             assert Assertion.assert(1 == 1) == :ok
-           end) =~ "."
+    assert Assertion.assert(1 == 1) == :ok
 
-    assert capture_io(fn ->
-             assert Assertion.assert(1 === 1) === :ok
-           end) =~ "."
+    assert Assertion.assert(1 === 1) === :ok
 
-    assert capture_io(fn ->
-             assert Assertion.assert(1 <= 1) == :ok
-           end) =~ "."
+    assert Assertion.assert(1 <= 1) == :ok
 
-    assert capture_io(fn ->
-             assert Assertion.assert(1 >= 1) == :ok
-           end) =~ "."
+    assert Assertion.assert(1 >= 1) == :ok
 
-    assert capture_io(fn ->
-             assert Assertion.assert(2 > 1) == :ok
-           end) =~ "."
+    assert Assertion.assert(2 > 1) == :ok
 
-    assert capture_io(fn ->
-             assert Assertion.assert(1 < 2) == :ok
-           end) =~ "."
+    assert Assertion.assert(1 < 2) == :ok
   end
 
   test "assert == _ failed" do
-    assert capture_io(fn ->
-             assert Assertion.assert(1 == 2) == :error
-           end) =~
-             """
-             Solution Failed.
-               Code: assert Assertion.assert(1 == 2) == :error
-               Expected: 2
-               To Equal: 1
-             """
+    expected = """
+    Assertion with == failed.
+      code: Assertion.assert(1 == 2)
+      left: 1
+      right: 2
+    """
+
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert(1 == 2)
+    end
   end
 
-  # test "assert <= _ failed" do
-  #   assert capture_io(fn ->
-  #            assert Assertion.assert(2 <= 1) == :error
-  #          end) =~
-  #            """
-  #            Solution Failed.
-  #              Code: assert Assertion.assert(1 == 2) == :error
-  #              Expected: 2
-  #              To Be Less Than Or Equal To: 1
-  #            """
-  # end
+  test "assert === _ failed" do
+    expected = """
+    Assertion with === failed.
+      code: Assertion.assert(1 === 2)
+      left: 1
+      right: 2
+    """
 
-  test "assert == _ failed with variable" do
-    assert capture_io(fn ->
-             small = 1
-             assert Assertion.assert(small == 2) == :error
-           end) =~
-             """
-             Solution Failed.
-               Code: assert Assertion.assert(small == 2) == :error
-               Expected: 2
-               To Equal: 1
-             """
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert(1 === 2)
+    end
   end
 
-  test "assert truthy passed" do
-    assert capture_io(fn ->
-             assert Assertion.assert(1)
-           end) =~ "."
+  test "assert == _ failed with nil" do
+    expected = """
+    Assertion with == failed.
+      code: Assertion.assert(nil == 2)
+      left: nil
+      right: 2
+    """
+
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert(nil == 2)
+    end
   end
 
-  test "assert truthy failed" do
-    assert capture_io(fn ->
-             assert Assertion.assert(false)
-           end) =~
-             """
-             Solution Failed.
-               Expected truthy, got false
-             """
+  test "assert == _ failed with message" do
+    expected = """
+    Assertion with == failed.
+      code: Assertion.assert(1 == 2)
+      left: 1
+      right: 2
+
+    Message Feedback
+    """
+
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert(1 == 2, "Message Feedback")
+    end
   end
 
-  test "assert Truthy variable passed" do
-    assert capture_io(fn ->
-             small = true
-             assert Assertion.assert(small)
-           end) =~ "."
-  end
+  describe "feedback" do
+    defmodule Example do
+      use Utils.Feedback.Assertion
+      alias Utils.Feedback.Assertion
 
-  test "assert Truthy variable failed" do
-    assert capture_io(fn ->
-             small = false
-             Assertion.assert(small)
-           end) =~
-             """
-             Solution Failed.
-               Code: Assertion.assert(small)
-               Expected: truthy
-               Recieved: false
-             """
-  end
+      feedback :example do
+        answer = get_answers()
+        Assertion.assert(answer == true)
+      end
+    end
 
-  test "assert Truthy called fn failed" do
-    assert capture_io(fn ->
-             small = fn -> false end
-             Assertion.assert(small.())
-           end) =~
-             """
-             Solution Failed.
-               Code: #{"Assertion.assert(small.())"}
-               Expected: truthy
-               Recieved: false
-             """
-  end
+    test "feedback _ solution failed" do
+      assert capture_io(fn ->
+               Example.feedback(:example, false)
+             end) =~
+               """
+               Assertion with == failed.
+                 code: Assertion.assert(answer == true)
+                 left: false
+                 right: true
+               """
+    end
 
-  test "assert Truthy bound is_integer" do
-    assert capture_io(fn ->
-             not_int = "hello"
-             Assertion.assert(is_integer(not_int))
-           end) =~
-             """
-             Solution Failed.
-               Code: #{"Assertion.assert(is_integer(not_int))"}
-               Expected: truthy
-               Recieved: false
-             """
-  end
+    test "feedback _ passed" do
+      assert capture_io(fn ->
+               Example.feedback(:example, true)
+             end) =~
+               "Solved!"
+    end
 
-  test "assert Truthy is_integer" do
-    assert capture_io(fn ->
-             Assertion.assert(is_integer("hello"))
-           end) =~
-             """
-             Solution Failed.
-               Code: #{"Assertion.assert(is_integer(\"hello\"))"}
-               Expected: truthy
-               Recieved: false
-             """
-  end
+    test "feedback _ given nil" do
+      assert capture_io(fn ->
+               Example.feedback(:example, nil)
+             end) =~
+               "Please enter an answer above."
+    end
 
-  test "assert Truthy is_integer called function" do
-    assert capture_io(fn ->
-             int = fn -> "hello" end
-             Assertion.assert(is_integer(int.()))
-           end) =~
-             """
-             Solution Failed.
-               Code: #{"Assertion.assert(is_integer(int.()))"}
-               Expected: truthy
-               Recieved: false
-             """
+    test "feedback _ given list with all nil values" do
+      assert capture_io(fn ->
+               Example.feedback(:example, [nil, nil])
+             end) =~
+               "Please enter an answer above."
+    end
+
+    test "feedback _ given list with any non nil value" do
+      refute capture_io(fn ->
+               Example.feedback(:example, [nil, false])
+             end) =~
+               "Please enter an answer above."
+    end
   end
 end

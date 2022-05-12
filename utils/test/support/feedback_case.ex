@@ -9,6 +9,7 @@ defmodule Utils.FeedbackCase do
         file_feedback_functions =
           Regex.scan(~r/Utils.feedback\(:(\w+)/, file)
           |> Enum.map(fn [_, test] -> String.to_atom(test) end)
+          |> Enum.uniq()
           |> Enum.sort()
 
         feedback_functions = Enum.sort(unquote(module).feedback_functions())

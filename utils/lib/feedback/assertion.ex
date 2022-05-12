@@ -42,7 +42,19 @@ defmodule Utils.Feedback.Assertion do
 
       def feedback(unquote(description), answers) do
         :persistent_term.put(:answers, answers)
-        unquote(assertion)
+
+        if is_nil(answers) or (is_list(answers) and Enum.all?(answers, &is_nil/1)) do
+          IO.puts("Please enter an answer above.")
+        else
+          try do
+            unquote(assertion)
+            IO.puts("Solved!")
+          rescue
+            err ->
+              IO.puts(err.message)
+              :error
+          end
+        end
       end
     end
   end
@@ -53,88 +65,28 @@ defmodule Utils.Feedback.Assertion do
     end
   end
 
-  defmacro assert({operator, meta, [lhs, rhs]}) do
+  defmacro assert({operator, meta, [lhs, rhs]}, hint \\ "") do
     [line: line] = meta
     code = get_code(__CALLER__, line)
 
-    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs, code: code] do
-      Utils.Feedback.Assertion.custom_assert(operator, lhs, rhs, code)
+    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs, code: code, hint: hint] do
+      case apply(Kernel, operator, [lhs, rhs]) do
+        true -> :ok
+        false -> raise Utils.Feedback.Assertion.format(operator, lhs, rhs, code, hint)
+      end
     end
   end
 
-  defmacro assert({_, meta, _} = assertion) do
-    [line: line] = meta
-    code = get_code(__CALLER__, line)
+  def format(operator, recieved, expected, code, hint) do
+    code = Regex.replace(~r/\,.*(?=\))/, code, "")
 
-    quote bind_quoted: [assertion: assertion, code: code] do
-      Utils.Feedback.Assertion.custom_assert(assertion, code)
-    end
-  end
+    hint = if hint == "", do: "", else: "\n\n#{hint}"
 
-  defmacro assert(assertion) do
-    quote bind_quoted: [assertion: assertion] do
-      Utils.Feedback.Assertion.custom_assert(assertion)
-    end
-  end
-
-  def custom_assert(operator, lhs, rhs, code) do
-    if apply(Kernel, operator, [lhs, rhs]) do
-      IO.write(".")
-      :ok
-    else
-      IO.puts(message(operator, lhs, rhs, code))
-      :error
-    end
-  end
-
-  def custom_assert(assertion) do
-    if assertion do
-      IO.write(".")
-      :ok
-    else
-      IO.puts(message(assertion))
-      :error
-    end
-  end
-
-  def custom_assert(assertion, code) do
-    if assertion do
-      IO.write(".")
-      :ok
-    else
-      IO.puts(message(assertion, code))
-      :error
-    end
-  end
-
-  def message(recieved, code) do
     """
-    Solution Failed.
-      Code: #{code}
-      Expected: truthy
-      Recieved: #{recieved}
+    Assertion with #{operator} failed.
+      code: #{code}
+      left: #{inspect(recieved)}
+      right: #{inspect(expected)}#{hint}
     """
   end
-
-  def message(recieved) do
-    """
-    Solution Failed.
-      Expected truthy, got #{recieved}
-    """
-  end
-
-  def message(operator, recieved, expected, code) do
-    """
-    Solution Failed.
-      Code: #{code}
-      Expected: #{expected}
-      To Equal: #{recieved}
-    """
-  end
-
-  def passed?(operator, lhs, rhs) do
-    apply(Kernel, operator, [lhs, rhs])
-  end
-
-  def passed?(truthy), do: truthy not in [false, nil]
 end

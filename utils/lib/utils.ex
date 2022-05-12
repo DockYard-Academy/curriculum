@@ -31,7 +31,6 @@ defmodule Utils do
   def table(table_name), do: Kino.DataTable.new(apply(Utils.Table, table_name, []))
 
   def feedback(description, answers) do
-    result = Utils.Feedback.feedback(description, answers)
-    if Mix.env() == :test, do: result, else: Kino.nothing()
+    Utils.Feedback.feedback(description, answers)
   end
 end
