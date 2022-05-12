@@ -36,14 +36,7 @@ iex(2)> Sublists.sublists(list, 3)
 ```elixir
 defmodule Sublist do
   def sublists(list, size) do
-    first_sublist = Enum.take(list, size)
-    remaining = Enum.drop(list, size)
-
-    remaining
-    |> Enum.reduce([first_sublist], fn
-      item, [[h | t] | _] = acc -> [t ++ [item] | acc]
-    end)
-    |> Enum.reverse()
+    list
   end
 end
 
