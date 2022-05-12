@@ -1717,6 +1717,13 @@ defmodule Utils.Feedback do
     assert length(pascal.of(50)) == 50
   end
 
+  feedback :sublist do
+    sublist = get_answers()
+    assert sublist.sublists([1, 1, 2, 3, 1, 4, 2], 3) == [
+      [1, 1, 2], [1, 2, 3], [2, 3, 1], [3, 1, 4], [1, 4, 2]
+    ]
+  end
+
   feedback :lucas_numbers do
     lucas_numbers = get_answers()
 
