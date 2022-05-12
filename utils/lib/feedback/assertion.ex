@@ -65,7 +65,7 @@ defmodule Utils.Feedback.Assertion do
     end
   end
 
-  defmacro assert({operator, meta, [lhs, rhs]}, hint \\ "") do
+  defmacro assert({operator, meta, [lhs, rhs]}, hint \\ nil) do
     [line: line] = meta
     code = get_code(__CALLER__, line)
 
@@ -78,15 +78,13 @@ defmodule Utils.Feedback.Assertion do
   end
 
   def format(operator, recieved, expected, code, hint) do
-    code = Regex.replace(~r/\,.*(?=\))/, code, "")
-
-    hint = if hint == "", do: "", else: "\n\n#{hint}"
+    code = Regex.replace(~r/, \"\"\"/, code, ")")
 
     """
     Assertion with #{operator} failed.
       code: #{code}
       left: #{inspect(recieved)}
-      right: #{inspect(expected)}#{hint}
+      right: #{inspect(expected)}#{hint && "\n\n#{hint}"}
     """
   end
 end

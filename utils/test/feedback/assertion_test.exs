@@ -46,6 +46,19 @@ defmodule Utils.Feedback.AssertionTest do
     end
   end
 
+  test "assert === _ failed with list" do
+    expected = """
+    Assertion with === failed.
+      code: Assertion.assert([1, 2] === 2)
+      left: [1, 2]
+      right: 2
+    """
+
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert([1, 2] === 2)
+    end
+  end
+
   test "assert == _ failed with nil" do
     expected = """
     Assertion with == failed.
@@ -62,7 +75,7 @@ defmodule Utils.Feedback.AssertionTest do
   test "assert == _ failed with message" do
     expected = """
     Assertion with == failed.
-      code: Assertion.assert(1 == 2)
+      code: Assertion.assert(1 == 2, "Message Feedback")
       left: 1
       right: 2
 
@@ -74,12 +87,37 @@ defmodule Utils.Feedback.AssertionTest do
     end
   end
 
+  test "assert == _ failed with same-line multi-line message" do
+    expected = """
+    Assertion with == failed.
+      code: Assertion.assert(1 == 2)
+      left: 1
+      right: 2
+
+    Multi Line
+    Message Feedback
+
+    """
+
+    assert_raise RuntimeError, expected, fn ->
+      Assertion.assert(1 == 2, """
+      Multi Line
+      Message Feedback
+      """)
+    end
+  end
+
   describe "feedback" do
     defmodule Example do
       use Utils.Feedback.Assertion
       alias Utils.Feedback.Assertion
 
-      feedback :example do
+      feedback :boolean do
+        answer = get_answers()
+        Assertion.assert(answer == true)
+      end
+
+      feedback :list do
         answer = get_answers()
         Assertion.assert(answer == true)
       end
@@ -87,7 +125,7 @@ defmodule Utils.Feedback.AssertionTest do
 
     test "feedback _ solution failed" do
       assert capture_io(fn ->
-               Example.feedback(:example, false)
+               Example.feedback(:boolean, false)
              end) =~
                """
                Assertion with == failed.
@@ -99,30 +137,35 @@ defmodule Utils.Feedback.AssertionTest do
 
     test "feedback _ passed" do
       assert capture_io(fn ->
-               Example.feedback(:example, true)
+               Example.feedback(:boolean, true)
              end) =~
                "Solved!"
     end
 
     test "feedback _ given nil" do
       assert capture_io(fn ->
-               Example.feedback(:example, nil)
+               Example.feedback(:boolean, nil)
              end) =~
                "Please enter an answer above."
     end
 
     test "feedback _ given list with all nil values" do
       assert capture_io(fn ->
-               Example.feedback(:example, [nil, nil])
+               Example.feedback(:boolean, [nil, nil])
              end) =~
                "Please enter an answer above."
     end
 
     test "feedback _ given list with any non nil value" do
-      refute capture_io(fn ->
-               Example.feedback(:example, [nil, false])
+      assert capture_io(fn ->
+               Example.feedback(:boolean, [nil, false])
              end) =~
-               "Please enter an answer above."
+               """
+               Assertion with == failed.
+                 code: Assertion.assert(answer == true)
+                 left: [nil, false]
+                 right: true
+               """
     end
   end
 end
