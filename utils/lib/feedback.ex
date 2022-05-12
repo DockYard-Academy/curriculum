@@ -17,39 +17,29 @@ defmodule Utils.Feedback do
   """
   use Utils.Feedback.Assertion
 
-  defdelegate feedback(test_name, answers), to: Utils.Feedback.CardCounting
+  @feedback_modules (File.ls!("lib/feedback") -- ["assertion.ex"])
+                    |> Enum.reduce([], fn file, acc ->
+                      file_name = String.split(file, ".") |> hd()
+                      module = Module.safe_concat(Utils.Feedback, Macro.camelize(file_name))
+                      [module | acc]
+                    end)
 
-  # feedback :habit_tracker_definition do
-  #   [small, medium, large] = get_answers()
-  #   assert small == 5
-  #   assert medium == 20
-  #   assert large == 30
-  # end
+  def feedback(test_name, answers) do
+    execute_feedback(@feedback_modules, test_name, answers)
+  end
 
-  # feedback :habit_tracker_add do
-  #   total_points = get_answers()
-  #   assert total_points == 20 + 5
-  # end
+  defp execute_feedback([], test_name, _) do
+    "Something went wrong, feedback does not exist for #{test_name}. Please speak to your teacher and/or reset the exercise."
+  end
 
-  # feedback :habit_tracker_percentage do
-  #   percentage = get_answers()
-  #   assert percentage == (5 + 20) / 40 * 100
-  # end
-
-  # feedback :habit_tracker_penalties_1 do
-  #   total_points = get_answers()
-  #   assert total_points == 5 + 20 + 30 * 0.5
-  # end
-
-  # feedback :habit_tracker_penalties_2 do
-  #   total_points = get_answers()
-  #   assert total_points == 5 / 2 * 3 + 20 / 2 * 3
-  # end
-
-  # feedback :habit_tracker_rewards do
-  #   total_points = get_answers()
-  #   assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
-  # end
+  defp execute_feedback([module | modules], test_name, answers) do
+    try do
+      apply(module, :feedback, [test_name, answers])
+    rescue
+      _ ->
+        execute_feedback(modules, test_name, answers)
+    end
+  end
 
   # feedback :percentage do
   #   [completed_items, total_items, percentage] = get_answers()

@@ -31,12 +31,7 @@ defmodule Utils do
   def table(table_name), do: Kino.DataTable.new(apply(Utils.Table, table_name, []))
 
   def feedback(description, answers) do
-    try do
-      result = Utils.Feedback.feedback(description, answers)
-      if Mix.env() == :test, do: result, else: Kino.nothing()
-    rescue
-      FunctionClauseError ->
-        "Something went wrong, feedback does not exist for #{description}. Please speak to your teacher and/or reset the exercise."
-    end
+    result = Utils.Feedback.feedback(description, answers)
+    if Mix.env() == :test, do: result, else: Kino.nothing()
   end
 end

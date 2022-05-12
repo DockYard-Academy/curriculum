@@ -30,13 +30,10 @@ defmodule Utils.FeedbackCase do
 
           solution = apply(unquote(module), each, [])
 
-          # This assertion helps debug, but may be expensive.
-          # As it is not required, we may opt to remove this if tests slow down.
-          assert Utils.feedback(each, solution) == :ok,
-                 "Solution fails for #{unquote(module)}.#{Atom.to_string(each)}}"
+          result = Utils.feedback(each, solution)
 
-          assert Utils.feedback(each, solution) == :ok,
-                 "Utils.feedback should delegate to #{unquote(module)}"
+          assert result == :ok,
+                 "Solution fails for #{unquote(module)}.#{Atom.to_string(each)}}. Recieved: #{result}"
         end)
       end
     end

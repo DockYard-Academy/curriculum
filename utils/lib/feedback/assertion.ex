@@ -47,88 +47,94 @@ defmodule Utils.Feedback.Assertion do
     end
   end
 
-  defmacro assert(stuff, message \\ nil)
-
-  defmacro assert({operator, _, [lhs, rhs]}, message) do
-    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs] do
-      Utils.Feedback.Assertion.custom_assert(operator, lhs, rhs)
+  defmacro get_code(caller, line) do
+    quote do
+      unquote(caller).file |> File.stream!() |> Enum.at(unquote(line) - 1) |> String.trim()
     end
   end
 
-  defmacro assert(assertion, message) do
+  defmacro assert({operator, meta, [lhs, rhs]}) do
+    [line: line] = meta
+    code = get_code(__CALLER__, line)
+
+    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs, code: code] do
+      Utils.Feedback.Assertion.custom_assert(operator, lhs, rhs, code)
+    end
+  end
+
+  defmacro assert({_, meta, _} = assertion) do
+    [line: line] = meta
+    code = get_code(__CALLER__, line)
+
+    quote bind_quoted: [assertion: assertion, code: code] do
+      Utils.Feedback.Assertion.custom_assert(assertion, code)
+    end
+  end
+
+  defmacro assert(assertion) do
     quote bind_quoted: [assertion: assertion] do
       Utils.Feedback.Assertion.custom_assert(assertion)
     end
   end
 
-  def custom_assert(:===, lhs, rhs) when lhs === rhs, do: passed()
-  def custom_assert(:===, lhs, rhs) when lhs != rhs, do: failed(lhs, rhs)
-
-  def custom_assert(:==, lhs, rhs) when lhs == rhs, do: passed()
-
-  def custom_assert(:==, lhs, rhs) when lhs != rhs, do: failed(lhs, rhs)
-
-  def custom_assert(assertion) when assertion, do: passed()
-
-  def custom_assert(assertion) when assertion do
-    IO.puts("""
-    Failed
-    """)
-
-    :fail
+  def custom_assert(operator, lhs, rhs, code) do
+    if apply(Kernel, operator, [lhs, rhs]) do
+      IO.write(".")
+      :ok
+    else
+      IO.puts(message(operator, lhs, rhs, code))
+      :error
+    end
   end
 
-  defp passed do
-    Mix.env() !== :test && IO.write("Solved!")
-    :ok
+  def custom_assert(assertion) do
+    if assertion do
+      IO.write(".")
+      :ok
+    else
+      IO.puts(message(assertion))
+      :error
+    end
   end
 
-  defp failed(lhs, rhs) do
-    Mix.env() !== :test &&
-      IO.puts("""
-      Failed:
-        Recieved: #{inspect(lhs)}
-        Expected: #{inspect(rhs)}
-      """)
-
-    :error
+  def custom_assert(assertion, code) do
+    if assertion do
+      IO.write(".")
+      :ok
+    else
+      IO.puts(message(assertion, code))
+      :error
+    end
   end
 
-  # defmacro feedback(module_name, do: assertion) do
-  #   quote do
-  #     @tests unquote(module_name)
-  #     def feedback(unquote(module_name), answers) do
-  #       :persistent_term.put(:answers, answers)
+  def message(recieved, code) do
+    """
+    Solution Failed.
+      Code: #{code}
+      Expected: truthy
+      Recieved: #{recieved}
+    """
+  end
 
-  #       list_contains_value = is_list(answers) and Enum.any?(answers)
-  #       has_non_list_value = not is_nil(answers) and not is_list(answers)
+  def message(recieved) do
+    """
+    Solution Failed.
+      Expected truthy, got #{recieved}
+    """
+  end
 
-  #       should_run = Mix.env() == :test or has_non_list_value or list_contains_value
+  def message(operator, recieved, expected, code) do
+    """
+    Solution Failed.
+      Code: #{code}
+      Expected: #{expected}
+      To Equal: #{recieved}
+    """
+  end
 
-  #       if should_run do
-  #         ExUnit.start(auto_run: false)
+  def passed?(operator, lhs, rhs) do
+    apply(Kernel, operator, [lhs, rhs])
+  end
 
-  #         defmodule unquote(module_name) do
-  #           use ExUnit.Case
-
-  #           def get_answers() do
-  #             :persistent_term.get(:answers)
-  #           end
-
-  #           def reset_message do
-  #             "Something went wrong, please reset the exercise or speak to your teacher."
-  #           end
-
-  #           test unquote(module_name) do
-  #             unquote(assertion)
-  #           end
-  #         end
-
-  #         ExUnit.run()
-  #       else
-  #         "Please enter your answer above."
-  #       end
-  #     end
-  #   end
-  # end
+  def passed?(truthy), do: truthy not in [false, nil]
 end

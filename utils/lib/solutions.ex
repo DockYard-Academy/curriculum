@@ -381,30 +381,6 @@ defmodule Utils.Solutions do
     [completed_items, total_items, percentage]
   end
 
-  def habit_tracker_rewards do
-    20 * 1.6 + 5 * 1.6 + 30 * 0.5
-  end
-
-  def habit_tracker_penalties_1 do
-    5 + 20 + 30 * 0.5
-  end
-
-  def habit_tracker_penalties_2 do
-    5 / 2 * 3 + 20 / 2 * 3
-  end
-
-  def habit_tracker_percentage do
-    (5 + 20) / 40 * 100
-  end
-
-  def habit_tracker_add do
-    20 + 5
-  end
-
-  def habit_tracker_definition do
-    [5, 20, 30]
-  end
-
   defmodule CustomGame do
     @enforce_keys [:rock, :paper, :scissors]
     defstruct @enforce_keys

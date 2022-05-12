@@ -1,8 +1,16 @@
 defmodule UtilsTest do
   use ExUnit.Case
   doctest Utils
-  alias Utils.Solutions
   alias Utils.Factory
+
+  import ExUnit.CaptureIO
+
+  test "feedback/2 with invalid atom" do
+    atom = Factory.string() |> String.to_atom()
+
+    assert Utils.feedback(atom, "non-nil answer") ==
+             "Something went wrong, feedback does not exist for #{atom}. Please speak to your teacher and/or reset the exercise."
+  end
 
   test "slide/1" do
     Utils.Slide.__info__(:functions)
@@ -42,12 +50,5 @@ defmodule UtilsTest do
   test "random" do
     assert Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
     assert Utils.random(1..9) in 1..9
-  end
-
-  test "feedback/2 with invalid atom" do
-    atom = Factory.string() |> String.to_atom()
-
-    assert Utils.feedback(atom, "non-nil answer") ==
-             "Something went wrong, feedback does not exist for #{atom}. Please speak to your teacher and/or reset the exercise."
   end
 end
