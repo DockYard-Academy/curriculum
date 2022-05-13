@@ -87,24 +87,46 @@ defmodule Utils.Feedback.Assertion do
     [line: line] = meta
     code = get_code(__CALLER__, line)
 
-    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs, code: code, hint: hint] do
+    args =
+      case lhs do
+        {{:., _,
+          [
+            _,
+            _function
+          ]}, _, args} ->
+          args
+
+        _ ->
+          nil
+      end
+
+    quote bind_quoted: [
+            operator: operator,
+            lhs: lhs,
+            rhs: rhs,
+            code: code,
+            hint: hint,
+            args: args
+          ] do
       case apply(Kernel, operator, [lhs, rhs]) do
         true ->
           :ok
 
         false ->
           raise AssertionError,
-            message: Utils.Feedback.Assertion.format(operator, lhs, rhs, code, hint)
+            message: Utils.Feedback.Assertion.format(operator, lhs, rhs, code, args, hint)
       end
     end
   end
 
-  def format(operator, recieved, expected, code, hint) do
+  def format(operator, recieved, expected, code, args, hint) do
     code = Regex.replace(~r/, \"\"\"/, code, ")")
+
+    called_with = args && "\n  called_with: #{Enum.map(args, &inspect/1) |> Enum.join(", ")}"
 
     """
     Assertion with #{operator} failed.
-      code: #{code}
+      code: #{code}#{called_with}
       left: #{inspect(recieved)}
       right: #{inspect(expected)}#{hint && "\n\n#{hint}"}
     """
