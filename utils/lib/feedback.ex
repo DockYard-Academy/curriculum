@@ -25,7 +25,11 @@ defmodule Utils.Feedback do
                     end)
 
   def feedback(test_name, answers) do
+        if is_nil(answers) or (is_list(answers) and Enum.all?(answers, &is_nil/1)) do
+          IO.puts("Please enter an answer above.")
+        else
     execute_feedback(@feedback_modules, test_name, answers)
+        end
   end
 
   defp execute_feedback([], test_name, _) do

@@ -24,11 +24,10 @@ defmodule Utils.Feedback.FunFormulas do
 
   feedback :tip_amount do
     [cost_of_the_meal, tip_rate, tip_amount] = get_answers()
-    assert tip_rate == 0.20, "tip rate should be 0.2."
-    assert cost_of_the_meal == 55.5, "cost_of_the_meal should be 55.5."
+    assert tip_rate == 0.20
+    assert cost_of_the_meal == 55.5
 
-    assert tip_amount === cost_of_the_meal * tip_rate,
-           "tip_amount should be cost_of_the_meal * tip_rate."
+    assert tip_amount === cost_of_the_meal * tip_rate
   end
 
   def pythagorean_c do

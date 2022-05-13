@@ -1,4 +1,6 @@
 defmodule Utils.Feedback.Assertion do
+  alias Utils.A
+
   defmacro __using__(_otps) do
     quote do
       import unquote(__MODULE__)
@@ -43,20 +45,36 @@ defmodule Utils.Feedback.Assertion do
       def feedback(unquote(description), answers) do
         :persistent_term.put(:answers, answers)
 
-        if is_nil(answers) or (is_list(answers) and Enum.all?(answers, &is_nil/1)) do
-          IO.puts("Please enter an answer above.")
-        else
-          try do
-            unquote(assertion)
-            IO.puts("Solved!")
-          rescue
-            err ->
-              IO.puts(err.message)
-              :error
-          end
+        try do
+          unquote(assertion)
+          IO.puts("Solved!")
+        rescue
+          e in AssertionError ->
+            IO.puts(e.message)
+
+          e ->
+            format_error(e, __STACKTRACE__)
         end
       end
     end
+  end
+
+  def format_error(error, stacktrace) do
+    [{_module, _function, _arity, info} | _tail] = stacktrace
+    file = Keyword.get(info, :file)
+    line = Keyword.get(info, :line)
+
+    code =
+      file
+      |> File.stream!()
+      |> Enum.at(line - 1)
+      |> String.trim()
+
+    IO.puts("""
+    Assertion crashed.
+      code: #{code}
+      error: #{inspect(error.message)}
+    """)
   end
 
   defmacro get_code(caller, line) do
@@ -71,8 +89,12 @@ defmodule Utils.Feedback.Assertion do
 
     quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs, code: code, hint: hint] do
       case apply(Kernel, operator, [lhs, rhs]) do
-        true -> :ok
-        false -> raise Utils.Feedback.Assertion.format(operator, lhs, rhs, code, hint)
+        true ->
+          :ok
+
+        false ->
+          raise AssertionError,
+            message: Utils.Feedback.Assertion.format(operator, lhs, rhs, code, hint)
       end
     end
   end
