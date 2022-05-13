@@ -52,16 +52,7 @@ defmodule Utils.Feedback do
 
 
 
-  # feedback :family_tree do
-  #   family_tree = get_answers()
-  #   assert is_map(family_tree), "Ensure `family_tree` is a map."
-  #   assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
 
-  #   assert %{name: "Arthur", parents: _list} = family_tree,
-  #          "Ensure Arthur in `family_tree` has a list of parents."
-
-  #   assert family_tree == Utils.Solutions.family_tree()
-  # end
 
   # feedback :naming_numbers do
   #   naming_numbers = get_answers()

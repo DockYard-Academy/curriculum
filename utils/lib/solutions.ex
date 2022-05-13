@@ -4,58 +4,7 @@ defmodule Utils.Solutions do
 
 
 
-  def family_tree do
-    han = %{
-      name: "Han",
-      status: :grand_parent,
-      age: 81,
-      parents: []
-    }
 
-    leia = %{
-      name: "Leia",
-      status: :grand_parent,
-      age: 82,
-      parents: []
-    }
-
-    uther = %{
-      name: "Uther",
-      status: :parent,
-      age: 56,
-      parents: [han, leia]
-    }
-
-    bob = %{
-      name: "Bob",
-      status: :grand_parent,
-      age: 68,
-      parents: []
-    }
-
-    bridget = %{
-      name: "Bridget",
-      status: :grand_parent,
-      age: 70
-    }
-
-    ygraine = %{
-      name: "Ygraine",
-      status: :parent,
-      age: 45,
-      parents: [bob, bridget]
-    }
-
-    %{
-      name: "Arthur",
-      status: :child,
-      age: 22,
-      parents: [
-        uther,
-        ygraine
-      ]
-    }
-  end
 
   def naming_numbers do
     fn integer ->

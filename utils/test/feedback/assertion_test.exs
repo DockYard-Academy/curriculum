@@ -99,23 +99,23 @@ defmodule Utils.Feedback.AssertionTest do
       end
     end
 
+    defmodule TestModule do
+      def call(a) do
+        a + 1
+      end
+    end
+
     test "assert == _ module failed with single param" do
       expected = """
       Assertion with == failed.
-        code: Assertion.assert(MyModule.call(2) == 2)
+        code: Assertion.assert(TestModule.call(2) == 2)
         called_with: 2
         left: 3
         right: 2
       """
 
-      defmodule MyModule do
-        def call(a) do
-          a + 1
-        end
-      end
-
       assert_raise AssertionError, expected, fn ->
-        Assertion.assert(MyModule.call(2) == 2)
+        Assertion.assert(TestModule.call(2) == 2)
       end
     end
 

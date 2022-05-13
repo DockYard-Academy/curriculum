@@ -1,6 +1,4 @@
 defmodule Utils.Feedback.Assertion do
-  alias Utils.A
-
   defmacro __using__(_otps) do
     quote do
       import unquote(__MODULE__)
