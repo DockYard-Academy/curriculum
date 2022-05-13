@@ -25,11 +25,11 @@ defmodule Utils.Feedback do
                     end)
 
   def feedback(test_name, answers) do
-        if is_nil(answers) or (is_list(answers) and Enum.all?(answers, &is_nil/1)) do
-          IO.puts("Please enter an answer above.")
-        else
-    execute_feedback(@feedback_modules, test_name, answers)
-        end
+    if is_nil(answers) or (is_list(answers) and Enum.all?(answers, &is_nil/1)) do
+      IO.puts("Please enter an answer above.")
+    else
+      execute_feedback(@feedback_modules, test_name, answers)
+    end
   end
 
   defp execute_feedback([], test_name, _) do
@@ -44,49 +44,6 @@ defmodule Utils.Feedback do
         execute_feedback(modules, test_name, answers)
     end
   end
-
-
-
-
-
-
-  # feedback :startup_madlib do
-  #   [
-  #     madlib,
-  #     name_of_company,
-  #     a_defined_offering,
-  #     a_defined_audience,
-  #     solve_a_problem,
-  #     secret_sauce
-  #   ] = answers = get_answers()
-
-  #   assert Enum.all?(answers, fn each -> is_binary(each) and String.length(each) > 0 end),
-  #          "each variable should be bound to a non-empty string"
-
-  #   assert madlib ==
-  #            "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
-  # end
-
-  # feedback :nature_show_madlib do
-  #   [
-  #     animal,
-  #     country,
-  #     plural_noun,
-  #     a_food,
-  #     type_of_screen_device,
-  #     noun,
-  #     verb1,
-  #     verb2,
-  #     adjective,
-  #     madlib
-  #   ] = answers = get_answers()
-
-  #   assert Enum.all?(answers, fn each -> is_binary(each) and String.length(each) > 0 end),
-  #          "each variable should be bound to a non-empty string"
-
-  #   assert madlib ==
-  #            "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
-  # end
 
   # feedback :boolean_diagram1 do
   #   answer = get_answers()

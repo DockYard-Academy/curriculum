@@ -119,6 +119,20 @@ defmodule Utils.Feedback.AssertionTest do
       end
     end
 
+    test "assert Enum.any? displays code line" do
+      expected = """
+      Assertion with == failed.
+        code: Assertion.assert(Enum.any?([1, 2, 3]) == false)
+        called_with: [1, 2, 3]
+        left: true
+        right: false
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        Assertion.assert(Enum.any?([1, 2, 3]) == false)
+      end
+    end
+
     test "assert == _ module failed with multi param" do
       expected = """
       Assertion with == failed.

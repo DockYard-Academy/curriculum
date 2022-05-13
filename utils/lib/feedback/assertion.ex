@@ -51,9 +51,11 @@ defmodule Utils.Feedback.Assertion do
         rescue
           e in AssertionError ->
             IO.puts(e.message)
+            :error
 
           e ->
             format_error(e, __STACKTRACE__)
+            :error
         end
       end
     end
@@ -65,14 +67,17 @@ defmodule Utils.Feedback.Assertion do
     line = Keyword.get(info, :line)
 
     code =
-      file
-      |> File.stream!()
-      |> Enum.at(line - 1)
-      |> String.trim()
+      try do
+        file
+        |> File.stream!()
+        |> Enum.at(line - 1)
+        |> String.trim()
+      rescue
+        _ -> nil
+      end
 
     IO.puts("""
-    Assertion crashed.
-      code: #{code}
+    Assertion crashed.#{code && "\n  code: #{code}"}
       error: #{inspect(error.message)}
     """)
   end

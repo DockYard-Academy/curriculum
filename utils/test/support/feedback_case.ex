@@ -34,7 +34,7 @@ defmodule Utils.FeedbackCase do
           result = Utils.feedback(each, solution)
 
           assert result == :ok,
-                 "Solution fails for #{unquote(module)}.#{Atom.to_string(each)}}. Recieved: #{result}"
+                 "Solution fails for #{unquote(module)}.#{Atom.to_string(each)}. Recieved: #{result}"
         end)
       end
     end
