@@ -2,23 +2,6 @@ defmodule Utils.Solutions do
 
 
 
-  def guess_the_word do
-    guess = Enum.random(["answer", "incorrect answer"])
-    answer = "answer"
-    correct = (guess == answer && "Correct!") || "Incorrect."
-    [guess, answer, correct]
-  end
-
-  def guess_the_number do
-    guess = Enum.random(1..9)
-    answer = Enum.random(1..9)
-
-    correct =
-      (guess == answer && "Correct!") || (guess < answer && "Too low!") ||
-        (guess > answer && "Too high!")
-
-    [guess, answer, correct]
-  end
 
   def shopping_list do
     shopping_list = [] ++ ["grapes", "walnuts", "apples"]

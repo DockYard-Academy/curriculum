@@ -47,32 +47,7 @@ defmodule Utils.Feedback do
 
 
 
-  # feedback :guess_the_word do
-  #   [guess, answer, correct] = answers = get_answers()
 
-  #   assert Enum.all?(answers, &is_binary/1),
-  #          "Ensure `guess`, `answer`, and `correct` are all strings"
-
-  #   if guess == answer do
-  #     assert correct == "Correct!"
-  #   else
-  #     assert correct == "Incorrect."
-  #   end
-  # end
-
-  # feedback :guess_the_number do
-  #   [guess, answer, correct] = get_answers()
-
-  #   assert is_integer(guess), "Ensure `guess` is an integer"
-  #   assert is_integer(answer), "Ensure `answer` is an integer"
-  #   assert is_binary(correct), "Ensure `correct` is a string"
-
-  #   cond do
-  #     guess == answer -> assert correct == "Correct!"
-  #     guess < answer -> assert correct == "Too low!"
-  #     guess > answer -> assert correct == "Too high!"
-  #   end
-  # end
 
   # feedback :copy_file do
   #   file_name = get_answers()
