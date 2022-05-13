@@ -47,23 +47,6 @@ defmodule Utils.Solutions do
     ]
   end
 
-  def rock_paper_scissors_two_player do
-    player1_choice = Utils.random(:rock_paper_scissors)
-    player2_choice = Utils.random(:rock_paper_scissors)
-
-    winner =
-      case {player1_choice, player2_choice} do
-        {:rock, :scissors} -> :player1
-        {:paper, :rock} -> :player1
-        {:scissors, :paper} -> :player1
-        {:scissors, :rock} -> :player2
-        {:rock, :paper} -> :player2
-        {:paper, :scissors} -> :player2
-        _ -> :draw
-      end
-
-    [player1_choice, player2_choice, winner]
-  end
 
   def boolean_diagram1, do: false
   def boolean_diagram2, do: true
@@ -335,15 +318,6 @@ defmodule Utils.Solutions do
     [random_card, next_count]
   end
 
-  def rock_paper_scissors_ai do
-    player_choice = Enum.random([:rock, :paper, :scissors])
-
-    ai_choice =
-      (player_choice == :rock && :paper) || (player_choice == :paper && :scissors) ||
-        (player_choice == :scissors && :rock)
-
-    [player_choice, ai_choice]
-  end
 
 
   defmodule CustomGame do
@@ -1213,23 +1187,6 @@ defmodule Utils.Solutions do
     Money
   end
 
-  defmodule RockPaperScissorsPatternMatching do
-    def play(guess1, guess2) do
-      case {guess1, guess2} do
-        {:paper, :rock} -> ":paper beats :rock!"
-        {:scissors, :paper} -> ":scissors beats :paper!"
-        {:rock, :scissors} -> ":rock beats :scissors!"
-        {:rock, :paper} -> ":paper beats :rock!"
-        {:scissors, :rock} -> ":rock beats :scissors!"
-        {:paper, :scissors} -> ":scissors beats :paper!"
-        _ -> "draw"
-      end
-    end
-  end
-
-  def rock_paper_scissors_pattern_matching do
-    RockPaperScissorsPatternMatching
-  end
 
   defmodule Pet do
     @callback speak() :: String.t()
