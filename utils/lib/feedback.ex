@@ -45,35 +45,7 @@ defmodule Utils.Feedback do
     end
   end
 
-  # feedback :boolean_diagram1 do
-  #   answer = get_answers()
-  #   assert answer == false
-  # end
 
-  # feedback :boolean_diagram2 do
-  #   answer = get_answers()
-  #   assert answer == true
-  # end
-
-  # feedback :boolean_diagram3 do
-  #   answer = get_answers()
-  #   assert answer == false
-  # end
-
-  # feedback :boolean_diagram4 do
-  #   answer = get_answers()
-  #   assert answer == false
-  # end
-
-  # feedback :boolean_diagram5 do
-  #   answer = get_answers()
-  #   assert answer == true
-  # end
-
-  # feedback :boolean_diagram6 do
-  #   answer = get_answers()
-  #   assert answer == true
-  # end
 
   # feedback :guess_the_word do
   #   [guess, answer, correct] = answers = get_answers()

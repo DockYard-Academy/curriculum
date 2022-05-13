@@ -1,12 +1,6 @@
 defmodule Utils.Solutions do
-  
 
-  def boolean_diagram1, do: false
-  def boolean_diagram2, do: true
-  def boolean_diagram3, do: false
-  def boolean_diagram4, do: false
-  def boolean_diagram5, do: true
-  def boolean_diagram6, do: true
+
 
   def guess_the_word do
     guess = Enum.random(["answer", "incorrect answer"])
