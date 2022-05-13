@@ -49,10 +49,6 @@ defmodule Utils.Feedback do
 
 
 
-  # feedback :copy_file do
-  #   file_name = get_answers()
-  #   assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
-  # end
 
   # feedback :shopping_list do
   #   shopping_list = get_answers()

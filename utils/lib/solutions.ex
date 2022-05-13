@@ -20,9 +20,6 @@ defmodule Utils.Solutions do
     list
   end
 
-  def copy_file do
-    "copy_example"
-  end
 
   def family_tree do
     han = %{
