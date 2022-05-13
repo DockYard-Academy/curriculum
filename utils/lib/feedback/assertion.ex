@@ -130,8 +130,8 @@ defmodule Utils.Feedback.Assertion do
     """
     Assertion with #{operator} failed.
       code: #{code}#{called_with}
-      left: #{inspect(recieved)}
-      right: #{inspect(expected)}#{hint && "\n\n#{hint}"}
+      left: #{inspect(recieved, pretty: true)}
+      right: #{inspect(expected, pretty: true)}#{hint && "\n\n#{hint}"}
     """
   end
 end

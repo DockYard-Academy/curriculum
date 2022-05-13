@@ -11,7 +11,8 @@ defmodule Utils.Feedback.FamilyTree do
     assert match?(%{name: "Arthur", parents: _}, family_tree) == true,
            "Ensure Arthur in `family_tree` has a list of parents."
 
-    assert family_tree == Utils.Feedback.FamilyTree.family_tree()
+    assert family_tree == Utils.Feedback.FamilyTree.family_tree(),
+           "Ensure your `family_tree` matches the expected value and order."
   end
 
   def family_tree do

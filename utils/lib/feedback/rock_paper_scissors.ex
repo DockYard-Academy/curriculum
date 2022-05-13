@@ -7,15 +7,15 @@ defmodule Utils.Feedback.RockPaperScissors do
     case player_choice do
       :rock ->
         assert ai_choice === :paper,
-               "when player_choice is :rock, ai_choice should be :paper."
+               "When player_choice is :rock, ai_choice should be :paper."
 
       :paper ->
         assert ai_choice === :scissors,
-               "when player_choice is :paper, ai_choice should be :scissors."
+               "When player_choice is :paper, ai_choice should be :scissors."
 
       :scissors ->
         assert ai_choice === :rock,
-               "when player_choice is :scissors, ai_choice should be :rock."
+               "When player_choice is :scissors, ai_choice should be :rock."
     end
   end
 

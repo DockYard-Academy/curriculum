@@ -45,15 +45,6 @@ defmodule Utils.Feedback do
     end
   end
 
-
-
-
-
-
-
-
-
-
   # feedback :naming_numbers do
   #   naming_numbers = get_answers()
 
