@@ -3,23 +3,6 @@ defmodule Utils.Solutions do
 
 
 
-  def shopping_list do
-    shopping_list = [] ++ ["grapes", "walnuts", "apples"]
-    shopping_list = shopping_list ++ ["blueberries", "chocolate", "pizza"]
-    shopping_list = shopping_list -- ["grapes", "walnuts"]
-    shopping_list = shopping_list ++ ["banana", "banana", "banana"]
-    shopping_list
-  end
-
-  def shopping_list_with_quantities do
-    list = [] ++ [milk: 1, eggs: 12]
-    list = list ++ [bars_of_butter: 2, candies: 10]
-    list = list -- [bars_of_butter: 2]
-    list = list -- [candies: 10]
-    list = list ++ [candies: 5]
-    list
-  end
-
 
   def family_tree do
     han = %{
