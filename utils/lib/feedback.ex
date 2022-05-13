@@ -45,27 +45,6 @@ defmodule Utils.Feedback do
     end
   end
 
-  # feedback :string_concatenation do
-  #   answer = get_answers()
-  #   assert is_binary(answer), "the answer should be a string."
-  #   assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
-  #   assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
-  # end
-
-  # feedback :string_interpolation do
-  #   answer = get_answers()
-  #   assert is_binary(answer), "the answer should be a string."
-
-  #   assert Regex.match?(~r/I have/, answer),
-  #          "the answer should be in the format: I have 10 classmates"
-
-  #   assert Regex.match?(~r/I have \d+/, answer),
-  #          "the answer should contain an integer for classmates."
-
-  #   assert Regex.match?(~r/I have \d+ classmates\./, answer) ||
-  #            answer === "I have 1 classmate.",
-  #          "the answer should end in a period."
-  # end
 
   # feedback :rock_paper_scissors_ai do
   #   [player_choice, ai_choice] = get_answers()

@@ -345,13 +345,6 @@ defmodule Utils.Solutions do
     [player_choice, ai_choice]
   end
 
-  def string_interpolation do
-    "I have #{1 - 1} classmates."
-  end
-
-  def string_concatenation do
-    "Hi, Peter."
-  end
 
   defmodule CustomGame do
     @enforce_keys [:rock, :paper, :scissors]
