@@ -22,34 +22,6 @@ Mix.install([
 Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
-```elixir
-
-```
-
-<!-- livebook:{"branch_parent_index":0} -->
-
-## Performance Concerns
-
-Computers are composed of several parts. As programmers, we are primarily concerned about
- the **processor**, and the **memory**.
-
-The processor determines the computer's speed when performing calculations.
-
-Memory or **RAM** (random access memory) is measured in GB (Gigabytes) and is the amount of data
-we can store during a calculation.
-
-In software terms, this translates to the **speed** and **memory consumption** of our program. Generally
-as you build software, those are your main performance concerns.
-
-While computers are incredibly fast, they do have limits. Certain calculations take time to complete.
-So, we need to be mindful of how to optimize our programs to operate efficiently.
-
-For example, this statement may take some time.
-
-```elixir
-Enum.map(1..10_000_000, fn each -> each + 2 end)
-```
-
 ## Big O Notation
 
 As programmers, we are generally more concerned with how performance grows in our
@@ -65,8 +37,10 @@ of the data.
 * **$$O(2^n)$$**: Exponential Time
 * **$$O(n!)$$**: Factorial Time
 
+Here's a video by Tom Scott for an introductory overview.
+
 ```elixir
-Utils.graph(:big_o_notation)
+Kino.YouTube.new("RGuJga2Gl_k")
 ```
 
 As you work with larger amounts of data, different big $O$ complexities grow faster than others.
@@ -414,163 +388,4 @@ Utils.graph(:factorial_complexity)
 
 ```elixir
 Utils.table(:factorial_complexity)
-```
-
-## Measuring Performance
-
-Big $O$ Notation allows us to reason about how processing speed and memory consumption will grow
-given larger data sets for a calculation.
-
-This is useful for theorizing about performance. In practice, it's best to test your assumptions.
-By testing performance, we can avoid pre-optimizing code before it's necessary. We can also know which
-pieces of code cost the most.
-
-There's a wide variety of tools for measuring and monitoring performance. We'll focus on
-benchmarking time and memory consumption for now.
-
-### :timer.tc/1
-
-Out of the box, Erlang provides a `:timer` library which contains a `tc/1` function to measure the time it takes to run a function.
-It returns a `{time, result}` tuple.
-
-```mermaid
-flowchart LR
-Function --> timer[:timer.tc/1] --> return["{timer, result}"]
-```
-
-```elixir
-:timer.tc(fn -> 10000 ** 10000 - 10000 ** 10000 + 1 end)
-```
-
-The `time` returned is measured in microseconds.
-
-`1000` microseconds equals `1` millisecond.
-`1000` milliseconds equals `1` seconds.
-
-So you can get the number of milliseconds the function takes to run by dividing the result by `1000`
-
-```elixir
-{time, _result} = :timer.tc(fn -> 10000 ** 10000 - 10000 ** 10000 + 1 end)
-milliseconds = time / 1000
-```
-
-And the number of seconds by dividing once again by `1000`.
-
-```elixir
-seconds = milliseconds / 1000
-```
-
-### Your Turn
-
-In the Elixir cell below, use `:timer.tc/1` to measure an operation that takes more than 5 seconds.
-
-```elixir
-
-```
-
-### Benchee
-
-[Benchee](https://github.com/bencheeorg/benchee)
-is a popular library for measuring performance and memory consumption.
-
-External libraries need to be installed to use them.
-
-We use [Mix](https://hexdocs.pm/mix/1.13/Mix.html) to install Benchee.
-
-Mix is a build tool that provides tasks for creating, compiling, and testing Elixir projects, managing its dependencies, and more.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-Benchee
-D[Dependencies]
-I[install/2]
-Mix
-Mix --> I
-I --> D
-D --> Benchee
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-You'll learn more about Mix in future lessons. For now, it's enough to be aware that you won't be able
-to use the Benchee library unless it's installed.
-
-We've installed Benchee for you for this lesson, but don't be surprised if you try to use Benchee in
-other lessons and it isn't installed.
-
-We can use the `Benchee.run/2` function to measure the performance and memory consumption of some code.
-
-```elixir
-Benchee.run(%{
-  "example test" => fn -> 10000 ** 10000 end
-})
-```
-
-Above, the most important part of the output should look like the following, but with different numbers.
-
-```
-Name                   ips        average  deviation         median         99th %
-example test        154.65        6.47 ms    ±26.50%        6.13 ms       13.17 ms
-
-Memory usage statistics:
-
-Name            Memory usage
-example test           600 B
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-The Benchee documentation explains how to read the output:
-
-> * average - average execution time/memory usage (the lower the better)
-> * ips - iterations per second, aka how often can the given function be executed within one second (the higher the better - good for graphing), only for run times
-> * deviation - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
-> * median - when all measured values are sorted, this is the middle value. More stable than the average and somewhat more likely to be a typical value you see, for the most typical value see mode. (the lower the better)
-> * 99th % - 99th percentile, 99% of all measured values are less than this - worst case performance-ish
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Using Benchee For Comparison
-
-let's use Benchee to compare tuples and lists. Tuples are intended to be used as fixed-sized
-containers that are fast for accessing. Lists are collections intended for dynamic sized containers that get modified.
-
-Therefore, lists should be slow to access, and tuples should be fast to access. That's in theory, let's
-verify our assumption and prove it to be true.
-
-```elixir
-size = 10000
-large_list = Enum.to_list(0..size)
-large_tuple = List.to_tuple(large_list)
-
-Benchee.run(%{
-  "list" => fn -> Enum.at(large_list, size) end,
-  "tuple" => fn -> elem(large_tuple, size) end
-})
-```
-
-Upon running the above, you should see an output similar to the following. You'll notice that
-accessing a list was far slower!
-
-```
-Name            ips        average  deviation         median         99th %
-tuple        1.09 M        0.92 μs  ±2806.65%        0.80 μs           2 μs
-list       0.0324 M       30.89 μs    ±93.31%       28.90 μs       67.80 μs
-
-Comparison:
-tuple        1.09 M
-list       0.0324 M - 33.58x slower +29.97 μs
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Use Benchee to compare accessing the **first** element instead of the last element as we already did above.
-You should notice the list is faster this time, or at least about the same speed. You'll learn why in a future lesson.
-
-```elixir
-
 ```
