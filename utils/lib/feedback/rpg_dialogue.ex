@@ -4,13 +4,13 @@ defmodule Utils.Feedback.RpgDialogue do
   feedback :define_character_struct do
     character_module = get_answers()
 
-    assert Keyword.get(character_module.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`"
+    assert defines_struct?(character_module), "Ensure you use `defstruct`"
 
-    assert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),
+    assert struct_keys?(character_module, [:name, :class, :weapon]),
            "Ensure you use `defstruct` with :name, :class, and :weapon"
 
-    assert_raise ArgumentError, struct!(character_module, %{weapon: "", class: ""}),
+    assert_raise ArgumentError,
+                 struct!(character_module, %{weapon: "", class: ""}),
                  "Use @enforce_keys to enforce the :name property."
   end
 
@@ -19,10 +19,9 @@ defmodule Utils.Feedback.RpgDialogue do
     assert is_struct(arthur), "Ensure `arthur` is a struct."
     assert is_struct(gandalf), "Ensure `gandalf` is a struct."
     assert is_struct(jarlaxle), "Ensure `jarlaxle` is a struct."
-
-    assert %{name: "Arthur", weapon: "sword", class: "warrior"} = arthur
-    assert %{name: "Gandalf", weapon: "staff", class: "wizard"} = gandalf
-    assert %{name: "Jarlaxle", weapon: "daggers", class: "rogue"} = jarlaxle
+    assert match?(%{name: "Arthur", weapon: "sword", class: "warrior"}, arthur)
+    assert match?(%{name: "Gandalf", weapon: "staff", class: "wizard"}, gandalf)
+    assert match?(%{name: "Jarlaxle", weapon: "daggers", class: "rogue"}, jarlaxle)
   end
 
   feedback :character_dialogue do
