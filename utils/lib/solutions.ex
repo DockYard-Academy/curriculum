@@ -11,33 +11,7 @@ defmodule Utils.Solutions do
 
 
 
-  defmodule RockPaperScissorsLizardSpock do
-    defp beats?(p1, p2) do
-      {p1, p2} in [
-        {:rock, :paper},
-        {:paper, :rock},
-        {:scissors, :paper},
-        {:rock, :lizard},
-        {:lizard, :spock},
-        {:scissors, :lizard},
-        {:lizard, :paper},
-        {:paper, :spock},
-        {:spock, :rock}
-      ]
-    end
 
-    def play(p1, p2) do
-      cond do
-        beats?(p1, p2) -> "#{p1} beats #{p2}."
-        beats?(p2, p1) -> "#{p2} beats #{p1}."
-        true -> "tie game, play again?"
-      end
-    end
-  end
-
-  def rock_paper_scissors_lizard_spock do
-    RockPaperScissorsLizardSpock
-  end
 
   def card_count_four do
     1
