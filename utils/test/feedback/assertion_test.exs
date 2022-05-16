@@ -19,6 +19,43 @@ defmodule Utils.Feedback.AssertionTest do
       assert Assertion.assert(2 > 1) == :ok
 
       assert Assertion.assert(1 < 2) == :ok
+
+      assert Assertion.assert(is_integer(2)) == :ok
+    end
+
+    test "assert truthy _ failed is_integer" do
+      expected = """
+      Expected truthy, got false.
+        code: Assertion.assert(is_integer(2.0))
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        Assertion.assert(is_integer(2.0))
+      end
+    end
+
+    test "assert truthy _ failed anonymous function" do
+      expected = """
+      Expected truthy, got false.
+        code: Assertion.assert(is_above_four.(2))
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        is_above_four = fn each -> each > 4 end
+        Assertion.assert(is_above_four.(2))
+      end
+    end
+
+    test "assert truthy _ failed Enum.any?/2" do
+      expected = """
+      Expected truthy, got false.
+        code: Assertion.assert(Enum.any?([1, 2, 3], fn each -> not is_integer(each) end))
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        my_function = fn -> false end
+        Assertion.assert(Enum.any?([1, 2, 3], fn each -> not is_integer(each) end))
+      end
     end
 
     test "all operators failing" do
@@ -44,6 +81,14 @@ defmodule Utils.Feedback.AssertionTest do
 
       assert_raise AssertionError, fn ->
         Assertion.assert(2 < 1)
+      end
+
+      assert_raise AssertionError, fn ->
+        Assertion.assert(is_integer(2.0))
+      end
+
+      assert_raise AssertionError, fn ->
+        Assertion.assert(Enum.any?(["1"], fn each -> each !== "1" end))
       end
     end
 
@@ -118,6 +163,18 @@ defmodule Utils.Feedback.AssertionTest do
         Assertion.assert(TestModule.call(2) == 2)
       end
     end
+
+    # test "assert truthy _ failed with feedback" do
+    #   expected = """
+    #   Expected truthy, got false.
+    #     code: Assertion.assert(list, Enum.any?(fn each -> each > 5 end))
+    #   """
+
+    #   assert_raise AssertionError, expected, fn ->
+    #     list = [1, 2, 3]
+    #     Assertion.assert(Enum.any?(list, fn each -> each > 5 end))
+    #   end
+    # end
 
     test "assert Enum.any? displays code line" do
       expected = """

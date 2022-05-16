@@ -86,7 +86,10 @@ defmodule Utils.Feedback.Assertion do
     end
   end
 
-  defmacro assert({operator, meta, [lhs, rhs]}, hint \\ nil) do
+  defmacro assert(expression, hint \\ nil)
+
+  defmacro assert({operator, meta, [lhs, rhs]} = x, hint)
+           when operator in [:==, :===, :<=, :>=, :>, :<] do
     [line: line] = meta
     code = get_code(__CALLER__, line)
 
@@ -118,6 +121,38 @@ defmodule Utils.Feedback.Assertion do
         false ->
           raise AssertionError,
             message: Utils.Feedback.Assertion.format(operator, lhs, rhs, code, args, hint)
+      end
+    end
+  end
+
+  defmacro assert(assertion, hint) do
+    {function, [line: line], args} = assertion
+    code = get_code(__CALLER__, line)
+
+    # function_name =
+    #   case function do
+    #     # module function
+    #     {:., meta, [{_, _, [module_name]}, function_name]} = func ->
+    #       "#{module_name}.#{function_name}"
+
+    #     # anon
+    #     {:., meta, [{function_name, _, _}]} = f ->
+    #       function_name
+
+    #     # :is_integer
+    #     function_name ->
+    #       function_name
+    #   end
+
+    quote do
+      if unquote(assertion) do
+        :ok
+      else
+        raise AssertionError,
+          message: """
+          Expected truthy, got #{unquote(assertion)}.
+            code: #{unquote(code)}
+          """
       end
     end
   end
