@@ -22,60 +22,21 @@ Mix.install([
 Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
+## Overview
+
+Lists and Tuples are intended for fundamentally different use cases.
+
+Lists are dynamic syzed containers meant to be optimized for updating elements within the list, Tuples
+are fixed-sized containers optimized for reading values.
+
+In this lesson, we'll go over how lists and tuples are implemented in Elixir so that you can
+understand their strengths and weaknesses in order to use them more effectively.
+
+We will use the following large list and large tuple to perform several benchmarks.
+
+```elixir
 large_list = Enum.to_list(1..10_000_000)
 large_tuple = List.to_tuple(large_list)
-```
-
-```elixir
-Kino.Input.text("ok")
-```
-
-```elixir
-Utils.form(:lists_vs_tuples)
-```
-
-## Mutation
-
-In Elixir, we do not allow for mutation. That means that when we rebind `hello` to a new value `"new"`,
-it rebinds the `hello` variable in a new location.
-
-`"world"` is no longer accessible under any
-variable name, so it gets removed. We call the process of removing old data **garbage collection**.
-
-![]()
-
-![](images/rebinding_stack_heep_garbage_collection.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-For example, when you call a function that sets a variable, it does not mutate that variable.
-Notice that there is a local definition of `example` inside of `will_not_mutate` that is bound to `10`,
-and an `example` variable in the top level scope that is bound to `5`.
-
-```elixir
-example = 5
-
-will_not_mutate = fn ->
-  example = 10
-  example
-end
-
-will_not_mutate.()
-
-example
-```
-
-![](images/example_does_not_mutate.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-In the Elixir cell below, create a function `demonstrate/0` which demonstrates that data in Elixir
-is immutable.
-
-```elixir
-
 ```
 
 ## Lists
@@ -121,18 +82,6 @@ end)
 
 Simultaneous operations in your computer compete for resources, and our measurement tools are not
 perfect, so you may notice that execution time is not always consistent.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-In the Elixir cell below, Use the `:timer.tc/1` function to measure the time it takes to measure any function you choose.
-Remember that the return value is in microseconds, so if you want to display it in milliseconds you
-need to divide it by `1000`.
-
-```elixir
-
-```
 
 ## Length
 
