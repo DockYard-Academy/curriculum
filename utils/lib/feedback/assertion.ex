@@ -147,6 +147,36 @@ defmodule Utils.Feedback.Assertion do
     end
   end
 
+  defmacro assert_raise(expected_error, assertion, hint \\ nil) do
+    {function, [line: line], args} = assertion
+    code = get_code(__CALLER__, line)
+
+    quote do
+      try do
+        unquote(assertion)
+
+        raise AssertionError
+      rescue
+        unquote(expected_error) ->
+          :ok
+
+        AssertionError ->
+          raise AssertionError,
+            message: """
+            Expected exception #{unquote(expected_error)} but nothing was raised
+              code: #{unquote(code)}#{unquote(hint) && "\n\n#{unquote(hint)}"}
+            """
+
+        error ->
+          raise AssertionError,
+            message: """
+            Expected exception #{unquote(expected_error)} but instead raised #{inspect(error)}
+              code: #{unquote(code)}#{unquote(hint) && "\n\n#{unquote(hint)}"}
+            """
+      end
+    end
+  end
+
   def format(operator, recieved, expected, code, args, hint) do
     code = Regex.replace(~r/, \"\"\"/, code, ")")
 

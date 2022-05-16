@@ -164,18 +164,6 @@ defmodule Utils.Feedback.AssertionTest do
       end
     end
 
-    # test "assert truthy _ failed with feedback" do
-    #   expected = """
-    #   Expected truthy, got false.
-    #     code: Assertion.assert(list, Enum.any?(fn each -> each > 5 end))
-    #   """
-
-    #   assert_raise AssertionError, expected, fn ->
-    #     list = [1, 2, 3]
-    #     Assertion.assert(Enum.any?(list, fn each -> each > 5 end))
-    #   end
-    # end
-
     test "assert Enum.any? displays code line" do
       expected = """
       Assertion with == failed.
@@ -304,6 +292,49 @@ defmodule Utils.Feedback.AssertionTest do
                  code: raise "error"
                  error: "error"
                """
+    end
+  end
+
+  describe "assert_raise" do
+    test "assert raise _ raise expected error" do
+      Assertion.assert_raise(RuntimeError, raise("runtime")) == :ok
+    end
+
+    test "assert raise _ not crashing" do
+      expected = """
+      Expected exception Elixir.RuntimeError but nothing was raised
+        code: Assertion.assert_raise(RuntimeError, two)
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        two = 2
+        Assertion.assert_raise(RuntimeError, two)
+      end
+    end
+
+    test "assert raise _ wrong error" do
+      expected = """
+      Expected exception Elixir.FunctionClauseError but instead raised %RuntimeError{message: \"runtime\"}
+        code: Assertion.assert_raise(FunctionClauseError, raise("runtime"))
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        Assertion.assert_raise(FunctionClauseError, raise("runtime"))
+      end
+    end
+
+    test "assert raise _ not crashing _ with feedback" do
+      expected = """
+      Expected exception Elixir.RuntimeError but nothing was raised
+        code: Assertion.assert_raise(RuntimeError, two, "Message Feedback")
+
+      Message Feedback
+      """
+
+      assert_raise AssertionError, expected, fn ->
+        two = 2
+        Assertion.assert_raise(RuntimeError, two, "Message Feedback")
+      end
     end
   end
 end
