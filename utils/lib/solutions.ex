@@ -1022,6 +1022,23 @@ defmodule Utils.Solutions do
     Pascal
   end
 
+  defmodule Sublist do
+    def sublists(list, size) do
+      first_sublist = Enum.take(list, size)
+      remaining = Enum.drop(list, size)
+
+      remaining
+      |> Enum.reduce([first_sublist], fn
+        item, [[h|t]|_]=acc -> [t ++ [item]|acc]
+      end)
+      |> Enum.reverse()
+    end
+  end
+
+  def sublist do
+    Sublist
+  end
+
   defmodule RecursiveEnum do
     def reverse(list) do
       reduce(list, [], fn each, acc -> [each | acc] end)
