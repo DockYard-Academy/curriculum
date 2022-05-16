@@ -53,7 +53,6 @@ defmodule Utils.Feedback.AssertionTest do
       """
 
       assert_raise AssertionError, expected, fn ->
-        my_function = fn -> false end
         Assertion.assert(Enum.any?([1, 2, 3], fn each -> not is_integer(each) end))
       end
     end
@@ -297,7 +296,7 @@ defmodule Utils.Feedback.AssertionTest do
 
   describe "assert_raise" do
     test "assert raise _ raise expected error" do
-      Assertion.assert_raise(RuntimeError, raise("runtime")) == :ok
+      assert Assertion.assert_raise(RuntimeError, raise("runtime")) == :ok
     end
 
     test "assert raise _ not crashing" do

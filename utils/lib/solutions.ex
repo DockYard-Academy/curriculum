@@ -9,67 +9,7 @@ defmodule Utils.Solutions do
 
 
 
-  defmodule Pokemon do
-    defstruct [:name, :type, :speed, health: 20, attack: 5]
-  end
 
-  def define_pokemon_struct do
-    Pokemon
-  end
-
-  def pokemon_structs do
-    charmander = %Pokemon{name: "Charmander", type: :fire, speed: 20}
-    bulbasaur = %Pokemon{name: "Bulbasaur", type: :grass, speed: 15}
-    squirtle = %Pokemon{name: "Squirtle", type: :water, speed: 10}
-    [charmander, bulbasaur, squirtle]
-  end
-
-  defmodule PokemonBattle do
-    def multiplier(pokemon1, pokemon2) do
-      case {pokemon1, pokemon2} do
-        {:fire, :grass} -> 2
-        {:water, :fire} -> 2
-        {:grass, :water} -> 2
-        {:fire, :water} -> 0.5
-        {:water, :grass} -> 0.5
-        {:grass, :fire} -> 0.5
-        _ -> 1
-      end
-    end
-
-    def attack(pokemon1, pokemon2) do
-      %Pokemon{
-        pokemon2
-        | health: pokemon2.health - pokemon2.attack * multiplier(pokemon1, pokemon2)
-      }
-    end
-
-    def battle(pokemon1, pokemon2) do
-      # pokemon1 faster or same speed as pokemon2
-      pokemon2 =
-        if pokemon1.speed >= pokemon2.speed, do: attack(pokemon1, pokemon2), else: pokemon2
-
-      pokemon1 =
-        if pokemon1.speed >= pokemon2.speed and pokemon2.health > 0,
-          do: attack(pokemon2, pokemon1),
-          else: pokemon1
-
-      # pokemon2 faster or same speed as pokemon1
-      pokemon1 =
-        if pokemon1.speed < pokemon2.speed, do: attack(pokemon2, pokemon1), else: pokemon1
-
-      pokemon2 =
-        if pokemon1.speed < pokemon2.speed and pokemon1.health > 0,
-          do: attack(pokemon1, pokemon2),
-          else: pokemon2
-
-      {pokemon1, pokemon2}
-    end
-  end
-
-  def pokemon_battle do
-    [PokemonBattle, Pokemon]
-  end
 
   defmodule RockPaperScissorsLizardSpock do
     defp beats?(p1, p2) do

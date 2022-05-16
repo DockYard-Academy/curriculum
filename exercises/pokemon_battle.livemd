@@ -80,11 +80,9 @@ Utils.feedback(:pokemon_structs, [charmander, bulbasaur, squirtle])
 
 ## Pokemon Battle
 
-Create a `PokemonBattle` module with the following functions:
+Create a `PokemonBattle` module with an `attack/2` function.
 
-### attack/2
-
-Create an `attack/2` function which:
+The `attack/2` function should:
 
 * accepts two pokemon structs as parameters
 * return an updated version of the second pokemon struct.
@@ -112,44 +110,10 @@ Use the following type advantages to determine half or double damage.
 * `:grass` beats `:water`
 * `:water` beats `:fire`
 
-<!-- livebook:{"break_markdown":true} -->
-
-### battle/2
-
-Create a `battle/2` function which:
-
-* Accepts two pokemon structs as parameters.
-* `attack/2` with the pokemon that has the higher speed. If their speed is the same attack the second pokemon first.
-* if the attacked pokemon is still above 0 health, attack with the second pokemon.
-* return two updated pokemon structs in a tuple.
-
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-charmander = %Pokemon{name: "Charmander", type: :fire, speed: 20}
-squirtle = %Pokemon{name: "Squirtle", type: :water, speed: 10}
-
-PokemonBattle.battle(charmander, squirtle)
-{
-    %Pokemon{name: "Charmander", type: :fire, health: 10, speed: 20, attack: 5},
-    %Pokemon{name: "Squirtle", type: :water, health: 17.5, speed: 10, attack: 5}
-}
-
-charizard = %Pokemon{name: "Charizard", type: :fire, speed: 20, attack: 20}
-blastoise = %Pokemon{name: "Blastoise", type: :water, speed: 10, health: 10}
-
-# the faster pokemon will not receive damage if the slower pokemon's health is 0.
-PokemonBattle.battle(charizard, blastoise)
-{
-    %Pokemon{name: "Charizard", type: :fire, health: 20, speed: 20, attack: 20},
-    %Pokemon{name: "Blastoise", type: :water, health: 0, speed: 10, attack: 5}
-}
-```
-
 ```elixir
 defmodule PokemonBattle do
+  def attack(pokemon1, pokemon2) do
+  end
 end
 
 Utils.feedback(:pokemon_battle, [PokemonBattle, Pokemon])
