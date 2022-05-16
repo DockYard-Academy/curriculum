@@ -3,7 +3,6 @@ defmodule Utils.Feedback.FunFormulas do
 
   feedback :percentage do
     [completed_items, total_items, percentage] = get_answers()
-
     assert percentage == completed_items / total_items * 100
   end
 

@@ -45,38 +45,6 @@ defmodule Utils.Feedback do
     end
   end
 
-  # feedback :naming_numbers do
-  #   naming_numbers = get_answers()
-
-  #   assert is_function(naming_numbers),
-  #          "Ensure you bind `naming_numbers` to an anonymous function."
-
-  #   list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-
-  #   Enum.each(1..9, fn integer ->
-  #     assert naming_numbers.(integer) == Enum.at(list, integer)
-  #   end)
-  # end
-
-  # feedback :numbering_names do
-  #   numbering_names = get_answers()
-
-  #   list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-  #   capital_list = Enum.map(list, &String.capitalize/1)
-
-  #   assert is_function(numbering_names),
-  #          "Ensure you bind `naming_numbers` to an anonymous function."
-
-  #   Enum.each(list, fn name ->
-  #     assert numbering_names.(name) ==
-  #              Enum.find_index(list, fn each -> each == String.downcase(name) end)
-  #   end)
-
-  #   Enum.each(capital_list, fn name ->
-  #     assert numbering_names.(name) ==
-  #              Enum.find_index(list, fn each -> each == String.downcase(name) end)
-  #   end)
-  # end
 
   # feedback :define_character_struct do
   #   character_module = get_answers()

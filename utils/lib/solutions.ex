@@ -6,19 +6,6 @@ defmodule Utils.Solutions do
 
 
 
-  def naming_numbers do
-    fn integer ->
-      list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-      Enum.at(list, integer)
-    end
-  end
-
-  def numbering_names do
-    fn name ->
-      list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-      Enum.find_index(list, fn each -> each == String.downcase(name) end)
-    end
-  end
 
   defmodule Character do
     @enforce_keys [:name]

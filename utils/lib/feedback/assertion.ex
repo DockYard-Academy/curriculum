@@ -6,6 +6,7 @@ defmodule Utils.Feedback.Assertion do
       Module.register_attribute(__MODULE__, :ignored, accumulate: true)
 
       import ExUnit.CaptureLog
+      import Utils.Feedback.AssertionHelpers
       require Logger
 
       def get_answers() do
@@ -60,24 +61,28 @@ defmodule Utils.Feedback.Assertion do
   end
 
   def format_error(error, stacktrace) do
-    [{_module, _function, _arity, info} | _tail] = stacktrace
-    file = Keyword.get(info, :file)
-    line = Keyword.get(info, :line)
+    try do
+      [{_module, _function, _arity, info} | _tail] = stacktrace
+      file = Keyword.get(info, :file)
+      line = Keyword.get(info, :line)
 
-    code =
-      try do
+      code =
         file
         |> File.stream!()
         |> Enum.at(line - 1)
         |> String.trim()
-      rescue
-        _ -> nil
-      end
 
-    IO.puts("""
-    Assertion crashed.#{code && "\n  code: #{code}"}
-      error: #{inspect(error.message)}
-    """)
+      IO.puts("""
+      Assertion crashed.#{code && "\n  code: #{code}"}
+        error: #{inspect(error.message)}
+      """)
+    rescue
+      _ ->
+        IO.puts("""
+        Assertion crashed.
+          error: #{inspect(error)}
+        """)
+    end
   end
 
   defmacro get_code(caller, line) do
@@ -128,21 +133,6 @@ defmodule Utils.Feedback.Assertion do
   defmacro assert(assertion, hint) do
     {function, [line: line], args} = assertion
     code = get_code(__CALLER__, line)
-
-    # function_name =
-    #   case function do
-    #     # module function
-    #     {:., meta, [{_, _, [module_name]}, function_name]} = func ->
-    #       "#{module_name}.#{function_name}"
-
-    #     # anon
-    #     {:., meta, [{function_name, _, _}]} = f ->
-    #       function_name
-
-    #     # :is_integer
-    #     function_name ->
-    #       function_name
-    #   end
 
     quote do
       if unquote(assertion) do

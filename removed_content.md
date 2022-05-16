@@ -2417,3 +2417,19 @@ for `add/2`, `subtract/2`, and `multiply/2` different data types.
 ```elixir
 
 ```
+
+### Getting Function Names
+    # function_name =
+    #   case function do
+    #     # module function
+    #     {:., meta, [{_, _, [module_name]}, function_name]} = func ->
+    #       "#{module_name}.#{function_name}"
+
+    #     # anon
+    #     {:., meta, [{function_name, _, _}]} = f ->
+    #       function_name
+
+    #     # :is_integer
+    #     function_name ->
+    #       function_name
+    #   end
