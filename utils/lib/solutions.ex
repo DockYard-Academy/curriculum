@@ -35,15 +35,6 @@ defmodule Utils.Solutions do
 
 
 
-  defmodule VoterCount do
-    def count(list_of_votes, vote) do
-      Enum.count(list_of_votes, fn each -> each == vote end)
-    end
-  end
-
-  def voter_count do
-    VoterCount
-  end
 
   defmodule Anagram do
     def sort_string(string) do
