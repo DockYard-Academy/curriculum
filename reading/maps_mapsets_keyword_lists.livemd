@@ -1,0 +1,205 @@
+# Maps, Mapsets, and Keyword Lists.
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Overview
+
+In this lesson, we will consider the internal details of Maps, MapSets, and Keyword Lists to best
+understand when to use each data type.
+
+## Keyword Lists
+
+Keyword lists have the same properties as [Lists](lists_vs_tuples.livemd).
+
+| Operation | Time Complexity                           |
+| --------- | ----------------------------------------- |
+| Access    | $O(n)$                                    |
+| Search    | $O(n)$                                    |
+| Insertion | $O(1)$ for prepending, otherwise $O(n)$   |
+| Deletion  | $O(1)$ if first element, otherwise $O(n)$ |
+
+Because they are simply lists of `{:atom, value}` tuples.
+
+```elixir
+[{:key1, "value"}, {:key2, "value"}] == [key1: "value", key2: "value"]
+```
+
+## Maps
+
+Maps are a key-value data type that typically has $O(log(n))$ time for any operation involving accessing a key.
+
+| Operation | Time Complexity                                  |
+| --------- | ------------------------------------------------ |
+| Access    | $o(log(n))$                                      |
+| Search    | $o(log(n))$                                      |
+| Insertion | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+| Deletion  | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+
+<!-- livebook:{"break_markdown":true} -->
+
+Maps with `32` or fewer keys are sorted lists. Therefore they have $O(n)$ performance, but this effect is negligible. 
+
+Notice that the map below retains its sort order.
+
+```elixir
+map = Map.new(1..32, fn x -> {x, "#{x}"} end)
+```
+
+Under the hood, a map with `32` or fewer keys uses a sorted list.
+
+Generally, we should avoid relying on this property. When a map grows beyond `32` keys, it loses its sorting order.
+
+Notice the map below is no longer ordered
+now that it has `33` keys.
+
+```elixir
+map = Map.new(1..33, fn x -> {x, "#{x}"} end)
+```
+
+Maps in Elixir are [Hash Array Mapped Trie (HAMT)](https://en.wikipedia.org/wiki/Hash_array_mapped_trie) structures.
+
+We won't dive deeply into the implementation of this data structure as it is beyond the scope of this course.
+
+For practical purposes, be aware most operations on a map will have $O(log(n))$ complexity.
+
+Maps scale better for large values when compared with lists or keyword lists, which grow linearly instead of logarithmically.
+
+### Your Turn
+
+Accessing any key in a map with a million elements is nearly instant, regardless of which key is accessed!
+
+```elixir
+large_map = Map.new(1..10_000_000, fn x -> {x, x} end)
+```
+
+Try changing `key` to any integer between `0` and `999_999`. Notice that accessing the value is
+nearly instant.
+
+```elixir
+key = 500_000
+
+{micro_seconds, _result} = :timer.tc(fn -> Map.get(large_map, key) end)
+
+micro_seconds
+```
+
+On the other hand, Lists are slow compared to maps because they need to enumerate each element.
+
+```elixir
+large_list = Enum.to_list(1..1_000_000)
+```
+
+Try changing `index` to any integer between `0` and `999_999` and notice that the larger the index value, the slower it takes to access an element.
+
+```elixir
+index = 500_000
+
+{micro_seconds, _result} = :timer.tc(fn -> Enum.at(large_list, index) end)
+
+micro_seconds
+```
+
+## MapSets
+
+[MapSets](https://hexdocs.pm/elixir/MapSet.html) are a set data structure. They function like a list that only allows non-duplicate values.
+
+```elixir
+MapSet.new([1, 2, 3])
+```
+
+MapSets ignore duplicate values.
+
+```elixir
+MapSet.new([1, 2, 3, 3])
+```
+
+MapSets are maps under the hood, so they inherit the same performance properties as maps.
+
+| Operation | Time Complexity                                  |
+| --------- | ------------------------------------------------ |
+| Access    | $o(log(n))$                                      |
+| Search    | $o(log(n))$                                      |
+| Insertion | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+| Deletion  | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+
+```elixir
+MapSet
+```
+
+The MapSet module contains functions for working with MapSets.
+
+Here's a few to get you started:
+
+* `new/1` create a new mapset.
+* `put/1` add an element into a mapset.
+* `delete/2` remove an element from a mapset.
+
+<!-- livebook:{"break_markdown":true} -->
+
+A MapSet can contain any value. Keep in mind that order is not
+guaranteed.
+
+```elixir
+MapSet.new(["1", 2, :three])
+```
+
+`put/2` adds any non-duplicate element to a mapset.
+
+```elixir
+set = MapSet.new([1, 2, 3])
+MapSet.put(set, 4)
+```
+
+Duplicates will simply be ignored.
+
+```elixir
+set = MapSet.new([1, 2, 3])
+MapSet.put(set, 2)
+```
+
+`delete/2` removes an element from a MapSet.
+
+```elixir
+set = MapSet.new([1, 2, 3])
+MapSet.delete(set, 2)
+```
+
+MapSet is enumerable, however, any `Enum` function with a MapSet returns a list.
+
+```elixir
+MapSet.new([1, 2, 3]) |> Enum.map(fn each -> each + 1 end)
+```
+
+Generally, lists are overused and can often be a MapSet instead. If you have a list
+where there should never be duplicate elements and order is not important, it's usually more performant to use a MapSet.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create a MapSet with the elements `1, 2, 3`. Use `MapSet.member?/2` to check if your MapSet contains
+the element `2`. Your answer should return `true`.
+
+```elixir
+
+```
