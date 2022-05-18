@@ -1,0 +1,59 @@
+# Smart Cache
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Smart Cache
+
+A simple implementation of Fibonacci  $fib(n) = fib(n-1) + fib(n - 2)$
+is very computationally expensive and creates a lot of duplicated work.
+
+```elixir
+defmodule Fib do
+  def of(1), do: 0
+  def of(2), do: 1
+  def of(n) do: of(n - 1) + of(n - 2)
+end
+
+Fib.of(30)
+```
+For example, `Fib.of(30)` calculates `Fib.of(29)` and `Fib.of(28)`. 
+Which in turn calculates both:
+-  `Fib.of(28)` and `Fib.of(27)`.
+- `Fib.of(27)` and `Fib.of(26)`.
+
+<!-- livebook:{"force_markdown": true} -->
+```elixir
+Fib.of(30) == Fib.of(29) + Fib.of(28)
+Fib.of(29) + Fib.of(28) == Fib.of(28) + Fib.of(27) + Fib.of(27) + Fib.of(26)
+```
+
+You can see that we're calculating `Fib.of(27)` twice in only the first step. This
+issue of duplicating work gets worse and worse the further we get in the execution.
+
+To avoid duplicated work, Use `Agent` to implement a smart cache for the `Fib` module above. 
+
+Ensure that you smart cache values as they are computed, rather than pre-caching results.
+
+<!-- livebook:{"force_markdown": true} -->
+```elixir
+defmodule FibCache do
+  def of(n) do
+
+  end
+end
+```
