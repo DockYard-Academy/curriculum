@@ -1,0 +1,76 @@
+# Concurrent Image Processing
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Concurrent Image Processing
+
+You have built an image processing app which helps users by converting image files from png time to jpeg.
+
+<!-- livebook:{"break_markdown":true} -->
+
+We've provided an `Image` module which simulates this process.
+
+```elixir
+defmodule Image do
+  def convert(file) do
+    # simulating expensive processing
+    Process.sleep(2000)
+    [file_name, _ext] = String.split(file, ".")
+    file_name <> ".jpeg"
+  end
+end
+
+Image.convert("a.png")
+```
+
+This process is very slow, and images take an average of `2` seconds to complete processing.
+Users with many files complain and ask that you improve performance.
+
+Unfortunately, there is no way to improve the performance of processing an individual file, 
+however you can leverage concurrency process many files at once.
+
+Write a `MutliImage` converter module which takes in many files, and concurrently calls `Image.convert/1` on
+each file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+MultiImage.convert(["a.png", "b.png", "c.png"])
+["a.jpeg", "b.jpeg", "c.jpeg"]
+```
+
+When complete, rather than taking `8` seconds to convert `4` files, it should take approximately `2` seconds in the best case.
+
+> This is for a computer with 4 or more cores. A computer with 2 cores would take `4` seconds, and a computer with a single core would still take `8` seconds.
+
+```elixir
+defmodule MultiImage do
+  # Optimize the function below using concurrency. Notice that it currently takes 8 seconds to run.
+  def convert(files) do
+    Enum.map(files, &Image.convert/1)
+  end
+end
+
+# Ensure the result matches the following
+MultiImage.convert(["a.png", "b.png", "c.png", "d.png"]) == [
+  "a.jpeg",
+  "b.jpeg",
+  "c.jpeg",
+  "d.jpeg"
+]
+```
