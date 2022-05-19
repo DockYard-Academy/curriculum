@@ -1,0 +1,60 @@
+# Save Game
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Save Game
+
+Many games have a Save function, which allows players to save the current state of the game.
+In some cases, the saved game is stored in a save file.
+
+We're going to recreate the Save functionality of a video game using the file system.
+
+The game will store some arbitrary elixir term in a given file name.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+game_data = %{
+  character_name: "Peter Parker",
+  level: 10,
+  current_location: "New York"
+}
+
+Game.save(game_data, "save file 1")
+```
+
+Then we should be able to retrieve the saved data given the file name.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+%{
+  character_name: "Peter Parker",
+  level: 10,
+  current_location: "New York"
+} = Game.retrieve("save file 1")
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Game do
+  def save(data, filename) do
+  end
+  def retrieve(filename) do
+  end
+end
+```
