@@ -450,9 +450,68 @@ from another process.
 
 ```
 
+## Race Conditions
+
+Concurrency is a powerful tool, but it introduces a new class of bugs.
+For example, **race conditions** are a common problem.
+
+A race condition occurs when events of operations occur in an unexpected order.
+
+Below we have an `:ets` table, which stores a count. Two tasks read the current count and then increment it. We use `Process.sleep(100)` to simulate a time-consuming computation, then insert a new count.
+
+Synchronously, we would expect the count to increment twice to return two. But when these operations are concurrent, both tasks read the count when of zero, increment zero to one, then save the resulting count in the :ets table. As a result, the count is one rather than the expected value of two.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+sequenceDiagram
+ETS Table->>ETS Table: sets count = 0
+    ETS Table->>Task 1: reads count (0)
+    ETS Table->>Task 2: reads count (0)
+    Task 1->>ETS Table: sets count = 1
+    Task 2->>ETS Table: sets count = 1
+```
+
+```
+activate Child Process
+Child Process-->>Parent Process: pid
+deactivate Child Process
+```
+
+```elixir
+table = :ets.new(:concurrent, [:public])
+
+:ets.insert(table, {:count, 0})
+
+task1 =
+  Task.async(fn ->
+    [count: count] = :ets.lookup(table, :count)
+    Process.sleep(100)
+    :ets.insert(table, {:count, count + 1})
+  end)
+
+task2 =
+  Task.async(fn ->
+    [count: count] = :ets.lookup(table, :count)
+    Process.sleep(100)
+    :ets.insert(table, {:count, count + 1})
+  end)
+
+Task.await(task1)
+Task.await(task2)
+
+table
+```
+
+For an overview of race conditions and how large systems deal with many concurrent operations, there is an excellent video by Tom Scott.
+
+```elixir
+Kino.YouTube.new("RY_2gElt3SA")
+```
+
 ### Futher Reading
 
 For more information, consider reading:
 
-* the excellent lesson by [Elixir Schools](https://elixirschool.com/en/lessons/storage/ets).
-* The [ETS Elixir Lang Guide](https://elixir-lang.org/getting-started/mix-otp/ets.html).
+* The ETS lesson by [Elixir Schools](https://elixirschool.com/en/lessons/storage/ets).
+* The ETS [Elixir Lang Guide](https://elixir-lang.org/getting-started/mix-otp/ets.html).
