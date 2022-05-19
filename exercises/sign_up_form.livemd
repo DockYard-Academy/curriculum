@@ -1,0 +1,60 @@
+# Sign Up Form
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Sign Up Form
+
+It's common for applications to have a sign up form that validates a user's email, password, and other information.
+
+Create a `User` module which validates that users provide valid information
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, user} =
+  User.new(%{
+    username: "Peter Parker",
+    password: "secret_spider",
+    email: "peter@spider.web",
+    terms_and_conditions: true
+  })
+```
+
+we're going to allow any string for the recipient name, domain name, and top level domain.
+
+* `username` (required) a 3-12 character string
+* `password` (required) a 12-50 character string.
+* `email` (required) a string in the format `recipient_name@domain_name.top_level_domain`. i.e. `"peter@gmail.com"`.
+* `age` (optional) an integer.
+* `agreed_to_terms_and_conditions` (required) a boolean which must be `true`.
+
+You should rely on Ecto Changesets and your own custom validation to validate the user information. 
+Enter your solution below.
+
+```elixir
+defmodule User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  def changeset(%User{} = user, params) do
+  end
+
+  def new(params) do
+  end
+end
+```
