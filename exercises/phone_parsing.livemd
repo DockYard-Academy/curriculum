@@ -1,0 +1,66 @@
+# Phone Parsing
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Phone Parsing
+
+You have been provided a `phone_numbers` text file with all phone numbers between `555-555-0100`
+and `555-555-0199`.
+
+```
+555-555-0100
+555-555-0101
+555-555-0102
+555-555-0103
+... and so on.
+```
+
+The following code creates the file.
+
+```elixir
+file_content =
+  for int <- 100..199, into: "" do
+    "555-555-0#{int}\n"
+  end
+
+File.write("phone_numbers.txt", file_content)
+```
+
+You are going to read the content from the file, and convert it into a list of integers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+PhoneNumbers.get()
+[5555550100, 5555550101, 5555550102, ...] # and so on.
+```
+
+While not strictly necessary for a file of this size, consider using `File.stream!/1` or `File.open/1` so that you do not need to load the entire file
+into memory.
+
+Enter your solution below.
+
+```elixir
+defmodule PhoneNumbers do
+  def get do
+  end
+end
+
+# The following should return a list of the correct phone number integers.
+PhoneNumbers.get()
+```
