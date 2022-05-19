@@ -31,12 +31,13 @@ end
 
 Fib.of(30)
 ```
+
 For example, `Fib.of(30)` calculates `Fib.of(29)` and `Fib.of(28)`. 
 Which in turn calculates both:
--  `Fib.of(28)` and `Fib.of(27)`.
-- `Fib.of(27)` and `Fib.of(26)`.
 
-<!-- livebook:{"force_markdown": true} -->
+* `Fib.of(28)` and `Fib.of(27)`.
+* `Fib.of(27)` and `Fib.of(26)`.
+
 ```elixir
 Fib.of(30) == Fib.of(29) + Fib.of(28)
 Fib.of(29) + Fib.of(28) == Fib.of(28) + Fib.of(27) + Fib.of(27) + Fib.of(26)
@@ -45,15 +46,13 @@ Fib.of(29) + Fib.of(28) == Fib.of(28) + Fib.of(27) + Fib.of(27) + Fib.of(26)
 You can see that we're calculating `Fib.of(27)` twice in only the first step. This
 issue of duplicating work gets worse and worse the further we get in the execution.
 
-To avoid duplicated work, Use `Agent` to implement a smart cache for the `Fib` module above. 
+To avoid duplicated work, Use `Agent` to implement a smart cache for the `Fib` module above.
 
 Ensure that you smart cache values as they are computed, rather than pre-caching results.
 
-<!-- livebook:{"force_markdown": true} -->
 ```elixir
 defmodule FibCache do
   def of(n) do
-
   end
 end
 ```
