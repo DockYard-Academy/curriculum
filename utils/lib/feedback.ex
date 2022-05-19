@@ -2005,6 +2005,18 @@ defmodule Utils.Feedback do
     end
   end
 
+  feedback :number_wordle do
+    number_wordle = get_answers()
+
+    assert number_wordle.feedback(1111, 9999), "Ensure you implement the feedback/2 function."
+
+    assert number_wordle.feedback(1111, 1111) == [:green, :green, :green, :green]
+    assert number_wordle.feedback(1111, 2222) == [:gray, :gray, :gray, :gray]
+    assert number_wordle.feedback(1111, 1122) == [:green, :green, :gray, :gray]
+    assert number_wordle.feedback(1112, 2333) == [:gray, :gray, :gray, :yellow]
+    assert number_wordle.feedback(2221, 1222) == [:yellow, :green, :green, :yellow]
+  end
+
   # test_names must be after tests that require a solution.
   def test_names, do: @tests
 
@@ -2201,18 +2213,6 @@ defmodule Utils.Feedback do
     jewel = get_answers()
     assert jewel != [1, 2, "jewel"], "Ensure you use pattern matching to bind `jewel`"
     assert jewel == "jewel"
-  end
-
-  feedback :number_wordle do
-    number_wordle = get_answers()
-
-    assert number_wordle.feedback(1111, 9999), "Ensure you implement the feedback/2 function."
-
-    assert number_wordle.feedback(1111, 1111) == [:green, :green, :green, :green]
-    assert number_wordle.feedback(1111, 2222) == [:gray, :gray, :gray, :gray]
-    assert number_wordle.feedback(1111, 1122) == [:green, :green, :gray, :gray]
-    assert number_wordle.feedback(1112, 2333) == [:gray, :gray, :gray, :yellow]
-    assert number_wordle.feedback(2221, 1222) == [:yellow, :green, :green, :yellow]
   end
 
   feedback :keyword_get do

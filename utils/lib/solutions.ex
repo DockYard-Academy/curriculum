@@ -1039,6 +1039,43 @@ defmodule Utils.Solutions do
     Sublist
   end
 
+  defmodule NumberWordle do
+    def feedback(guess, answer) do
+      guess = Integer.to_charlist(guess)
+      answer = Integer.to_charlist(answer)
+
+      # find matches and gather possibilities
+      {guess, possibilities} = Enum.zip(guess, answer)
+      |> Enum.reduce({[], []}, fn
+        {same, same}, {result, possibilities} ->
+          {[:green|result], possibilities}
+        {guessed, possible}, {result, possibilities} ->
+          {[guessed|result], [possible|possibilities]}
+      end)
+
+      # find possibilities
+      {result, _} = guess
+      |> Enum.reverse
+      |> Enum.reduce({[], possibilities}, fn
+        item, {result, possibilities} when is_atom(item) ->
+          {[item|result], possibilities}
+        item, {result, possibilities} ->
+          if item in possibilities do
+            # dont forget to remove from future possibilities!!
+            {[:yellow|result], List.delete(possibilities, item)}
+          else
+            {[:gray|result], possibilities}
+          end
+      end)
+
+      Enum.reverse(result)
+    end
+  end
+
+  def number_wordle do
+    NumberWordle
+  end
+
   defmodule RecursiveEnum do
     def reverse(list) do
       reduce(list, [], fn each, acc -> [each | acc] end)
