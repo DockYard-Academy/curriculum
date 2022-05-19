@@ -1,0 +1,64 @@
+# Inventory Management
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Inventory Management
+
+We're going to build an in-memory inventory management application. We need to be able to
+start a process and return it's pid.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+pid = Warehouse.start()
+```
+
+We should be able to store an item with a quantity in our warehouse. If we
+store the same item in should increase the quantity.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Warehouse.store(pid, :apples, 5)
+Warehouse.store(pid, :apples, 10)
+```
+
+We should be able to retrieve the current quantity of an item in our warehouse.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+15 = Warehouse.quantity(pid, :apples)
+```
+
+You are free to solve the problem how you see fit. However, you might consider using a `GenServer`, `Agent`, or `:ets` table.
+
+Enter your solution in the Elixir cell below.
+
+```elixir
+defmodule Warehouse do
+  def start do
+  end
+
+  def store(pid, item, quantity) do
+  end
+
+  def quantity(pid, item) do
+  end
+end
+```

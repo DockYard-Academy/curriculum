@@ -1,0 +1,107 @@
+# Kitchen Queue
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Kitchen Queue
+
+A FIFO (First In First Out) queue is a common pattern in programming with many applications.
+
+First in First is also a common term when managing inventory, meaning that older
+items should be consumed before newer products.
+
+We're going to apply the concept of a FIFO queue and build a kitchen management game.
+Customer requests will be received, and saved in-memory.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Kitchen.request("burger with fries")
+Kitchen.request("caesar salad")
+```
+
+Then the kitchen can prepare the oldest request in the queue.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"burger with fries" = Kitchen.prepare()
+"caesar salad" = Kitchen.prepare()
+```
+
+You might consider using either a named `Agent`, `:ets`, or `GenServer` process to save the queue in-memory.
+You may need to start a named process before calling the `Kitchen` module.
+
+```elixir
+defmodule Kitchen do
+  def request(item) do
+  end
+
+  def prepare() do
+  end
+end
+```
+
+Test your solution by uncommenting and executing the code below.
+
+```elixir
+# Kitchen.request("burger with fries")
+# Kitchen.request("caesar salad")
+# "burger with fries" = Kitchen.prepare()
+# "caesar salad" = Kitchen.prepare()
+```
+
+## Kitchen Stock Application
+
+Happy with our previous work, we are asked to build an inventory management system for the kitchen stock.
+Items in a kitchen are stored under a common `:name` and a unique `:id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Stock.store(%{name: :carton_of_eggs, id: 1})
+Stock.store(%{name: :carton_of_eggs, id: 2})
+```
+
+We should be able to retrieve an item by it's name, and return the oldest items first.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{name: :carton_of_eggs, id: 1} = Stock.retrieve(:carton_of_eggs)
+%{name: :carton_of_eggs, id: 2} = Stock.retrieve(:carton_of_eggs)
+```
+
+There are many valid solutions, but you
+might consider using a named `:ets` table with the `:bag` configuration.
+
+You may need to start a named process before calling the `Stock` module.
+
+Enter your solution below.
+
+```elixir
+
+```
+
+Test your solution by uncommenting and executing the code below.
+
+```elixir
+# Stock.store(%{name: :carton_of_eggs, id: 1})
+# Stock.store(%{name: :carton_of_eggs, id: 2})
+# %{name: :carton_of_eggs, id: 1} = Stock.retrieve(:carton_of_eggs)
+# %{name: :carton_of_eggs, id: 2} = Stock.retrieve(:carton_of_eggs)
+```
