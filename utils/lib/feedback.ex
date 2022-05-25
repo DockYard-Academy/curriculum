@@ -204,7 +204,7 @@ defmodule Utils.Feedback do
            "each variable should be bound to a non-empty string"
 
     assert madlib ==
-             "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
+             "My company, #{name_of_company}, is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
   end
 
   feedback :nature_show_madlib do
