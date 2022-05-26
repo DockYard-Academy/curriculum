@@ -1,0 +1,75 @@
+# Games Project
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Overview
+
+This is the start of a `Games` project which you will continue to build upon throughout the course.
+In this exercise, you will create a mix project with a `RockPaperScissors` game.
+
+## Create a New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `games`.
+
+```
+mix new games
+```
+
+## Create a Rock Paper Scissors game.
+
+You're going to create a rock paper scissors game where players will play against an AI which randomly chooses
+rock, paper, or scissors.
+
+You should be able to start your project by running the following from the `game` folder in
+the command line.
+
+```
+iex -S mix
+```
+
+Then you can play the game in a `Games.RockPaperScissors` module. 
+Each time the player plays the game, it should generate a random choice for the opponent, and 
+display a custom message of your choosing to let the player know they won or lost.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+# randomly generated :scissors for the opponent
+iex> Games.RockPaperScissors.play(:rock)
+"You win! :rock beats :scissors."
+
+# randomly generated :paper for the opponent
+iex> Games.RockPaperScissors.play(:rock)
+"You lose! :paper beats :rock."
+
+# randomly generated :rock for the opponent
+iex> Games.RockPaperScissors.play(:rock)
+"It's a tie!"
+```
+
+## (Bonus) Save Score
+
+Ever time you play, you should save a running total of your wins, loses, and draws.
+You should be able to retrieve the current tally like so:
+
+```elixir
+RockPaperScissors.score()
+%{wins: 1, loses: 1, draws: 0}
+```
+
+You may choose to persist the score between sessions (using the file system), 
+or keep a running tally in memory (using a process).

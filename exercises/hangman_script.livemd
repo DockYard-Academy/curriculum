@@ -1,0 +1,94 @@
+# Hangman Script
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Overview
+
+Hangman is a popular game where players guess a word.
+
+Players are given empty spaces representing characters in the word. They then guess a letter, and any letters in
+that word are revealed.
+
+For example, the player may be given a 5 letter word. 
+
+```
+_ _ _ _ _
+```
+
+The player guesses the letter `e`, and the following is revealed.
+
+```
+_ e _ _ _
+```
+
+The player continues to guess, and gradually the answer is revealed as `"hello"`.
+
+```
+h e l l o
+```
+
+## Create a Hangman Script
+
+In the `projects` folder, create a `hangman.exs` script.
+
+When you execute the `hangman.exs` script it should randomly generate a word from
+a list of your choosing, for example:
+
+```elixir
+Enum.random(["fries", "burgers", "pizza"])
+```
+
+The game should prompt players to enter a guess and display empty underscores `_`.
+The player can then enter a single letter to guess.
+
+A correct guess should reveal any matching letters in the word. An incorrect guess
+should print the previously revealed letters.
+
+For example,
+```
+$ elixir hangman.exs
+_ _ _ _ _
+w
+w _ _ _ _
+o
+w o _ _ _
+r
+w o r _ _
+l
+w o r l _
+e
+w o r l _
+d
+w o r l d
+```
+
+## (Bonus) Draw a hangman
+
+Draw a hangman or other ASCII picture of your choosing gradually with each failed guess. Once the player reaches
+the maximum number of guesses (based on how many steps it takes to draw your ASCII picture.) end the game with a failure
+message. For example, you might gradually draw the following:
+
+```
++---+
+|   O
+|  /|\
+|  / \
+|
+======== 
+_ _ _ _ _
+```

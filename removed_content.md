@@ -2379,41 +2379,114 @@ flowchart
 In the Elixir cell below, create a behaviour `Math` which defines the common interface
 for `add/2`, `subtract/2`, and `multiply/2` different data types.
 
-```elixir
 
-```
+# Code Organization
 
-* Create a module `Math.Number` which implements the `Math` behavior.
-* handle `add/2`, `subtract/2`, and `multiply/2` for integers and floats.
+## alias
 
-```elixir
+It can be tedious to write the entire namespace every time we use a module's function.
 
-```
+Instead, we can use [alias](https://elixir-lang.org/getting-started/alias-require-and-import.html#alias)
+to set up an alias for any given module name.
 
-* Create a module `Math.String` which implements the `Math` behavior.
-* handle `add/2`, `subtract/2`, and `multiply/2` for strings.
+For example, here we can `alias HelloWorld.Names` to use `Names` directly.
 
 ```elixir
+defmodule HelloWorld.Names do
+  def random() do
+    Faker.Person.first_name()
+  end
+end
 
+defmodule HelloWorld.Greeting do
+  alias HelloWorld.Names
+
+  def hello() do
+    "Hello, #{Names.random()}"
+  end
+end
 ```
 
-* Create a module `Math.List` which implements the `Math` behavior.
-* handle `add/2`, `subtract/2`, and `multiply/2` for lists.
+By default, the module alias will be the last part of the module name. so `alias HelloWorld.Greeting.Formal` would
+be `Formal`.
+
+We can override the default alias by using `as`.
 
 ```elixir
+defmodule HelloWorld.Names do
+  def random() do
+    Faker.Person.first_name()
+  end
+end
 
+defmodule HelloWorld.Greeting do
+  alias HelloWorld.Names, as: AmazingAlias
+
+  def hello() do
+    "Hello, #{AmazingAlias.random()}"
+  end
+end
 ```
 
-* Create a module `Math.Map` which implements the `Math` behavior.
-* handle `add/2`, `subtract/2`, and `multiply/2` for maps.
+Alter your code in `HelloWorld.Greeting` to use an `alias` for `HelloWorld.Names`.
+
+## import
+
+Rather than `alias` a module, we can use `import` to import all of it's functions.
+
+This reduces the amount of code we need to write even further.
 
 ```elixir
+defmodule Imported do
+  def imported_fn do
+  end
+end
 
+defmodule WillImport do
+  import Imported
+  def my_fn do
+    imported_fn()
+  end
+end
 ```
 
-* Create a module `Math.Range` which implements the `Math` behavior.
-* handle `add/2`, `subtract/2`, and `multiply/2` for ranges.
+However, consider being cautious when using `import`. It can obscure the origin of your functions.
+
+For example, which module does `imported_fn` come from in this code?
+It's impossible to tell without reading `ImportedModule1` and `ImportedModule2`.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+defmodule Example do
+  import ImportedModule1
+  import ImportedModule2
+  def my_fn() do
+    imported_fn()
+  end
+end
+```
+It can also lead to conflicts if two imported modules have the same functions.
 
 ```elixir
+defmodule Imported1 do
+  def imported_fn do
+  end
+end
 
+defmodule Imported2 do
+  def imported_fn do
+  end
+end
+
+defmodule WillImport do
+  import Imported1
+  import Imported2
+  def my_fn do
+    imported_fn()
+  end
+end
 ```
+
+### Your Turn
+
+Convert your `alias` in `HelloWorld.Greeting` to `HelloWorld.Names` to use an `import`.

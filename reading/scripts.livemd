@@ -1,0 +1,154 @@
+# Scripts
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Scripts
+
+With [Elixir installed](https://elixir-lang.org/install.html) we can execute an Elixir file ending in `.ex` or `.exs`.
+
+Elixir treats both file extensions similarly. However, we generally use `.exs` files for scripts.
+
+Let's create an Elixir script. First, create a `script.exs` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+IO.puts("Hello, world!")
+```
+
+Then execute the file from the command line. Any Elixir code inside of the file will execute.
+
+```
+$ elixir script.ex
+Hello, world!
+```
+
+## IO module
+
+We can leverage the built-in [IO Module](https://hexdocs.pm/elixir/IO.html) to
+retrieve user input and print information to the console.
+
+Let's build a simple number guessing game to see how we can apply this to our scripts.
+
+The game will generate a number between `1` and `10`, and prompt the user to answer. If their answer is correct, it will print `"Correct!"`.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+2
+Correct!
+```
+
+If their answer is incorrect, it will print `"Incorrect!"`.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+3
+Incorrect!
+```
+
+First, create a `guessing_game.exs` script.
+
+We can use the `IO.gets/2` function to accept some user input and bind it to a variable. Note `IO.gets/2` does
+not work in Livebook.
+
+The user input is a string, which we can parse with `Integer.parse/2`.
+
+With the parsed integer, we can then compare it to a random integer generated with `Enum.random/1`.
+
+We then print the result to the console with `IO.puts/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+guess = IO.gets("Guess a number between 1 and 10.")
+{parsed_guess, _} = Integer.parse(guess)
+answer = Enum.random(1..10)
+
+if parsed_guess == answer do
+  IO.puts("Correct!")
+else
+  IO.puts("Incorrect")
+end
+```
+
+Currently, the guessing game ends after the player enters a single guess.
+How could you let the player guess until they get the correct answer?
+
+There are multiple solutions. One solution is to use recursion. We can recursively call 
+`IO.gets/2` until the answer matches the player's guess.
+
+To create a recursive function, we'll need a module. Copy the following code
+into your `guessing_game.exs` script.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule GuessingGame do
+  def guess do
+    player_guess = IO.gets("Guess a number between 1 and 10.")
+    answer = Enum.random(1..10)
+    if player_guess == answer do
+      IO.puts("Correct!")
+      else
+      guess()
+    end 
+  end
+end
+
+GuessingGame.guess()
+```
+
+Now we can keep guessing.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+2
+Incorrect!
+Guess a number between 1 and 10.
+3
+Incorrect!
+```
+
+However, we have a bug. The `answer` is re-bound every time we recursively call `GuessingGame.guess/0`.
+
+### Your Turn
+
+Modify the `guessing_game.ex` script so that the random `answer` does not change each time the player guesses
+a number.
+
+<details>
+<summary>Hint</summary>
+Consider using module attributes, which are created at compile time and will not change.
+</details>
+
+## Loading Multiple Files.
+
+Generally, a script is a single `.exs` file used for some singular purpose. While it is possible to load other
+files with the [Code](https://hexdocs.pm/elixir/Code.html) module to split up functionality and create larger projects, it's
+generally not something you will do on most projects, and therefore beyond the scope of this course.
+
+Instead, it's more common to use the
+[IEx shell](reading/iex.livemd) or [Mix](reading/mix.livemd) to create larger projects with multiple files, both of which
+you will learn about in the next sections.
