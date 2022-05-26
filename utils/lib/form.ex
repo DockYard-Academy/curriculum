@@ -26,7 +26,7 @@ defmodule Utils.Form do
         label: "9 __ 9 and <b>not</b> 10 __ 10.0",
         answers: ["==="]
       },
-      %{label: "8 __ 8.0 and 0 __ 9.0", answers: ["=="]}
+      %{label: "8 __ 8.0 and 9 __ 9.0", answers: ["=="]}
     ]
   end
 

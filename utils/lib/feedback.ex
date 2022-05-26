@@ -87,9 +87,16 @@ defmodule Utils.Feedback do
     assert percentage == completed_items / total_items * 100
   end
 
+  feedback :percentage_random do
+    [completed_items, total_items, percentage] = get_answers()
+    assert total_items >= completed_items, "total_items should always be more than completed items, please reset the exercise"
+    assert percentage <= 100, "percentage should be a float between 0 and 100. Please check the formula entered."
+    assert percentage == completed_items / total_items * 100
+  end
+
   feedback :pythagorean_c_square do
     c_square = get_answers()
-    assert c_square == 10 ** 2 + 10 ** 2
+    assert c_square == 10 ** 2 + 10 ** 2, "The answer is not correct, please check the formula entered."
   end
 
   feedback :pythagorean_c do
@@ -197,7 +204,7 @@ defmodule Utils.Feedback do
            "each variable should be bound to a non-empty string"
 
     assert madlib ==
-             "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
+             "My company, #{name_of_company}, is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
   end
 
   feedback :nature_show_madlib do
