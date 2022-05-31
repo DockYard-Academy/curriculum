@@ -526,7 +526,7 @@ There are several schools of thought on how you should comprehensively test appl
 Many developers believe the [Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 creates a fast and comprehensive test suite with many unit tests, some integration tests, and fewer end-to-end tests.
 
-Alternatively, you might consider the [Test Trophy], which prioritizes integration tests.
+Alternatively, you might consider the [Test Trophy](https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications), which prioritizes integration tests.
 
 Rather than recommend a specific pattern, we hope to introduce you to them so that you can develop
 your own opinions and do further research.
@@ -870,6 +870,8 @@ ExUnit.start()
 ExUnit.configure(exclude: :my_tag)
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
 Use the `@moduletag`, `@describetag`, and `@tag` module attributes in the `math_test.exs` module.
@@ -878,9 +880,91 @@ Then use the `--exclude`, `--include`, and `--only` flags for the `mix test` com
 Finally, configure the `test_helper.exs` file to exclude each tag individually and run all tests.
 Ensure tests with your skipped test do not run.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Documentation and Doc Testing
+
+We use the `@moduledoc` and `@doc` module attributes to document our code in a mix project.
+By documenting our project, we explain to other developers the purpose of our code.
+
+`@moduledoc` contains documentation for the entire module, and `@doc` documents the function below it.
+
+When we created the `Math` mix project, it used the `@doc` and `@moduledoc` module attribute to document the main `math.ex` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Math do
+  @moduledoc """
+  Documentation for `Math`.
+  """
+
+  @doc """
+  Hello world.
+
+  ## Examples
+
+      iex> Math.hello()
+      :world
+
+  """
+  def hello do
+    :world
+  end
+end
+
+```
+
+Notice the `Examples` section, which simulates an `IEx` shell. This is a doc test.
+doc tests are run by the corresponding test file `math_test.exs` using the `doctest` macro from `ExUnit`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule MathTest do
+  use ExUnit.Case
+  doctest Math
+  ...
+end
+
+ExUnit.run()
+```
+
+Doctests are generally not as comprehensive as typical testing and are not a full replacement. 
+However, they can be a great way to TDD your code and ensure the documentation remains up to date.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Add doctests for the `math.ex` the `add/2` and `subtract/2` functions. Include an example
+for each data type (integers, floats, strings, lists, maps, keyword lists).
+
+Generally, doctests go in an `Examples` section.
+You can write multiple doc tests like so.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  @doc """
+  add data types.
+
+  ## Examples
+
+      iex> Math.add(1, 1)
+      2
+
+      iex> Math.add(2.1, 2.1)
+      4.2
+  """
+```
+
 ## Further Reading
 
 For more on testing, consider using the following resources.
 
 * [Mix Test](https://hexdocs.pm/mix/Mix.Tasks.Test.html) For more on how you can use the `mix test` command.
 * [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) For documentation on ExUnit.
+* [ElixirSchools: Documentation](https://elixirschool.com/en/lessons/basics/documentation) An lesson by Elixir schools on documentation and doc-testing.
