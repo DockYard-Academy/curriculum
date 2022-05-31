@@ -2741,3 +2741,67 @@ Firstly, there is the test pyramid, which states that you should have many unit 
 
 Then there is a modified version called the testing trophy, originally 
 
+
+## Testing Singletons
+
+Singletons can be tricky to test, because they exist for the runtime of the tests. 
+Here, we've re-implemented the `Counter` to use a singleton.
+
+```elixir
+defmodule SingletonCounter do
+  use GenServer
+
+  # Client
+
+  def start_link(opts) do
+    # the name option makes this a singleton.
+    server_name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, %{count: 0}, name: :example)
+  end
+
+  def increment(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+
+  # Server
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    {:reply, state.count, state}
+  end
+
+  def handle_call(:increment, _from, state) do
+    {:reply, state.count + 1, %{state | count: state.count + 1}}
+  end
+end
+```
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule SingletonCounterTest do
+  use ExUnit.Case
+
+  test "increment/1" do
+    {:ok, pid} = SingletonCounter.start_link([])
+    SingletonCounter.increment(pid)
+    assert SingletonCounter.get_count(pid) == 1
+  end
+
+  test "increment/1 twice" do
+    {:ok, pid} = SingletonCounter.start_link([])
+    SingletonCounter.increment(pid)
+    SingletonCounter.increment(pid)
+    assert SingletonCounter.get_count(pid) == 2
+  end
+end
+
+ExUnit.run()
+```

@@ -1,0 +1,217 @@
+# Testing GenServers
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Testing GenServers
+
+We've seen how to perform tests on a module and function, but how do you test something stateful like a process?
+Let's consider how we could test a simple `Counter` process that should store an integer in it's state and increment the value.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call(:increment, _from, state) do
+    {:reply, state + 1, state + 1}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    {:reply, state, state}
+  end
+end
+```
+
+Generally, we don't want to test the implementation of the counter, so we don't
+want to specifically send it messages using the `GenServer` module, nor do we want
+to test on the state of the process.
+
+For example, the following test is coupled to implementation.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule CounterTest do
+  use ExUnit.Case
+
+  test "handle_call :increment" do
+    {:ok, pid} = GenServer.start_link(Counter, 0)
+    GenServer.call(pid, :increment)
+    assert GenServer.call(pid, :get_count) == 1
+  end
+end
+
+ExUnit.run()
+```
+
+So if any of the internals change, these tests could break, even though the behavior of the counter module doesn't.
+Instead, we generally want to test on the [client interface](https://hexdocs.pm/elixir/1.12/GenServer.html#module-client-server-apis) of the `GenServer`.
+
+Here's the `Counter` module separated into the `Client` and `Server` interface.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  # Client
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, 0)
+  end
+
+  def increment(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+
+  # Server
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    {:reply, state, state}
+  end
+
+  def handle_call(:increment, _from, state) do
+    {:reply, state, state + 1}
+  end
+end
+```
+
+Now we can use these functions in our test.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule CounterTest do
+  use ExUnit.Case
+
+  test "increment/1" do
+    {:ok, pid} = Counter.start_link([])
+    Counter.increment(pid)
+    assert Counter.get_count(pid) == 1
+  end
+end
+
+ExUnit.run()
+```
+
+Now if any of the internals of `Counter` change, so long as the client interface and behavior remain the same the tests will not break.
+For example, let's say we decide to change how we store state in the `Counter`. Instead of an integer, it will be a keyword list like so.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  # Client
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, %{count: 0})
+  end
+
+  def increment(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+
+  # Server
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    {:reply, state.count, state}
+  end
+
+  def handle_call(:increment, _from, state) do
+    {:reply, state.count + 1, %{state | count: state.count + 1}}
+  end
+end
+```
+
+Our tests still pass, because the behavior and interface has not changed.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule CounterTest do
+  use ExUnit.Case
+
+  test "increment/1" do
+    {:ok, pid} = Counter.start_link([])
+    Counter.increment(pid)
+    assert Counter.get_count(pid) == 1
+  end
+end
+
+ExUnit.run()
+```
+
+However, the old test suite breaks, because it was coupled to the underlying implementation.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule CounterTest do
+  use ExUnit.Case
+
+  test "handle_call :increment" do
+    {:ok, pid} = GenServer.start_link(Counter, 0)
+    GenServer.call(pid, :increment)
+    assert GenServer.call(pid, :get_count) == 1
+  end
+end
+
+ExUnit.run()
+```
+
+###  Your Turn
+
+Create a `counter` mix project in your projects folder.
+
+```
+$ mix new counter
+```
+
+Implement your own `Counter` server with `increment/1`,  `decrement/1` and `get_count/1` functions.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+{:ok, pid} = Counter.start_link([])
+Counter.increment(pid)
+1 = Counter.get_count(pid)
+Counter.decrement(pid)
+0 = Counter.get_count(pid)
+```

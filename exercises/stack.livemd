@@ -1,0 +1,47 @@
+# Testing Counter
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Stack
+
+Test and implement a `Stack` process.
+
+The `Stack` process should store a list as state and `push/2` elements onto the stack, and `pop/2` elements
+off of the stack like so.
+
+<!-- livebook:{"force_markdown":true} -->
+```elixir
+{:ok, pid} = Stack.start_link([])
+[:one] = Stack.push(pid, :one)
+[:two, :one] = Stack.push(pid, :two)
+:two = Stack.pop(pid)
+:one = Stack.pop(pid)
+```
+
+Implement and test the `Stack` module. Ensure you have at least one test each for the `push/2` function
+and the `pop/1` function.
+
+```elixir
+defmodule Stack do
+  use GenServer
+end
+
+defmodule StackTests do
+  use ExUnit.Case
+end
+```
