@@ -2490,3 +2490,254 @@ end
 ### Your Turn
 
 Convert your `alias` in `HelloWorld.Greeting` to `HelloWorld.Names` to use an `import`.
+
+
+Tests provide [assertions](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html) about how the application is supposed to behave.
+
+We `assert` that the `HelloWorld.hello/0` function should return `:world`.
+If we change the `HelloWorld.hello/0` function's behavior, the test will fail.
+
+This test focuses on the input, and output of a function, treating the rest like a black box.
+
+```mermaid
+flowchart
+  Input -> Output
+```
+
+### Your Turn
+
+If we change the output of the function, the test will break.
+Try changing the output of the `HelloWorld` module to break the tests. Then undo your change
+to make the tests pass again.
+
+```elixir
+defmodule HelloWorld do
+  def hello do
+    "world"
+  end
+end
+```
+
+You should see some similar output.
+
+```
+$ mix test
+
+1) doctest HelloWorld.hello/0 (1) (HelloWorldTest)
+     test/hello_world_test.exs:3
+     Doctest failed
+     doctest:
+       iex> HelloWorld.hello()
+       :world
+     code:  HelloWorld.hello() === :world
+     left:  "world"
+     right: :world
+     stacktrace:
+       lib/hello_world.ex:11: HelloWorld (module)
+
+
+
+  2) test greets the world (HelloWorldTest)
+     test/hello_world_test.exs:5
+     Assertion with == failed
+     code:  assert HelloWorld.hello() == :world
+     left:  "world"
+     right: :world
+     stacktrace:
+       test/hello_world_test.exs:6: (test)
+```
+
+There are actually two tests that fail. The second is the test in `tests/hello_world_test.ex`.
+The first is a doctest, which we will cover later.
+
+## Assertions
+
+Generally tests focus on some assertion about how your application will behave.
+When testing, you want to think about what assertions properly verify the behavior of your
+application.
+
+We can use any comparison operators in our assertions. It's most common to check if a value is equal using `==`.
+
+```elixir
+test "4 is 5" do
+  assert 4 == 4
+end
+```
+
+A test will fail if it's given any falsy value.
+
+```elixir
+test "4 is 6" do
+  assert 4 == 6
+end
+```
+
+So long as the result is a truthy or falsy value, we can use any functions, operators, etc.
+
+```elixir
+test "4 < 2" do
+  assert 4 < 2
+end
+
+test "[] is a list" do
+  assert is_list([])
+end
+
+test "" do
+  assert (true and true) or false
+end
+```
+
+We have a number of assertions other than `assert`.
+For example, if we want a test to fail for a truthy value rather than a false value we can us `refute`.
+
+```elixir
+test "empty map %{} is not a list" do
+  refute is_list(%{})
+end
+```
+
+See [Assertions](https://hexdocs.pm/ex_unit/1.13.4/ExUnit.Assertions.html) for the full list of ExUnit assertions.
+
+### Your Turn
+
+Create a new test in `hello_world_test.ex`.
+
+Assert that when the `hello/1` function receives the string `"Peter"` it should
+return `"Hello, Peter."`. Implement the code necessary to make this pass.
+
+### Test Cases
+
+So far, we've used **example-based tests** where we test the output of some function given some input.
+In the exercise above, you may have written a test like so:
+
+```elixir
+test "hello peter" do
+  assert HelloWorld.hello("Peter") == "Hello, Peter."
+end
+```
+
+This is a **test case**. It's important to think about test cases for you unit tests. The more comprehensive
+your test cases, the more comprehensive your tests and less likely you are to have unexpected bugs.
+
+Currently, We provided a single example, and the assume that other examples
+work similarly. This can lead to issues if we aren't careful.
+
+```mermaid
+flowchart
+Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
+```
+
+For example, the following function in the `HelloWorld` module would make the above test pass.
+
+```elixir
+def hello(name) do
+  "Hello, Peter."
+end
+```
+
+We can make the test more comprehensive by adding more cases. For example, the following tests would
+be more comprehensive.
+
+```elixir
+test "hello peter" do
+  assert HelloWorld.hello("Peter") == "Hello, Peter."
+end
+
+test "hello mary" do
+  assert HelloWorld.hello("Mary") == "Hello, Mary."
+end
+```
+
+Granted, we could still fake this test, but it's less likely.
+
+```elixir
+def hello(name) do
+  case name do
+    "Peter" -> "Hello, Peter."
+    "Mary" -> "Hello, Mary."
+end
+```
+
+Now we have two different test cases. We test with one name and another name. There are now diminishing returns
+to adding similar test cases.
+
+```mermaid
+flowchart
+  Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
+  Mary --> H[HelloWorld.hello/1] --> P[Hello, Mary.]
+```
+
+Instead of adding more test cases with different names, we can leverage randomization to make the test even more comprehensive.
+Randomization is a powerful testing tool!
+
+```elixir
+def random_string do
+  # generate a random string
+end
+
+test "hello string" do
+  name = random_string()
+  assert HelloWorld.hello(name) == "Hello, #{name}."
+end
+```
+
+Essentially, we've created a test case for any string, rather than only two examples.
+
+```mermaid
+flowchart
+  Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
+  Mary --> H[HelloWorld.hello/1] --> P[Hello, Mary.]
+  string --> H[HelloWorld.hello/1] --> P[Hello, string.]
+```
+
+### Your Turn
+
+Add a new test case to your `HelloWorldTest` suite for
+when the `HelloWorld.hello/1` function is called with "Mary".
+
+### Your Turn (Bonus)
+
+Add a new test case to your `HelloWorldTest` suite for
+when the `HelloWorld.hello/1` function is called with a random string.
+You will need to determine how to generate a random string.
+
+## Edge Cases
+
+Sometimes it's important to include edge case tests.
+
+An edge case refers to a test case that deviates from the **happy path** or desired behavior for
+a unit.
+
+For example, if you were testing a payment system, the happy path might be when a customer makes a purchase
+and their payment goes through. However, what happens if their credit card is declined? How are you going to handle this
+edge case?
+
+To bring it to a more concrete example, what happens if you call `HelloWorld.hello/1` with a non-string value?
+What do you want to have happen?
+
+### Your Turn
+
+Write an edge case test for `HelloWorld.hello/1` when it receives a non-string value.
+
+Assert that you will return an error like so:
+
+```elixir
+HelloWorld.hello(%{})
+{:error, :non_string_value}
+```
+## Test Suite Structure
+
+We want to have confidence in our test suite so that as we add features, refactor, and otherwise change your codebase, 
+we are not at risk of making breaking changes.
+
+There are several schools of thought for how you should comprehensively test applications.
+Rather than recommend a specific pattern, we hope to introduce you to some schools of mind so that you can develop
+you own opinions.
+
+Firstly, there is the test pyramid, which states that you should have many unit tests, some integration tests, and few end-to-end tests.
+
+[TODO - TESTING Pyramid]()
+
+Then there is a modified version called the testing trophy, originally 
+

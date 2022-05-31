@@ -22,283 +22,514 @@ Mix.install([
 Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
-## ExUnit
+## Testing
 
-[ExUnit](https://hexdocs.pm/ex_unit/1.13.4/ExUnit.html) is a built-in testing framework for Elixir.
+We test to ensure our code behaves as expected.
+
+Automated tests automate the process of manually testing our code and verify our code continues to behave as expected.
+
+Without tests, it's easy to introduce breaking changes. With tests, when something breaks, the automated test suite catches issue and facilitates debugging by providing useful feedback.
 
 > We test to increase confidence that our software does what it’s
-supposed to do. Testing gives us confidence that our code works as expected.
-This is true for all kinds of testing, whether for automated tests performed
-by a machine or for manual tests performed by a human.
-> - Testing Elixir by Andrea Leopardi and Jeffrey Matthias
+> supposed to do. Testing gives us confidence that our code works as expected.
+> This is true for all kinds of testing, whether for automated tests performed
+> by a machine or for manual tests performed by a human.
+> 
+> * Testing Elixir by Andrea Leopardi and Jeffrey Matthias
 
-When you create a new `mix` application, your tests are contained within the `/tests` folder.
+## Test Behavior, Not Implementation
 
-```elixir
-defmodule HelloWorldTest do
-  use ExUnit.Case
-  doctest HelloWorld
+Tests can be **brittle**, meaning that as you change your codebase, tests will fail frequently. Typically,
+tests are brittle because they test implementation rather than behavior.
 
-  test "greets the world" do
-    assert HelloWorld.hello() == :world
-  end
-end
-```
-
-[mix test](https://hexdocs.pm/mix/Mix.Tasks.Test.html) runs the tests for a project.
-
-### Your Turn
-Open your `hello_world` application. Try running tests with `mix test` from your command line.
-All tests should pass.
-
-```
-$ mix test
-
-Compiling 1 file (.ex)
-Generated hello_world app
-..
-
-Finished in 0.01 seconds (0.00s async, 0.01s sync)
-1 doctest, 1 test, 0 failures
-
-Randomized with seed 489570
-```
-
-### Writing a Unit Test
-
-
-A **Unit Test** focuses on a single unit of the application. The `HelloWorld.hello/0` function is the **unit** of our
-first unit test.
-
-Tests provide [assertions](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html) about how the application is supposed to behave.
-
-We `assert` that the `HelloWorld.hello/0` function should return `:world`.
-If we change the `HelloWorld.hello/0` function's behavior, the test will fail.
-
-This test focuses on the input, and output of a function, treating the rest like a black box.
+Think of behavior as the input and output of your function, and the implementation is the black box within it.
 
 ```mermaid
 flowchart
-  Input -> Output
+  subgraph Behavior
+    subgraph BB[Black Box]
+      Implementation
+    end
+    Input --> BB --> Output
+  end
 ```
 
-### Your Turn
-If we change the output of the function, the test will break.
-Try changing the output of the `HelloWorld` module to break the tests. Then undo your change
-to make the tests pass again.
+Our tests should concern themselves with the behavior of our code, not the internal details. Easier said than done, however as a general rule if
+refactoring your code (making improvements without changing behavior) breaks your tests, then you are likely testing implementation.
+
+## Test Cases
+
+Generally, we can split up our test suite into test cases. Each test case may require many assertions.
+
+Let's consider how we would test a `Math` module that abstracts the operators for adding different
+data types together, like so.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule HelloWorld do
-  def hello do
-    "world"
+8 = Math.add(4, 4)
+9.0 = Math.add(4.5, 4.5)
+"ab" = Math.add("a", "b")
+[1, 2] = Math.add([1], [2])
+%{one: 1, two: 2} = Math.add(%{one: 1}, %{two: 2})
+[one: 1, two: 2] = Math.add([two: 2], [two: 2])
+```
+
+Our **Happy-path** test cases (where our code is used as expected) could be the following.
+
+* adding two integers
+* adding two floats
+* adding two lists
+* adding two maps
+
+We also want to consider **edge-case** test cases, also called **sad-path** or **unhappy path** when things go wrong, or the code is misused. For example, we might consider the following cases.
+
+* adding an integer and a list
+* adding an integer and a float
+* adding a list and a map
+
+There can be a deceptive number of edge cases to consider. For example, we could build a growing list of edge-case permutations for each data type we want the `Math` module to handle.
+
+Here, we've colored happy path tests green and edge-case tests yellow.
+
+![](images/test%20cases.png)
+
+By planning test cases, we can anticipate possible edge cases and ensure we understand the desired behavior of the feature.
+
+## Test Driven Development
+
+Many developers follow a practice of **TDD (Test Driven Development)**, where
+they write the test for their feature before writing the implementation.
+
+These developers would likely claim that TDD leads to better-tested code, simpler interfaces, and other benefits. However, other developers use different approaches, and it's possible to take TDD too far or use it for the wrong situation.
+
+It's for you to make up your own mind about TDD, and this course aspires to be unbiased. However, we do believe that it's beneficial for you to understand TDD so that it can be a tool in your toolbox should you choose to use it.
+
+TDD has three main phases, often called **Red, Green, and Refactor**.
+
+* Red: Write a failing test.
+* Green: Write the code to make the test pass.
+* Refactor: Improve and optimize your code without changing the behavior.
+
+You will have the opportunity to practice TDD throughout this course. For a deeper dive on TDD and testing, you might consider watching this video by Ian Cooper. It's over an hour and completely optional.
+
+```elixir
+Kino.YouTube.new("EZ05e7EMOLM")
+```
+
+## ExUnit
+
+ExUnit is a built-in test framework for Elixir.
+
+Let's look at a very minimal test.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule ExampleTest do
+  use ExUnit.Case
+
+  test "truthy" do
+    assert true
   end
 end
+
+ExUnit.run()
 ```
 
-You should see some similar output.
-```
-$ mix test
+First, we start `ExUnit`.
 
-1) doctest HelloWorld.hello/0 (1) (HelloWorldTest)
-     test/hello_world_test.exs:3
-     Doctest failed
-     doctest:
-       iex> HelloWorld.hello()
-       :world
-     code:  HelloWorld.hello() === :world
-     left:  "world"
-     right: :world
-     stacktrace:
-       lib/hello_world.ex:11: HelloWorld (module)
+Next, we define a test module, `ExampleTest`. The name of this module does not matter. However, it's common to end the module name in `Test`.
 
+The next line, `use ExUnit.Case`, generates some code from
+the `ExUnit.Case` module, which gives us access to the `test` and `assert` macros.
 
+`test` is a macro that defines a single test. `test` accepts the name of the test as a string, in this case `"truthy"`.
 
-  2) test greets the world (HelloWorldTest)
-     test/hello_world_test.exs:5
-     Assertion with == failed
-     code:  assert HelloWorld.hello() == :world
-     left:  "world"
-     right: :world
-     stacktrace:
-       test/hello_world_test.exs:6: (test)
-```
+`assert` is a macro that makes a single assertion inside of the test. The test passes if `assert` is given any truthy value and fails if it receives any falsy value.
+Here, we `assert` that `true` is truthy.
 
-There are actually two tests that fail. The second is the test in `tests/hello_world_test.ex`.
-The first is a doctest, which we will cover later.
+A test can contain many assertions, and a test module can have many tests.
 
 ## Assertions
 
-Generally tests focus on some assertion about how your application will behave.
-When testing, you want to think about what assertions properly verify the behavior of your
-application.
+`ExUnit` provides many different assertion macros from the [ExUnit.Assertion](https://hexdocs.pm/ex_unit/1.13/ExUnit.Assertions.html#functions)
+module. We'll focus on the following common assertions.
 
-We can use any comparison operators in our assertions. It's most common to check if a value is equal using `==`.
+* `assert` check if a value is truthy.
+* `refute` check if a value is falsy.
+* `assert_raise` check if the code raises an error.
 
-```elixir
-test "4 is 5" do
-  assert 4 == 4
-end
-```
+### assert
 
-A test will fail if it's given any falsy value.
+We can use the `assert` macro provided by ExUnit to assert that a value is truthy.
 
 ```elixir
-test "4 is 6" do
-  assert 4 == 6
+ExUnit.start(auto_run: false)
+
+defmodule AssertExampleTest do
+  use ExUnit.Case
+
+  test "assert examples" do
+    assert true
+    assert fn -> 2 end
+    assert []
+    assert 1
+    assert %{}
+  end
 end
+
+ExUnit.run()
 ```
 
-So long as the result is a truthy or falsy value, we can use any functions, operators, etc.
+`assert/2` accepts a message as the second argument, which will display a message if the test fails.
 
 ```elixir
-test "4 < 2" do
-  assert 4 < 2
+ExUnit.start(auto_run: false)
+
+defmodule AssertMessageExampleTest do
+  use ExUnit.Case
+
+  test "failing example" do
+    assert false, "This message will display for a failing test."
+  end
 end
 
-test "[] is a list" do
-  assert is_list([])
-end
-
-test "" do
-  assert true and true or false
-end
+ExUnit.run()
 ```
 
-We have a number of assertions other than `assert`.
-For example, if we want a test to fail for a truthy value rather than a false value we can us `refute`.
+### refute
+
+The `refute` macro is the opposite of the `assert` macro. It checks that a value is falsy (`nil` or `false`)
 
 ```elixir
-test "empty map %{} is not a list" do
-  refute is_list(%{})
+ExUnit.start(auto_run: false)
+
+defmodule RefuteExampleTest do
+  use ExUnit.Case
+
+  test "refute examples" do
+    refute false
+    refute not true
+    refute !5
+    refute is_map(4)
+  end
 end
+
+ExUnit.run()
 ```
 
-See [Assertions](https://hexdocs.pm/ex_unit/1.13.4/ExUnit.Assertions.html) for the full list of ExUnit assertions.
+`refute/2` also displays a message if the test fails.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule RefuteMessageExampleTest do
+  use ExUnit.Case
+
+  test "failing example" do
+    refute true, "This message will display for a failing test."
+  end
+end
+
+ExUnit.run()
+```
+
+## Practical Assertions
+
+Since `assert` tests if a value is truthy, we often use operators to compare the value with another or functions to verify some property of the value under test.
+
+For example, we might use comparison operators (`==`, `===`, `>=`, `>`, `<=`, `<`) to compare our received value with the expected value.
+
+```elixir
+double = fn int -> int * 2 end
+double.(2) == 4
+```
+
+It's also common to use the match operator `=` to check if the value matches a specific pattern. Alternatively, we can also use the
+built-in `match?/2` function.
+
+```elixir
+map = %{one: 1, two: 2}
+
+%{one: _} = map
+match?(%{one: 1}, map)
+```
+
+The test-based match operator `=~` can test if a regular expression matches a string.
+
+```elixir
+string = "hello world"
+string =~ "hello"
+```
+
+```elixir
+string =~ ~r/\w/
+```
+
+There are also many built-in functions, such as `is_map`, `is_list`, `is_integer`, and more which we can use to assert some
+property of the value under test.
+
+These operators and functions can combine with `assert` to make more useful assertions.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule AssertionExampleTest do
+  use ExUnit.Case
+
+  test "practical assertions example" do
+    # comparison operators
+    assert 2 == 2.0
+    assert 2.0 === 2.0
+    assert 1 < 2
+    assert 2 > 1
+    assert 2 >= 2
+    assert 2 <= 2
+
+    # match operator
+    assert %{one: _} = %{one: 1, two: 2}
+    assert [one: _, two: _] = [one: 1, two: 2]
+    assert {_, _, _} = {1, 2, 3}
+    assert [1 | _tail] = [1, 2, 3]
+
+    # functions
+    assert is_integer(2)
+    assert is_map(%{})
+
+    # text-based match operator
+    assert "hello world" =~ "hello"
+    assert "hello world" =~ ~r/\w+/
+  end
+end
+
+ExUnit.run()
+```
+
+Assertions that use an operator provide a `:left` and `:right` value for feedback.
+Generally, `:left` should be the **received** value for the system under test, and `:right` should be the **expected** value
+for the system under test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  1) test left/right == example (LeftRightExampleTest)
+     reading/exunit.livemd#cell:6
+     Assertion with == failed
+     code:  assert 4 == 5
+     left:  4
+     right: 5
+     stacktrace:
+       reading/exunit.livemd#cell:7: (test)
+```
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule LeftRightExampleTest do
+  use ExUnit.Case
+
+  test "left/right == example" do
+    assert 4 == 5
+  end
+
+  test "left/right > example" do
+    assert 4 > 5
+  end
+
+  test "left/right =~ example" do
+    assert "hello world" =~ "non-matching pattern"
+  end
+end
+
+ExUnit.run()
+```
 
 ### Your Turn
 
-Create a new test in `hello_world_test.ex`.
+Putting everything we've learned so far together, you're going to create
+a suite of tests for a `Math` module that handles adding similar data types together.
 
-Assert that when the `hello/1` function receives the string `"Peter"` it should
-return `"Hello, Peter."`. Implement the code necessary to make this pass.
-
-### Test Cases
-
-So far, we've used **example-based tests** where we test the output of some function given some input.
-In the exercise above, you may have written a test like so:
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-test "hello peter" do
-  assert HelloWorld.hello("Peter") == "Hello, Peter."
-end
+8 = Math.add(4, 4)
+9.0 = Math.add(4.5, 4.5)
+"ab" = Math.add("a", "b")
+[1, 2] = Math.add([1], [2])
+%{one: 1, two: 2} = Math.add(%{one: 1}, %{two: 2})
+[one: 1, two: 2] = Math.add([two: 2], [two: 2])
 ```
 
-This is a **test case**. It's important to think about test cases for you unit tests. The more comprehensive
-your test cases, the more comprehensive your tests and less likely you are to have unexpected bugs.
+Write the following happy-path test cases for the `Math` module in the Elixir cell below.
 
-Currently, We provided a single example, and the assume that other examples
-work similarly. This can lead to issues if we aren't careful.
+* add two integers
+* add two floats
+* add two strings
+* add two lists
+* add two maps
+* add two keyword lists.
 
-```mermaid
-flowchart
-Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
-```
-
-For example, the following function in the `HelloWorld` module would make the above test pass.
+We've pre-made the test case to add two integers as a demonstration of the task.
+Notice we can omit the `do` block to make a `"Not implemented"` test.
 
 ```elixir
-def hello(name) do
-  "Hello, Peter."
+defmodule Math do
 end
-```
 
-We can make the test more comprehensive by adding more cases. For example, the following tests would
-be more comprehensive.
+ExUnit.start(auto_run: false)
 
-```elixir
-test "hello peter" do
-  assert HelloWorld.hello("Peter") == "Hello, Peter."
+defmodule MathTest do
+  use ExUnit.Case
+
+  test "add/2 integers" do
+    assert Math.add(1, 1) === 2
+  end
+
+  test "add/2 floats"
+  test "add/2 strings"
+  test "add/2 lists"
+  test "add/2 maps"
+  test "add/2 keyword lists"
 end
-test "hello mary" do
-  assert HelloWorld.hello("Mary") == "Hello, Mary."
-end
+
+ExUnit.run()
 ```
-
-Granted, we could still fake this test, but it's less likely.
-
-```elixir
-def hello(name) do
-  case name do
-    "Peter" -> "Hello, Peter."
-    "Mary" -> "Hello, Mary."
-end
-```
-
-Now we have two different test cases. We test with one name and another name. There are now diminishing returns
-to adding similar test cases.
-
-```mermaid
-flowchart
-  Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
-  Mary --> H[HelloWorld.hello/1] --> P[Hello, Mary.]
-```
-
-Instead of adding more test cases with different names, we can leverage randomization to make the test even more comprehensive.
-Randomization is a powerful testing tool!
-
-```elixir
-def random_string do
-  # generate a random string
-end
-test "hello string" do
-  name = random_string()
-  assert HelloWorld.hello(name) == "Hello, #{name}."
-end
-```
-
-Essentially, we've created a test case for any string, rather than only two examples.
-
-```mermaid
-flowchart
-  Peter --> H[HelloWorld.hello/1] --> P[Hello, Peter.]
-  Mary --> H[HelloWorld.hello/1] --> P[Hello, Mary.]
-  string --> H[HelloWorld.hello/1] --> P[Hello, string.]
-```
-### Your Turn
-
-Add a new test case to your `HelloWorldTest` suite for
-when the `HelloWorld.hello/1` function is called with "Mary".
 
 ### Your Turn (Bonus)
 
-Add a new test case to your `HelloWorldTest` suite for
-when the `HelloWorld.hello/1` function is called with a random string.
-You will need to determine how to generate a random string.
+Implement the `Math` module using a module, and then implement the `Math` module using protocols.
+Do your tests pass for both solutions? Ideally, none of your tests should depend on the
+underlying implementation of the `Math` module.
 
-## Edge Cases
+## Example-Based Testing
 
-Sometimes it's important to include edge case tests.
+Above, we've demonstrated example-based testing, in that we provide a single example
+of input and output, and assume that the system under test continues to behave as expected.
 
-An edge case refers to a test case that deviates from the **happy path** or desired behavior for
-a unit.
-
-For example, if you were testing a payment system, the happy path might be when a customer makes a purchase
-and their payment goes through. However, what happens if their credit card is declined? How are you going to handle this
-edge case?
-
-To bring it to a more concrete example, what happens if you call `HelloWorld.hello/1` with a non-string value?
-What do you want to have happen?
-
-### Your Turn
-
-Write an edge case test for `HelloWorld.hello/1` when it receives a non-string value.
-
-Assert that you will return an error like so:
+However, there are a potentially infinite number of inputs and outputs for the `Math.add/2` function.
+Is it safe to assume that a single example comprehensively tests all inputs?
 
 ```elixir
-HelloWorld.hello(%{})
-{:error, :non_string_value}
+for int1 <- 1..3, int2 <- 1..3 do
+  [input: int1, input: int2, output: int1 + int2]
+end
+|> Kino.DataTable.new()
 ```
+
+For example, we can make the integers test pass with a fake solution.
+
+```elixir
+defmodule Math do
+  def add(_int1, _int2) do
+    2
+  end
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule MyTest do
+  use ExUnit.Case
+
+  test "add/2 integer + integer" do
+    assert Math.add(1, 1) == 2
+  end
+end
+
+ExUnit.run()
+```
+
+A robust test ensures the code behaves correctly under many scenarios.
+To improve the robustness of our tests, we could write more example-based tests or more assertions in the same test.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule MathTest do
+  use ExUnit.Case
+
+  test "add/2 integer + integer" do
+    assert Math.add(1, 1) === 2
+    assert Math.add(1, 2) === 3
+  end
+
+  # Alternatively, we could separate this into two tests.
+  test "add/2 1 + 1" do
+    assert Math.add(1, 1) === 2
+  end
+
+  test "add/2 1 + 2" do
+    assert Math.add(1, 2) === 3
+  end
+end
+
+ExUnit.run()
+```
+
+This is more comprehensive. However, it's still possible to fake the solution. In addition, if we continue
+this pattern, we will write more tests than necessary, which makes our test suite longer
+and potentially harder to maintain.
+
+## Randomized Test Data
+
+Simple example-based tests have their place, but when we want a highly robust
+test, we can rely on randomized data.
+
+We can generate random data ourselves or depend on an external library like [Faker](https://hexdocs.pm/faker/readme.html).
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule MathTest do
+  use ExUnit.Case
+
+  test "add/2 integer + integer" do
+    # you may still choose to include a few example-based assertions.
+    assert Math.add(1, 1) === 2
+    assert Math.add(1, 2) === 3
+
+    # Now all integers between 1 and 99 will be covered.
+    int1 = Enum.random(1..99)
+    int2 = Enum.random(1..99)
+    assert Math.add(int1, int2) == int1 + int2
+  end
+end
+
+ExUnit.run()
+```
+
+## Types of Test
+
+There are three primary types of tests.
+
+* **Unit Test**: tests that cover a single unit in isolation.
+* **Integration Tests** tests that cover the integration of multiple components.
+* **End to End (E2E)** tests that cover the whole system from start to finish.
+
+So far, we have only seen examples of Unit Tests. In addition, the definition of a unit is
+often hotly debated in the programming community, so the lines between integration and unit tests are blurry.
+
+We'll have the opportunity to see various types of tests. For now, it's sufficient to be aware that there are multiple types.
+
+For more on integration tests, consider reading [Integration Tests](https://martinfowler.com/bliki/IntegrationTest.html), a blog post by Martin Fowler.
+
+For end-to-end testing, we'll later use the popular [Wallaby](https://github.com/elixir-wallaby/wallaby) project, which can test web applications
+by simulating realistic user interactions.
+
+### Test Suite Structure
+
+We want to have confidence in our test suite so that as we add features, refactor, and otherwise change your codebase, 
+we are not at risk of making breaking changes.
+
+There are several schools of thought on how you should comprehensively test applications.
+
+Many developers believe the [Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
+creates a fast and comprehensive test suite with many unit tests, some integration tests, and fewer end-to-end tests.
+
+Alternatively, you might consider the [Test Trophy], which prioritizes integration tests.
+
+Rather than recommend a specific pattern, we hope to introduce you to them so that you can develop
+your own opinions and do further research.
 
 ## Test Naming
 
@@ -306,57 +537,350 @@ Naming tests is important, but also highly subjective. There are some common pat
 as [Given, When, Then](https://www.agilealliance.org/glossary/gwt/#q=~(infinite~false~filters~(postType~(~'page~'post~'aa_book~'aa_event_session~'aa_experience_report~'aa_glossary~'aa_research_paper~'aa_video)~tags~(~'given*20when*20then))~searchTerm~'~sort~false~sortDirection~'asc~page~1)).
 
 In general, a good test name should capture:
-1. the system under test (the HelloWorld.hello/1 function)
-2. the state under test (the input to the function)
-3. the desired behavior (return "Hello, name")
+
+1. the system under test
+2. the state under test
+3. the desired behavior
 
 All of the following would capture the desired information.
 
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-test "Given a string, when calling hello/1 with the string, it returns Hello, string."
-test "hello/1 _ with a random_string _ returns Hello, random_string."
+test "Given two strings, when calling add/2 with both strings, it concatenates the strings."
+test "add/2 _ two strings _ concatenates the strings."
 ```
 
-Some schools of thought believe the desired behavior should be contained within the test, rather than the test name.
-The reason being it prevents the test name from becoming outdated if the desired behavior changes.
+<!-- livebook:{"break_markdown":true} -->
+
+We might omit the desired behavior from the test name, as it is also implicitly stated by the assertions in the test. By omitting the desired behavior, we prevent the test name from becoming outdated when the desired behavior changes, at the cost of possibly reducing the immediate clarity of our test.
 
 So the following test name could be appropriate:
 
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-test "hello/1 with a random_string"
+test "add/2 strings"
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 Rather than dogmatically recommend a pattern, we'll say that a good test name makes it easier to understand
-the goal of the test. How you do this is up to you, and many teams develop their own standards.
+the goal of the test. Of course, how you do this is up to you, and many teams develop different patterns.
 
-## Describe
+## Test Organization
 
-We can group tests into a `describe` block. A describe block organizes tests by some commonality. For example,
-we might group all tests for a single function together.
+We can group tests into a `describe` block. A `describe` block organizes tests by some commonality. For example, it's common to group tests for a single function in the module under test together.
 
 ```elixir
-describe "hello/1" do
-  test "hello Peter" do
-    # test
+ExUnit.start(auto_run: false)
+
+defmodule DescribeExampleTest do
+  use ExUnit.Case
+
+  describe "Module.function1/1" do
+    test "test 1" do
+    end
+
+    test "test 2" do
+    end
   end
-  test "hello Mary" do
-    # test
-  end
-  test "hello String" do
-    # test
+
+  describe "Module.function2/1" do
+    test "test 1" do
+    end
+
+    test "test 2" do
+    end
   end
 end
+
+ExUnit.run()
 ```
 
 ### Your Turn
 
-Organize your existing `HelloWorld.hello/1` tests under a single describe block.
+In the Elixir cell below, write the happy-path test cases for the `Math.subtract/2` function in it's own `describe` block.
 
-## Setup
+* subtract two integers
+* subtract two floats
+* subtract two strings
+* subtract two lists
+* subtract two maps
+* subtract two keyword lists.
 
-Tests often require some initial setup of data. For example, when we generate a random string
-for `HelloWorld.hello/1`, this is part of the setup phase.
+In addition, add your previous happy-path test cases for the `Math.add/2` function in it's own `describe` block.
 
-## Setup
-## Testing Behavior
-## Tags
+`Math.subtract/2` should work as follows.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+4 = Math.subtract(8, 4)
+2.0 = Math.subtract(4.5, 2.5)
+"b" = Math.subtract("ab", "a")
+[1] = Math.subtract([1, 2], [2])
+%{two: 2} = Math.subtract(%{one: 1, two: 2}, %{one: 1})
+[one: 1] = Math.add([one: 2, two: 2], [two: 2])
+```
+
+```elixir
+defmodule Math do
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule MathTest do
+  use ExUnit.Case
+
+  describe "Math.add/2" do
+    test "integers"
+    test "floats"
+    test "strings"
+    test "lists"
+    test "maps"
+    test "keyword lists"
+  end
+
+  describe "Math.subtract/2" do
+    test "integers"
+    test "floats"
+    test "strings"
+    test "lists"
+    test "maps"
+    test "keyword lists"
+  end
+end
+
+ExUnit.run()
+```
+
+### Your Turn (Bonus)
+
+Implement the `Math` module using a module, and then implement the `Math` module using protocols.
+Do your tests pass for both solutions? Ideally, none of your tests should depend on the
+underlying implementation of the `Math` module.
+
+## Testing Mix Projects
+
+Mix projects provide some conveniences when working with `ExUnit`.
+
+Let's see how we would test the `Math` module if it were a Mix project.
+First, create a new mix project called `math`.
+
+```
+$ mix new math
+```
+
+You should see an output similar to the following.
+
+```
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/math.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/math_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd math
+    mix test
+
+Run "mix help" for more commands.
+```
+
+Tests in a mix project are in the `test/` folder. Generally there is an equivalent file in the `test/` folder
+for each tested file in the `lib` folder.
+
+ExUnit is started for us in the `test/test_helper.exs` file, and
+files in the `test/` folder automatically compile, evaluate, and execute when we run tests.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run tests
+
+We can execute all tests by running the following from the command line in the project folder.
+
+```
+$ mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run tests in a file
+
+We can run a single test file by providing its path.
+
+```
+$ mix test path/to/test/file.exs
+```
+
+For example, we can run the `math_test.exs` file.
+
+```
+$ mix test test/math_test.exs
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run tests by line number.
+
+We can execute a specific test or several tests under a `describe` block by providing the line number.
+
+```
+$ mix test test/math_test.exs:5
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Visual Studio Code Elixir Testing Extension
+
+We highly recommend using the [Elixir Test](https://marketplace.visualstudio.com/items?itemName=samuel-pordeus.elixir-test)
+extension if you are using Visual Studio Code.
+
+Elixir Test provides several commands which facilitate more straightforward test running.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/Elixir%20Test%20Commands.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Move the `Math.add/2` and `Math.subtract/2` test suite into the `math_test.exs` file.
+Then use the command line to experiment with running tests.
+
+Run all tests from the command line.
+
+```
+$ mix test
+```
+
+Run tests in the `math_test.exs` file.
+
+```
+$ mix test test/math_test.exs
+```
+
+Run tests in the the `Math.add/2` describe block. Replace `1` with the correct line number.
+
+```
+$ mix test test/math_test.exs:1
+```
+
+Run a single test. Replace `1` with the correct line number.
+
+```
+$ mix test test/math_test.exs:1
+```
+
+## Test Tags
+
+We can use `@moduletag`, `@describetag`, and `@tag` module attributes to tag our tests.
+Once tagged, we can configure ExUnit to exclude, include, or only run tests with specific tags.
+
+See the documentation for more on [ExUnit Configuration](https://hexdocs.pm/ex_unit/1.12/ExUnit.html#configure/1).
+
+Notice below that the test suite passes because the failing test never runs.
+
+```elixir
+ExUnit.start(auto_run: false)
+# We can configure ExUnit to exclude, include, or only run certain tests.
+
+ExUnit.configure(exclude: :my_module_tag)
+
+defmodule TagTest do
+  use ExUnit.Case
+
+  @moduletag :my_module_tag
+  test "failing test" do
+    assert false
+  end
+end
+
+ExUnit.run()
+```
+
+### Your Turn
+
+`@moduletag` tags all tests in a module, `@descibetag` tags all tests in a describe block, and `@tag` tags a single test.
+
+We've provided several examples of configuring tests with tags in the cell below. Uncomment each configuration one by one and execute the tests to see which tests are included and
+excluded.
+
+Feel free to write your own `configure/1` function to experiment with configuration.
+
+```elixir
+ExUnit.start(auto_run: false)
+
+ExUnit.configure(exclude: :my_module_tag, include: :my_descibe_tag, include: :my_tag)
+# ExUnit.configure(exclude: :my_descibe_tag, exclude: :my_tag)
+# ExUnit.configure(only: :my_descibe_tag)
+# ExUnit.configure(only: :my_tag)
+
+defmodule TagTest do
+  use ExUnit.Case
+
+  @moduletag :my_module_tag
+
+  test "failing module test" do
+    assert false
+  end
+
+  describe "failing describe" do
+    @describetag :my_describe_tag
+    test "failing test" do
+      assert false
+    end
+  end
+
+  @tag :my_tag
+  test "failing test" do
+    assert false
+  end
+end
+
+ExUnit.run()
+```
+
+### Mix Project Tags
+
+Once tagged, we can use the flags `--only`, `--exclude`, and `--include` to run specific tests.
+
+```
+mix test --exclude my_tag
+```
+
+Alternatively, we can place the `ExUnit.configure/1` function in `test_helpers.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ExUnit.start()
+ExUnit.configure(exclude: :my_tag)
+```
+
+### Your Turn
+
+Use the `@moduletag`, `@describetag`, and `@tag` module attributes in the `math_test.exs` module.
+Then use the `--exclude`, `--include`, and `--only` flags for the `mix test` command to only run certain tests.
+
+Finally, configure the `test_helper.exs` file to exclude each tag individually and run all tests.
+Ensure tests with your skipped test do not run.
+
+## Further Reading
+
+For more on testing, consider using the following resources.
+
+* [Mix Test](https://hexdocs.pm/mix/Mix.Tasks.Test.html) For more on how you can use the `mix test` command.
+* [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) For documentation on ExUnit.
