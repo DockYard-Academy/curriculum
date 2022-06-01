@@ -1,0 +1,95 @@
+# Product Filters
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Product Filters
+
+We have an application where users search for products based on certain filters.
+Products have a `:name`, `:category`, and `:price` (in cents).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+products = [
+  %{name: "Laptop", category: :tech, price: 100000},
+  %{name: "Phone", category: :tech, price: 50000},
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Shampoo", category: :health, price: 1000}
+]
+```
+
+Test and implement a `Products.filter/2` function which accepts a list of items
+and a filter. It should be able to filter by a partial case-insensitive name, by an exact category, and by
+an inclusive minimum and maximum price.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Products.filter(products, name: "l")
+[
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Laptop", category: :tech, price: 100000}
+]
+
+Products.filter(products, category: :tech)
+[
+  %{name: "Laptop", category: :tech, price: 100000}
+  %{name: "Phone", category: :tech, price: 50000}
+]
+
+Products.filter(products, min: 1000)
+[
+  %{name: "Laptop", category: :tech, price: 100000},
+  %{name: "Phone", category: :tech, price: 50000},
+  %{name: "Shampoo", category: :health, price: 1000},
+]
+
+Products.filter(products, max: 1000)
+[
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Shampoo", category: :health, price: 1000},
+]
+
+Products.filter(products, min: 300, max: 1200)
+[
+  %{name: "Shampoo", category: :health, price: 1000},
+]
+
+Products.filter(products, name: "P", max: 100000, min: 50000, category: :tech)
+[
+  %{name: "Laptop", category: :tech, price: 100000},
+  %{name: "Phone", category: :tech, price: 50000},
+]
+```
+
+Ensure you include at least one test for each filter, and one test which combines all filters.
+
+```elixir
+defmodule Products do
+  def filter(products, filters) do
+  end
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule ProductTests do
+  use ExUnit.Case
+end
+
+ExUnit.run()
+```
