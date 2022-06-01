@@ -80,23 +80,20 @@ defmodule Utils.Feedback do
   feedback :percentage do
     [completed_items, total_items, percentage] = get_answers()
 
-    assert completed_items == 10,
-           "completed_items should always be 10. Please reset the exercise."
+    assert total_items >= completed_items,
+           "total_items should always be more than completed items, please reset the exercise"
 
-    assert total_items == 100, "total_items should always be 100. Please reset the exercise."
-    assert percentage == completed_items / total_items * 100
-  end
+    assert percentage <= 100,
+           "percentage should be a float between 0 and 100. Please check the formula entered."
 
-  feedback :percentage_random do
-    [completed_items, total_items, percentage] = get_answers()
-    assert total_items >= completed_items, "total_items should always be more than completed items, please reset the exercise"
-    assert percentage <= 100, "percentage should be a float between 0 and 100. Please check the formula entered."
     assert percentage == completed_items / total_items * 100
   end
 
   feedback :pythagorean_c_square do
     c_square = get_answers()
-    assert c_square == 10 ** 2 + 10 ** 2, "The answer is not correct, please check the formula entered."
+
+    assert c_square == 10 ** 2 + 10 ** 2,
+           "The answer is not correct, please check the formula entered."
   end
 
   feedback :pythagorean_c do
@@ -1726,9 +1723,14 @@ defmodule Utils.Feedback do
 
   feedback :sublist do
     sublist = get_answers()
+
     assert sublist.sublists([1, 1, 2, 3, 1, 4, 2], 3) == [
-      [1, 1, 2], [1, 2, 3], [2, 3, 1], [3, 1, 4], [1, 4, 2]
-    ]
+             [1, 1, 2],
+             [1, 2, 3],
+             [2, 3, 1],
+             [3, 1, 4],
+             [1, 4, 2]
+           ]
   end
 
   feedback :lucas_numbers do
