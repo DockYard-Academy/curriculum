@@ -7,7 +7,7 @@ defmodule Utils.Solutions do
     secret_sauce = "a"
 
     madlib =
-      "My company, #{name_of_company} is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
+      "My company, #{name_of_company}, is developing #{a_defined_offering} to help #{a_defined_audience} #{solve_a_problem} with #{secret_sauce}."
 
     [
       madlib,
@@ -1029,7 +1029,7 @@ defmodule Utils.Solutions do
 
       remaining
       |> Enum.reduce([first_sublist], fn
-        item, [[h|t]|_]=acc -> [t ++ [item]|acc]
+        item, [[h | t] | _] = acc -> [t ++ [item] | acc]
       end)
       |> Enum.reverse()
     end
@@ -1045,28 +1045,32 @@ defmodule Utils.Solutions do
       answer = Integer.to_charlist(answer)
 
       # find matches and gather possibilities
-      {guess, possibilities} = Enum.zip(guess, answer)
-      |> Enum.reduce({[], []}, fn
-        {same, same}, {result, possibilities} ->
-          {[:green|result], possibilities}
-        {guessed, possible}, {result, possibilities} ->
-          {[guessed|result], [possible|possibilities]}
-      end)
+      {guess, possibilities} =
+        Enum.zip(guess, answer)
+        |> Enum.reduce({[], []}, fn
+          {same, same}, {result, possibilities} ->
+            {[:green | result], possibilities}
+
+          {guessed, possible}, {result, possibilities} ->
+            {[guessed | result], [possible | possibilities]}
+        end)
 
       # find possibilities
-      {result, _} = guess
-      |> Enum.reverse
-      |> Enum.reduce({[], possibilities}, fn
-        item, {result, possibilities} when is_atom(item) ->
-          {[item|result], possibilities}
-        item, {result, possibilities} ->
-          if item in possibilities do
-            # dont forget to remove from future possibilities!!
-            {[:yellow|result], List.delete(possibilities, item)}
-          else
-            {[:gray|result], possibilities}
-          end
-      end)
+      {result, _} =
+        guess
+        |> Enum.reverse()
+        |> Enum.reduce({[], possibilities}, fn
+          item, {result, possibilities} when is_atom(item) ->
+            {[item | result], possibilities}
+
+          item, {result, possibilities} ->
+            if item in possibilities do
+              # dont forget to remove from future possibilities!!
+              {[:yellow | result], List.delete(possibilities, item)}
+            else
+              {[:gray | result], possibilities}
+            end
+        end)
 
       Enum.reverse(result)
     end
