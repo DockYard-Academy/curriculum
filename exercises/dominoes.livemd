@@ -1,0 +1,72 @@
+# Dominoes
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Dominoes
+
+Dominoes are square tiles often placed near each other to make satisfying effects when the fall and knock each other over.
+
+You're going to make three `Domino` processes under a `Supervisor` (`Domino1`, `Domino2`, and `Domino3`), then
+have them terminate and restart sequentially.
+
+```mermaid
+flowchart
+S[Supervisor]
+S --> Domino1
+S --> Domino2
+S --> Domino3
+```
+
+You should be able to cause each `Domino` process to crash by sending it a `:fall` message.
+
+We've created the `Domino1` server for sake of example.
+
+```elixir
+defmodule Domino1 do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_info(:fall, _state) do
+    raise "Domino1 falls"
+  end
+end
+```
+
+Create the `Domino2` and `Domino3` modules. Then configure them with a supervisor such that
+each `Domino` process terminates (and restarts) one after the other.
+
+For example:
+
+* `Domino1` receives the `:fall` message. `Domino1` crashes. `Domino2` then `Domino3` are terminated by the supervisor.
+* `Domino2` receives the `:fall` message. `Domino2` crashes. `Domino3` is terminated by the supervisor.
+
+<details>
+<summary>Hint</summary>
+Use the :rest_for_one strategy for your supervisor.
+</details>
+
+```elixir
+
+```

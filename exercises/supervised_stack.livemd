@@ -1,0 +1,80 @@
+# Supervised Stack
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Supervised Stack
+
+We've created a Stack process.
+
+```elixir
+defmodule Stack do
+  use GenServer
+
+  def start_link(state, opts) do
+    server_name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def init(stack) do
+    {:ok, stack}
+  end
+
+  def push(pid, item) do
+    GenServer.cast(pid, {:push, item})
+  end
+
+  def pop(pid) do
+    GenServer.call(pid, :pop)
+  end
+
+  def handle_call(:pop, _from, [head | tail]) do
+    {:reply, head, tail}
+  end
+
+  def handle_cast({:push, item}, stack) do
+    {:noreply, [item | stack]}
+  end
+end
+```
+
+The Stack process can store a list and `push/2`/`pop/1` elements onto and off of the stack.
+
+```elixir
+{:ok, pid} = Stack.start_link([], name: :example)
+Stack.push(pid, 1)
+Stack.push(pid, 2)
+2 = Stack.pop(pid)
+1 = Stack.pop(pid)
+```
+
+However, there's a bug. If we try to `pop/1` an item off of an empty stack, the process
+will crash due to a function clause error because the `handle_call/2` function expects a list with one or more elements.
+
+Here we use `GenServer.start/2` to avoid crashing the livebook.
+
+```elixir
+{:ok, pid} = GenServer.start(Stack, [])
+Stack.pop(pid)
+```
+
+In the Elixir cell below, 
+start the `Stack` process under a supervisor so that it will restart with an empty stack when it crashes.
+
+```elixir
+
+```

@@ -1,0 +1,86 @@
+# Typing Game
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Typing Game
+
+You're going to create a typing game which helps players practice their typing speed.
+If a player does not type a word in time, the game will end and restart.
+
+A process will prompt the user for input every five seconds. They must enter the
+prompted word. If they do not enter the word within five seconds, or if they enter the word incorrectly then
+the game will crash and restart.
+
+You may use any random list of words. For example: `["red", "blue", "green", "orange", "yellow", "pink"]`.
+Remember that you can retrieve input from the console using `IO.get/2`.
+
+The player should be able to load your game into the `IEx` shell, and enter the prompted word.
+
+```
+$ iex -S mix
+iex> TypingGame.start()
+Your word: red
+red
+Your word: blue
+bluw
+Your word: red
+```
+
+Create a mix project with a supervisor in your projects folder and create your game.
+
+```
+$ mix new typing_game --sup
+```
+
+### Bonus: Terminate
+
+Use the `terminate/2` callback to print a message in the console if the `Word` process crashes.
+
+```
+iex> TypingGame.start()
+Your word: red
+rad
+You lose!
+Your word: blue
+```
+
+### Bonus: Timer
+
+Count down from five in the console as the player enters their word.
+
+```
+iex> TypingGame.start()
+Your word: red
+5
+4
+2
+red
+Your word: red
+5
+4
+3
+2
+1
+You lose!
+Your word: blue
+```

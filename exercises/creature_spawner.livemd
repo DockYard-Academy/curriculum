@@ -1,0 +1,80 @@
+# Creature Spawner
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Setup
+
+Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+you can evaluate the Elixir cells as you read.
+
+## Creature Spawner
+
+Many video games contain **Spawners** which spawn enemy creatures.
+
+Typically, the spawner has a limit for how many enemy creatures it spawns. If
+a creature dies, the spawner then re-spawns that creature.
+
+Sound familiar? We can leverage supervisors to create this effect.
+
+Create three `Creature` processes. A creature process should store
+it's health in state, and you should be able to send a message to damage the creature like so.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, creature} = Creature1.start_link([])
+%{health: 100} = :sys.get_state(creature)
+Creature1.damage(creature, 10)
+%{health: 90} = :sys.get_state(creature)
+```
+
+When the creature's health reaches `0`, it should die (crash).
+When it crashes, the supervisor should restart the creature process.
+
+```mermaid
+flowchart
+  S[Spawner]
+  C1[Creature1]
+  C2[Creature2]
+  C3[Creature3]
+
+  S --> C1
+  S --> C2
+  S --> C3
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Creature1 do
+end
+
+defmodule Creature2 do
+end
+
+defmodule Creature3 do
+end
+
+# start the creatures under a supervisor below:
+```
+
+### Bonus: Hero
+
+You may add a `Hero` process supervised by the supervisor above.
+The `Hero` process should automatically damage the three `Creature` processes on
+an interval (i.e. 5 seconds)

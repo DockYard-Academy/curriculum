@@ -2805,3 +2805,445 @@ end
 
 ExUnit.run()
 ```
+
+We've seen that we can spawn a process, and it will die without affecting the parent process.
+However, rather than letting the process die, we can supervise it and restart the process in the
+event of a crash.
+
+Let's take a `GenServer` as and example. This singleton process is `Doomed` to crash if anything sends it
+a `:doom` message.
+
+<!-- livebook:{"break_markdown":true} -->
+
+We can start the `Doomed` singleton and ensure it is alive.
+
+```elixir
+Doomed.start_link([])
+
+# find the pid of the singleton and checks if the process is alive.
+Doomed |> Process.whereis() |> Process.alive?()
+```
+
+If we start the GenServer without a link, it will crash without affecting the parent process.
+
+```elixir
+GenServer.cast(Doomed, :doom)
+
+# allow the process time to crash
+Process.sleep(1000)
+
+"I still run"
+```
+
+We can check to see that the process is dead.
+
+```elixir
+pid = Process.whereis(Doomed)
+Process.alive?()
+```
+
+```elixir
+
+```
+
+However, if we start the `GenServer` with a link, it will crash and also crash the parent process.
+We've ommited functional example, because it would crash your livebook and prevent further execution of Elixir cells..
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, pid} = GenServer.start_link(Doomed, [])
+GenServer.cast(pid, :doom)
+```
+
+Instead of allowing the process to crash,
+we can instead use a `Supervisor` to restart the process.
+
+In order to supervise a process, it must define a `start_link/1` function. We'll
+also make the `Saved` module a singleton to make it easier to send it messages.
+
+```elixir
+defmodule Saved do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_cast(:doom, _state) do
+    raise "error"
+  end
+end
+```
+
+We can start a `Supervisor` with a list of children in a tuple. Each tuple contains
+the module of the process to start under the supervisor, and the initial state for the process.
+
+The `:one_for_one` strategy means any children under the supervisor individually restart if they crash.
+
+```elixir
+children = [
+  {Saved, []}
+]
+
+{:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+Now when we send the `Saved` process the `:doom` message, it will crash and restart.
+
+```elixir
+# GenServer.cast(Saved, :doom)
+
+# allow the process time to crash
+Process.sleep(100)
+```
+
+We can use `count_children/1` to see the supervisor still has an active child.
+
+```elixir
+Supervisor.count_children(pid)
+```
+
+And we can use `which_children/1` to see the active child is the `Saved` singleton.
+
+```elixir
+Supervisor.which_children(pid)
+```
+
+As expected, the `Saved` singleton is still alive. We can use `Process.whereis/1` to find it's pid,
+and then `Process.alive?/1` to make sure it is still alive.
+
+```elixir
+saved_pid = Process.whereis(Saved)
+Process.alive?(saved_pid)
+```
+
+```elixir
+Process.whereis(Doomed)
+```
+
+Generally, we will start named processes under a supervisor.
+
+
+# Robots
+defmodule Wallee do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def send_metal do
+    GenServer.cast(__MODULE__, :send_metal)
+  end
+
+  def compress do
+    GenServer.cast(__MODULE__, :compress)
+  end
+
+  def handle_cast(:send_metal, remaining_metal) do
+    IO.puts("Wallee: Recieving Metal.")
+    {:noreply, [:metal, remaining_metal]}
+  end
+
+  def handle_cast(:compress, [sheet | remaining_metal]) do
+    IO.puts("Wallee: Compressing metal into sheet.")
+    Bender.recieve_sheet(sheet)
+    {:noreply, remaining_metal}
+  end
+end
+
+defmodule Bender do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def recieve_sheet(sheet) do
+    GenServer.cast(__MODULE__, {:recieve_sheet, sheet})
+  end
+
+  def bend do
+    GenServer.cast(__MODULE__, :bend)
+  end
+
+  def handle_cast({:recieve_sheet, sheet}, state) do
+    IO.puts("Bender: Recieved Sheet - #{sheet}")
+    {:noreply, state}
+  end
+
+  def handle_call(:bend, _from, [product, remaining_sheets]) do
+    IO.puts("Bender: Bending sheet into product")
+    Marvin.recieve_product(product)
+    {:noreply, remaining_sheets}
+  end
+end
+
+defmodule Marvin do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  def init(money) do
+    {:ok, money}
+  end
+
+  def recieve_product(product) do
+    GenServer.cast(__MODULE__, {:send_product, product})
+  end
+
+  def sell do
+    GenServer.cast(__MODULE__, :sell)
+  end
+
+  def handle_cast({:send_product, product}, products) do
+    IO.puts("Marvin: Recieved Product - #{product}")
+    {:noreply, [product | products]}
+  end
+
+  def handle_cast(:sell, [_product, remaining_products]) do
+    IO.puts("Marvin: Selling Product")
+    {:noreply, remaining_products}
+  end
+end
+
+## Restart Strategies
+
+Supervisors have different strategies for when one of their workers crashes.
+
+* `:one_to_one`: restart only the worker that crashed.
+* `:one_for_all`: restart all of the child workers.
+* `:rest_for_all`: restart child workers ordered after the crashed process.
+
+To better understand how we can use a supervisor with different restart strategies, let's create a
+factory simulator. In this factory simulator, we will have three different factory workers (pun intended).
+
+Each robot will take items from a storage, and convert them into another item to be put back in the
+storage.
+
+Our three workers will be robots: `Bender` `Wallee` and `Marvin`.
+
+* `Wallee` works on the first floor compressing metal into sheets.
+* `Bender` works on the second floor and bends the metal sheets into usable products.
+* `Marvin` works on the third floor and sells the usable products to make money.
+
+Each robot will store their instructions for where to retrieve and put items in storage, and
+what items the convert to and from.
+
+```elixir
+defmodule Storage do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def init(_opts) do
+    {:ok,
+     %{
+       metal: 0,
+       sheet: 0,
+       product: 0,
+       money: 0
+     }}
+  end
+
+  def take(storage, item) do
+    GenServer.call(storage, {:take, item})
+  end
+
+  def put(storage, item) do
+    GenServer.cast(storage, {:put, item})
+  end
+
+  def handle_call({:take, item}, _from, store) do
+    case Map.get(store, item) do
+      0 -> {:reply, nil, store}
+      count -> {:reply, nil, Map.put(store, item, count - 1)}
+    end
+  end
+
+  def handle_cast({:put, item}, store) do
+    {:noreply, Map.update!(store, item, fn count -> count + 1 end)}
+  end
+end
+```
+
+Our robots will be able to take items from the storage, convert them, and put them back into the 
+storage like so.
+
+```elixir
+{:ok, storage} = Storage.start_link([])
+
+# Initial Metal
+Storage.put(storage, :metal)
+Storage.put(storage, :metal)
+Storage.put(storage, :metal)
+
+:sys.get_state(storage)
+```
+
+```elixir
+# Wallee :metal to :sheets
+
+Storage.take(storage, :metal)
+Storage.put(storage, :sheet)
+
+:sys.get_state(storage)
+```
+
+```elixir
+# Bender :sheet to :product
+
+Storage.take(storage, :sheet)
+Storage.put(storage, :product)
+
+:sys.get_state(storage)
+```
+
+```elixir
+# Marvin :product to :money
+
+Storage.take(storage, :sheet)
+Storage.put(storage, :product)
+
+:sys.get_state(storage)
+```
+
+Now let's create the `Robot`. Each `Robot` worker will automatically take items from the `Storage`,
+convert them, and then put them back into storage. We provide them with instructions for where
+to find the storage (it's `pid`) and what items to convert `:from` and `:to`.
+
+```elixir
+defmodule Robot do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def init(%{from: from, to: to, storage: storage, id: name}) do
+    Process.send_after(self(), :convert, 1000)
+    {:ok, %{from: from, to: to, storage: storage, id: name}}
+  end
+
+  def handle_info(:convert, %{from: from, to: to, id: id, storage: storage} = state) do
+    IO.puts("HANDLING INFO")
+
+    case Storage.take(storage, from) do
+      nil ->
+        IO.puts("NOT FOUND")
+        nil
+
+      item ->
+        IO.puts("#{id}: taking #{from} from storage. Putting #{to} into storage.")
+        Storage.put(storage, to)
+    end
+
+    Process.send_after(self(), :convert, 1000)
+    {:noreply, state}
+  end
+end
+```
+
+```elixir
+{:ok, storage} = Storage.start_link([])
+{:ok, robot} = Robot.start_link(%{from: :metal, to: :sheet, storage: storage, id: "Wallee"})
+```
+
+```elixir
+Storage.put(storage, :metal)
+Process.sleep(2000)
+:sys.get_state(storage)
+```
+
+Right now, we send `Wallee` some metal, he compresses it and sends the sheet to `Bender`.
+
+```elixir
+Wallee.send_metal()
+Wallee.compress()
+
+# allow time to compress, bend, and sell metal
+Process.sleep(100)
+```
+
+```elixir
+:sys.get_state(Wallee)
+```
+
+## Section
+
+## Supervised Application
+
+## Supervised Tasks
+
+To learn more about supervisors, let's create a factory simulator game.
+
+First, we can create a supervised mix project by running the `mix new` command with the `--sup` flag.
+
+```
+$ mix new factory_sim --sup.
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/factory_sim.ex
+* creating lib/factory_sim/application.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/factory_sim_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd factory_sim
+    mix test
+
+Run "mix help" for more commands.
+```
+
+In addition to the normal files, this also creates the `factory_sim/application.ex` file.
+This defines the top supervisor of our application.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule FactorySim.Application do
+  # See https://hexdocs.pm/elixir/Application.html
+  # for more information on OTP Applications
+  @moduledoc false
+
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      # Starts a worker by calling: FactorySim.Worker.start_link(arg)
+      # {FactorySim.Worker, arg}
+    ]
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: FactorySim.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+```
+
+This also configures the `application/0` function in `mix.exs`

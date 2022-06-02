@@ -1,0 +1,322 @@
+# Supervisors
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Fault Tolerance
+
+Elixir and OTP are fantastic for building highly concurrent and fault-tolerant systems which can handle runtime errors.
+
+Errors happen. We often implement specific error handling for the errors we expect. However, it's impossible to anticipate every possible error. For unexpected errors, Elixir follows a **let it crash** philosophy.
+
+To achieve a fault-tolerant system in Elixir, we leverage concurrency and isolate our system into different processes. These processes share no memory, and a crash in one process cannot crash another.
+
+Therefore, we can let a process crash, and it will not affect the rest of our system.
+
+> it’s somewhat surprising that the core tool for error handling is concurrency. 
+> In the BEAM world, two concurrent processes are 
+> completely separated; they share no memory, and a crash in one process can’t by default compromise the execution flow of another.
+> Process isolation allows you to confine the negative effects of an error to a single process or a small group of related processes, 
+> which keeps most of the system functioning normally.
+> 
+> * Sasa Juric, Elixir in Action.
+
+For example, We can spawn a process and raise an error. Unless we explicitly link the process with `spawn_link/1`
+The process will die and leave the parent process unaffected.
+
+```elixir
+pid =
+  spawn(fn ->
+    raise "error"
+  end)
+
+# allow the process time to crash
+Process.sleep(100)
+
+"I still run."
+```
+
+## Supervisors
+
+We've seen that unlinked processes can crash and die without affecting the parent process.
+
+Instead of crashing the process and leaving it dead, we can use `Supervisors` to monitor
+processes and attempt to restart them.
+
+The term restart is a bit misleading. To be clear, we cannot restart a process. Restart in this case means that we kill the process and start a new one in its place. However, it's conceptually easier to think of it as restarting.
+
+Why would we want to restart the process? Well, most technical issues are the result of state. Our system gets into a bad state and cannot recover. Turning a system on and off again clears the state and often resolves the issue. Using a `Supervisor` is like adding an automatic on/off switch to your application.
+
+A `Supervisor` monitors one or more child processes. We generally refer to these processes as **workers**.
+The `Supervisor` can use different strategies for restarting its child workers. The `:one_for_one` strategy individually restarts any worker that dies.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+S[Supervisor]
+W1[Worker]
+W2[Worker]
+W3[Worker]
+
+S --> W1
+S --> W2
+S --> W3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We'll create a `Bomb` process that crashes after two seconds to demonstrate how to supervise a process.
+
+```elixir
+defmodule Bomb do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state) do
+    Process.send_after(self(), :explode, 2000)
+    {:ok, state}
+  end
+
+  def handle_info(:explode, _state) do
+    raise "Bomb Exploded!"
+  end
+end
+```
+
+The `Supervisor.start_link/2` function accepts a list of child processes. Each child must define a
+`start_link/1` function, which `Bomb` already does.
+
+By default, a Supervisor limits the number of
+times a child worker can crash to three times in five seconds. So we kill the supervisor process after five seconds to avoid crashing this livebook.
+
+```elixir
+children = [
+  {Bomb, []}
+]
+
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
+
+Process.sleep(5000)
+Process.exit(supervisor_pid, :normal)
+```
+
+## Restart Strategies
+
+Supervisors have different strategies for when one of their workers crashes.
+
+* `:one_to_one`: restart only the worker that crashed.
+* `:one_for_all`: restart all of the child workers.
+* `:rest_for_one`: restart child workers ordered after the crashed process.
+
+To better understand how we can use a supervisor with different restart strategies, we're going to
+supervise multiple bomb processes.
+
+Each `Bomb` will exist for a specified time and then crash (explode).
+
+* `Bomb1` will explode after 1 second
+* `Bomb2` will explode after 2 seconds
+* `Bomb3` will explode after 3 seconds
+
+```elixir
+defmodule Bomb1 do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def init(state) do
+    Process.send_after(self(), :explode, 2000)
+    {:ok, state}
+  end
+
+  def handle_info(:explode, _state) do
+    raise "Bomb 1 Exploded!"
+  end
+end
+
+defmodule Bomb2 do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def init(state) do
+    Process.send_after(self(), :explode, 3000)
+    {:ok, state}
+  end
+
+  def handle_info(:explode, _state) do
+    raise "Bomb 2 Exploded!"
+  end
+end
+
+defmodule Bomb3 do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def init(state) do
+    Process.send_after(self(), :explode, 5000)
+    {:ok, state}
+  end
+
+  def handle_info(:explode, _state) do
+    raise "Bomb 3 Exploded!"
+  end
+end
+```
+
+### One For One
+
+We'll start the three bombs using the `:one_for_all` strategy.
+
+Each bomb restarts individually without affecting the others, 
+so the timeline of crashes should be:
+
+* 2 seconds: Bomb1 crashes.
+* 3 seconds: Bomb2 crashes.
+* 4 seconds: Bomb1 crashes.
+* 5 seconds: Bomb3 crashes.
+
+We've increased
+`:max_restarts` to increase the limit of three crashes per five seconds to four crashes per five seconds.
+
+You can go to [Supervisor Options](https://hexdocs.pm/elixir/1.12/Supervisor.html#init/2-options)
+ on HexDocs for a full list of configuration options.
+
+```elixir
+children = [
+  {Bomb1, []},
+  {Bomb2, []},
+  {Bomb3, []}
+]
+
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_one, max_restarts: 5)
+
+# allow time for crashes and kill the supervisor to clean up the process.
+Process.sleep(5100)
+Process.exit(supervisor, :normal)
+```
+
+### One For All
+
+If we change the restart strategy to `:one_for_all`, then all processes will be
+terminated and restarted when a single process crashes.
+
+So the timeline of crashes will be:
+
+* 2 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 4 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 6 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+
+Notice that `Bomb2` and `Bomb3` will never explode because their timers restart.
+
+```elixir
+children = [
+  {Bomb1, []},
+  {Bomb2, []},
+  {Bomb3, []}
+]
+
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_all)
+
+# allow time for crashes and kill the supervisor to clean up the process.
+Process.sleep(6100)
+Process.exit(supervisor, :normal)
+```
+
+### Rest For One
+
+If we change the restart strategy to `:rest_for_one`, the processes will restart any
+processes ordered after them in the supervisor.
+
+At first, we won't notice any change from the `:one_for_all` strategy. The
+timeline will still be:
+
+* 2 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 4 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 6 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+
+```elixir
+children = [
+  {Bomb1, []},
+  {Bomb2, []},
+  {Bomb3, []}
+]
+
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :rest_for_one)
+
+# allow time for crashes and kill the supervisor to clean up the process.
+Process.sleep(6100)
+Process.exit(supervisor, :normal)
+```
+
+However, if we change the order of children in the supervisor, only children after the crashed
+process (`Bomb1`) will restart.
+
+So the timeline of crashes would be:
+
+* 2 seconds: `Bomb1` crashes (`Bomb2` restarted)
+* 4 seconds: `Bomb1` crashes (`Bomb2` restarted)
+* 5 seconds: `Bomb3` crashes (`Bomb1` and `Bomb2` restarted)
+* 7 seconds: `Bomb1` crashes (`Bomb2` restarted)
+
+We've increased `max_restarts` because there would normally be three crashes in five seconds.
+
+```elixir
+children = [
+  {Bomb3, []},
+  {Bomb1, []},
+  {Bomb2, []}
+]
+
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
+
+# allow time for crashes and kill the supervisor to cleanup the process.
+Process.sleep(7100)
+Process.exit(supervisor, :normal)
+```
+
+### Your Turn
+
+Start `Bomb1`, `Bomb2`, and `Bomb3` under a new supervisor.
+
+Change the order to:
+
+* first: `Bomb2`
+* second: `Bomb3`
+* third: `Bomb1`
+
+Predict the crash timeline, Then evaluate your code. Did the result match your prediction?
+
+```elixir
+
+```
+
+## Further Reading
+
+* [HexDocs: Supervisor](https://hexdocs.pm/elixir/1.12/Supervisor.html#init/2-options)
+* [Elixir Schools: Supervisor Strategies](https://elixirschool.com/blog/supervisor-strategies)
+* [Elixir Schools: OTP Supervisors](https://elixirschool.com/en/lessons/advanced/otp_supervisors)
