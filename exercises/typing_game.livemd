@@ -37,8 +37,7 @@ Remember that you can retrieve input from the console using `IO.get/2`.
 The player should be able to load your game into the `IEx` shell, and enter the prompted word.
 
 ```
-$ iex -S mix
-iex> TypingGame.start()
+$ mix run --no-halt
 Your word: red
 red
 Your word: blue
@@ -52,24 +51,48 @@ Create a mix project with a supervisor in your projects folder and create your g
 $ mix new typing_game --sup
 ```
 
-### Bonus: Terminate
+## Bonus: Terminate
 
-Use the `terminate/2` callback to print a message in the console if the `Word` process crashes.
+Use the [terminate/2](https://hexdocs.pm/elixir/1.12/GenServer.html#c:terminate/2)
+callback to print a message in the console when the game crashes.
 
 ```
-iex> TypingGame.start()
+$ mix run --no-halt
 Your word: red
 rad
 You lose!
 Your word: blue
 ```
 
-### Bonus: Timer
+## Bonus: Score
+
+For each successful word store a score in memory.
+When the game crashes, use the `terminate/2` callback
+to print the score to the player.
+
+```
+$ mix run --no-halt
+Your word: red
+5
+4
+2
+red
+Your word: blue
+5
+4
+3
+2
+1
+Score: 1
+Your word: yellow
+```
+
+## Bonus: Countdown
 
 Count down from five in the console as the player enters their word.
 
 ```
-iex> TypingGame.start()
+$ mix run --no-halt
 Your word: red
 5
 4
