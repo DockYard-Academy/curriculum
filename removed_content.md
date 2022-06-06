@@ -3247,3 +3247,18 @@ end
 ```
 
 This also configures the `application/0` function in `mix.exs`
+
+Typically, APIs expose some [URL](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_is_a_URL) This URL (Uniform Resource Locator) allows the client to locate the server on the internet.
+
+
+
+Clients make and HTTP request.
+
+A URL (Uniform Resource Locator)
+
+
+In order to communicate with the API programmatically we generally use HTTP (HyperText Transfer Protocol).
+HTTP is a protocol used to transfer messages between machines across the internet.
+
+We won't go into great depths on HTTP or Computer Networking, as those are deep topics on their own. However,
+you may find this crash course video useful for an overview.
