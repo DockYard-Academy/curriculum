@@ -1,0 +1,71 @@
+# Pokemon API
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Pokemon API
+
+We can request information about Pokemon using the [Pokemon API](https://pokeapi.co/).
+
+When we rely on an external API, it's possible for them to change the format of a response, and have that cause issues
+for our application.
+
+That's why it's often important to translate information from an API into a struct when we retrieve it. This way
+if the format of the API response changes then we can fix the issue in a single spot where we convert the API response into a struct.
+We can also keep only the information we want, rather than all of the data returned.
+
+```elixir
+{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/charmander")
+```
+
+In the `Pokemon.from_response/1` function, 
+Decode the above `response` into an Elixir map using the `Poison` library.
+then use the converted response to create a `Pokemon` struct with `:name`, `:weight`, and `:height` fields.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Pokemon.from_response(response)
+%Pokemon{name: "charmander", weight: 85, height: 6}
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Pokemon do
+  defstruct [:name, :weight, :height]
+
+  def from_response(response) do
+    nil
+  end
+end
+
+Pokemon.from_response(response)
+```
+
+### Types (Bonus)
+
+Add `:types` to the `Pokemon` struct and use the `"types"` field from `response` to create a list of types.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Pokemon.from_response(response)
+%Pokemon{name: "charmander", weight: 85, height: 6, types: ["fire"]}
+```

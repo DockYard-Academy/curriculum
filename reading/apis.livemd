@@ -96,8 +96,6 @@ We use web APIs to communicate with servers on the internet. These APIs provide 
 
 We use HTTP to communicate with web APIs. The browser hides the details of how we use HTTP to communicate with these APIs. However, as developers, we want to interact with them directly using the HTTP protocol to request and send information.
 
-HTTP GET requests retrieve data from a server, and HTTP POST requests send data to a server.
-
 In Elixir, we use an HTTP client to make HTTP requests. We've installed the popular [HTTPoison](https://github.com/edgurgel/httpoison) HTTP client library for you in this livebook to demonstrate how to make HTTP requests.
 
 With `HTTPoison` we can programmatically request information from the same Joke API you visited in the browser.
@@ -106,7 +104,7 @@ With `HTTPoison` we can programmatically request information from the same Joke 
 HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
 ```
 
-We use the `HTTPoison.get/2` function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
+We use the `HTTPoison.get/3` function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
 
 The `:body` is the JSON response you saw previously in the browser, and `:headers` provide additional context and meta-data about the response. The `:status_code` specifies the response's status, where `200` indicates a successful response. The `:request_url` is simply the URL.
 
@@ -168,6 +166,23 @@ Use `Poison.decode!/2` to decode the following json string.
 
 ```elixir
 string = "{\"hello\"\: \"world\"}"
+```
+
+### HTTP GET and HTTP POST
+
+HTTP GET requests retrieve data from a server and HTTP POST requests send data to a server.
+
+We've already seen how we can use `HTTPoison.get/3` to make an HTTP GET request.
+We can also use the `HTTPoison.post/4` function to make an HTTP POST request.
+
+POST requests include **body** and **headers**. The body contains the data to send to the server. The headers contain context and metadata about the body of data being sent. which is the data to send to the server. The POST request also includes **headers** which
+contain context and metadata about the data. For example, the `Content-Type` header tells the server the format of data being sent.
+
+Below we send a POST request to http://httparrot.herokuapp.com/post. The body is a JSON string `"{\"body\": \"test\"}"` and the
+`Content-Type` header specifies that the data being sent is JSON.
+
+```elixir
+HTTPoison.post("http://httparrot.herokuapp.com/post", "{\"body\": \"test\"}", [{"Content-Type", "application/json"}])
 ```
 
 ## Private APIs
