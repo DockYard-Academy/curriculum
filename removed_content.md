@@ -3262,3 +3262,103 @@ HTTP is a protocol used to transfer messages between machines across the interne
 
 We won't go into great depths on HTTP or Computer Networking, as those are deep topics on their own. However,
 you may find this crash course video useful for an overview.
+
+### Metaprogramming
+Macros can accept arguments, and we need to accept some truthy or falsy condition in the `ControlFlow.if` macro.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's consider a more functional example. Many language constructs such as `if` are actually macros. We're going to recreate to the `if` macro.
+
+```elixir
+defmodule ControlFlow do
+  defmacro my_if(condition) do
+  end
+end
+```
+
+Macros are used to generate code, so if you're using a macro the way you would use a function to return a value, then you should simply return that value instead.
+
+To show the power of macros, we'll create a new macro that defines a function inside of another module.
+
+```elixir
+defmodule Macros do
+  defmacro create_hello do
+    quote do
+      def world do
+        "world"
+      end
+    end
+  end
+end
+
+defmodule Hello do
+  require Macros
+  Macros.create_hello()
+end
+
+Hello.world()
+```
+
+Inside of the `Hello` module, the `Macros.create_hello/1` macro define a new `world/0` function,
+so we're above to call `Hello.world/0`.
+
+Any code inside of the `create_hello/1` macro will compile into the code inside of the `quote` module. For example, you could define module attributes.
+
+```elixir
+defmodule Macros do
+  defmacro create_attribute do
+    quote do
+      @attr "hello"
+    end
+  end
+end
+
+defmodule Hello do
+  require Macros
+  Macros.create_attribute()
+
+  def hello do
+    @attr
+  end
+end
+
+Hello.hello()
+```
+
+As you can see, macros can hide code. However, hiding code can make it harder to reason about our program. Without knowing the internals of the `Macros.create_attribute/0` macro, it's unclear where `@attr` comes from.
+
+### Unquoting Arguments
+
+Macros can accept arguments. However, these arguments are not available within the `quote` block. They need to be injected using `unquote`.
+
+```elixir
+defmodule Macro do
+  defmacro create_hello(name) do
+    quote do
+      def hello do
+        unquote(name)
+      end
+    end
+  end
+end
+
+defmodule Hello do
+  require Macro
+  Macro.create_hello("Peter")
+end
+
+Hello.hello()
+```
+
+### Your Turn
+
+Define a `hello_world/0` macro in the `Macros` module.  then use that macro in the `UsingMacro` module.
+
+```elixir
+defmodule Macros do
+end
+
+defmodule UsingMacro do
+end
+```
