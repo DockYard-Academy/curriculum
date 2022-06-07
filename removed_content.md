@@ -2847,7 +2847,7 @@ Process.alive?()
 ```
 
 However, if we start the `GenServer` with a link, it will crash and also crash the parent process.
-We've ommited functional example, because it would crash your livebook and prevent further execution of Elixir cells..
+We've omitted functional example, because it would crash your livebook and prevent further execution of Elixir cells..
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -2950,7 +2950,7 @@ defmodule Wallee do
   end
 
   def handle_cast(:send_metal, remaining_metal) do
-    IO.puts("Wallee: Recieving Metal.")
+    IO.puts("Wallee: Receiving Metal.")
     {:noreply, [:metal, remaining_metal]}
   end
 
@@ -2981,7 +2981,7 @@ defmodule Bender do
   end
 
   def handle_cast({:recieve_sheet, sheet}, state) do
-    IO.puts("Bender: Recieved Sheet - #{sheet}")
+    IO.puts("Bender: Received Sheet - #{sheet}")
     {:noreply, state}
   end
 
@@ -3012,7 +3012,7 @@ defmodule Marvin do
   end
 
   def handle_cast({:send_product, product}, products) do
-    IO.puts("Marvin: Recieved Product - #{product}")
+    IO.puts("Marvin: Received Product - #{product}")
     {:noreply, [product | products]}
   end
 

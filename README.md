@@ -8,14 +8,28 @@ Contributors and beta testers are welcome to go through the course, raise issues
 
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
 
-# QuickStart
-1. install a compatible Elixir and Erlang version. You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
-2. Install livebook main `mix escript.install github livebook-dev/livebook`.
-3. From the project folder run `livebook server start.livemd`. This opens the navigation page where you can find the course reading material and associated exercises.
+## QuickStart
 
-If you cannot see mermaid.js graphs, ensure your livebook version is correct.
+1. Install a compatible Elixir (1.13.3 or higher) and Erlang (24 or higher)
+   version. You may wish to use
+   [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
-See the full [Beta Tester & Contributor Setup](https://github.com/DockYard-Academy/beta_curriculum/wiki/Beta-Tester-Guide-&-Contributor-Setup) for comprehensive getting started and contribution instructions.
+2. Install [Livebook](https://github.com/livebook-dev/livebook):
+
+   ```sh
+   mix escript.install github livebook-dev/livebook
+   ```
+
+3. From the project folder run the command below. This opens the navigation
+   page where you can find the course reading material and associated
+   exercises.
+
+   ```sh
+   livebook server start.livemd
+   ```
+
+If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
+ensure your Livebook version is correct.
 
 ## Course Outcome
 Students will be competent developers prepared to excel in the Elixir industry. They will have
@@ -31,7 +45,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Basics (Simple Types, Operators, Variables, Comments)
 3. Complex Types (atom, tuples, list, keyword list, map, mapset)
 4. Modules, Functions, Structs, Control Flow
-5. 
+5.
 
 ## Week 2
 1. Problem Solving & Enumeration (ranges, map, filter, all, any, count, find, random)
@@ -43,7 +57,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Week 3
 1. Polymorphism, Protocols & Behaviors
 2. Performance (Immutability, Streams, Lists Vs Tuples Vs Maps Vs Mapsets, Big O, Benchee, :timer) & Recursion
-3. 
+3.
 4. File, .iex Scripts, Persistence, Data Validation (Ecto Changesets) (+Binary)
 5. Processes (Processes, Generic Server, Genserver, Agents, ETS)
 
@@ -52,14 +66,14 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Supervisor Basics and Fault Tolerance (+Task)
 3. BEAM
 4. Ecto & Database Basics
-5. 
+5.
 
 ## Week 5
 1. APIs & Parsing JSON
-2. Networking Basics & Plug 
+2. Networking Basics & Plug
 3. Macros and `use`
 4. Deploying Mix Project
-5.  
+5.
 
 ## Week 6 (Phoenix Setup)
 1. Phoenix Framework & Generators (+ Testing Patterns)
@@ -87,7 +101,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 3. Advanced Livebook (Graphs, Tables, Connecting Projects)
 4. Collaborative GitHub Patterns (PRs, Forking, Cloning, Issues)
-5. 
+5.
 
 ## Week 10
 1. Emailing & Swoosh
@@ -100,13 +114,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 1. Umbrella Projects
 2. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
 3. Nodes, Clustering
-4. 
-5. 
+4.
+5.
 
 
 ## Week 12 (Final Project)
-1. 
-2. 
-3. 
-4. 
-5. 
+1.
+2.
+3.
+4.
+5.
