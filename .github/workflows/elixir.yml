@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
+      uses: erlef/setup-beam@v1
       with:
         elixir-version: '1.13.3' # Define the elixir version [required]
         otp-version: '24.3' # Define the OTP version [required]
@@ -34,3 +34,14 @@ jobs:
     - name: Run tests
       working-directory: ./utils
       run: mix test
+
+  codespell:
+    name: Check for spelling errors
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: codespell-project/actions-codespell@master
+      with:
+        check_filenames: true
+        check_hidden: true
+        skip: ./.git
