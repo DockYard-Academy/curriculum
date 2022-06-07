@@ -804,20 +804,20 @@ defmodule Utils.Feedback do
     list = Enum.to_list(1..10)
 
     custom_enum = get_answers()
-    assert custom_enum.map(list, & &1), "Implement the `map/2` funtion."
+    assert custom_enum.map(list, & &1), "Implement the `map/2` function."
     assert is_list(custom_enum.map(list, & &1)), "`map/2` should return a list."
 
     assert custom_enum.map([1, 2, 3], &(&1 * 2)) == [2, 4, 6]
 
-    assert custom_enum.each(list, & &1), "Implement the `each/2` funtion."
+    assert custom_enum.each(list, & &1), "Implement the `each/2` function."
     assert custom_enum.each(list, & &1) == :ok, "`each/2` should return :ok."
 
-    assert custom_enum.filter(list, & &1), "Implement the `filter/2` funtion."
+    assert custom_enum.filter(list, & &1), "Implement the `filter/2` function."
     assert is_list(custom_enum.filter(list, & &1)), "`each/2` should return a list."
 
     assert custom_enum.filter(list, &(&1 < 5)) == Enum.filter(list, &(&1 < 5))
 
-    assert custom_enum.sum(list), "Implement the `sum/1` funtion."
+    assert custom_enum.sum(list), "Implement the `sum/1` function."
     assert is_integer(custom_enum.sum(list)), "`sum/1` should return an integer."
 
     assert custom_enum.sum(list) == Enum.sum(list)
@@ -985,7 +985,7 @@ defmodule Utils.Feedback do
     assert bingo_winner.is_winner?([row_lose, row_win, row_lose])
     assert bingo_winner.is_winner?([row_lose, row_lose, row_win])
 
-    # colums
+    # columns
     assert bingo_winner.is_winner?([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
     assert bingo_winner.is_winner?([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
     assert bingo_winner.is_winner?([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
@@ -1996,7 +1996,7 @@ defmodule Utils.Feedback do
       assert character.can_attack?(wizard, {init_x, init_y}, {x, y}) == can_attack, """
       Called with: Character.can_attack(%Wizard{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
       Expected: #{can_attack}
-      Recieved: #{character.can_attack?(wizard, {init_x, init_y}, {x, y})}
+      Received: #{character.can_attack?(wizard, {init_x, init_y}, {x, y})}
       """
     end
 
@@ -2009,7 +2009,7 @@ defmodule Utils.Feedback do
       assert character.can_attack?(barbarian, {init_x, init_y}, {x, y}) == can_attack, """
       Called with: Character.can_attack(%Barbarian{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
       Expected: #{can_attack}
-      Recieved: #{character.can_attack?(barbarian, {init_x, init_y}, {x, y})}
+      Received: #{character.can_attack?(barbarian, {init_x, init_y}, {x, y})}
       """
     end
   end
