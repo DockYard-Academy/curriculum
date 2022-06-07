@@ -147,7 +147,9 @@ defmodule Utils.Solutions do
     bridget = %{
       name: "Bridget",
       status: :grand_parent,
-      age: 70
+      age: 70,
+      parents: []
+
     }
 
     ygraine = %{
