@@ -1,0 +1,458 @@
+# Macros
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)
+
+## Metaprogramming
+
+Metaprogramming is the process of writing code that generates code.
+
+In Elixir, we use macros for code generation. Macros are a powerful tool for generating code. As always, with great power comes great responsibility.
+
+> Even though Elixir attempts its best to provide a safe environment for macros, the major responsibility of writing clean code with macros falls on developers. Macros are harder to write than ordinary Elixir functions and it’s considered to be bad style to use them when they’re not necessary. So write macros responsibly.
+> 
+> * [elixir-lang.org](https://elixir-lang.org/getting-started/meta/macros.html)
+
+## Quote
+
+Under the hood, Elixir expressions are represented using three element tuples.
+This representation is called the AST (abstract syntax tree). We can inspect the AST representation of an expression using the `quote` macro.
+
+```elixir
+quote do
+  2 + 2
+end
+```
+
+The three element tuple above is often called a **quoted expression**
+
+The first element in the tuple is the function name.
+The second element is a keyword list containing metadata, and the third element is a list of arguments.
+
+`{function, metadata, arguments}`
+
+So `2 + 2` as a quoted expression is
+
+* function: `:+`
+* metadata: `[context: Elixir, import: Kernel]`
+* arguments: `[2, 2]`
+
+The function name is `:+` which referes to the `Kernel.+/2` function. `+` is simply a convenient syntax for calling this function.
+
+```elixir
+Kernel.+(2, 2) == 2 + 2
+```
+
+The metadata includes information about the environment. By default, the `:context` is `Elixir`
+because we are in the top level scope.
+
+The context changes if we use `quote` in a module. Now the context will be the name of the module.
+
+```elixir
+defmodule MyModule do
+  def example do
+    quote do
+      2 + 2
+    end
+  end
+end
+
+MyModule.example()
+```
+
+`quote` can also be called on a single line.
+
+```elixir
+quote do: 1 - 1
+```
+
+A single function (remember that operators such as `+`, `-`, `+`, `=` are all actually functions) will be represented as a single three element tuple. The function name will be an atom. For example the `sum` function is represented as `:sum`.
+
+```elixir
+sum = fn int1, int2, int3 -> int1 + int2 + int3 end
+
+quote do: sum(1, 2, 3)
+```
+
+Simple data types such as integers are represented as themselves in quoted expressions.
+
+```elixir
+quote do: 2
+```
+
+Arguments in the three element tuple can also be three element tuples if they are function calls.
+
+```elixir
+quote do: sum(1, 2, sum(1, 2, 3))
+```
+
+### Your Turn
+
+Use the `quote` macro to discover the AST representation of the following expression.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+2 + 2 + 2
+```
+
+Experiment with `quote` and Elixir expressions to see their AST representation.
+
+```elixir
+quote do
+end
+```
+
+## Unquote
+
+`unquote` injects code into the `quote` macro.
+
+Before using `quote` to retrieve the internal AST representation of an expression, we can use `unquote` to inject some computed value.
+
+For example, the following `unquote(1 + 1)` evaluates to `2` inside of the `quote` macro.
+
+```elixir
+quote do
+  2 + unquote(1 + 1)
+end
+```
+
+The above `quote` expression is equivalent to `2 + 2`, because unquote injected the result of `1 + 1` into the `quote` expression.
+
+```elixir
+quote do
+  2 + 2
+end
+```
+
+## defmacro
+
+We can use macros to extend the Elixir syntax and create our own keywords.
+
+For example, we're going to create an `assert` macro, similar to the `assert` macro in `ExUnit` that we can use to verify the behavior of our code.
+
+The `assert` macro will accept a truthy expression, and print a message with feedback.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+assert 1 == 2
+
+"""
+Assertion with `==` failed.
+
+left: 1
+right: 2
+"""
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We use `defmacro` to define a macro. We'll create an `assert` macro in an `Assertions` module.
+
+```elixir
+defmodule Assertions do
+  defmacro assert do
+  end
+end
+```
+
+Arguments to the `assert` macro will be interpreted as the AST representation of the code. We know this will be a three element tuple. Specifically, it will be the quoted expression for `1 == 2`.
+
+```elixir
+quote do
+  2 == 2
+end
+```
+
+We can pattern match on this expression in the macro definition.
+
+```elixir
+defmodule Assertions do
+  defmacro assert({operator, _meta, [left, right]}) do
+    IO.inspect(operator, label: "operator")
+    IO.inspect(left, label: "left")
+    IO.inspect(right, label: "right")
+  end
+end
+```
+
+In order to use a macro we use [require](https://elixir-lang.org/getting-started/alias-require-and-import.html#require) it.
+
+See that `left` is left side of the expression (`1`) and `right` is the right side of the expression (`2`).
+
+```elixir
+require Assertions
+
+Assertions.assert(2 == 2)
+```
+
+Thanks to our macro, we know the operator, and the left/right hand sides of the expression.
+
+Notice that this would be impossible in a regular function, because instead of receiving a quoted expression we would recieve the result of `1 == 2` (`false`) as an argument.
+
+```elixir
+assert = fn expression -> IO.puts(expression) end
+
+assert.(1 == 2)
+```
+
+Putting this together, we can use the `operator`, `left`, and `right` variables to print the assertion message.
+
+```elixir
+defmodule Assertions do
+  defmacro assert({operator, _meta, [left, right]}) do
+    IO.puts("""
+    Assertion with #{operator} failed.
+    left: #{left}
+    right: #{right}
+    """)
+  end
+end
+```
+
+```elixir
+require Assertions
+
+Assertions.assert(1 == 2)
+```
+
+We want to verify if the `left` and `right` values are equal. We also want to expand this assert macro to work with different operators such as `>`, `>=`, `<`, `<=`, and `===`.
+
+We can delegate to a separate function now that the `assert` macro separates the expression into it's quoted expression.
+
+This function will take the values from the quoted expression and print the assertion success or failure message.
+
+```elixir
+defmodule Assertion.Test do
+  def assert(:==, left, right) when left == right do
+    IO.puts("Success!")
+  end
+
+  def assert(:==, left, right) do
+    IO.puts("""
+    Assertion with == failed.
+    left: #{left}
+    right: #{right}
+    """)
+  end
+end
+
+Assertion.Test.assert(:==, 1, 2)
+```
+
+We'll use the `Assertion.Test.assert` function inside of our macro. Keep in mind that we need to use `unquote` to retrieve the values.
+
+The following would not compile, because `operator`, `left`, and `right` are all not available inside of the `quote` expression.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Assertion do
+  defmacro assert({operator, _meta, [left, right]}) do
+    quote do
+      Assertion.Test.assert(operator, left, right)
+    end
+  end
+end
+```
+
+We need to use `unquote` to inject their evaluated value into the `quote` block.
+
+```elixir
+defmodule Assertion do
+  defmacro assert({operator, _meta, [left, right]}) do
+    quote do
+      Assertion.Test.assert(unquote(operator), unquote(left), unquote(right))
+    end
+  end
+end
+```
+
+```elixir
+require Assertion
+
+Assertion.assert(2 == 2)
+IO.puts("==================")
+Assertion.assert(1 == 2)
+```
+
+Alternatively, we can use `bind_quoted` to bind multiple values to the quoted expression without using `unquote`.
+
+```elixir
+defmodule Assertion do
+  defmacro assert({operator, _meta, [left, right]}) do
+    quote bind_quoted: [operator: operator, left: left, right: right] do
+      Assertion.Test.assert(operator, left, right)
+    end
+  end
+end
+```
+
+The macro continues to work as expected.
+
+```elixir
+require Assertion
+Assertion.assert(1 == 2)
+```
+
+### Your Turn
+
+Expand the `Assertion.Test` module to include the `<`, `<=`, `>`, `>=`, and `===` operators.
+
+```elixir
+defmodule Assertion.Test do
+  def assert(:==, left, right) when left == right do
+    IO.puts("Success!")
+  end
+
+  def assert(:==, left, right) do
+    IO.puts("""
+    Assertion with == failed.
+    left: #{left}
+    right: #{right}
+    """)
+  end
+end
+
+defmodule Assertion do
+  defmacro assert({operator, _meta, [left, right]}) do
+    quote bind_quoted: [operator: operator, left: left, right: right] do
+      Assertion.Test.assert(operator, left, right)
+    end
+  end
+end
+```
+
+You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without causing a `FunctionClauseError`.
+
+```elixir
+require Assertion
+
+Assertion.assert(1 == 2)
+Assertion.assert(1 == 2)
+Assertion.assert(1 > 2)
+Assertion.assert(1 >= 2)
+Assertion.assert(2 < 1)
+Assertion.assert(2 <= 1)
+Assertion.assert(1 === 1.0)
+```
+
+## use and __using__
+
+While you might not often write your own macros, you are likely to use them everday in Elixir.
+For example, you have already encountered a macro with the `use` keyword.
+
+When you `use GenServer` you're calling a macro in the `GenServer` module that generates the necessary boilerplate code to make a `GenServer`.
+
+```elixir
+defmodule Server do
+  use GenServer
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+```
+
+Using the `.__info__/2` function on the module, we can see that the `Server` module defines several functions. These functions are generated by the `use GenServer` expression under the hood.
+
+```elixir
+Server.__info__(:functions)
+```
+
+You'll most often use the `use` keyword to work with macros. `use` often feels like magic, because we don't need to see any of the details of how macros are used under the hood.
+
+Under the hood, the `use` keyword simply calls a `__using__` macro in the specified module.
+
+```elixir
+defmodule Example do
+  defmacro __using__(_opts) do
+    quote do
+      def created_function do
+        "hello"
+      end
+    end
+  end
+end
+```
+
+```elixir
+defmodule Help do
+  use Example
+end
+
+Help.created_function()
+```
+
+The `use` keyword provides a cleaner interface for working with macros, and imposes some restrictions that help maintain orderly code.
+
+Often we'll use the `use` keyword to create templates of common patterns. For example, it's common to create our own ExUnit cases for common test scenarios.
+
+```elixir
+defmodule IOCase do
+  # Use the module
+  defmacro __using__(_opts) do
+    quote do
+      use ExUnit.Case, async: true
+      import ExUnit.CaptureIO
+    end
+  end
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule Test do
+  use IOCase
+
+  test "capure io" do
+    capture_io(fn -> IO.puts("hello") end) =~ "hello"
+  end
+end
+
+ExUnit.run()
+```
+
+### Your Turn
+
+Create a `Greetings` module with a `__using__` macro. define a `hello/0` function inside of the `__using__` macro. You may choose to expriement with defining other functions or module attributes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def hello do
+  "hello"
+end
+```
+
+Create a `Usage` module which uses the `use` keyword to call the `__using__` macro in the `Greetings` module.
+
+```elixir
+defmodule Greetings do
+end
+
+defmodule Usage do
+end
+```
+
+Call `Usage.hello()` to ensure your solution works correctly.
+
+```elixir
+Usage.hello()
+```
