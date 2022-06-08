@@ -107,9 +107,9 @@ broken down into a quoted expression.
 
 ```elixir
 defmodule Math do
-	def sum(int1, int2, int3) do
-		int1 + int2 + int3	
-	end
+  def sum(int1, int2, int3) do
+    int1 + int2 + int3
+  end
 end
 
 quote do: Math.sum(1, 2, 3)
@@ -155,11 +155,19 @@ end
 
 Variables outside the quote block will not be available within the quote block. So we can use `unquote` to inject their evaluated value.
 
-```
+```elixir
 my_variable = 5
 
 quote do
- 2 + unquote(my_variable)
+  2 + unquote(my_variable)
+end
+```
+
+This creates the same quoted expression as `2 + 5`.
+
+```elixir
+quote do
+  2 + 5
 end
 ```
 
@@ -171,11 +179,11 @@ We can use macros to extend the Elixir language or create DSLs (Domain Specific 
 ExUnit.start(auto_run: false)
 
 defmodule Test do
-	use ExUnit.Case
+  use ExUnit.Case
 
-	test "example" do
-		assert 1 == 2
-	end
+  test "example" do
+    assert 1 == 2
+  end
 end
 
 ExUnit.run()
@@ -203,17 +211,17 @@ right: 2
 Notice that we cannot accomplish this with a function.
 Functions accept the evaluated result expressions as arguments. We lose the context about the operator and values.
 
-```
+```elixir
 assert = fn expression ->
-if expression do
-IO.puts("Success")
-else
-IO.puts("Failure")
+  if expression do
+    IO.puts("Success")
+  else
+    IO.puts("Failure")
+  end
 end
-end
-```
 
-<!-- livebook:{"break_markdown":true} -->
+assert.(1 == 2)
+```
 
 We use `defmacro` to define a macro. We'll create an `assert` macro in an `Assertion` module.
 
@@ -246,15 +254,13 @@ end
 
 To use macros, we must [require](https://elixir-lang.org/getting-started/alias-require-and-import.html#require) the module that defines them.
 
-See that `left` is the left side of the expression (`1`), and `right` is the right side of the expression (`2`).
+Notice the the operator is `:==`, the `left` value is `1`, and the `right` value is `2`. Unlike with a function, the macro retains context about the expression given to it.
 
 ```elixir
 require Assertions
 
 Assertions.assert(2 == 2)
 ```
-
-Thanks to our macro, we know the operator and the left/right-hand sides of the expression.
 
 We can use the `operator`, `left`, and `right` variables to print the assertion message.
 
@@ -312,11 +318,11 @@ defmodule Assertion do
 end
 ```
 
+When we call the `assert` macro below it compiles into `Assertion.Test.assert(:==, 1, 2)`.
+
 ```elixir
 require Assertion
 
-Assertion.assert(2 == 2)
-IO.puts("==================")
 Assertion.assert(1 == 2)
 ```
 
@@ -424,9 +430,9 @@ Conceptually, it may help think of modules that define macros as templates or co
 defmodule ExtendedTemplate do
   use Template
 
- def extended_function() do
-	template_function() <> " world"
-end
+  def extended_function() do
+    template_function() <> " world"
+  end
 end
 ```
 
