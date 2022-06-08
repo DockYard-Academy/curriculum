@@ -323,10 +323,10 @@ defmodule Utils.Feedback do
     assert is_map(family_tree), "Ensure `family_tree` is a map."
     assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
 
-    assert %{name: "Arthur", parents: _list} = family_tree,
+    assert %{name: "Arthur", parents: parents } = family_tree,
            "Ensure Arthur in `family_tree` has a list of parents."
+    assert length(parents) == 2, "Ensure both parents are included."
 
-    assert family_tree == Utils.Solutions.family_tree()
   end
 
   feedback :naming_numbers do
