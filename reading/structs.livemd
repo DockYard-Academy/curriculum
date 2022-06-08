@@ -153,21 +153,33 @@ end
 Person.new(25)
 ```
 
-### Functions a Struct module.
+### Module Functions
 
-A module that defines a `struct` is still a regular module as well.
-
-You can define functions as usual.
+A module that defines a struct can contain functions just like a normal module.
 
 ```elixir
+defmodule Person do
+  defstruct [:name]
 
+  def new(name) when is_binary(name) do
+    {:ok, %Person{name: name}}
+  end
+
+  def greet(person) do
+    "Hello, #{person.name}."
+  end
+end
+
+{:ok, person} = Person.new("Peter")
+
+Person.greet(person)
 ```
 
 ### Your Turn
 
 * Define a new struct `Hero`.
 
-* A `Hero` will have a `:name`, `:catchphrase`, and `secret_identity`
+* A `Hero` will have a `:name`, `:catchphrase`, and `:secret_identity`
 
 * create a `reveal/1` function which takes in an instance of a hero and returns
 
