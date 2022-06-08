@@ -1003,16 +1003,13 @@ defmodule Utils.Solutions do
   defmodule Pascal do
     def row(1), do: [1]
     def row(2), do: [1, 1]
+    def row(n), do: generate_row(row(n - 1), [1])
 
     def generate_row(previous_row, acc \\ []) do
       case previous_row do
         [first, second | tail] -> generate_row([second | tail], [first + second | acc])
         _ -> [1 | acc]
       end
-    end
-
-    def row(n) do
-      generate_row(row(n - 1), [1])
     end
 
     def of(n) do
@@ -1031,7 +1028,7 @@ defmodule Utils.Solutions do
 
       remaining
       |> Enum.reduce([first_sublist], fn
-        item, [[h | t] | _] = acc -> [t ++ [item] | acc]
+        item, [[_h | t] | _] = acc -> [t ++ [item] | acc]
       end)
       |> Enum.reverse()
     end
@@ -1286,7 +1283,7 @@ defmodule Utils.Solutions do
       %__MODULE__{amount: amount, currency: currency}
     end
 
-    def convert(%__MODULE__{amount: amount, currency: from_currency} = money, to_currency) do
+    def convert(%__MODULE__{amount: amount, currency: from_currency} = _money, to_currency) do
       cad_amount =
         case from_currency do
           :CAD -> amount
