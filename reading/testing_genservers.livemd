@@ -57,10 +57,10 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "handle_call :increment" do
+  test "Counter receives :increment call" do
     {:ok, pid} = GenServer.start_link(Counter, 0)
     GenServer.call(pid, :increment)
-    assert GenServer.call(pid, :get_count) == 1
+    assert :sys.get_state(pid) == 1
   end
 end
 
@@ -114,7 +114,7 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "increment/1" do
+  test "Counter.increment/1" do
     {:ok, pid} = Counter.start_link([])
     Counter.increment(pid)
     assert Counter.get_count(pid) == 1
@@ -169,7 +169,7 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "increment/1" do
+  test "Counter.increment/1" do
     {:ok, pid} = Counter.start_link([])
     Counter.increment(pid)
     assert Counter.get_count(pid) == 1
@@ -190,7 +190,7 @@ defmodule CounterTest do
   test "handle_call :increment" do
     {:ok, pid} = GenServer.start_link(Counter, 0)
     GenServer.call(pid, :increment)
-    assert GenServer.call(pid, :get_count) == 1
+    assert :sys.get_state(pid) == 1
   end
 end
 
@@ -211,8 +211,7 @@ Create a `counter` mix project in your projects folder.
 $ mix new counter
 ```
 
-Implement your own `Counter` server with `increment/1`,  `decrement/1` and `get_count/1` functions.
-Ensure it is fully tested.
+Implement your own `Counter` server with `increment/1`, `decrement/1` and `get_count/1` functions. Ensure each function has at least one test.
 
 <!-- livebook:{"force_markdown":true} -->
 
