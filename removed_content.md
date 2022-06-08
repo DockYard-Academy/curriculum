@@ -2177,7 +2177,8 @@ Mix.install([
 
 ## Navigation
 
-[Return Home](../start.livemd)
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
 
 ## Setup
 
