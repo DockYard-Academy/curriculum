@@ -20,13 +20,11 @@ Mix.install([
 
 ## Overview
 
-Elixir provides a great deal of built-in behavior in common modules.
+Elixir provides a great deal of functionality in built-in modules.
 
-Each built-in module contains many related functions. In general, each data type has its own
-built-in module.
+In general, each data type or common behavior has a built-in module containing related functions for dealing with that data type.
 
-While it is not necessary to memorize every function in every module (that would be a real accomplishment!) you
-should try to develop enough familiarity with the modules to know when you should reach for them.
+While it is unnecessary to memorize every function in every module, it's essential to be familiar with the built-in modules to know when to reach for them.
 
 ## The Kernel Module
 
@@ -48,15 +46,13 @@ true = Kernel.is_binary("")
 true = Kernel.is_integer(1)
 ```
 
-Functions in the Kernel module can be accessed directly without using the `Kernel.` namespace.
+We can use `Kernel` functions without using the `Kernel` namespace.
 
 ```elixir
 is_map(%{})
 ```
 
-The `Kernel` is fairly large and overwhelming to look at. Remember, your goal for this section is not
-to remember every function of every module. Instead, you'll develop familiarity over time and with
-practice.
+The `Kernel` is reasonably large. Remember, our goal is not to memorize every function but to develop familiarity with repeated practice.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -270,6 +266,89 @@ uppercase_string = nil
 Utils.feedback(:string_upcase, uppercase_string)
 ```
 
+## The List Module
+
+The [List](https://hexdocs.pm/elixir/List.html) module contains functionality related to lists.
+
+Here are a few common functions to get you started.
+
+* `delete_at/2` remove an element at an index in a list.
+* `first/2` retrieve the first element in a list similar to `hd/1` or pattern matching on the head and tail of a list.
+* `flatten/2` flatten nested lists within a list.
+* `insert_at/3` flatten nested lists within a list.
+* `last/2` retrieve the last element in a list.
+* `update_at/3` flatten nested lists within a list.
+* `zip/1` combine elements from multiple lists into a single list of tuples.
+
+The `delete_at/2`, `insert_at/3` and `update_at/3` functions do not mutate the original list. Instead, they create a new copy of the original list with the operation applied to it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Use `delete_at/2` to remove `2` from this list.
+
+```elixir
+list = [1, 2, 3]
+```
+
+`first/2` retrieves the first element in a list. We can also use `hd/1`, `Enum.at/2`, or pattern matching.
+
+```elixir
+head = List.first([1, 2, 3])
+```
+
+```elixir
+[head | _tail] = [1, 2, 3]
+head
+```
+
+```elixir
+hd([1, 2, 3])
+```
+
+```elixir
+head = Enum.at([1, 2, 3], 0)
+```
+
+Try pattern matching, `List.first/2`, `Enum.at/2`, and `hd/1` to retrieve the first element of
+the list below.
+
+```elixir
+list = [1, 2, 3]
+```
+
+Use `List.flatten/1` to flatten the following list into [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+```elixir
+list = [1, 2, [3, 4, 5], 6, [7, [8, [9]]]]
+```
+
+Use `List.insert_at/3` to insert `2` into the following list to make `[1, 2, 3]`.
+
+```elixir
+List.insert_at([1, 3], 1, 2)
+```
+
+Use `List.last/2` to retrieve the last element `10000` in the list below.
+
+```elixir
+list = Enum.to_list(1..10000)
+```
+
+Use `List.update_at/2` to replace `4` with `2` in the following list to make `[1, 2, 3]`.
+
+```elixir
+list = [1, 4, 3]
+```
+
+Use `List.zip/1` to combine these two lists to make `[{"a", 1}, {"b", 2}, {"c", 3}]`.
+
+```elixir
+lista = ["a", "b", "c"]
+listb = [1, 2, 3]
+```
+
 ## The Map Module
 
 The [Map](https://hexdocs.pm/elixir/Map.html#functions) module contains functionality related to maps.
@@ -286,7 +365,7 @@ Here are a few common functions to get you started.
 Keep in mind operations do not mutate a value.
 
 For example, if we use `Map.put/3` to put a new value in a map, the original variable is not
-changed. Functions return a new value, rather than modifying the original one.
+changed. Functions return a new value rather than modifying the original one.
 
 ```elixir
 original_map = %{}
@@ -379,7 +458,7 @@ Here are a few common functions to get you started.
 * `keys/1` list the keys in a keyword list.
 * `keyword?/1` check if some data is a keyword list.
 
-Keyword lists are often used for optional arguments. You may have already encountered this pattern.
+We often use keyword lists to provide optional arguments to a function. 
 For example, `IO.inspect/2` has [many optional arguments](https://hexdocs.pm/elixir/Inspect.Opts.html)
 Including `:label`.
 
@@ -433,7 +512,7 @@ keys = nil
 Utils.feedback(:keyword_keys, keys)
 ```
 
-Use the `Keyword.keyword?/1`. function to determine if the following is a keyword list. 
+Use the `Keyword.keyword?/1` function to determine if the following is a keyword list. 
 Replace `nil` with your answer.
 
 ```elixir
@@ -446,8 +525,7 @@ Utils.feedback(:keyword_keyword?, is_keyword_list)
 
 ## Further Reading
 
-There are more built-in modules and functions beyond the scope of this introductory reading. 
-You can learn more on the Elixir documentation.
+There are more built-in modules and functions beyond the scope of this introductory reading. The Elixir documentation further examples and information on the built-in modules.
 
 * [Kernel](https://hexdocs.pm/elixir/Kernel.html)
 * [Integer](https://hexdocs.pm/elixir/Integer.html)
