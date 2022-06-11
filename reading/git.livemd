@@ -4,7 +4,8 @@
 Mix.install([
   {:kino, github: "livebook-dev/kino", override: true},
   {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.3"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
   {:benchee, "~> 0.1"},
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
@@ -20,7 +21,7 @@ Mix.install([
 
 ## Setup
 
-Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
 ## Source Control
@@ -43,7 +44,7 @@ you should already have Git installed on your computer.
 
 Enter the following into the command line to confirm you have Git installed. You should see a similar output.
 
-```
+```sh
 $ git --version
 git version 2.25.1
 ```
@@ -52,10 +53,10 @@ You can use Github Desktop, the command line, or a source control extension in y
 
 ## GitHub
 
-[Github](https://github.com/) hosts your git projects and provides tools for easier collaboration with Git. 
+[GitHub](https://github.com/) hosts your git projects and provides tools for easier collaboration with Git.
 
 For example, this entire project is on GitHub. It is a **public** repository meaning that anyone can view the code and
-request to make a pull request. However, only **contributors** with valid permission can approve those changes. 
+request to make a pull request. However, only **contributors** with valid permission can approve those changes.
 
 **public** repositories
 are generally called **open-source projects** if they accept changes from other developers.
@@ -71,12 +72,12 @@ Please raise an issue if you encounter a problem with the curriculum.
 
 ## Initializing A Local Repository
 
-Git uses a `.git` folder that stores the necessary folders 
+Git uses a `.git` folder that stores the necessary folders
 and files to manage the project's source control. We call this git-managed folder a **repository**.
 
 Using the command line, you can initialize Git in your current working directory by running:
 
-```
+```sh
 git init
 ```
 
@@ -84,11 +85,11 @@ git init
 
 ### Your Turn
 
-Use the command line to create a new git managed project called `git_example`.
+Use the command line to create a new Git managed project called `git_example`.
 
-You can use `git status` from the command line from the `git_example` folder to verify that git manages the folder. Like so:
+You can use `git status` from the command line from the `git_example` folder to verify that Git manages the folder. Like so:
 
-```
+```sh
 $ git init
 Initialized empty Git repository in ~/github_example/.git/
 $ git status
@@ -108,9 +109,9 @@ flowchart LR
   Untracked --git add--> Staged --git commit--> Committed
 ```
 
-You'll use some common commands for saving changes in git.
+You'll use some common commands for saving changes in Git.
 
-* `git status`: Display git information and see the untracked and staged changes.
+* `git status`: Display Git information and see the untracked and staged changes.
 * `git add`: Stage current changes.
 * `git commit`: Save staged changes into a commit.
 
@@ -128,7 +129,7 @@ In the `github_example` create an empty file named `finished.txt`.
 
 Use `git status` to see that the file is untracked.
 
-```
+```sh
 $ git status
 On branch master
 
@@ -143,13 +144,13 @@ nothing added to commit but untracked files present (use "git add" to track)
 
 Now, stage `finished.txt` to prepare it to be committed.
 
-```
+```sh
 $ git add finished.txt
 ```
 
 Use `git status` again and see the file is staged.
 
-```
+```sh
 $ git status
 On branch master
 
@@ -163,14 +164,14 @@ Changes to be committed:
 Now we'll use `git commit` to commit the staged changes. We use the `-m` flag and provide
 a message in quotations. `"example commit message"` can be any description you want.
 
-```
+```sh
 $ git commit -m "example commit message"
 ```
 
 ## Pushing Changes
 
-You've so far used git locally. Now to share code and collaborate with other developers, we
-push code to a remote git repository on **GitHub**.
+You've so far used Git locally. Now to share code and collaborate with other developers, we
+push code to a remote Git repository on **GitHub**.
 
 ```mermaid
 flowchart LR
@@ -183,9 +184,9 @@ We use `git push` to push changes to the remote repository.
 
 ### Your Turn
 
-Run `git push` now, and you'll notice the following error.
+Run `git push` now, and you'll notice the following error:
 
-```
+```sh
 $ git push
 fatal: No configured push destination.
 Either specify the URL from the command line or configure a remote repository using
@@ -216,10 +217,10 @@ the remote repository.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Now the remote repository is created, we need to tell our local git repository how to find it. Follow
+Now the remote repository is created, we need to tell our local Git repository how to find it. Follow
 the instructions for **push an existing repository from the command line**.
 
-* `git remote add origin <githuburl>` Tell your local git project where to find the remote git repository.
+* `git remote add origin <github_url>` Tell your local Git project where to find the remote Git repository.
 * `git branch -M main` Rename the default branch to main.
 * `git push -u origin main` Push local commits to the remote repository. This command sets the default remote repository, so only `git push` is necessary for future commits.
 
@@ -230,9 +231,9 @@ the instructions for **push an existing repository from the command line**.
 <!-- livebook:{"break_markdown":true} -->
 
 You are done! You can now add, commit, and push any further changes.
-This will be your typical developer process with git.
+This will be your typical developer process with Git.
 
-```
+```sh
 $ git add .
 $ git commit -m "add example changes"
 $ git push
@@ -240,7 +241,7 @@ $ git push
 
 ## Cloning Repositories
 
-You can clone remote repositories to create a local git project on your computer.
+You can clone remote repositories to create a local Git project on your computer.
 
 ```mermaid
 flowchart LR
@@ -249,12 +250,12 @@ Remote --git clone--> Local
 
 There are many methods for cloning a remote repository onto your computer.
 
-### Github Desktop
+### GitHub Desktop
 
-[Github Desktop](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/adding-and-cloning-repositories/cloning-and-forking-repositories-from-github-desktop)
+[GitHub Desktop](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/adding-and-cloning-repositories/cloning-and-forking-repositories-from-github-desktop)
 is the most straightforward way to clone a repository.
 
-On a Github repository, click the **Code** button to see your options for cloning.
+On a GitHub repository, click the **Code** button to see your options for cloning.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -284,31 +285,31 @@ You can find instructions for each method on GitHub:
 
 * [HTTPS](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls)
 * [SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-* [Github CLI](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+* [GitHub CLI](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 
 <!-- livebook:{"break_markdown":true} -->
 
 #### HTTPS
 
-HTTPS (Hypertext Transfer Protocol Secure) is a method of transferring data. 
+HTTPS (Hypertext Transfer Protocol Secure) is a method of transferring data.
 In this case, we use it to copy files from the GitHub remote repository onto our local computer.
 
 More practically, it's the easiest method for the command line however the downside is it's less secure and requires
-you to enter your GitHub credentials every time you use a git command.
+you to enter your GitHub credentials every time you use a `git` command.
 
 We use `git clone` with the URL provided by GitHub to clone the repo with HTTPS.
 ![](images/git_clone_https_github.png)
 
-```
+```sh
 $ git clone https://github.com/BrooklinJazz/github_example.git
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-However, you'll need to enter credentials every time you use `git push` or any other git command that
+However, you'll need to enter credentials every time you use `git push` or any other `git` command that
 interacts with a remote repository.
 
-```
+```sh
 $ git push
 Username for 'https://github.com':
 Password for 'https://a@github.com':
@@ -335,19 +336,19 @@ You'll want to follow the instructions for:
 * [Testing your SSH connection](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection)
 * [Working with SSH key passphrases](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases) (optional)
 
-Then you can use the `git clone` with the SSH url provided.
+Then you can use the `git clone` with the SSH URL provided.
 
 ![](images/github_clone_ssh.png)
 
-```
+```sh
 $ git clone git@github.com:BrooklinJazz/github_example.git
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Github CLI
+### GitHub CLI
 
-The github CLI provides some conveniences for working with Git and GitHub.
+The GitHub CLI provides some conveniences for working with Git and GitHub.
 It allows you to use the command line
 to accomplish tasks that would normally require GitHub.
 
@@ -403,7 +404,7 @@ GitHub Desktop allows you to pull changes through the UI.
 
 Alternatively, you can use the command line with `git pull` from the project folder.
 
-```
+```sh
 $ git pull
 ```
 
@@ -413,12 +414,12 @@ $ git pull
 
 We're going to simulate pulling changes on your `github_example` project.
 
-Create a new file called `pull.txt` in your `github_example2` project. 
+Create a new file called `pull.txt` in your `github_example2` project.
 **Not** your `github_example` project.
 
-Stage, commit and push the `pull.txt` file from github_example2.
+Stage, commit and push the `pull.txt` file from `github_example2`.
 
-```
+```sh
 $ git add pull.txt
 $ git commit -m "add pull.txt"
 $ git push
@@ -426,7 +427,7 @@ $ git push
 
 Now pull the change from your `github_example` project.
 
-```
+```sh
 $ git pull
 ```
 
@@ -434,12 +435,12 @@ You should see `pull.txt` is now part of the `github_example` project.
 
 ## Branching Strategies
 
-You can use branching strategies for your git workflow as an alternative to trunk-based development.
+You can use branching strategies for your Git workflow as an alternative to trunk-based development.
 
-You create a branch for a feature from the main branch and then make a pull request which is 
+You create a branch for a feature from the main branch and then make a pull request which is
 reviewed and merged back into the main branch.
 
-These strategies vary in complexity. For example, you could simply make a pr for a feature and then
+These strategies vary in complexity. For example, you could simply make a pull request for a feature and then
 merge those changes directly into the main branch.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -461,7 +462,7 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-Alternatively, many git branching strategies have a pipeline for changes to be reviewed and tested.
+Alternatively, many Git branching strategies have a pipeline for changes to be reviewed and tested.
 
 There is no universal strategy. Each project may have a different pipeline.
 However, some common steps include:
@@ -490,14 +491,14 @@ We will create a new branch on your `github_example` project.
 
 On the command line run:
 
-```
+```sh
 $ git checkout -b <branchname>
 ```
 
 Where `<branchname>` is the name of the branch with no spaces.
 Each branch must have a name with no spaces. For example, you could create a branch called `my-branch`.
 
-```
+```sh
 $ git checkout -b my-branch
 ```
 
@@ -506,15 +507,15 @@ Any commits we make are saved on the current branch.
 
 Next, create, stage and commit a new file `branch.txt`.
 
-```
+```sh
 $ git add branch.txt
 $ git commit -m "add branch.txt"
 ```
 
-You'll need to create a remote my-branch and push the changes. You can visit the link provided
-to create a pull request.
+You'll need to create a remote `my-branch` and push the changes. You can visit the link provided
+to create a PR.
 
-```
+```sh
 $ git push -u origin my-branch
 ...
 remote: Create a pull request for 'my-branch' on GitHub by visiting:
@@ -542,13 +543,13 @@ Click the **Merge pull request** button to merge the changed files into main.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Now the main branch of the remote repository has the changes from the pull request, however
-your local main branch needs to be updated.
+Now the `main` branch of the remote repository has the changes from the pull request, however
+your local `main` branch needs to be updated.
 
-Use `git pull` while on the main branch of your local `github_example` project. You
-may need to use `git checkout main` if you are not already on the main branch.
+Use `git pull` while on the `main` branch of your local `github_example` project. You
+may need to use `git checkout main` if you are not already on the `main` branch.
 
-```
+```sh
 $ git checkout main
 $ git pull
 ```
@@ -575,13 +576,13 @@ On your `github_example` and `github_example2` projects, edit the `finished.txt`
 
 Both should have conflicting content. i.e.
 
-```
+```sh
 github_example version of finished.txt
 ```
 
-and for `github_example2`
+and for `github_example2`:
 
-```
+```sh
 conflicting github_example2 version of finished.txt
 ```
 
