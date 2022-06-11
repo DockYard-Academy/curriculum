@@ -1,0 +1,472 @@
+# RDBMS
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.3"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:kino_db, "~> 0.1.1"},
+  {:postgrex, "~> 0.16.3"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Relational Database Management Systems (RDBMS)
+
+Databases store long-term information in a program. There are many kinds of databases, but in Elixir we'll focus on Relational Database Management Systems (RDBMS) with PostgreSQL.
+
+Here's a great primer by Linux Academy.
+
+```elixir
+Kino.YouTube.new("Tk1t3WKK-ZY")
+```
+
+Relational Databases store data in tables with relationships to each other.
+You can think of these tables as conceptually similar to rows and columns in an Excel spreadsheet. Each item in the table is called a **record**.
+
+To demonstrate how to use Relational Databases, we will build a journaling database where many users will create private journal entries.
+
+Our journal database will have a users table that stores a user's name, email, and unique identifier (id).
+
+<!-- livebook:{"break_markdown":true} -->
+
+| id | name  | email            |
+| -- | ----- | ---------------- |
+| 1  | Peter | peter@spider.web |
+| 2  | Miles | miles@spider.web |
+
+<!-- livebook:{"break_markdown":true} -->
+
+Our journal database will also have an entries table. The entries table stores the entry's title, content, and unique identifier. Each entry also contains a reference to a record in the users table. This reference is a foreign key id (user id) to the user that owns the journal.
+
+<!-- livebook:{"break_markdown":true} -->
+
+| id | user_id | title             | content                                                           |
+| -- | ------- | ----------------- | ----------------------------------------------------------------- |
+| 3  | 1       | Rhino Encounter   | Today, I fought Rhino. |
+| 4  | 2       | Multiverse Theory | Is the spider-verse a subset of the multiverse?                    |
+
+## PostgreSQL Getting Started
+
+PostgreSQL is a Relational Database Management System often used with Elixir.
+Ensure you [Download and Install PostgreSQL](https://www.postgresql.org/).
+
+Installing PostgreSQL should create a `postgres` user with the password `postgres`.
+We recommend keeping this as the default to ensure consistency with this lesson.
+
+You can check that PostgreSQL is installed and running with the following command on Mac or Linux:
+
+```
+pgrep -u postgres -fa -- -D
+```
+
+If PostgreSQL is running on your computer, you should see a similar output to the following:
+
+```
+1254 /usr/lib/postgresql/12/bin/postgres -D /var/lib/postgresql/12/main -c config_file=/etc/postgresql/12/main/postgresql.conf
+```
+
+If you do not see any output, go to the debugging section below.
+
+With PostgreSQL running, we can start the PostgreSQL command-line tool.
+
+First, switch to the `postgres` user with the following command.
+
+```
+$ sudo -i -u postgres
+```
+
+Then open the PostgreSQL command-line tool. You should see a new postgres prompt. From here, we can interact with our PostgreSQL databases.
+
+```
+$ psql
+postgres-#
+```
+
+Close the prompt with `/q`.
+
+```
+postgres-# /q
+```
+
+## Debugging
+
+Unfortunately, It's common to run into issues when setting up PostgreSQL. Every student
+has a different environment, so it's difficult to anticipate issues you may encounter.
+
+If you get stuck, please speak to a classmate, speak to your teacher, or [raise an issue] on the Dockyard Academy repository. You may also attempt to debug the issue by researching the error message and finding recommendations online.
+
+We recommend caution when running commands found on the internet, as they can cause further issues. We also recommend you keep a journal of everything you try. This journal can help you and others identify issues and may help if you encounter the same problem in the future.
+
+It often helps to "turn it off and on again." In this case, uninstall and re-install PostgreSQL.
+
+Here, we've provided debugging instructions for some common issues.
+
+### PostgreSQL not started
+
+On Linux (Ubuntu) you can start the postgresql process with the following command.
+
+```
+$ sudo service postgresql start
+```
+
+On macOS you can start the postgresql process with the following command.
+
+```
+$ postgres -D /usr/local/var/postgres
+```
+
+Then test if PostgreSQL is running on your computer again.
+
+```
+pgrep -u postgres -fa -- -D
+```
+
+#### Role does not exist
+
+PostgreSQL uses different roles to manage permissions when communicating with your PostgreSQL databases. Ensure you are using the correct `postgres` role with the following command.
+
+```
+sudo -i -u postgres
+```
+
+Then ensure you can start the PostgreSQL command-line tool.
+
+```
+$ psql
+postgres-#
+```
+
+## Postgres Command Line Tool (psql)
+
+We can manually interact with our database using the `psql` command-line tool.
+
+For the sake of simplicity, we'll switch to the postgres user to avoid any authentication issues. After this lesson, you can switch to your normal user by running `exit` from the terminal (after exiting the PostgreSQL prompt).
+
+```
+$ sudo -i -u postgres
+```
+
+Create a database using the `createdb` command. We'll call the database `example`.
+
+```
+$ createdb example
+```
+
+Run the `psql` command to open the PostgreSQL prompt.
+
+```
+$ psql
+postgres-#
+```
+
+We can view our databases using the `\l` command.
+
+```
+postgres-# \l
+```
+
+You should see a table with your PostgreSQL databases.
+
+```sql
+                                     List of databases
+          Name           |  Owner   | Encoding | Collate |  Ctype  |   Access privileges
+-------------------------+----------+----------+---------+---------+-----------------------
+ example                 | postgres | UTF8     | C.UTF-8 | C.UTF-8 |
+```
+
+We can use the `\c` command to connect to the `example` database.
+
+```
+postgres-# \c example
+You are now connected to database "example" as user "postgres".
+```
+
+## SQL
+
+Now that we're connected to the database. We can use a Structured Query Language (SQL) to read and write data to the database.
+
+For a primer on SQL syntax, here's a great video by Danielle Thé.
+
+```elixir
+Kino.YouTube.new("27axs9dO7AE")
+```
+
+The [SQL Cheatcheet](https://www.sqltutorial.org/sql-cheat-sheet/) also provides an overview of SQL syntax.
+
+
+<!-- livebook:{"break_markdown":true} -->
+
+### CREATE TABLE
+
+We will use SQL to create a users table in our example database.
+We can create a table with the `CREATE TABLE` query, which creates a table and defines how the table stores records.
+
+Copy and past the following into the psql prompt.
+
+```sql
+CREATE TABLE USERS (
+   ID    INT              NOT NULL,
+   NAME  VARCHAR (255)    NOT NULL,
+   EMAIL VARCHAR (255)    NOT NULL, 
+   PRIMARY KEY (ID)
+);
+```
+
+`INT` and `VARCHAR` are both SQL data types. Here's a full list of [sql-data-types](https://www.tutorialspoint.com/sql/sql-data-types.htm). `INT` is conceptually the same as an integer in Elixir, and `VARCHAR` is conceptually similar to a string in Elixir.
+
+`NOT NULL` specifies that the field in the table must exist.
+
+`PRIMARY KEY` defines the `ID` field as the unique identifier for each user. Therefore, each primary key must be unique.
+
+You can use the `\dt` command to list the current tables in your database.
+
+```
+example=# \dt
+
+         List of relations
+ Schema | Name  | Type  |  Owner
+--------+-------+-------+----------
+ public | users | table | postgres
+```
+
+Now, we'll create the entries table, which will store journal entries that belong to users.
+The entries table will have a foreign key that references the users table, because each entry belongs to one user.
+
+Copy and paste the following into the psql prompt.
+
+```sql
+CREATE TABLE ENTRIES (
+    ID INT NOT NULL,
+    TITLE VARCHAR(255) NOT NULL,
+    CONTENT VARCHAR(255) NOT NULL,
+    USERID INT,
+    PRIMARY KEY (ID),
+    FOREIGN KEY (USERID) REFERENCES USERS(ID)
+);
+```
+
+We should be able to view both tables with the `/dt` command.
+
+```sql
+example=# \dt
+          List of relations
+ Schema |  Name   | Type  |  Owner
+--------+---------+-------+----------
+ public | entries | table | postgres
+ public | users   | table | postgres
+(2 rows)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### INSERT INTO
+
+Now that we've created these two tables let's insert some data.
+First, we'll make a single user in the users table using the `INSERT INTO` query.
+
+```sql
+INSERT INTO USERS (ID,NAME,EMAIL) VALUES (1, 'Peter', 'peter@spider.web');
+```
+
+We'll also create an entry for this user.
+
+```sql
+INSERT INTO ENTRIES (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Today, I Encountered Rhino.', 1);
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### SELECT
+
+We can the records in our table using the `SELECT` query.
+
+```sql
+SELECT * FROM USERS;
+```
+
+The query above should display the following.
+
+```sql
+ id | name  |      email
+----+-------+------------------
+  1 | Peter | peter@spider.web
+```
+
+We can also see the data created in the entries table.
+
+```sql
+SELECT * FROM ENTRIES;
+```
+
+The query above should display the following.
+
+```sql
+id |      title      |          content           | userid
+----+-----------------+----------------------------+--------
+  1 | Rhino Encounter | Today, I Encountered Rhino. |      1
+```
+
+`*` is a wildcard, meaning we want to display every field in the record.
+Alternatively, we can specify the fields we want to display.
+For example, here's how we could retrieve only the title and the content for each entry.
+
+```sql
+SELECT TITLE,CONTENT from ENTRIES
+```
+
+The query above should display the following.
+
+```sql
+      title      |          content
+-----------------+----------------------------
+ Rhino Encounter | Today, I Encountered Rhino.
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### WHERE
+
+We can filter our `SELECT` results using the `WHERE` query. For example,
+
+```sql
+SELECT * FROM USERS u WHERE u.id = 1
+```
+
+The `u` before `WHERE` is conceptually similar to a variable bound to each user in the table.
+We can then use [SQL Comparison Operators](https://www.sqltutorial.org/sql-comparison-operators/) such as `=` (equals) to filter the data returned from the table.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Livebook provides [Smart Cells]() which can connect to our PostgreSQL Database. For example, the following smart cell should successfully connect to your `example` database if you used the default `postgres` user.
+
+<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn2"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+
+```elixir
+opts = [
+  hostname: "localhost",
+  port: 5432,
+  username: "postgres",
+  password: "postgres",
+  database: "example"
+]
+
+{:ok, conn2} = Kino.start_child({Postgrex, opts})
+```
+
+Once connected, these smart cells can make SQL queries to our database. Here you should see your users table.
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn2"},"query":"select * from USERS","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result2 = Postgrex.query!(conn2, "select * from USERS", [])
+```
+
+Use the following SQL smart cell to create a new user in the users table.
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn2"},"query":"","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result3 = Postgrex.query!(conn2, "", [])
+```
+
+Use the following SQL smart cell to create a new entry in the entries table, which has a foreign key to the same user you previously created.
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn2"},"query":"","result_variable":"result4","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result4 = Postgrex.query!(conn2, "", [])
+```
+
+## Relationships
+
+Tables can relate to other tables through relationships.
+
+There are three primary relationships (sometimes called associations).
+
+* one-to-one
+* one-to-many
+* many-to-many
+
+<!-- livebook:{"break_markdown":true} -->
+
+### One-to-one
+
+One-to-one relationships mean that each record in one table relates to one record in another.
+For example, we might choose to add profile pictures to our journal application. Each user would only have a single profile picture.
+
+We describe the nature of the relationship by saying that the user **has one** profile picture, and the profile picture **belongs to** the user.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- Learn more at https://mermaid-js.github.io/mermaid -->
+
+```mermaid
+graph TD;
+  a[User]
+  b[Profile Picture]
+  a --has one--> b
+  b --belongs to--> a
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Under the hood, each profile picture would store a foreign key for the user.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### One to Many
+
+One to many relationships means each record in one table relates to many records in another.
+For example, a user of our journal application will have many journal entries.
+
+We describe the nature of one-to-many relationships by saying that the user **has many** entries, and the entries **belongs to** the user.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- Learn more at https://mermaid-js.github.io/mermaid -->
+
+```mermaid
+graph TD;
+  a[User]
+  b[Entry]
+  c[Entry]
+  d[Entry]
+  a --has many--> b
+  a --has many--> c
+  a --has many--> d
+  b --belongs to--> a
+  c --belongs to--> a
+  d --belongs to--> a
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Each entry would store a foreign key for the user. In addition, we might create an index of each entry id to make querying faster.
+
+For more on indexes, consider reading [PostgreSQL - INDEXES](https://www.tutorialspoint.com/postgresql/postgresql_indexes.htm) on Tutorials Point. 
+
+### Further Reading
+
+PostgreSQL, SQL, and Relational Database Management Systems are massive topics.
+
+In addition, you'll likely find yourself using [Ecto](reading/ecto.livemd) as a wrapper around the database rather
+than directly interacting with PostgreSQL or writing SQL queries. This lesson is a primer to prepare you to use Ecto and understand what's happening under the hood.
+
+However, if you do want to dive deeper into PostgreSQL and SQL, 
+you might consider the following resources.
+
+* [SQL Tutorial Org](https://www.sqltutorial.org/)
+* [Tutorials Point SQL](https://www.tutorialspoint.com/sql/index.htm)
+* [PostgreSQL Tutorial](https://www.postgresqltutorial.com/)
