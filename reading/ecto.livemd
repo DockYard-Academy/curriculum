@@ -607,7 +607,7 @@ Now we can insert entries with `Journal.Repo.insert/2`.
 
 ```elixir
 iex> import Ecto.Query
-iex> %Journal.Entry{} |> Journal.Entry.changeset(%{title: "Rhino Encounter", content: "Today I faught the Rhino", user_id: 1}) |> Journal.Repo.insert()
+iex> %Journal.Entry{} |> Journal.Entry.changeset(%{title: "Rhino Encounter", content: "Today I fought the Rhino", user_id: 1}) |> Journal.Repo.insert()
 ```
 
 Notice that the entry automatically includes timestamp information.
@@ -618,7 +618,7 @@ Notice that the entry automatically includes timestamp information.
 {:ok,
  %Journal.Entry{
    __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
-   content: "Today I faught the Rhino",
+   content: "Today I fought the Rhino",
    id: 2,
    inserted_at: ~N[2022-06-11 06:00:46],
    title: "Rhino Encounter",
@@ -637,7 +637,7 @@ iex> Journal.Repo.all(Journal.Entry)
 [
   %Journal.Entry{
     __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
-    content: "Today I faught the Rhino",
+    content: "Today I fought the Rhino",
     id: 2,
     inserted_at: ~N[2022-06-11 06:00:46],
     title: "Rhino Encounter",
@@ -673,7 +673,7 @@ Journal.Repo.all(from entry in Journal.Entry, preload: :user)
 [
   %Journal.Entry{
     __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
-    content: "Today I faught the Rhino",
+    content: "Today I fought the Rhino",
     id: 2,
     inserted_at: ~N[2022-06-11 06:00:46],
     title: "Rhino Encounter",
@@ -736,7 +736,7 @@ Now each `Journal.User` struct should include a list in the `:entries` field.
     entries: [
       %Journal.Entry{
         __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
-        content: "Today I faught the Rhino",
+        content: "Today I fought the Rhino",
         id: 2,
         inserted_at: ~N[2022-06-11 06:00:46],
         title: "Rhino Encounter",
