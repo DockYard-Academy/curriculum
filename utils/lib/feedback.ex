@@ -1129,7 +1129,7 @@ defmodule Utils.Feedback do
 
     assert today.hour == now.hour
     # Allowing 2 second adjustment for possible time delay
-    DateTime.diff(now, today) < 2
+    assert DateTime.diff(now, today) < 2
   end
 
   feedback :datetime_tomorrow do
@@ -1141,7 +1141,7 @@ defmodule Utils.Feedback do
     assert tomorrow.day == now.day + 1
     assert tomorrow.hour == now.hour
     # Allowing 2 second adjustment for possible time delay
-    DateTime.diff(DateTime.add(now, 60 * 60 * 24, :second), tomorrow) < 2
+    assert DateTime.diff(DateTime.add(now, 60 * 60 * 24, :second), tomorrow) < 2
   end
 
   feedback :datetime_compare do
@@ -1661,7 +1661,7 @@ defmodule Utils.Feedback do
 
     list = Enum.to_list(1..5)
 
-    assert custom_enum.reduce(list, 0, fn each, acc -> each end),
+    assert custom_enum.reduce(list, 0, fn each, _acc -> each end),
            "Ensure you implement the `reduce/3` function."
 
     assert custom_enum.reduce(list, 0, fn each, acc -> acc + each end) == 15
@@ -1963,7 +1963,7 @@ defmodule Utils.Feedback do
   end
 
   feedback :evolvable do
-    [evolvable, charmander, charmeleon, charizard] = get_answers
+    [evolvable, charmander, charmeleon, charizard] = get_answers()
 
     assert Keyword.get(evolvable.__info__(:functions), :evolve),
            "add the `evolve` function to the `Evolvable` protocol."
