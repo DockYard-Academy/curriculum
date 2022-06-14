@@ -21,8 +21,9 @@ defmodule Utils.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:kino, github: "livebook-dev/kino"},
-      {:vega_lite, "~> 0.1.3"},
+      {:kino, github: "livebook-dev/kino", override: true},
+      {:vega_lite, "~> 0.1.4"},
+      {:kino_vega_lite, "~> 0.1.1"},
       {:benchee, "~> 0.1"},
       {:ecto, "~> 3.7"},
       {:math, "~> 0.7.0"},

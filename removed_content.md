@@ -2036,7 +2036,8 @@ You'll also see some patterns for this course. For example, many notebooks will 
 Mix.install([
   {:kino, github: "livebook-dev/kino", override: true},
   {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.3"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
   {:benchee, "~> 0.1"},
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
@@ -2166,7 +2167,8 @@ a list.
 Mix.install([
   {:kino, github: "livebook-dev/kino", override: true},
   {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.3"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
   {:benchee, "~> 0.1"},
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
