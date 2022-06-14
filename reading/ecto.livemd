@@ -248,7 +248,7 @@ journal_repo=# \dt
 With the users table defined, we can use SQL to read and write data.
 We don't recommend doing this manually for your application, but we want to demonstrate that Ecto is simply a wrapper around PostgreSQL.
 
-<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn2"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 opts = [
@@ -259,28 +259,27 @@ opts = [
   database: "journal_repo"
 ]
 
-{:ok, conn2} = Kino.start_child({Postgrex, opts})
+{:ok, conn} = Kino.start_child({Postgrex, opts})
 ```
 
-In the Elixir smart cell below, evaluate the following SQL query using `INSERT INTO` to insert a user into the users table.
+In the Elixir smart cell below, enter the following SQL query to insert a user into the users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn2"},"query":"INSERT INTO USERS (ID,NAME,EMAIL) VALUES (0, 'Peter', 'peter@spider.web');","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+```sql
+INSERT INTO USERS (ID,NAME,EMAIL) VALUES (0, 'Peter', 'peter@spider.web');
+```
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result2 =
-  Postgrex.query!(
-    conn2,
-    "INSERT INTO USERS (ID,NAME,EMAIL) VALUES (0, 'Peter', 'peter@spider.web');",
-    []
-  )
+result2 = Postgrex.query!(conn, "", [])
 ```
 
 Ensure the user was created by evaluating the cell below to display all users in the users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn2"},"query":"select * from users ","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users ","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result3 = Postgrex.query!(conn2, "select * from users ", [])
+result3 = Postgrex.query!(conn, "select * from users ", [])
 ```
 
 ## Schemas
@@ -336,20 +335,6 @@ iex> Journal.Repo.insert(user)
 Assuming this succeeds with an `{:ok, user}` tuple, there should be a user in our PostgreSQL database, which we'll check using a smart cell.
 
 Re-evaluate the smart cell below to ensure a new user is in the users table.
-
-<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
-
-```elixir
-opts = [
-  hostname: "localhost",
-  port: 5432,
-  username: "postgres",
-  password: "postgres",
-  database: "journal_repo"
-]
-
-{:ok, conn} = Kino.start_child({Postgrex, opts})
-```
 
 <!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 

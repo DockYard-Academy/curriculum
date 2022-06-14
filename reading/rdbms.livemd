@@ -50,10 +50,10 @@ Our journal database will also have an entries table. The entries table stores t
 
 <!-- livebook:{"break_markdown":true} -->
 
-| id | user_id | title             | content                                                           |
-| -- | ------- | ----------------- | ----------------------------------------------------------------- |
-| 3  | 1       | Rhino Encounter   | Today, I fought Rhino. |
-| 4  | 2       | Multiverse Theory | Is the spider-verse a subset of the multiverse?                    |
+| id | user_id | title             | content                                         |
+| -- | ------- | ----------------- | ----------------------------------------------- |
+| 3  | 1       | Rhino Encounter   | Today, I fought Rhino.                          |
+| 4  | 2       | Multiverse Theory | Is the spider-verse a subset of the multiverse? |
 
 ## PostgreSQL Getting Started
 
@@ -203,7 +203,6 @@ Kino.YouTube.new("27axs9dO7AE")
 
 The [SQL Cheatcheet](https://www.sqltutorial.org/sql-cheat-sheet/) also provides an overview of SQL syntax.
 
-
 <!-- livebook:{"break_markdown":true} -->
 
 ### CREATE TABLE
@@ -351,8 +350,6 @@ We can then use [SQL Comparison Operators](https://www.sqltutorial.org/sql-compa
 
 Livebook provides [Smart Cells]() which can connect to our PostgreSQL Database. For example, the following smart cell should successfully connect to your `example` database if you used the default `postgres` user.
 
-<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn2"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
-
 ```elixir
 opts = [
   hostname: "localhost",
@@ -455,9 +452,19 @@ graph TD;
 
 Each entry would store a foreign key for the user. In addition, we might create an index of each entry id to make querying faster.
 
-For more on indexes, consider reading [PostgreSQL - INDEXES](https://www.tutorialspoint.com/postgresql/postgresql_indexes.htm) on Tutorials Point. 
+For more on indexes, consider reading [PostgreSQL - INDEXES](https://www.tutorialspoint.com/postgresql/postgresql_indexes.htm) on Tutorials Point.
 
-### Further Reading
+<!-- livebook:{"break_markdown":true} -->
+
+### Many-to-Many
+
+Many-to-many relationships mean that many records in a database relate to many other records.
+For example, if we added social networking features to the journal application, then each user might
+have many friends, and each of those users might also have many friends.
+
+In this case, there would be a **many to many** relationship between users.
+
+## Further Reading
 
 PostgreSQL, SQL, and Relational Database Management Systems are massive topics.
 
