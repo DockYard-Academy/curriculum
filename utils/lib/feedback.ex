@@ -533,13 +533,17 @@ defmodule Utils.Feedback do
         cond do
           beats?.(p1, p2) -> "#{p1} beats #{p2}."
           beats?.(p2, p1) -> "#{p2} beats #{p1}."
-          true -> "tie game, play again?"
+          true -> "Tie game!"
         end
 
       actual = module.play(p1, p2)
 
       assert actual == expected_result,
-             "Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2})."
+      """
+      Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).
+      expected: #{inspect(expected_result)}
+      received: #{inspect(actual)}
+      """
     end)
   end
 

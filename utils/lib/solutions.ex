@@ -315,7 +315,7 @@ defmodule Utils.Solutions do
       cond do
         beats?(p1, p2) -> "#{p1} beats #{p2}."
         beats?(p2, p1) -> "#{p2} beats #{p1}."
-        true -> "tie game, play again?"
+        true -> "Tie game!"
       end
     end
   end
