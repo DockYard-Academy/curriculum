@@ -2184,8 +2184,7 @@ Mix.install([
 
 ## Setup
 
-Ensure you run the `ea` command to evaluate all Elixir cells before starting. Alternatively,
-you can evaluate the Elixir cells as you read.
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
 ## Character Generator
 
