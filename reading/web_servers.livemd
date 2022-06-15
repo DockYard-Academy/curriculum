@@ -1,0 +1,181 @@
+# Web Servers
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+Web development is one sub-field within programming. Broadly speaking, web developers create websites.
+
+Websites are programs that run on a web server. Clients communicate with these web servers over a computer network. We've already seen how we can connect to a web server as a client using HTTP requests in the [APIs](./apis.livemd) section.
+
+In this lesson, we'll cover how we can create the web server that the client connects to. Together, we'll create a web server from scratch to demystify how they are built.
+
+However, be aware that in general we'll rely on the Phoenix Framework, which is a web framework for Elixir, rather than building our own web server from scratch.
+
+Also, this lesson relies on port `4000` being free. If you have any programs using port `4000` this lesson may not work properly.
+
+## Transmission Control Protocol (TCP)
+
+Transmission Control Protocol (TCP) is the communication protocol applications use to communicate and exchange data over a network.
+
+We use the built in `:gen_tcp` library to from Erlang to start a server that uses TCP to listen for connections on a network.
+
+This server creates a **socket** connection on a specified **port** of the machine.
+A port is a communication endpoint for a particular service. For example, by default this livebook application runs on port `8080` which you can see in the url of your browser. `http://localhost:8080/sessions/`. A socket allows for two way communication over this port to send and recieve data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- Learn more at https://mermaid-js.github.io/mermaid -->
+
+```mermaid
+graph LR;
+  S[Server]
+  P[Port]
+  LSO[Listen Socket]
+  C[Client]
+  S --listen on --> P --establish--> LSO
+  C --request --> LSO
+  LSO --response--> C
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+This socket listens for connections from clients, and accepts them when they connect, reads the request, then send a response to the client.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- Learn more at https://mermaid-js.github.io/mermaid -->
+
+```mermaid
+sequenceDiagram
+participant C as Client
+participant S as Server
+S->> S: start socket
+C--> S: accept connection
+C->> S: send request
+S->> S: read request
+S->> C: send response
+C--> S: close connection
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Below, we simulate a web server that accepts only a single request, and returns `"Hello, world!"` to the client. We then send the web server a `HTTPoison.get!` request and receive a response from the server.
+
+```elixir
+port = 4000
+
+spawn(fn ->
+  # start socket
+  {:ok, listen_socket} = :gen_tcp.listen(port, active: false, reuseaddr: true)
+
+  # accept connection
+  {:ok, connection} = :gen_tcp.accept(listen_socket)
+
+  # read request 
+  {:ok, request} = :gen_tcp.recv(connection, 0)
+  IO.inspect(request, label: "Client Request")
+
+  # send response
+  response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n Hello world!"
+  :gen_tcp.send(connection, response)
+
+  # close connection
+  :gen_tcp.close(connection)
+
+  # we kill the listen_socket to avoid address already in use issues for the listen_socket.
+  # Typically, the listen socket will remain open and recursively accept connections indefinitely.
+  Process.exit(listen_socket, :kill)
+end)
+
+# send request
+HTTPoison.get!("http://localhost:#{port}")
+```
+
+## Web Server
+
+Putting all of this together, we can make a `WebServer` module. The `WebServer` module will listen on port `4000` and recursively accept client requests indefinitely.
+
+Start the `WebServer` socket below by executing the code cell, then navigate to http://localhost:4000 in a new tab in your browser. You should see a message from the web server with the current time.
+
+```elixir
+defmodule WebServer do
+  def start_link(port) do
+    {:ok, listen_socket} = :gen_tcp.listen(port, active: false, reuseaddr: true)
+
+    accept(listen_socket)
+  end
+
+  def accept(listen_socket) do
+    # accept connection
+    {:ok, connection} = :gen_tcp.accept(listen_socket)
+
+    # send response
+    current_time = Time.to_string(Time.utc_now())
+    response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n It is #{current_time}"
+    :gen_tcp.send(connection, response)
+
+    # close connection
+    :gen_tcp.close(connection)
+
+    accept(listen_socket)
+  end
+end
+
+WebServer.start_link(4000)
+```
+
+This server will remain open indefinitely and recursively call `accept/2` every time a new client connects to the socket on port `4000`.
+
+All websites use a similar (albiet more fully featured) web server to accept client connections, recieve requests, and send responses back.
+
+Hopefully, this example provides you context on how web servers operate under the hood. However, it's rarely practical to build our own web server, and instead we'll rely on the Phoenix Framework which hides these implementation details from use.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+We've seen a simple text response, but web servers are also able to send more complex responses containing an entire web page.
+
+In the `WebServer` module above, modify the original response:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n It is #{current_time}"
+```
+
+To a response using [Hyper Text Markup Language (HTML)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics). HTML is the code used to structure a web page. For example, we can modify the response to use an HTML header tag `<h>`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n <h>It is #{current_time}<h/>"
+```
+
+You will learn more about HTML in a future lesson.
+
+Visit http://localhost:4000 to see your modified content. You may need to stop the `WebServer` elixir cell and start it again.
