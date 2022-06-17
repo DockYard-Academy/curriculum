@@ -1,0 +1,277 @@
+# Phoenix APIs
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+The Phoenix Framework is a web development framework for Elixir.
+In this lesson, we'll walk through creating a Phoenix API that can respond to client HTTP requests.
+
+## Install Phoenix
+
+In order to use Phoenix, we need to install it and several prerequisite programs.
+At this point in the course, you should already have Erlang, Elixir, and Postgres installed.
+
+You'll also need to install the Hex package manager. [Hex](https://hex.pm/) manages elixir dependencies.
+
+```sh
+$ mix local.hex
+```
+
+Install the `phx_new` dependency which we'll use to generate a phoenix project.
+
+```sh
+$ mix archive.install hex phx_new
+```
+
+Phoenix projects use Live Reloading to automatically reload the project anytime a project file changes.
+macOS and Windows users will have this by default, but Linux users or Windows users students using WSL need to
+install inotify-tools to use this feature.
+
+Consult the [inotify-tools](https://github.com/inotify-tools/inotify-tools/wiki) documentation for installation instructions.
+This is technically optional, but highly recommended.
+
+If you have any issues, consult the [Phoenix Installation Guide](https://hexdocs.pm/phoenix/installation.html) and speak with
+your teacher.
+
+## Creating a Pheonix API
+
+The `phx_new` dependency provides the `mix phx.new` task which we can use to generate a new phoenix project.
+We're going to create a counter server that will track an integer we can increment using HTTP requests.
+
+Run the following in your command line to create a new phoenix project.
+
+```
+mix phx.new counter --no-ecto --no-html --no-assets --no-dashboard
+```
+
+This command creates a new phoenix project. The `--no-ecto` flag omits creating a project with a database. The `--no-html` flag omits creating Hyper Text Markup Language (HTML) views and the `--no-assets` flag omits creating asset files that style those views. The `--no-dashboard` omits an admin dashboard auto generated with the default phoenix project.
+
+We've included these flags to omit several features of phoenix, to create a more minimal API and build everything from scratch.
+
+You should see a list of the files generated.
+
+```
+* creating counter/config/config.exs
+* creating counter/config/dev.exs
+* creating counter/config/prod.exs
+* creating counter/config/runtime.exs
+* creating counter/config/test.exs
+* creating counter/lib/counter/application.ex
+* creating counter/lib/counter.ex
+* creating counter/lib/counter_web/views/error_helpers.ex
+* creating counter/lib/counter_web/views/error_view.ex
+* creating counter/lib/counter_web/endpoint.ex
+* creating counter/lib/counter_web/router.ex
+* creating counter/lib/counter_web/telemetry.ex
+* creating counter/lib/counter_web.ex
+* creating counter/mix.exs
+* creating counter/README.md
+* creating counter/.formatter.exs
+* creating counter/.gitignore
+* creating counter/test/support/conn_case.ex
+* creating counter/test/test_helper.exs
+* creating counter/test/counter_web/views/error_view_test.exs
+* creating counter/lib/counter/mailer.ex
+* creating counter/lib/counter_web/gettext.ex
+* creating counter/priv/gettext/en/LC_MESSAGES/errors.po
+* creating counter/priv/gettext/errors.pot
+```
+
+When prompted to install dependencies, type `Y` and press enter.
+This runs `mix deps.get` and `mix deps.compile`.
+
+```
+Fetch and install dependencies? [Yn] Y
+```
+
+## Project Structure
+
+Open the new `counter` project in your code editor.
+Phoenix projects use [Mix](./mix.livemd), so this folder structure should feel familiar, but includes a few extra or modified files.
+
+```
+├── _build
+├── assets
+├── config
+├── deps
+├── lib
+│   ├── counter
+│   ├── counter.ex
+│   ├── counter_web
+│   └── counter_web.ex
+├── priv
+└── test
+```
+
+For a complete overview of each folder, see the Phoenix Documentation on [Directory structure](https://hexdocs.pm/phoenix/directory_structure.html).
+We'll walk through the purpose of each folder and file as they become relevant to our counter project.
+
+First, we'll focus on the `/lib` folder which contains our application code.
+`/lib` is split into two subdirectories, one for the business logic of our application, and one that handles the web server side of our application.
+
+For example, in the `counter` project, there should be a `/lib/counter` folder and a `lib/counter_web` folder.
+`/lib/counter` will hold the business logic of our counter such as storing and incrementing the count. The `lib/counter_web`
+folder will hold the web related logic for our counter such as creating a web server, accepting requests from clients, and responding to requests from clients.
+
+## Routes
+
+You can start the phoenix web server by running the following command from the `/counter` folder.
+
+```sh
+$ mix phx.server
+```
+
+The phoenix server runs on port `4000`. Navigate to http://localhost:4000 in your browser to connect to the project as a client. The server currently responds with an error message.
+
+In order to handle an HTTP request from the client we need to define a **route**.
+
+Routes accept incoming client requests provided a particular path and determine how to return a response to the client. Routes are defined in the `lib/counter_web/router.ex` file.
+
+We use the [get/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#get/4) macro to create a route that handles a GET request. Routes delegate to a **controller** function. Replace `router.ex` with the following contents.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.Router do
+  use CounterWeb, :router
+
+  get "/", CounterWeb.CounterController, :index
+end
+```
+
+Now the `/` route is defined, but we get an error because we haven't defined  `CounterWeb.CounterController` controller module.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/counter_controller_is_undefined.png)
+
+## Controllers
+
+A controller determines the response to send back to a user.
+
+Define a `/counter_web/controllers/counter_controller.ex` file with the following content to create a controller.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+end
+```
+
+Now when we visit the page, well get an error because the `index/2` function is not defined.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/counter_index_undefined_function_error.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+In `router.ex` we used the `:index` atom as the third argument to `get/4`. This atom specifies the name of the function to call in the controller.
+
+Define an `index/2` function in `counter_controller.ex`. Functions in the controller automatically accept two arguments. The first is a [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct provided by the router, the second are any query params included in the request.
+
+We'll use the [text/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#text/2) macro to return a text response.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    text(conn, "Hello, world!")
+  end
+end
+```
+
+Now when we visit http://localhost:4000 we should see the `"Hello, world!"` response.
+
+### Query Params
+
+We can access query params as the second argument to the controller function. Remember that
+query params are values after a `?` in the url separated by the `&` symbol.
+
+Query params are conveniently converted into an Elixir map before reaching the controller.
+For example, if you visit http://localhost:4000?message=hello the second argument to
+`index/2` will be `%{"message" => "hello"}`.
+
+We can verify this by creating a new function clause for the `index/2` function which returns text based on the `"message"` query parameter.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    text(conn, "Hello, world!")
+  end
+
+  def index(conn, %{"message" => message}) do
+    text(conn, message)
+  end
+end
+```
+
+Now if you visit http://localhost:4000?message=hello the page should display `"hello"`.
+
+## Counter Implementation
+
+In the `/lib/counter` folder we're going to create a `counter_server.ex`. This counter server will be a `GenServer` singleton that
+stores an integer we can increment.
+
+```elixir
+defmodule Counter.CounterServer do
+  use GenServer
+
+  def start_link(state, _opts) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(count \\ 0) do
+    {:ok, state}
+  end
+
+  def get do
+    GenServer.call(__MODULE__, :get)
+  end
+
+  def handle_call(:get, _from, count) do
+    count
+  end
+
+  def handle_cast(:increment, _from, count) do
+    {:reply, count + 1}
+  end
+end
+```
+
+## Application
+
+The `lib/counter/application.ex` defines our Elixir application and the services that are part of our application.
+As we've already done with a mix project, we can start our workers and supervisors in this file.
+
+## Request LifeCycle

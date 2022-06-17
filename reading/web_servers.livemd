@@ -106,7 +106,7 @@ spawn(fn ->
   # close connection
   :gen_tcp.close(connection)
 
-  # we kill the listen_socket to avoid address already in use issues for the listen_socket.
+  # we kill the listen_socket to avoid address already in use issues.
   # Typically, the listen socket will remain open and recursively accept connections indefinitely.
   Process.exit(listen_socket, :kill)
 end)
@@ -123,7 +123,7 @@ Start the `WebServer` socket below by executing the code cell, then navigate to 
 
 ```elixir
 defmodule WebServer do
-  def start_link(port) do
+  def start(port) do
     {:ok, listen_socket} = :gen_tcp.listen(port, active: false, reuseaddr: true)
 
     accept(listen_socket)
@@ -145,7 +145,7 @@ defmodule WebServer do
   end
 end
 
-WebServer.start_link(4000)
+WebServer.start(4000)
 ```
 
 This server will remain open indefinitely and recursively call `accept/2` every time a new client connects to the socket on port `4000`.
@@ -178,4 +178,4 @@ response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n <h>It is #{current_t
 
 You will learn more about HTML in a future lesson.
 
-Visit http://localhost:4000 to see your modified content. You may need to stop the `WebServer` elixir cell and start it again.
+Visit http://localhost:4000 to see your modified content. You may need to stop the `WebServer` Elixir cell and start it again.
