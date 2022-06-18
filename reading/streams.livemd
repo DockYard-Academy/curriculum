@@ -115,7 +115,7 @@ Name             ips        average  deviation         median         99th %
 stream       69.84 K       14.32 μs   ±126.27%       11.30 μs       59.40 μs
 enum          8.77 K      114.02 μs    ±75.94%      106.10 μs      227.45 μs
 
-Comparison: 
+Comparison:
 stream       69.84 K
 enum          8.77 K - 7.96x slower +99.70 μs
 
@@ -157,7 +157,7 @@ For example, a single `Stream.map` is not faster than `Enum.map`.
 %{stream_time: stream_time, enum_time: enum_time}
 ```
 
-That's because we only gain performance benefits when sequential execution on each element in the 
+That's because we only gain performance benefits when sequential execution on each element in the
 collection reduces the amount of computation and/or memory necessary.
 
 Notice how when we string
@@ -180,13 +180,13 @@ enum_fn = fn -> 1..1000 |> Enum.map(&(&1 * 2)) |> Enum.map(&(&1 * 2)) |> Enum.ma
 %{stream_time: stream_time, enum_time: enum_time}
 ```
 
-In terms of improving performance, streams will generally provide the greatest benefits when operations 
+In terms of improving performance, streams will generally provide the greatest benefits when operations
 reduce the number of elements in the enumerable.
 
 ## Stream
 
 As you've seen, Streams generate elements one by one and can improve performance.
-They are often beneficial when working with large data as they only consume the amount of data 
+They are often beneficial when working with large data as they only consume the amount of data
 necessary for each operation. On the other hand, `Enum` will create an entire copy of
 the collection for each intermediate step.
 
@@ -225,7 +225,7 @@ Kino.nothing()
 However, Streams are more than a performant alternative to Enum.
 Streams are also used to generate a (potentially infinite) amount of data.
 
-Streams only execute necessary computation, so we can have a theoretically 
+Streams only execute necessary computation, so we can have a theoretically
 infinite stream such as `1,2,3,1,2,3,1,2,3....` continue forever. However, we'll only ever generate the necessary number of elements.
 
 ```mermaid
@@ -310,7 +310,7 @@ For example, let's take the number `5` to see how it quickly repeats `4, 2, 1`
 
 ```mermaid
 flowchart LR
-  5 -- 5 * 3 + 1 --> 16 --16 / 2--> 8 -- 8 / 2 --> 4 -- 4 / 2--> 2 -- 2 / 2 --> 1 
+  5 -- 5 * 3 + 1 --> 16 --16 / 2--> 8 -- 8 / 2 --> 4 -- 4 / 2--> 2 -- 2 / 2 --> 1
   -- 1 * 3 + 1--> a[4] --4 / 2--> b[2] --2 / 2--> c[1]
 ```
 
