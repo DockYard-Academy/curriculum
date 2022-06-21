@@ -71,7 +71,7 @@ Don't worry too much about that. It's how Elixir represents a function internall
 
 Let's break down what we did above.
 
-1. `double` is a variable name. Often you'll refer to it as the **function name**. 
+1. `double` is a variable name. Often you'll refer to it as the **function name**.
    It can be any valid variable name.
 
 2. We bind `double` to an **anonymous function**.
@@ -140,14 +140,14 @@ In Elixir, you can ignore this warning for unused variables by starting them wit
 double = fn _parameter -> nil end
 ```
 
-No more warning 😀 But we actually want to use that parameter, so let's 
+No more warning 😀 But we actually want to use that parameter, so let's
 modify the function to return the parameter instead.
 
 ```elixir
 double = fn parameter -> parameter end
 ```
 
-The parameter is named `parameter` here for the sake of example. But it works a lot like a variable, 
+The parameter is named `parameter` here for the sake of example. But it works a lot like a variable,
 and it can be named any valid variable name.
 
 Let's rename it to `number` to clarify that we expect the input to be a number.
@@ -157,7 +157,7 @@ double = fn number -> number end
 ```
 
 Now the function head takes in a value. We have to pass it
-an **argument** when we call it. The argument will be bound to the parameter when the function 
+an **argument** when we call it. The argument will be bound to the parameter when the function
 executes. We'll give it the integer `2`.
 
 ```elixir
@@ -171,7 +171,7 @@ it expects an argument. Not all languages do that, but Elixir is pretty smart �
 double.()
 ```
 
-Great, now all that's left is to multiply the parameter by `2`. You should be familiar with 
+Great, now all that's left is to multiply the parameter by `2`. You should be familiar with
 this from the previous sections.
 
 ```elixir
@@ -284,7 +284,7 @@ is called `add_two/2`.
 
 ### Your Turn
 
-Create a multi-parameter `calculate_force/2` function. 
+Create a multi-parameter `calculate_force/2` function.
 `calculate_force/2` should accept `mass` and `acceleration` and return `mass * acceleration`.
 
 Replace `nil` with your anonymous function.
@@ -352,14 +352,14 @@ double = fn number -> number * 2 end
 call_twice.(double, 3)
 ```
 
-We don't need to bind the passed function to a variable first. We can pass 
+We don't need to bind the passed function to a variable first. We can pass
 in the anonymous function directly.
 
 ```elixir
 call_twice.(fn number -> number * 2 end, 5)
 ```
 
-Whenever you pass a function into a higher-order function with the 
+Whenever you pass a function into a higher-order function with the
 expectation that the higher-order function is going to call it, the passed function is
 referred to as a **callback function**.
 
@@ -389,7 +389,7 @@ for the input of another function.
 
 ```mermaid
 flowchart LR
-  A[Input] --> B[Function1] 
+  A[Input] --> B[Function1]
   B --> C[Pipe]
   C --> D[Function2]
   D --> E[Output]

@@ -131,7 +131,7 @@ module will `use` `Agent` to store state and define a struct.
 defmodule RockPaperScissors.Player do
   use Agent
   defstruct [wins: 0, loses: 0, draws: 0, guess: nil]
-end 
+end
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -420,7 +420,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-We still need to ensure that the second player can beat the first player. We can copy paste the 
+We still need to ensure that the second player can beat the first player. We can copy paste the
 first test, but change who wins.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -552,9 +552,9 @@ Then play a game of rock paper scissors in the terminal.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex(1)> alias RockPaperScissors.Player                     
+iex(1)> alias RockPaperScissors.Player
 RockPaperScissors.Player
-iex(2)> Player.start_link(:player1) 
+iex(2)> Player.start_link(:player1)
 {:ok, #PID<0.172.0>}
 iex(3)> Player.start_link(:player2)
 {:ok, #PID<0.174.0>}
@@ -562,9 +562,9 @@ iex(4)> Player.guess(:player1, :rock)
 :ok
 iex(5)> Player.guess(:player2, :scissors)
 :ok
-iex(6)> Player.play(:player1, :player2)  
+iex(6)> Player.play(:player1, :player2)
 :ok
-iex(7)> Player.get(:player1)           
+iex(7)> Player.get(:player1)
 %RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 1}
 iex(8)> Player.get(:player2)
 %RockPaperScissors.Player{draws: 0, guess: nil, loses: 1, wins: 0}
@@ -736,17 +736,17 @@ so `:player1` becomes `{:player1, :"player1_node@COMPUTER-NAME"}` and `:player2`
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex(player1_node@COMPUTER-NAME)> Player.start_link(:player1) 
+iex(player1_node@COMPUTER-NAME)> Player.start_link(:player1)
 {:ok, #PID<0.160.0>}
-iex(player2_node@COMPUTER-NAME)> Player.start_link(:player2) 
+iex(player2_node@COMPUTER-NAME)> Player.start_link(:player2)
 {:ok, #PID<0.160.0>}
 iex(player1_node@COMPUTER-NAME)> Player.guess(:player1, :rock)
 :ok
 iex(player2_node@COMPUTER-NAME)> Player.guess(:player2, :scissors)
 :ok
-iex(player1_node@COMPUTER-NAME)> Player.play(:player1, {:player2, :"player2_node@COMPUTER-NAME"})  
+iex(player1_node@COMPUTER-NAME)> Player.play(:player1, {:player2, :"player2_node@COMPUTER-NAME"})
 :ok
-iex(player1_node@COMPUTER-NAME)> Player.get(:player1)         
+iex(player1_node@COMPUTER-NAME)> Player.get(:player1)
 %RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 1}
 iex(player2_node@COMPUTER-NAME)> Player.get(:player2)
 %RockPaperScissors.Player{draws: 0, guess: nil, loses: 1, wins: 0}
