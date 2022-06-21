@@ -2390,8 +2390,8 @@ defmodule Utils.Feedback do
     assert call_with_20.(fn int -> int * 10 end) == 20 * 10
   end
 
-    
-  feedback :range_to_list do 
+
+  feedback :range_to_list do
     list = get_answers()
     assert list == [3,6,9]
   end
