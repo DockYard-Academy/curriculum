@@ -1,0 +1,446 @@
+# HTML & CSS
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+### HTML
+
+Hyper Text Markup Language (HTML) is the language used to structure a web page and it's content.
+
+HTML is composed of a series as HTML elements. For example, the following is an [HTML paragraph element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p).
+
+```html
+<p>hello world</p>
+```
+
+An HTML element generally includes an opening tag, content, then a closing tag.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/html_element_diagram_breakdown.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here is a brief overview of HTML by Fireship.
+
+```elixir
+Kino.YouTube.new("ok-plXXHlWw")
+```
+
+### CSS
+
+Cascading Style Sheets (CSS) is the language used to style HTML web pages.
+
+CSS rules apply in the order they are defined (hence, cascading). Each CSS rule has a **selector** to target HTML elements and semi-colon separated **declarations** of styles to apply.
+
+For example, the following is a CSS rule would apply to all paragraph tags to make them green and bold.
+
+```css
+p {
+  color: green;
+  font-weight: bold;
+}
+```
+
+Which would look like the following.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<hr />
+
+<p style="color: green; font-weight: bold;">Hello, world!</p>
+
+<hr />
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here's a breakdown of our CSS rule.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/css_breakdown.png)
+
+## HTML Files
+
+We can create `.html` files and open them in the browser. For example, create a file `hello.html` with the following content.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+  </head>
+  <body>
+    <p>Hello World!</h1>
+  </body>
+</html>
+```
+
+Open this file in the browser. You can click on the file in your file explorer to open it and see the following web page.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/hello_world_html.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+HTML documents are a nested series of HTML elements. See the [Anatomy of an HTML document](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics#anatomy_of_an_html_document) for a complete breakdown.
+
+The `<!Doctype>` doctype is required boilerplate for the HTML document to work correctly, and the `<html>` element is the top-level or root element of the html document.
+
+The `<head>` element contains metadata about the document such as the CSS styles.
+Inside of the head element, the `<title>` element determines the content to display in the browser tab, and the `<meta>` tag sets text content to use [UTF-8 character encoding](https://developer.mozilla.org/en-US/docs/Glossary/UTF-8).
+
+The `<body>` element contains the content of the web page.
+
+We can add a `<style>` element inside of the `<head>` element to write our CSS for the document. Replace the `hello.html` file with the following content.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+    <style>
+      p {
+        color: green;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Hello World!</p>
+  </body>
+</html>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now when we reload the browser, we should see the same web page but with bold green text.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/hello_world_html_green_text.png)
+
+## CSS Selectors
+
+CSS selectors use patterns to describe which HTML elements to apply a CSS rule to.
+
+### Element
+
+We've already seen we can select all matching elements using the element tag name.
+
+```css
+p {
+  color: green;
+  font-weight: bold;
+}
+```
+
+### Class
+
+By far the most commonly used selector is a class. We define a CSS class selecting using a `.` followed by the class name.
+
+```css
+.green-text {
+  color: green;
+  font-weight: bold;
+}
+```
+
+The `.green-text` class will then apply to all elements with the `green-text` class attribute.
+Attributes are key-value pairs which contain additional information about the element.
+
+```html
+<p class="green-text">This text will be green and bold.</p>
+<p class="green-text">This text will also be green and bold.</p>
+```
+
+### ID
+
+IDs work similarly to class, however the `id` attribute should be unique for each element.
+We define a CSS id using a `#` followed by the id name.
+
+```css
+#first-paragraph {
+  color: green
+}
+```
+
+The `#first-paragraph` id will then apply to the element with the `first-paragraph` id attribute.
+
+```html
+<p id="first-paragraph">This text will be green and bold.</p>
+```
+
+Keep in mind that browsers do not enforce that IDs must be unique, however it is conventional and strongly encouraged.
+
+### Universal
+
+The `*` symbol allows us to select all elements.
+
+```css
+
+* {
+  color: blue
+}
+```
+
+```html
+<p class="green-text">This text will be green and bold.</p>
+<p class="green-text">This text will also be green and bold.</p>
+```
+
+## HTML Elements
+
+There are a massive number of HTML elements. We recommend the [MDN HTML Element reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) for a complete list.
+
+HTML and CSS are deep topics, and as an Elixir focused course we aim to cover the most commonly used HTML elements, and the most commonly used CSS declarations and selectors.
+
+## Headings and Paragraph Tags
+
+Heading elements represent six levels of section headings. Often, you will use headings
+in descending order to create headings and subheadings.
+
+```html
+<h1>Heading 1</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<h5>Heading 5</h5>
+<h6>Heading 6</h6>
+```
+
+We've already seen the `<p>` tag for paragraph content. Each paragraph tag is automatically on a new line.
+
+```html
+<p>Paragraph</p>
+```
+
+We can also use the `<span>` tag to group inner text content (perhaps for styling) without creating a new line of text.
+
+```html
+
+<p>Outer content. <span>Inner content</span>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Replace your `hello.html` file with the following content and view the new content in your browser.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+</head>
+<body>
+    <h1>Heading 1</h1>
+    <h2>Heading 2</h2>
+    <h3>Heading 3</h3>
+    <h4>Heading 4</h4>
+    <h5>Heading 5</h5>
+    <h6>Heading 6</h6>
+    <p>Hello World!</p>
+    <p>Outer content. <span>Inner content</span>
+</body>
+</html>
+```
+
+You should see the following content.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/headings_and_paragraphs.png)
+
+## List Tags
+
+The ordered list `<ol>` and list item `<li>` tags create numbered lists.
+
+```html
+<ol>
+  <li>a</li>
+  <li>b</li>
+  <li>c</li>
+</ol>
+```
+
+Which displays the following.
+
+<ol>
+  <li>a</li>
+  <li>b</li>
+  <li>c</li>
+</ol>
+
+If we want to use non-numbered lists with dashes, then we can use the unordered list `<ul>` tag instead.
+
+```html
+<ul>
+  <li>a</li>
+  <li>b</li>
+  <li>c</li>
+</ul>
+```
+
+Which displays the following.
+
+<ul>
+  <li>a</li>
+  <li>b</li>
+  <li>c</li>
+</ul>
+
+We can nest ordered and unordered lists inside one another to create nested lists.
+
+```html
+<ul>
+  <li>a</li>
+  <ol>
+    <li>b</li>
+    <ul>
+      <li>c</li>
+    </ul>
+  </ol>
+</ul>
+```
+
+Which displays the following.
+
+<ul>
+  <li>1</li>
+  <ol>
+    <li>1.1</li>
+    <ul>
+      <li>1.1.1</li>
+    </ul>
+  </ol>
+</ul>
+
+## Image Tag
+
+The `<img>` tag embeds image content into a web page.
+
+Images must include a `src` attribute for the local file or URL of the image to embed.
+
+Images also include an optional `alt` attribute which is a text description of the image. The `alt` attribute is used for accessibility with screen readers, and also displays if the image fails to load.
+
+Images can use a self-closing tag `<img/>` so they do not require an opening and closing tag. `<img></img>`. While both syntax styles are valid, it's generally recommended to use self-closing tags when possible.
+
+Here are two `<img>` tag examples.
+
+```html
+<img src="https://picsum.photos/200" alt="a random lorem ipsum image">
+<img src="broken url" alt="image purposefully not loaded">
+```
+
+The first loads an image from https://picsum.photos/200.
+
+<img src="https://picsum.photos/200" alt="a random lorem ipsum image" />
+
+The second displays the `alt` text when it fails to load.
+
+<img src="broken url" alt="image purposefully not loaded" />
+
+## Anchor Tags
+
+The `<a>` anchor tag creates a link to another resource using the `href` attribute as the URL for the resource.
+
+```html
+<a href="https://www.google.com/search?q=cat+pictures">Cat Pictures Link</a>
+```
+
+Which displays the following.
+
+<a href="https://www.google.com/search?q=cat+pictures">
+Cat Pictures Link
+</a>
+
+## Button Tag
+
+## Division Tag
+
+When we need to group content, we can use the `<div>` tag.
+
+```html
+<div>
+  <p>Paragraph 1</p>
+  <p>Paragraph 2</p>
+</div>
+```
+
+## Nesting Elements
+
+The content inside of an HTML element may be text, or other HTML elements. Nested elements are the **children** of their **parent** elements.
+
+For example, here the [strong](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strong) element is a child of the paragraph element.
+
+```html
+<p>Hello, <strong>world!</strong></p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Which creates the following:
+
+<!-- livebook:{"break_markdown":true} -->
+
+<hr />
+
+<p>
+Hello, <strong>world!</strong>
+</p>
+
+<hr />
+
+<!-- livebook:{"break_markdown":true} -->
+
+Elements can have many elements as children.
+
+## Heading Section Elements
+
+
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/heading_elements.png)
+
+## Cascading Style Sheets
+
+## Semantic HTML
+
+Within HTML, there are also many semantic elements which don't provide additional functionality, but instead declare the intent of the web page which is useful for accessibility, screenreaders, and search optimization.
+
+Here is a brief overview of semantic HTML elements by The Net Ninja.
+
+```elixir
+Kino.YouTube.new("kGW8Al_cga4")
+```
+
+## Inspecting HTML

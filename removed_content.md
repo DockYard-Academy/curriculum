@@ -3364,3 +3364,16 @@ end
 defmodule UsingMacro do
 end
 ```
+
+## HTML CSS
+We'll go over several of the most common HTML elements and their purpose.
+As you follow through the list of elements, add them to your `hello.html` file to visualize them.
+
+For a more complete list of all HTML elements, consider this online [HTML Cheatsheet](https://web.stanford.edu/group/csp/cs21/htmlcheatsheet.pdf) helpful or the [MDN HTML Elements Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
+
+* `<!DOCTYPE html>`: The [doctype](https://developer.mozilla.org/en-US/docs/Glossary/Doctype) ensures the HTML behaves correctly.
+* `<html>`: The [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html) element represents the top level element of an HTML document. it is also referred to as the *root element*.
+* `<head>`: The [head](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/head) element contains meta data about the document.
+* `<meta charset="utf-8">`: the [meta](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta) elements represents meta data. Specifically, this sets the character encoding of the web page to use [utf-8](https://developer.mozilla.org/en-US/docs/Glossary/UTF-8).
+* `<title>`: The [title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) element defines the document's title. Notice that the tab for `hello.html` in your browser should say `Hello!`.
+* `<body>`: The [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body) element represents the content of an HTML document.
