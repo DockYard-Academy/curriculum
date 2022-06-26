@@ -746,8 +746,6 @@ defmodule Utils.Feedback do
     assert result, "Implement the `all_items/2` function."
     assert is_list(result), "`all_items/2` should return a list."
 
-    assert length(result) == 2,
-           "`all_items/2` should return all items when no filters are provided."
 
     assert length(result) == 2,
            "`all_items/2` should return all items when no filters are provided."
