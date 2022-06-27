@@ -21,21 +21,21 @@ Mix.install([
 
 ## Setup
 
-Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
 ## Overview
 
 ### HTML
 
-Hyper Text Markup Language (HTML) is the language used to structure a web page and it's content.
+Hyper Text Markup Language (HTML) is used to structure a web page and its content.
 
-HTML is composed of a series as HTML elements. For example, the following is an [HTML paragraph element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p).
+HTML defines many HTML elements. For example, the following is an [HTML paragraph element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p).
 
 ```html
 <p>hello world</p>
 ```
 
-An HTML element generally includes an opening tag, content, then a closing tag.
+An HTML element generally includes an opening tag, content, and closing tag.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -55,7 +55,7 @@ Cascading Style Sheets (CSS) is the language used to style HTML web pages.
 
 CSS rules apply in the order they are defined (hence, cascading). Each CSS rule has a **selector** to target HTML elements and semi-colon separated **declarations** of styles to apply.
 
-For example, the following is a CSS rule would apply to all paragraph tags to make them green and bold.
+For example, the following is a CSS rule that would apply to all paragraph tags to make them green and bold.
 
 ```css
 p {
@@ -64,7 +64,7 @@ p {
 }
 ```
 
-Which would look like the following.
+The CSS above would style the paragraph tag like so.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -109,7 +109,7 @@ We can create `.html` files and open them in the browser. For example, create a 
 </html>
 ```
 
-Open this file in the browser. You can click on the file in your file explorer to open it and see the following web page.
+Open this file in the browser and see the following web page.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -119,7 +119,7 @@ Open this file in the browser. You can click on the file in your file explorer t
 
 HTML documents are a nested series of HTML elements. See the [Anatomy of an HTML document](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics#anatomy_of_an_html_document) for a complete breakdown.
 
-The `<head>` element contains metadata about the document such as the CSS styles. We can add a `<style>` element inside of the `<head>` element to write our CSS for the document. The `<body>` element contains the content of the web page.
+The `<head>` element contains metadata about the document, such as the CSS styles. We can add a `<style>` element inside of the `<head>` element to write our CSS for the document. The `<body>` element contains the web page's content.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -171,7 +171,7 @@ Rather than defining our styles in a `<style>` tag, we can use external `.css` s
 </html>
 ```
 
-Where a `styles.css` file in the same folder as `hello.html` contains the CSS.
+A `styles.css` file in the same folder as `hello.html` contains the CSS.
 
 ```css
 p {
@@ -180,22 +180,22 @@ p {
 }
 ```
 
-A `.css` file can include another `.css` file using `@import`. This is helpful for organizing CSS files on larger projects.
+A `.css` file can include another `.css` file using `@import`. Importing files helps organize CSS files on larger projects.
 
 ```css
 /* in styles.css */
 @import 'otherstyles.css';
 ```
 
-Where `otherstyles.css` is another stylesheet file in the same folder.
+`otherstyles.css` would be another stylesheet in the same folder as `styles.css`.
 
 ## CSS Selectors
 
-CSS selectors use patterns to describe which HTML elements to apply a CSS rule to.
+CSS selectors describe which HTML elements to apply the CSS rule to.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Element
+### Type
 
 We've already seen we can select all matching elements using the element tag name.
 
@@ -205,17 +205,17 @@ p {
 }
 ```
 
-Which selects all matching elements.
+The type selector applies styles to all elements with a matching node name, so `p` matches all `<p>` tags.
 
 ```html
-<p>This text will be green</p>
+<p>all paragraph tags will be green</p>
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Class
 
-By far the most commonly used selector is a class. We define a CSS class selecting using a `.` followed by the class name.
+By far, the most commonly used selector is a class. We define a CSS class selecting using a `.` followed by the class name.
 
 ```css
 .green-text {
@@ -223,8 +223,7 @@ By far the most commonly used selector is a class. We define a CSS class selecti
 }
 ```
 
-The `.green-text` class will then apply to all elements with the `green-text` class attribute.
-Attributes are key-value pairs which contain additional information about the element.
+The `.green-text` class will apply to all elements with the `green-text` class attribute. Attributes are key-value pairs that contain additional information about the element.
 
 ```html
 <p class="green-text">This text will be green.</p>
@@ -235,7 +234,7 @@ Attributes are key-value pairs which contain additional information about the el
 
 ### ID
 
-IDs work similarly to class, however the `id` attribute should be unique for each element.
+IDs work similarly to class, however, the `id` attribute should be unique for each element.
 We define a CSS id using a `#` followed by the id name.
 
 ```css
@@ -250,13 +249,13 @@ The `#first-paragraph` id will then apply to the element with the `first-paragra
 <p id="first-paragraph">This text will be green and bold.</p>
 ```
 
-Keep in mind that browsers do not enforce unique IDs, however it is conventional and strongly encouraged.
+Keep in mind that browsers do not enforce unique IDs. However, it is conventional and strongly encouraged.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Children
 
-We select can all children of an element using a `>` symbol between selectors.
+We select all children of an element using a `>` symbol between selectors.
 
 ```css
 .parent > .child {
@@ -264,7 +263,7 @@ We select can all children of an element using a `>` symbol between selectors.
 }
 ```
 
-Which selects all elements with the `.child` class that are direct children of the `.parent` class.
+The `>` selects all elements with the `.child` class that are direct children of the `.parent` class.
 
 ```html
 <p class="parent">
@@ -286,7 +285,7 @@ We select can all descendants of an element using a space between selectors.
 }
 ```
 
-Which selects all elements with the `.child` class that are direct children of the `.parent` class.
+The space selects all elements with the `.child` class inside the`.parent` class element.
 
 ```html
 <p class="parent">
@@ -309,11 +308,11 @@ The `*` symbol allows us to select all elements.
 }
 ```
 
-This would select all elements on the page.
+All elements, regardless of type, will be selected.
 
 ```html
-<p class="green-text">This text will be green and bold.</p>
-<p class="green-text">This text will also be green and bold.</p>
+<p>This text will be green.</p>
+<h1>This text will also be green.</h1>
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -334,7 +333,7 @@ Play the CSS Diner game to familiarize yourself with selectors until you feel sa
 
 There are a massive number of HTML elements. We recommend the [MDN HTML Element reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) for a complete list.
 
-HTML and CSS are deep topics, and as an Elixir focused course we aim to cover the most commonly used HTML elements, and the most commonly used CSS declarations and selectors.
+HTML and CSS are deep topics, and as an Elixir-focused course, we aim to cover the most commonly used HTML elements and CSS rules.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -379,7 +378,7 @@ The ordered list `<ol>` and list item `<li>` tags create numbered lists.
 </ol>
 ```
 
-Which displays the following.
+The above HTML displays the following.
 
 <ol>
   <li>a</li>
@@ -387,7 +386,7 @@ Which displays the following.
   <li>c</li>
 </ol>
 
-If we want to use non-numbered lists with dashes, then we can use the unordered list `<ul>` tag instead.
+If we want to use non-numbered lists with dashes, we can use the unordered list `<ul>` tag instead.
 
 ```html
 <ul>
@@ -397,7 +396,7 @@ If we want to use non-numbered lists with dashes, then we can use the unordered 
 </ul>
 ```
 
-Which displays the following.
+The above HTML displays the following.
 
 <ul>
   <li>a</li>
@@ -405,7 +404,7 @@ Which displays the following.
   <li>c</li>
 </ul>
 
-We can nest ordered and unordered lists inside one another to create nested lists.
+To create nested lists, we can nest ordered and unordered lists inside one another.
 
 ```html
 <ul>
@@ -419,7 +418,7 @@ We can nest ordered and unordered lists inside one another to create nested list
 </ul>
 ```
 
-Which displays the following.
+The above HTML displays the following.
 
 <ul>
   <li>1</li>
@@ -439,9 +438,9 @@ The `<img>` tag embeds image content into a web page.
 
 Images must include a `src` attribute for the local file or URL of the image to embed.
 
-Images also include an optional `alt` attribute which is a text description of the image. The `alt` attribute is used for accessibility with screen readers, and also displays if the image fails to load.
+Images may include an `alt` attribute. The `alt` attribute is a text description of the image used as a fallback if the image does not load and for screen readers.
 
-Images can use a self-closing tag `<img/>` so they do not require an opening and closing tag. `<img></img>`. While both syntax styles are valid, it's generally recommended to use self-closing tags when possible.
+Images can use a self-closing tag `<img/>`, so they do not require an opening and closing tag. `<img></img>`. While both syntax styles are valid, it's conventional to use self-closing tags when possible.
 
 Here are two `<img>` tag examples.
 
@@ -450,7 +449,7 @@ Here are two `<img>` tag examples.
 <img src="broken url" alt="image purposefully not loaded">
 ```
 
-The first loads an image from https://picsum.photos/200.
+The first `<img>` tag above loads an image from https://picsum.photos/200.
 
 <img src="https://picsum.photos/200" alt="a random lorem ipsum image" />
 
@@ -468,7 +467,7 @@ The `<a>` anchor tag creates a link to another resource using the `href` attribu
 <a href="https://www.google.com/search?q=cat+pictures">Cat Pictures Link</a>
 ```
 
-Which displays the following.
+The anchor tag above displays the following.
 
 <a href="https://www.google.com/search?q=cat+pictures">
 Cat Pictures Link
@@ -546,7 +545,7 @@ For a full guide to HTML tables, see the [MDN Table](https://developer.mozilla.o
 
 ## Division
 
-When we need to group content, we can use the `<div>` tag.
+We can use the `<div>` tag when we need to group content.
 
 ```html
 <div>
@@ -555,15 +554,15 @@ When we need to group content, we can use the `<div>` tag.
 </div>
 ```
 
-The division tag is very generic and minimal. It does not convey any meaning about the content, and is typically used to group content together for the sake of styling.
+The division tag is very generic and minimal. It does not convey any meaning about the content and is typically used to group content together for styling.
 
-It's a common issue to overused div tags. Instead, ideally we should use semantic tags instead of divs where possible.
+It's a common issue to overused div tags. Instead, ideally, we should use semantic tags instead of divs where possible.
 
 ## Semantic Tags
 
-HTML includes a number of semantic tags that groups content and describes their meaning.
+HTML includes several semantic tags that group content and describe their meaning.
 
-For an overview of semantic tags, we recommend this tutorial by The Net Ninja.
+We recommend this tutorial by The Net Ninja for an overview of semantic tags.
 
 ```elixir
 Kino.YouTube.new("kGW8Al_cga4")
@@ -571,7 +570,7 @@ Kino.YouTube.new("kGW8Al_cga4")
 
 ## CSS Cascading
 
-**Cascading** Style Sheets apply rules in the order they are defined. You can have multiple CSS rules apply to several elements, and declarations in one rule can override another.
+**Cascading** Style Sheets apply rules in the order they are defined. Therefore, multiple CSS rules can apply to the same element, and declarations in one rule can override another.
 
 In the example below, the second rule overrides the first.
 
@@ -591,7 +590,7 @@ So all paragraph tags will be blue, not red.
 <p>This text will be blue, not red.</p>
 ```
 
-Multiple non-conflicting rules can still apply to the same element. In the example below, the paragraph tag would be both bold, and green.
+Multiple non-conflicting rules can still apply to the same element. In the example below, the paragraph tag would be bold and green.
 
 ```css
 p {
@@ -605,9 +604,9 @@ p {
 
 ## CSS Specificity
 
-Different CSS selectors are prioritized over one another. We refer to this prioritization as specificity. The specificity of a CSS rule determines how it is prioritized over others.
+CSS prioritizes different selectors over one another. We refer to this prioritization as specificity. The greater the specificity, the higher the priority of the rule.
 
-For example, a class selector will always override a type selector, even when you consider cascading order.
+For example, a class selector will always override a type selector and ignore cascading order.
 
 ```css
 .my-class {
@@ -626,15 +625,15 @@ So the following paragraph tag would be blue, not red.
 <p class="my-class">This text will be blue.</p>
 ```
 
-See the [Specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity) documentation for more on how specificity is calculated.
+See the [Specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity) documentation for more on how to determine specificity.
 
-For a more hands on guide, we recommend this video by whatsdev.
+For a more hands-on guide, we recommend this video by whatsdev.
 
 ```elixir
 Kino.YouTube.new("ndM8b-hnSwM")
 ```
 
-We can also use the `!important` flag to forcefully set the rule to be prioritized. We should be careful when we use this flag, as it can make your CSS more difficult to reason about.
+We can also use the `!important` flag to prioritize a CSS declaration. We should be careful when using this flag, as it can make our CSS difficult to reason about.
 
 ```css
 .my-class {
@@ -654,7 +653,7 @@ We will use Google Chrome for our examples, but similar functionality is availab
 
 Consider [Downloading Google Chrome](https://www.google.com/intl/en_ca/chrome/) to follow along with inspector examples.
 
-We can open the inspector by right clicking on any element in a web page and selecting **inspect**. From here we can view the **Elements** that make up the web page, and the **Styles** for those elements.
+We can open the inspector by right-clicking on any element in a web page and selecting **inspect**. We can view the **Elements** that make up the web page and the **Styles** for those elements.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -681,7 +680,7 @@ Replace `hello.html` with following content.
 </html>
 ```
 
-Open `hello.html` in your browser, right click and select **inspect** on the paragraph tag.
+Open `hello.html` in your browser, right-click and select **inspect** on the paragraph tag.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -691,7 +690,7 @@ Open `hello.html` in your browser, right click and select **inspect** on the par
 
 The **Elements** tab contains the HTML of the web page. Click the arrow to expand the `<body>` tag if it is not already open.
 
-Select the paragraph tag and view the **Styles** tab. From here you can see the styles applied to the element.
+Select the paragraph tag and view the **Styles** tab. From here, you can see the styles applied to the element.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -720,7 +719,7 @@ We generally use `px` (pixels) or percent `%` for CSS measurements. For a full l
 
 ### Padding and Margin
 
-We can set the size of the padding, and margin properties. A single unit sets both the top, right, bottom, and left margin values.
+We can set the size of the padding and margin properties. A single unit sets the top, right, bottom, and left margin values.
 
 ```css
 p {
@@ -729,15 +728,16 @@ p {
 }
 ```
 
-Alternatively we can add up to four units in the order top, right, bottom, left.
+Alternatively, we can add up to four units in the order of top, right, bottom, and left.
 
 ```css
 p {
+  /*top right bottom left*/
   padding: 10px 20px 30px 40px;
 }
 ```
 
-Missing units will mirror the opposite unit. Here the top and bottom padding are `10px` and the right and padding are `5px`.
+Missing units will mirror the opposite value. Below, the top and bottom padding are `10px`, and the right and left padding are `5px`.
 
 ```css
 p {
@@ -745,7 +745,7 @@ p {
 }
 ```
 
-We can also set the top, right, bottom, and left margin or padding individually.
+We can also individually set the top, right, bottom, and left margin or padding.
 
 ```css
 p {
@@ -809,9 +809,9 @@ The total height and width of an element will be an addition of the margin, padd
 }
 ```
 
-Alternatively, we can set the `box-sizing` property to `border-box` to include the border and padding in the elements total height and width. The content height and width are then automatically computed.
+Alternatively, we can set the `box-sizing` property to `border-box` to include the border and padding in the element's total height and width. The content height and width are then automatically computed.
 
-Now the elements total height and width including padding and border will be `100px`.
+Now the element's total height and width, including padding and border, will be `100px`.
 
 ```css
 .class {
@@ -854,7 +854,7 @@ Replace `hello.html` with the following content.
 </html>
 ```
 
-We can view the box model of any HTML element using the inspector. On chrome, inspect the `<p>` and go to the **Computed** section to see the computed box model.
+We can view the box model of any HTML element using the inspector. For example, inspect the `<p>` and go to the **Computed** section to see the computed box model.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -862,15 +862,15 @@ We can view the box model of any HTML element using the inspector. On chrome, in
 
 <!-- livebook:{"break_markdown":true} -->
 
-Hover your cursor over the `<p>` tag in the **Elements** section to see the full box model highlight on the page.
+Hover your cursor over the `<p>` tag in the **Elements** section to see the box model highlighted on the page.
 
-You can also hover your cursur over the box model in the **Computed** section to individually highlight the content, padding, border, and margin.
+You can also hover your cursor over the box model in the **Computed** section to highlight the content, padding, border, and margin individually.
 
-Notice that while we set the margin to be `10px` on all sides, the horizontal margin takes up the entire page. That's because by default the `<div>` element uses block positioning which we will cover in the next section.
+Notice that while we set the margin to be `10px` on all sides, the horizontal margin takes up the entire page. That's because, by default, the `<div>` element is a block element, which we will cover in the next section.
 
 ## CSS Display
 
-The **display** property determines how elements are displayed on the page. Elements have different default display properties.
+The **display** property determines how to display elements on the page. Elements have different default display properties.
 
 For example, `<div>` is a **block** element. Block elements start on a new line and take up the whole width of the line.
 
@@ -878,7 +878,7 @@ Alternatively,`<span>` is an **inline** element. Inline elements exist on the sa
 
 **inline** elements ignore height and width values. Instead of inline, we can use **inline-block** values to display an element on the same line, but apply width and height values.
 
-Generally you can accomplish most common CSS behavior with block, inline, and inline-block elements. However there is a massive list of alternative display properties. See the [MDN Display](https://developer.mozilla.org/en-US/docs/Web/CSS/display) documentation for a full list of display values.
+Generally, you can accomplish the most common CSS behaviors with block, inline, and inline-block elements. However, there is a massive list of alternative display properties. See the [MDN Display](https://developer.mozilla.org/en-US/docs/Web/CSS/display) documentation for a full list of display values.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -895,7 +895,7 @@ The `...` represents the rest of the CSS styles in `.box-model-example`.
 }
 ```
 
-Use the inspector to view to computed box model. Notice the height and width do not apply to inline elements.
+Use the inspector to view the computed box model. Notice the height and width do not apply to inline elements.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -946,8 +946,7 @@ CSS provides many tools for the layout of elements.
 
 ### Center Align Element
 
-We can use `margin: auto;` to horizontally center a block element inside of its container.
-The element must have a smaller width than its parent container.
+We can use `margin: auto;` to center a block element horizontally inside its container. The element must have a smaller width than its parent container as this automatically adds left and right margin based on the remaining space in the parent container.
 
 ```css
 .center {
@@ -960,7 +959,7 @@ The element must have a smaller width than its parent container.
 
 ### Right and Left Align Element
 
-We can use `position: absolute;` to right or left align an element to it's parent container.
+We can use `position: absolute;` to right align or left align an element to its parent container.
 
 ```css
 .right {
@@ -996,7 +995,7 @@ We can left, right, and center align text using the `text-align` property.
 
 ## CSS Colors
 
-Certain CSS declarations accept a color-name as a value. For example, we've used to `color` property to set the color of some text content.
+Certain CSS declarations accept a color name as a value. For example, we've used to `color` property to set the color of some text content.
 
 ```css
 p {
@@ -1004,7 +1003,7 @@ p {
 }
 ```
 
-We're also able to set the background-color of an element.
+We're also able to set the background color of an element.
 
 ```css
 p {
@@ -1038,7 +1037,7 @@ p {
 }
 ```
 
-We recommend finding a browser extension that let's you find the color code for a color on a web page such as [Color Zilla](https://www.colorzilla.com/).
+We recommend using a browser extension that finds the color code for a color on a web page, such as [Color Zilla](https://www.colorzilla.com/).
 
 It's also handy to use a color selector such as the [Chrome Color Selector](https://www.google.com/search?q=color+selector) for picking colors and getting their code representation.
 
@@ -1046,7 +1045,7 @@ It's also handy to use a color selector such as the [Chrome Color Selector](http
 
 ### Font Weight
 
-We've already used the `font-weight` property which can set the font weight using a number or named weight.
+We've already used the `font-weight` property, which can set the font-weight using a number or named weight.
 
 ```css
 /* Keyword values */
@@ -1075,7 +1074,7 @@ font-weight: 900;
 
 ### Font-Size
 
-We can also set the `font-size`. We can set the font-size using `px`, however pixels are a static value so this can cause issues depending on the screen size.
+We can also set the `font-size`. We can set the font size using `px`. However, pixels are a static value, which can cause issues depending on the screen size.
 
 ```css
 p {
@@ -1083,7 +1082,7 @@ p {
 }
 ```
 
-Instead, we generally recommend using a relative unit such as `em`. `1em` is equal to the current font-size. On browsers the default font-size is `16px`, and the user can change their font size if desired.
+Instead, we recommend using a relative unit such as `em`. `1em` is equal to the current font size.  The default font size on browsers is `16px`, and users can change their font size if desired.
 
 ```css
 p {
@@ -1099,7 +1098,7 @@ h1 {
 
 ### Font-Family
 
-We can change the font-family of an element.
+We can change the font family of an element.
 
 There are many generic font families such as `serif`, `sans-serif`, `monospace`, and `cursive`.
 
@@ -1109,7 +1108,7 @@ p {
 }
 ```
 
-We can also use a specific font if it is installed on the user's computer. If the font doesn't exist, then it will use any comma-separated fallbacks provided.
+We can also use any fonts installed on the user's computer. If the font doesn't exist, it will use any comma-separated fallback fonts.
 
 ```css
 p {
@@ -1117,11 +1116,11 @@ p {
 }
 ```
 
-Some fonts such as Arial and Verdana are safe, because most users should have them installed. However, often we want to use more custom fonts.
+Some fonts, such as Arial and Verdana, are web-safe because most users should have them installed. However, we often want to use custom fonts.
 
 We can install custom fonts using [Google Fonts](https://fonts.google.com/) or other similar services.
 
-For example, here's how we could use the [League Gothic](https://fonts.google.com/specimen/League+Gothic) font from Google Fonts. Google Fonts contains the `<link>` tag instructions for how to install the font.
+For example, we could use the [League Gothic](https://fonts.google.com/specimen/League+Gothic) font from Google Fonts. Google Fonts contains the `<link>` tag instructions for installing the font in an HTML document.
 
 ```html
 <!DOCTYPE html>
@@ -1149,11 +1148,11 @@ For example, here's how we could use the [League Gothic](https://fonts.google.co
 
 ## Further Reading
 
-Armed with the fundamentals of HTML and CSS we're ready to build great looking websites. However, HTML and CSS are both massive topics and there is still much more to learn.
+Armed with the fundamentals of HTML and CSS, we're ready to build functional and great-looking websites. However, HTML and CSS are both massive topics, and there is still much more to learn.
 
-Consider the following resources a you continue your HTML and CSS learning journey.
+Consider the following resources as you continue your HTML and CSS learning journey.
 
 * [MDN CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
 * [MDN HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
 
-For experimenting with HTML and CSS we recommend sites such as [CodePen](https://codepen.io/) that make it easy to rapidly prototype HTML and CSS designs.
+For experimenting with HTML and CSS, we recommend sites such as [CodePen](https://codepen.io/) that make it easy to prototype HTML and CSS designs rapidly.
