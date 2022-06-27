@@ -3377,3 +3377,31 @@ For a more complete list of all HTML elements, consider this online [HTML Cheats
 * `<meta charset="utf-8">`: the [meta](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta) elements represents meta data. Specifically, this sets the character encoding of the web page to use [utf-8](https://developer.mozilla.org/en-US/docs/Glossary/UTF-8).
 * `<title>`: The [title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) element defines the document's title. Notice that the tab for `hello.html` in your browser should say `Hello!`.
 * `<body>`: The [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body) element represents the content of an HTML document.
+
+### CSS Position
+
+### Absolute
+
+The absolute position removes the element from the document flow and lets us use the top, right, bottom, and left properties to position an element relative to it's immediate parent element.
+
+For example, the following moves an element `10px` to the right from the top left of it's parent element.
+
+```css
+p {
+  position: absolute;
+  left: 10px;
+}
+```
+
+### Relative
+
+The **relative** position lets use use the top, right, bottom, and left properties to position an element relative to it's default position when static.
+
+For example, the following moves an element `10px` downwards.
+
+```css
+p {
+  position: absolute;
+  top: 10px;
+}
+```
