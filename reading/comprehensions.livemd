@@ -176,7 +176,7 @@ There's no real limit to the number of generators that you can use, but
 each generator creates another nested loop and therefore has a significant performance impact.
 
 That means generally, a comprehension with a single generator will have linear complexity $O(n)$.
-A comprehension with two generators will have polynomial-time $O(n^2)$. A comprehension with
+A comprehension with two generators will have polynomial time $O(n^2)$. A comprehension with
 three generators will also have polynomial time but $O(n^3)$.
 
 So the performance follows Big $On^g$ where $g$ is
@@ -330,7 +330,7 @@ code points.
 
 <details>
 <summary>Hint</summary>
-You can use `:binary.first/1` to convert a variable bound to a string to a codepoint.
+You can use <code>:binary.first/1</code> to convert a variable bound to a string to a codepoint.
 </details>
 
 ```elixir
@@ -350,6 +350,8 @@ Instead, consider using comprehensions to refactor (improve) your code after you
 For example, in the creation of the graph for how nested generators have $O(n^g)$ performance where
 $g$ is the number of generators, we originally wrote the following code to display $O(n^2)$ complexity.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 Enum.map(init..max, fn number_of_elements ->
   %{"number of elements": number_of_elements, time: number_of_elements ** 2, type: "2"}
@@ -359,6 +361,8 @@ end)
 But then while writing, realized we could refactor it into a one-line statement using comprehensions.
 
 What do you think? Is this more clear or not?
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 for n <- init..max, do: %{"number of elements": n, time: n ** 2, type: "2"}
