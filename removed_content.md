@@ -3408,3 +3408,7 @@ p {
 
   * https://flexboxfroggy.com/
   * Piet Mondrian Box Art https://learnodo-newtonic.com/wp-content/uploads/2016/09/Composition-with-Large-Red-Plane-Yellow-Black-Gray-and-Blue-1921-Piet-Mondrian.jpg
+
+* Create a custom weather plug.
+* JSON API (with .json file)
+* Pokemon Search Site
