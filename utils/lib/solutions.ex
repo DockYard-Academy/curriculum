@@ -827,14 +827,14 @@ defmodule Utils.Solutions do
 
   def filter_by_type, do: Filter
 
-  defmodule TicTakToe do
+  defmodule TicTacToe do
     def play(board, coordinate, symbol) do
       {row, column} = coordinate
       List.replace_at(board, row, List.replace_at(Enum.at(board, row), column, symbol))
     end
   end
 
-  def tic_tak_toe, do: TicTakToe
+  def tic_tac_toe, do: TicTacToe
 
   def datetime_new, do: DateTime.new!(~D[1938-04-18], ~T[12:00:00])
 

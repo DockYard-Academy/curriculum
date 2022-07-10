@@ -162,7 +162,7 @@ postgres-# \l
 journal_repo            | postgres | UTF8     | C.UTF-8 | C.UTF-8 |
 ```
 
-We can drop this database from the command line (not the psql prompt). 
+We can drop this database from the command line (not the psql prompt).
 This clears any data in the database.
 
 ```
@@ -378,8 +378,8 @@ Now we can use the `changeset/2` function to pre-validate data before inserting 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex> %Journal.User{} 
-|> Journal.User.changeset(%{name: "miles", email: "miles@spider.web"}) 
+iex> %Journal.User{}
+|> Journal.User.changeset(%{name: "miles", email: "miles@spider.web"})
 |> Journal.Repo.insert()
 ```
 
@@ -402,8 +402,8 @@ Now, invalid data will not insert into the database.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex> %Journal.User{} 
-|> Journal.User.changeset(%{name: "miles", email: "invalid email"}) 
+iex> %Journal.User{}
+|> Journal.User.changeset(%{name: "miles", email: "invalid email"})
 |> Journal.Repo.insert()
 ```
 
@@ -524,7 +524,7 @@ Create the migration.
 mix ecto.gen.migration create_entries
 ```
 
-Modify the migration file under `priv/repo/migrations/create_entries.ex`. 
+Modify the migration file under `priv/repo/migrations/create_entries.ex`.
 We'll use the `timestamps` macro to store when we create and update entries.
 
 We'll also use the `:text` type for the content field to allow for large content. By default, the `:string` type allows for a maximum of `255` characters, which isn't enough for the content of a journal entry.

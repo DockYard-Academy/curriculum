@@ -746,8 +746,6 @@ defmodule Utils.Feedback do
     assert result, "Implement the `all_items/2` function."
     assert is_list(result), "`all_items/2` should return a list."
 
-    assert length(result) == 2,
-           "`all_items/2` should return all items when no filters are provided."
 
     assert length(result) == 2,
            "`all_items/2` should return all items when no filters are provided."
@@ -1072,8 +1070,8 @@ defmodule Utils.Feedback do
     assert filter.keyword_lists(input) == [[], [one: 1], [two: 2]]
   end
 
-  feedback :tic_tak_toe do
-    tic_tak_toe = get_answers()
+  feedback :tic_tac_toe do
+    tic_tac_toe = get_answers()
 
     board = [
       [nil, nil, nil],
@@ -1081,37 +1079,37 @@ defmodule Utils.Feedback do
       [nil, nil, nil]
     ]
 
-    assert tic_tak_toe.play(board, {0, 0}, "X"), "Ensure you implement the `play/3` function."
+    assert tic_tac_toe.play(board, {0, 0}, "X"), "Ensure you implement the `play/3` function."
 
-    assert tic_tak_toe.play(board, {0, 0}, "X") == [
+    assert tic_tac_toe.play(board, {0, 0}, "X") == [
              ["X", nil, nil],
              [nil, nil, nil],
              [nil, nil, nil]
            ]
 
-    assert tic_tak_toe.play(board, {0, 2}, "X") == [
+    assert tic_tac_toe.play(board, {0, 2}, "X") == [
              [nil, nil, "X"],
              [nil, nil, nil],
              [nil, nil, nil]
            ]
 
-    assert tic_tak_toe.play(board, {1, 1}, "X") == [
+    assert tic_tac_toe.play(board, {1, 1}, "X") == [
              [nil, nil, nil],
              [nil, "X", nil],
              [nil, nil, nil]
            ]
 
-    assert tic_tak_toe.play(board, {2, 2}, "X") == [
+    assert tic_tac_toe.play(board, {2, 2}, "X") == [
              [nil, nil, nil],
              [nil, nil, nil],
              [nil, nil, "X"]
            ]
 
     assert board
-           |> tic_tak_toe.play({0, 0}, "X")
-           |> tic_tak_toe.play({1, 1}, "O")
-           |> tic_tak_toe.play({2, 2}, "X")
-           |> tic_tak_toe.play({2, 1}, "O") ==
+           |> tic_tac_toe.play({0, 0}, "X")
+           |> tic_tac_toe.play({1, 1}, "O")
+           |> tic_tac_toe.play({2, 2}, "X")
+           |> tic_tac_toe.play({2, 1}, "O") ==
              [
                ["X", nil, nil],
                [nil, "O", nil],
@@ -2390,8 +2388,8 @@ defmodule Utils.Feedback do
     assert call_with_20.(fn int -> int * 10 end) == 20 * 10
   end
 
-    
-  feedback :range_to_list do 
+
+  feedback :range_to_list do
     list = get_answers()
     assert list == [3,6,9]
   end
