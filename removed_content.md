@@ -3364,3 +3364,51 @@ end
 defmodule UsingMacro do
 end
 ```
+
+## HTML CSS
+We'll go over several of the most common HTML elements and their purpose.
+As you follow through the list of elements, add them to your `hello.html` file to visualize them.
+
+For a more complete list of all HTML elements, consider this online [HTML Cheatsheet](https://web.stanford.edu/group/csp/cs21/htmlcheatsheet.pdf) helpful or the [MDN HTML Elements Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element).
+
+* `<!DOCTYPE html>`: The [doctype](https://developer.mozilla.org/en-US/docs/Glossary/Doctype) ensures the HTML behaves correctly.
+* `<html>`: The [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html) element represents the top level element of an HTML document. it is also referred to as the *root element*.
+* `<head>`: The [head](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/head) element contains meta data about the document.
+* `<meta charset="utf-8">`: the [meta](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta) elements represents meta data. Specifically, this sets the character encoding of the web page to use [utf-8](https://developer.mozilla.org/en-US/docs/Glossary/UTF-8).
+* `<title>`: The [title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) element defines the document's title. Notice that the tab for `hello.html` in your browser should say `Hello!`.
+* `<body>`: The [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body) element represents the content of an HTML document.
+
+### CSS Position
+
+### Absolute
+
+The absolute position removes the element from the document flow and lets us use the top, right, bottom, and left properties to position an element relative to it's immediate parent element.
+
+For example, the following moves an element `10px` to the right from the top left of it's parent element.
+
+```css
+p {
+  position: absolute;
+  left: 10px;
+}
+```
+
+### Relative
+
+The **relative** position lets use use the top, right, bottom, and left properties to position an element relative to it's default position when static.
+
+For example, the following moves an element `10px` downwards.
+
+```css
+p {
+  position: absolute;
+  top: 10px;
+}
+```
+
+  * https://flexboxfroggy.com/
+  * Piet Mondrian Box Art https://learnodo-newtonic.com/wp-content/uploads/2016/09/Composition-with-Large-Red-Plane-Yellow-Black-Gray-and-Blue-1921-Piet-Mondrian.jpg
+
+* Create a custom weather plug.
+* JSON API (with .json file)
+* Pokemon Search Site
