@@ -1,0 +1,1147 @@
+# Phoenix Authentication
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+We implement authorization in our applications to ensure only authorized clients can perform protected actions and access protected resources.
+
+Failure to implement authorization properly can lead to severe repercussions. We can expose confidential information and leave our users vulnerable to harmful attacks.
+
+To learn about authorization, we're going to create a diary application. A diary is a private journal. Each user will have private diary entries that other users should not be able access.
+
+```mermaid
+classDiagram
+  class User {
+    email: string
+    password: string
+  }
+  class Entry {
+    user_id: :id
+    title: 
+  }
+  User --> Entry : Has many
+  Entry --> User : Belongs to
+```
+
+## Create the Diary Application
+
+Create a new phoenix diary project.
+
+```
+$ mix phx.new diary
+```
+
+Install dependencies.
+
+```
+$ mix deps.get
+```
+
+Create the Database and run migrations.
+
+```
+$ mix ecto.setup
+```
+
+## Add Authorization
+
+Fortunately, Phoenix provides a command to generate an authorization system for our applications.
+
+Run the following command in the diary project folder.
+
+```
+$ mix phx.gen.auth Accounts User users
+```
+
+By running this command, we've created new files and modified existing files to implement an authorization system.
+
+```
+Compiling 14 files (.ex)
+Generated diary app
+* creating priv/repo/migrations/20220711044627_create_users_auth_tables.exs
+* creating lib/diary/accounts/user_notifier.ex
+* creating lib/diary/accounts/user.ex
+* creating lib/diary/accounts/user_token.ex
+* creating lib/diary_web/controllers/user_auth.ex
+* creating test/diary_web/controllers/user_auth_test.exs
+* creating lib/diary_web/views/user_confirmation_view.ex
+* creating lib/diary_web/templates/user_confirmation/new.html.heex
+* creating lib/diary_web/templates/user_confirmation/edit.html.heex
+* creating lib/diary_web/controllers/user_confirmation_controller.ex
+* creating test/diary_web/controllers/user_confirmation_controller_test.exs
+* creating lib/diary_web/templates/layout/_user_menu.html.heex
+* creating lib/diary_web/templates/user_registration/new.html.heex
+* creating lib/diary_web/controllers/user_registration_controller.ex
+* creating test/diary_web/controllers/user_registration_controller_test.exs
+* creating lib/diary_web/views/user_registration_view.ex
+* creating lib/diary_web/views/user_reset_password_view.ex
+* creating lib/diary_web/controllers/user_reset_password_controller.ex
+* creating test/diary_web/controllers/user_reset_password_controller_test.exs
+* creating lib/diary_web/templates/user_reset_password/edit.html.heex
+* creating lib/diary_web/templates/user_reset_password/new.html.heex
+* creating lib/diary_web/views/user_session_view.ex
+* creating lib/diary_web/controllers/user_session_controller.ex
+* creating test/diary_web/controllers/user_session_controller_test.exs
+* creating lib/diary_web/templates/user_session/new.html.heex
+* creating lib/diary_web/views/user_settings_view.ex
+* creating lib/diary_web/templates/user_settings/edit.html.heex
+* creating lib/diary_web/controllers/user_settings_controller.ex
+* creating test/diary_web/controllers/user_settings_controller_test.exs
+* creating lib/diary/accounts.ex
+* injecting lib/diary/accounts.ex
+* creating test/diary/accounts_test.exs
+* injecting test/diary/accounts_test.exs
+* creating test/support/fixtures/accounts_fixtures.ex
+* injecting test/support/fixtures/accounts_fixtures.ex
+* injecting test/support/conn_case.ex
+* injecting config/test.exs
+* injecting mix.exs
+* injecting lib/diary_web/router.ex
+* injecting lib/diary_web/router.ex - imports
+* injecting lib/diary_web/router.ex - plug
+* injecting lib/diary_web/templates/layout/root.html.heex
+```
+
+The command above added new dependencies, so we need to install them.
+
+```
+$ mix deps.get
+```
+
+## Migration
+
+The `mix phx.gen.auth` command generates a new migration file `priv/repo/migrations/create_users_auth_tables.exs` with the current timestamp in the file name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Diary.Repo.Migrations.CreateUsersAuthTables do
+  use Ecto.Migration
+
+  def change do
+    execute "CREATE EXTENSION IF NOT EXISTS citext", ""
+
+    create table(:users) do
+      add :email, :citext, null: false
+      add :hashed_password, :string, null: false
+      add :confirmed_at, :naive_datetime
+      timestamps()
+    end
+
+    create unique_index(:users, [:email])
+
+    create table(:users_tokens) do
+      add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :token, :binary, null: false
+      add :context, :string, null: false
+      add :sent_to, :string
+      timestamps(updated_at: false)
+    end
+
+    create index(:users_tokens, [:user_id])
+    create unique_index(:users_tokens, [:context, :token])
+  end
+end
+```
+
+The migration above creates `:users` and `:users_tokens` tables.
+We'll gain insight into what these tables do as we continue diving into the authorization system.
+
+Run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+## User Registration
+
+Now we can start the server and visit http://localhost:4000.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/diary_register_login_home_page.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Notice there are now register and log-in links which we can find in the  `lib/diary_web/templates/layout/_user_menu.html.heex` template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/templates/layout/_user_menu.html.heex
+<ul>
+<%= if @current_user do %>
+  <li><%= @current_user.email %></li>
+  <li><%= link "Settings", to: Routes.user_settings_path(@conn, :edit) %></li>
+  <li><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></li>
+<% else %>
+  <li><%= link "Register", to: Routes.user_registration_path(@conn, :new) %></li>
+  <li><%= link "Log in", to: Routes.user_session_path(@conn, :new) %></li>
+<% end %>
+</ul>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+When we click the register button, the application directs us to http://localhost:4000/users/register.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/diary_user_register_page.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+This triggers the `"users/register"` route.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/router.ex
+
+get "/users/register", UserRegistrationController, :new
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We've already walked through route -> controller -> view -> template flow in the previous [Phoenix](./phoenix.livemd) lesson. Re-read this lesson if it is not already clear how the `"users/register"` route renders the `lib/diary_web/templates/user_registration/new.html.heex` template.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+R[users/register]
+C[UserRegistrationController.new/2]
+V[UserRegistrationView]
+T[user_registration/new.html.heex]
+
+R --> C --> V --> T
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Submit the form with any email (real or fake such as `test@test.com`) and any valid password such as `supersecretpassword`. We should never re-use personal passwords, particularly during development where they may not be private.
+
+This form triggers an HTTP POST request to `"/users/registration"` to create a new user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/router.ex
+post "/users/register", UserRegistrationController, :create
+```
+
+The `UserRegistrationController.create/2` function creates a new user in the Database. If successful, it delivers a confirmation email. It then flashes a success message and logs the user in.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/user_registration_controller.ex
+
+def create(conn, %{"user" => user_params}) do
+  case Accounts.register_user(user_params) do
+    {:ok, user} ->
+      {:ok, _} =
+        Accounts.deliver_user_confirmation_instructions(
+          user,
+          &Routes.user_confirmation_url(conn, :edit, &1)
+        )
+
+      conn
+      |> put_flash(:info, "User created successfully.")
+      |> UserAuth.log_in_user(user)
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+To accomplish this, the `UserRegistrationController.create/2` function calls the following four functions.
+
+* `Accounts.register_user/1`: Create a User in the Database.
+* `Accounts.deliver_user_confirmation_instructions/1`: Send a confirmation email.
+* `put_flash/2`: Attach a blue info message to the assigns to be displayed on the client.
+* `UserAuth.log_in_user/3`: Create a user token and store it on the client. The user will use this token to authenticate future requests.
+
+<!-- livebook:{"branch_parent_index":6} -->
+
+## Creating Users
+
+The `Accounts.register_user(user_params)` function call above creates a user with the provided email and password.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts.ex
+
+def register_user(attrs) do
+  %User{}
+  |> User.registration_changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+The `User.registration_changeset(attrs)` function call uses Ecto changesets to validate the email and password.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts/user.ex
+
+def registration_changeset(user, attrs, opts \\ []) do
+  user
+  |> cast(attrs, [:email, :password])
+  |> validate_email()
+  |> validate_password(opts)
+end
+```
+
+The `validate_password(opts)` function call validates the password. There are several commented-out validation functions we may wish to uncomment to improve password strength.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts/user.ex
+
+defp validate_password(changeset, opts) do
+  changeset
+  |> validate_required([:password])
+  |> validate_length(:password, min: 12, max: 72)
+  # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
+  # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
+  # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+  |> maybe_hash_password(opts)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Hashed Passwords
+
+The `maybe_hash_password(opts)` call generates the `:hashed_password` using [Bcrypt](https://hexdocs.pm/bcrypt_elixir/Bcrypt.html).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp maybe_hash_password(changeset, opts) do
+  hash_password? = Keyword.get(opts, :hash_password, true)
+  password = get_change(changeset, :password)
+
+  if hash_password? && password && changeset.valid? do
+    changeset
+    # If using Bcrypt, then further validate it is at most 72 bytes long
+    |> validate_length(:password, max: 72, count: :bytes)
+    |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
+    |> delete_change(:password)
+  else
+    changeset
+  end
+end
+```
+
+Hashing is a way of encrypting data using a mathematical algorithm. Hashing algorithms run on some input string and return an encrypted output.
+
+We store the hash of the password rather than the actual password to improve security. For an overview of hashing, here's a video by Seytonic.
+
+```elixir
+Kino.YouTube.new("--tnZMuoK3E")
+```
+
+The user schema includes a `:password` and a `:hashed_password` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts/user.ex
+
+defmodule Diary.Accounts.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "users" do
+    field :email, :string
+    field :password, :string, virtual: true, redact: true
+    field :hashed_password, :string, redact: true
+    field :confirmed_at, :naive_datetime
+
+    timestamps()
+  end
+  ...
+```
+
+The `redact: true` option redacts the `:hashed_password` and the `:password` if we attempt to `IO.inspect/2` their values. See [Redacting Fields](https://hexdocs.pm/ecto/Ecto.Schema.html#module-redacting-fields) for a full explanation.
+
+The `virtual: true` means the Database doesn't store the `:password`.
+For security reasons, the users table only stores the `:hashed_password`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# priv/repo/migrations/_create_users_auth_tables.exs
+
+create table(:users) do
+  add :email, :citext, null: false
+  add :hashed_password, :string, null: false
+  add :confirmed_at, :naive_datetime
+  timestamps()
+end
+```
+
+<!-- livebook:{"branch_parent_index":6} -->
+
+## Confirmation Emails
+
+The `deliver_user_confirmation_instructions/2` function sends a confirmation email to the user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts.ex
+
+def deliver_user_confirmation_instructions(%User{} = user, confirmation_url_fun)
+    when is_function(confirmation_url_fun, 1) do
+  if user.confirmed_at do
+    {:error, :already_confirmed}
+  else
+    {encoded_token, user_token} = UserToken.build_email_token(user, "confirm")
+    Repo.insert!(user_token)
+    UserNotifier.deliver_confirmation_instructions(user, confirmation_url_fun.(encoded_token))
+  end
+end
+```
+
+The `UserNotifier` module in `lib/diary/accounts/user_notifier.ex` uses [Swoosh](https://github.com/swoosh/swoosh) to send emails. Swoosh provides a `deliver/2` function which takes an email address and a string with the desired email content to send.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/accounts/user_notifier.ex
+
+def deliver_confirmation_instructions(user, url) do
+  deliver(user.email, "Confirmation instructions", """
+
+  ==============================
+
+  Hi #{user.email},
+
+  You can confirm your account by visiting the URL below:
+
+  #{url}
+
+  If you didn't create an account with us, please ignore this.
+
+  ==============================
+  """)
+end
+```
+
+In development, emails are stored locally rather than sent because we don't want to send development emails accidentally. We can view sent emails by visiting http://localhost:4000/dev/mailbox.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/swoosh_mailbox_preview.png)
+
+<!-- livebook:{"branch_parent_index":6} -->
+
+## Sessions
+
+Phoenix uses cookies to store a session key on each client to identify them. Cookies are a local storage mechanism used by browsers.
+
+We can view this cookie. First, ensure the diary server is running, then visit http://localhost:4000. Next, open the inspector and go to **Applications**. Find **Cookies** under **Storage** and view the cookies for http://localhost:4000. Notice the `_diary_key` cookie.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_diary_cookie.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+For each client connection, Phoenix stores a session in memory. The session stores client-specific information. We can set and retrieve values on the session using the `get_session/2` and `put_session/2` functions on the [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct .
+
+Earlier, when we triggered the `UserRegistrationController.create/2` function in `lib/diary_web/controllers/user_registration_controller.ex` we called the `UserAuth.log_in_user/3` function.
+
+The `UserAuth.log_in_user/3` function generates a user token and puts it on the session.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/user_auth.ex
+
+def log_in_user(conn, user, params \\ %{}) do
+  token = Accounts.generate_user_session_token(user)
+  user_return_to = get_session(conn, :user_return_to)
+
+  conn
+  |> renew_session()
+  |> put_session(:user_token, token)
+  |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
+  |> maybe_write_remember_me_cookie(token, params)
+  |> redirect(to: user_return_to || signed_in_path(conn))
+end
+```
+
+Every client request includes their session key. Our Phoenix application uses this session key to retrieve the session which stores the user token.
+
+The user token is associated with a user in the Database. Our application uses this token to retrieve the user for authorization purposes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+
+subgraph Client
+  C[Session Key Cookie]
+end
+
+subgraph Server
+  subgraph Conn
+    subgraph Session
+      UT[User Token]
+      U[User]
+      UT --retrieve--> U 
+    end
+  end
+end
+C --> Server
+```
+
+We'll see this in action in the Authenticated Routes section.
+
+## Authenticated Routes
+
+Earlier, when we ran `mix phx.gen.auth` we generated many new authentication routes and added some new plugs.
+
+The `:browser` pipeline now uses the `:fetch_current_user` plug to fetch the current user for authentication purposes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/journal_web/router.ex
+
+pipeline :browser do
+  ...
+  plug :fetch_current_user
+end
+```
+
+The `:redirect_if_user_is_authenticated` plug prevents an already signed-in user from accessing any routes in the scope, such as registering or logging in.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/journal_web/router.ex
+
+scope "/", DiaryWeb do
+  pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+  get "/users/register", UserRegistrationController, :new
+  post "/users/register", UserRegistrationController, :create
+  get "/users/log_in", UserSessionController, :new
+  post "/users/log_in", UserSessionController, :create
+  get "/users/reset_password", UserResetPasswordController, :new
+  post "/users/reset_password", UserResetPasswordController, :create
+  get "/users/reset_password/:token", UserResetPasswordController, :edit
+  put "/users/reset_password/:token", UserResetPasswordController, :update
+end
+```
+
+The `:require_authenticated_user` plug requires an authenticated user. We can use this plug to hide resources that should only be accessible to authenticated users.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/journal_web/router.ex
+
+scope "/", DiaryWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  get "/users/settings", UserSettingsController, :edit
+  put "/users/settings", UserSettingsController, :update
+  get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+end
+```
+
+Publicly available routes simply omit both plugs.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/journal_web/router.ex
+
+scope "/", DiaryWeb do
+  pipe_through [:browser]
+
+  delete "/users/log_out", UserSessionController, :delete
+  get "/users/confirm", UserConfirmationController, :new
+  post "/users/confirm", UserConfirmationController, :create
+  get "/users/confirm/:token", UserConfirmationController, :edit
+  post "/users/confirm/:token", UserConfirmationController, :update
+end
+```
+
+These plugs come from the `DiaryWeb.UserAuth` module.
+
+The `:redirect_if_user_is_authenticated` plug checks if there is a current user, and redirects the client to the `signed_in_path/1` (`"/"`) if there is.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/user_auth.ex
+
+@doc """
+Used for routes that require the user to not be authenticated.
+"""
+def redirect_if_user_is_authenticated(conn, _opts) do
+  if conn.assigns[:current_user] do
+    conn
+    |> redirect(to: signed_in_path(conn))
+    |> halt()
+  else
+    conn
+  end
+end
+```
+
+The `:require_authenticated_user` plug checks if there is a current user and redirects the client to the `Routes.user_session_path/2` (`"users/log_in"`) if there is not.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/user_auth.ex
+
+@doc """
+Used for routes that require the user to be authenticated.
+
+If you want to enforce the user email is confirmed before
+they use the application at all, here would be a good place.
+"""
+def require_authenticated_user(conn, _opts) do
+  if conn.assigns[:current_user] do
+    conn
+  else
+    conn
+    |> put_flash(:error, "You must log in to access this page.")
+    |> maybe_store_return_to()
+    |> redirect(to: Routes.user_session_path(conn, :new))
+    |> halt()
+  end
+end
+```
+
+Both plugs use a `:current_user` value on the `conn.assigns`, which is defined in the `:fetch_current_user` plug also in `DiaryWeb.UserAuth`.
+
+As previously mentioned, Phoenix uses the user token stored on the session to retrieve the user from the Database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/user_auth.ex
+
+def fetch_current_user(conn, _opts) do
+  {user_token, conn} = ensure_user_token(conn)
+  user = user_token && Accounts.get_user_by_session_token(user_token)
+  assign(conn, :current_user, user)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+We've walked through the flow of the `"/users/register"` routes to understand the generated authentication system better.
+
+Now, it's your turn to explore the rest of the system. Read through the remaining routes and their associated controllers to get a good overview of the system.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  ## Authentication routes
+
+  scope "/", DiaryWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
+    get "/users/reset_password", UserResetPasswordController, :new
+    post "/users/reset_password", UserResetPasswordController, :create
+    get "/users/reset_password/:token", UserResetPasswordController, :edit
+    put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", DiaryWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", DiaryWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+    get "/users/confirm", UserConfirmationController, :new
+    post "/users/confirm", UserConfirmationController, :create
+    get "/users/confirm/:token", UserConfirmationController, :edit
+    post "/users/confirm/:token", UserConfirmationController, :update
+  end
+```
+
+## Diary
+
+With our authorization system in place, we're ready to add the diary functionality.
+
+Run the following command to generate the boilerplate code for the Diary Notes resource.
+
+```
+$ mix phx.gen.html Entries Entry entries title:string content:text user_id:references:users
+```
+
+Make sure to run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+Everything other than `user_id:references:users` should be familiar from when we created a journal application in the previous [Phoenix](../phoenix.livemd) section.
+
+This time, we need to associate each diary entry with a user and ensure users can only access their own entries.
+
+First, we can add all of the routes for the `"/entries"` and require an authenticated user to access them.
+
+Add the following to `lib/diary_web/router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/router.ex
+
+scope "/entries", DiaryWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  resources "/", EntryController
+end
+```
+
+Client can only perform entry-related actions after they've logged in.
+
+By default, `mix phx.gen.html` generates tests for the context and the controller.
+
+We've broken the default tests by requiring an authenticated user to access the `"/entries"` route.
+
+Run the following command in the diary project folder, and the output should include eight failing tests.
+
+```
+$ mix test
+```
+
+To fix this issue, add the `:register_and_login_user` setup function to the `EntryControllerTest` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary_web/controllers/entry_controller_test.ex
+defmodule DiaryWeb.EntryControllerTest do
+  use DiaryWeb.ConnCase
+
+  import Diary.EntriesFixtures
+
+  @create_attrs %{content: "some content", title: "some title"}
+  @update_attrs %{content: "some updated content", title: "some updated title"}
+  @invalid_attrs %{content: nil, title: nil}
+
+  setup :register_and_log_in_user
+  ...
+```
+
+Now run `mix test` again, and all tests should pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create Diary Entries
+
+While logged in, we can visit http://localhost:4000/new to create a diary entry.
+
+Currently, created entires are not associated with a user. We have an authorization issue where users can view and modify other users' diary entries.
+
+To resolve this issue, we need to associate users with an entry upon creation.
+
+Modify the `EntryController.create/2` function to include the user id in the `entry_params`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/entry_controller.ex
+
+def create(conn, %{"entry" => entry_params}) do
+  entry_params = Map.put(entry_params, "user_id", conn.assigns[:current_user].id)
+
+  case Entries.create_entry(entry_params) do
+    {:ok, entry} ->
+      conn
+      |> put_flash(:info, "Entry created successfully.")
+      |> redirect(to: Routes.entry_path(conn, :show, entry))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+Modify the `Entry.changeset/2` to include the `:user_id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary/entries/entry.ex
+
+def changeset(entry, attrs) do
+  entry
+  |> cast(attrs, [:title, :content, :user_id])
+  |> validate_required([:title, :content])
+end
+```
+
+Modify the `EntryController.index/2` function to use the current user in the `Entries.list_entries` function. We'll use the user id to filter entries.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/entry_controller.ex
+
+def index(conn, _params) do
+  entries = Entries.list_entries(conn.assigns[:current_user].id)
+  render(conn, "index.html", entries: entries)
+end
+```
+
+Finally, create a new `Entries.list_entries/1` function to accept the `user_id` as an argument and use it to filter the entries query.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_entries(user_id) do
+  Entry
+  |> where([e], e.user_id == ^user_id)
+  |> Repo.all()
+end
+```
+
+Now when we visit http://localhost:4000, we'll only see entries created by the current user. Try creating an entry, sign out, create a new account with a different email, and notice there are no visible entries, because none belong to the current user.
+
+## Custom Authorization Plug
+
+We've fixed the authorization issue where users can access a list of diaries that don't belong to them, and now we associate created diary entries with a user.
+
+However, we still have authorization issues. For example, users can show, edit, update, and delete entries that don't belong to them.
+
+We could extend the pattern above and write custom authorization for every `EntryController` action. However, to avoid duplication, let's create a custom plug that ensures users own the resource they are manipulating.
+
+Remember that plugs are simply functions that take a conn struct as the first argument and parameters as the second argument.
+
+We can define and execute a custom plug to run on the `:show`, `:edit`, `:update`, and `:delete` controller actions.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/entry_controller.ex
+
+plug :require_user_owns_entry when action in [:show, :edit, :update, :delete]
+```
+
+Now create a `:require_user_owns_entry` plug. This plug checks if the current entry belongs to the current user and redirects the client if it does not.
+
+To accomplish this, it reads the entry id from `conn.path_params` and converts it into an integer. It then retrieves the entry by the entry id and compares the `entry.user_id` to the current user's id.
+
+If the entry belongs to the current user, it simply returns the current connection allowing the client to run the desired action. If the entry does not belong to the current user, it redirects the client to the entries `:index` path and prevents the client from running the desired action.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/diary_web/controllers/entry_controller.ex
+
+def require_user_owns_entry(conn, _opts) do
+  entry_id = String.to_integer(conn.path_params["id"])
+  entry = Entries.get_entry!(entry_id)
+
+  if conn.assigns[:current_user].id == entry.user_id do
+    conn
+  else
+    conn
+    |> put_flash(:error, "You do not own this resource.")
+    |> redirect(to: Routes.entry_path(conn, :index))
+    |> halt()
+  end
+end
+```
+
+Now users can only show, edit, update, and delete entries that belong to them.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Adding User Authentication To Tests
+
+By adding the `:require_user_owns_entry` plug we've broken several tests in the `EntryControllerTest` module.
+
+Run `mix test` and we should see the following failed tests in the output.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  1) test delete entry deletes chosen entry (DiaryWeb.EntryControllerTest)
+     test/diary_web/controllers/entry_controller_test.exs:72
+     expected error to be sent as 404 status, but response sent 302 without error
+     code: assert_error_sent 404, fn ->
+     stacktrace:
+       (phoenix 1.6.10) lib/phoenix/test/conn_test.ex:651: Phoenix.ConnTest.assert_error_sent/2
+       test/diary_web/controllers/entry_controller_test.exs:76: (test)
+
+
+
+  2) test update entry renders errors when data is invalid (DiaryWeb.EntryControllerTest)
+     test/diary_web/controllers/entry_controller_test.exs:63
+     ** (RuntimeError) expected response with status 200, got: 302, with body:
+     "<html><body>You are being <a href=\"/entries\">redirected</a>.</body></html>"
+     code: assert html_response(conn, 200) =~ "Edit Entry"
+     stacktrace:
+       (phoenix 1.6.10) lib/phoenix/test/conn_test.ex:369: Phoenix.ConnTest.response/2
+       (phoenix 1.6.10) lib/phoenix/test/conn_test.ex:383: Phoenix.ConnTest.html_response/2
+       test/diary_web/controllers/entry_controller_test.exs:65: (test)
+
+  3) test edit entry renders form for editing chosen entry (DiaryWeb.EntryControllerTest)
+     test/diary_web/controllers/entry_controller_test.exs:46
+     ** (RuntimeError) expected response with status 200, got: 302, with body:
+     "<html><body>You are being <a href=\"/entries\">redirected</a>.</body></html>"
+     code: assert html_response(conn, 200) =~ "Edit Entry"
+     stacktrace:
+       (phoenix 1.6.10) lib/phoenix/test/conn_test.ex:369: Phoenix.ConnTest.response/2
+       (phoenix 1.6.10) lib/phoenix/test/conn_test.ex:383: Phoenix.ConnTest.html_response/2
+       test/diary_web/controllers/entry_controller_test.exs:48: (test)
+
+  4) test update entry redirects when data is valid (DiaryWeb.EntryControllerTest)
+     test/diary_web/controllers/entry_controller_test.exs:55
+     Assertion with == failed
+     code:  assert redirected_to(conn) == Routes.entry_path(conn, :show, entry)
+     left:  "/entries"
+     right: "/entries/154"
+     stacktrace:
+       test/diary_web/controllers/entry_controller_test.exs:57: (test)
+```
+
+The current tests do not log in a user, so they fail on the `:show`, `:edit`, `:update`, and `:delete` actions.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# tests/diary_web/controllers/entry_controller_test.exs
+
+describe "edit entry" do
+  setup [:create_entry]
+
+  test "renders form for editing chosen entry", %{conn: conn, entry: entry} do
+    conn = get(conn, Routes.entry_path(conn, :edit, entry))
+    assert html_response(conn, 200) =~ "Edit Entry"
+  end
+end
+
+describe "update entry" do
+  setup [:create_entry]
+
+  test "redirects when data is valid", %{conn: conn, entry: entry} do
+    conn = put(conn, Routes.entry_path(conn, :update, entry), entry: @update_attrs)
+    assert redirected_to(conn) == Routes.entry_path(conn, :show, entry)
+
+    conn = get(conn, Routes.entry_path(conn, :show, entry))
+    assert html_response(conn, 200) =~ "some updated content"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn, entry: entry} do
+    conn = put(conn, Routes.entry_path(conn, :update, entry), entry: @invalid_attrs)
+    assert html_response(conn, 200) =~ "Edit Entry"
+  end
+end
+
+describe "delete entry" do
+  setup [:create_entry]
+
+  test "deletes chosen entry", %{conn: conn, entry: entry} do
+    conn = delete(conn, Routes.entry_path(conn, :delete, entry))
+    assert redirected_to(conn) == Routes.entry_path(conn, :index)
+
+    assert_error_sent 404, fn ->
+      get(conn, Routes.entry_path(conn, :show, entry))
+    end
+  end
+end
+```
+
+To fix these tests, we need to ensure the created entry belongs to a user, and that the user is logged in.
+
+The `Diary.AccountsFixture` provides a `user_fixture/1` function for creating users, and a `log_in_user/2` function for logging in users.
+
+Import the `Diary.AccountsFixture` to get access to these functions in our tests.
+It's conventional for imports to be grouped together, so put the import with out other `Diary.EntriesFixture`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary_web/controllers/entry_controller_test.exs
+
+import Diary.EntriesFixtures
+import Diary.AccountsFixtures
+```
+
+Now remove all instances of `setup [:create_entry]`. We can also remove the private `create_entry/1` function since it's no longer used.
+
+Then put the following in each failing test to create a user, associate it with the created entry, and log the user in.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary_web/controllers/entry_controller_test.exs
+
+user = user_fixture()
+entry = entry_fixture(user_id: user.id)
+conn = log_in_user(conn, user)
+```
+
+The final `test/diary_web/controllers/entry_controller_test.exs` test file should have the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule DiaryWeb.EntryControllerTest do
+  use DiaryWeb.ConnCase
+
+  import Diary.EntriesFixtures
+  import Diary.AccountsFixtures
+
+  @create_attrs %{content: "some content", title: "some title"}
+  @update_attrs %{content: "some updated content", title: "some updated title"}
+  @invalid_attrs %{content: nil, title: nil}
+
+  setup :register_and_log_in_user
+
+  describe "index" do
+    test "lists all entries", %{conn: conn} do
+      conn = get(conn, Routes.entry_path(conn, :index))
+      assert html_response(conn, 200) =~ "Listing Entries"
+    end
+  end
+
+  describe "new entry" do
+    test "renders form", %{conn: conn} do
+      conn = get(conn, Routes.entry_path(conn, :new))
+      assert html_response(conn, 200) =~ "New Entry"
+    end
+  end
+
+  describe "create entry" do
+    test "redirects to show when data is valid", %{conn: conn} do
+      conn = post(conn, Routes.entry_path(conn, :create), entry: @create_attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == Routes.entry_path(conn, :show, id)
+
+      conn = get(conn, Routes.entry_path(conn, :show, id))
+      assert html_response(conn, 200) =~ "Show Entry"
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, Routes.entry_path(conn, :create), entry: @invalid_attrs)
+      assert html_response(conn, 200) =~ "New Entry"
+    end
+  end
+
+  describe "edit entry" do
+    test "renders form for editing chosen entry", %{conn: conn} do
+      user = user_fixture()
+      entry = entry_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+
+      conn = get(conn, Routes.entry_path(conn, :edit, entry))
+      assert html_response(conn, 200) =~ "Edit Entry"
+    end
+  end
+
+  describe "update entry" do
+    test "redirects when data is valid", %{conn: conn} do
+      user = user_fixture()
+      entry = entry_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+
+      conn = put(conn, Routes.entry_path(conn, :update, entry), entry: @update_attrs)
+      assert redirected_to(conn) == Routes.entry_path(conn, :show, entry)
+
+      conn = get(conn, Routes.entry_path(conn, :show, entry))
+      assert html_response(conn, 200) =~ "some updated content"
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      user = user_fixture()
+      entry = entry_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+
+      conn = put(conn, Routes.entry_path(conn, :update, entry), entry: @invalid_attrs)
+      assert html_response(conn, 200) =~ "Edit Entry"
+    end
+  end
+
+  describe "delete entry" do
+    test "deletes chosen entry", %{conn: conn} do
+      user = user_fixture()
+      entry = entry_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+      conn = delete(conn, Routes.entry_path(conn, :delete, entry))
+      assert redirected_to(conn) == Routes.entry_path(conn, :index)
+
+      assert_error_sent 404, fn ->
+        get(conn, Routes.entry_path(conn, :show, entry))
+      end
+    end
+  end
+end
+```
+
+Run `mix test` and all tests should pass.
+
+## Further Reading
+
+We've provided an overview of basic route-based and ownership-based authentication.
+However, authorization is a massive topic far beyond the scope of this course.
+
+There is no single authorization solution, and the authorization implementation depends on the application's needs. Therefore, always consider who should be able to access application resources and how to protect them effectively.
+
+Consider the following resources as you continue to learn more about authorization.
+
+<!-- livebook:{"break_markdown":true} -->
+
+* [Authorization in Phoenix web applications using Role Based Access Control (RBAC)](https://www.youtube.com/watch?v=6TlcVk-1Tpc)
+* [HexDocs: mix phx.gen.auth](https://hexdocs.pm/phoenix/mix_phx_gen_auth.html)
