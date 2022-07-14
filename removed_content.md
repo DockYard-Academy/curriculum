@@ -3412,3 +3412,85 @@ p {
 * Create a custom weather plug.
 * JSON API (with .json file)
 * Pokemon Search Site
+
+## Logging in
+We never want to store confidential information on the client, such as their password, as it's a massive security risk, so instead 
+
+Instead, we store a key on the client to identify the user. This is unique for each session.
+When a user registers or signs in, we associate this key with a user token used to authenticate user requests.
+
+The Phoenix connection stores a session that contains client-specific values while the client is connected to the server.
+
+Sessions store a cookie on the client. The cookie uniquely identifies the client connected to the server.
+
+The client sends this cookie when it makes a request, and the server uses the cookie to retrieve session data for the client.
+
+### Auth Fixing Tests
+
+`mix phx.gen.html` and `mix phx.gen.auth` generate tests. We'll dive deeper into these tests and how to write effective phoenix tests in a future lesson.
+
+We've altered the behavior of our application, so there should be nine broken tests if you run the following command from the project folder.
+
+```
+$ mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### EntriesTest
+
+The `Entries.list_entries/0` function now takes a user id, making it `Entries.list_entries/1`.
+
+The existing test for `Entries.list_entries/0` does not associate a user with the entry, so the test fails.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary/entries_test.ex
+
+test "list_entries/0 returns all entries" do
+  entry = entry_fixture()
+  assert Entries.list_entries() == [entry]
+end
+```
+
+To fix this test, replace it with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary/entries_test.ex
+
+test "list_entries/1 returns all entries" do
+  user = user_fixture()
+  entry = entry_fixture(user_id: user.id)
+  assert Entries.list_entries(user.id) == [entry]
+end
+```
+
+We need to import `Diary.AccountsFixtures` to use the `user_fixture/1` function to create a test user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/diary/entries_test.ex
+...
+  describe "entries" do
+    alias Diary.Entries.Entry
+
+    import Diary.EntriesFixtures
+    import Diary.AccountsFixtures # import the AccountsFixtures module.
+...
+```
+
+Now we should have eight failing tests when we run the test command.
+
+```
+$ mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### EntryControllerTest
+
+The eight remaining failing tests will be in the `EntryControllerTest` module.

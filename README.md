@@ -31,6 +31,16 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
 ensure your Livebook version is correct.
 
+## Spell Checking
+
+This project uses [codespell](https://github.com/codespell-project/codespell) for spell checking.
+
+If contributing to the project, install codespell and run the following command to fix any spelling errors. Ensure all corrections are correct before committing altered files.
+
+```
+codespell --skip="./utils/deps/*,./.git/*" -w
+```
+
 ## Course Outcome
 Students will be competent developers prepared to excel in the Elixir industry. They will have
 a solid grasp of Elixir fundamentals, Elixir project development, Phoenix project development, LiveView, and OTP.
