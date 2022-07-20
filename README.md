@@ -10,7 +10,7 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 
 ## QuickStart
 
-1. Install a compatible Elixir (1.13.3 or higher) and Erlang (24 or higher)
+1. Install a compatible Elixir (1.13.4 or higher) and Erlang (25 or higher)
    version. You may wish to use
    [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
