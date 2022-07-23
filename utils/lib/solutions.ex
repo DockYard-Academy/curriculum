@@ -149,7 +149,6 @@ defmodule Utils.Solutions do
       status: :grand_parent,
       age: 70,
       parents: []
-
     }
 
     ygraine = %{
