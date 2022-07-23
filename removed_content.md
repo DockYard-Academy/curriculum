@@ -3494,3 +3494,98 @@ $ mix test
 ### EntryControllerTest
 
 The eight remaining failing tests will be in the `EntryControllerTest` module.
+
+## Portfolio Exercise Ideas
+
+  * Configure Tailwind with the Blog
+  * Recreate Card Component
+  * Create Responsive Navigation Bar
+  * Configure Tailwind with Music Artist Search. Add styles from Mock.
+
+We'll see the following error if we attempt to create a new principal.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/not_null_violation_school_id.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+That's because earlier we added the `null: false` constraint to the principals table, and we're not including the school when we create a principal.
+
+Modify the `PrincipalController.create/2` function to include the school id and fix the `Routes` path when we redirect to the principal show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_web/controllers/principal_controller.ex
+
+def create(conn, %{"principal" => principal_params, "school_id" => school_id}) do
+  # Include "school_id" in the params.
+  principal_params = Map.put(principal_params, "school_id", school_id)
+
+  case Principals.create_principal(principal_params) do
+    {:ok, principal} ->
+      conn
+      |> put_flash(:info, "Principal created successfully.")
+      # Update principal_path/2 to school_principal_path/3
+      |> redirect(to: Routes.school_principal_path(conn, :show, school_id, principal))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+We also need to include the `:school_id` in the `Principal.changeset/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager/principals/principal.ex
+
+def changeset(principal, attrs) do
+  principal
+  |> cast(attrs, [:name, :school_id])
+  |> validate_required([:name, :school_id])
+end
+```
+
+Now we successfully create the user and are redirected to http://localhost:4000/schools/1/principals/3.
+
+The principal show page has the same error where `Routes.principal_path/2` should be `Routes.school_principal_path/3`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_show_principals_principal_path_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Fix the links in the principal show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/templates/principal/show.html.heex
+
+<span><%= link "Edit", to: Routes.school_principal_path(@conn, :edit, @school_id, @principal) %></span> |
+<span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
+```
+
+And add the `@school_id` in the assigns in the `PrincipalController.show/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/controllers/principal_controller.ex
+
+def show(conn, %{"id" => id, "school_id" => school_id}) do
+  principal = Principals.get_principal!(id)
+  render(conn, "show.html", principal: principal, school_id: school_id)
+end
+```
+
+Now the principal show page on http://localhost:4000/schools/1/principals/3 should successfully render.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_show_principals.png)

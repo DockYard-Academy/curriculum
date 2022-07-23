@@ -1,0 +1,41 @@
+# Portfolio: Blog Live Search
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Blog Page
+
+From the [Portfolio: Blog Search](./portfolio_blog_search.livemd) exercise, you should already have the ability to search for blogs when the client visits http://localhost:4000/blog?title=search_string.
+
+Using LiveView, you're going to add a realtime blog search. Now, the list of blogs will update everytime the user types into the search text input without needing to press a submit button.
+
+Implement the LiveView on a new http://localhost:4000/blog_live route rather than replacing the existing http://localhost:4000/blog route to avoid deleting your existing work.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Blog Live
+
+The Blog LiveView should display a list of all blogs when the user visits http://localhost:4000/blog_live.
+
+There should be a text input that triggers a `phx-change` event to filter the list of blogs using the value of the text input.
+
+Consider including the following test cases.
+
+* Visit http://localhost:4000/blog_live and assert all blogs are found on the page.
+* Visit http://localhost:4000/blog_live and trigger the search event. Assert all matching blogs are found on the page, and non-matching blogs are not found.
