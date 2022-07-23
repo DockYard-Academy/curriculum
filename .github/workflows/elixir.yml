@@ -20,8 +20,8 @@ jobs:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.13.3' # Define the elixir version [required]
-        otp-version: '24.3' # Define the OTP version [required]
+        elixir-version: '1.13.4' # Define the elixir version [required]
+        otp-version: '25.0.2' # Define the OTP version [required]
     - name: Restore dependencies cache
       uses: actions/cache@v3
       with:
@@ -31,6 +31,9 @@ jobs:
     - name: Install dependencies
       working-directory: ./utils
       run: mix deps.get
+    - name: Check code format
+      working-directory: ./utils
+      run: mix format --check-formatted
     - name: Check compilation warnings
       working-directory: ./utils
       run: mix compile --warnings-as-errors
