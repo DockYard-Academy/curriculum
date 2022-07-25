@@ -83,13 +83,13 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
 
   def animate(:road_light) do
     Kino.animate(500, 0, fn i ->
-      md = Kino.Markdown.new("
+      md = Kino.Markdown.new(~s(
 <div style=\"display: flex; justify-content: center; width: 100%;\">
   <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 0 && "green") || "black"}; border-radius: 50%;\"></div>
   <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 1 && "yellow") || "black"}; border-radius: 50%;\"></div>
   <div style=\"height: 50px; width: 50px; margin: 10px; background-color: #{(i === 2 && "red") || "black"}; border-radius: 50%;\"></div>
 </div>
-  ")
+  "))
       {:cont, md, rem(i + 1, 3)}
     end)
   end

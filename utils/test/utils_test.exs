@@ -1,8 +1,8 @@
 defmodule UtilsTest do
   use ExUnit.Case
   doctest Utils
-  alias Utils.Solutions
   alias Utils.Factory
+  alias Utils.Solutions
 
   test "slide/1" do
     Utils.Slide.__info__(:functions)
@@ -57,7 +57,7 @@ defmodule UtilsTest do
   end
 
   test "feedback/2 with invalid atom" do
-    atom = Factory.string() |> String.to_atom()
+    atom = String.to_atom(Factory.string())
 
     assert Utils.feedback(atom, "non-nil answer") ==
              "Something went wrong, feedback does not exist for #{atom}. Please speak to your teacher and/or reset the exercise."
