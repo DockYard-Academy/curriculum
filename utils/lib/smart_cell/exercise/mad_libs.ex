@@ -1,4 +1,4 @@
-defmodule Utils.SmartCell.MadLibs do
+defmodule Utils.SmartCell.Exercise.MadLibs do
   use Utils.SmartCell.Exercise
 
   @impl true
@@ -15,19 +15,19 @@ defmodule Utils.SmartCell.MadLibs do
   end
 
   @impl true
-  def expected_solution do
+  def possible_solution do
     """
-    name_of_company = "a"
-    a_defined_offering = "a"
-    a_defined_audience = "a"
-    solve_a_problem = "a"
-    secret_sauce = "a"
+    name_of_company = "DockYard"
+    a_defined_offering = "DockYard Academy"
+    a_defined_audience = "Junior Developers"
+    solve_a_problem = "learn Elixir"
+    secret_sauce = "Livebook"
 
-    madlib =
-      "My company, " <> name_of_company <> ", is developing " <> a_defined_offering <> " to help " <> a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
+    madlib = "My company, " <> name_of_company <> ", is developing " <> a_defined_offering <> " to help " <> a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
     """
   end
 
+  @impl true
   def feedback do
     """
     assert is_binary(name_of_company) and name_of_company != "", "name_of_company should be a non-empty string"

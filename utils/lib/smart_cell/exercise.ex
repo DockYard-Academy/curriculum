@@ -1,10 +1,10 @@
 defmodule Utils.SmartCell.Exercise do
   @callback default_source :: String.t()
   @callback feedback :: String.t()
-  @callback expected_solution :: String.t()
+  @callback possible_solution :: String.t()
   defmacro __using__(_opts) do
     quote do
-      use Kino.JS
+      use Kino.JS, assets_path: "lib/assets/exercise"
       use Kino.JS.Live
       use Kino.SmartCell, name: "Mad Libs"
 
@@ -18,23 +18,39 @@ defmodule Utils.SmartCell.Exercise do
         raise "feedback/0 not implemented"
       end
 
-      def expected_solution do
-        raise "expected_solution/0 not implemented"
+      def possible_solution do
+        raise "possible_solution/0 not implemented"
       end
 
       defoverridable feedback: 0
       defoverridable default_source: 0
-      defoverridable expected_solution: 0
+      defoverridable possible_solution: 0
 
       @impl true
       def init(attrs, ctx) do
-        {:ok, ctx,
-         editor: [attribute: "code", language: "elixir", default_source: default_source()]}
+        {:ok, assign(ctx, attempt: 0),
+         editor: [
+           attribute: "code",
+           language: "elixir",
+           default_source: String.trim(default_source()),
+           placement: :top
+         ]}
+      end
+
+      @impl true
+      def handle_info(:attempt, ctx) do
+         broadcast_event(ctx, "attempt", %{"attempt" => ctx.assigns.attempt + 1})
+        {:noreply, assign(ctx, attempt: ctx.assigns.attempt + 1)}
       end
 
       @impl true
       def to_source(attrs) do
+        [p, i, d] =
+          Regex.scan(~r/\d+/, inspect(self()))
+          |> Enum.map(fn [id] -> String.to_integer(id) end)
+
         """
+        send(:c.pid(#{p}, #{i}, #{d}), :attempt)
         ExUnit.start(auto_run: false)
         defmodule Test do
           use ExUnit.Case
@@ -44,34 +60,22 @@ defmodule Utils.SmartCell.Exercise do
           end
         end
         ExUnit.run()
+
+        # Make variables and modules defined in the test available.
+        # Also allows for exploration using the output of the cell.
+        #{attrs["code"]}
         """
       end
 
       @impl true
       def handle_connect(ctx) do
         # I'd like to display the expected solution as a hint, but can't seem to get the styling working.
-        {:ok, %{expected_solution: expected_solution()}, ctx}
+        {:ok, %{possible_solution: Makeup.highlight(String.trim(possible_solution()))}, ctx}
       end
 
       @impl true
       def to_attrs(ctx) do
         %{}
-      end
-
-      asset "main.js" do
-        """
-        export function init(ctx, payload) {
-          ctx.importCSS("/css/app.css");
-
-          ctx.root.innerHTML = `
-          <div class="w-full">
-            <div class="markdown">
-              <h3>Solution:</h3>
-            </div>
-          </div>
-            `;
-          }
-        """
       end
     end
   end

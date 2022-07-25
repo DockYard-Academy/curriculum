@@ -10,7 +10,9 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:makeup, "~> 1.1.0"},
+  {:makeup_elixir, "~> 0.16.0"}
 ])
 ```
 
@@ -31,7 +33,59 @@ can enter in a word or sentence to fill in the blanks.
 In the Elixir cell below, Create replace `nil` for each blank in the madlib.
 Then use those variables with string concatenation `<>` to create the `madlib`.
 
+<!-- livebook:{"attrs":{},"kind":"Elixir.Utils.SmartCell.Exercise.MadLibs","livebook_object":"smart_cell"} -->
+
 ```elixir
+send(:c.pid(0, 343, 0), :attempt)
+ExUnit.start(auto_run: false)
+
+defmodule Test do
+  use ExUnit.Case
+
+  test "test" do
+    name_of_company = nil
+    a_defined_offering = nil
+    a_defined_audience = nil
+    solve_a_problem = nil
+    secret_sauce = nil
+
+    madlib = nil
+
+    assert is_binary(name_of_company) and name_of_company != "",
+           "name_of_company should be a non-empty string"
+
+    assert is_binary(a_defined_offering) and a_defined_offering != "",
+           "a_defined_offering should be a non-empty string"
+
+    assert is_binary(a_defined_audience) and a_defined_audience != "",
+           "a_defined_audience should be a non-empty string"
+
+    assert is_binary(solve_a_problem) and solve_a_problem != "",
+           "solve_a_problem should be a non-empty string"
+
+    assert is_binary(secret_sauce) and secret_sauce != "",
+           "secret_sauce should be a non-empty string"
+
+    assert String.contains?(madlib, name_of_company),
+           "name_of_company should be used in the madlib"
+
+    assert String.contains?(madlib, a_defined_offering),
+           "a_defined_offering should be used in the madlib"
+
+    assert String.contains?(madlib, a_defined_audience),
+           "a_defined_audience should be used in the madlib"
+
+    assert String.contains?(madlib, solve_a_problem),
+           "solve_a_problem should be used in the madlib"
+
+    assert String.contains?(madlib, secret_sauce), "secret_sauce should be used in the madlib"
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 name_of_company = nil
 a_defined_offering = nil
 a_defined_audience = nil
@@ -39,15 +93,6 @@ solve_a_problem = nil
 secret_sauce = nil
 
 madlib = nil
-
-Utils.feedback(:startup_madlib, [
-  madlib,
-  name_of_company,
-  a_defined_offering,
-  a_defined_audience,
-  solve_a_problem,
-  secret_sauce
-])
 ```
 
 ## Nature Show Madlib
