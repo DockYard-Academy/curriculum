@@ -14,7 +14,8 @@ defmodule Utils.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {Utils.Application, []}
     ]
   end
 
@@ -28,7 +29,9 @@ defmodule Utils.MixProject do
       {:ecto, "~> 3.7"},
       {:math, "~> 0.7.0"},
       {:faker, "~> 0.17.0"},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:makeup, "~> 1.1.0"},
+      {:makeup_elixir, "~> 0.16.0"}
     ]
   end
 end
