@@ -1,4 +1,6 @@
 defmodule Utils.Slide do
+  @moduledoc false
+
   def case do
     [
       "
