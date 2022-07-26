@@ -323,10 +323,10 @@ defmodule Utils.Feedback do
     assert is_map(family_tree), "Ensure `family_tree` is a map."
     assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
 
-    assert %{name: "Arthur", parents: parents } = family_tree,
+    assert %{name: "Arthur", parents: parents} = family_tree,
            "Ensure Arthur in `family_tree` has a list of parents."
-    assert length(parents) == 2, "Ensure both parents are included."
 
+    assert length(parents) == 2, "Ensure both parents are included."
   end
 
   feedback :naming_numbers do
@@ -539,11 +539,11 @@ defmodule Utils.Feedback do
       actual = module.play(p1, p2)
 
       assert actual == expected_result,
-      """
-      Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).
-      expected: #{inspect(expected_result)}
-      received: #{inspect(actual)}
-      """
+             """
+             Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).
+             expected: #{inspect(expected_result)}
+             received: #{inspect(actual)}
+             """
     end)
   end
 
@@ -745,7 +745,6 @@ defmodule Utils.Feedback do
     result = search.all_items(items, [])
     assert result, "Implement the `all_items/2` function."
     assert is_list(result), "`all_items/2` should return a list."
-
 
     assert length(result) == 2,
            "`all_items/2` should return all items when no filters are provided."
@@ -1399,7 +1398,7 @@ defmodule Utils.Feedback do
         )
     end
 
-    assert money.subtract(money.new(10000, :US), money.new(100, :US)) == money.new(9900, :US)
+    assert money.subtract(money.new(10_000, :US), money.new(100, :US)) == money.new(9900, :US)
 
     assert_raise FunctionClauseError, fn ->
       money.subtract(money.new(500, :CAD), money.new(100, :US)) &&
@@ -1764,10 +1763,10 @@ defmodule Utils.Feedback do
       3571,
       5778,
       9349,
-      15127,
-      24476,
-      39603,
-      64079,
+      15_127,
+      24_476,
+      39_603,
+      64_079,
       103_682,
       167_761,
       271_443,
@@ -2386,10 +2385,9 @@ defmodule Utils.Feedback do
     assert call_with_20.(fn int -> int * 10 end) == 20 * 10
   end
 
-
   feedback :range_to_list do
     list = get_answers()
-    assert list == [3,6,9]
+    assert list == [3, 6, 9]
   end
 
   feedback :created_project do

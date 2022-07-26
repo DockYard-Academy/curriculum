@@ -276,64 +276,6 @@ classDiagram
   Principal "*" --> "1" School : belongs to 
 ```
 
-## Nested Resources
-
-Presently, have several failing tests because we have not added the resources for principals to our router.
-
-We could add these resources to the router the usual way, however this does not account for the relationship between principals and schools.
-
-Instead, we can use nested resources to associate one resource with another.
-
-Principals should always belong to a school, so we can nest the principal resource inside of the schools resource.
-
-Modify our router to include the following.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-# lib/faculty_manager_web/router.ex
-
-scope "/", FacultyManagerWeb do
-  pipe_through :browser
-
-  get "/", PageController, :index
-
-  resources "/schools", SchoolController do
-    resources "/principals", PrincipalController
-  end
-end
-```
-
-We can run `mix phx.routes` to view the new nested routes we've created.
-
-```
-$ mix phx.routes
-page_path  GET     /                                        FacultyManagerWeb.PageController :index
-          school_path  GET     /schools                                 FacultyManagerWeb.SchoolController :index
-          school_path  GET     /schools/:id/edit                        FacultyManagerWeb.SchoolController :edit
-          school_path  GET     /schools/new                             FacultyManagerWeb.SchoolController :new
-          school_path  GET     /schools/:id                             FacultyManagerWeb.SchoolController :show
-          school_path  POST    /schools                                 FacultyManagerWeb.SchoolController :create
-          school_path  PATCH   /schools/:id                             FacultyManagerWeb.SchoolController :update
-                       PUT     /schools/:id                             FacultyManagerWeb.SchoolController :update
-          school_path  DELETE  /schools/:id                             FacultyManagerWeb.SchoolController :delete
-school_principal_path  GET     /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :index
-school_principal_path  GET     /schools/:school_id/principals/:id/edit  FacultyManagerWeb.PrincipalController :edit
-school_principal_path  GET     /schools/:school_id/principals/new       FacultyManagerWeb.PrincipalController :new
-school_principal_path  GET     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :show
-school_principal_path  POST    /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :create
-school_principal_path  PATCH   /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
-                       PUT     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
-school_principal_path  DELETE  /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :delete
-  live_dashboard_path  GET     /dashboard                               Phoenix.LiveDashboard.PageLive :home
-  live_dashboard_path  GET     /dashboard/:page                         Phoenix.LiveDashboard.PageLive :page
-  live_dashboard_path  GET     /dashboard/:node/:page                   Phoenix.LiveDashboard.PageLive :page
-                       *       /dev/mailbox                             Plug.Swoosh.MailboxPreview []
-            websocket  WS      /live/websocket                          Phoenix.LiveView.Socket
-             longpoll  GET     /live/longpoll                           Phoenix.LiveView.Socket
-             longpoll  POST    /live/longpoll                           Phoenix.LiveView.Socket
-```
-
 ## Principal Context
 
 Because we added the `null: false` constraint on the `FacultyManager.Repo.Migrations.CreatePrincipals` migration, we have seven failing tests in the `Principals` context.
@@ -346,7 +288,7 @@ $ mix test test/faculty_manager/principals_test.exs
 8 tests, 7 failures
 ```
 
-Let's fix each test one by one, starting with the following.
+Let's fix these tests, starting with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -530,9 +472,7 @@ $ mix test test/faculty_manager/principals_test.exs
 8 tests, 0 failures
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### List Principal By School
+## List Principals By School
 
 While we're in the `Principals` context, we're going to need a `Principals.list_principals/1` function that will list principals by school, rather than just listing all principals.
 
@@ -553,24 +493,119 @@ test "list_principals/1 returns all principals by school" do
   {:ok, principal2} = Principals.create_principal(school2, %{name: "Skinner"})
 
   # list school1 principals
-  assert Principals.list_principals(school1) == [principal1]
+  assert Principals.list_principals(school1.id) == [principal1]
   
   # list school2 principals
-  assert Principals.list_principals(school2) == [principal2]
+  assert Principals.list_principals(school2.id) == [principal2]
 end
 ```
 
-Then add the `Principals.list_principal/1` function to make the test pass.
+Now we need to add the `Principals.list_principal/1` function to make the test pass.
+
+There are many ways to build a query that will find all principals that belong to a school. Let's consider a few examples.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Where
+
+We can use the [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function to filter the list of principals by their `school_id`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-
+def list_principals(school_id) do
+  FacultyManager.Principals.Principal
+  |> where([p], p.school_id == ^school_id)
+  |> Repo.all()
+end
 ```
 
-## List Principals
+**Why use where/3?**
 
-We have eight more failing tests for our `PrincipalController`. Run the following to see these failing tests.
+Filtering by the id using `where/3` is often the simplest and best performing query option when we want to retrieve data from a single table. However it's less flexible than the other options below for incorrorating data from multiple tables.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Preloading
+
+We can use the [preload](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) function to load an associated table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager/principals.ex
+
+def list_principals(school_id) do
+  school =
+    FacultyManager.Schools.School
+    |> preload([s], :principals)
+    |> Repo.get(school_id)
+
+  school.principals
+end
+```
+
+First, this will retrieve the school from the database in one query. Then, it will load the principals for that school in a second query.
+
+**Why use preloading?**
+
+Preloading is a fantastic way to retrieve associated data from a table. However, it's slower because it requires two queries unless we add further optimizations.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Join and Select
+
+We can [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) two associated tables together.
+Then use [select](https://hexdocs.pm/ecto/Ecto.Query.html#select/3) to return the nested principals field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager/principals.ex
+
+def list_principals(school_id) do
+  FacultyManager.Schools.School
+  |> where([s], s.id == ^school_id)
+  |> join(:inner, [s], p in assoc(s, :principals))
+  |> select([s, p], p)
+  |> Repo.all()
+end
+```
+
+**Why use join/5 and select/3?**
+
+Using `join/5` and `select/3` we can be extremely specific about our return value. For example, we could return a tuple with both the school name and the principal name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  FacultyManager.Schools.School
+  |> where([s], s.id == ^school_id)
+  |> join(:inner, [s], p in assoc(s, :principals))
+  |> select([s, p], {s.name, p.name})
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn: Which solution is fastest?
+
+First, guess which approach you think will be fastest.
+
+Then, use either [Benchee](https://github.com/bencheeorg/benchee) (which you'll have to add to your `mix.exs`) or `:timer.tc` to determine which approach out of the above is the actually fastest.
+
+Which solution is fastest? Why do you think that is? What do you think would happen if you had more Schools or more Principals?
+
+Use the fastest solution for the `Principals.list_principals/1` function and ensure your tests pass.
+
+```
+$ mix test test/faculty_manager/principals_test.exs
+```
+
+## Nested Resources
+
+Presently, have several failing tests because we have not added the resources for principals to our router.
+
+We have eight more failing tests for our `PrincipalController` because we have not added the resources for principals to our router. Run the following to see these failing tests.
 
 ```
 $ mix test test/faculty_manager_web/controllers/principal_controller_test.exs
@@ -578,7 +613,61 @@ $ mix test test/faculty_manager_web/controllers/principal_controller_test.exs
 8 tests, 8 failures
 ```
 
-These are controller tests, so we can reproduce these bugs in the browser.
+We could add these resources to the router the usual way, however this does not account for the relationship between principals and schools.
+
+Instead, we'll use nested resources to associate one resource with another.
+
+Principals should always belong to a school, so we can nest the principal resource inside of the schools resource.
+
+Modify our router to include the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/router.ex
+
+scope "/", FacultyManagerWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+
+  resources "/schools", SchoolController do
+    resources "/principals", PrincipalController
+  end
+end
+```
+
+We can run `mix phx.routes` to view the new nested routes we've created.
+
+```
+$ mix phx.routes
+page_path  GET     /                                        FacultyManagerWeb.PageController :index
+          school_path  GET     /schools                                 FacultyManagerWeb.SchoolController :index
+          school_path  GET     /schools/:id/edit                        FacultyManagerWeb.SchoolController :edit
+          school_path  GET     /schools/new                             FacultyManagerWeb.SchoolController :new
+          school_path  GET     /schools/:id                             FacultyManagerWeb.SchoolController :show
+          school_path  POST    /schools                                 FacultyManagerWeb.SchoolController :create
+          school_path  PATCH   /schools/:id                             FacultyManagerWeb.SchoolController :update
+                       PUT     /schools/:id                             FacultyManagerWeb.SchoolController :update
+          school_path  DELETE  /schools/:id                             FacultyManagerWeb.SchoolController :delete
+school_principal_path  GET     /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :index
+school_principal_path  GET     /schools/:school_id/principals/:id/edit  FacultyManagerWeb.PrincipalController :edit
+school_principal_path  GET     /schools/:school_id/principals/new       FacultyManagerWeb.PrincipalController :new
+school_principal_path  GET     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :show
+school_principal_path  POST    /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :create
+school_principal_path  PATCH   /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
+                       PUT     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
+school_principal_path  DELETE  /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :delete
+  live_dashboard_path  GET     /dashboard                               Phoenix.LiveDashboard.PageLive :home
+  live_dashboard_path  GET     /dashboard/:page                         Phoenix.LiveDashboard.PageLive :page
+  live_dashboard_path  GET     /dashboard/:node/:page                   Phoenix.LiveDashboard.PageLive :page
+                       *       /dev/mailbox                             Plug.Swoosh.MailboxPreview []
+            websocket  WS      /live/websocket                          Phoenix.LiveView.Socket
+             longpoll  GET     /live/longpoll                           Phoenix.LiveView.Socket
+             longpoll  POST    /live/longpoll                           Phoenix.LiveView.Socket
+```
+
+## List Principals
 
 Ensure the server is running.
 
@@ -588,7 +677,13 @@ mix phx.server
 
 Then visit http://localhost:4000/schools/new and create one school.
 
-Then visit http://localhost:4000/schools/1/principals. Normally we would see an empty list of principals for the school. However currently we see the following.
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/create_new_school.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now visit http://localhost:4000/schools/1/principals. We want to see an empty list of principals for the school. However currently we see the following.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -596,9 +691,7 @@ Then visit http://localhost:4000/schools/1/principals. Normally we would see an 
 
 <!-- livebook:{"break_markdown":true} -->
 
-The error above is because we used nested routes. By default, the Phoenix generator assumes all principal routes will use `Routes.principal_path/2` but instead they use `Routes.school_principal_path/3` which we saw when we ran `mix phx.routes`.
-
-<!-- livebook:{"break_markdown":true} -->
+The error above is because we used nested routes. By default, the Phoenix generator assumes all principal routes will use `Routes.principal_path` but instead they use `Routes.school_principal_path` which we saw when we ran `mix phx.routes`.
 
 To resolve the error above, we need to fix the `"index"` test in our controller tests.
 
@@ -631,11 +724,9 @@ describe "index" do
 end
 ```
 
-The test will still fail with the same error, because we also use `Routes/principal_path/2` in the principal index template rendered by the `:index` route.
+Now we need to modify the `PrincipalController`. Because we've used nested routes, we have access to the `"school_id"` parameter from the URL http://localhost:4000/schools/1/principals.
 
-Expose the `school_id` in the `PrincipalController.index/2` function. `"school_id"` is available in the second parameter of the controller because it's a route parameter.
-
-While we're in the controller, we should have the `Principals.list_principals/1` function filter principals by schools.
+Let's use the `school_id` to filter the list of principals, and pass `school_id: school_id` to the `render/3` function for the template.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -645,6 +736,8 @@ def index(conn, %{"school_id" => school_id}) do
   render(conn, "index.html", principals: principals, school_id: school_id)
 end
 ```
+
+Now we need to use the proper `Routes.school_principal_path` instead of `Routes.principal_path` in the template file.
 
 Replace the index page with the following content.
 
@@ -681,27 +774,10 @@ Replace the index page with the following content.
 <span><%= link "New Principal", to: Routes.school_principal_path(@conn, :new, @school_id) %></span>
 ```
 
-Then provide the `@school_id` in the assigns. We gained access to `"school_id"` in the params when we nested the `"/principals"` resource inside of the `"/schools"` resource.
-
-We also want to filter principals by school, so provide the `school_id` to the `Principals.list_principals/1` function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-# lib/faculty_manager_web/controllers/principal_controller
-
-def index(conn, %{"school_id" => school_id}) do
-  principals = Principals.list_principals()
-  render(conn, "index.html", school_id: school_id, principals: principals)
-end
-```
-
-Notice that we've introduced a bug, because the `PrincipalController.index/2` function lists all principals rather than only principals that belong to the school. We'll come back to this later.
-
-Now re-run the test and it should pass.
+Now re-run the test where `7` is the line number of the `"index"` test and it should pass.
 
 ```
-$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:12
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:7
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -714,7 +790,7 @@ To ensure we've correctly fixed the issue, visit http://localhost:4000/schools a
 
 <!-- livebook:{"break_markdown":true} -->
 
-Then visit http://localhost:4000/schools/1 and we should see the list principals page.
+Then visit http://localhost:4000/schools/1/principals and we should see the list principals page.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -754,7 +830,7 @@ Replace the test with the following.
 
 describe "new principal" do
   test "renders form", %{conn: conn} do
-    school = school_fixture()
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
     conn = get(conn, Routes.school_principal_path(conn, :new, school.id))
     assert html_response(conn, 200) =~ "New Principal"
   end
@@ -788,10 +864,10 @@ Then replace the template file to remove calls to `Routes.principal_path/2`.
 <span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
 ```
 
-Now the test should pass when we run the following.
+Now the test should pass when we run the following where `18` is the line number of the `"new principal"` test.
 
 ```
-$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:20
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:18
 ```
 
 http://localhost:4000/schools/1/principals/new should no longer crash.
@@ -835,7 +911,7 @@ describe "create principal" do
 end
 ```
 
-Replace these tests with the following to use `Routes.school_principal_path/3` instead of `Routes.principal_path/2`.
+Replace these tests with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -844,7 +920,7 @@ Replace these tests with the following to use `Routes.school_principal_path/3` i
 
 describe "create principal" do
   test "redirects to show when data is valid", %{conn: conn} do
-    school = school_fixture()
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
 
     conn =
       post(conn, Routes.school_principal_path(conn, :create, school.id),
@@ -859,7 +935,7 @@ describe "create principal" do
   end
 
   test "renders errors when data is invalid", %{conn: conn} do
-    school = school_fixture()
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
 
     conn =
       post(conn, Routes.school_principal_path(conn, :create, school.id),
@@ -871,9 +947,7 @@ describe "create principal" do
 end
 ```
 
-Update the `PrincipalController.create/2` function to use the `school_id`.
-
-> Notice that `Principals.create_principal/1` creates a principal without a school. We'll circle back to fix this later.
+Update the `PrincipalController.create/2` function to use the `school_id`. We need to use `Routes.school_principal_path` instead of `Routes.principal_path`. We also need to provide the `school` to the `Principals.create_principal/2` function.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -881,15 +955,18 @@ Update the `PrincipalController.create/2` function to use the `school_id`.
 # lib/faculty_manager_web/controllers/principal_controller
 
 def create(conn, %{"principal" => principal_params, "school_id" => school_id}) do
-  IO.inspect(principal_params)
+  school = FacultyManager.Schools.get_school!(school_id)
 
-  case Principals.create_principal(principal_params) do
+  # provide the school to create_principal/2
+  case Principals.create_principal(school, principal_params) do
     {:ok, principal} ->
       conn
       |> put_flash(:info, "Principal created successfully.")
+      # use school_principal_path
       |> redirect(to: Routes.school_principal_path(conn, :show, school_id, principal))
 
     {:error, %Ecto.Changeset{} = changeset} ->
+      # bind the school_id to the assigns
       render(conn, "new.html", changeset: changeset, school_id: school_id)
   end
 end
@@ -978,9 +1055,8 @@ Replace the test with the following. We're going to opt out of using the `:creat
 
 describe "edit principal" do
   test "renders form for editing chosen principal", %{conn: conn} do
-    school = school_fixture()
-    principal = principal_fixture(school: school)
-    conn = get(conn, Routes.school_principal_path(conn, :edit, school.id, principal))
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    conn = get(conn, Routes.principal_path(conn, :edit, school.id, principal))
     assert html_response(conn, 200) =~ "Edit Principal"
   end
 end

@@ -149,7 +149,6 @@ defmodule Utils.Solutions do
       status: :grand_parent,
       age: 70,
       parents: []
-
     }
 
     ygraine = %{
@@ -1494,7 +1493,7 @@ defmodule Utils.Solutions do
     end
 
     def multiply(a, b) do
-      String.graphemes(a) |> Enum.map(fn each -> each ++ String.graphemes(b) end) |> Enum.join()
+      String.graphemes(a) |> Enum.map_join(fn each -> each ++ String.graphemes(b) end)
     end
   end
 
