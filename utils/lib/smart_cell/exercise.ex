@@ -2,11 +2,11 @@ defmodule Utils.SmartCell.Exercise do
   @callback default_source :: String.t()
   @callback feedback :: String.t()
   @callback possible_solution :: String.t()
-  defmacro __using__(_opts) do
+  defmacro __using__(name: name) do
     quote do
       use Kino.JS, assets_path: "lib/assets/exercise"
       use Kino.JS.Live
-      use Kino.SmartCell, name: "Mad Libs"
+      use Kino.SmartCell, name: unquote(name)
 
       @behaviour Utils.SmartCell.Exercise
 
@@ -39,7 +39,7 @@ defmodule Utils.SmartCell.Exercise do
 
       @impl true
       def handle_info(:attempt, ctx) do
-         broadcast_event(ctx, "attempt", %{"attempt" => ctx.assigns.attempt + 1})
+        broadcast_event(ctx, "attempt", %{"attempt" => ctx.assigns.attempt + 1})
         {:noreply, assign(ctx, attempt: ctx.assigns.attempt + 1)}
       end
 
@@ -52,9 +52,9 @@ defmodule Utils.SmartCell.Exercise do
         """
         send(:c.pid(#{p}, #{i}, #{d}), :attempt)
         ExUnit.start(auto_run: false)
-        defmodule Test do
+        defmodule Assertion do
           use ExUnit.Case
-          test "test" do
+          test "" do
             #{attrs["code"]}
             #{feedback()}
           end
@@ -78,5 +78,23 @@ defmodule Utils.SmartCell.Exercise do
         %{}
       end
     end
+  end
+
+  def smart_cells do
+    {:ok, modules} = :application.get_key(:utils, :modules)
+
+    modules
+    |> Enum.filter(fn module ->
+      case Module.split(module) do
+        [_utils, "SmartCell", "Exercise" | []] ->
+          false
+
+        [_utils, "SmartCell", "Exercise" | _tail] ->
+          true
+
+        _ ->
+          false
+      end
+    end)
   end
 end

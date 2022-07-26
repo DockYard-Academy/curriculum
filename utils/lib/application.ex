@@ -7,7 +7,7 @@ defmodule Utils.Application do
 
   defp exercise_modules do
     [
-      Utils.SmartCell.Exercise.MadLibs
+      Utils.SmartCell.Exercise.StringConcatenationMadlib
     ]
   end
 

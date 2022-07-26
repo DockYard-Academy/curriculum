@@ -21,7 +21,7 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
 
-## Startup Madlib
+## String Concatenation Madlib
 
 In this exercise, you're going to recreate the following madlib game. A madlib is a game where the player
 can enter in a word or sentence to fill in the blanks.
@@ -30,19 +30,20 @@ can enter in a word or sentence to fill in the blanks.
 
 <!-- livebook:{"break_markdown":true} -->
 
-In the Elixir cell below, Create replace `nil` for each blank in the madlib.
-Then use those variables with string concatenation `<>` to create the `madlib`.
+In the Elixir cell below bind `name_of_company`, `a_defined_offering`, `a_defined_audience`, `solve_a_problem`, and `secret_sauce` to a string.
 
-<!-- livebook:{"attrs":{},"kind":"Elixir.Utils.SmartCell.Exercise.MadLibs","livebook_object":"smart_cell"} -->
+Then use string concatenation to concentenate the variables to create the madlib above.
+
+<!-- livebook:{"attrs":{},"kind":"Elixir.Utils.SmartCell.Exercise.StringConcatenationMadlib","livebook_object":"smart_cell"} -->
 
 ```elixir
-send(:c.pid(0, 343, 0), :attempt)
+send(:c.pid(0, 354, 0), :attempt)
 ExUnit.start(auto_run: false)
 
 defmodule Test do
   use ExUnit.Case
 
-  test "test" do
+  test "" do
     name_of_company = nil
     a_defined_offering = nil
     a_defined_audience = nil
@@ -79,6 +80,14 @@ defmodule Test do
            "solve_a_problem should be used in the madlib"
 
     assert String.contains?(madlib, secret_sauce), "secret_sauce should be used in the madlib"
+
+    madlib =
+      "My company, " <>
+        name_of_company <>
+        ", is developing " <>
+        a_defined_offering <>
+        " to help " <>
+        a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
   end
 end
 
@@ -95,38 +104,44 @@ secret_sauce = nil
 madlib = nil
 ```
 
-## Nature Show Madlib
+## String Interpolation Madlib
 
-In the Elixir cell below, create a variable for each of the blanks in the following madlib.
-Then use those variables to create a mad lib, but this time use string interpolation `#{}`.
+In the Elixir cell below, fill in `blank1`, `blank2`, and `blank3` with a word to replace the blanks in the sentence.
 
-![](images/nature_show_madlib.png)
+> A programmer is a ____ that turns ____ into ____.
 
-Replace `nil` with your complete madlib.
+Then use string interpololation to interpolate these values into a single string bound to the `madlib` variable.
+
+<!-- livebook:{"attrs":{"assertions":"assert is_binary(blank1) and blank1 != \"\", \"blank1 should be a non-empty string\"\nassert is_binary(blank2) and blank2 != \"\", \"blank2 should be a non-empty string\"\nassert is_binary(blank3) and blank3 != \"\", \"blank3 should be a non-empty string\"\nassert madlib == \"a programmer is a #{blank1} that turns #{blank2} into #{blank3}.\"","attempt":1,"code":"blank1 = nil\r\nblank2 = nil\r\nblank3 = nil\r\n\r\nmadlib = nil","hint":"blank1 = \"machine\"\nblank2 = \"coffee\"\nblank3 = \"code\"\n\nmadlib = \"a programmer is a #{blank1} that turns #{blank2} into #{blank3}.\"","hint_html":"<pre class=\"highlight\"><code><span class=\"n\">blank1</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">&quot;machine&quot;</span><span class=\"w\">\n</span><span class=\"n\">blank2</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">&quot;coffee&quot;</span><span class=\"w\">\n</span><span class=\"n\">blank3</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">&quot;code&quot;</span><span class=\"w\">\n\n</span><span class=\"n\">madlib</span><span class=\"w\"> </span><span class=\"o\">=</span><span class=\"w\"> </span><span class=\"s\">&quot;a programmer is a </span><span class=\"si\" data-group-id=\"4538266215-1\">#{</span><span class=\"n\">blank1</span><span class=\"si\" data-group-id=\"4538266215-1\">}</span><span class=\"s\"> that turns </span><span class=\"si\" data-group-id=\"4538266215-2\">#{</span><span class=\"n\">blank2</span><span class=\"si\" data-group-id=\"4538266215-2\">}</span><span class=\"s\"> into </span><span class=\"si\" data-group-id=\"4538266215-3\">#{</span><span class=\"n\">blank3</span><span class=\"si\" data-group-id=\"4538266215-3\">}</span><span class=\"s\">.&quot;</span></code></pre>"},"kind":"Elixir.Utils.SmartCell.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-animal = nil
-country = nil
-plural_noun = nil
-a_food = nil
-type_of_screen_device = nil
-noun = nil
-verb1 = nil
-verb2 = nil
-adjective = nil
+send(:c.pid(0, 358, 0), :attempt)
+
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    blank1 = nil
+    blank2 = nil
+    blank3 = nil
+
+    madlib = nil
+    assert is_binary(blank1) and blank1 != "", "blank1 should be a non-empty string"
+    assert is_binary(blank2) and blank2 != "", "blank2 should be a non-empty string"
+    assert is_binary(blank3) and blank3 != "", "blank3 should be a non-empty string"
+    assert madlib == "a programmer is a #{blank1} that turns #{blank2} into #{blank3}."
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+blank1 = nil
+blank2 = nil
+blank3 = nil
 
 madlib = nil
-
-Utils.feedback(:nature_show_madlib, [
-  animal,
-  country,
-  plural_noun,
-  a_food,
-  type_of_screen_device,
-  noun,
-  verb1,
-  verb2,
-  adjective,
-  madlib
-])
 ```

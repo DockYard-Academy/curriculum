@@ -92,7 +92,6 @@ defmodule Utils.SmartCell.TestedCell do
     # Make variables and modules defined in the test available.
     # Also allows for exploration using the output of the cell.
     #{attrs["code"]}
-    #{attrs["attempt"]}
     """
   end
 end

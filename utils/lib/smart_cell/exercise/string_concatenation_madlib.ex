@@ -1,6 +1,5 @@
-defmodule Utils.SmartCell.Exercise.MadLibs do
-  use Utils.SmartCell.Exercise
-
+defmodule Utils.SmartCell.Exercise.StringConcatenationMadlib do
+  use Utils.SmartCell.Exercise, name: "String Concatenation Madlib"
   @impl true
   def default_source do
     """
@@ -19,7 +18,7 @@ defmodule Utils.SmartCell.Exercise.MadLibs do
     """
     name_of_company = "DockYard"
     a_defined_offering = "DockYard Academy"
-    a_defined_audience = "Junior Developers"
+    a_defined_audience = "students"
     solve_a_problem = "learn Elixir"
     secret_sauce = "Livebook"
 
@@ -40,6 +39,7 @@ defmodule Utils.SmartCell.Exercise.MadLibs do
     assert String.contains?(madlib, a_defined_audience), "a_defined_audience should be used in the madlib"
     assert String.contains?(madlib, solve_a_problem), "solve_a_problem should be used in the madlib"
     assert String.contains?(madlib, secret_sauce), "secret_sauce should be used in the madlib"
+    madlib = "My company, " <> name_of_company <> ", is developing " <> a_defined_offering <> " to help " <> a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
     """
   end
 end
