@@ -1398,7 +1398,7 @@ defmodule Utils.Feedback do
         )
     end
 
-    assert money.subtract(money.new(10000, :US), money.new(100, :US)) == money.new(9900, :US)
+    assert money.subtract(money.new(10_000, :US), money.new(100, :US)) == money.new(9900, :US)
 
     assert_raise FunctionClauseError, fn ->
       money.subtract(money.new(500, :CAD), money.new(100, :US)) &&
@@ -1763,10 +1763,10 @@ defmodule Utils.Feedback do
       3571,
       5778,
       9349,
-      15127,
-      24476,
-      39603,
-      64079,
+      15_127,
+      24_476,
+      39_603,
+      64_079,
       103_682,
       167_761,
       271_443,

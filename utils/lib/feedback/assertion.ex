@@ -26,7 +26,7 @@ defmodule Utils.Feedback.Assertion do
           defmodule unquote(module_name) do
             use ExUnit.Case
 
-            def get_answers() do
+            def get_answers do
               :persistent_term.get(:answers)
             end
 
