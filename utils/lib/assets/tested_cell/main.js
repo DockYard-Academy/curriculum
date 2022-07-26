@@ -20,7 +20,7 @@ export function init(ctx, payload) {
     const assertions_editor = ctx.root.querySelector("#assertions_editor");
     const hint_editor = ctx.root.querySelector("#hint_editor");
 
-    if (payload.hide) {
+    if (!payload.display_editors) {
         teacher_editor.style.display = "none"
     }
 

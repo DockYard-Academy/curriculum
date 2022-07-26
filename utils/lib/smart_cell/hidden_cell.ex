@@ -2,18 +2,16 @@ defmodule Utils.SmartCell.HiddenCell do
   use Kino.JS
   use Kino.JS.Live
   use Kino.SmartCell, name: "Hidden Cell"
-  # Enable Hidden Cells For Students
-  @enabled false
 
   @impl true
   def init(attrs, ctx) do
     source = attrs["source"] || ""
-    {:ok, assign(ctx, source: source, hide: @enabled)}
+    {:ok, assign(ctx, source: source, display_editors: Flags.get(:display_editors))}
   end
 
   @impl true
   def handle_connect(ctx) do
-    {:ok, %{source: ctx.assigns.source, hide: ctx.assigns.hide}, ctx}
+    {:ok, %{source: ctx.assigns.source, display_editors: ctx.assigns.display_editors}, ctx}
   end
 
   @impl true
@@ -44,7 +42,7 @@ defmodule Utils.SmartCell.HiddenCell do
 
       const textarea = ctx.root.querySelector("#source");
 
-      if (payload.hide) {
+      if (!payload.display_editors) {
         textarea.style.display = "none"
       }
 

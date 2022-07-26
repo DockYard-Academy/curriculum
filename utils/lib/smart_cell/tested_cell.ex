@@ -2,7 +2,6 @@ defmodule Utils.SmartCell.TestedCell do
   use Kino.JS, assets_path: "lib/assets/tested_cell"
   use Kino.JS.Live
   use Kino.SmartCell, name: "Tested cell"
-  @enabled false
 
   @impl true
   def init(attrs, ctx) do
@@ -17,7 +16,7 @@ defmodule Utils.SmartCell.TestedCell do
        assertions: assertions,
        hint: hint,
        hint_html: hint_html,
-       hide: @enabled
+       display_editors: Flags.get(:display_editors)
      ),
      editor: [
        attribute: "code",
@@ -33,7 +32,7 @@ defmodule Utils.SmartCell.TestedCell do
        assertions: ctx.assigns.assertions,
        hint: ctx.assigns.hint,
        hint_html: Makeup.highlight(String.trim(ctx.assigns.hint)),
-       hide: ctx.assigns.hide,
+       display_editors: ctx.assigns.display_editors,
        attempt: 0
      }, ctx}
   end
