@@ -10,17 +10,19 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 
 ## QuickStart
 
-1. Install a compatible Elixir (1.13.4 or higher) and Erlang (25 or higher)
+1. Clone the project `git clone <URL>`.
+
+2. Install a compatible Elixir (1.13.4 or higher) and Erlang (25 or higher)
    version. You may wish to use
    [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
-2. Install [Livebook](https://github.com/livebook-dev/livebook):
+3. Install [Livebook](https://github.com/livebook-dev/livebook):
 
    ```sh
    mix escript.install github livebook-dev/livebook
    ```
 
-3. From the project folder run the command below. This opens the navigation
+4. From the project folder run the command below. This opens the navigation
    page where you can find the course reading material and associated
    exercises.
 
@@ -38,7 +40,7 @@ This project uses [codespell](https://github.com/codespell-project/codespell) fo
 If contributing to the project, install codespell and run the following command to fix any spelling errors. Ensure all corrections are correct before committing altered files.
 
 ```
-codespell --skip="./utils/deps/*,./.git/*" -w
+codespell --skip="./utils/deps/*,./.git/*,./utils/assets/*" -w
 ```
 
 ## Course Outcome
