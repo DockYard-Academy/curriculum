@@ -861,8 +861,6 @@ defmodule Utils.Feedback do
     assert measurements.increased([3, 1, 2]) == 1, "Ensure you count each positive change."
     assert measurements.increased([1, 1, 2, 3, 1]) == 2
 
-    IO.inspect(list)
-
     assert measurements.increased(list) == Utils.Solutions.Measurements.increased(list),
            "`increased/1 failed when called with #{inspect(list)}"
 
