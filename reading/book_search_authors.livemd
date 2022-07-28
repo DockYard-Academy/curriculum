@@ -27,17 +27,15 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-Over the next several lessons we're going to build a `BookSearch` application that let's us search for books and authors.
+Over the next several lessons, we're going to build a `BookSearch` application that lets us search for books and authors.
 
 The `BookSearch` app will demonstrate how to build well-tested applications and work with complex data relationships.
 
-In this lesson, we're going to create our authors, and implement the ability to search for authors by their name.
-
-If you encounter any issues, consider reading through the [Demonstration Project](https://github.com/BrooklinJazz/book_search) for reference.
+See the [Demonstration Project](https://github.com/BrooklinJazz/book_search) for reference if you encounter any issues.
 
 ## Create Phoenix Project
 
-Initialize a new phoenix project and install dependencies when prompted.
+Initialize a new Phoenix project and install dependencies when prompted.
 
 ```
 $ mix phx.new book_search
@@ -51,7 +49,7 @@ $ mix ecto.create
 
 ## Generate Authors
 
-To create the authors resource, run the following command.
+Use the generators to scaffold the context, controllers, and other files for authors.
 
 ```
 $ mix phx.gen.html Authors Author authors name:string
@@ -76,7 +74,7 @@ scope "/", BookSearchWeb do
 end
 ```
 
-And all tests should pass.
+All tests should pass.
 
 ```
 $ mix test
@@ -90,7 +88,7 @@ $ mix phx.server
 
 ## ConnCase & ConnTest
 
-Phoenix automatically generates controller tests to ensure we're able to perform CRUD (Create, Read, Update, Delete) actions for the generated resource.
+Phoenix automatically generates controller tests to ensure we can perform CRUD (Create, Read, Update, Delete) actions for the generated resource.
 
 Phoenix applications generate a `ConnCase` test module that simulates building the connection between a client and server.
 
@@ -147,7 +145,7 @@ end
 
 These functions often accept the `conn` structure built in the `setup` section of `BookSearch.ConnCase` using [Phoenix.ConnTest.build_conn/0](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#build_conn/0).
 
-These tests programatically interact with our Phoenix application the same way we would use the browser. We can then make assertions on the behavior of the application, and/or the HTML response.
+`ConnCase` tests allow us to interact with our Phoenix web application programmatically and make assertions on its behavior or HTML response.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -193,15 +191,13 @@ The [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function acc
 `Routes.author_path(conn, :index)` returns the `"/authors"` route.
 
 [html_response](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#html_response/2) retrieves the HTML response. `200` is the success code for an HTTP response. after the HTTP GET request to the
-`"/authors"` route. We then use `=~` to assert that the text `"Listing Authors"` was found in the page.
-
-Ultimately, this test asserts that when the client visits the `"/authors"` route, the text `"Listing Authors"` is visible on the page.
+`"/authors"` route. We then use `=~` to assert that `"Listing Authors"` was found on the HTML web page response.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Modifying Assertions and Behavior
 
-Under the hood, this triggers the `AuthorsController.index/2` action.
+Under the hood, `get(conn, Routes.author_path(conn, :index))` triggers the `AuthorsController.index/2` action.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -214,7 +210,7 @@ def index(conn, _params) do
 end
 ```
 
-Which renders the template file.
+The `AuthorController` renders the template file.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -249,7 +245,7 @@ Which renders the template file.
 <span><%= link "New Author", to: Routes.author_path(@conn, :new) %></span>
 ```
 
-This is where the text `"Listing Authors"` is defined. We're going to implement a feature to search for authors, so let's change this text to `"Search Authors"`.
+`"Listing Authors"` is in this template file. We're going to implement a feature to search for authors, so let's change this text to `"Search Authors"`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -259,7 +255,7 @@ This is where the text `"Listing Authors"` is defined. We're going to implement 
 <h1>Search Authors</h1>
 ```
 
-This causes our test to fail. The error output is a bit difficult to read. That's because the `left` value in our assertion is the entire HTML response. See if you can find `<h1>Search Authors</h1>` in the test failure output.
+Changing the text causes our test to fail. The error output is a bit difficult to read. That's because the `left` value in our assertion is the full HTML response.
 
 ```
 $ mix test
@@ -276,6 +272,56 @@ $ mix test
 
 Finished in 0.2 seconds (0.08s async, 0.1s sync)
 19 tests, 1 failure
+```
+
+Here, we've converted this output into HTML to make it easier to understand.
+See if you can find `<h1>Search Authors</h1>` in the test failure output.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="JWQEbh8hXx0ELGUTKk4CKEkrUEQsehcBw-BWKpmy7M2eZwAI9mg4YHXh">
+    <title data-suffix=" · Phoenix Framework">BookSearch · Phoenix Framework</title>
+    <link phx-track-static rel="stylesheet" href="/assets/app.css">
+    <script defer phx-track-static type="text/javascript" src="/assets/app.js"></script>
+</head>
+
+<body>
+    <header>
+        <section class="container">
+            <nav>
+                <ul>
+                    <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+                    <li><a href="/dashboard">LiveDashboard</a></li>
+                </ul>
+            </nav> <a href="https://phoenixframework.org/" class="phx-logo"> <img src="/images/phoenix.png"
+                    alt="Phoenix Framework Logo"> </a>
+        </section>
+    </header>
+    <main class="container">
+        <p class="alert alert-info" role="alert"></p>
+        <p class="alert alert-danger" role="alert"></p>
+        <h1>
+            Search Authors</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table><span><a href="/author/new">New Author</a></span>
+    </main>
+</body>
+
+</html>
 ```
 
 To fix this test, we need to change our assertion.
@@ -297,9 +343,11 @@ end
 
 ### Comprehensive Testing
 
-Asserting on the static text contents of the web page is not always desirable. As we've just seen, simply changing the wording causes our tests to fail. This can lead to brittle tests that are a lot of work to maintain. These tests also aren't very comprehensive.
+Assertions about the static text contents of the web page are not always desirable. As we've just seen, changing the wording causes our tests to fail. These tests can be brittle and hard to maintain. These tests also aren't very comprehensive.
 
-For example, we can alter the `AuthorController.index/2` function to not list any authors, and our test will still pass.
+For example, we can alter the `AuthorController.index/2` function to return an empty list of authors, and our test will still pass.
+
+Replace `AuthorController.index/2` with the following and run `mix test`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -312,20 +360,9 @@ def index(conn, _params) do
 end
 ```
 
-Replace `AuthorController.index/2` with the above and run `mix test`. Despite breaking our application so we don't list any authors, all tests still pass!
+Alternatively, we can verify the behavior of the web page instead of its static contents. For example, when we send an HTTP GET request to `"/authors"` we expect to see a list of all authors.
 
-```
-$ mix test
-...
-19 tests, 0 failures
-```
-
-As an alternative we can assert on the behavior of the page. For example, when we send an HTTP GET request to `"/authors"` we expect to see a list of all authors. Instead of in addition to assert
-
-First we need to create an author that we expect to find on the page.
-Then we assert that the page contains the author's name
-
-replace the `"index"` test with the following.
+Replace the `"index"` test with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -374,7 +411,7 @@ defmodule BookSearchWeb.AuthorControllerTest do
 end
 ```
 
-Test fixtures provide convenience functions for setting up test data. They are one of many patterns for writing tests, and completely optional.
+Test fixtures provide convenient functions for setting up test data. They are one of many patterns for writing tests and are completely optional.
 
 The `author_fixture/1` function creates an author with some default arguments using the `BookSearch.Authors` context.
 
@@ -411,7 +448,7 @@ attrs = %{}
 Enum.into(attrs, %{name: "some name"})
 ```
 
-This fixture function is merely an abstration around calling `BookSearch.Authors.create_author/1` directly. For example, we can replace the `setup [:create_author]` function in our test with a call to the `BookSearch.Authors` context.
+This fixture function is merely an abstraction around calling `BookSearch.Authors.create_author/1` directly. So, for example, we can replace the `setup [:create_author]` function in our test with a call to the `BookSearch.Authors` context.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -427,7 +464,7 @@ describe "index" do
 end
 ```
 
-So why use a fixture? Well, the fixture provides some default arguments. It can also be useful if the interface for calling `BookSearch.Authors.create_author/1` changes. In that case, we'd only need to change our fixture, rather than changing all of our tests.
+So why use a fixture? Well, the fixture provides some default arguments. It can also be helpful if the interface to `BookSearch.Authors.create_author/1` changes. In that case, we'd only need to update our fixture rather than all of our tests.
 
 Revert the `"index"` test to use the test fixture.
 
@@ -446,7 +483,7 @@ describe "index" do
 end
 ```
 
-To make this test pass, we have revert `AuthorController` back to what it was before we broke it.
+Revert `AuthorController` to what it was before we broke it, and the test should pass.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -461,7 +498,7 @@ end
 
 ## HTTP POST "/authors"
 
-The `"create author"` tests test both successful creation of an author and failed creation of an author.
+The `"create author"` tests handle both the successful creation of an author and failed creation of an author.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -488,7 +525,7 @@ end
 
 ### Successful Author Creation
 
-The `"redirects to show when data is valid"` tests checks that when we the client sends POST request to http://localhost:4000/authors with proper values we redirect the client to http://localhost:4000/authors/1 where `1` is the id of the author created.
+The `"redirects to show when data is valid"` test checks that when the client sends a POST request to http://localhost:4000/authors with proper values, the server redirects them to http://localhost:4000/authors/1 where `1` is the id of the author created.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -560,7 +597,7 @@ end
 
 ## Flash Messages
 
-Successfully and unsuccessfuly creating an author create a flash message.
+Creating an author displays a flash message.
 Flash messages are temporary messages attached to the `conn`.
 
 For example, go to http://localhost:4000/authors/new and create an author. We'll see the following blue message.
@@ -571,7 +608,7 @@ For example, go to http://localhost:4000/authors/new and create an author. We'll
 
 <!-- livebook:{"break_markdown":true} -->
 
-These messages are created using the [put_flash/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#put_flash/3) function.
+[put_flash/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#put_flash/3)  persists a flash message.
 
 When we create an author, we call the `put_flash/3` function in `AuthorController.create/2`.
 
@@ -593,7 +630,7 @@ end
 
 Messages generally use either the `:info` key or `:error` key.
 
-To display the message we call the [get_flash/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#get_flash/2) function in the app layout.
+To display the message, we call the [get_flash/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#get_flash/2) function in the app layout.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -609,9 +646,9 @@ To display the message we call the [get_flash/2](https://hexdocs.pm/phoenix/Phoe
 
 <!-- livebook:{"break_markdown":true} -->
 
-Our application creates a flash message when we create an author, however we don't have any test for this.
+Our application displays a flash message when we create an author. However, this behavior is untested.
 
-We can use the test specific [get_flash](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) from `ConnTest` to check if there's a flash message.
+We can use the test-specific [get_flash](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) from `ConnTest` to check if there's a flash message.
 
 Replace the `"redirect to show when data is valid"` test with the following.
 
@@ -694,11 +731,13 @@ It also verifies that the author show page of the deleted author returns a 404 n
 
 ## Author Search
 
-to better understand how to write effective Phoenix Controller tests using `ConnCase` and `ConnTest` we're going to implement a new feature to search for authors.
+To better understand how to write effective Phoenix Controller tests using `ConnCase` and `ConnTest` we're going to implement a new feature to search for authors.
 
-We want to visit http://localhost:4000/authors?name=search_query where `search_query` is a string entered by the user in a form input.
+We want to visit http://localhost:4000/authors?name=search_query, where `search_query` is a string entered by the client in a text input.
 
-First, let's create a new form on the authors list page. We wnat clients to be able to send a GET request through the form to `"/authors"`. This is not associated with any changeset so we can provide it `@conn`. We can also use `Routes.author_path(@conn, :index)` to get the `"/authors"` route.
+First, let's create a new form on the author list page. We want clients to be able to send a GET request through the form to `"/authors"`.
+
+The form has no changeset, so we use `@conn` as the `for` value. The `method` is `"get"` for an HTTP GET request. The `action` is the route to send the GET request to. `Routes.author_path(@conn, :index)` returns the `"/authors"` route.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -739,7 +778,7 @@ First, let's create a new form on the authors list page. We wnat clients to be a
 <span><%= link "New Author", to: Routes.author_path(@conn, :new) %></span>
 ```
 
-This creates the following form on http://localhost:4000/authors.
+The code above created the following form on http://localhost:4000/authors.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -753,9 +792,7 @@ We're ready to write our test!
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Your Turn? (optional)
 
-Before moving on to the solution for creating a search input, consider taking some time to solve this yourself. Write the test you think is appropriate, and implement the solution to make the test pass. Then compare your solution with the one below.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -781,7 +818,7 @@ describe "index" do
 end
 ```
 
-`setup [:create_author]` introduces coupling between tests. This is fine when every test has the same setup. However, it becomes an issue if they don't. That's why it's often not recommended to use `setup` sections in tests too early otherwise it makes refactoring and adding new tests more difficult.
+`setup [:create_author]` introduces coupling between tests. Setup sections are fine when every test has the same setup. However, it becomes an issue if they don't. That's why it's often not recommended to use `setup` sections in tests too early; otherwise, refactoring and adding new tests becomes difficult.
 
 Let's refactor the `"lists all authors"` test to use the `author_fixture/1` function directly and remove the setup section.
 
@@ -801,7 +838,7 @@ describe "index" do
 end
 ```
 
-The `"lists all authors _ matching search query"` test will check for a search exactly matching the authors name.
+The `"lists all authors _ matching search query"` test will check for a search matching the author's name.
 
 We can trigger a request to http://localhost:4000/authors?name=Patrick+Rothfus by passing the query param to the `get/3` function.
 
@@ -825,9 +862,7 @@ $ mix test
 20 tests, 0 failures
 ```
 
-Unfortunately that's because we're not filtering. Sometimes features require multiple tests to implement properly.
-
-Let's write another test where the search query does not match the author's name. We'll [refute/1](https://hexdocs.pm/ex_unit/1.12/ExUnit.Assertions.html#refute/2) that the author's name is on the page this time.
+Unfortunately, that's because we're not filtering at all! We'll have to write another test for filtering out authors. We'll [refute/1](https://hexdocs.pm/ex_unit/1.12/ExUnit.Assertions.html#refute/2) that the author's name is on the page this time.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -841,11 +876,11 @@ test "lists all authors _ not matching search query", %{conn: conn} do
 end
 ```
 
-Now this test should fail. To make the test pass, we need to implement the ability to filter authors by name in the `AuthorController.index/2` function.
+Now, this test should fail. To make the test pass, we need to implement the ability to filter authors by name in the `AuthorController.index/2` function.
 
-We can retrieve the `"name"` query parameter inside of the controller. Let's create a new function clause for the `AuthorController.index/2` function to use when there is a `"name"` query parameter. The more specific function clause should always be first, as order does matter.
+We can retrieve the " name " query parameter inside the second argument to the controller action. Let's create a new function clause for the `AuthorController.index/2` function to use when there is a `"name"` query parameter. The more specific function clause should always be first, as the order does matter.
 
-We can pass the name to the `Authors.list_authors/1` function which will handle the filtering.
+We can pass the name to the `Authors.list_authors/1` function, which will handle the filtering.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -867,9 +902,9 @@ end
 
 ### Authors.list_authors/1
 
-The test still fails, because the `Authors.list_authors/1` function does not exist.
+The test fails because the `Authors.list_authors/1` function does not exist.
 
-We could implement this function right away, however this is a great time to write tests for the `Authors` context!
+We could implement this function right away. However, this is a great time to write tests for the `Authors` context!
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -912,7 +947,7 @@ end
 
 To make our tests pass, we need to filter the query. By default we're passing the `Author` schema to [Repo.all/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2).
 
-Let's consider a few solutions to the problem. We could retrieve the list of `Author` structs from the database, and then filter them using `Enum`.
+Let's consider a few solutions to the problem. First, we could retrieve the list of `Author` structs from the Database and filter them using `Enum`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -924,14 +959,13 @@ def list_authors(name) do
 end
 ```
 
-Our tests pass, however this is **NOT RECOMMENDED**. Why do you think that is?
-The answer is performance. This solution loads all of the authors from the database, and then filters them in memory. That's not a problem if we only have a few authors, however it becomes a massive problem if there are thousands of authors.
+Our tests pass. However, this is **NOT RECOMMENDED**. Why do you think that is? The answer is performance. This solution loads all of the authors from the Database, and then filters them in memory. That's not a problem if we only have a few authors. However, it becomes a massive problem as the list of authors grows.
 
-Instead, it's generally recommended to rely on the database query for filtering results whenever possible.
+Instead, rely on the database query for filtering results when possible/appropriate.
 
-[Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) provides functions for writing queries to the database.
+[Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) provides functions for writing queries to the Database.
 
-We can use the [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function to filter our query. The pin `^` operator with `^name` allows us to inject variables into the query expression.
+We can filter our query using [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function. The pin `^` operator with `^name` allows us to inject variables into the query expression.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -943,7 +977,7 @@ def list_authors(name) do
 end
 ```
 
-Now all test pass! This includes our controller test.
+Now all tests (including our original controller tests) pass!
 
 ```
 $ mix test
@@ -968,7 +1002,7 @@ test "list_authors/1 _ partially matching name" do
 end
 ```
 
-This fails, because `list_authors/1` checks for an exact match.
+This test fails because the `list_authors/1` function checks for an exact match.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -997,7 +1031,7 @@ def list_authors(name) do
 end
 ```
 
-The `%` works similarly to the wildcard `*` in a regular expression, so this will find all author's whose name starts with `name`.
+The `%` works similarly to the wildcard `*` in a regular expression, so this will find all authors whose name starts with the searched `name`.
 
 Let's expand the test to check. We'll check that we can find authors by a partially matching query in the middle or the end of their name as well.
 
@@ -1014,7 +1048,7 @@ test "list_authors/1 _ partially matching name" do
 end
 ```
 
-To make this pass, we need to use the `%` character at the start and the end of the query.
+To make this pass, we need to use the `%` character at the start and end of the query.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1029,7 +1063,7 @@ def list_authors(name) do
 end
 ```
 
-Finally, what happens when the search is all lowercase or all capitals? Currently the search is case-sensitive. Add the following test, and well see that it fails.
+Finally, what happens when the search is all lowercase or all capitals? Currently, the search is case-sensitive. Add the following test, and we'll see that it fails.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1041,7 +1075,7 @@ test "list_authors/1 _ case insensitive match" do
 end
 ```
 
-To make this test pass, we can use [ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2) which is a case insensitive version of `like`.
+To make this test pass, we can use [ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2), which is a case insensitive version of `like`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1066,16 +1100,16 @@ $ mix test
 
 ## Context vs Controller Tests
 
-We chose to write the edge cases for our author search on the `Authors` context, however we could have written them on the controller. Why didn't we?
+We chose to write the edge cases for our author search on the `Authors` context. However, we could have written them on the controller. Why didn't we?
 
-Generally context tests run faster than controller tests. Controller tests require more setup and ceremony to run so they are more verbose. It's also easier to read the intent of a context test.
+Generally, context tests run faster than controller tests. Controller tests require more setup and ceremony, so they are more verbose. It's also easier to read the intent of a context test.
 
-Controller tests are more comprehensive. They test that your application is actually working as expected rather than testing a single function. Controller tests (depending on how they are written) generally provide more confidence than context tests.
+Controller tests are more comprehensive. They test your application more holistically than testing a single function. As a result, controller tests (depending on how they are written) generally provide more confidence than context tests.
 
-This isn't a question with a simple answer! We've decided to comprehensively test the context because they are fast and easy to write, and have fewer controller tests that ensure the controller and context are integrated correctly.
+However, this question doesn't have a simple answer! In this case, we've decided to comprehensively test the context because they are fast and easy to write. We then have fewer controller tests to ensure the controller and context integrate correctly. However, different situations require different styles of tests.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-It's time for a class discussion! What are the benefits of testing controllers vs contexts? When would you do one or the other?
+It's time for a class discussion! What are the benefits of testing controllers vs. contexts? When would you do one or the other?
