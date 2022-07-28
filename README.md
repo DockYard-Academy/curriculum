@@ -40,7 +40,7 @@ This project uses [codespell](https://github.com/codespell-project/codespell) fo
 If contributing to the project, install codespell and run the following command to fix any spelling errors. Ensure all corrections are correct before committing altered files.
 
 ```
-codespell --skip="./utils/deps/*,./.git/*,./utils/assets/*" -w
+codespell --skip="./utils/deps/*,./.git/*,./utils/lib/assets/*" -w
 ```
 
 ## Course Outcome

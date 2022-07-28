@@ -39,13 +39,13 @@ There are three primary relationships that data can have.
 * One to Many.
 * Many to Many.
 
-We use belongs to, has many, and has one to describe the nature of the relationship.
+We use **belongs to**, **has many**, and **has one** to describe the nature of the relationship.
 
-In order to understand relationships better, we're going to create an education app called `FacultyManager` that manages students and staff.
+In order to understand relationships better, we're going to spend the next few lessons creating a book management software called `BookSearch` that manages authors and books.
 
-For the sake of example, our education app will have schools, teachers, principals, and students.
+For the sake of example, our book management app will have authors, books, and tags.
 
-* Principals belong to a school, and schools have one principal (One to One).
+* Books belong to an author, and authors have many books (One to Many).
 * Schools have many teachers, and teachers have one school (One to Many).
 * Teachers have many students, and students have many teachers (Many to Many).
 
@@ -476,7 +476,7 @@ $ mix test test/faculty_manager/principals_test.exs
 
 While we're in the `Principals` context, we're going to need a `Principals.list_principals/1` function that will list principals by school, rather than just listing all principals.
 
-First, add a new test.
+First, add a new test. This test will ensure we list principals by the provided school.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -484,19 +484,23 @@ First, add a new test.
 # test/faculty_manager/principals_test.exs
 
 test "list_principals/1 returns all principals by school" do
-  # create two schools
+  # create schools
   {:ok, school1} = Schools.create_school(%{name: "Hogwarts"})
   {:ok, school2} = Schools.create_school(%{name: "Springfield"})
+  {:ok, school3} = Schools.create_school(%{name: "Empty School"})
 
-  # create one principal for each school
+  # create one principals for schools
   {:ok, principal1} = Principals.create_principal(school1, %{name: "Dumbledore"})
   {:ok, principal2} = Principals.create_principal(school2, %{name: "Skinner"})
 
   # list school1 principals
   assert Principals.list_principals(school1.id) == [principal1]
-  
+
   # list school2 principals
   assert Principals.list_principals(school2.id) == [principal2]
+
+  # list school 3 principals
+  assert Principals.list_principals(school3.id) == []
 end
 ```
 
@@ -600,6 +604,48 @@ Use the fastest solution for the `Principals.list_principals/1` function and ens
 ```
 $ mix test test/faculty_manager/principals_test.exs
 ```
+
+## Table Joins
+
+Every resource in our application is stored in a separate table.
+
+### Schools Table
+
+| id | name       |
+| -- | ---------- |
+| 1  | "Hogwarts" |
+
+### Principals Table
+
+| id | name         | school_id |
+| -- | ------------ | --------- |
+| 1  | "Dumbledore" | 1         |
+
+While querying a resource, we often want to retrieve data from associated tables. We do this by joining two tables during the query.
+
+We use the [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) function from [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
+
+There are many different kinds of joins including `:inner`, `:left`, `:right`, `:cross`, `:full`, `:inner_lateral` or `:left_lateral`.
+
+The most commonly used join is the `:inner` join, so we'll focus on that. An inner join combines two associated tables that satisfy the join condition. For example, earlier when we used the following:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+join(:inner, [s], p in assoc(s, :principals))
+```
+
+We joined the schools and the principals table using the `:principals` association with `assoc`.
+
+Alternatively, we can specify the table to join using either the table name and the schema, then use the `:on` option to specify the join condition. In the example below, we join tables where the `school_id` field of the principal matches the school's id.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+join(:inner, [s], p in FacultyManager.Principals.Principal, on: p.school_id == s.id)
+```
+
+Both accomplish the same functionality. `assoc` is only syntax sugar in this example.
 
 ## Nested Resources
 
@@ -878,11 +924,11 @@ http://localhost:4000/schools/1/principals/new should no longer crash.
 
 ## Create Principal
 
-Now, if we attempt to submit the form, we'll see the following error.
+Now, if we attempt to submit the form on http://localhost:4000/schools/1/principals/new, we'll see the following error.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/faculty_manager_create_principals_principal_path_undefined.png)
+![](images/create_new_principal_no_function_clause_error.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1013,11 +1059,11 @@ Now the tests should pass when we run the following.
 $ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:27
 ```
 
-When we create a principal from the browser, we'll be successfully redirected to http://localhost:4000/schools/1/principals/2.
+When we create a principal from the browser, we'll be successfully redirected to http://localhost:4000/schools/1/principals/1.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/faculty_manager_show_principals.png)
+![](images/show_principal_page_after_creation.png)
 
 ## Edit Principals
 
@@ -1025,7 +1071,7 @@ If we click the **Edit** button to go to http://localhost:4000/schools/1/princip
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/faculty_manager_edit_principals_principal_path_undefined.png)
+![](images/edit_principal_page_principal_path_is_undefined.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1046,7 +1092,7 @@ describe "edit principal" do
 end
 ```
 
-Replace the test with the following. We're going to opt out of using the `:create_principal` function and instead associate the principal and the school using the fixture functions.
+Replace the test with the following. We're going to opt out of using the `:create_principal` function and instead manually create a school and principal. We also replace
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1055,14 +1101,18 @@ Replace the test with the following. We're going to opt out of using the `:creat
 
 describe "edit principal" do
   test "renders form for editing chosen principal", %{conn: conn} do
+    # create school and principal
     {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
-    conn = get(conn, Routes.principal_path(conn, :edit, school.id, principal))
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+
+    # use Routes.school_principal_path instead of Routes.principal_path
+    conn = get(conn, Routes.school_principal_path(conn, :edit, school.id, principal))
     assert html_response(conn, 200) =~ "Edit Principal"
   end
 end
 ```
 
-Now update the `PrincipalController.edit/2` function to use the `school_id`.
+Update the `PrincipalController.edit/2` function to use the `school_id` in the assigns.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1076,7 +1126,7 @@ def edit(conn, %{"id" => id, "school_id" => school_id}) do
 end
 ```
 
-Fix the principal edit page.
+Fix the principal edit page to replace `Routes.principal_path` with `Routes.school_principal_path`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1090,7 +1140,7 @@ Fix the principal edit page.
 <span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
 ```
 
-The test should pass when we run the following in the command line.
+The test should pass when we run the following in the command line where `55` is the correct line number of the test.
 
 ```
 $ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:55
@@ -1137,7 +1187,7 @@ describe "update principal" do
 end
 ```
 
-Replace the tests with the following.
+Replace the tests with the following. We're manually creating the school and principal, and replacing `Routes.principal_path` with `Routes.school_principal_path`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1146,8 +1196,8 @@ Replace the tests with the following.
 
 describe "update principal" do
   test "redirects when data is valid", %{conn: conn} do
-    school = school_fixture()
-    principal = principal_fixture(school: school)
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
 
     conn =
       put(conn, Routes.school_principal_path(conn, :update, school.id, principal),
@@ -1162,8 +1212,8 @@ describe "update principal" do
   end
 
   test "renders errors when data is invalid", %{conn: conn} do
-    school = school_fixture()
-    principal = principal_fixture(school: school)
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
 
     conn =
       put(conn, Routes.school_principal_path(conn, :update, school.id, principal),
@@ -1197,10 +1247,10 @@ def update(conn, %{"id" => id, "principal" => principal_params, "school_id" => s
 end
 ```
 
-Tests should pass when we run the following.
+Tests should pass when we run the following where `64` is the line number of the test.
 
 ```
-$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:6
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:64
 ```
 
 We should be able to update a principal when we submit the form on http://localhost:4000/schools/1/principals/1/edit.
@@ -1245,8 +1295,8 @@ Replace the test with the following.
 ```elixir
 describe "delete principal" do
   test "deletes chosen principal", %{conn: conn} do
-    school = school_fixture()
-    principal = principal_fixture(school: school)
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
 
     conn = delete(conn, Routes.school_principal_path(conn, :delete, school.id, principal))
     assert redirected_to(conn) == Routes.school_principal_path(conn, :index, school.id)
@@ -1273,7 +1323,7 @@ def delete(conn, %{"id" => id, "school_id" => school_id}) do
 end
 ```
 
-Tests should pass when we run the following.
+Tests should pass when we run the following where `94` is the correct line number of the test.
 
 ```
 $ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:94
@@ -1284,3 +1334,15 @@ When we visit http://localhost:schools/1/principals and delete a principal we sh
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/faculty_manager_delete_principals.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+With that, all of our tests should pass!
+
+```
+$ mix test
+...
+36 tests, 0 failures
+```
+
+## Untitled
