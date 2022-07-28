@@ -55,7 +55,7 @@ export function init(ctx, payload) {
     ctx.handleEvent("attempt", ({ attempt }) => {
         // attempts start at 1 on the first render
         // displays hint after 2 attempts
-        if (attempt >= 3) {
+        if (attempt >= 3 && payload.hint !== "") {
             hint.style.display = "block"
         }
     });
