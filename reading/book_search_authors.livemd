@@ -33,6 +33,8 @@ The `BookSearch` app will demonstrate how to build well-tested applications and 
 
 In this lesson, we're going to create our authors, and implement the ability to search for authors by their name.
 
+If you encounter any issues, consider reading through the [Demonstration Project](https://github.com/BrooklinJazz/book_search) for reference.
+
 ## Create Phoenix Project
 
 Initialize a new phoenix project and install dependencies when prompted.
@@ -80,15 +82,17 @@ And all tests should pass.
 $ mix test
 ```
 
-## Testing CRUD
+Start the server.
+
+```
+$ mix phx.server
+```
+
+## ConnCase & ConnTest
 
 Phoenix automatically generates controller tests to ensure we're able to perform CRUD (Create, Read, Update, Delete) actions for the generated resource.
 
-<!-- livebook:{"break_markdown":true} -->
-
-### ConnCase & ConnTest
-
-Phoenix applications come with a `ConnCase` test module that simulates building the connection between a client and server.
+Phoenix applications generate a `ConnCase` test module that simulates building the connection between a client and server.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -139,13 +143,34 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-This `BookSearch.ConnCase` module defines a setup section that assigns the `:conn` value in every test. We can use the `conn` to simulate HTTP requests such as GET and POST using the macros imported from [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html).
+`BookSearch.ConnCase` imports [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html) which defines many functions for simulating HTTP requests.
 
-These tests programatically interact with our Phoenix application the same way we would use the browser, and then make assertions on the behavior of the application and/or the HTML response.
+These functions often accept the `conn` structure built in the `setup` section of `BookSearch.ConnCase` using [Phoenix.ConnTest.build_conn/0](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#build_conn/0).
 
-For example, let's look at the `"index"` test in `test/book_search/controllers/author_controller_test.exs`.
+These tests programatically interact with our Phoenix application the same way we would use the browser. We can then make assertions on the behavior of the application, and/or the HTML response.
 
 <!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+
+ControllerTest --> ConnCase
+ControllerTest --> ConnTest
+ConnTest --> get/3
+ConnTest --> post/3
+ConnTest --> delete/3
+ConnTest --> put/3
+ConnTest --> put/3
+
+click get/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3" _blank
+click post/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3" _blank
+click put/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3" _blank
+click delete/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#delete/3" _blank
+```
+
+## HTTP GET "/authors"
+
+For example, let's look at the `"index"` test in `test/book_search/controllers/author_controller_test.exs`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -160,14 +185,9 @@ describe "index" do
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+This test simulates the same interaction as when we manually visit http://localhost:4000/authors.
 
-This test above uses `%{conn: conn}` defined in `BookSearch.ConnCase`. `conn` is a [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) Struct
-we can use to work with requests and responses in an HTTP connection.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### HTTP GET and assert on response
+The `"index"` test uses `%{conn: conn}` defined in `BookSearch.ConnCase`. `conn` is a [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct we can use to work with requests and responses in an HTTP connection.
 
 The [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function accepts the `conn` and simulates an HTTP GET request.
 `Routes.author_path(conn, :index)` returns the `"/authors"` route.
@@ -322,6 +342,8 @@ describe "index" do
 end
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Test Fixtures
 
 The `setup [:create_author]` function calls the `create_author/1` function to bind `author: author` onto the test context. See [ExUnit Module Contexts](https://hexdocs.pm/ex_unit/ExUnit.Callbacks.html#module-context) for more on setup contexts.
@@ -394,6 +416,8 @@ This fixture function is merely an abstration around calling `BookSearch.Authors
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# test/book_search_web/controllers/author_controller_test.ex
+
 describe "index" do
   test "lists all authors", %{conn: conn} do
     author = BookSearch.Authors.create_author(%{name: "some name"})
@@ -405,16 +429,12 @@ end
 
 So why use a fixture? Well, the fixture provides some default arguments. It can also be useful if the interface for calling `BookSearch.Authors.create_author/1` changes. In that case, we'd only need to change our fixture, rather than changing all of our tests.
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Passing Test
-
-Revert the `"index"` tests back to the following.
+Revert the `"index"` test to use the test fixture.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-#
+# test/book_search_web/controllers/author_controller_test.ex
 
 describe "index" do
   setup [:create_author]
@@ -426,23 +446,55 @@ describe "index" do
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### HTTP POST and assert on result/redirect
-
-<!-- livebook:{"break_markdown":true} -->
-
-In the `"create author"` test `"redirects to show when data is valid"`, we use the [post/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3) function imported from `ConnTest` to send a POST request to `"/author"` which is the return value of `Routes.author_path(conn, :create)`.
-
-When then use [redirected_params/1](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#redirected_params/1) to retrieve the id of the author created by the POST request.
-
-With [redirected_to/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#redirected_to/2) we assert that the client was redirected to http://localhost:4000/authors/1 where `1` is the id of the author.
-
-We then make an additional GET request to http://localhost:4000/authors/1 where `1` is the id of the author using the [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function and verify that the page contains the text `"Show Author"`.
+To make this test pass, we have revert `AuthorController` back to what it was before we broke it.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# lib/book_search_web/controllers/author_controller.ex
+
+def index(conn, _params) do
+  authors = Authors.list_authors()
+  render(conn, "index.html", authors: authors)
+end
+```
+
+## HTTP POST "/authors"
+
+The `"create author"` tests test both successful creation of an author and failed creation of an author.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
+describe "create author" do
+  test "redirects to show when data is valid", %{conn: conn} do
+    conn = post(conn, Routes.author_path(conn, :create), author: @create_attrs)
+
+    assert %{id: id} = redirected_params(conn)
+    assert redirected_to(conn) == Routes.author_path(conn, :show, id)
+
+    conn = get(conn, Routes.author_path(conn, :show, id))
+    assert html_response(conn, 200) =~ "Show Author"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn} do
+    conn = post(conn, Routes.author_path(conn, :create), author: @invalid_attrs)
+    assert html_response(conn, 200) =~ "New Author"
+  end
+end
+```
+
+### Successful Author Creation
+
+The `"redirects to show when data is valid"` tests checks that when we the client sends POST request to http://localhost:4000/authors with proper values we redirect the client to http://localhost:4000/authors/1 where `1` is the id of the author created.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
 test "redirects to show when data is valid", %{conn: conn} do
   conn = post(conn, Routes.author_path(conn, :create), author: @create_attrs)
 
@@ -454,13 +506,168 @@ test "redirects to show when data is valid", %{conn: conn} do
 end
 ```
 
-This test ensures that successfully creating an author should redirect us to http://localhost:4000/authors/1 where `1` is the id of the author.
+The [post/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3) function imported from `ConnTest` simulates a POST request to `"/author"` which is the return value of `Routes.author_path(conn, :create)`.
 
-Feel free to manually create an author on http://localhost:4000/authors/new if you would like to verify this behavior.
+[redirected_params/1](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#redirected_params/1) retrieves params from the current URL http://localhost:4000/authors/1 where `1` is the `:id` in the url.
+
+We can run `mix phx.routes` to see the corresponding url with the `:id` field.
+
+```
+$ mix phx.routes
+...
+author_path  POST    /authors                                BookSearchWeb.AuthorController :create
+...
+```
+
+[redirected_to/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#redirected_to/2) returns the URL that we were redirected to. We assert that we are redirected to `Routes.author_path(conn, :show, id)` which is the show path.
+
+We then make an additional GET request to http://localhost:4000/authors/1 where `1` is the id of the author using the [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function and verify that the page contains the text `"Show Author"`.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### HTTP DELETE
+### Your Turn
+
+Manually create a new author on http://localhost:4000/authors/new to verify the behavior of our successful test above.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Unsuccessful Author Creation
+
+The `"renders errors when data is invalid"` test ensures the response after a failed creation attempt includes the text `"New Author"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "renders errors when data is invalid", %{conn: conn} do
+  conn = post(conn, Routes.author_path(conn, :create), author: @invalid_attrs)
+  assert html_response(conn, 200) =~ "New Author"
+end
+```
+
+`"New Author"` is text on the new author template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/authors/new.html.heex
+
+<h1>New Author</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.author_path(@conn, :create)) %>
+
+<span><%= link "Back", to: Routes.author_path(@conn, :index) %></span>
+```
+
+## Flash Messages
+
+Successfully and unsuccessfuly creating an author create a flash message.
+Flash messages are temporary messages attached to the `conn`.
+
+For example, go to http://localhost:4000/authors/new and create an author. We'll see the following blue message.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/show_author_flash_message.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+These messages are created using the [put_flash/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#put_flash/3) function.
+
+When we create an author, we call the `put_flash/3` function in `AuthorController.create/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"author" => author_params}) do
+  case Authors.create_author(author_params) do
+    {:ok, author} ->
+      conn
+      |> put_flash(:info, "Author created successfully.") # <-- PUT FLASH
+      |> redirect(to: Routes.author_path(conn, :show, author))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+Messages generally use either the `:info` key or `:error` key.
+
+To display the message we call the [get_flash/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#get_flash/2) function in the app layout.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/layout/app.html.heex
+
+<main class="container">
+  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+  <%= @inner_content %>
+</main>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Our application creates a flash message when we create an author, however we don't have any test for this.
+
+We can use the test specific [get_flash](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) from `ConnTest` to check if there's a flash message.
+
+Replace the `"redirect to show when data is valid"` test with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "redirects to show when data is valid", %{conn: conn} do
+  conn = post(conn, Routes.author_path(conn, :create), author: @create_attrs)
+  assert get_flash(conn, :info) == "Author created successfully." # <-- Check The Flash Message
+
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == Routes.author_path(conn, :show, id)
+
+  conn = get(conn, Routes.author_path(conn, :show, id))
+  assert html_response(conn, 200) =~ "Show Author"
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Change the `redirects to show when data is valid"` to change the flash message `"Author created successfully"` to some other message such as `"Author created!"`.
+
+Ensure you fix the `AuthorController` so that all tests pass.
+
+## HTTP PUT "/authors/:id"
+
+The `"update author"` test verifies we can successfully update an author. it's essentially the same as the `"create author"` test except it uses [put/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3) instead of [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "update author" do
+  setup [:create_author]
+
+  test "redirects when data is valid", %{conn: conn, author: author} do
+    conn = put(conn, Routes.author_path(conn, :update, author), author: @update_attrs)
+    assert redirected_to(conn) == Routes.author_path(conn, :show, author)
+
+    conn = get(conn, Routes.author_path(conn, :show, author))
+    assert html_response(conn, 200) =~ "some updated name"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn, author: author} do
+    conn = put(conn, Routes.author_path(conn, :update, author), author: @invalid_attrs)
+    assert html_response(conn, 200) =~ "Edit Author"
+  end
+end
+```
+
+## HTTP DELETE "/authors/:id"
+
+The `"delete author"` tests checks that when the client deletes an author, they are redirected back to http://localhost:4000/authors.
+
+It also verifies that the author show page of the deleted author returns a 404 not found error.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -479,8 +686,396 @@ Feel free to manually create an author on http://localhost:4000/authors/new if y
   end
 ```
 
+[assert_error_sent/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#assert_error_sent/2) allows us to test HTTP actions that raise an error.
+
 <!-- livebook:{"break_markdown":true} -->
 
 ###
 
 ## Author Search
+
+to better understand how to write effective Phoenix Controller tests using `ConnCase` and `ConnTest` we're going to implement a new feature to search for authors.
+
+We want to visit http://localhost:4000/authors?name=search_query where `search_query` is a string entered by the user in a form input.
+
+First, let's create a new form on the authors list page. We wnat clients to be able to send a GET request through the form to `"/authors"`. This is not associated with any changeset so we can provide it `@conn`. We can also use `Routes.author_path(@conn, :index)` to get the `"/authors"` route.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Search Authors</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <.form let={f} for={@conn} method={"get"} action={Routes.author_path(@conn, :index)}>
+    <%= text_input f, :name %>
+    <%= error_tag f, :name %>
+
+    <div>
+      <%= submit "Search" %>
+    </div>
+  </.form>
+<%= for author <- @authors do %>
+    <tr>
+      <td><%= author.name %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.author_path(@conn, :show, author) %></span>
+        <span><%= link "Edit", to: Routes.author_path(@conn, :edit, author) %></span>
+        <span><%= link "Delete", to: Routes.author_path(@conn, :delete, author), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Author", to: Routes.author_path(@conn, :new) %></span>
+```
+
+This creates the following form on http://localhost:4000/authors.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/search_authors_form.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+When we submit this form, we're taken to http://localhost:4000/authors?name=search_query where `search_query` is the value of the `:name` text input.
+
+We're ready to write our test!
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn? (optional)
+
+Before moving on to the solution for creating a search input, consider taking some time to solve this yourself. Write the test you think is appropriate, and implement the solution to make the test pass. Then compare your solution with the one below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Author Search
+
+We'll need a new `"index"` test specifically for query params as we still want to list all authors when the client visits http://localhost:4000/authors.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
+describe "index" do
+  setup [:create_author]
+
+  test "lists all authors", %{conn: conn, author: author} do
+    conn = get(conn, Routes.author_path(conn, :index))
+    assert html_response(conn, 200) =~ author.name
+  end
+
+  test "lists all authors _ matching search query", %{conn: conn} do
+  end
+end
+```
+
+`setup [:create_author]` introduces coupling between tests. This is fine when every test has the same setup. However, it becomes an issue if they don't. That's why it's often not recommended to use `setup` sections in tests too early otherwise it makes refactoring and adding new tests more difficult.
+
+Let's refactor the `"lists all authors"` test to use the `author_fixture/1` function directly and remove the setup section.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
+describe "index" do
+  test "lists all authors", %{conn: conn} do
+    author = author_fixture()
+    conn = get(conn, Routes.author_path(conn, :index))
+    assert html_response(conn, 200) =~ author.name
+  end
+
+  ...
+end
+```
+
+The `"lists all authors _ matching search query"` test will check for a search exactly matching the authors name.
+
+We can trigger a request to http://localhost:4000/authors?name=Patrick+Rothfus by passing the query param to the `get/3` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
+test "lists all authors _ matching search query", %{conn: conn} do
+  author = author_fixture(name: "Patrick Rothfus")
+  conn = get(conn, Routes.author_path(conn, :index, name: author.name))
+  assert html_response(conn, 200) =~ author.name
+end
+```
+
+You'll notice this test passes!
+
+```
+$ mix test
+...
+20 tests, 0 failures
+```
+
+Unfortunately that's because we're not filtering. Sometimes features require multiple tests to implement properly.
+
+Let's write another test where the search query does not match the author's name. We'll [refute/1](https://hexdocs.pm/ex_unit/1.12/ExUnit.Assertions.html#refute/2) that the author's name is on the page this time.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/author_controller_test.exs
+
+test "lists all authors _ not matching search query", %{conn: conn} do
+  author = author_fixture(name: "Patrick Rothfus")
+  conn = get(conn, Routes.author_path(conn, :index, name: "Brandon Sanderson"))
+  refute html_response(conn, 200) =~ author.name
+end
+```
+
+Now this test should fail. To make the test pass, we need to implement the ability to filter authors by name in the `AuthorController.index/2` function.
+
+We can retrieve the `"name"` query parameter inside of the controller. Let's create a new function clause for the `AuthorController.index/2` function to use when there is a `"name"` query parameter. The more specific function clause should always be first, as order does matter.
+
+We can pass the name to the `Authors.list_authors/1` function which will handle the filtering.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/author_controller.ex
+
+def index(conn, %{"name" => name}) do
+  authors = Authors.list_authors(name)
+  render(conn, "index.html", authors: authors)
+end
+
+def index(conn, _params) do
+  authors = Authors.list_authors()
+  render(conn, "index.html", authors: authors)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Authors.list_authors/1
+
+The test still fails, because the `Authors.list_authors/1` function does not exist.
+
+We could implement this function right away, however this is a great time to write tests for the `Authors` context!
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/authors_test.exs
+
+describe "authors" do
+...
+# Add the list_authors/1 tests inside the "authors" describe block.
+
+test "list_authors/1 _ matching name" do
+  author = author_fixture(name: "Andrew Rowe")
+  assert Authors.list_authors("Andrew Rowe") == [author]
+end
+
+test "list_authors/1 _ non matching name" do
+  author = author_fixture(name: "Andrew Rowe")
+  assert Authors.list_authors("Dennis E Taylor") == []
+end
+
+...
+end
+```
+
+Now we need to implement the `Authors.list_authors/1` function. We'll create another function clause for `list_authors`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/authors.ex
+
+def list_authors do
+  Repo.all(Author)
+end
+
+def list_authors(name) do
+  Repo.all(Author)
+end
+```
+
+To make our tests pass, we need to filter the query. By default we're passing the `Author` schema to [Repo.all/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2).
+
+Let's consider a few solutions to the problem. We could retrieve the list of `Author` structs from the database, and then filter them using `Enum`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_authors(name) do
+  Author
+  |> Repo.all()
+  |> Enum.filter(fn author -> author.name == name end)
+end
+```
+
+Our tests pass, however this is **NOT RECOMMENDED**. Why do you think that is?
+The answer is performance. This solution loads all of the authors from the database, and then filters them in memory. That's not a problem if we only have a few authors, however it becomes a massive problem if there are thousands of authors.
+
+Instead, it's generally recommended to rely on the database query for filtering results whenever possible.
+
+[Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) provides functions for writing queries to the database.
+
+We can use the [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function to filter our query. The pin `^` operator with `^name` allows us to inject variables into the query expression.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_authors(name) do
+  Author
+  |> where([author], author.name == ^name)
+  |> Repo.all()
+end
+```
+
+Now all test pass! This includes our controller test.
+
+```
+$ mix test
+...
+23 tests, 0 failures
+```
+
+## Author Search Edge Cases
+
+We have a working search! However, there are a few limitations.
+
+For example, let's add the following test where we search by a partial name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/authors_test.exs
+
+test "list_authors/1 _ partially matching name" do
+  author = author_fixture(name: "Dennis E Taylor")
+  assert Authors.list_authors("Dennis") == [author]
+end
+```
+
+This fails, because `list_authors/1` checks for an exact match.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/authors.ex
+
+def list_authors(name) do
+  Author
+  |> where([author], author.name == ^name)
+  |> Repo.all()
+end
+```
+
+We can use [like/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#like/2) from `Ecto.Query` to check if one string is inside of another.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/authors.ex
+
+def list_authors(name) do
+  search = "#{name}%"
+  Author
+  |> where([author], like(author.name, search))
+  |> Repo.all()
+end
+```
+
+The `%` works similarly to the wildcard `*` in a regular expression, so this will find all author's whose name starts with `name`.
+
+Let's expand the test to check. We'll check that we can find authors by a partially matching query in the middle or the end of their name as well.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/authors_test.exs
+
+test "list_authors/1 _ partially matching name" do
+  author = author_fixture(name: "Dennis E Taylor")
+  assert Authors.list_authors("Dennis") == [author]
+  assert Authors.list_authors("E") == [author]
+  assert Authors.list_authors("Taylor") == [author]
+end
+```
+
+To make this pass, we need to use the `%` character at the start and the end of the query.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/authors.ex
+
+def list_authors(name) do
+  search = "%#{name}%"
+  Author
+  |> where([author], like(author.name, search))
+  |> Repo.all()
+end
+```
+
+Finally, what happens when the search is all lowercase or all capitals? Currently the search is case-sensitive. Add the following test, and well see that it fails.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "list_authors/1 _ case insensitive match" do
+  author = author_fixture(name: "Dennis E Taylor")
+  assert Authors.list_authors("DENNIS") == [author]
+  assert Authors.list_authors("dennis") == [author]
+end
+```
+
+To make this test pass, we can use [ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2) which is a case insensitive version of `like`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/authors.ex
+
+def list_authors(name) do
+  search = "%#{name}%"
+  Author
+  |> where([author], ilike(author.name, search))
+  |> Repo.all()
+end
+```
+
+Congratulations! All tests pass. We're all done.
+
+```
+$ mix test
+...
+25 tests, 0 failures
+```
+
+## Context vs Controller Tests
+
+We chose to write the edge cases for our author search on the `Authors` context, however we could have written them on the controller. Why didn't we?
+
+Generally context tests run faster than controller tests. Controller tests require more setup and ceremony to run so they are more verbose. It's also easier to read the intent of a context test.
+
+Controller tests are more comprehensive. They test that your application is actually working as expected rather than testing a single function. Controller tests (depending on how they are written) generally provide more confidence than context tests.
+
+This isn't a question with a simple answer! We've decided to comprehensively test the context because they are fast and easy to write, and have fewer controller tests that ensure the controller and context are integrated correctly.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+It's time for a class discussion! What are the benefits of testing controllers vs contexts? When would you do one or the other?
