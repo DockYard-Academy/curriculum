@@ -225,36 +225,6 @@ defmodule Utils.Feedback do
              "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
   end
 
-  feedback :boolean_diagram1 do
-    answer = get_answers()
-    assert answer == false
-  end
-
-  feedback :boolean_diagram2 do
-    answer = get_answers()
-    assert answer == true
-  end
-
-  feedback :boolean_diagram3 do
-    answer = get_answers()
-    assert answer == false
-  end
-
-  feedback :boolean_diagram4 do
-    answer = get_answers()
-    assert answer == false
-  end
-
-  feedback :boolean_diagram5 do
-    answer = get_answers()
-    assert answer == true
-  end
-
-  feedback :boolean_diagram6 do
-    answer = get_answers()
-    assert answer == true
-  end
-
   feedback :guess_the_word do
     [guess, answer, correct] = answers = get_answers()
 
