@@ -27,21 +27,21 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-We're going to add books to our `BookSearch` application from the previous lesson.
+We will add books to our `BookSearch` application from the previous lesson.
 We need to associate books with a particular author.
 
-If you need clarification at any point during this reading, you can reference the completed [BookSearch with Books](https://github.com/BrooklinJazz/book_search/tree/books) project.
+If you need clarification during this reading, you can reference the completed [BookSearch with Books](https://github.com/BrooklinJazz/book_search/tree/books) project.
 
-In order to associate books with an author, we need to model their relationship in our database.
-Ecto handles the data layer in our application. By default, Ecto uses Postgres which is a relational database.
+To associate books with an author, we need to model their relationship in our Database.
+Ecto handles the data layer in our application. By default, Ecto uses Postgres, which is a relational database.
 
-Relational databases store data in any number of tables, and use foreign keys to relate data to one another.
-One of the most common data relationships is **one to many**.
+Relational databases store data in any number of tables and use foreign keys to relate data to one another.
+One of the most common data relationships is **one-to-many**.
 
-We use **belongs to**, **has many**, to describe the nature of a **one to many** relationship.
+We use **belongs to**, **has many**, to describe the nature of a **one-to-many** relationship.
 
-Authors and books have a one to many relationship. There are potentially many books for a single author.
-We would say that an author **has many** books and a book **belongs to** a single author.
+Authors and books have a one-to-many relationship because there are potentially many books for a single author.
+We would say that an author **has many** books, and a book **belongs to** a single author.
 
 ```mermaid
 flowchart
@@ -51,8 +51,7 @@ flowchart
   Author --> Book3
 ```
 
-Sometimes we model relationships and data tables using diagrams. There is a specific diagram called a UML (Unified Modelling Language) with
-very specific rules. However we'll use a more lightweight style. Generally, `1` represents the **one** in the relationship and `*` represent **many**.
+Sometimes we model relationships and data tables using diagrams. For example, there is a specific diagram specification called a UML (Unified Modelling Language) with particular rules and symbols. However, we'll use a more lightweight style. Generally, `1` represents the **one** in the relationship, and `*` represent **many**.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -71,7 +70,7 @@ classDiagram
   Book "1" --> "*" Author :belongs to
 ```
 
-Databases use foreign keys to associate one table with another. In this case, each book with store a foreign key `author_id` to the author they belong to.
+Databases use foreign keys to associate one table with another. In this case, each book stores a foreign key `author_id` to an author.
 
 ## Run Book Search Project
 
@@ -91,11 +90,11 @@ $ mix phx.server
 
 ## Books & Authors Association
 
-Books will store a foreign key to reference the author. We can generate the books resource with the following command.
-`author_id:references:author` creates the foreign key to the authors table.
+Books will store a foreign key to reference the author. For example, we can generate the books resource with the following command.
+`author_id:references:author` creates the foreign key to the `"authors"` table.
 
 ```
-$ mix phx.gen.html Books Book books title:string author_id:references:author
+$ mix phx.gen.html Books Book books title:string author_id:references:authors
 ```
 
 We've generated the following migration for books.
@@ -111,7 +110,7 @@ defmodule BookSearch.Repo.Migrations.CreateBooks do
   def change do
     create table(:books) do
       add :title, :string
-      add :author_id, references(:author, on_delete: :nothing)
+      add :author_id, references(:authors, on_delete: :nothing)
 
       timestamps()
     end
@@ -122,13 +121,11 @@ end
 ```
 
 The [references/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2) function defines the foreign key relationship with the author table.
-`on_delete: :nothing` means that if an author is deleted, the book will remain in the database.
+`on_delete: :nothing` means that if an author is deleted, the book will remain in the Database.
 
-However, sometimes that's not desirable, and instead we want to delete all associated records.
-For the sake of example, change the delete behavior to `on_delete: :delete_all`. the `:delete_all` option means we'll delete
-all books associated with an author if we delete that author.
+Instead, we want to delete all associated records. Change the delete behavior to `on_delete: :delete_all`. The `:delete_all` option means we'll delete all books associated with an author if we delete that author.
 
-For demonstration purposes we're also going to add `null: false`. This indicates that books must have an author.
+We'll also add `null: false`. This indicates that books must have an author because the relationship is not allowed to be `null`.
 
 Replace the migration file with the following.
 
@@ -161,11 +158,10 @@ $ mix ecto.migrate
 
 ### Has Many
 
-Schemas describe the application domain representation of data in our database.
-We've associated authors and books in our database, however we have not created this association in our application schema yet.
-We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
+Schemas describe the application domain representation of data in our Database.
+We've associated authors and books in our Database. However, we have not associated them in our application schemas. We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
 
-We can use the [has_many/3] macro to indicate a one to many association with another schema.
+We can use the [has_many/3] macro to indicate a one-to-many association with another schema.
 
 Add `has_many/3` to the `Author` schema.
 
@@ -263,7 +259,7 @@ end
 ```
 
 The `book_fixture/1` function causes this error. That's because books must have an author, and the `book_fixture/1` function does not include an author.
-let's import the `AuthorFixtures` and use the `author_fixture/1` function to create an author that we'll provide to the `book_fixture/1`.
+Let's import the `AuthorFixtures` and use the `author_fixture/1` function to create an author that we'll provide to the `book_fixture/1`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -273,7 +269,7 @@ import BookSearch.BooksFixtures
 import BookSearch.AuthorsFixtures
 ```
 
-Then create an author and give it the the `book_fixture/1` in our test.
+Then create an author and pass it to the `book_fixture/1` in our test.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -328,7 +324,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-This builds the association with `author` in the `Book` struct. This is the value returned by `Ecto.build_assoc/3` when we run our test.
+`Ecto.build_assoc/3` builds the association with `author` in the `Book` struct.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -353,7 +349,7 @@ This builds the association with `author` in the `Book` struct. This is the valu
 
 This struct then gets saved to the Database when it's passed to `Repo.insert/2`.
 
-Run our first test where `14` is the actual line number of the test and unfortunately it still fails.
+Run our first test where `14` is the actual line number of the test, and unfortunately, it still fails.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -398,7 +394,7 @@ author: #Ecto.Association.NotLoaded<association :author is not loaded>,
 author: %BookSearch.Authors.Author{__meta__: #Ecto.Schema.Metadata<:loaded, "authors">, books: #Ecto.Association.NotLoaded<association :books is not loaded>, id: 336, inserted_at: ~N[2022-07-28 04:05:19], name: "some name", updated_at: ~N[2022-07-28 04:05:19]},
 ```
 
-We could modify the assertion, but instead we'll use this opportunity to demonstrate loading associated data.
+We could modify the assertion, but instead, we'll use this opportunity to demonstrate loading associated data.
 We can use [Ecto.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) to load associated data in a query.
 
 Replace the `Books.list_books/1` function with the following to load the author association.
@@ -435,7 +431,7 @@ test "get_book!/1 returns the book with given id" do
 end
 ```
 
-However the test still fails because the `:author` association is not loaded when we get a single book in the `Books.get_book!/1` function.
+However, the test fails because the `:author` association is not loaded when we get a single book in the `Books.get_book!/1` function.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -481,8 +477,7 @@ test "get_book!/1 returns the book with given id" do
 end
 ```
 
-Above we use the pin operator `^` and fields of the book created by `book_fiture/1` to assert that the `:title`, `:id`, and `:author_id` fields match.
-We could accomplish the same thing more verbosely with the following.
+Above, we use the pin operator `^` and fields of the book created by `book_fiture/1` to assert that the `:title`, `:id`, and `:author_id` fields match. We could accomplish the same thing more verbosely with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -505,8 +500,8 @@ $ mix test test/book_search/books_test.exs:20
 
 ### Your Turn
 
-The remaining tests can be resolved following the same patterns.
-Fix the remaining tests. When you are done, all tests should pass and your `test/book_search/books_test.exs` file should look similar to the following.
+You can resolve the remaining tests by following the same patterns.
+Fix the remaining tests. When complete, all tests should pass, and your `test/book_search/books_test.exs` file should look similar to the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -599,8 +594,7 @@ $ mix test test/book_search/books_test.exs
 
 ## Book Controller Tests
 
-Our book controller tests fail due to the association between authors and books.
-In order to associate authors and books, we can nest resources in our router.
+Our book controller tests fail due to the association between authors and books. To associate authors and books, we can nest resources in our router.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -644,7 +638,7 @@ $ mix phx.routes
 
 <!-- livebook:{"break_markdown":true} -->
 
-All of our controller tests still fail, however we've laid the groundwork for fixing them.
+All of our controller tests still fail. However, we've laid the groundwork for fixing them.
 
 ```
 $ mix test test/book_search_web/controllers/book_controller_test.exs
@@ -698,7 +692,7 @@ end
 ```
 
 We still have the same error because the `lib/book_search_web/templates/books/index.html.heex` template also uses `Routes.book_path`.
-Replace `Routes.book_path` with `Routes.author_book_path`. `Routes.author_book_path` requires an author, so we'll pass in `@author_id` which we'll define in a moment in the controller.
+Replace `Routes.book_path` with `Routes.author_book_path`. `Routes.author_book_path` requires an author, so we'll pass in `@author_id`, which we'll define in a moment in the controller.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -733,7 +727,7 @@ Replace `Routes.book_path` with `Routes.author_book_path`. `Routes.author_book_p
 <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
 ```
 
-We have access to the `"author_id"` in second argument controller now because we nested our author and book routes.
+We have access to the `"author_id"` in the second argument controller because we nested our author and book routes.
 We need to pass the `author_id` into the [render](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function to provide it to the template.
 
 Replace `BookController.index/2` with the following.
@@ -758,8 +752,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:12
 We can create an author on http://localhost:4000/authors/new and then view an (empty) list of books for the author on
 http://localhost:4000/authors/1 where `1` is the id of the author.
 
-However, our test isn't very comprehensive. This is a nested resources for the author, so we would expect to list only books that belong to that author.
-Currently, it simply lists all books. We'll circle back to this after we've resolved the other tests.
+However, our test isn't very comprehensive. For example, the route is nested under the author, so we would expect to list only books that belong to that author. Currently, it simply lists all books. We'll circle back to this after we've resolved the other tests.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -825,7 +818,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:19
 8 tests, 0 failures, 7 excluded
 ```
 
-We should be able to visit http://localhost:4000/authors/1/books/new to view the new book page. However we cannot yet submit the form to create a new book.
+We should be able to visit http://localhost:4000/authors/1/books/new to view the new book page. However, we cannot yet submit the form to create a new book.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -936,7 +929,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:28
 
 That's because [Ecto.Changeset.cast/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) expects a map with either string keys, or atom keys, not both.
 
-There's a few solutions to this problem. We'll use [Map.pop!](https://hexdocs.pm/elixir/1.12/Map.html#pop!/2) to separate the `:author` key and the rest of the parameters.
+There are a few solutions to this problem. We've chosen to use [Map.pop!](https://hexdocs.pm/elixir/1.12/Map.html#pop!/2) to separate the `:author` key and the rest of the parameters. However, we could have changed the interface to the `Books.create_book/1` function.
 
 ```elixir
 author = %{name: "Dennis E Taylor"}
@@ -960,7 +953,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-We're successfully creating the book, however we encounter the `Routes.book_path` issue when we render the book show page.
+We're successfully creating the book. However we encounter the `Routes.book_path` issue when we render the book show page.
 
 Replace `Routes.book_path` with `Routes.author_book_path` in the show template.
 
@@ -1074,7 +1067,7 @@ Then submit the form to create a new book.
 
 ## Books.list_books/1
 
-Unfortunately, with our last change to `Books.create_book/1` we caused one of our `Books` context tests to fail.
+Unfortunately, our previous change to `Books.create_book/1` caused one of our `Books` context tests to fail.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1101,7 +1094,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-The behavior of `list_books/0` to build the `:author` is desirable, so we don't need to change it. Instead, lets modify the `"list_books/0 returns all books"` test to explicitly check for the author association.
+The behavior of `list_books/0` to build the `:author` is desirable, so we don't need to change it. Instead, let's modify the `"list_books/0 returns all books"` test to check for the author association.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1117,7 +1110,7 @@ test "list_books/0 returns all books" do
 end
 ```
 
-Now run the the following to verify the test passes! Replace `` with the correct line number of the test.
+Now run the following in the command line to verify the test passes! Replace `14` with the correct line number of the test.
 
 ```
 $ mix test test/book_search/books_test.exs:14
@@ -1153,9 +1146,9 @@ defp create_book(_) do
 end
 ```
 
-We can modify it to associate an author with the book, or simply remove the function and use the fixtures directly.
+We can modify it to associate an author with the book or remove the function and use the fixtures directly.
 
-Some developers consider it an anti-pattern to create associated data in a fixture. However, we're going to associate an author with the book in the `create_book/1` function for the sake of demonstration.
+It can be an anti-pattern to create associated data in a fixture. With complex domains, this can cause unexpected behavior. However, we will associate an author with the book in the `create_book/1` function for demonstration purposes.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1205,7 +1198,7 @@ def edit(conn, %{"id" => id, "author_id" => author_id}) do
 end
 ```
 
-Run the following in the terminal and the test should pass! Replace `46` with the correct line number of the test.
+Run the following in the terminal, and the test should pass! Replace `46` with the correct line number of the test.
 
 ```
 $ mix test test/book_search_web/controllers/book_controller_test.exs:46
@@ -1214,7 +1207,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:46
 
 <!-- livebook:{"break_markdown":true} -->
 
-Now we should be able to visit the edit page on http://localhost:4000/authors/1/book/1/edit. However, we cannot yet submit the form.
+Now we should be able to visit the edit page on http://localhost:4000/authors/1/book/1/edit. We cannot yet submit the form.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1222,7 +1215,7 @@ Now we should be able to visit the edit page on http://localhost:4000/authors/1/
 
 ## BookController.update/2
 
-The `"update book"` tests are very similar to the `"create book"` tests. There is one test for updating a book with valid parameters, and one test for updating a book with invalid parameters.
+The `"update book"` tests are very similar to the `"create book"` tests. There is one test for updating a book with valid parameters and another for updating a book with invalid parameters.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1296,7 +1289,7 @@ def update(conn, %{"id" => id, "book" => book_params, "author_id" => author_id})
 end
 ```
 
-Run the following in your command line and both tests should pass! Replace `55` with the correct line number of the describe block.
+Run the following in your command line, and both tests should pass! Replace `55` with the correct line number of the `describe` block.
 
 ```
 $ mix test test/book_search_web/controllers/book_controller_test.exs:55
@@ -1394,7 +1387,7 @@ def index(conn, %{"author_id" => author_id}) do
 end
 ```
 
-Let's expand the functionality of our `BookSearch` application. We want clients to be able to visit http://localhost:4000/books to view all books, and http://localhost:4000/authors/1/books to view all books for an author.
+Let's expand the functionality of our `BookSearch` application. We want clients to be able to visit http://localhost:4000/books to view all books and http://localhost:4000/authors/1/books to view all books for an author.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1410,7 +1403,7 @@ test "lists all books", %{conn: conn} do
 end
 ```
 
-For this test, we want to visit http://localhost:4000/books. Currently, there's no defined route for that URL, so we need to make one in our router.
+For this test, we want to visit http://localhost:4000/books. There's no defined route for that URL, so we need to make one in our router.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1437,7 +1430,7 @@ book_path  GET     /books                                 BookSearchWeb.BookCont
 ...
 ```
 
-Replace `Routes.author_book_path` with `Routes.book_path`. We also want to create a book and assert that we find it's title in the HTML response.
+Replace `Routes.author_book_path` with `Routes.book_path`. We also want to create a book and assert that we find its title in the HTML response.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1479,7 +1472,7 @@ end
 
 We need to handle the case where there's no author_id in the index template. We can use the `book.author_id` instead of `@author_id` for the list of books.
 
-And we can wrap the **New Book** button in an if statement to only render if there is an `@author_id` value. We can use the `assigns` variable directly with the square bracket syntax to access a value that's not guaranteed to exist.
+We can wrap the **New Book** button in an if statement to only render if there is an `@author_id` value. We can use `assigns` with square bracket syntax to safely access a value that's may not exist.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1522,7 +1515,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:12
 8 tests, 0 failures, 7 excluded
 ```
 
-For the sake of convenient UI, let's add a **New Book** button to the author show page.
+For convenient UI, let's add a **New Book** button to the author show page.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1598,9 +1591,7 @@ Looking good! That's the power of associating data!
 
 ## List Books By Author
 
-We need a new test for listing books by author. We'll create two authors each with one book. Then we'll use the `get/3` macro to send a GET request to `http://localhost:4000/authors/1/books` where `1` is the id of the author.
-
-We expect to only find the title of the first book.
+We need a new test for listing books by their author. First, we'll create two authors, each with one book. Then we'll use the `get/3` macro to send a GET request to `http://localhost:4000/authors/1/books` where `1` is the author's id. Lastly, we assert we only find the author's book on the page.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1632,7 +1623,7 @@ def index(conn, %{"author_id" => author_id}) do
 end
 ```
 
-We'll need to implement the `Books.list_book/1` function. Create a new function clause as we still want the `Books.list_book/0` function to work. We can use the [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) to filter books by a matching author id.
+We'll need to implement the `Books.list_book/1` function. Create a new function clause as we still want the `Books.list_book/0` function to work. We can filter books by a matching author id with[where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3).
 
 <!-- livebook:{"force_markdown":true} -->
 
