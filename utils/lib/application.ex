@@ -6,7 +6,6 @@ defmodule Utils.Application do
   use Application
 
   def start(_type, _args) do
-    Enum.each(Utils.SmartCell.Exercise.smart_cells(), &Kino.SmartCell.register/1)
     Kino.SmartCell.register(Utils.SmartCell.HiddenCell)
     children = []
     Supervisor.start_link(children, strategy: :one_for_one)
