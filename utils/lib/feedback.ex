@@ -187,33 +187,6 @@ defmodule Utils.Feedback do
              "The majestic #{animal} has roamed the forests of #{country} for thousands of years. Today she wanders in search of #{plural_noun}. She must find food to survive. While hunting for #{a_food}, she found a/an #{type_of_screen_device} hidden behind a #{noun}. She has never seen anything like this before. What will she do? With the device in her teeth, she tries to #{verb1}, but nothing happens. She takes it back to her family. When her family sees it, they quickly #{verb2}. Soon, the device becomes #{adjective}, and the family decides to put it back where they found it."
   end
 
-  feedback :guess_the_word do
-    [guess, answer, correct] = answers = get_answers()
-
-    assert Enum.all?(answers, &is_binary/1),
-           "Ensure `guess`, `answer`, and `correct` are all strings"
-
-    if guess == answer do
-      assert correct == "Correct!"
-    else
-      assert correct == "Incorrect."
-    end
-  end
-
-  feedback :guess_the_number do
-    [guess, answer, correct] = get_answers()
-
-    assert is_integer(guess), "Ensure `guess` is an integer"
-    assert is_integer(answer), "Ensure `answer` is an integer"
-    assert is_binary(correct), "Ensure `correct` is a string"
-
-    cond do
-      guess == answer -> assert correct == "Correct!"
-      guess < answer -> assert correct == "Too low!"
-      guess > answer -> assert correct == "Too high!"
-    end
-  end
-
   feedback :copy_file do
     file_name = get_answers()
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
