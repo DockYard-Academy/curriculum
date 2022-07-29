@@ -119,7 +119,7 @@ next_count = card <= 6 && count + 1 # returns 1
 
 Replace `nil` with your answer.
 
-<!-- livebook:{"attrs":{"assertions":"cond do\n  card in 2..6 -> assert next_count === 1\n  card in 7..9 -> assert next_count === 0\n  card in 10..14 -> assert next_count === -1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"# A random integer between 2 and 14\r\nrandom_card = Utils.random(2..14)\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    card in 2..6 -> 1\n    card in 7..9 -> 0\n    card in 10..14 -> -1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"cond do\n  random_card in 2..6 -> assert next_count === 1\n  random_card in 7..9 -> assert next_count === 0\n  random_card in 10..14 -> assert next_count === -1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"# A random integer between 2 and 14\r\nrandom_card = Utils.random(2..14)\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    random_card in 2..6 -> 1\n    random_card in 7..9 -> 0\n    random_card in 10..14 -> -1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -135,9 +135,9 @@ defmodule Assertion do
     next_count = nil
 
     cond do
-      card in 2..6 -> assert next_count === 1
-      card in 7..9 -> assert next_count === 0
-      card in 10..14 -> assert next_count === -1
+      random_card in 2..6 -> assert next_count === 1
+      random_card in 7..9 -> assert next_count === 0
+      random_card in 10..14 -> assert next_count === -1
       true -> raise "Something went wrong. Please reset the exercise."
     end
   end
