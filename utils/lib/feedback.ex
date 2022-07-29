@@ -17,34 +17,6 @@ defmodule Utils.Feedback do
   """
   use Utils.Feedback.Assertion
 
-  feedback :card_count_four do
-    next_count = get_answers()
-    assert next_count == 1
-  end
-
-  feedback :card_count_king do
-    next_count = get_answers()
-    assert next_count === 4
-  end
-
-  feedback :card_count_random do
-    [card, next_count] = get_answers()
-
-    cond do
-      card in 2..6 ->
-        assert next_count === 1
-
-      card in 7..9 ->
-        assert next_count === 0
-
-      card in 10..14 ->
-        assert next_count === -1
-
-      true ->
-        raise "Something went wrong. Please reset the exercise."
-    end
-  end
-
   feedback :habit_tracker_definition do
     [small, medium, large] = get_answers()
     assert small == 5
