@@ -17,66 +17,6 @@ defmodule Utils.Feedback do
   """
   use Utils.Feedback.Assertion
 
-  feedback :card_count_four do
-    next_count = get_answers()
-    assert next_count == 1
-  end
-
-  feedback :card_count_king do
-    next_count = get_answers()
-    assert next_count === 4
-  end
-
-  feedback :card_count_random do
-    [card, next_count] = get_answers()
-
-    cond do
-      card in 2..6 ->
-        assert next_count === 1
-
-      card in 7..9 ->
-        assert next_count === 0
-
-      card in 10..14 ->
-        assert next_count === -1
-
-      true ->
-        raise "Something went wrong. Please reset the exercise."
-    end
-  end
-
-  feedback :habit_tracker_definition do
-    [small, medium, large] = get_answers()
-    assert small == 5
-    assert medium == 20
-    assert large == 30
-  end
-
-  feedback :habit_tracker_add do
-    total_points = get_answers()
-    assert total_points == 20 + 5
-  end
-
-  feedback :habit_tracker_percentage do
-    percentage = get_answers()
-    assert percentage == (5 + 20) / 40 * 100
-  end
-
-  feedback :habit_tracker_penalties_1 do
-    total_points = get_answers()
-    assert total_points == 5 + 20 + 30 * 0.5
-  end
-
-  feedback :habit_tracker_penalties_2 do
-    total_points = get_answers()
-    assert total_points == 5 / 2 * 3 + 20 / 2 * 3
-  end
-
-  feedback :habit_tracker_rewards do
-    total_points = get_answers()
-    assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
-  end
-
   feedback :string_concatenation do
     answer = get_answers()
     assert is_binary(answer), "the answer should be a string."

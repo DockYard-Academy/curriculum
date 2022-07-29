@@ -10,14 +10,15 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
 ```
 
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Setup
 
@@ -41,13 +42,31 @@ Card values are as follows:
 When the current card is `4` and the current count is `0` what is the `next_count`?
 Replace `nil` with your answer.
 
+<!-- livebook:{"attrs":{"assertions":"assert next_count === 1","code":"card = 4\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = 1"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    card = 4
+    count = 0
+
+    next_count = nil
+    assert next_count === 1
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 card = 4
 count = 0
 
 next_count = nil
-
-Utils.feedback(:card_count_four, next_count)
 ```
 
 ### Card King (13)
@@ -55,13 +74,31 @@ Utils.feedback(:card_count_four, next_count)
 When the current card is a King `(13)` and the current count is `5` what is the `next_count`?
 Replace `nil` with your answer.
 
+<!-- livebook:{"attrs":{"assertions":"assert next_count === 4","code":"card = 13\r\ncount = 5\r\n\r\nnext_count = nil","solution":"next_count = 4"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    card = 13
+    count = 5
+
+    next_count = nil
+    assert next_count === 4
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 card = 13
 count = 5
 
 next_count = nil
-
-Utils.feedback(:card_count_king, next_count)
 ```
 
 Now the current card is a random card between `2` and `14`. We've used the `Utils` project to generate a random number.
@@ -82,13 +119,37 @@ next_count = card <= 6 && count + 1 # returns 1
 
 Replace `nil` with your answer.
 
-```elixir
-# a random integer between 2 and 14
-random_card = Utils.random(2..14)
+<!-- livebook:{"attrs":{"assertions":"cond do\n  random_card in 2..6 -> assert next_count === 1\n  random_card in 7..9 -> assert next_count === 0\n  random_card in 10..14 -> assert next_count === -1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"# A random integer between 2 and 14\r\nrandom_card = Utils.random(2..14)\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    random_card in 2..6 -> 1\n    random_card in 7..9 -> 0\n    random_card in 10..14 -> -1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    # A random integer between 2 and 14
+    random_card = Utils.random(2..14)
+    count = 0
+
+    next_count = nil
+
+    cond do
+      random_card in 2..6 -> assert next_count === 1
+      random_card in 7..9 -> assert next_count === 0
+      random_card in 10..14 -> assert next_count === -1
+      true -> raise "Something went wrong. Please reset the exercise."
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+# A random integer between 2 and 14
+random_card = Utils.random(2..14)
 count = 0
 
 next_count = nil
-
-Utils.feedback(:card_count_random, [random_card, next_count])
 ```

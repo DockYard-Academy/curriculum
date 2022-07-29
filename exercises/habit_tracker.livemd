@@ -10,14 +10,15 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
 ```
 
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Setup
 
@@ -42,12 +43,31 @@ Bind a variable `small`, `medium`, and `large` to represent the point value as a
 
 Replace `nil` with your answers.
 
+<!-- livebook:{"attrs":{"assertions":"assert small == 5\nassert medium == 20\nassert large == 30","code":"small = nil\r\nmedium = nil\r\nlarge = nil","solution":"small = 5\nmedium = 20\nlarge = 30"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    small = nil
+    medium = nil
+    large = nil
+    assert small == 5
+    assert medium == 20
+    assert large == 30
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 small = nil
 medium = nil
 large = nil
-
-Utils.feedback(:habit_tracker_definition, [small, medium, large])
 ```
 
 ### Add Tasks
@@ -58,10 +78,25 @@ Use the `small` and `medium` variables to calculate your answer.
 
 Replace `nil` with your answer below.
 
-```elixir
-total_points = nil
+<!-- livebook:{"attrs":{"assertions":"assert total_points == 20 + 5","code":"total_points = nil","solution":"total_points = small + medium"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:habit_tracker_add, total_points)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    total_points = nil
+    assert total_points == 20 + 5
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+total_points = nil
 ```
 
 ### Point Goal Percentages
@@ -75,12 +110,29 @@ Remember that you can calculate percentage with $\frac{points}{point\ goal} * 10
 
 Replace `nil` with your answer below.
 
+<!-- livebook:{"attrs":{"assertions":"assert percentage == (5 + 20) / 40 * 100","code":"point_goal = 40\r\n\r\npercentage = nil","solution":"percentage = (small + medium) / point_goal * 100"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    point_goal = 40
+
+    percentage = nil
+    assert percentage == (5 + 20) / 40 * 100
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 point_goal = 40
 
 percentage = nil
-
-Utils.feedback(:habit_tracker_percentage, percentage)
 ```
 
 ### New Feature Added - Penalties
@@ -97,10 +149,25 @@ A user has completed
 
 What is their total point score? Replace `nil` with your answer.
 
-```elixir
-total_points = nil
+<!-- livebook:{"attrs":{"assertions":"assert total_points == 5 + 20 + 30 * 0.5","code":"total_points = nil","solution":"total_points = small + medium + large * 0.5"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:habit_tracker_penalties_1, total_points)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    total_points = nil
+    assert total_points == 5 + 20 + 30 * 0.5
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+total_points = nil
 ```
 
 A user has completed
@@ -110,10 +177,25 @@ A user has completed
 
 What is their total point score? Replace `nil` with your answer.
 
-```elixir
-total_points = nil
+<!-- livebook:{"attrs":{"assertions":"assert total_points == 5 / 2 * 3 + 20 / 2 * 3","code":"total_points = nil","solution":"total_points = small / 2 * 3 + medium / 2 * 3"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:habit_tracker_penalties_2, total_points)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    total_points = nil
+    assert total_points == 5 / 2 * 3 + 20 / 2 * 3
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+total_points = nil
 ```
 
 ### New Feature Added - Rewards
@@ -132,10 +214,25 @@ A user has completed:
 
 What is their total point score? Replace `nil` with your answer.
 
-```elixir
-total_points = nil
+<!-- livebook:{"attrs":{"assertions":"assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5","code":"total_points = nil","solution":"total_points = medium * 1.6 + small * 1.6 + large * 0.5"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:habit_tracker_rewards, total_points)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    total_points = nil
+    assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+total_points = nil
 ```
 
 ### (BONUS): Add Your Own Feature
