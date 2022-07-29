@@ -2,19 +2,21 @@
 
 The DockYard Academy curriculum is an open source curriculum to help students learn Elixir.
 The `beta_curriculum` is a work in progress effort available for feedback and contribution.
-When launched, this curriculum will be used as the primary teaching material in DockYard Academy.
-
-Contributors and beta testers are welcome to go through the course, raise issues, and make PRs.
+When launched, this curriculum will be used as the primary teaching material in [DockYard Academy](https://dockyard.com/blog/2022/07/26/what-to-expect-from-the-dockyard-academy-q-a-with-instructor-brooklin-myers).
 
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
+
+## Want To Get Involved?
+
+Contributors and beta testers are welcome to go through the course, raise issues, and make PRs. See the [Contributor Guide](https://github.com/DockYard-Academy/beta_curriculum/wiki/Beta-Tester-Guide-&-Contributor-Setup).
+
+See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculum/issues). Comment on any issue and mention @brooklinjazz to get support.
 
 ## QuickStart
 
 1. Clone the project `git clone <URL>`.
 
-2. Install a compatible Elixir (1.13.4 or higher) and Erlang (25 or higher)
-   version. You may wish to use
-   [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+2. Install a compatible Elixir and Erlang version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook):
 
@@ -32,6 +34,14 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
 ensure your Livebook version is correct.
+
+## Troubleshooting
+
+Raise an issue or contact brooklin.myers@dockyard.com if you are having trouble setting up the curriculum.
+
+### LiveBook Desktop App (Currently) Not Supported
+
+Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
 
 ## Spell Checking
 
