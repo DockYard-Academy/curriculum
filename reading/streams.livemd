@@ -26,8 +26,9 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 ## Enum vs Stream
 
 Currently, we typically use the `Enum` module to work with collections.
-The `Enum` module uses **eager evaluation**. That means any instruction we provide is immediately
-executed. This requires each element in the enumeration to be stored in memory during execution.
+The `Enum` module uses [**eager evaluation**](https://en.wikipedia.org/wiki/Eager_evaluation). That means any
+instruction we provide is immediately executed. This requires each element in the enumeration to be stored in
+memory during execution.
 
 ```elixir
 1..10
@@ -43,8 +44,8 @@ seen in this slide.
 Utils.animate(:eager_evaluation)
 ```
 
-While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by the
-end of the execution the `Enum.take/2` function only needs two elements.
+While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by
+the end of the execution the `Enum.take/2` function only needs two elements.
 
 It seems like a waste of resources to execute every operation on every element, and it is.
 As the list grows, this becomes a massive waste of computation. It would be far more performant if we
@@ -55,8 +56,8 @@ Utils.animate(:lazy_evaluation)
 ```
 
 We can't accomplish this with the `Enum` module, however we can with `Stream`.
-[Streams](https://hexdocs.pm/elixir/Stream.html#unfold/2) are composable,
-lazy enumerables. **lazy** means they execute on each element in the stream one by one. **Composable**
+[Streams](https://hexdocs.pm/elixir/Stream.html) are composable, lazy enumerables.
+**Lazy** means they execute on each element in the stream one by one. **Composable**
 means that we build up functions to execute on each element in the stream.
 
 Notice that the following does not execute, it instead builds up future work to execute and returns
@@ -180,7 +181,7 @@ enum_fn = fn -> 1..1000 |> Enum.map(&(&1 * 2)) |> Enum.map(&(&1 * 2)) |> Enum.ma
 %{stream_time: stream_time, enum_time: enum_time}
 ```
 
-In terms of improving performance, streams will generally provide the greatest benefits when operations
+In terms of improving performance, Streams will generally provide the greatest benefits when operations
 reduce the number of elements in the enumerable.
 
 ## Stream
@@ -216,8 +217,6 @@ We've used pattern matching here to demonstrate each has similar behavior.
 
 [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]] = Enum.chunk_every(1..10, 2)
 [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]] = Stream.chunk_every(1..10, 2) |> Enum.to_list()
-
-Kino.nothing()
 ```
 
 ### Streams As Generators
@@ -240,7 +239,7 @@ Stream.cycle([1, 2, 3])
 |> Enum.take(10)
 ```
 
-We've been using Streams for a while now! Did you know that ranges are streams? Each element
+We've been using Streams for a while now! Did you know that ranges are Streams? Each element
 in the range is only created as necessary. For example, we can create an incredibly massive range in a
 single moment.
 
@@ -280,8 +279,12 @@ Accumulator --> Function --> A2[Next Accumulator] --> Function
 <!-- livebook:{"break_markdown":true} -->
 
 You could build more complicated sequences this way too. For example, there is
-such a thing as the [Collatz Conjecture](https://www.youtube.com/watch?v=094y1Z2wpJg&ab_channel=Veritasium)
+such a thing as the [Collatz Conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture).
 Also known as the simplest math problem that no one can solve.
+
+```elixir
+Kino.YouTube.new("https://www.youtube.com/watch?v=094y1Z2wpJg")
+```
 
 The Collatz Conjecture states that if you take any number and apply the following two
 rules:

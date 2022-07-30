@@ -66,19 +66,19 @@ defmodule Utils.Form do
     ]
 
     [
-      %{label: "concatenating two lists", answers: ["O(n1)"], options: options},
-      %{label: "inserting an element in tuple", answers: ["O(n)"], options: options},
-      %{label: "deleting an element in a list", answers: ["O(n*)"], options: options},
-      %{label: "prepending an element in a list", answers: ["O(1)"], options: options},
-      %{label: "updating an element in a list", answers: ["O(n*)"], options: options},
-      %{label: "concatenating two tuples", answers: ["O(n1 + n1)"], options: options},
-      %{label: "inserting an element in list", answers: ["O(n*)"], options: options},
-      %{label: "updating an element in tuple", answers: ["O(n)"], options: options},
-      %{label: "deleting an element in a tuple", answers: ["O(n)"], options: options},
-      %{label: "finding the length of a tuple", answers: ["O(1)"], options: options},
-      %{label: "deleting an element in a list", answers: ["O(n*)"], options: options},
-      %{label: "finding the length of a list", answers: ["O(n)"], options: options},
-      %{label: "finding the length of a list", answers: ["O(n)"]}
+      %{label: "Concatenating two lists", answers: ["O(n1)"], options: options},
+      %{label: "Inserting an element in tuple", answers: ["O(n)"], options: options},
+      %{label: "Deleting an element in a list", answers: ["O(n*)"], options: options},
+      %{label: "Prepending an element in a list", answers: ["O(1)"], options: options},
+      %{label: "Updating an element in a list", answers: ["O(n*)"], options: options},
+      %{label: "Concatenating two tuples", answers: ["O(n1 + n1)"], options: options},
+      %{label: "Inserting an element in list", answers: ["O(n*)"], options: options},
+      %{label: "Updating an element in tuple", answers: ["O(n)"], options: options},
+      %{label: "Deleting an element in a tuple", answers: ["O(n)"], options: options},
+      %{label: "Finding the length of a tuple", answers: ["O(1)"], options: options},
+      %{label: "Feleting an element in a list", answers: ["O(n*)"], options: options},
+      %{label: "Finding the length of a list", answers: ["O(n)"], options: options},
+      %{label: "Finding the length of a list", answers: ["O(n)"]}
     ]
   end
 end

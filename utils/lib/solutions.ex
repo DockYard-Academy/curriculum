@@ -47,24 +47,6 @@ defmodule Utils.Solutions do
     ]
   end
 
-  def rock_paper_scissors_two_player do
-    player1_choice = Utils.random(:rock_paper_scissors)
-    player2_choice = Utils.random(:rock_paper_scissors)
-
-    winner =
-      case {player1_choice, player2_choice} do
-        {:rock, :scissors} -> :player1
-        {:paper, :rock} -> :player1
-        {:scissors, :paper} -> :player1
-        {:scissors, :rock} -> :player2
-        {:rock, :paper} -> :player2
-        {:paper, :scissors} -> :player2
-        _ -> :draw
-      end
-
-    [player1_choice, player2_choice, winner]
-  end
-
   def shopping_list do
     shopping_list = [] ++ ["grapes", "walnuts", "apples"]
     shopping_list = shopping_list ++ ["blueberries", "chocolate", "pizza"]
@@ -292,16 +274,6 @@ defmodule Utils.Solutions do
 
   def rock_paper_scissors_lizard_spock do
     RockPaperScissorsLizardSpock
-  end
-
-  def rock_paper_scissors_ai do
-    player_choice = Enum.random([:rock, :paper, :scissors])
-
-    ai_choice =
-      (player_choice == :rock && :paper) || (player_choice == :paper && :scissors) ||
-        (player_choice == :scissors && :rock)
-
-    [player_choice, ai_choice]
   end
 
   def string_interpolation do

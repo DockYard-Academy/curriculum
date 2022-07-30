@@ -39,38 +39,6 @@ defmodule Utils.Feedback do
            "the answer should end in a period."
   end
 
-  feedback :rock_paper_scissors_ai do
-    [player_choice, ai_choice] = get_answers()
-
-    case player_choice do
-      :rock ->
-        assert ai_choice === :paper,
-               "when player_choice is :rock, ai_choice should be :paper."
-
-      :paper ->
-        assert ai_choice === :scissors,
-               "when player_choice is :paper, ai_choice should be :scissors."
-
-      :scissors ->
-        assert ai_choice === :rock,
-               "when player_choice is :scissors, ai_choice should be :rock."
-    end
-  end
-
-  feedback :rock_paper_scissors_two_player do
-    [player1_choice, player2_choice, winner] = get_answers()
-
-    case {player1_choice, player2_choice} do
-      {:rock, :scissors} -> assert winner == :player1
-      {:paper, :rock} -> assert winner == :player1
-      {:scissors, :paper} -> assert winner == :player1
-      {:scissors, :rock} -> assert winner == :player2
-      {:rock, :paper} -> assert winner == :player2
-      {:paper, :scissors} -> assert winner == :player2
-      _ -> assert winner == :draw
-    end
-  end
-
   feedback :rock_paper_scissors_pattern_matching do
     rock_paper_scissors = get_answers()
 
