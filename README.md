@@ -32,6 +32,12 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
    livebook server start.livemd
    ```
 
+   Note: If the previous command is not found and `asdf` is being used, you may need to perform
+   a `reshim` by running the following command.
+   ```
+    asdf reshim 
+   ```
+
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
 ensure your Livebook version is correct.
 
