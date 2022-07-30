@@ -47,35 +47,6 @@ defmodule Utils.Solutions do
     ]
   end
 
-  def rocket_ship do
-    20
-  end
-
-  def boolean_diagram1, do: false
-  def boolean_diagram2, do: true
-  def boolean_diagram3, do: false
-  def boolean_diagram4, do: false
-  def boolean_diagram5, do: true
-  def boolean_diagram6, do: true
-
-  def guess_the_word do
-    guess = Enum.random(["answer", "incorrect answer"])
-    answer = "answer"
-    correct = (guess == answer && "Correct!") || "Incorrect."
-    [guess, answer, correct]
-  end
-
-  def guess_the_number do
-    guess = Enum.random(1..9)
-    answer = Enum.random(1..9)
-
-    correct =
-      (guess == answer && "Correct!") || (guess < answer && "Too low!") ||
-        (guess > answer && "Too high!")
-
-    [guess, answer, correct]
-  end
-
   def copy_file do
     "copy_example"
   end
@@ -288,77 +259,12 @@ defmodule Utils.Solutions do
     RockPaperScissorsLizardSpock
   end
 
-  def card_count_four do
-    1
-  end
-
-  def card_count_king do
-    4
-  end
-
-  def card_count_random do
-    random_card = Utils.random(2..14)
-
-    count = 0
-
-    next_count = (random_card <= 6 && count + 1) || (random_card >= 10 && count - 1) || count
-    [random_card, next_count]
-  end
-
-  def tip_amount do
-    cost_of_the_meal = 55.5
-    tip_rate = 0.2
-
-    tip_amount = cost_of_the_meal * tip_rate
-
-    [cost_of_the_meal, tip_rate, tip_amount]
-  end
-
   def string_interpolation do
     "I have #{1 - 1} classmates."
   end
 
   def string_concatenation do
     "Hi, Peter."
-  end
-
-  def pythagorean_c do
-    :math.sqrt(200)
-  end
-
-  def pythagorean_c_square do
-    10 ** 2 + 10 ** 2
-  end
-
-  def percentage do
-    completed_items = 10
-    total_items = 100
-    percentage = completed_items / total_items * 100
-    [completed_items, total_items, percentage]
-  end
-
-  def habit_tracker_rewards do
-    20 * 1.6 + 5 * 1.6 + 30 * 0.5
-  end
-
-  def habit_tracker_penalties_1 do
-    5 + 20 + 30 * 0.5
-  end
-
-  def habit_tracker_penalties_2 do
-    5 / 2 * 3 + 20 / 2 * 3
-  end
-
-  def habit_tracker_percentage do
-    (5 + 20) / 40 * 100
-  end
-
-  def habit_tracker_add do
-    20 + 5
-  end
-
-  def habit_tracker_definition do
-    [5, 20, 30]
   end
 
   defmodule CustomGame do
