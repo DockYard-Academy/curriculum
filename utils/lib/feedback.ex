@@ -100,37 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :shopping_list do
-    shopping_list = get_answers()
-    list = [] ++ ["grapes", "walnuts", "apples"]
-    list = list ++ ["blueberries", "chocolate", "pizza"]
-    list = list -- ["grapes", "walnuts"]
-    list = list ++ ["banana", "banana", "banana"]
-
-    assert is_list(shopping_list), "Ensure shopping_list is still a list."
-
-    assert Enum.sort(list) == Enum.sort(shopping_list),
-           "Ensure your shopping list has all of the expected items"
-
-    assert shopping_list == list, "Ensure you add and remove items in the expected order"
-  end
-
-  feedback :shopping_list_with_quantities do
-    shopping_list = get_answers()
-    list = [] ++ [milk: 1, eggs: 12]
-    list = list ++ [bars_of_butter: 2, candies: 10]
-    list = list -- [bars_of_butter: 2]
-    list = list -- [candies: 10]
-    list = list ++ [candies: 5]
-
-    assert is_list(shopping_list), "Ensure shopping_list is still a list."
-
-    assert Enum.sort(shopping_list) == Enum.sort(shopping_list),
-           "Ensure your shopping list has all of the expected items"
-
-    assert shopping_list == list, "Ensure you add and remove items in the expected order"
-  end
-
   feedback :family_tree do
     family_tree = get_answers()
     assert is_map(family_tree), "Ensure `family_tree` is a map."
