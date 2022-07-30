@@ -10,7 +10,8 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
 ```
 
@@ -35,10 +36,35 @@ In the Elixir cells below, use `++` and `--` to add the items show.
 * Remove `"grapes"` and `"walnuts"` from the `shopping_cart`
 * Add three `"banana"`s to the `shopping_cart`
 
-```elixir
-shopping_cart = []
+<!-- livebook:{"attrs":{"assertions":"list = [] ++ [\"grapes\", \"walnuts\", \"apples\"]\nlist = list ++ [\"blueberries\", \"chocolate\", \"pizza\"]\nlist = list -- [\"grapes\", \"walnuts\"]\nlist = list ++ [\"banana\", \"banana\", \"banana\"]\n\nassert is_list(shopping_list), \"Ensure shopping_list is still a list.\"\n\nassert Enum.sort(list) == Enum.sort(shopping_list),\n  \"Ensure your shopping list has all of the expected items\"\n\nassert shopping_list == list, \"Ensure you add and remove items in the expected order\"","code":"shopping_cart = []","solution":"shopping_cart = []\n\nshopping_cart = shopping_cart ++ ~w[grapes walnuts apples]\nshopping_cart = shopping_cart ++ ~w[blueberries chocolate pizza]\nshopping_cart = shopping_cart -- ~w[grapes walnuts]\nshopping_cart = shopping_cart ++ ~w[banana banana banana]"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:shopping_list, shopping_cart)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    shopping_cart = []
+    list = [] ++ ["grapes", "walnuts", "apples"]
+    list = list ++ ["blueberries", "chocolate", "pizza"]
+    list = list -- ["grapes", "walnuts"]
+    list = list ++ ["banana", "banana", "banana"]
+
+    assert is_list(shopping_list), "Ensure shopping_list is still a list."
+
+    assert Enum.sort(list) == Enum.sort(shopping_list),
+           "Ensure your shopping list has all of the expected items"
+
+    assert shopping_list == list, "Ensure you add and remove items in the expected order"
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+shopping_cart = []
 ```
 
 ## Text Shopping List With Quantities
@@ -58,8 +84,34 @@ items from the `shopping_cart`
   Likely you will need to remove 10 candies, and then add 5 candies.
   </details>
 
-```elixir
-shopping_cart = []
+<!-- livebook:{"attrs":{"assertions":"list = [] ++ [milk: 1, eggs: 12]\nlist = list ++ [bars_of_butter: 2, candies: 10]\nlist = list -- [bars_of_butter: 2]\nlist = list -- [candies: 10]\nlist = list ++ [candies: 5]\n\nassert is_list(shopping_list), \"Ensure shopping_list is still a list.\"\n\nassert Enum.sort(shopping_list) == Enum.sort(shopping_list),\n  \"Ensure your shopping list has all of the expected items\"\n\nassert shopping_list == list, \"Ensure you add and remove items in the expected order\"","code":"shopping_cart = []","solution":"shopping_cart = []\n\nshopping_cart = shopping_cart ++ [milk: 1, eggs: 12]\nshopping_cart = shopping_cart ++ [bars_of_butter: 2, candies: 10]\nshopping_cart = shopping_cart -- [bars_of_butter: 2]\nshopping_cart = shopping_cart -- [candies: 10]\nshopping_cart = shopping_cart ++ [candies: 5]"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:shopping_list_with_quantities, shopping_cart)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    shopping_cart = []
+    list = [] ++ [milk: 1, eggs: 12]
+    list = list ++ [bars_of_butter: 2, candies: 10]
+    list = list -- [bars_of_butter: 2]
+    list = list -- [candies: 10]
+    list = list ++ [candies: 5]
+
+    assert is_list(shopping_list), "Ensure shopping_list is still a list."
+
+    assert Enum.sort(shopping_list) == Enum.sort(shopping_list),
+           "Ensure your shopping list has all of the expected items"
+
+    assert shopping_list == list, "Ensure you add and remove items in the expected order"
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+shopping_cart = []
 ```
