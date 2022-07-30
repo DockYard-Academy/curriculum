@@ -13,6 +13,8 @@ Mix.install([
   {:utils, path: "utils"},
   {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
+
+Elixir.TestedCell.Control.show_editors()
 ```
 
 ## Navigation
@@ -51,7 +53,7 @@ Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determining 
 Replace `nil` with your answer. Change `player_choice` to `:rock`, `:paper`, and `:scissors` to ensure
 your solution works correctly.
 
-<!-- livebook:{"attrs":{"assertions":"case player_choice do\n  :rock ->\n    assert ai_choice === :paper,\n      \"when player_choice is :rock, ai_choice should be :paper.\"\n\n  :paper ->\n    assert ai_choice === :scissors,\n      \"when player_choice is :paper, ai_choice should be :scissors.\"\n\n  :scissors ->\n    assert ai_choice === :rock,\n      \"when player_choice is :scissors, ai_choice should be :rock.\"\nend","code":"player_choice = nil\r\n\r\nai_choice = nil","solution":"ai_choice =\n  (player_choice == :scissors && :rock) ||\n    (player_choice == :rock && :paper) ||\n    (player_choice == :paper && :scissors)"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"case player_choice do\n  :rock ->\n    assert ai_choice === :paper,\n      \"when player_choice is :rock, ai_choice should be :paper.\"\n\n  :paper ->\n    assert ai_choice === :scissors,\n      \"when player_choice is :paper, ai_choice should be :scissors.\"\n\n  :scissors ->\n    assert ai_choice === :rock,\n      \"when player_choice is :scissors, ai_choice should be :rock.\"\nend","code":"player_choice = :rock\r\n\r\nai_choice = nil","solution":"ai_choice =\n  (player_choice == :scissors && :rock) ||\n    (player_choice == :rock && :paper) ||\n    (player_choice == :paper && :scissors)"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -60,7 +62,7 @@ defmodule Assertion do
   use ExUnit.Case
 
   test "" do
-    player_choice = nil
+    player_choice = :rock
 
     ai_choice = nil
 
@@ -84,7 +86,7 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
-player_choice = nil
+player_choice = :rock
 
 ai_choice = nil
 ```
