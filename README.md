@@ -23,19 +23,19 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
    ```sh
    mix escript.install github livebook-dev/livebook
    ```
+   
+4. If using [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) you need to create the [shim](https://github.com/asdf-vm/asdf-elixir#elixir-escripts-support) for livebook.
 
-4. From the project folder run the command below. This opens the navigation
+   ```sh
+   asdf reshim
+   ```
+
+5. From the project folder run the command below. This opens the navigation
    page where you can find the course reading material and associated
    exercises.
 
    ```sh
    livebook server start.livemd
-   ```
-
-   Note: If the previous command is not found and `asdf` is being used, you may need to perform
-   a `reshim` by running the following command.
-   ```
-    asdf reshim 
    ```
 
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
