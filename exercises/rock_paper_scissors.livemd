@@ -10,7 +10,8 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
 ```
 
@@ -50,12 +51,42 @@ Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determining 
 Replace `nil` with your answer. Change `player_choice` to `:rock`, `:paper`, and `:scissors` to ensure
 your solution works correctly.
 
+<!-- livebook:{"attrs":{"assertions":"case player_choice do\n  :rock ->\n    assert ai_choice === :paper,\n      \"when player_choice is :rock, ai_choice should be :paper.\"\n\n  :paper ->\n    assert ai_choice === :scissors,\n      \"when player_choice is :paper, ai_choice should be :scissors.\"\n\n  :scissors ->\n    assert ai_choice === :rock,\n      \"when player_choice is :scissors, ai_choice should be :rock.\"\nend","code":"player_choice = nil\r\n\r\nai_choice = nil","solution":"ai_choice =\n  (player_choice == :scissors && :rock) ||\n    (player_choice == :rock && :paper) ||\n    (player_choice == :paper && :scissors)"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-player_choice = :rock
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    player_choice = nil
+
+    ai_choice = nil
+
+    case player_choice do
+      :rock ->
+        assert ai_choice === :paper,
+               "when player_choice is :rock, ai_choice should be :paper."
+
+      :paper ->
+        assert ai_choice === :scissors,
+               "when player_choice is :paper, ai_choice should be :scissors."
+
+      :scissors ->
+        assert ai_choice === :rock,
+               "when player_choice is :scissors, ai_choice should be :rock."
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+player_choice = nil
 
 ai_choice = nil
-
-Utils.feedback(:rock_paper_scissors_ai, [player_choice, ai_choice])
 ```
 
 ## Create Two Player Rock Paper Scissors
@@ -83,13 +114,42 @@ w --> p2
 
 Replace `nil` with your answer.
 
+<!-- livebook:{"attrs":{"assertions":"case {player1_choice, player2_choice} do\n  {:rock, :scissors} -> assert winner == :player1\n  {:paper, :rock} -> assert winner == :player1\n  {:scissors, :paper} -> assert winner == :player1\n  {:scissors, :rock} -> assert winner == :player2\n  {:rock, :paper} -> assert winner == :player2\n  {:paper, :scissors} -> assert winner == :player2\n  _ -> assert winner == :draw\nend","code":"# Will be either :rock, :paper, or :scissors\r\nplayer1_choice = Utils.random(:rock_paper_scissors)\r\n# Will be either :rock, :paper, or :scissors\r\nplayer2_choice = Utils.random(:rock_paper_scissors)\r\n\r\nwinner = nil","solution":"winner =\n  (player1_choice == :scissors && player2_choice == :rock && :player2) ||\n    (player1_choice == :rock && player2_choice == :paper && :player2) ||\n    (player1_choice == :paper && player2_choice == :scissors && :player2) ||\n    (player1_choice == player2_choice && :draw) ||\n    :player1"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    # Will be either :rock, :paper, or :scissors
+    player1_choice = Utils.random(:rock_paper_scissors)
+    # Will be either :rock, :paper, or :scissors
+    player2_choice = Utils.random(:rock_paper_scissors)
+
+    winner = nil
+
+    case {player1_choice, player2_choice} do
+      {:rock, :scissors} -> assert winner == :player1
+      {:paper, :rock} -> assert winner == :player1
+      {:scissors, :paper} -> assert winner == :player1
+      {:scissors, :rock} -> assert winner == :player2
+      {:rock, :paper} -> assert winner == :player2
+      {:paper, :scissors} -> assert winner == :player2
+      _ -> assert winner == :draw
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 # Will be either :rock, :paper, or :scissors
 player1_choice = Utils.random(:rock_paper_scissors)
 # Will be either :rock, :paper, or :scissors
 player2_choice = Utils.random(:rock_paper_scissors)
 
 winner = nil
-
-Utils.feedback(:rock_paper_scissors_two_player, [player1_choice, player2_choice, winner])
 ```
