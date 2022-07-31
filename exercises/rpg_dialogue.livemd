@@ -182,7 +182,7 @@ Dialogue.matching_weapon(character)
 "I'm not sure a mace suits a wizard."
 ```
 
-<!-- livebook:{"attrs":{"assertions":"character_permutations =\n  for class <- [\"wizard\", \"rogue\", \"warrior\", nil],\n      weapon <- [\"daggers\", \"sword\", \"staff\", nil],\n      name <- [Utils.Factory.name(), nil] do\n    %{class: class, weapon: weapon, name: name}\n  end\n\nenemy = Utils.Factory.name()\n\nEnum.each(character_permutations, fn character ->\n  assert dialogue_module.greet(character) == \"Hello, my name is #{character.name}.\"\n\n  assert dialogue_module.attack(character, enemy) ==\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n\n  relinquish_weapon_dialogue =\n    case character.class do\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      _ -> \"My precious!\"\n    end\n\n  assert dialogue_module.relinquish_weapon(character) == relinquish_weapon_dialogue\n\n  matching_weapon_dialogue =\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n\n  assert dialogue_module.matching_weapon(character) == matching_weapon_dialogue\nend)","code":"defmodule Dialogue do\r\n  def greet(character) do\r\n  end\r\n\r\n  def attack(character, enemy) do\r\n  end\r\n\r\n  def relinquish_weapon(character) do\r\n  end\r\n\r\n  def matching_weapon(character) do\r\n  end\r\nend","solution":"defmodule Dialogue do\n  def greet(character) do\n    \"Hello, my name is #{character.name}.\"\n  end\n\n  def attack(character, enemy) do\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n  end\n\n  def relinquish_weapon(character) do\n    case character.class do\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      _ -> \"My precious!\"\n    end\n  end\n\n  def matching_weapon(character) do\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"character_permutations =\n  for class <- [\"wizard\", \"rogue\", \"warrior\", nil],\n      weapon <- [\"daggers\", \"sword\", \"staff\", nil],\n      name <- [Utils.Factory.name(), nil] do\n    %{class: class, weapon: weapon, name: name}\n  end\n\nenemy = Utils.Factory.name()\n\nEnum.each(character_permutations, fn character ->\n  assert Dialogue.greet(character) == \"Hello, my name is #{character.name}.\"\n\n  assert Dialogue.attack(character, enemy) ==\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n\n  relinquish_weapon_dialogue =\n    case character.class do\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      _ -> \"My precious!\"\n    end\n\n  assert Dialogue.relinquish_weapon(character) == relinquish_weapon_dialogue\n\n  matching_weapon_dialogue =\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n\n  assert Dialogue.matching_weapon(character) == matching_weapon_dialogue\nend)","code":"defmodule Dialogue do\r\n  def greet(character) do\r\n  end\r\n\r\n  def attack(character, enemy) do\r\n  end\r\n\r\n  def relinquish_weapon(character) do\r\n  end\r\n\r\n  def matching_weapon(character) do\r\n  end\r\nend","solution":"defmodule Dialogue do\n  def greet(character) do\n    \"Hello, my name is #{character.name}.\"\n  end\n\n  def attack(character, enemy) do\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n  end\n\n  def relinquish_weapon(character) do\n    case character.class do\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      _ -> \"My precious!\"\n    end\n  end\n\n  def matching_weapon(character) do\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -215,9 +215,9 @@ defmodule Assertion do
     enemy = Utils.Factory.name()
 
     Enum.each(character_permutations, fn character ->
-      assert dialogue_module.greet(character) == "Hello, my name is #{character.name}."
+      assert Dialogue.greet(character) == "Hello, my name is #{character.name}."
 
-      assert dialogue_module.attack(character, enemy) ==
+      assert Dialogue.attack(character, enemy) ==
                "#{character.name} attacks #{enemy} with a #{character.weapon}."
 
       relinquish_weapon_dialogue =
@@ -228,7 +228,7 @@ defmodule Assertion do
           _ -> "My precious!"
         end
 
-      assert dialogue_module.relinquish_weapon(character) == relinquish_weapon_dialogue
+      assert Dialogue.relinquish_weapon(character) == relinquish_weapon_dialogue
 
       matching_weapon_dialogue =
         case {character.class, character.weapon} do
@@ -239,7 +239,7 @@ defmodule Assertion do
           {_, _} -> "I'm not sure a #{character.weapon} suits a #{character.class}."
         end
 
-      assert dialogue_module.matching_weapon(character) == matching_weapon_dialogue
+      assert Dialogue.matching_weapon(character) == matching_weapon_dialogue
     end)
   end
 end
