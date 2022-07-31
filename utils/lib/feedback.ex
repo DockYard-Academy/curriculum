@@ -100,50 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :family_tree do
-    family_tree = get_answers()
-    assert is_map(family_tree), "Ensure `family_tree` is a map."
-    assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
-
-    assert %{name: "Arthur", parents: parents} = family_tree,
-           "Ensure Arthur in `family_tree` has a list of parents."
-
-    assert length(parents) == 2, "Ensure both parents are included."
-  end
-
-  feedback :naming_numbers do
-    naming_numbers = get_answers()
-
-    assert is_function(naming_numbers),
-           "Ensure you bind `naming_numbers` to an anonymous function."
-
-    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-
-    Enum.each(1..9, fn integer ->
-      assert naming_numbers.(integer) == Enum.at(list, integer)
-    end)
-  end
-
-  feedback :numbering_names do
-    numbering_names = get_answers()
-
-    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-    capital_list = Enum.map(list, &String.capitalize/1)
-
-    assert is_function(numbering_names),
-           "Ensure you bind `naming_numbers` to an anonymous function."
-
-    Enum.each(list, fn name ->
-      assert numbering_names.(name) ==
-               Enum.find_index(list, fn each -> each == String.downcase(name) end)
-    end)
-
-    Enum.each(capital_list, fn name ->
-      assert numbering_names.(name) ==
-               Enum.find_index(list, fn each -> each == String.downcase(name) end)
-    end)
-  end
-
   feedback :define_pokemon_struct do
     pokemon_module = get_answers()
 
