@@ -100,17 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :family_tree do
-    family_tree = get_answers()
-    assert is_map(family_tree), "Ensure `family_tree` is a map."
-    assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
-
-    assert %{name: "Arthur", parents: parents} = family_tree,
-           "Ensure Arthur in `family_tree` has a list of parents."
-
-    assert length(parents) == 2, "Ensure both parents are included."
-  end
-
   feedback :naming_numbers do
     naming_numbers = get_answers()
 
