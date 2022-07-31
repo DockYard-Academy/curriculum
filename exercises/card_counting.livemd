@@ -13,6 +13,8 @@ Mix.install([
   {:utils, path: "utils"},
   {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
+
+TestedCell.Control.show_editors()
 ```
 
 ## Navigation
@@ -26,16 +28,19 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Card Counting
 
-Card counting is a blackjack strategy used to determine whether the player or the dealer has an advantage on the next hand.
+Card counting is a strategy used in card games to determine if there are more high cards or low cards in the deck.
 
-The most common strategy is the **Hi-Lo** strategy where we keep a running total based on the cards
-dealt. We either add 1, subtract 1, or do nothing based on the card's value.
+The most common strategy is the **Hi-Lo** strategy where we keep a running total based on the cards dealt. The higher the running total, the better the deck is for players.
 
-Card values are as follows:
+Don't worry if you aren't familiar with cards. We'll break down the goal without needing to know the rules of card games!
 
-* 2-6 = `+1`
-* 7-9 = `0`
-* 10-14= `-1` (for 10 -> Ace)
+We'll use integers to represent cards from `1` to `13`.
+
+We either add 1, subtract 1, or do nothing based on the card's value.
+
+* When the card is between `1` and `6` we increment `(+1)` the count.
+* When the card is between `7` and `9` we do nothing.
+* When the card is between `10` and `13` we decrenent `(-1)` the count.
 
 ### Card (4)
 
@@ -66,6 +71,39 @@ ExUnit.run()
 # Also allows for exploration using the output of the cell.
 card = 4
 count = 0
+
+next_count = nil
+```
+
+### Card (7)
+
+When the current card is `7` and the current count is `3` what is the `next_count`?
+
+Replace `nil` with your answer.
+
+<!-- livebook:{"attrs":{"assertions":"assert next_count == count","code":"card = 7\r\ncount = 3\r\n\r\nnext_count = nil","solution":"next_count = count"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    card = 7
+    count = 3
+
+    next_count = nil
+    assert next_count == count
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+card = 7
+count = 3
 
 next_count = nil
 ```
@@ -103,25 +141,27 @@ count = 5
 next_count = nil
 ```
 
-Now the current card is a random card between `2` and `14`. We've used the `Utils` project to generate a random number.
+### Random Card and Count (BONUS)
 
-Use comparison operators to determine `next_count`.
+Now the `card` is a random card between `2` and `14`, and the current `count` is a random number between `1` and `10`.
 
-Remember that you can check if a comparison is true, and then return a value using `&&`.
+* `Enum.random(2..14)` generates a `card` between `2` and `14`.
+* `Enum.random(1..10)` generates a `count` between `2` and `14`.
 
-i.e.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-card = 4
-count = 0
-next_count = card <= 6 && count + 1 # returns 1
-```
+Based on the value of `random_card` and `count`, what is the `next_count`?
+Use arithmetic operators `+` or `-` with the `count` variable to set the `next_count`.
 
 Replace `nil` with your answer.
 
-<!-- livebook:{"attrs":{"assertions":"cond do\n  random_card in 2..6 -> assert next_count === 1\n  random_card in 7..9 -> assert next_count === 0\n  random_card in 10..14 -> assert next_count === -1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"# A random integer between 2 and 14\r\nrandom_card = Utils.random(2..14)\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    random_card in 2..6 -> 1\n    random_card in 7..9 -> 0\n    random_card in 10..14 -> -1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details>
+<summary>Hint</summary>
+There are multiple possible solutions. You might consider:
+
+1. comparison operators `card <= 6 && count + 1 || card >= 10 && count - 1 || count`
+2. Use control flow such as `cond` or `case`.
+</details>
+
+<!-- livebook:{"attrs":{"assertions":"cond do\n  card in 2..6 -> assert next_count === count + 1\n  card  in 7..9 -> assert next_count === count\n  card in 10..14 -> assert next_count === count - 1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"card = Enum.random(2..14)\r\ncount = Enum.random(1..10)\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    card in 2..6 -> count + 1\n    card in 7..9 -> count\n    card in 10..14 -> count - 1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -130,16 +170,15 @@ defmodule Assertion do
   use ExUnit.Case
 
   test "" do
-    # A random integer between 2 and 14
-    random_card = Utils.random(2..14)
-    count = 0
+    card = Enum.random(2..14)
+    count = Enum.random(1..10)
 
     next_count = nil
 
     cond do
-      random_card in 2..6 -> assert next_count === 1
-      random_card in 7..9 -> assert next_count === 0
-      random_card in 10..14 -> assert next_count === -1
+      card in 2..6 -> assert next_count === count + 1
+      card in 7..9 -> assert next_count === count
+      card in 10..14 -> assert next_count === count - 1
       true -> raise "Something went wrong. Please reset the exercise."
     end
   end
@@ -149,9 +188,8 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
-# A random integer between 2 and 14
-random_card = Utils.random(2..14)
-count = 0
+card = Enum.random(2..14)
+count = Enum.random(1..10)
 
 next_count = nil
 ```
