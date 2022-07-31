@@ -119,56 +119,6 @@ defmodule Utils.Solutions do
     end
   end
 
-  defmodule Character do
-    @enforce_keys [:name]
-    defstruct @enforce_keys ++ [:class, :weapon]
-  end
-
-  def define_character_struct do
-    Character
-  end
-
-  def character_structs do
-    arthur = %Character{name: "Arthur", weapon: "sword", class: "warrior"}
-    gandalf = %Character{name: "Gandalf", weapon: "staff", class: "wizard"}
-    jarlaxle = %Character{name: "Jarlaxle", weapon: "daggers", class: "rogue"}
-
-    [arthur, gandalf, jarlaxle]
-  end
-
-  defmodule Dialogue do
-    def greet(character) do
-      "Hello, my name is #{character.name}."
-    end
-
-    def attack(character, enemy) do
-      "#{character.name} attacks #{enemy} with a #{character.weapon}."
-    end
-
-    def relinquish_weapon(character) do
-      case character.class do
-        "rogue" -> "Fine, have my #{character.weapon}. I have more hidden anyway."
-        "wizard" -> "You would not part an old man from his walking stick?"
-        "warrior" -> "Have my #{character.weapon} then!"
-        _ -> "My precious!"
-      end
-    end
-
-    def matching_weapon(character) do
-      case {character.class, character.weapon} do
-        {"wizard", "staff"} -> "My lovely magical staff"
-        {"rogue", "daggers"} -> "Hidden and deadly."
-        {"warrior", "sword"} -> "My noble sword!"
-        {_, nil} -> "I'm unarmed!"
-        {_, _} -> "I'm not sure a #{character.weapon} suits a #{character.class}."
-      end
-    end
-  end
-
-  def character_dialogue do
-    Dialogue
-  end
-
   defmodule Pokemon do
     defstruct [:name, :type, :speed, health: 20, attack: 5]
   end

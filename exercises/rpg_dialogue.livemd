@@ -30,11 +30,36 @@ This lesson is designed to provide you an opportunity to practice structs and co
 In the Elixir cell below, define a `Character` struct with a `:name`, `:class`, and `:weapon`.
 Enforce that the `:name` property exists.
 
+<!-- livebook:{"attrs":{"assertions":"assert Keyword.get(character_module.__info__(:functions), :__struct__),\n  \"Ensure you use `defstruct`\"\n\nassert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),\n  \"Ensure you use `defstruct` with :name, :class, and :weapon\"\n\nassert_raise ArgumentError, fn ->\n  struct!(character_module, %{weapon: \"\", class: \"\"})\nend","code":"def Character do\r\nend","solution":"defmodule Character do\n  @enforce_keys :name\n  defstruct [:name, :class, :weapon]\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-defmodule Character do
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    def Character do
+    end
+
+    assert Keyword.get(character_module.__info__(:functions), :__struct__),
+           "Ensure you use `defstruct`"
+
+    assert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),
+           "Ensure you use `defstruct` with :name, :class, and :weapon"
+
+    assert_raise ArgumentError, fn ->
+      struct!(character_module, %{weapon: "", class: ""})
+    end
+  end
 end
 
-Utils.feedback(:define_character_struct, Character)
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+def Character do
+end
 ```
 
 Create character structs with the following information:
@@ -57,12 +82,35 @@ classDiagram
 
 Replace `nil` with each struct.
 
+<!-- livebook:{"attrs":{"assertions":"assert is_struct(arthur), \"Ensure `arthur` is a struct.\"\nassert is_struct(gandalf), \"Ensure `gandalf` is a struct.\"\nassert is_struct(jarlaxle), \"Ensure `jarlaxle` is a struct.\"\n\nassert %{name: \"Arthur\", weapon: \"sword\", class: \"warrior\"} = arthur\nassert %{name: \"Gandalf\", weapon: \"staff\", class: \"wizard\"} = gandalf\nassert %{name: \"Jarlaxle\", weapon: \"daggers\", class: \"rogue\"} = jarlaxle","code":"arthur = nil\r\ngandalf = nil\r\njarlaxle = nil","solution":"arthur = %Character{name: \"Arthur\", class: \"warrior\", weapon: \"sword\"}\ngandalf = %Character{name: \"Gandalf\", class: \"wizard\", weapon: \"staff\"}\njarlaxle = %Character{name: \"Jarlaxle\", class: \"rogue\", weapon: \"daggers\"}"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    arthur = nil
+    gandalf = nil
+    jarlaxle = nil
+    assert is_struct(arthur), "Ensure `arthur` is a struct."
+    assert is_struct(gandalf), "Ensure `gandalf` is a struct."
+    assert is_struct(jarlaxle), "Ensure `jarlaxle` is a struct."
+
+    assert %{name: "Arthur", weapon: "sword", class: "warrior"} = arthur
+    assert %{name: "Gandalf", weapon: "staff", class: "wizard"} = gandalf
+    assert %{name: "Jarlaxle", weapon: "daggers", class: "rogue"} = jarlaxle
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 arthur = nil
 gandalf = nil
 jarlaxle = nil
-
-Utils.feedback(:character_structs, [arthur, gandalf, jarlaxle])
 ```
 
 ### Create A Dialogue Module
@@ -81,11 +129,11 @@ Dialogue.greet(character)
 
 * Create a `Dialogue.attack/2` function which accepts a character and returns the following dialogue.
   ```elixir
-      character = %Character{name: "Arthur", weapon: "sword"}
-      enemy = "Mordred"
+  character = %Character{name: "Arthur", weapon: "sword"}
+  enemy = "Mordred"
 
-      Dialogue.attack(character, enemy)
-      "Arthur attacks Mordred with a sword."
+  Dialogue.attack(character, enemy)
+  "Arthur attacks Mordred with a sword."
   ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -123,15 +171,80 @@ For example,
 
 ```elixir
 character = %Character{name: "Vax", class: "rogue", weapon: "daggers"}
-Dialogue.relinquish_weapon(character)
+Dialogue.matching_weapon(character)
 "Hidden and deadly."
 
 character = %Character{name: "Taako", class: "wizard", weapon: "mace"}
-Dialogue.relinquish_weapon(character)
+Dialogue.matching_weapon(character)
 "I'm not sure a mace suits a wizard."
 ```
 
+<!-- livebook:{"attrs":{"assertions":"character_permutations =\n  for class <- [\"wizard\", \"rogue\", \"warrior\", nil],\n      weapon <- [\"daggers\", \"sword\", \"staff\", nil],\n      name <- [Utils.Factory.name(), nil] do\n    %{class: class, weapon: weapon, name: name}\n  end\n\nenemy = Utils.Factory.name()\n\nEnum.each(character_permutations, fn character ->\n  assert dialogue_module.greet(character) == \"Hello, my name is #{character.name}.\"\n\n  assert dialogue_module.attack(character, enemy) ==\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n\n  relinquish_weapon_dialogue =\n    case character.class do\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      _ -> \"My precious!\"\n    end\n\n  assert dialogue_module.relinquish_weapon(character) == relinquish_weapon_dialogue\n\n  matching_weapon_dialogue =\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n\n  assert dialogue_module.matching_weapon(character) == matching_weapon_dialogue\nend)","code":"defmodule Dialogue do\r\n  def greet(character) do\r\n  end\r\n\r\n  def attack(character, enemy) do\r\n  end\r\n\r\n  def relinquish_weapon(character) do\r\n  end\r\n\r\n  def matching_weapon(character) do\r\n  end\r\nend","solution":"defmodule Dialogue do\n  def greet(character) do\n    \"Hello, my name is #{character.name}.\"\n  end\n\n  def attack(character, enemy) do\n    \"#{character.name} attacks #{enemy} with a #{character.weapon}.\"\n  end\n\n  def relinquish_weapon(character) do\n    case character.class do\n      \"warrior\" -> \"Have my #{character.weapon} then!\"\n      \"wizard\" -> \"You would not part an old man from his walking stick?\"\n      \"rogue\" -> \"Fine, have my #{character.weapon}. I have more hidden anyway.\"\n      _ -> \"My precious!\"\n    end\n  end\n\n  def matching_weapon(character) do\n    case {character.class, character.weapon} do\n      {\"wizard\", \"staff\"} -> \"My lovely magical staff.\"\n      {\"rogue\", \"daggers\"} -> \"Hidden and deadly.\"\n      {\"warrior\", \"sword\"} -> \"My noble sword!\"\n      {_, nil} -> \"I'm unarmed!\"\n      {_, _} -> \"I'm not sure a #{character.weapon} suits a #{character.class}.\"\n    end\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule Dialogue do
+      def greet(character) do
+      end
+
+      def attack(character, enemy) do
+      end
+
+      def relinquish_weapon(character) do
+      end
+
+      def matching_weapon(character) do
+      end
+    end
+
+    character_permutations =
+      for class <- ["wizard", "rogue", "warrior", nil],
+          weapon <- ["daggers", "sword", "staff", nil],
+          name <- [Utils.Factory.name(), nil] do
+        %{class: class, weapon: weapon, name: name}
+      end
+
+    enemy = Utils.Factory.name()
+
+    Enum.each(character_permutations, fn character ->
+      assert dialogue_module.greet(character) == "Hello, my name is #{character.name}."
+
+      assert dialogue_module.attack(character, enemy) ==
+               "#{character.name} attacks #{enemy} with a #{character.weapon}."
+
+      relinquish_weapon_dialogue =
+        case character.class do
+          "rogue" -> "Fine, have my #{character.weapon}. I have more hidden anyway."
+          "wizard" -> "You would not part an old man from his walking stick?"
+          "warrior" -> "Have my #{character.weapon} then!"
+          _ -> "My precious!"
+        end
+
+      assert dialogue_module.relinquish_weapon(character) == relinquish_weapon_dialogue
+
+      matching_weapon_dialogue =
+        case {character.class, character.weapon} do
+          {"wizard", "staff"} -> "My lovely magical staff."
+          {"rogue", "daggers"} -> "Hidden and deadly."
+          {"warrior", "sword"} -> "My noble sword!"
+          {_, nil} -> "I'm unarmed!"
+          {_, _} -> "I'm not sure a #{character.weapon} suits a #{character.class}."
+        end
+
+      assert dialogue_module.matching_weapon(character) == matching_weapon_dialogue
+    end)
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 defmodule Dialogue do
   def greet(character) do
   end
@@ -145,6 +258,4 @@ defmodule Dialogue do
   def matching_weapon(character) do
   end
 end
-
-Utils.feedback(:character_dialogue, Dialogue)
 ```
