@@ -25,8 +25,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-In this lesson, we will consider the internal details of Maps, MapSets, and Keyword Lists to best
-understand when to use each data type.
+In this lesson, we will study the internal details of Maps, MapSets, and Keyword Lists to determine when to use each data type.
 
 ## Keyword Lists
 
@@ -39,7 +38,7 @@ Keyword lists have the same properties as [Lists](lists_vs_tuples.livemd).
 | Insertion | $O(1)$ for prepending, otherwise $O(n)$   |
 | Deletion  | $O(1)$ if first element, otherwise $O(n)$ |
 
-Because they are simply lists of `{:atom, value}` tuples.
+Because they are simply lists of `{:atom, value}` Tuples.
 
 ```elixir
 [{:key1, "value"}, {:key2, "value"}] == [key1: "value", key2: "value"]
@@ -51,10 +50,10 @@ Maps are a key-value data type that typically has $O(log(n))$ time for any opera
 
 | Operation | Time Complexity                                  |
 | --------- | ------------------------------------------------ |
-| Access    | $o(log(n))$                                      |
-| Search    | $o(log(n))$                                      |
-| Insertion | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
-| Deletion  | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+| Access    | $O(log(n))$                                      |
+| Search    | $O(log(n))$                                      |
+| Insertion | $O(n)$ for <= 32 elements, otherwise $O(log(n))$ |
+| Deletion  | $O(n)$ for <= 32 elements, otherwise $O(log(n))$ |
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -104,7 +103,7 @@ key = 500_000
 micro_seconds
 ```
 
-On the other hand, Lists are slow compared to maps because they need to enumerate each element.
+On the other hand, Lists are slow compared to Maps because they need to enumerate each element.
 
 ```elixir
 large_list = Enum.to_list(1..1_000_000)
@@ -134,14 +133,14 @@ MapSets ignore duplicate values.
 MapSet.new([1, 2, 3, 3])
 ```
 
-MapSets are maps under the hood, so they inherit the same performance properties as maps.
+MapSets are Maps under the hood, so they inherit the same performance properties as Maps.
 
 | Operation | Time Complexity                                  |
 | --------- | ------------------------------------------------ |
-| Access    | $o(log(n))$                                      |
-| Search    | $o(log(n))$                                      |
-| Insertion | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
-| Deletion  | $o(n)$ for <= 32 elements, otherwise $o(log(n))$ |
+| Access    | $O(log(n))$                                      |
+| Search    | $O(log(n))$                                      |
+| Insertion | $O(n)$ for <= 32 elements, otherwise $O(log(n))$ |
+| Deletion  | $O(n)$ for <= 32 elements, otherwise $O(log(n))$ |
 
 ```elixir
 MapSet
@@ -185,13 +184,13 @@ set = MapSet.new([1, 2, 3])
 MapSet.delete(set, 2)
 ```
 
-MapSet is enumerable, however, any `Enum` function with a MapSet returns a list.
+MapSet is enumerable. However, any `Enum` function with a MapSet returns a list.
 
 ```elixir
 MapSet.new([1, 2, 3]) |> Enum.map(fn each -> each + 1 end)
 ```
 
-Generally, lists are overused and can often be a MapSet instead. If you have a list
+Generally, Lists are overused and can often be a MapSet instead. If you have a list
 where there should never be duplicate elements and order is not important, it's usually more performant to use a MapSet.
 
 <!-- livebook:{"break_markdown":true} -->
