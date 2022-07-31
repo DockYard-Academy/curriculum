@@ -49,6 +49,22 @@ Raise an issue or contact brooklin.myers@dockyard.com if you are having trouble 
 
 Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
 
+For now, there is a workaround by running livebook with the **Mix standalone** runtime connected to the `utils` project.
+
+To run the project in **Mix Standalone** mode:
+1. start livebook.
+2. open the curriculum folder in livebook.
+3. open `start.livemd` or any other `.livemd` file in livebook.
+4. Go to **Runtime Settings**.
+5. Click the gear icon.
+6. Select **Mix standalone**.
+7. Select the `utils` project in the curriculum folder.
+8. Click **Connect**.
+
+You should be able to use the curriculum normally now.
+
+Open the curriculum in livebookgo to **Runtime Settings**. 
+
 ## Spell Checking
 
 This project uses [codespell](https://github.com/codespell-project/codespell) for spell checking.
