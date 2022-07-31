@@ -30,7 +30,7 @@ This lesson is designed to provide you an opportunity to practice structs and co
 In the Elixir cell below, define a `Character` struct with a `:name`, `:class`, and `:weapon`.
 Enforce that the `:name` property exists.
 
-<!-- livebook:{"attrs":{"assertions":"assert Keyword.get(character_module.__info__(:functions), :__struct__),\n  \"Ensure you use `defstruct`\"\n\nassert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),\n  \"Ensure you use `defstruct` with :name, :class, and :weapon\"\n\nassert_raise ArgumentError, fn ->\n  struct!(character_module, %{weapon: \"\", class: \"\"})\nend","code":"def Character do\r\nend","solution":"defmodule Character do\n  @enforce_keys :name\n  defstruct [:name, :class, :weapon]\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"assert Keyword.get(character_module.__info__(:functions), :__struct__),\n  \"Ensure you use `defstruct`\"\n\nassert match?(%{name: nil, class: nil, weapon: nil}, struct(character_module)),\n  \"Ensure you use `defstruct` with :name, :class, and :weapon\"\n\nassert_raise ArgumentError, fn ->\n  struct!(character_module, %{weapon: \"\", class: \"\"})\nend","code":"defmodule Character do\r\nend","solution":"defmodule Character do\n  @enforce_keys :name\n  defstruct [:name, :class, :weapon]\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -39,7 +39,7 @@ defmodule Assertion do
   use ExUnit.Case
 
   test "" do
-    def Character do
+    defmodule Character do
     end
 
     assert Keyword.get(character_module.__info__(:functions), :__struct__),
@@ -58,7 +58,7 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
-def Character do
+defmodule Character do
 end
 ```
 
@@ -128,13 +128,16 @@ Dialogue.greet(character)
 ```
 
 * Create a `Dialogue.attack/2` function which accepts a character and returns the following dialogue.
-  ```elixir
-  character = %Character{name: "Arthur", weapon: "sword"}
-  enemy = "Mordred"
 
-  Dialogue.attack(character, enemy)
-  "Arthur attacks Mordred with a sword."
-  ```
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+character = %Character{name: "Arthur", weapon: "sword"}
+enemy = "Mordred"
+
+Dialogue.attack(character, enemy)
+"Arthur attacks Mordred with a sword."
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
