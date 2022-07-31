@@ -106,8 +106,29 @@ classDiagram
     Uther --> Leia
 ```
 
-```elixir
-family_tree = %{}
+<!-- livebook:{"attrs":{"assertions":"assert is_map(family_tree), \"Ensure `family_tree` is a map.\"\nassert %{name: \"Arthur\"} = family_tree, \"Ensure `family_tree` starts with Arthur.\"\n\nassert %{name: \"Arthur\", parents: parents} = family_tree,\n  \"Ensure Arthur in `family_tree` has a list of parents.\"\n\nassert length(parents) == 2, \"Ensure both parents are included.\"","code":"family_tree = %{}","solution":"han = %{name: \"Han\", status: :grand_parent, age: 81}\nleia = %{name: \"Leia\", status: :grand_parent, age: 82}\nbob = %{name: \"Bob\", status: :grand_parent, age: 68}\nbridget = %{name: \"Bridget\", status: :grand_parent, age: 70}\n\nuther = %{name: \"Uther\", status: :parent, age: 56, parents: [han, leia]}\nygraine = %{name: \"Ygraine\", status: :parent, age: 68, parents: [bob, bridget]}\n\narthur = %{name: \"Arthur\", status: :child, age: 22, parents: [uther, ygraine]}\n\nfamily_tree = arthur"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:family_tree, family_tree)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    family_tree = %{}
+    assert is_map(family_tree), "Ensure `family_tree` is a map."
+    assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
+
+    assert %{name: "Arthur", parents: parents} = family_tree,
+           "Ensure Arthur in `family_tree` has a list of parents."
+
+    assert length(parents) == 2, "Ensure both parents are included."
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+family_tree = %{}
 ```
