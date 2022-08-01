@@ -65,6 +65,16 @@ You should be able to use the curriculum normally now.
 
 Open the curriculum in livebookgo to **Runtime Settings**. 
 
+### Windows (not WSL2)
+
+#### Livebook server not starting
+
+This is a Livebook known issue ([196](https://github.com/livebook-dev/livebook/issues/196), [194](https://github.com/livebook-dev/livebook/issues/194), [1042](https://github.com/livebook-dev/livebook/issues/1042)) that happens when some erlang files don't show a dialog for its firewall approval on the first Livebook execution after being installed.
+
+- Before calling Livebook, execute `iex --sname test` on terminal.
+- On appearing Windows firewall dialog, approve permission for `epmd.exe`.
+- Both `erl.exe` and `epmd.exe` should appear on firewall-allowed apps.
+
 ## Spell Checking
 
 This project uses [codespell](https://github.com/codespell-project/codespell) for spell checking.
