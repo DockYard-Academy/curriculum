@@ -72,4 +72,26 @@ defmodule UtilsTest do
       execute_tests_until_failure(tail)
     end
   end
+
+  test "Teacher-only editors are hidden" do
+    exercises = fetch_livebooks("../exercises/")
+    reading = fetch_livebooks("../reading/")
+
+    assert any_show_editors?(exercises ++ reading) == false
+  end
+
+  defp any_show_editors?(livebooks) do
+    livebooks
+      |> Stream.map(fn file ->
+        File.stream!(file, [], :line)
+        |> Enum.any?(&(String.contains?(&1, "TestedCell.Control.show_editors()")))
+      end)
+      |> Enum.any?
+  end
+
+  defp fetch_livebooks(path) do
+    File.ls!(path)
+    |> Stream.filter(&(String.ends_with?(&1, ".livemd")))
+    |> Enum.map(&(path <> &1))
+  end
 end
