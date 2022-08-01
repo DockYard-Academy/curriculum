@@ -82,16 +82,16 @@ defmodule UtilsTest do
 
   defp any_show_editors?(livebooks) do
     livebooks
-      |> Stream.map(fn file ->
-        File.stream!(file, [], :line)
-        |> Enum.any?(&(String.contains?(&1, "TestedCell.Control.show_editors()")))
-      end)
-      |> Enum.any?
+    |> Stream.map(fn file ->
+      File.stream!(file, [], :line)
+      |> Enum.any?(&String.contains?(&1, "TestedCell.Control.show_editors()"))
+    end)
+    |> Enum.any?()
   end
 
   defp fetch_livebooks(path) do
     File.ls!(path)
-    |> Stream.filter(&(String.ends_with?(&1, ".livemd")))
+    |> Stream.filter(&String.ends_with?(&1, ".livemd"))
     |> Enum.map(&(path <> &1))
   end
 end
