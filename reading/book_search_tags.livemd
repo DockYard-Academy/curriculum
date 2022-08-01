@@ -32,12 +32,12 @@ If you need clarification during this reading, you can reference the completed [
 
 Tags describe the type of book. For example we might have `"fiction"` or `"history"` tags.
 
-Books can have multiple tags. For example, a book might have both the `"action"` tag and the `"comic book"` tag.
-Tags can also have multiple books. For example, We want to be able to query books that have the `"action"` tag.
+Books can have multiple tags. For example, a book might have both the `"action"` tag and the `"fiction"` tag.
+Tags can also have multiple books. For example, We want to be able to query all books that have the `"action"` tag.
 
-Books and Tags have a **many-to-many** to many relationship.
+Books and Tags have a **many-to-many** relationship.
 
-In order to model many-to-many relationships each resource belongs in it's own table, and then we use another table often called a **join-through** table to associate one resource with another.
+To model many-to-many relationships in a Database we use a **join** table to associate one resource with another.
 
 ### books table
 
@@ -50,16 +50,19 @@ In order to model many-to-many relationships each resource belongs in it's own t
 
 | id  | name      |
 | --- | --------- |
-| 123 | "fiction" |
+| 456 | "fiction" |
+| 457 | "action"  |
 
-### book_tags table
+### book_tags table (join table)
 
 | id | book_id | tag_id |
 | -- | ------- | ------ |
 | 1  | 123     | 456    |
-| 1  | 124     | 456    |
+| 2  | 124     | 456    |
+| 3  | 123     | 457    |
+| 14 | 124     | 457    |
 
-This way tags can have many books, and books can have many tags.
+This way, tags can have many books, and books can have many tags.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -85,8 +88,7 @@ classDiagram
   Tag "*" --> "*" BookTag :has_many
 ```
 
-The `"book_tags"` table stores a foreign key to both the book and the tag.
-We can query this table to find all of the tags for a book, and all of the books for a tag.
+The `"book_tags"` table stores a foreign key to both the book and the tag. We can query this table to find all of the tags for a book, and all of the books for a tag.
 
 ## Run Book Search Project
 
@@ -158,9 +160,8 @@ table.
 $ mix ecto.gen.migration create_book_tags
 ```
 
-Now we need to create our migration in the generated migration `priv/repo/migrations/_create_book_tags.exs` file.
-The `:book_tags` table should contain a reference to `:book_id` and `:tag_id`. If either the book or the tag is deleted we want to delete the association.
-We also want to enforce that both the `:book_id` and `:tag_id` cannot be null.
+Now we need to create our join table migration in the generated migration `priv/repo/migrations/_create_book_tags.exs` file.
+The `:book_tags` table should contain a reference to `:book_id` and `:tag_id`. We want to delete the association if the book or the tag are deleted. We also want to enforce that both the `:book_id` and `:tag_id` cannot be null.
 
 The `create unique_index(:book_tags, [:book_id, :tag_id])` ensures we don't associate a book with the same tag multiple times. Each association must be unique.
 
@@ -228,20 +229,24 @@ Visit http://localhost:4000/authors/1/books/new where `1` is the id of an author
 
 We need to provide the tags to the template.
 
-Options to the `multiple_select/4` input are passed in as a keyword list of labels and values.
+The `multiple_select/4` input accepts a list of tuples with a label and a value as selection options.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # lib/book_search_web/templates/book/form.html.heex
 
+# Using Keyword lists
 <%= multiple_select f, :tags, ["label": "value"], selected: [] %>
+
+# Using Lists of Tuples
+<%= multiple_select f, :tags, [{"label", "value"}], selected: [] %>
 ```
 
 To provide the tag options to the template, we can create a `tag_options/0` function in the view. All functions defined in the view are available in every template.
 
-We want the label to be the name of the tag, and the value to be the tag's id.
-We can map over the `@tags` to create the keyword list. Remember that under the hood, a keyword list is a list of `{:atom, value}` tuples.
+We want the label to be the tag's name and the value to be the tag's id.
+We can map over the tags to create the list of `{label, value}` tuples.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -267,11 +272,11 @@ Provide `tag_options/0` to the `multiple_select/4` input.
 
 ## Seeding
 
-We haven't created any tags, so the text input is still empty, however this is a great opportunity to demonstrate the value of seeding.
+We haven't created any tags, so the text input is still empty. However, this is an excellent opportunity to demonstrate the value of seeding.
 
-Seeding is the initial creation of data in your database typically run before your tests or to create a convenient developer environment. Though, you can seed in a production or other environment as well.
+Seeding is the initial creation of data in your database typically run before your tests or to create a convenient developer environment. Though, you can seed in a production or other environments as well.
 
-It would be convenient to create several authors, books, and tags in our development environment programatically through a seed file. This way we can explore and test features in our application without needing to do any manual setup.
+It would be convenient to programmatically create several authors, books, and tags in our development environment through a seed file. This way, we can explore and test features in our application without needing to do any manual setup.
 
 Fortunately, Phoenix provides a `priv/repo/seeds.exs` where we can seed data in our development and test environment.
 
@@ -299,9 +304,9 @@ end
 ```
 
 For the most part, this code should look familiar other than perhaps `Mix.env() == :dev`.
-`Mix.env()` returns the current environment. When we run tests `Mix.env()` returns `:test`. When we run the applicatiohn locally `Mix.env()` returns `:dev`. We've added this condition to avoid seeding data in our tests, which could cause unexpected behavior.
+`Mix.env()` returns the current environment. When we run tests `Mix.env()` returns `:test`. When we run the application locally, `Mix.env()` returns `:dev`. We've added this condition to avoid seeding data in our tests, which could cause unexpected behavior.
 
-We can seed our database by running the following. Make sure you stop the server first, otherwise the command will fail.
+We can seed our database by running the following. Make sure you stop the server first. Otherwise, the command will fail.
 
 ```
 $ mix run priv/repo/seeds.exs
@@ -309,7 +314,7 @@ $ mix run priv/repo/seeds.exs
 
 However, keep in mind if we keep running this file, we'll keep creating duplicate values in the database. We currently don't prevent two authors having the same name.
 
-To avoid this issue, we can instead run the following command to first drop the database, recreate an empty database, run migrations, and then run the seed file.
+To avoid this issue, we can instead run the following command to drop the database, recreate an empty database, run migrations, and then run the seed file.
 
 ```
 $ mix ecto.reset
@@ -331,7 +336,7 @@ defp aliases do
 end
 ```
 
-After running `mix ecto.reset` our database is properly seeded. Start the server again and we should see the following when we visit http://localhost:4000/authors/1/books/new.
+After running `mix ecto.reset` our database is seeded correctly. Start the server again, and we should see the following when we visit http://localhost:4000/authors/1/books/new.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -339,7 +344,7 @@ After running `mix ecto.reset` our database is properly seeded. Start the server
 
 ## Create Book Tags
 
-Submitting our form doesn't associate a book with a tag. However, it does provide the data we need to the controller action.
+Submitting our form doesn't associate a book with a tag. However, it does provide the data we need for the controller action.
 
 Here's the `book_params` value in `BookController.create/2` when we submit the form with the first three tags selected.
 
@@ -374,7 +379,7 @@ end
 
 ### Books.create_book/1
 
-Now that we know we can send a list of tags, let's start writing a test for the `Books.create_book/1` function. First, import the `BookSearch.TagsFixtures` into the test file. This gives us access to the `tag_fixture/1` fuction to create tags in our tests.
+Now that we know we can send a list of tags, let's start writing a test for the `Books.create_book/1` function. First, import the `BookSearch.TagsFixtures` into the test file. This import gives us access to the `tag_fixture/1` function to create tags in our tests.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -422,7 +427,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-To let `Ecto` handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many to many relationship. The [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
+To let `Ecto` handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -464,7 +469,7 @@ However, if we visit http://localhost:4000/authors/1/books/new and submit the fo
 
 <!-- livebook:{"break_markdown":true} -->
 
-That's because `Books.create_book/1` expectes `attrs` to contain a `:tags` field that is a list of tags. Instead, we're passing it a `"tags"` field that is a list of tag ids.
+That's because `Books.create_book/1` expects `attrs` to contain a `:tags` field that is a list of tags. However, we're passing it a `"tags"` field that is a list of tag ids.
 
 Let's retrieve the tag for each tag id, and `Map.put/2` the `:tags` field into the `book_params` map. Also, we'll provide a default value for tags to avoid breaking existing controller tests.
 
@@ -518,9 +523,9 @@ $ mix test
 
 ## Show Book Tags
 
-To ensure we're creating books with tags successfuly, let's display the list of tags on the book show page.
+To ensure we're creating books with tags successfully, let's display the list of tags on the book show page.
 
-First, let's add a controller test that will create a book with tags. We'll then assert we find the tag text on the page.
+First, add a controller test to create a book with tags. We'll then assert we find the tag text on the page.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -544,7 +549,7 @@ describe "create book" do
 end
 ```
 
-We'll display the book's tags in the book show page.
+We'll display the book's tags on the book show page.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -572,7 +577,7 @@ We'll display the book's tags in the book show page.
 <span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
 ```
 
-However, by default we don't load the tags association with each book, so this will fail when we visit http://localhost:4000/authors/1/books/1
+However, by default, we don't load the tags associated with each book, so this will fail when we visit http://localhost:4000/authors/1/books/1
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -603,7 +608,7 @@ To load associations from other tables, we can use [preload/3](https://hexdocs.p
 def get_book!(id), do: Book |> preload(:tags) |> Repo.get!(id)
 ```
 
-This loads the associated `tags` table through the `book_tags` table to preload each associated `BookSearch.Tags.Tag` struct. Now we have access to `book.tags` and our test passes!
+`preload/3` loads the associated `tags` table through the `book_tags` table to preload each associated `BookSearch.Tags.Tag` struct. Now we have access to `book.tags` and our test passes!
 
 ```sh
 $ mix test
@@ -615,7 +620,7 @@ $ mix test
 
 ### Seeding
 
-Let's seed some tags in our books to make sure the show page displays tags.
+Let's seed some tags in our books to ensure the show page displays tags.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -664,7 +669,7 @@ $ mix phx.server
 
 ## Edit Book Tags
 
-Currently, we cannot edit a books tags. We can visit http://localhost:4000/authors/1/books/1/edit and submit the form with different tags selected, however we'll see the tags aren't actually updated.
+Currently, we cannot update a book's tags. We can visit http://localhost:4000/authors/1/books/1/edit and submit the form with different tags selected. However, the tags aren't updated.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -761,7 +766,7 @@ def update_book(%Book{} = book, attrs) do
 end
 ```
 
-However our tests still fail. Run the following in the command line to run the test. Replace `57` with the correct line number of the `"update_book/2 with tags` test and we'll see an interesting error.
+However, our tests still fail. Run the following in the command line to run the test. Replace `57` with the correct line number of the `"update_book/2 with tags` test, and we'll see an interesting error.
 
 ```sh
 $ mix test test/book_search/books_test.exs:57
@@ -791,12 +796,13 @@ $ mix test test/book_search/books_test.exs:57
          must be given on update.
 ```
 
-This error explains that by default, it's not possible to delete or replace associated data.
-Here's the `:on_replace` documentation for [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3)
+This error explains that, by default, we cannot delete or replace associated data. That's because of the default value for the `:on_replace` option for [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3).
+
+We can see the default behavior of `:on_replace` is `:raise` in the documentation:
 
 > :on_replace - The action taken on associations when the record is replaced when casting or manipulating parent changeset. May be :raise (default), :mark_as_invalid, or :delete. :delete will only remove data from the join source, never the associated records. See Ecto.Changeset's section on related data for more info.
 
-We can see that by default, if we try to replace one associated record with another we `:raise` an error. Instead, let's use the `:delete` option in the `Book` schema to delete the record in the `book_tags` join table and replace it with another record.
+By default, if we try to replace one associated record with another, we `:raise` an error. So instead, let's use the `:delete` option in the `Book` schema to delete the record in the `book_tags` join table and replace it with another record.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -832,7 +838,7 @@ $ mix test test/book_search/books_test.exs:57
 10 tests, 0 failures, 9 excluded
 ```
 
-Now we can update a books tags when we visit http://localhost:4000/authors/1/books/1/edit.
+Now we can update a book's tags when we visit http://localhost:4000/authors/1/books/1/edit.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -852,7 +858,7 @@ By default, we don't select any tags in the book form.
 <%= multiple_select f, :tags, tag_options(), selected: [] %>
 ```
 
-This means when we edit the form without selecting tags, we accidentally remove the tags associated with a book!
+When we submit the edit form without selecting tags, we accidentally remove the tags associated with a book!
 
 To fix this, we need to use the book's tags as the default `:selected` option in `multiple_select/4`. The `:selected` option accepts a list of ids.
 
@@ -874,7 +880,7 @@ So we can retrieve a list of ids from `@book.tags`.
 <%= multiple_select f, :tags, tag_options(), selected: Enum.map(@book.tags, fn book -> book.id end) %>
 ```
 
-Some pages use this form without an `@book` in the assigns, so we have to check if `:book` exists. If it doesn't we won't have any pre-selected options.
+Some pages use this form without an `@book` in the assigns, so we have to check if `:book` exists. If it doesn't, we won't have any pre-selected options.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -892,11 +898,11 @@ Now the book's tags will be selected by default.
 
 ## Lists Books By Tag
 
-We've show we can retrieve all of the tags that belong to a book, but what about all of the books that belong to a tag?
+We've shown we can retrieve tags that belong to a book, but what about  books that belong to a tag?
 
-To demonstrate how to work through the opposite association, we're going to list all of the books associated with a tag on the tag show page.
+To demonstrate, we're going to list all of the books associated with a tag on the tag show page.
 
-Let's start with our test. We need to import `BookSeach.BooksFixtures` to create books. Add the import with our existing `BookSearch.TagsFixtures` import.
+Let's start with our test. First, we'll import `BookSeach.BooksFixtures` to create books.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -967,7 +973,7 @@ However, this association isn't loaded when we retrieve the tag, so we encounter
 
 <!-- livebook:{"break_markdown":true} -->
 
-That's because while we've defined the [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) relationship for books, we have not defined this relationship for tags. Let's add this now.
+That's because while we've defined the [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) relationship for books, we have not defined this relationship for tags. So let's add this now.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1043,9 +1049,9 @@ We'll preload the books in the `Tags.get_tag!/1` function.
 def get_tag!(id), do: Tag |> preload(:books) |> Repo.get!(id)
 ```
 
-However that's not enough! If we visit http://localhost:4000/tags/1 we'll see the following error.
+However, that's not enough! For example, if we visit http://localhost:4000/tags/1 we'll see the following error.
 
-> If you don't see the error, try resetting your database with `mix ecto.reset` to ensure the tag has associated books. If there are no books associated with the tag, then `@tag.books` returns an empty list and we won't trigger the bug.
+> If you don't see the error, try resetting your database with `mix ecto.reset` to ensure the tag has associated books. If no books are associated with the tag, then `@tag.books` returns an empty list, and we won't trigger the bug.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1053,7 +1059,7 @@ However that's not enough! If we visit http://localhost:4000/tags/1 we'll see th
 
 <!-- livebook:{"break_markdown":true} -->
 
-We have an issue, because while we're preloading the `:books` associated with the tag, we're not loading the `:author` associated with each book.
+We have an issue because while we're preloading the `:books` associated with the tag, we're not loading the `:author` associated with each book.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -1087,7 +1093,7 @@ $ mix test test/book_search_web/controllers/tag_controller_test.exs:20
 9 tests, 0 failures, 8 excluded
 ```
 
-However we've broken a couple of other tests by preloading this data.
+However, we've broken a couple of other tests by preloading this data.
 
 ```sh
 $ mix test
@@ -1095,7 +1101,7 @@ $ mix test
 63 tests, 2 failures
 ```
 
-We can fix these tests by explicitly checking the fields on the tag that we care about.
+We can fix these tests by explicitly checking the fields on the tag.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1187,7 +1193,7 @@ Let's add the ability to search for books by tags. We'll need a `multiple_select
 <% end %>
 ```
 
-Let's add a new test for searching by tags and the title of the book.
+Let's add a new test for searching by tags and the book title.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1266,7 +1272,7 @@ test "list all books filtered by search query", %{conn: conn} do
 end
 ```
 
-We'll change the controller to provide a default value to tags, since the won't be available if the list is empty.
+We'll change the controller to provide a default value for tags since they won't be available if the list is empty.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1281,7 +1287,7 @@ def index(conn, %{"title" => title} = params) do
 end
 ```
 
-The test still fails because of how we've written the query. If tags is an empty list, then our [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) query is always false.
+The test still fails because of how we've written the query. For example, if tags is an empty list, then our [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) query is always false.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1325,3 +1331,5 @@ $ mix test
 ...
 65 tests, 0 failures
 ```
+
+We can visit http://localhost:4000/books and filter books by tags.
