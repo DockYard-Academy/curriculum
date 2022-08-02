@@ -68,7 +68,7 @@ defmodule Utils.Solutions do
 
   defmodule PokemonBattle do
     def multiplier(pokemon1, pokemon2) do
-      case {pokemon1, pokemon2} do
+      case {pokemon1.type, pokemon2.type} do
         {:fire, :grass} -> 2
         {:water, :fire} -> 2
         {:grass, :water} -> 2
@@ -80,9 +80,9 @@ defmodule Utils.Solutions do
     end
 
     def attack(pokemon1, pokemon2) do
-      %Pokemon{
+      %{
         pokemon2
-        | health: pokemon2.health - pokemon2.attack * multiplier(pokemon1, pokemon2)
+        | health: pokemon2.health - pokemon1.attack * multiplier(pokemon1, pokemon2)
       }
     end
 
