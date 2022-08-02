@@ -33,19 +33,19 @@ If it's a draw, then return `"Tie game!"`
 
 The rules to rock paper scissors lizard spock start normal:
 
-* Rock beats scissors.
-* Paper beats rock.
-* Scissors beats paper.
+* Rock beats Scissors.
+* Paper beats Rock.
+* Scissors beats Paper.
 
 Then add the following extra rules
 
-* Rock beats Lizard
-* Lizard beats Spock
-* Spock beats Scissors
-* Scissors beats lizard
-* Lizard beats Paper
-* Paper beats Spock
-* Spock beats Rock
+* Rock beats Lizard.
+* Lizard beats Spock.
+* Spock beats Scissors.
+* Scissors beats Lizard.
+* Lizard beats Paper.
+* Paper beats Spock.
+* Spock beats Rock.
 
 For example,
 
@@ -58,9 +58,66 @@ RockPaperScissorsLizardSpock.play(:lizard, :spock)
 ":lizard beats :spock"
 ```
 
+<!-- livebook:{"attrs":{"assertions":"assert Keyword.has_key?(RockPaperScissorsLizardSpock.__info__(:functions), :play),\n        \"Ensure you define the `play/2` function\"\n\ngame_permutations =\n  for player1 <- [:rock, :paper, :scissors, :lizard, :spock],\n      player2 <- [:rock, :paper, :scissors, :lizard, :spock] do\n    {player1, player2}\n  end\n\nbeats? = fn player1, player2 ->\n  {player1, player2} in [\n    {:rock, :scissors},\n    {:paper, :rock},\n    {:scissors, :paper},\n    {:rock, :lizard},\n    {:lizard, :spock},\n    {:scissors, :lizard},\n    {:lizard, :paper},\n    {:paper, :spock},\n    {:spock, :scissors},\n    {:spock, :rock}\n  ]\nend\n\nEnum.each(game_permutations, fn {p1, p2} ->\n  expected_result =\n    cond do\n      beats?.(p1, p2) -> \"#{p1} beats #{p2}.\"\n      beats?.(p2, p1) -> \"#{p2} beats #{p1}.\"\n      true -> \"Tie game!\"\n    end\n\n  actual = RockPaperScissorsLizardSpock.play(p1, p2)\n\n  assert actual == expected_result,\n          \"\"\"\n          Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).\n          expected: #{inspect(expected_result)}\n          received: #{inspect(actual)}\n          \"\"\"\nend)","code":"defmodule RockPaperScissorsLizardSpock do\r\nend","solution":"defmodule RockPaperScissorsLizardSpock do\n  def play(a, b) do\n    cond do\n      beats?(a, b) -> \"#{a} beats #{b}.\"\n      beats?(b, a) -> \"#{b} beats #{a}.\"\n      true -> \"Tie game!\"\n    end\n  end\n\n  defp beats?(a, b) do\n    {a, b} in [\n      {:rock, :scissors},\n      {:paper, :rock},\n      {:scissors, :paper},\n      {:rock, :lizard},\n      {:lizard, :spock},\n      {:spock, :scissors},\n      {:scissors, :lizard},\n      {:lizard, :paper},\n      {:paper, :spock},\n      {:spock, :rock}\n    ]\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-defmodule RockPaperScissorsLizardSpock do
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule RockPaperScissorsLizardSpock do
+    end
+
+    assert Keyword.has_key?(RockPaperScissorsLizardSpock.__info__(:functions), :play),
+           "Ensure you define the `play/2` function"
+
+    game_permutations =
+      for player1 <- [:rock, :paper, :scissors, :lizard, :spock],
+          player2 <- [:rock, :paper, :scissors, :lizard, :spock] do
+        {player1, player2}
+      end
+
+    beats? = fn player1, player2 ->
+      {player1, player2} in [
+        {:rock, :scissors},
+        {:paper, :rock},
+        {:scissors, :paper},
+        {:rock, :lizard},
+        {:lizard, :spock},
+        {:scissors, :lizard},
+        {:lizard, :paper},
+        {:paper, :spock},
+        {:spock, :scissors},
+        {:spock, :rock}
+      ]
+    end
+
+    Enum.each(game_permutations, fn {p1, p2} ->
+      expected_result =
+        cond do
+          beats?.(p1, p2) -> "#{p1} beats #{p2}."
+          beats?.(p2, p1) -> "#{p2} beats #{p1}."
+          true -> "Tie game!"
+        end
+
+      actual = RockPaperScissorsLizardSpock.play(p1, p2)
+
+      assert actual == expected_result,
+             """
+             Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).
+             expected: #{inspect(expected_result)}
+             received: #{inspect(actual)}
+             """
+    end)
+  end
 end
 
-Utils.feedback(:rock_paper_scissors_lizard_spock, RockPaperScissorsLizardSpock)
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+defmodule RockPaperScissorsLizardSpock do
+end
 ```
