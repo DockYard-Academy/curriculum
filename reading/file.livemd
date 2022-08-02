@@ -50,7 +50,7 @@ File.ls()
 
 ### Your Turn
 
-In the Elixir cell below, try listing the parent directory of this livebook file. Use `"../"` as the argument to
+In the Elixir cell below, try listing the parent directory of this Livebook file. Use `"../"` as the argument to
 `File.ls/1`.
 
 ```elixir
@@ -152,7 +152,7 @@ If a folder doesn't exist, then `File.write/2` returns `{:error, :enoent}`.
 File.write("non_existing_folder/test", "hello, world!")
 ```
 
-When you expect writing a file to generally succeed, you can use `File.write!/2` instead
+When you expect writing a file always works, you can use `File.write!/2` instead
 to return an error and halt execution.
 
 ```elixir
@@ -161,15 +161,14 @@ File.write!("non_existing_folder/test", "hello, world!")
 
 ## File.rm/2
 
-`rm` is short for **remove**. We use File.rm to delete existing files.
+`rm` is short for **remove**. We use `File.rm/2` to delete existing files.
 
 ```elixir
 File.write("data/temp", "Goodbye!")
 File.rm("data/temp")
 ```
 
-`File.rm/2` will return an error tuple `{:error, :enoent}` if the file does not exist. As usual,
-you can use the bang `!` with File functions to fail and halt execution.
+`File.rm/2` will return an error tuple `{:error, :enoent}` if the file does not exist. As usual, you can use the bang `!` version of the function to fail and halt execution.
 
 ```elixir
 File.rm("data/non_existing_file")
@@ -185,7 +184,7 @@ If this were a woodshop class, this would be the point that we all need to put g
 You have direct access to your file system, so you can accidentally delete important things with the
 wrong path!
 
-You can always use **git** to recover committed project files, but the same isn't true for files
+You can always use **Git** to recover committed project files, but the same isn't true for files
 outside of this project. Proceed with caution!
 
 In the Elixir cell below, delete the written file `"data/delete_me"` using
@@ -275,9 +274,7 @@ end)
 
 We set the `:read` mode to enable permissions to read the contents of a file.
 
-We can use the [IO](https://hexdocs.pm/elixir/1.13/IO.html) module to read and write to the file. We can
-use `IO.read/2` to read from a file. We can specify if we would like to read a line or a number
-of characters.
+We can use the [IO](https://hexdocs.pm/elixir/1.13/IO.html) module to read and write to the file. For example, using `IO.read/2` to read from a file where we can specify if we would like to read a line or a number of characters.
 
 ```elixir
 File.write("data/open_read_example", "first line of the file\nsecond line of the file")
@@ -326,7 +323,7 @@ flowchart LR
 
 <!-- livebook:{"break_markdown":true} -->
 
-Therefore, the following is an antipattern for appending information to a file.
+Therefore, the following is an [anti-pattern](https://en.wikipedia.org/wiki/Anti-pattern) for appending information to a file.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -374,7 +371,7 @@ File.open("data/open_write_example", [:write], fn file ->
   end)
 end)
 
-File.read("data/large_data")
+File.read("data/open_write_example")
 ```
 
 If you would prefer to append information and preserve the existing text in the file,
@@ -394,7 +391,7 @@ File.read("data/large_data")
 
 <!-- livebook:{"break_markdown":true} -->
 
-We've preferred `File.open/3` In our examples for the sake of simplicity, but there is also a very similar `File.open/2` function.
+We've preferred `File.open/3` in our examples for the sake of simplicity, but there is also a very similar `File.open/2` function.
 
 `File.open/3` opens a process, runs a callback function, and then automatically closes it, so it's more convenient for demonstration.
 
@@ -416,15 +413,14 @@ content
 
 <!-- livebook:{"break_markdown":true} -->
 
-We can read files as a [Stream](streams.livemd). It's a [File Stream](https://hexdocs.pm/elixir/1.13/File.Stream.html)
-but use it the same as a stream. File Streams are often useful when the file is very large.
+We can read files as a [Stream](streams.livemd). It's a [File Stream](https://hexdocs.pm/elixir/1.13/File.Stream.html) but use it the way same as a stream. File Streams are often useful when the file is very large.
 
 We'll use a small file for the same example.
 
 ```elixir
 File.write("data/stream_example", "line 1\nline 2\nline 3\n")
 
-File.stream!("data/large_data")
+File.stream!("data/stream_example")
 ```
 
 Each element in the stream will be a file line by default.
@@ -461,14 +457,13 @@ File.stream!("data/stream_example")
 ## Challenge
 
 We have the core tools to create file-based persistence. You now know how to read and write files, create folders, and handle very
-large files. When you need a tool related to file-based persistence, you should start with the [File Documentation](https://hexdocs.pm/elixir/File.html#content)
+large files. When you need a tool related to file-based persistence, you should start with the [File Documentation](https://hexdocs.pm/elixir/File.html#content).
 Or, if you're working with a file as a Stream, you may find the [Stream Documentation](https://hexdocs.pm/elixir/Stream.html) useful.
 
 For example, we haven't taught you how to copy files yet. Programmers must be able to read the documentation
 and discover information when they need it.
 
-In the Elixir cell below, take the written file "data/copy_example" and copy the information it contains into a new
-file "data/copied_example".
+In the Elixir cell below, take the written file `data/copy_example` and copy the information it contains into a new file `data/copied_example`.
 
 ```elixir
 File.write("data/copy_example", "Copy me!")
