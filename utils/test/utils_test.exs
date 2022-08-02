@@ -77,7 +77,7 @@ defmodule UtilsTest do
     exercises = fetch_livebooks("../exercises/")
     reading = fetch_livebooks("../reading/")
 
-    assert any_invalid_links?(~r/\]\(exercises\/\w+\)/, exercises) == false
+    assert any_invalid_links?(~r/\]\(.*exercises\/\w+.livemd\)/, exercises) == false
     assert any_invalid_links?(~r/\]\(.*reading\/\w+.livemd\)/, reading) == false
     assert any_invalid_links?(~r/\]\(\)/, exercises ++ reading) == false
   end
