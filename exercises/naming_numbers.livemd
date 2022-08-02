@@ -58,10 +58,33 @@ naming_numbers.(1)
 
 Replace `nil` with your anonymous function.
 
-```elixir
-naming_numbers = nil
+<!-- livebook:{"attrs":{"assertions":"assert is_function(naming_numbers),\n  \"Ensure you bind `naming_numbers` to an anonymous function.\"\n\nlist = [\"zero\", \"one\", \"two\", \"three\", \"four\", \"five\", \"six\", \"seven\", \"eight\", \"nine\"]\n\nEnum.each(1..9, fn integer ->\n  assert naming_numbers.(integer) == Enum.at(list, integer)\nend)","code":"naming_numbers = nil","solution":"naming_numbers = fn number ->\n  Enum.at(~w[zero one two three four five six seven eight nine], number)\nend\n"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:naming_numbers, naming_numbers)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    naming_numbers = nil
+
+    assert is_function(naming_numbers),
+           "Ensure you bind `naming_numbers` to an anonymous function."
+
+    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+
+    Enum.each(1..9, fn integer ->
+      assert naming_numbers.(integer) == Enum.at(list, integer)
+    end)
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+naming_numbers = nil
 ```
 
 ## Numbering Names
@@ -103,8 +126,37 @@ flowchart
 
 Replace `nil` with your anonymous function.
 
-```elixir
-numbering_names = nil
+<!-- livebook:{"attrs":{"assertions":"list = [\"zero\", \"one\", \"two\", \"three\", \"four\", \"five\", \"six\", \"seven\", \"eight\", \"nine\"]\ncapital_list = Enum.map(list, &String.capitalize/1)\n\nassert is_function(numbering_names),\n  \"Ensure you bind `naming_numbers` to an anonymous function.\"\n\nEnum.each(list, fn name ->\n  assert numbering_names.(name) ==\n    Enum.find_index(list, fn each -> each == String.downcase(name) end)\n  end)\n\nEnum.each(capital_list, fn name ->\n  assert numbering_names.(name) ==\n    Enum.find_index(list, fn each -> each == String.downcase(name) end)\n  end)","code":"numbering_names = nil","solution":"numbering_names = fn number ->\n  ~w[zero one two three four five six seven eight nine]\n  |> Enum.find_index(&(&1 == String.downcase(number)))\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-Utils.feedback(:numbering_names, numbering_names)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    numbering_names = nil
+    list = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    capital_list = Enum.map(list, &String.capitalize/1)
+
+    assert is_function(numbering_names),
+           "Ensure you bind `naming_numbers` to an anonymous function."
+
+    Enum.each(list, fn name ->
+      assert numbering_names.(name) ==
+               Enum.find_index(list, fn each -> each == String.downcase(name) end)
+    end)
+
+    Enum.each(capital_list, fn name ->
+      assert numbering_names.(name) ==
+               Enum.find_index(list, fn each -> each == String.downcase(name) end)
+    end)
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+numbering_names = nil
 ```
