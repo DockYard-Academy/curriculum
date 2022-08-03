@@ -30,7 +30,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 We will add books to our `BookSearch` application from the previous lesson.
 We need to associate books with a particular author.
 
-If you need clarification during this reading, you can reference the completed [BookSearch with Books](https://github.com/BrooklinJazz/book_search/tree/books) project.
+If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/BrooklinJazz/book_search/tree/books) project.
 
 To associate books with an author, we need to model their relationship in our Database.
 Ecto handles the data layer in our application. By default, Ecto uses Postgres, which is a relational database.
@@ -1653,6 +1653,162 @@ Now we can visit http://localhost:4000/authors/1/books to view only the books fo
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/list_book_by_author.png)
+
+## Search Books
+
+We're going to add a form to search for books. We'll be able to search all books, and search books by an author.
+
+First, let's add a form to the book index page. We're going to pass the action from the controller since it will be different depending on the current page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/index.html.heex
+
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <.form let={f} for={@conn} method={"get"} action={@action}>
+    <%= text_input f, :title %>
+    <%= error_tag f, :title %>
+
+    <div>
+      <%= submit "Search" %>
+    </div>
+  </.form>
+  <%= for book <- @books do %>
+      <tr>
+        <td><%= book.author.name %></td>
+        <td><%= book.title %></td>
+
+        <td>
+          <span><%= link "Show", to: Routes.author_book_path(@conn, :show, book.author_id, book) %></span>
+          <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, book.author_id, book) %></span>
+          <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, book.author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= if assigns[:author_id] do %>
+  <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+<% end %>
+```
+
+Let's add the test to ensure we filter books by the search query when we visit http://localhost:4000/books?name=search_input where `search_input` is the book name entered in the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "index" do
+  test "list all books filtered by search query", %{conn: conn} do
+    author = author_fixture(name: "Brandon Sanderson")
+    book = book_fixture(author: author, title: "The Final Empire")
+    non_matching_book = book_fixture(author: author, title: "The Hero of Ages")
+
+    conn = get(conn, Routes.book_path(conn, :index, title: book.title))
+    assert html_response(conn, 200) =~ book.title
+    refute html_response(conn, 200) =~ non_matching_book.title
+  end
+...
+end
+```
+
+We'll add a new function clause for the `BookController.index/2` action. Do not delete any existing function clauses.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"name" => book_name}) do
+  books = Books.list_books(title: book_name)
+  render(conn, "index.html", books: books)
+end
+```
+
+We can implement the search using [ilike/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_books(name: name) do
+  search = "%#{name}%"
+
+  Book
+  |> preload(:author)
+  |> where([book], ilike(book.name, ^search))
+  |> Repo.all()
+end
+```
+
+All tests pass!
+
+```sh
+$ mix test
+...
+43 tests, 0 failures
+```
+
+However, we have a bug. The search input also displays on http://localhost:4000/authors/1/books, but it searches all books, not just books for the author.
+
+We'll use a value on the `assigns` called `:display_search` to toggle the search form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if assigns[:display_form] do %>
+  <.form let={f} for={@conn} method={"get"} action={@action}>
+    <%= text_input f, :title %>
+    <%= error_tag f, :title %>
+
+    <div>
+      <%= submit "Search" %>
+    </div>
+  </.form>
+<% end %>
+```
+
+Then enable the form through the `BookController.index/2` function clauses for listing all books, but not for listing books by author.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books(author_id)
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+
+def index(conn, %{"title" => title}) do
+  books = Books.list_books(title: title)
+  render(conn, "index.html", books: books, display_form: true)
+end
+
+def index(conn, _params) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, display_form: true)
+end
+```
+
+Now the form will not display when we visit http://localhost:4000/authors/1/books.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/display_form_authors_search.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn (Bonus)
+
+We omitted tests for `Books.list_books(name: name)`. Create tests to ensure we can filter books by their name. You may take inspiration from how we've already tested `Authors.list_authors/1`.
 
 <!-- livebook:{"break_markdown":true} -->
 

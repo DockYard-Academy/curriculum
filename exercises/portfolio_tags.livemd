@@ -1,0 +1,60 @@
+# Portfolio: Blog Tags
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Blog Tags
+
+You're going to associate each blog with zero or more tags.
+
+Blogs have a **many to many** relationship with Tags.
+
+Tags should have `:name` field describing the type of tag such as `"tutorial"`, `"elixir"`, `"testing"`, etc.
+
+```mermaid
+classDiagram
+  class Tag {
+    name: :string
+  }
+```
+
+Blogs and tags should be associated through a **join** table `blog_tags`.
+
+```mermaid
+classDiagram
+  class BlogTag {
+    blog_id: :id
+    tag_id: :id
+  }
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Comment Requirements
+
+Ensure you:
+
+* Can perform standard CRUD operations for tags.
+* Can associate a blog with a tag using a multiple select when you create or update a blog.
+* Include a list of a blog's tags on the blog show page.
+* Include a show blogs by tag page which displays all blogs that belong to a specified tag. For example: `"/blogs/tags/:id` where `:id` is the id of a tag.
+
+## Bonus: Search By Tag
+
+Add a feature to the blog search form to search for blogs by tag.
