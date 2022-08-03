@@ -72,4 +72,35 @@ defmodule UtilsTest do
       execute_tests_until_failure(tail)
     end
   end
+
+  test "Ensure no broken / empty links in livebooks" do
+    exercises = fetch_livebooks("../exercises/")
+    reading = fetch_livebooks("../reading/")
+
+    assert file_contains?(~r/\]\(.*exercises\/\w+.livemd\)/, exercises) == false
+    assert file_contains?(~r/\]\(.*reading\/\w+.livemd\)/, reading) == false
+    assert file_contains?(~r/\]\(\)/, exercises ++ reading) == false
+  end
+
+  test "Teacher-only editors are hidden" do
+    exercises = fetch_livebooks("../exercises/")
+    reading = fetch_livebooks("../reading/")
+
+    assert file_contains?(~r/TestedCell.Control.show_editors/, exercises ++ reading) == false
+  end
+
+  defp file_contains?(regex, livebooks) do
+    livebooks
+    |> Stream.map(fn file ->
+      File.stream!(file, [], :line)
+      |> Enum.any?(&Regex.match?(regex, &1))
+    end)
+    |> Enum.any?()
+  end
+
+  defp fetch_livebooks(path) do
+    File.ls!(path)
+    |> Stream.filter(&String.ends_with?(&1, ".livemd"))
+    |> Enum.map(&(path <> &1))
+  end
 end

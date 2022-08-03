@@ -17,7 +17,7 @@ Mix.install([
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Setup
 
@@ -104,7 +104,6 @@ defmodule HelloWorld do
     :world
   end
 end
-
 ```
 
 ## Running a Mix Project
@@ -147,6 +146,7 @@ In your `hello_world` project, there should be an example test file `test/hello_
 the following content.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 defmodule HelloWorldTest do
   use ExUnit.Case
@@ -167,6 +167,7 @@ We will dive deeper into how to test Elixir projects in the [ExUnit](exunit.live
 For now, know that you can execute all of your tests by running the following in the command line.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 $ mix test
 ```
@@ -177,6 +178,7 @@ Run `mix test` in your `hello_world` project folder from the command line, and y
 should see an output similar to the following.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 Compiling 1 file (.ex)
 Generated hello_world app
@@ -187,6 +189,7 @@ Finished in 0.02 seconds (0.00s async, 0.02s sync)
 
 Randomized with seed 768874
 ```
+
 ## File and Module Names
 
 Mix compiles all `.ex` files under the `lib/` folder and bundles them together into a project.
@@ -211,7 +214,7 @@ relate to each other, often sub-modules deal with a more specific application of
 For example, a `Formal` module would be under the `Greeting` module.
 
 ```elixir
-defmodule  HelloWorld.Greeting.Formal do
+defmodule HelloWorld.Greeting.Formal do
   def charmed() do
     "Charmed, I'm sure."
   end
@@ -232,6 +235,7 @@ lib/
 ```
 
 ### Your Turn
+
 Modules can call functions from any other modules in `.ex` files under the `lib/` folder,
 just as you have already seen in livebook cells.
 
@@ -274,6 +278,7 @@ end
 Run your project in the `IEx` shell and ensure the `HelloWorld.hello/0` function works as expected.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 $ iex -S mix
 iex> HelloWorld.hello()
@@ -309,10 +314,12 @@ Note the original contents of the application manifest `build/ebin/hello_world.a
 
 Change the `application/0` function to return an empty list.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-  def application do
-    []
-  end
+def application do
+  []
+end
 ```
 
 Run `mix compile`.
@@ -376,6 +383,7 @@ To install a dependency, include the name of the project and desired version in 
 in `mix.exs`. Notice that `mix.exs` includes comments on installing a dependency using the project version or GitHub URL.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
   defp deps do
     [
@@ -395,6 +403,7 @@ It's often most reliable to check [Hex](https://hex.pm/packages/faker) for the l
 Ensure you add `:faker` with the latest version to the `deps/0` function in `mix.exs`.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
   defp deps do
     [
@@ -411,7 +420,8 @@ Use the `Faker.Person.first_name/0` function in your `HelloWorld.hello/0` functi
 
 For more on how to use `Faker`, you can read the [Faker Documentation](https://hexdocs.pm/faker/readme.html).
 
-<!-- livebook:{"force_markdown": true} -->
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 def hello do
   "Hello, #{Faker.Person.first_name()}."
@@ -421,11 +431,13 @@ end
 Ensure your `hello/0` function works in the IEx shell.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 iex -S mix
 iex> HelloWorld.hello()
 "Hello, Salvador." # The name will be random each time.
 ```
+
 <!-- livebook:{"break_markdown":true} -->
 
 ### Versions
@@ -436,7 +448,12 @@ Project [Versions](https://hexdocs.pm/elixir/Version.html) are generally represe
 When installing dependencies, we specify a [version requirement](https://hexdocs.pm/elixir/1.13/Version.html#module-requirements).
 We can even specify a version between two numbers using comparison operators. i.e. `>= 2.0.0 and < 2.1.0`,
 
-The `~>` symbol you see in dependencies means it will use the latest version type provided.
+The locally installed dependency may not exactly match the version requirement, but must belong in the range specified.
+
+The `~>` symbol you see in dependencies means it will never go above its upper bound.
+
+* `~> 2.1` would allow any version below `3.0.0` and above or equal to `2.1.0`.
+* `~> 2.1.2` would allow any version below `2.2.0` and above or equal to `2.1.2`.
 
 The [Version documentation](https://hexdocs.pm/elixir/Version.html) goes into further depth.
 
@@ -451,7 +468,8 @@ Or with the `--all` option to update all deps.
 ```
 mix deps.update --all
 ```
-## .formatter.exs
+
+## Formatting
 
 The `.formatter.exs` file contains project configuration for how to format elixir files automatically.
 
@@ -467,10 +485,11 @@ formats. If it does not, ensure that you do not have syntax errors that prevent 
 Most projects include a README.md file which contains basic information about the project written in markdown.
 
 There is no universal README structure however it's common to include:
-- The repository name.
-- The project purpose.
-- Setup instructions.
-- Collaborators on the project.
+
+* The repository name.
+* The project purpose.
+* Setup instructions.
+* Collaborators on the project.
 
 GitHub pages display the README on the front of the repository page for the project.
 
@@ -479,13 +498,14 @@ you'll want to make sure you update the default README to include relevant infor
 
 View the [Markdown cheat-sheet](https://www.markdownguide.org/cheat-sheet/) for a quick guide on markdown syntax.
 
-## Environment Variables
+## Mix Environments
 
 Mix projects can run in different environments. The default environment is your development `:dev` environment.
 
 Run your `hello_world` project in the IEx shell and call `Mix.env()` to see that `:dev` is the current environment.
 
 <!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 $ iex -S mix
 iex> Mix.env()
@@ -502,5 +522,5 @@ environment to ensure that developers don't accidentally send out text messages 
 
 For more on `Mix`, consider reading the following.
 
-- [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
-- [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)
+* [elixir-lang: Intro to Mix](https://elixir-lang.org/getting-started/mix-otp/introduction-to-mix.html)
+* [HexDocs: Mix](https://hexdocs.pm/mix/Mix.html#content)

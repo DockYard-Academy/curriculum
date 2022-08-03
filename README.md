@@ -2,19 +2,21 @@
 
 The DockYard Academy curriculum is an open source curriculum to help students learn Elixir.
 The `beta_curriculum` is a work in progress effort available for feedback and contribution.
-When launched, this curriculum will be used as the primary teaching material in DockYard Academy.
-
-Contributors and beta testers are welcome to go through the course, raise issues, and make PRs.
+When launched, this curriculum will be used as the primary teaching material in [DockYard Academy](https://dockyard.com/blog/2022/07/26/what-to-expect-from-the-dockyard-academy-q-a-with-instructor-brooklin-myers).
 
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
+
+## Want To Get Involved?
+
+Contributors and beta testers are welcome to go through the course, raise issues, and make PRs. See the [Contributor Guide](https://github.com/DockYard-Academy/beta_curriculum/wiki/Beta-Tester-Guide-&-Contributor-Setup).
+
+See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculum/issues). Comment on any issue and mention @brooklinjazz to get support.
 
 ## QuickStart
 
 1. Clone the project `git clone <URL>`.
 
-2. Install a compatible Elixir (1.13.4 or higher) and Erlang (25 or higher)
-   version. You may wish to use
-   [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+2. Install a compatible Elixir and Erlang version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook):
 
@@ -32,6 +34,95 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
 ensure your Livebook version is correct.
+
+## Troubleshooting
+
+Raise an issue or contact brooklin.myers@dockyard.com if you are having trouble setting up the curriculum.
+
+### Could not compile dependency :aws_signature
+
+When installing Livebook `mix escript.install github livebook-dev/livebook` you may see the following error.
+
+```
+** (Mix) Could not compile dependency :aws_signature, "/home/user/.mix/rebar3 bare compile --paths /tmp/mix-local-installer-fetcher-Ao9gNA/deps/new package/_build/prod/lib/*/ebin" command failed. Errors may have been logged above. You can recompile this dependency with "mix deps.compile aws_signature", update it with "mix deps.update aws_signature" or clean it with "mix deps.clean aws_signature"
+```
+
+To resolve this issue, update `rebar3` by running the following command.
+
+```sh
+mix local.rebar
+```
+
+Then try installing Livebook again. This time it should succeed.
+
+### Livebook: Command Not Found (ASDF)
+
+If using [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies) you need to create the [shim](https://github.com/asdf-vm/asdf-elixir#elixir-escripts-support) for livebook.
+
+```sh
+asdf reshim
+```
+   
+### Livebook: Command Not Found
+
+After installing livebook `mix escript.install github livebook-dev/livebook` you may see the following message:
+
+```
+warning: you must append "/home/user/.mix/escripts" to your PATH if you want to invoke escripts by name
+```
+
+This means we need to append `.mix/escripts` to the PATH variable in order to find the location of the `.mix/escripts` folder when we run the livebook command.
+
+Try running the following to confirm you can run Livebook. Stop Livebook once you have confirmed it runs successfully.
+
+```sh
+~/.mix/escripts/livebook server
+```
+
+Different operating systems use different configuration files, typically either `.bashrc` on Windows and Linux or `.zshrc` on MacOS.
+If you want to run `livebook` instead of  `~/.mix/escripts/livebook`, add the following at the bottom of the appropriate configuration file.
+
+```sh
+PATH=$PATH:~/.mix/escript
+```
+
+Then close your terminal and reload it, or run the following. Replace `.bashrc` with the appropriate configuration file.
+
+```sh
+source .bashrc
+```
+
+Now you can run Livebook using the `livebook` command.
+
+```sh
+livebook server
+```
+
+### LiveBook Desktop App (Currently) Not Supported
+
+Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
+
+For now, there is a workaround by running livebook with the **Mix standalone** runtime connected to the `utils` project.
+
+To run the project in **Mix Standalone** mode:
+1. start livebook.
+2. open the curriculum folder in livebook.
+3. open `start.livemd` or any other `.livemd` file in livebook.
+4. Go to **Runtime Settings**.
+5. Click the gear icon.
+6. Select **Mix standalone**.
+7. Select the `utils` project in the curriculum folder.
+8. Click **Connect**.
+
+You should be able to use the curriculum normally now.
+
+### Livebook server not starting (Windows)
+
+This is a known Livebook issue ([196](https://github.com/livebook-dev/livebook/issues/196), [194](https://github.com/livebook-dev/livebook/issues/194), [1042](https://github.com/livebook-dev/livebook/issues/1042)) that happens when some Erlang files don't show a dialog for its firewall approval on the first Livebook execution after being installed.
+
+- Before calling Livebook, execute `iex --sname test` on terminal.
+- On appearing Windows firewall dialog, approve permission for `epmd.exe`.
+- Both `erl.exe` and `epmd.exe` should appear on firewall-allowed apps.
 
 ## Spell Checking
 
@@ -117,15 +208,15 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 
 ## Week 10
 1. Emailing & Swoosh
-2. Stripe
-3. Oban
-4. RabbitMQ
-5. Kafka
+2. Oban
+3. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
+4. Umbrella Projects
+5. Nodes, Clustering
 
-## Week 11
-1. Umbrella Projects
-2. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
-3. Nodes, Clustering
+## Week 11 (Final Project)
+1. 
+2. 
+3. 
 4.
 5.
 

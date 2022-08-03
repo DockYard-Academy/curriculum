@@ -10,14 +10,15 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "utils"},
+  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
 ])
 ```
 
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Guess the Word
 
@@ -31,13 +32,39 @@ In the Elixir cell below create a word guessing game.
 Run the code with a correct and incorrect `guess` to ensure
 your code passes the tests.
 
+<!-- livebook:{"attrs":{"assertions":"assert Enum.all?([guess, answer, correct], &is_binary/1),\n  \"Ensure `guess`, `answer`, and `correct` are all strings\"\n\nif guess == answer do\n  assert correct == \"Correct!\"\nelse\n  assert correct == \"Incorrect.\"\nend","code":"guess = nil\r\nanswer = nil\r\n\r\ncorrect = nil","solution":"correct = if guess == answer, do: \"Correct!\", else: \"Incorrect.\""},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    guess = nil
+    answer = nil
+
+    correct = nil
+
+    assert Enum.all?([guess, answer, correct], &is_binary/1),
+           "Ensure `guess`, `answer`, and `correct` are all strings"
+
+    if guess == answer do
+      assert correct == "Correct!"
+    else
+      assert correct == "Incorrect."
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 guess = nil
 answer = nil
 
 correct = nil
-
-Utils.feedback(:guess_the_word, [guess, answer, correct])
 ```
 
 ## Guess the Number
@@ -53,11 +80,37 @@ In the Elixir cell below create a number guessing game.
 Run your code with an equal, smaller, and larger `guess` than the `answer` to ensure your
 code passes all tests.
 
+<!-- livebook:{"attrs":{"assertions":"assert is_integer(guess), \"Ensure `guess` is an integer\"\nassert is_integer(answer), \"Ensure `answer` is an integer\"\nassert is_binary(correct), \"Ensure `correct` is a string\"\n\ncond do\n  guess == answer -> assert correct == \"Correct!\"\n  guess < answer -> assert correct == \"Too low!\"\n  guess > answer -> assert correct == \"Too high!\"\nend","code":"guess = nil\r\nanswer = nil\r\n\r\ncorrect = nil","solution":"correct =\n  cond do\n    guess == answer -> \"Correct!\"\n    guess < answer -> \"Too low!\"\n    guess > answer -> \"Too high!\"\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    guess = nil
+    answer = nil
+
+    correct = nil
+    assert is_integer(guess), "Ensure `guess` is an integer"
+    assert is_integer(answer), "Ensure `answer` is an integer"
+    assert is_binary(correct), "Ensure `correct` is a string"
+
+    cond do
+      guess == answer -> assert correct == "Correct!"
+      guess < answer -> assert correct == "Too low!"
+      guess > answer -> assert correct == "Too high!"
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 guess = nil
 answer = nil
 
 correct = nil
-
-Utils.feedback(:guess_the_number, [guess, answer, correct])
 ```

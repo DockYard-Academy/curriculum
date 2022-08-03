@@ -17,7 +17,7 @@ Mix.install([
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Setup
 
@@ -27,10 +27,10 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 Lists and Tuples are intended for fundamentally different use cases.
 
-Lists are dynamic syzed containers meant to be optimized for updating elements within the list, Tuples
+Lists are dynamic-sized containers meant to be optimized for updating elements within the list, while Tuples
 are fixed-sized containers optimized for reading values.
 
-In this lesson, we'll go over how lists and tuples are implemented in Elixir so that you can
+In this lesson, we'll go over how Lists and Tuples are implemented in Elixir so that you can
 understand their strengths and weaknesses in order to use them more effectively.
 
 We will use the following large list and large tuple to perform several benchmarks.
@@ -56,7 +56,7 @@ element.
 
 In fact, `[2, 3]` can also be written as pairs like so `[2 | [3 | []]]`, where each cell is written
 as `[head | tail]`. The head is the value, and the tail is the reference to the rest of the list.
-You may sometimes hear these called `cons` cells.
+You may sometimes hear these called [`cons` cells](https://en.wikipedia.org/wiki/Cons).
 
 ## Tuples
 
@@ -71,7 +71,7 @@ For example, the tuple `{1, 2, 3}` could be stored like so.
 Lists and tuples serve different purposes. Due to their structure they are more or less performant
 for certain operations.
 
-We'll use the built-in erlang library's `:timer.tc/1` function to compare the amount of time in microseconds
+We'll use the built-in Erlang library's `:timer.tc/1` function to compare the amount of time in microseconds
 that it takes to perform common operations on a large set of data.
 
 ```elixir
@@ -89,11 +89,11 @@ perfect, so you may notice that execution time is not always consistent.
 Tuples are fixed-size containers, so their length is known upfront. It's a constant $O(1)$
 time to determine the size of a tuple no matter how large.
 
-For lists, we only know the location of the first element. So, we need to traverse the entire
+For Lists, we only know the location of the first element. So, we need to traverse the entire
 list to find its length.
 That means it takes $O(n)$ time where $n$ is the number of elements in the list.
 
-Let's compare the time it takes to determine the length of an equal sized list and tuple.
+Let's compare the time it takes to determine the length of an equal-sized list and tuple.
 We can use `tuple_size` to count the length of a tuple, and `length` to determine the length of a list.
 
 ```elixir
@@ -183,7 +183,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-That means retrieving the head of any sized list is constant $O(1)$ complexity, and retrieving
+That means retrieving the head of any list regardless of its size is constant $O(1)$ complexity, and retrieving
 the last element of the list is $O(n)$ complexity.
 
 Let's compare accessing the first element of a tuple and list of equal size.
