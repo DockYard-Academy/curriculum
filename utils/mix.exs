@@ -23,6 +23,8 @@ defmodule Utils.MixProject do
   defp deps do
     [
       {:kino, github: "livebook-dev/kino", override: true},
+      {:livebook, "~> 0.6.3", runtime: false},
+      {:poison, "~> 5.0"},
       {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
       {:vega_lite, "~> 0.1.4"},
       {:kino_vega_lite, "~> 0.1.1"},
