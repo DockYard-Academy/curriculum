@@ -1660,7 +1660,7 @@ defmodule Utils.Feedback do
 
     assert is_map(custom_maze), "`custom_maze` should be a map."
 
-    assert path == "Exit"
+    assert path == "Exit!"
   end
 
   feedback :treasure_map do
