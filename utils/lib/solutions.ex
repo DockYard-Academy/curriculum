@@ -165,23 +165,6 @@ defmodule Utils.Solutions do
     CustomGame
   end
 
-  defmodule FizzBuzz do
-    def run(range) do
-      Enum.map(range, fn integer ->
-        cond do
-          rem(integer, 15) == 0 -> "fizzbuzz"
-          rem(integer, 5) == 0 -> "buzz"
-          rem(integer, 3) == 0 -> "fizz"
-          true -> integer
-        end
-      end)
-    end
-  end
-
-  def fizzbuzz do
-    FizzBuzz
-  end
-
   defmodule VoterCount do
     def count(list_of_votes, vote) do
       Enum.count(list_of_votes, fn each -> each == vote end)
