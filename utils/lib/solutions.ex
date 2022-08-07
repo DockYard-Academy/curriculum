@@ -275,40 +275,6 @@ defmodule Utils.Solutions do
     VoterTally
   end
 
-  defmodule Measurements do
-    defp make_pairs(list) do
-      list
-      |> Enum.chunk_every(2, 1, :discard)
-    end
-
-    def increased(measurements) do
-      measurements
-      |> make_pairs
-      |> Enum.count(fn [a, b] -> b > a end)
-    end
-
-    def increased_by(measurements) do
-      measurements
-      |> increments
-      |> Enum.filter(fn inc -> inc > 0 end)
-      |> Enum.sum()
-    end
-
-    def increments(measurements) do
-      measurements
-      |> make_pairs
-      |> Enum.map(fn [a, b] -> b - a end)
-    end
-
-    def average(measurements) do
-      Enum.sum(measurements) / length(measurements)
-    end
-  end
-
-  def measurements do
-    Measurements
-  end
-
   def keyword_list_hero do
     [name: "", secret_identity: ""]
   end
