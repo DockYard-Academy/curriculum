@@ -100,37 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :is_anagram do
-    anagram_module = get_answers()
-
-    assert anagram_module.is_anagram?("stop", "pots") == true
-    refute anagram_module.is_anagram?("example", "nonanagram") == true
-
-    word = Utils.Factory.string()
-
-    generate_non_anagram = fn word ->
-      word <> Enum.random(["a", "b", "c"])
-    end
-
-    generate_anagram = fn word ->
-      String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
-    end
-
-    assert anagram_module.is_anagram?(word, generate_anagram.(word)),
-           "`is_anagram?/1` failed to identify anagram."
-
-    refute anagram_module.is_anagram?(word, generate_non_anagram.(word)),
-           "`is_anagram?/1` failed to identify non-anagram."
-
-    non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
-    anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
-
-    result = anagram_module.filter_anagrams(word, anagrams ++ non_anagrams)
-    assert is_list(result), "filter_anagrams/2 should return a list"
-
-    assert Enum.sort(result) == Enum.sort(anagrams), "filter_anagrams/2 failed to filter anagrams"
-  end
-
   feedback :bottles_of_soda do
     bottles_of_soda = get_answers()
     result = bottles_of_soda.on_the_wall()

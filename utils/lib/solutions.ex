@@ -121,24 +121,6 @@ defmodule Utils.Solutions do
     "Hi, Peter."
   end
 
-  defmodule Anagram do
-    def sort_string(string) do
-      String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
-    end
-
-    def is_anagram?(word, possible_anagram) do
-      sort_string(word) == sort_string(possible_anagram)
-    end
-
-    def filter_anagrams(word, possible_anagrams) do
-      Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)
-    end
-  end
-
-  def is_anagram do
-    Anagram
-  end
-
   defmodule BottlesOfSoda do
     def singular(container) do
       String.slice(container, 0..(String.length(container) - 2))

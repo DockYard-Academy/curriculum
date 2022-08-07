@@ -52,7 +52,56 @@ Anagram.filter_anagrams("acres", ["cares", "races", "scare", "tree", "bear"])
 ["cares", "races", "scare"]
 ```
 
+<!-- livebook:{"attrs":{"assertions":"assert Anagram.is_anagram?(\"stop\", \"pots\") == true\nrefute Anagram.is_anagram?(\"example\", \"nonanagram\") == true\n\nword = Utils.Factory.string()\n\ngenerate_non_anagram = fn word ->\n  word <> Enum.random([\"a\", \"b\", \"c\"])\nend\n\ngenerate_anagram = fn word ->\n  String.split(word, \"\", trim: true) |> Enum.shuffle() |> Enum.join(\"\")\nend\n\nassert Anagram.is_anagram?(word, generate_anagram.(word)),\n        \"`is_anagram?/1` failed to identify anagram.\"\n\nrefute Anagram.is_anagram?(word, generate_non_anagram.(word)),\n        \"`is_anagram?/1` failed to identify non-anagram.\"\n\nnon_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)\nanagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)\n\nresult = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)\nassert is_list(result), \"filter_anagrams/2 should return a list\"\n\nassert Enum.sort(result) == Enum.sort(anagrams), \"filter_anagrams/2 failed to filter anagrams\"","code":"defmodule Anagram do\r\n  def is_anagram?(word, possible_anagram) do\r\n  end\r\n\r\n  def filter_anagrams(word, possible_anagrams) do\r\n  end\r\nend","solution":"defmodule Anagram do\n  def is_anagram?(word, possible_anagram) do\n    sort_string(word) == sort_string(possible_anagram)\n  end\n\n  def filter_anagrams(word, possible_anagrams) do\n    Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)\n  end\n\n  defp sort_string(string) do\n    String.split(string, \"\", trim: true) |> Enum.sort() |> Enum.join()\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule Anagram do
+      def is_anagram?(word, possible_anagram) do
+      end
+
+      def filter_anagrams(word, possible_anagrams) do
+      end
+    end
+
+    assert Anagram.is_anagram?("stop", "pots") == true
+    refute Anagram.is_anagram?("example", "nonanagram") == true
+
+    word = Utils.Factory.string()
+
+    generate_non_anagram = fn word ->
+      word <> Enum.random(["a", "b", "c"])
+    end
+
+    generate_anagram = fn word ->
+      String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
+    end
+
+    assert Anagram.is_anagram?(word, generate_anagram.(word)),
+           "`is_anagram?/1` failed to identify anagram."
+
+    refute Anagram.is_anagram?(word, generate_non_anagram.(word)),
+           "`is_anagram?/1` failed to identify non-anagram."
+
+    non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
+    anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
+
+    result = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)
+    assert is_list(result), "filter_anagrams/2 should return a list"
+
+    assert Enum.sort(result) == Enum.sort(anagrams), "filter_anagrams/2 failed to filter anagrams"
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 defmodule Anagram do
   def is_anagram?(word, possible_anagram) do
   end
@@ -60,6 +109,4 @@ defmodule Anagram do
   def filter_anagrams(word, possible_anagrams) do
   end
 end
-
-Utils.feedback(:is_anagram, Anagram)
 ```
