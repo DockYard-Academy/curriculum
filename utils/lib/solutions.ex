@@ -155,43 +155,6 @@ defmodule Utils.Solutions do
     BottlesOfSoda
   end
 
-  defmodule Item do
-    defstruct [:type, :effect, :level, :size, :style]
-  end
-
-  def item_generator_item do
-    Item
-  end
-
-  def item_generator do
-    types = [
-      "sword",
-      "halberd",
-      "crossbow",
-      "hammer",
-      "mace",
-      "longsword",
-      "shortsword",
-      "longbow"
-    ]
-
-    effects = [
-      "protection",
-      "healing",
-      "speed",
-      "power",
-      "jump"
-    ]
-
-    styles = ["holy", "dark", "heroic", "crude", "mundane", "lavish"]
-    sizes = 1..10
-    levels = 1..100
-
-    for type <- types, effect <- effects, style <- styles, size <- sizes, level <- levels do
-      %Item{type: type, effect: effect, style: style, size: size, level: level}
-    end
-  end
-
   defmodule Search do
     def all_items(items, filters) do
       inclusive = Keyword.get(filters, :inclusive)
