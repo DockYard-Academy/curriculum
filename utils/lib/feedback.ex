@@ -100,30 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :fizzbuzz do
-    fizz_buzz_module = get_answers()
-
-    assert fizz_buzz_module.run(1..15) == [
-             1,
-             2,
-             "fizz",
-             4,
-             "buzz",
-             "fizz",
-             7,
-             8,
-             "fizz",
-             "buzz",
-             11,
-             "fizz",
-             13,
-             14,
-             "fizzbuzz"
-           ]
-
-    assert fizz_buzz_module.run(1..100) == Utils.Solutions.FizzBuzz.run(1..100)
-  end
-
   feedback :voter_count do
     voter_count = get_answers()
 
