@@ -92,7 +92,7 @@ Measurements.average([2, 10])
 6
 ```
 
-<!-- livebook:{"attrs":{"assertions":"list = Utils.Factory.integers()\n\nassert measurements.increased([1, 1]), \"Implement the `increased` function.\"\nassert measurements.increased([1, 2, 1]) == 1\nassert measurements.increased([3, 1, 2]) == 1, \"Ensure you count each positive change.\"\nassert measurements.increased([1, 1, 2, 3, 1]) == 2\n\nassert measurements.increased(list) == Utils.Solutions.Measurements.increased(list),\n        \"`increased/1 failed when called with #{inspect(list)}\"\n\nassert measurements.increased_by([1, 1]), \"Implement the `increased_by` function.\"\nassert measurements.increased_by([100, 150, 120, 130]) == 60\nassert measurements.increased_by([10, 20, 10, 40]) == 40\n\nassert measurements.increased_by(list) == Utils.Solutions.Measurements.increased_by(list),\n        \"`increased_by/1 failed when called with #{inspect(list)}\"\n\nassert measurements.increments([1, 2]), \"Implement the `increments` function.\"\nassert measurements.increments([100, 150, 120, 130]) == [50, -30, 10]\nassert measurements.increments([10, 20, 10, 40]) == [10, -10, 30]\n\nassert measurements.increments(list) == Utils.Solutions.Measurements.increments(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"\n\nassert measurements.average([1, 1]), \"Implement the `average` function.\"\nassert measurements.average([4, 5, 6]) == 5\nassert measurements.average([2, 10]) == 6\n\nassert measurements.average(list) == Utils.Solutions.Measurements.average(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"","code":"defmodule Measurements do\r\n  def increments(measurements) do\r\n  end\r\n\r\n  def increased(measurements) do\r\n  end\r\n\r\n  def increased_by(measurements) do\r\n  end\r\n\r\n  def average(measurements) do\r\n  end\r\nend","solution":"defmodule Measurements do\n  def increments(measurements) do\n    measurements\n    |> Enum.chunk_every(2, 1, :discard)\n    |> Enum.map(fn [x, y] -> y - x end)\n  end\n\n  def increased(measurements) do\n    measurements\n    |> increments()\n    |> Enum.count(&(&1 > 0))\n  end\n\n  def increased_by(measurements) do\n    measurements\n    |> increments()\n    |> Enum.filter(&(&1 > 0))\n    |> Enum.sum()\n  end\n\n  def average(measurements) do\n    Enum.sum(measurements) / Enum.count(measurements)\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"defmodule Solutions.Measurements do\n  def increments(measurements) do\n    measurements\n    |> Enum.chunk_every(2, 1, :discard)\n    |> Enum.map(fn [x, y] -> y - x end)\n  end\n\n  def increased(measurements) do\n    measurements\n    |> increments()\n    |> Enum.count(&(&1 > 0))\n  end\n\n  def increased_by(measurements) do\n    measurements\n    |> increments()\n    |> Enum.filter(&(&1 > 0))\n    |> Enum.sum()\n  end\n\n  def average(measurements) do\n    Enum.sum(measurements) / Enum.count(measurements)\n  end\nend\n\nlist = Utils.Factory.integers()\n\nassert Measurements.increased([1, 1]), \"Implement the `increased` function.\"\nassert Measurements.increased([1, 2, 1]) == 1\nassert Measurements.increased([3, 1, 2]) == 1, \"Ensure you count each positive change.\"\nassert Measurements.increased([1, 1, 2, 3, 1]) == 2\n\nassert Measurements.increased(list) == Solutions.Measurements.increased(list),\n        \"`increased/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.increased_by([1, 1]), \"Implement the `increased_by` function.\"\nassert Measurements.increased_by([100, 150, 120, 130]) == 60\nassert Measurements.increased_by([10, 20, 10, 40]) == 40\n\nassert Measurements.increased_by(list) == Solutions.Measurements.increased_by(list),\n        \"`increased_by/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.increments([1, 2]), \"Implement the `increments` function.\"\nassert Measurements.increments([100, 150, 120, 130]) == [50, -30, 10]\nassert Measurements.increments([10, 20, 10, 40]) == [10, -10, 30]\n\nassert Measurements.increments(list) == Solutions.Measurements.increments(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.average([1, 1]), \"Implement the `average` function.\"\nassert Measurements.average([4, 5, 6]) == 5\nassert Measurements.average([2, 10]) == 6\n\nassert Measurements.average(list) == Solutions.Measurements.average(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"","code":"defmodule Measurements do\r\n  def increments(measurements) do\r\n  end\r\n\r\n  def increased(measurements) do\r\n  end\r\n\r\n  def increased_by(measurements) do\r\n  end\r\n\r\n  def average(measurements) do\r\n  end\r\nend","solution":"defmodule Measurements do\n  def increments(measurements) do\n    measurements\n    |> Enum.chunk_every(2, 1, :discard)\n    |> Enum.map(fn [x, y] -> y - x end)\n  end\n\n  def increased(measurements) do\n    measurements\n    |> increments()\n    |> Enum.count(&(&1 > 0))\n  end\n\n  def increased_by(measurements) do\n    measurements\n    |> increments()\n    |> Enum.filter(&(&1 > 0))\n    |> Enum.sum()\n  end\n\n  def average(measurements) do\n    Enum.sum(measurements) / Enum.count(measurements)\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -115,35 +115,60 @@ defmodule Assertion do
       end
     end
 
+    defmodule Solutions.Measurements do
+      def increments(measurements) do
+        measurements
+        |> Enum.chunk_every(2, 1, :discard)
+        |> Enum.map(fn [x, y] -> y - x end)
+      end
+
+      def increased(measurements) do
+        measurements
+        |> increments()
+        |> Enum.count(&(&1 > 0))
+      end
+
+      def increased_by(measurements) do
+        measurements
+        |> increments()
+        |> Enum.filter(&(&1 > 0))
+        |> Enum.sum()
+      end
+
+      def average(measurements) do
+        Enum.sum(measurements) / Enum.count(measurements)
+      end
+    end
+
     list = Utils.Factory.integers()
 
-    assert measurements.increased([1, 1]), "Implement the `increased` function."
-    assert measurements.increased([1, 2, 1]) == 1
-    assert measurements.increased([3, 1, 2]) == 1, "Ensure you count each positive change."
-    assert measurements.increased([1, 1, 2, 3, 1]) == 2
+    assert Measurements.increased([1, 1]), "Implement the `increased` function."
+    assert Measurements.increased([1, 2, 1]) == 1
+    assert Measurements.increased([3, 1, 2]) == 1, "Ensure you count each positive change."
+    assert Measurements.increased([1, 1, 2, 3, 1]) == 2
 
-    assert measurements.increased(list) == Utils.Solutions.Measurements.increased(list),
+    assert Measurements.increased(list) == Solutions.Measurements.increased(list),
            "`increased/1 failed when called with #{inspect(list)}"
 
-    assert measurements.increased_by([1, 1]), "Implement the `increased_by` function."
-    assert measurements.increased_by([100, 150, 120, 130]) == 60
-    assert measurements.increased_by([10, 20, 10, 40]) == 40
+    assert Measurements.increased_by([1, 1]), "Implement the `increased_by` function."
+    assert Measurements.increased_by([100, 150, 120, 130]) == 60
+    assert Measurements.increased_by([10, 20, 10, 40]) == 40
 
-    assert measurements.increased_by(list) == Utils.Solutions.Measurements.increased_by(list),
+    assert Measurements.increased_by(list) == Solutions.Measurements.increased_by(list),
            "`increased_by/1 failed when called with #{inspect(list)}"
 
-    assert measurements.increments([1, 2]), "Implement the `increments` function."
-    assert measurements.increments([100, 150, 120, 130]) == [50, -30, 10]
-    assert measurements.increments([10, 20, 10, 40]) == [10, -10, 30]
+    assert Measurements.increments([1, 2]), "Implement the `increments` function."
+    assert Measurements.increments([100, 150, 120, 130]) == [50, -30, 10]
+    assert Measurements.increments([10, 20, 10, 40]) == [10, -10, 30]
 
-    assert measurements.increments(list) == Utils.Solutions.Measurements.increments(list),
+    assert Measurements.increments(list) == Solutions.Measurements.increments(list),
            "`increments/1 failed when called with #{inspect(list)}"
 
-    assert measurements.average([1, 1]), "Implement the `average` function."
-    assert measurements.average([4, 5, 6]) == 5
-    assert measurements.average([2, 10]) == 6
+    assert Measurements.average([1, 1]), "Implement the `average` function."
+    assert Measurements.average([4, 5, 6]) == 5
+    assert Measurements.average([2, 10]) == 6
 
-    assert measurements.average(list) == Utils.Solutions.Measurements.average(list),
+    assert Measurements.average(list) == Solutions.Measurements.average(list),
            "`increments/1 failed when called with #{inspect(list)}"
   end
 end
