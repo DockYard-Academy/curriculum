@@ -121,67 +121,6 @@ defmodule Utils.Solutions do
     "Hi, Peter."
   end
 
-  defmodule CustomGame do
-    @enforce_keys [:rock, :paper, :scissors]
-    defstruct @enforce_keys
-
-    def new(rock, paper, scissors) do
-      %__MODULE__{rock: rock, paper: paper, scissors: scissors}
-    end
-
-    def convert_choice(game, choice) do
-      %{rock: rock, paper: paper, scissors: scissors} = game
-
-      case choice do
-        ^rock -> :rock
-        ^paper -> :paper
-        ^scissors -> :scissors
-      end
-    end
-
-    def beats?(game, player1, player2) do
-      {convert_choice(game, player1), convert_choice(game, player2)} in [
-        {:rock, :scissors},
-        {:paper, :rock},
-        {:scissors, :paper}
-      ]
-    end
-
-    def play(game, player1, player2) do
-      cond do
-        beats?(game, player1, player2) ->
-          "#{player1} beats #{player2}"
-
-        beats?(game, player2, player1) ->
-          "#{player2} beats #{player1}"
-
-        true ->
-          "draw"
-      end
-    end
-  end
-
-  def custom_rps do
-    CustomGame
-  end
-
-  defmodule FizzBuzz do
-    def run(range) do
-      Enum.map(range, fn integer ->
-        cond do
-          rem(integer, 15) == 0 -> "fizzbuzz"
-          rem(integer, 5) == 0 -> "buzz"
-          rem(integer, 3) == 0 -> "fizz"
-          true -> integer
-        end
-      end)
-    end
-  end
-
-  def fizzbuzz do
-    FizzBuzz
-  end
-
   defmodule Anagram do
     def sort_string(string) do
       String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()

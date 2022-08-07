@@ -100,73 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :custom_rps do
-    custom_game_module = get_answers()
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :new),
-           "Ensure you define the `new/3` function"
-
-    assert Keyword.get(custom_game_module.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
-
-    assert match?(%{rock: _, paper: _, scissors: _}, struct(custom_game_module)),
-           "Ensure you use `defstruct` with :rock, :paper, and :scissors."
-
-    assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
-             custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :play),
-           "Ensure you define the `play/3` function"
-
-    game = custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    beats? = fn p1, p2 ->
-      {p1, p2} in [
-        {:custom_rock, :custom_scissors},
-        {:custom_paper, :custom_rock},
-        {:custom_scissors, :custom_paper}
-      ]
-    end
-
-    for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
-        player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
-      result = custom_game_module.play(game, player1, player2)
-
-      expected_result =
-        cond do
-          beats?.(player1, player2) -> "#{player1} beats #{player2}"
-          beats?.(player2, player1) -> "#{player2} beats #{player1}"
-          true -> "draw"
-        end
-
-      assert result == expected_result
-    end
-  end
-
-  feedback :fizzbuzz do
-    fizz_buzz_module = get_answers()
-
-    assert fizz_buzz_module.run(1..15) == [
-             1,
-             2,
-             "fizz",
-             4,
-             "buzz",
-             "fizz",
-             7,
-             8,
-             "fizz",
-             "buzz",
-             11,
-             "fizz",
-             13,
-             14,
-             "fizzbuzz"
-           ]
-
-    assert fizz_buzz_module.run(1..100) == Utils.Solutions.FizzBuzz.run(1..100)
-  end
-
   feedback :is_anagram do
     anagram_module = get_answers()
 
@@ -1641,7 +1574,7 @@ defmodule Utils.Feedback do
 
     assert is_map(custom_maze), "`custom_maze` should be a map."
 
-    assert path == "Exit"
+    assert path == "Exit!"
   end
 
   feedback :treasure_map do
