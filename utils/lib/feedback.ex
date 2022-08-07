@@ -100,92 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :custom_rps do
-    custom_game_module = get_answers()
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :new),
-           "Ensure you define the `new/3` function"
-
-    assert Keyword.get(custom_game_module.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
-
-    assert match?(%{rock: _, paper: _, scissors: _}, struct(custom_game_module)),
-           "Ensure you use `defstruct` with :rock, :paper, and :scissors."
-
-    assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
-             custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :play),
-           "Ensure you define the `play/3` function"
-
-    game = custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    beats? = fn p1, p2 ->
-      {p1, p2} in [
-        {:custom_rock, :custom_scissors},
-        {:custom_paper, :custom_rock},
-        {:custom_scissors, :custom_paper}
-      ]
-    end
-
-    for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
-        player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
-      result = custom_game_module.play(game, player1, player2)
-
-      expected_result =
-        cond do
-          beats?.(player1, player2) -> "#{player1} beats #{player2}"
-          beats?.(player2, player1) -> "#{player2} beats #{player1}"
-          true -> "draw"
-        end
-
-      assert result == expected_result
-    end
-  end
-
-  feedback :fizzbuzz do
-    fizz_buzz_module = get_answers()
-
-    assert fizz_buzz_module.run(1..15) == [
-             1,
-             2,
-             "fizz",
-             4,
-             "buzz",
-             "fizz",
-             7,
-             8,
-             "fizz",
-             "buzz",
-             11,
-             "fizz",
-             13,
-             14,
-             "fizzbuzz"
-           ]
-
-    assert fizz_buzz_module.run(1..100) == Utils.Solutions.FizzBuzz.run(1..100)
-  end
-
-  feedback :voter_count do
-    voter_count = get_answers()
-
-    assert voter_count.count([], :test), "Implement the `count` function."
-
-    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :dogs) == 3,
-           "failed on ([:dogs, :dogs, :dogs, :cats], :dogs)"
-
-    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :cats) == 1,
-           "Failed on ([:dogs, :dogs, :dogs, :cats], :cats)"
-
-    assert voter_count.count([:apples, :oranges, :apples, :cats], :birds) == 0,
-           "Failed on ([:apples, :oranges, :apples, :cats], :birds)"
-
-    list = Enum.map(1..10, fn _ -> Enum.random([:cat, :dog, :bird, :apple, :orange]) end)
-    choice = Enum.random([:cat, :dog, :bird, :apple, :orange])
-    assert voter_count.count(list, choice) == Enum.count(list, fn each -> each == choice end)
-  end
-
   feedback :bottles_of_soda do
     bottles_of_soda = get_answers()
     result = bottles_of_soda.on_the_wall()
@@ -1629,7 +1543,7 @@ defmodule Utils.Feedback do
 
     assert is_map(custom_maze), "`custom_maze` should be a map."
 
-    assert path == "Exit"
+    assert path == "Exit!"
   end
 
   feedback :treasure_map do

@@ -16,7 +16,7 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
 
 1. Clone the project `git clone <URL>`.
 
-2. Install a compatible Elixir and Erlang version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+2. Install a compatible [Elixir and Erlang](https://elixir-lang.org/install.html) version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook):
 
