@@ -237,29 +237,6 @@ defmodule Utils.Feedback do
            "`all_items/2` should work with multiple inclusive filters."
   end
 
-  feedback :custom_enum do
-    list = Enum.to_list(1..10)
-
-    custom_enum = get_answers()
-    assert custom_enum.map(list, & &1), "Implement the `map/2` function."
-    assert is_list(custom_enum.map(list, & &1)), "`map/2` should return a list."
-
-    assert custom_enum.map([1, 2, 3], &(&1 * 2)) == [2, 4, 6]
-
-    assert custom_enum.each(list, & &1), "Implement the `each/2` function."
-    assert custom_enum.each(list, & &1) == :ok, "`each/2` should return :ok."
-
-    assert custom_enum.filter(list, & &1), "Implement the `filter/2` function."
-    assert is_list(custom_enum.filter(list, & &1)), "`each/2` should return a list."
-
-    assert custom_enum.filter(list, &(&1 < 5)) == Enum.filter(list, &(&1 < 5))
-
-    assert custom_enum.sum(list), "Implement the `sum/1` function."
-    assert is_integer(custom_enum.sum(list)), "`sum/1` should return an integer."
-
-    assert custom_enum.sum(list) == Enum.sum(list)
-  end
-
   feedback :voter_tally do
     voter_tally = get_answers()
     assert voter_tally.tally([]), "Implement the `tally/1` function."

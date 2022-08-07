@@ -220,41 +220,6 @@ defmodule Utils.Solutions do
     Search
   end
 
-  defmodule CustomEnum do
-    def map(collection, function) do
-      Enum.reduce(collection, [], fn each, acc ->
-        [function.(each) | acc]
-      end)
-      |> Enum.reverse()
-    end
-
-    def each(collection, function) do
-      Enum.reduce(collection, fn each, _acc ->
-        function.(each)
-        :ok
-      end)
-    end
-
-    def filter(collection, function) do
-      Enum.reduce(collection, [], fn each, acc ->
-        if function.(each) do
-          [each | acc]
-        else
-          acc
-        end
-      end)
-      |> Enum.reverse()
-    end
-
-    def sum(collection) do
-      Enum.reduce(collection, 0, fn each, acc -> acc + each end)
-    end
-  end
-
-  def custom_enum do
-    CustomEnum
-  end
-
   defmodule VoterTally do
     def tally(votes) do
       Enum.reduce(votes, %{}, fn
