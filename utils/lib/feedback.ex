@@ -100,34 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :item_generator_item do
-    item = get_answers()
-
-    assert Keyword.get(item.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
-
-    assert match?(%{type: nil, effect: nil, level: nil, size: nil, style: nil}, struct(item)),
-           "Ensure you use `defstruct` with :type, :effect, :level, :size, and :style."
-  end
-
-  feedback :item_generator do
-    items = get_answers()
-
-    assert is_list(items), "`items` should be a list."
-
-    expected_items = Utils.Solutions.item_generator()
-
-    expected_length = length(expected_items)
-
-    assert length(items) == expected_length,
-           "There should be #{expected_length} permutations of items."
-
-    Enum.each(items, fn item ->
-      assert is_struct(item), "Each item should be an `Item` struct."
-      assert match?(%{type: _, effect: _, style: _, size: _, level: _, __struct__: _}, item)
-    end)
-  end
-
   feedback :item_generator_search do
     search = get_answers()
     items = [Utils.Factory.item(%{}), Utils.Factory.item()]
