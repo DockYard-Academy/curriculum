@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.AddGitSection do
   @moduledoc "The add git section mix task: `mix help add_git_section`"
   @shortdoc "Adds git commit section to files"
-  
+
   use Mix.Task
 
   @ignore_reading_files [
@@ -37,11 +37,11 @@ defmodule Mix.Tasks.AddGitSection do
 
   defp commit_snippet(commit_message) do
     """
-
+    
     ## Commit Your Progress
-
+    
     Run the following in your command line from the project folder to track and save your progress in a Git commit.
-
+    
     ```
     $ git add .
     $ git commit -m "#{commit_message}"
