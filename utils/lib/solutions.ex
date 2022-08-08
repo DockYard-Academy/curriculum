@@ -121,40 +121,6 @@ defmodule Utils.Solutions do
     "Hi, Peter."
   end
 
-  defmodule BottlesOfSoda do
-    def singular(container) do
-      String.slice(container, 0..(String.length(container) - 2))
-    end
-
-    def verse(2, beverage, container) do
-      "2 #{container} of #{beverage} on the wall.\n2 #{container} of #{beverage}.\nTake one down, pass it around.\n1 #{singular(container)} of #{beverage} on the wall."
-    end
-
-    def verse(1, beverage, container) do
-      "1 #{singular(container)} of #{beverage} on the wall.\n1 #{singular(container)} of #{beverage}.\nTake one down, pass it around.\n0 #{container} of #{beverage} on the wall."
-    end
-
-    def verse(0, beverage, container) do
-      "No more #{container} of #{beverage} on the wall, no more #{container} of #{beverage}.\nGo to the store and buy some more, 99 #{container} of #{beverage} on the wall."
-    end
-
-    def verse(line, beverage, container) do
-      "#{line} #{container} of #{beverage} on the wall.\n#{line} #{container} of #{beverage}.\nTake one down, pass it around.\n#{line - 1} #{container} of #{beverage} on the wall."
-    end
-
-    def on_the_wall(range \\ 99..0, beverage \\ "soda", container \\ "bottles") do
-      Enum.map(range, fn line -> verse(line, beverage, container) end)
-    end
-  end
-
-  def bottles_of_soda do
-    BottlesOfSoda
-  end
-
-  def bottles_of_blank do
-    BottlesOfSoda
-  end
-
   defmodule Search do
     def all_items(items, filters) do
       inclusive = Keyword.get(filters, :inclusive)
@@ -183,41 +149,6 @@ defmodule Utils.Solutions do
     Search
   end
 
-  defmodule CustomEnum do
-    def map(collection, function) do
-      Enum.reduce(collection, [], fn each, acc ->
-        [function.(each) | acc]
-      end)
-      |> Enum.reverse()
-    end
-
-    def each(collection, function) do
-      Enum.reduce(collection, fn each, _acc ->
-        function.(each)
-        :ok
-      end)
-    end
-
-    def filter(collection, function) do
-      Enum.reduce(collection, [], fn each, acc ->
-        if function.(each) do
-          [each | acc]
-        else
-          acc
-        end
-      end)
-      |> Enum.reverse()
-    end
-
-    def sum(collection) do
-      Enum.reduce(collection, 0, fn each, acc -> acc + each end)
-    end
-  end
-
-  def custom_enum do
-    CustomEnum
-  end
-
   defmodule VoterTally do
     def tally(votes) do
       Enum.reduce(votes, %{}, fn
@@ -236,40 +167,6 @@ defmodule Utils.Solutions do
 
   def voter_power do
     VoterTally
-  end
-
-  defmodule Measurements do
-    defp make_pairs(list) do
-      list
-      |> Enum.chunk_every(2, 1, :discard)
-    end
-
-    def increased(measurements) do
-      measurements
-      |> make_pairs
-      |> Enum.count(fn [a, b] -> b > a end)
-    end
-
-    def increased_by(measurements) do
-      measurements
-      |> increments
-      |> Enum.filter(fn inc -> inc > 0 end)
-      |> Enum.sum()
-    end
-
-    def increments(measurements) do
-      measurements
-      |> make_pairs
-      |> Enum.map(fn [a, b] -> b - a end)
-    end
-
-    def average(measurements) do
-      Enum.sum(measurements) / length(measurements)
-    end
-  end
-
-  def measurements do
-    Measurements
   end
 
   def keyword_list_hero do
