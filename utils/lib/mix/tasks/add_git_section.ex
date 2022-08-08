@@ -37,11 +37,11 @@ defmodule Mix.Tasks.AddGitSection do
 
   defp commit_snippet(commit_message) do
     """
-    
+
     ## Commit Your Progress
-    
+
     Run the following in your command line from the project folder to track and save your progress in a Git commit.
-    
+
     ```
     $ git add .
     $ git commit -m "#{commit_message}"
