@@ -53,13 +53,68 @@ Go to the store and buy some more, 99 bottles of soda on the wall."
 ]
 ```
 
+<!-- livebook:{"attrs":{"assertions":"defmodule Solutions.BottlesOfSoda do\n  def on_the_wall do\n    Enum.to_list(99..0)\n    |> Enum.map(&sentence/1)\n  end\n\n  defp container(1), do: \"bottle\"\n  defp container(_n), do: \"bottles\"\n\n  defp sentence(0) do\n    \"No more bottles of soda on the wall, no more bottles of soda.\\nGo to the store and buy some more, 99 bottles of soda on the wall.\"\n  end\n\n  defp sentence(n) when n > 0 do\n    \"#{n} #{container(n)} of soda on the wall.\\n#{n} #{container(n)} of soda.\\nTake one down, pass it around.\\n#{n - 1} #{container(n - 1)} of soda on the wall.\"\n  end\nend\n\nresult = BottlesOfSoda.on_the_wall()\nassert result, \"Implement the `on_the_wall/0` function.\"\nassert is_list(result), \"`on_the_wall/0` should return a list.\"\n\nassert Enum.at(result, 0) ==\n          \"99 bottles of soda on the wall.\\n99 bottles of soda.\\nTake one down, pass it around.\\n98 bottles of soda on the wall.\"\n\nassert length(result) == 100, \"There should be 100 total verses.\"\n\nassert Enum.at(result, 97) ==\n          \"2 bottles of soda on the wall.\\n2 bottles of soda.\\nTake one down, pass it around.\\n1 bottle of soda on the wall.\"\n\nassert Enum.at(result, 98) ==\n          \"1 bottle of soda on the wall.\\n1 bottle of soda.\\nTake one down, pass it around.\\n0 bottles of soda on the wall.\"\n\nassert Enum.at(result, 99) ==\n          \"No more bottles of soda on the wall, no more bottles of soda.\\nGo to the store and buy some more, 99 bottles of soda on the wall.\"\n\nassert result == Utils.Solutions.BottlesOfSoda.on_the_wall()","code":"defmodule BottlesOfSoda do\r\n  def on_the_wall do\r\n  end\r\nend","solution":"defmodule BottlesOfSoda do\n  def on_the_wall do\n    Enum.to_list(99..0)\n    |> Enum.map(&sentence/1)\n  end\n\n  defp container(1), do: \"bottle\"\n  defp container(_n), do: \"bottles\"\n\n  defp sentence(0) do\n    \"No more bottles of soda on the wall, no more bottles of soda.\\nGo to the store and buy some more, 99 bottles of soda on the wall.\"\n  end\n\n  defp sentence(n) when n > 0 do\n    \"#{n} #{container(n)} of soda on the wall.\\n#{n} #{container(n)} of soda.\\nTake one down, pass it around.\\n#{n - 1} #{container(n - 1)} of soda on the wall.\"\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule BottlesOfSoda do
+      def on_the_wall do
+      end
+    end
+
+    defmodule Solutions.BottlesOfSoda do
+      def on_the_wall do
+        Enum.to_list(99..0)
+        |> Enum.map(&sentence/1)
+      end
+
+      defp container(1), do: "bottle"
+      defp container(_n), do: "bottles"
+
+      defp sentence(0) do
+        "No more bottles of soda on the wall, no more bottles of soda.\nGo to the store and buy some more, 99 bottles of soda on the wall."
+      end
+
+      defp sentence(n) when n > 0 do
+        "#{n} #{container(n)} of soda on the wall.\n#{n} #{container(n)} of soda.\nTake one down, pass it around.\n#{n - 1} #{container(n - 1)} of soda on the wall."
+      end
+    end
+
+    result = BottlesOfSoda.on_the_wall()
+    assert result, "Implement the `on_the_wall/0` function."
+    assert is_list(result), "`on_the_wall/0` should return a list."
+
+    assert Enum.at(result, 0) ==
+             "99 bottles of soda on the wall.\n99 bottles of soda.\nTake one down, pass it around.\n98 bottles of soda on the wall."
+
+    assert length(result) == 100, "There should be 100 total verses."
+
+    assert Enum.at(result, 97) ==
+             "2 bottles of soda on the wall.\n2 bottles of soda.\nTake one down, pass it around.\n1 bottle of soda on the wall."
+
+    assert Enum.at(result, 98) ==
+             "1 bottle of soda on the wall.\n1 bottle of soda.\nTake one down, pass it around.\n0 bottles of soda on the wall."
+
+    assert Enum.at(result, 99) ==
+             "No more bottles of soda on the wall, no more bottles of soda.\nGo to the store and buy some more, 99 bottles of soda on the wall."
+
+    assert result == Utils.Solutions.BottlesOfSoda.on_the_wall()
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 defmodule BottlesOfSoda do
   def on_the_wall do
   end
 end
-
-Utils.feedback(:bottles_of_soda, BottlesOfSoda)
 ```
 
 ## (Bonus) Bottles of ???
@@ -102,13 +157,50 @@ You can assume any container will be provided in it's plural form so a `"can"` w
 be passed into the function as `"cans"`. You only need to worry about containers whose plural form
 ends in an `s`.
 
+<!-- livebook:{"attrs":{"assertions":"result = BottlesOfBlank.on_the_wall(50..0, \"pop\", \"cans\")\n\nassert result, \"Implement the `on_the_wall/3` function.\"\n\nassert is_list(result), \"`on_the_wall/3` should return a list.\"\n\nassert Enum.at(result, 0) ==\n          \"50 cans of pop on the wall.\\n50 cans of pop.\\nTake one down, pass it around.\\n49 cans of pop on the wall.\"\n\nassert length(result) == 51, \"There should be 51 total verses.\"\n\nassert Enum.at(result, 48) ==\n          \"2 cans of pop on the wall.\\n2 cans of pop.\\nTake one down, pass it around.\\n1 can of pop on the wall.\"\n\nassert Enum.at(result, 49) ==\n          \"1 can of pop on the wall.\\n1 can of pop.\\nTake one down, pass it around.\\n0 cans of pop on the wall.\"\n\nassert Enum.at(result, 50) ==\n          \"No more cans of pop on the wall, no more cans of pop.\\nGo to the store and buy some more, 99 cans of pop on the wall.\"","code":"defmodule BottlesOfBlank do\r\n  def on_the_wall(range, beverage, container) do\r\n  end\r\nend","solution":"defmodule BottlesOfBlank do\n  def on_the_wall(range, beverage, container) do\n    Enum.to_list(range)\n    |> Enum.map(fn x -> sentence(x, beverage, container) end)\n  end\n\n  defp container(1, container), do: String.slice(container, 0..-2)\n  defp container(_n, container), do: container\n\n  defp sentence(0, beverage, container) do\n    \"No more #{container} of #{beverage} on the wall, no more #{container} of #{beverage}.\\nGo to the store and buy some more, 99 #{container} of #{beverage} on the wall.\"\n  end\n\n  defp sentence(n, beverage, container) when n > 0 do\n    \"#{n} #{container(n, container)} of #{beverage} on the wall.\\n#{n} #{container(n, container)} of #{beverage}.\\nTake one down, pass it around.\\n#{n - 1} #{container(n - 1, container)} of #{beverage} on the wall.\"\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule BottlesOfBlank do
+      def on_the_wall(range, beverage, container) do
+      end
+    end
+
+    result = BottlesOfBlank.on_the_wall(50..0, "pop", "cans")
+
+    assert result, "Implement the `on_the_wall/3` function."
+
+    assert is_list(result), "`on_the_wall/3` should return a list."
+
+    assert Enum.at(result, 0) ==
+             "50 cans of pop on the wall.\n50 cans of pop.\nTake one down, pass it around.\n49 cans of pop on the wall."
+
+    assert length(result) == 51, "There should be 51 total verses."
+
+    assert Enum.at(result, 48) ==
+             "2 cans of pop on the wall.\n2 cans of pop.\nTake one down, pass it around.\n1 can of pop on the wall."
+
+    assert Enum.at(result, 49) ==
+             "1 can of pop on the wall.\n1 can of pop.\nTake one down, pass it around.\n0 cans of pop on the wall."
+
+    assert Enum.at(result, 50) ==
+             "No more cans of pop on the wall, no more cans of pop.\nGo to the store and buy some more, 99 cans of pop on the wall."
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
 defmodule BottlesOfBlank do
   def on_the_wall(range, beverage, container) do
   end
 end
-
-Utils.feedback(:bottles_of_blank, BottlesOfBlank)
 ```
 
 ## Commit Your Progress
