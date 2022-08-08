@@ -31,7 +31,7 @@ We implement authorization in our applications to ensure only authorized clients
 
 Failure to implement authorization properly can lead to severe repercussions. We can expose confidential information and leave our users vulnerable to harmful attacks.
 
-To learn about authorization, we're going to create a diary application. A diary is a private journal. Each user will have private diary entries that other users should not be able access.
+To learn about authorization, we're going to create a diary application. A diary is a private journal. Each user will have private diary entries that other users should not be able to access.
 
 ```mermaid
 classDiagram
@@ -53,6 +53,12 @@ Create a new phoenix diary project.
 
 ```
 $ mix phx.new diary
+```
+
+Change directory into the project.
+
+```
+$ cd diary
 ```
 
 Install dependencies.
@@ -207,7 +213,7 @@ Notice there are now register and log-in links which we can find in the  `lib/di
 
 <!-- livebook:{"break_markdown":true} -->
 
-When we click the register button, the application directs us to http://localhost:4000/users/register.
+When we click the register link, the application directs us to http://localhost:4000/users/register.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -243,7 +249,7 @@ R --> C --> V --> T
 
 <!-- livebook:{"break_markdown":true} -->
 
-Submit the form with any email (real or fake such as `test@test.com`) and any valid password such as `supersecretpassword`. We should never re-use personal passwords, particularly during development where they may not be private.
+Submit the form with any email (real or fake such as `test@example.com`) and any valid password such as `supersecretpassword`. We should never re-use personal passwords, particularly during development where they may not be private.
 
 This form triggers an HTTP POST request to `"/users/registration"` to create a new user.
 
@@ -750,7 +756,7 @@ scope "/entries", DiaryWeb do
 end
 ```
 
-Client can only perform entry-related actions after they've logged in.
+Clients can only perform entry-related actions after they've logged in.
 
 By default, `mix phx.gen.html` generates tests for the context and the controller.
 
@@ -787,11 +793,11 @@ Now run `mix test` again, and all tests should pass.
 
 ### Create Diary Entries
 
-While logged in, we can visit http://localhost:4000/new to create a diary entry.
+While logged in, we can visit http://localhost:4000/entries/new to create a diary entry.
 
 Currently, created entries are not associated with a user. We have an authorization issue where users can view and modify other users' diary entries.
 
-To resolve this issue, we need to associate users with an entry upon creation.
+To resolve this issue, we need to associate entries with a user upon creation.
 
 Modify the `EntryController.create/2` function to include the user id in the `entry_params`.
 
@@ -847,6 +853,8 @@ Finally, create a new `Entries.list_entries/1` function to accept the `user_id` 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# lib/diary/entries.ex
+
 def list_entries(user_id) do
   Entry
   |> where([e], e.user_id == ^user_id)
@@ -854,7 +862,7 @@ def list_entries(user_id) do
 end
 ```
 
-Now when we visit http://localhost:4000, we'll only see entries created by the current user. Try creating an entry, sign out, create a new account with a different email, and notice there are no visible entries, because none belong to the current user.
+Now when we visit http://localhost:4000/entries, we'll only see entries created by the current user. Try creating an entry, sign out, create a new account with a different email, and notice there are no visible entries, because none belong to the current user.
 
 ## Custom Authorization Plug
 
@@ -1004,10 +1012,8 @@ end
 
 To fix these tests, we need to ensure the created entry belongs to a user, and that the user is logged in.
 
-The `Diary.AccountsFixture` provides a `user_fixture/1` function for creating users, and a `log_in_user/2` function for logging in users.
-
-Import the `Diary.AccountsFixture` to get access to these functions in our tests.
-It's conventional for imports to be grouped together, so put the import with out other `Diary.EntriesFixture`.
+The `Diary.AccountsFixture` module provides a `user_fixture/1` function for creating users. Import the module to get access to this function in our tests.
+It's conventional for imports to be grouped together, so add the new import statement below the existing `import Diary.EntriesFixture` statement.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1018,7 +1024,7 @@ import Diary.EntriesFixtures
 import Diary.AccountsFixtures
 ```
 
-Now remove all instances of `setup [:create_entry]`. We can also remove the private `create_entry/1` function since it's no longer used.
+Now remove all instances of `setup [:create_entry]` from the `EntryControllerTest` module. Also remove `entry: entry` from the map passed to each test that was making use of `setup [:create_entry]`. We can also remove the private `create_entry/1` function since it's no longer used.
 
 Then put the following in each failing test to create a user, associate it with the created entry, and log the user in.
 
@@ -1119,6 +1125,7 @@ defmodule DiaryWeb.EntryControllerTest do
       user = user_fixture()
       entry = entry_fixture(user_id: user.id)
       conn = log_in_user(conn, user)
+
       conn = delete(conn, Routes.entry_path(conn, :delete, entry))
       assert redirected_to(conn) == Routes.entry_path(conn, :index)
 
@@ -1137,7 +1144,7 @@ Run `mix test` and all tests should pass.
 We've provided an overview of basic route-based and ownership-based authentication.
 However, authorization is a massive topic far beyond the scope of this course.
 
-There is no single authorization solution, and the authorization implementation depends on the application's needs. Therefore, always consider who should be able to access application resources and how to protect them effectively.
+There is no single authorization solution, and an effective authorization implementation depends on the application's needs. Therefore, always consider who should be able to access application resources and how to protect them effectively.
 
 Consider the following resources as you continue to learn more about authorization.
 
