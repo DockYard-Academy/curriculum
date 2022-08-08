@@ -1808,7 +1808,7 @@ to the file.
 * [Save Game State](exercises/save_game_state.livemd)
 * * [User Form](exercises/user_form.livemd)
 * 
-* [Pokemon PC](exercises/pokemon_pc.livemd)
+* [Pokémon PC](exercises/pokemon_pc.livemd)
 
 ### How to install a utils folder!
 
@@ -2102,18 +2102,18 @@ end
 ```
 
 
-### Pokemon Simulator
+### Pokémon Simulator
 
 In the Elixir cell below, bring all of the prior functionality into a single
-`Pokemon` module.
+`Pokémon` module.
 
-* Define a `Pokemon` struct the same as before.
+* Define a `Pokémon` struct the same as before.
 * add the named functions `attack/2` and `battle/2`.
 * set `@charmander`, `@bulbasaur`, and `@squirtle` as module attributes.
-* create a `simulate/2` function that takes in two pokemon names as strings `"Bulbasaur"`, `"Squirtle"`, or `"Charmander"`.
-* make the pokemon `battle/2` each other three times. Ensure that you use the updated pokemon structs in the next battle.
-* if both pokemon still have health, return `"it's a draw"`
-* if one pokemon has less than 1 health, return `"#{pokemon.name} wins!"`
+* create a `simulate/2` function that takes in two Pokémon names as strings `"Bulbasaur"`, `"Squirtle"`, or `"Charmander"`.
+* make the Pokémon `battle/2` each other three times. Ensure that you use the updated Pokémon structs in the next battle.
+* if both Pokémon still have health, return `"it's a draw"`
+* if one Pokémon has less than 1 health, return `"#{Pokémon.name} wins!"`
 
 ```elixir
 
@@ -3411,7 +3411,7 @@ p {
 
 * Create a custom weather plug.
 * JSON API (with .json file)
-* Pokemon Search Site
+* Pokémon Search Site
 
 ## Logging in
 We never want to store confidential information on the client, such as their password, as it's a massive security risk, so instead 
