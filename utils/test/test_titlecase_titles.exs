@@ -20,7 +20,8 @@ defmodule MyTitleCaseTest do
       # get only headers in file
       header_list =
         Enum.filter(ast, fn
-          {tag, _, _, _} when is_binary(tag) -> String.match?(tag, ~r/h[1-6]/)
+          # only match h2's and on since h1's are notebook titles
+          {tag, _, _, _} when is_binary(tag) -> String.match?(tag, ~r/h[2-6]/)
           _ -> false
         end)
 
