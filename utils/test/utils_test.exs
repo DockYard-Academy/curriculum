@@ -86,7 +86,7 @@ defmodule UtilsTest do
     exercises = fetch_livebooks("../exercises/")
     reading = fetch_livebooks("../reading/")
 
-    assert file_contains?(~r/TestedCell.Control.show_editors/, exercises ++ reading) == false
+    refute file_contains?(~r/TestedCell\./, exercises ++ reading)
   end
 
   defp file_contains?(regex, livebooks) do
