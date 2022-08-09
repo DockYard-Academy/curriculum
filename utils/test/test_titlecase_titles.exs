@@ -5,9 +5,6 @@ defmodule MyTitleCaseTest do
   # Started from here: https://stackoverflow.com/a/40559914
 
   @one_word_title_titlecase_regex ~r/^[A-Z].*$/
-  @first_letter_cap_regex ~r/^[A-Z]/
-  @articles_conjunctions_prepositions "(a|an|and|but|for|in|of|on|or|the|with)"
-  @other_titlecase_ignored "(vs)"
 
   test "all titles should be in title case" do
     exercises = fetch_livebooks("../exercises/")
@@ -42,15 +39,6 @@ defmodule MyTitleCaseTest do
                    "[#{f}] expected: \"#{single_word}\" to be capitalized"
           end
         else
-          first_word = Enum.at(word_list, 0)
-
-          # check if the first word in the title is an article, conjunction or prepositions
-          # and if so, then it must capitalized
-          if String.match?(first_word, ~r/^#{@articles_conjunctions_prepositions}/) do
-            assert String.match?(first_word, @first_letter_cap_regex),
-                   "[#{f}] expected:\n\t\"#{first_word}\" in\n\t\"#{content}\" to be capitalized"
-          end
-
           is_line_titlecase =
             word_list
             # filter out punctuations , `#`'s, articles, conjunctions, prepositions, numbers
@@ -76,14 +64,12 @@ defmodule MyTitleCaseTest do
       &(!String.match?(
           &1,
           # ~r/
-          # method_names: increased/1, Stream.iterate/2, <start_link> |
+          # method_names: e.g. increased/1, Stream.iterate/2, <start_link> |
           # all punctuations |
-          # word-boundary articles, conjunctions, prepositions, numbers word-boundary |
-          # word-boundary any other words we want to exclude from titlecase checking word-boundary |
           # hashes |
-          # word-boundry numbers word-boundary
+          # word-boundary numbers word-boundary
           # /
-          ~r/.*\/[0-9]$|[!"#$%&'()*+,-.:;<=>?@[\]^_`{|}~]|\b#{@articles_conjunctions_prepositions}\b|\b#{@other_titlecase_ignored}\b|#+|\b[0-9]+\b/
+          ~r/.*\/[0-9]$|[!"#$%&'()*+,-.:;<=>?@[\]^_`{|}~]|#+|\b[0-9]+\b/
         ))
     )
   end
