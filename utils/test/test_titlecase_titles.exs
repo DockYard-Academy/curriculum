@@ -2,8 +2,6 @@ defmodule MyTitleCaseTest do
   use ExUnit.Case
   alias Livebook.LiveMarkdown.MarkdownHelpers
 
-  # Started from here: https://stackoverflow.com/a/40559914
-
   @one_word_title_titlecase_regex ~r/^[A-Z].*$/
 
   test "all titles should be in title case" do
@@ -12,7 +10,7 @@ defmodule MyTitleCaseTest do
 
     (exercises ++ reading)
     |> Enum.each(fn f ->
-      IO.puts("Checking #{f}")
+      # IO.puts("Checking #{f}")
 
       file_contents = File.read!(f)
       {_, ast, _} = MarkdownHelpers.markdown_to_block_ast(file_contents)
@@ -25,8 +23,8 @@ defmodule MyTitleCaseTest do
           _ -> false
         end)
 
-      # check each header for titlcase
-      Enum.each(header_list, fn {tag, _, [content], _} ->
+      # check each header for titlecase
+      Enum.each(header_list, fn {_tag, _, [content], _} ->
         # IO.puts("#{f} - #{content}")
 
         word_list = String.split(content)
@@ -35,6 +33,7 @@ defmodule MyTitleCaseTest do
         if length(word_list) == 1 do
           single_word = word_list |> filter_headline |> List.first()
 
+          # check for single word and is not symbol
           if is_binary(single_word) && !String.starts_with?(single_word, ":") do
             assert String.match?(single_word, @one_word_title_titlecase_regex),
                    "[#{f}] expected: \"#{single_word}\" to be capitalized"
