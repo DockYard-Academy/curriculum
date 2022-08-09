@@ -462,7 +462,7 @@ A race condition occurs when events of operations occur in an unexpected order.
 
 Below we have an `:ets` table, which stores a count. Two tasks read the current count and then increment it. We use `Process.sleep(100)` to simulate a time-consuming computation, then insert a new count.
 
-Synchronously, we would expect the count to increment twice to return two. But when these operations are concurrent, both tasks read the count when of zero, increment zero to one, then save the resulting count in the `:ets` table. As a result, the count is one rather than the expected value of two.
+If these tasks were synchronous, we would expect the count to increment twice and return two. However, when both of these operations are concurrent, both tasks read the count when it's zero, then increment the count to one. They then save the resulting count in the `:ets` table. As a result, the count is one rather than the expected value of two. This is a classic issue you'll often run into when working with concurrency.
 
 <!-- livebook:{"break_markdown":true} -->
 
