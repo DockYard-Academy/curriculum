@@ -25,8 +25,8 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Ecto
 
-Ecto is a library we typically use to communicate with a database. We'll learn more about databases in future lessons,
-but for now, we'll see how Ecto helps interact with data.
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a library we typically use to communicate with a database. We'll learn more about databases in future lessons,
+but for now, we'll see how Ecto helps to interact with data.
 
 In addition to being the layer that we use to communicate with the database,
 Ecto is powerful for validating data. So far, you've created structs with their own (limited) data validation.
@@ -68,7 +68,7 @@ Ecto helps us validate data with **changeset** structs.
 
 ## Changesets
 
-An `Ecto.Changeset` struct allows us to validate data and return helpful error messages when something is invalid.
+An [`Ecto.Changeset`](https://hexdocs.pm/ecto/Ecto.Changeset.html) struct allows us to validate data and return helpful error messages when something is invalid.
 
 A changeset describes the expected shape of your data and ensures that data conforms to the desired shape.
 
@@ -91,7 +91,7 @@ To create a changeset, we need to know.
 
 * the `initial_data`.
 * the expected data validation as `types`.
-* the attempted change (`params`).
+* the attempted change from `params`.
 * the keys of `params` to `cast/3` into data that conforms to the changeset.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -253,7 +253,7 @@ A blog should have:
 
 * A required `:title` string field.
 * A required `:body` string field.
-* A list of tags no larger than 5.
+* A list of tags no more than 5.
 
 ## Schemaless Changesets
 
@@ -318,16 +318,25 @@ end
 ### Your Turn
 
 In the Elixir cell below, create a `Book` schemaless changeset struct.
-A blog should have:
+A book should have:
 
 * A required `:title` field with a minimum of 3 characters and a maximum of 100 characters.
-* A required `:published_status` field that is either `true` or `false`
+* A required `:published_status` field that is either `true` or `false`.
 * A `:body` string field.
-* A `published_on` date field.
+* A `:published_on` date field.
 * An `:author` string field.
 * An `:is_licenced` field which must always be true.
 
 ```elixir
 defmodule Blog do
 end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the project folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish ecto changesets section"
 ```

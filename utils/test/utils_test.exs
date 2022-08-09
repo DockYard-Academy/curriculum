@@ -77,32 +77,23 @@ defmodule UtilsTest do
     exercises = fetch_livebooks("../exercises/")
     reading = fetch_livebooks("../reading/")
 
-    assert any_invalid_links?(~r/\]\(.*exercises\/\w+.livemd\)/, exercises) == false
-    assert any_invalid_links?(~r/\]\(.*reading\/\w+.livemd\)/, reading) == false
-    assert any_invalid_links?(~r/\]\(\)/, exercises ++ reading) == false
-  end
-
-  defp any_invalid_links?(regex, livebooks) do
-    livebooks
-    |> Stream.map(fn file ->
-      File.stream!(file, [], :line)
-      |> Enum.any?(&Regex.match?(regex, &1))
-    end)
-    |> Enum.any?()
+    assert file_contains?(~r/\]\(.*exercises\/\w+.livemd\)/, exercises) == false
+    assert file_contains?(~r/\]\(.*reading\/\w+.livemd\)/, reading) == false
+    assert file_contains?(~r/\]\(\)/, exercises ++ reading) == false
   end
 
   test "Teacher-only editors are hidden" do
     exercises = fetch_livebooks("../exercises/")
     reading = fetch_livebooks("../reading/")
 
-    assert any_show_editors?(exercises ++ reading) == false
+    refute file_contains?(~r/TestedCell\./, exercises ++ reading)
   end
 
-  defp any_show_editors?(livebooks) do
+  defp file_contains?(regex, livebooks) do
     livebooks
     |> Stream.map(fn file ->
       File.stream!(file, [], :line)
-      |> Enum.any?(&String.contains?(&1, "TestedCell.Control.show_editors()"))
+      |> Enum.any?(&Regex.match?(regex, &1))
     end)
     |> Enum.any?()
   end

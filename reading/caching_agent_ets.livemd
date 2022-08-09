@@ -262,8 +262,10 @@ end
 
 ### Further Reading
 
-For more on Agents, you can read the [Elixir Lang Guide](https://elixir-lang.org/getting-started/mix-otp/agent.html)
-and the [Agent HexDocs](https://hexdocs.pm/elixir/Agent.html).
+For more on Agents, consider reading:
+
+* The [Elixir Lang Guide](https://elixir-lang.org/getting-started/mix-otp/agent.html)
+* The [Agent HexDocs](https://hexdocs.pm/elixir/Agent.html)
 
 ## Erlang Term Storage (ETS)
 
@@ -290,7 +292,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Livebook let's use view the `:ets` process as a table. Let's start a new `:ets` table called
+Livebook allows us to view the `:ets` process as a table. Let's start a new `:ets` table called
 `:example_table`.
 
 ```elixir
@@ -460,7 +462,7 @@ A race condition occurs when events of operations occur in an unexpected order.
 
 Below we have an `:ets` table, which stores a count. Two tasks read the current count and then increment it. We use `Process.sleep(100)` to simulate a time-consuming computation, then insert a new count.
 
-Synchronously, we would expect the count to increment twice to return two. But when these operations are concurrent, both tasks read the count when of zero, increment zero to one, then save the resulting count in the :ets table. As a result, the count is one rather than the expected value of two.
+If these tasks were synchronous, we would expect the count to increment twice and return two. However, when both of these operations are concurrent, both tasks read the count when it's zero, then increment the count to one. They then save the resulting count in the `:ets` table. As a result, the count is one rather than the expected value of two. This is a classic issue you'll often run into when working with concurrency.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -516,3 +518,12 @@ For more information, consider reading:
 
 * The ETS lesson by [Elixir Schools](https://elixirschool.com/en/lessons/storage/ets).
 * The ETS [Elixir Lang Guide](https://elixir-lang.org/getting-started/mix-otp/ets.html).
+
+## Commit Your Progress
+
+Run the following in your command line from the project folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish caching agent ets section"
+```
