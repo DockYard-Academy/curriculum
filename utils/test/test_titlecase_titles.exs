@@ -10,8 +10,6 @@ defmodule MyTitleCaseTest do
 
     (exercises ++ reading)
     |> Enum.each(fn f ->
-      # IO.puts("Checking #{f}")
-
       file_contents = File.read!(f)
       {_, ast, _} = MarkdownHelpers.markdown_to_block_ast(file_contents)
 
@@ -25,8 +23,6 @@ defmodule MyTitleCaseTest do
 
       # check each header for titlecase
       Enum.each(header_list, fn {_tag, _, [content], _} ->
-        # IO.puts("#{f} - #{content}")
-
         word_list = String.split(content)
 
         # if header is only one word, check that it's capitalized
