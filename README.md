@@ -14,6 +14,40 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
 
 ## QuickStart
 
+The recommended installation methods for this course below are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install a different version of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
+
+MacOS
+
+Windows
+
+Windows+WSL (Ubuntu)
+
+Linux (Ubuntu)
+
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+
+2. Install Erlang and Elixir
+      - Add the Erlang Solutions repository
+         - `wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && sudo dpkg -i erlang-solutions_2.0_all.deb`
+      - Update the package repository list
+         - `sudo apt-get update`
+      - Install Erlang
+         - `sudo apt-get install esl-erlang`
+      - Install Elixir
+         - `sudo apt-get install elixir`
+
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript.install github livebook-dev/livebook`
+
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
+
+If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
+ensure your Livebook version is correct.
+
+<!-- ## QuickStart
+
 1. Clone the project `git clone <URL>`.
 
 2. Install a compatible [Elixir and Erlang](https://elixir-lang.org/install.html) version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
@@ -33,7 +67,7 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
    ```
 
 If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
-ensure your Livebook version is correct.
+ensure your Livebook version is correct. -->
 
 ## Troubleshooting
 
