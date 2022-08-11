@@ -1,0 +1,731 @@
+# Book Search: Book Content
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "#{__DIR__}/../utils"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+We're going to add book content to books in our book_search application.
+
+`BookContent` will represent the contents of the book. It will have a `:summary` field
+with a text summary of the book, and a `:content` field will the full text contents of the book.
+
+```mermaid
+classDiagram
+  class BookContent {
+    book_id: :id
+    summary: :text
+    content: :text
+  }
+```
+
+Each `BookContent` record will **belong to** a `Book`. And each `Book` will **has one/have one** book.
+`Book`s and `BookContent` have a **one-to-one** relationship with eachother.
+
+`BookContent` can hold a large amount of data, so we've chosen to put `BookContent` into a separate table to avoid loading too much data with each `Book`.
+Alternatively we could have simply added the `:content` and `:summary` fields to `Book`, but this could easily result in performance issues.
+
+Arguably, we could still encounter performance issues by storing an entire book in a single text field, however we're not
+going to address that optimization as it's beyond the scope of this lesson.
+
+To model one-to-one relationships in a Database we store a foreign key in one table to the other.
+Typically one-to-one relationships have a parent and a child entity. One entity belongs to the other.
+The foreign key relationship is stored on the child entity that belongs to the parent.
+
+`Book` owns `BookContent`, so `BookContent` stores a foreign key to the `Book` that it belongs to.
+
+### books table
+
+| id  | name                         |
+| --- | ---------------------------- |
+| 123 | "We are Legend (We are Bob)" |
+
+### book_contents table
+
+| id  | book_id | content                                                                      |
+| --- | ------- | ---------------------------------------------------------------------------- |
+| 456 | 123     | ...but as for me, I am tormented with an everlasting itch for things remote. |
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  direction RL
+  class Book {
+    title: :string
+  }
+
+  class BookContent {
+    book_id: :id
+    content: :text
+  }
+
+  BookContent "1" --> "1" Book :belongs_to
+```
+
+## Run Book Search Project
+
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/BrooklinJazz/book_search/tree/tags) project on the `tags` branch.
+
+All tests should pass.
+
+```
+$ mix test
+```
+
+Start the server from the `book_search` project folder.
+
+```
+$ mix phx.server
+```
+
+## Books Contents Migration
+
+We aren't going to use the Phoenix generators to create the book content resource because book content is going to be very closely tied to the existing book resource.
+
+We need to create a book contents table, so let's generate a new migration.
+
+```
+$ mix ecto.gen.migration create_book_contents
+```
+
+In the generated migration, create the `book_contents` table with the `:content` field and a reference to the `books` table. Both fields should be required, so we'll add `null: false`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# priv/repo/migrations/_create_book_contents.exs
+
+defmodule BookSearch.Repo.Migrations.CreateBookContents do
+  use Ecto.Migration
+
+  def change do
+    create table(:book_contents) do
+      add :content, :text, null: false
+      add :book_id, references(:books, on_delete: :delete_all), null: false
+
+      timestamps()
+    end
+
+    create index(:book_contents, [:book_id])
+  end
+end
+```
+
+Run the migration.
+
+```sh
+$ mix ecto.migrate
+```
+
+## Book Contents Schema
+
+Now add a schema file `lib/book_search/books/book_content.ex` to match our previous migration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books/book_content.ex
+
+defmodule BookSearch.Books.BookContents do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "book_contents" do
+    field :content, :string
+    belongs_to :book, BookSearch.Books.Book
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:content])
+    |> validate_required([:content])
+  end
+end
+```
+
+## Book Schema
+
+We'll use [has_one/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_one/3) to define the relationship between books and book contents.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books/book.ex
+
+defmodule BookSearch.Books.Book do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "books" do
+    field(:title, :string)
+    belongs_to(:author, BookSearch.Authors.Author)
+    many_to_many(:tags, BookSearch.Tags.Tag, join_through: "book_tags", on_replace: :delete)
+    has_one(:book_contents, BookSearch.Books.BookContents)
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:title])
+    |> validate_required([:title])
+  end
+end
+```
+
+## Create Book Content
+
+We want to create the associated book contents whenever we create a book. Let's start with a test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_book/1 with book content creates a book with book content" do
+  author = author_fixture()
+  valid_attrs = %{title: "some title", author: author, book_contents: %{content: "some content"}}
+
+  assert {:ok, %Book{} = book} = Books.create_book(valid_attrs)
+  assert book.title == "some title"
+  assert book.book_contents.content == "some content"
+end
+```
+
+We can use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create associations from parameters. [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful when you want to manage associations with external data, such as parameters coming from a form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+
+  author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Ecto.Changeset.cast_assoc(:book_contents)
+  |> Repo.insert()
+end
+```
+
+We may need to run migrations in our test environment.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ MIX_ENV=test mix ecto.migrate
+```
+
+All tests should pass.
+
+```
+$ mix test
+66 tests, 0 failures
+```
+
+## Update Book Content
+
+We need want to be able to update the associated book contents, so let's write our test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update_book/2 with book content" do
+  author = author_fixture()
+  book = book_fixture(author: author, book_contents: %{content: "some content"})
+
+  update_attrs = %{
+    title: "Name of the Wind",
+    book_contents: %{content: "some updated content"}
+  }
+
+  assert {:ok, %Book{} = book} = Books.update_book(book, update_attrs)
+  assert book.title == "Name of the Wind"
+  assert book.book_contents.content == "some updated content"
+end
+```
+
+This test fails because we do not update book contents.
+
+```
+test books update_book/2 with book content (BookSearch.BooksTest)
+     test/book_search/books_test.exs:72
+     Assertion with == failed
+     code:  assert book.book_contents.content == "some updated content"
+     left:  "some content"
+     right: "some updated content"
+```
+
+Make it pass by casting the association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+def update_book(%Book{} = book, attrs) do
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+
+  book
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Ecto.Changeset.cast_assoc(:book_contents)
+  |> Repo.update()
+end
+```
+
+For the sake of completeness, let's make a test for the controller aswell that will already pass. Add this test inside of the existing `"update book"` describe block.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs
+
+test "with book content", %{conn: conn, book: book} do
+  tag = tag_fixture(name: "Fantasy")
+  update_attrs = %{title: "Name of the Wind", }
+
+  conn =
+    put(conn, Routes.author_book_path(conn, :update, book.author_id, book), book: update_attrs)
+
+  assert redirected_to(conn) == Routes.author_book_path(conn, :show, book.author_id, book)
+  conn = get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
+  
+  assert html_response(conn, 200) =~ tag.name
+end
+```
+
+## Managing Associations
+
+So far we've seen three different functions for managing associations.
+
+* [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4)
+* [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3)
+* [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+
+Let's take a moment to consider the differences.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### put_assoc/4
+
+Puts the given association as a change in the changeset.
+
+```mermaid
+flowchart LR
+Record --> Association
+```
+
+It allows you to add, remove, or change all associatiated records at once.
+
+**Example Return Value**:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#Ecto.Changeset<
+  action: nil,
+  changes: %{
+    tags: [
+      #Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: #BookSearch.Tags.Tag<>, valid?: true>,
+      #Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: #BookSearch.Tags.Tag<>, valid?: true>
+    ],
+    title: "some title"
+  },
+  errors: [],
+  data: #BookSearch.Books.Book<>,
+  valid?: true
+>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### build_assoc/3
+
+Builds a struct from the given association. Often used when we want to work with the child association of an existing parent record such as `author` and `book`. It returns a child struct with the foreign key to the parent record, such as `author_id`.
+
+```mermaid
+flowchart LR
+Parent --> Child
+```
+
+**Example Return Value**:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%BookSearch.Books.Book{
+  __meta__: #Ecto.Schema.Metadata<:built, "books">,
+  author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+  author_id: 603,
+  book_contents: #Ecto.Association.NotLoaded<association :book_contents is not loaded>,
+  id: nil,
+  inserted_at: nil,
+  tags: #Ecto.Association.NotLoaded<association :tags is not loaded>,
+  title: nil,
+  updated_at: nil
+}
+```
+
+Keep in mind, for our example book search application we've chosen to use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) for the sake of demonstration, however we could have used [put_assoc/4](https://hexdocs.pm/ecto/Ecto.html#put_assoc/4) instead.
+
+For example, you can replace `create_book/1` with the following and all tests continue to pass.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+
+  %Book{}
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Ecto.Changeset.put_assoc(:author, author)
+  |> Ecto.Changeset.cast_assoc(:book_contents)
+  |> Repo.insert()
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### cast_assoc/3
+
+> Casts the given association with the changeset parameters.
+> This function should be used when working with the entire association at once (and not a single element of a many-style association) and receiving data external to the application.
+> 
+> * [cast_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+
+We use [cast_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) when we want to use parameters to create our association. This is often useful for external data such as the parameters we recieve from a form.
+
+```mermaid
+flowchart LR
+Params --> Association
+```
+
+**Example Return Value**:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#Ecto.Changeset<
+  action: nil,
+  changes: %{
+    book_contents: #Ecto.Changeset<
+      action: :insert,
+      changes: %{content: "some content"},
+      errors: [],
+      data: #BookSearch.Books.BookContents<>,
+      valid?: true
+    >,
+    tags: [],
+    title: "some title"
+  },
+  errors: [],
+  data: #BookSearch.Books.Book<>,
+  valid?: true
+>
+```
+
+## Book Contents Form Input
+
+We've already mentioned that [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is useful for params from a form, so let's add book contents to our existing book form.
+
+We can use [inputs_for/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#inputs_for/4) to create inputs for an association.
+
+Modify the book form template file to include an input for book contents.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :title %>
+  <%= text_input f, :title %>
+  <%= error_tag f, :title %>
+
+  <%= label f, :tags %>
+  <%= multiple_select f, :tags, tag_options(), selected: if assigns[:book], do: Enum.map(@book.tags, fn book -> book.id end), else: [] %>
+  <%= error_tag f, :tags %>
+
+  <%= inputs_for f, :book_contents, fn i -> %>
+    <%= label i, :content %>
+    <%= text_input i, :content %>
+  <% end %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>
+```
+
+We need to preload the book contents association otherwise this form will crash. Notice we have some failing tests.
+
+```sh
+$ mix test
+...
+)test edit book renders form for editing chosen book (BookSearchWeb.BookControllerTest)
+     test/book_search_web/controllers/book_controller_test.exs:101
+     ** (ArgumentError) using inputs_for for association `book_contents` from `BookSearch.Books.Book` but it was not loaded. Please preload your associations before using them in inputs_for
+...
+2) test update book renders errors when data is invalid (BookSearchWeb.BookControllerTest)
+     test/book_search_web/controllers/book_controller_test.exs:135
+     ** (ArgumentError) using inputs_for for association `book_contents` from `BookSearch.Books.Book` but it was not loaded. Please preload your associations before using them in inputs_for
+...
+```
+
+Preload the `:book_contents`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def get_book!(id), do: Book |> preload([:tags, :book_contents]) |> Repo.get!(id)
+```
+
+Now all tests should pass.
+
+```
+$ mix test
+...
+65 tests, 0 failures
+```
+
+We can view our new book contents field when we visit http://localhost:4000/authors/1/books/new.
+
+Now that we have a form, ket's a test to ensure we can send the book contents in our `BookController.create/2` action, and that we display the book contents on the book show page. Put the following test inside of the existing `"create book"` describe block.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs
+
+test "with book content", %{conn: conn} do
+  author = author_fixture()
+  create_attrs = %{title: "some title", tags: [], book_contents: %{content: "some content"}}
+  conn = post(conn, Routes.author_book_path(conn, :create, author), book: create_attrs)
+
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == Routes.author_book_path(conn, :show, author, id)
+
+  conn = get(conn, Routes.author_book_path(conn, :show, author, id))
+  assert html_response(conn, 200) =~ "some content"
+end
+```
+
+Add book contents to the book show page. We haven't enforced that a book must have book contents, so we'll make sure book contents exists before displaying them.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Show Book</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @book.title %>
+  </li>
+  <li>
+    <strong>Tags:</strong>
+    <%= for tag <- @book.tags do %>
+      <%= tag.name %>
+    <% end %>
+  </li>
+
+  <%= if @book.book_contents do %> 
+    <li>
+      <strong>Content:</strong>
+      <%= @book.book_contents.content %>
+    </li>
+  <% end %>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, @author_id, @book) %></span> |
+<span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
+```
+
+All tests should pass!
+
+```
+$ mix test
+...
+67 tests, 0 failures
+```
+
+## Update Book
+
+We'll also want to update book content when we update a book. Let's write a test to ensure we can update the book content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update_book/2 with book content" do
+  author = author_fixture()
+  book = book_fixture(author: author, book_contents: %{content: "some content"})
+
+  update_attrs = %{
+    title: "Name of the Wind",
+    book_contents: %{content: "some updated content"}
+  }
+
+  assert {:ok, %Book{} = book} = Books.update_book(book, update_attrs)
+  assert book.title == "Name of the Wind"
+  assert book.book_contents.content == "some updated content"
+end
+```
+
+Now we need to create the `:book_contents` association using [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def update_book(%Book{} = book, attrs) do
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+  {content, attrs} = Map.pop(attrs, :content, "")
+
+  book
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Ecto.Changeset.put_assoc(:book_contents, %{content: content})
+  |> Repo.update()
+end
+```
+
+We'll also test the controller for the sake of comprehensive testing.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/books_test.ex
+
+test "with book content", %{conn: conn, book: book} do
+  update_attrs = %{
+    title: "Name of the Wind",
+    book_contents: %{content: "some updated content"}
+  }
+
+  conn =
+    put(conn, Routes.author_book_path(conn, :update, book.author_id, book), book: update_attrs)
+
+  assert redirected_to(conn) == Routes.author_book_path(conn, :show, book.author_id, book)
+  conn = get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
+  assert html_response(conn, 200) =~ "some updated content"
+end
+```
+
+Now all tests should pass!
+
+```
+$ mix test
+```
+
+## Large Data
+
+We want to make sure our book contents can contain a large amount of data. We can use the [Faker](https://github.com/elixirs/faker) library to generate large amounts of fake text.
+
+Add `Faker` to our list of dependencies.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# mix.exs
+
+defp deps do
+  [
+    {:phoenix, "~> 1.6.10"},
+    {:phoenix_ecto, "~> 4.4"},
+    {:ecto_sql, "~> 3.6"},
+    {:postgrex, ">= 0.0.0"},
+    {:phoenix_html, "~> 3.0"},
+    {:phoenix_live_reload, "~> 1.2", only: :dev},
+    {:phoenix_live_view, "~> 0.17.5"},
+    {:floki, ">= 0.30.0", only: :test},
+    {:phoenix_live_dashboard, "~> 0.6"},
+    {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
+    {:swoosh, "~> 1.3"},
+    {:telemetry_metrics, "~> 0.6"},
+    {:telemetry_poller, "~> 1.0"},
+    {:gettext, "~> 0.18"},
+    {:jason, "~> 1.2"},
+    {:plug_cowboy, "~> 2.5"},
+    # Added Dependencies
+    {:faker, "~> 0.17.0"}
+  ]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Make sure to install dependencies.
+
+```sh
+$ mix deps.get
+```
+
+The [Faker.Lorem](https://hexdocs.pm/faker/Faker.Lorem.html) module handles generating specified amounts of fake text. The `Faker.Lorem` module is named after [Lorem ipsum](https://simple.wikipedia.org/wiki/Lorem_ipsum) which is a commonly for fake text.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/books_test.exs
+
+test "create_book/1 with large amounts of book content" do
+  author = author_fixture()
+
+  valid_attrs = %{
+    title: "some title",
+    author: author,
+    book_contents: %{content: Faker.Lorem.paragraph(1000..2000)}
+  }
+
+  assert {:ok, %Book{} = book} = Books.create_book(valid_attrs)
+
+  assert book.book_contents.content == valid_attrs.book_contents.content
+end
+```
+
+The test already passes, but it's good to verify we can have books with lots of content!
