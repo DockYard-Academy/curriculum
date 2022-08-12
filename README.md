@@ -24,6 +24,8 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
    mix escript.install github livebook-dev/livebook
    ```
 
+   You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an Escript.
+
 4. From the project folder run the command below. This opens the navigation
    page where you can find the course reading material and associated
    exercises.
@@ -97,24 +99,6 @@ Now you can run Livebook using the `livebook` command.
 ```sh
 livebook server
 ```
-
-### LiveBook Desktop App (Currently) Not Supported
-
-Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
-
-For now, there is a workaround by running livebook with the **Mix standalone** runtime connected to the `utils` project.
-
-To run the project in **Mix Standalone** mode:
-1. start livebook.
-2. open the curriculum folder in livebook.
-3. open `start.livemd` or any other `.livemd` file in livebook.
-4. Go to **Runtime Settings**.
-5. Click the gear icon.
-6. Select **Mix standalone**.
-7. Select the `utils` project in the curriculum folder.
-8. Click **Connect**.
-
-You should be able to use the curriculum normally now.
 
 ### Livebook server not starting (Windows)
 
