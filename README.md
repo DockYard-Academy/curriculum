@@ -14,15 +14,35 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
 
 ## QuickStart
 
-The recommended installation methods for this course below are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install a different version of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
+The recommended installation methods for this course are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs, please ensure your Livebook version is correct.
 
-MacOS
+In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
 
-Windows
+### MacOS
 
-Windows+WSL (Ubuntu)
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
 
-Linux (Ubuntu)
+2. Install Elixir
+   - `brew install elixir`
+
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript.install github livebook-dev/livebook`
+
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
+
+### Windows
+
+1. Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and follow the instructions.
+
+### Windows+WSL (Ubuntu)
+
+1. Install the Ubuntu distribution application from the Windows store [here](https://apps.microsoft.com/store/detail/ubuntu-on-windows/9NBLGGH4MSV6?hl=en-ca&gl=CA). Follow the instructions in the description to ensure WSL in enabled on your system.
+
+2. Follow the installation steps below for Linux (Ubuntu) inside the Ubuntu WSL application you just downloaded.
+
+### Linux (Ubuntu)
 
 1. Clone the project
    - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
@@ -42,32 +62,6 @@ Linux (Ubuntu)
 
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
-
-If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
-ensure your Livebook version is correct.
-
-<!-- ## QuickStart
-
-1. Clone the project `git clone <URL>`.
-
-2. Install a compatible [Elixir and Erlang](https://elixir-lang.org/install.html) version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
-
-3. Install [Livebook](https://github.com/livebook-dev/livebook):
-
-   ```sh
-   mix escript.install github livebook-dev/livebook
-   ```
-
-4. From the project folder run the command below. This opens the navigation
-   page where you can find the course reading material and associated
-   exercises.
-
-   ```sh
-   livebook server start.livemd
-   ```
-
-If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
-ensure your Livebook version is correct. -->
 
 ## Troubleshooting
 
@@ -157,6 +151,10 @@ This is a known Livebook issue ([196](https://github.com/livebook-dev/livebook/i
 - Before calling Livebook, execute `iex --sname test` on terminal.
 - On appearing Windows firewall dialog, approve permission for `epmd.exe`.
 - Both `erl.exe` and `epmd.exe` should appear on firewall-allowed apps.
+
+## Unable to locate package (Linux, Windows+WSL)
+
+On a new install of a Linux distribution the package list does not come updated and you need to run (in Ubuntu) `sudo apt update`. This is also true when adding a new package such as when we add the Erlang Solutions repository.
 
 ## Spell Checking
 
