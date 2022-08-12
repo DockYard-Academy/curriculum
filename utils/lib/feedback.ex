@@ -42,11 +42,11 @@ defmodule Utils.Feedback do
   feedback :rock_paper_scissors_pattern_matching do
     rock_paper_scissors = get_answers()
 
-    assert rock_paper_scissors.play(:rock, :rock) == "draw",
+    assert rock_paper_scissors.play(:rock, :rock) == "draw!",
            "Ensure you implement the RockPaperScissors.play/2 function."
 
-    assert rock_paper_scissors.play(:paper, :paper) == "draw"
-    assert rock_paper_scissors.play(:scissors, :scissors) == "draw"
+    assert rock_paper_scissors.play(:paper, :paper) == "draw!"
+    assert rock_paper_scissors.play(:scissors, :scissors) == "draw!"
 
     assert rock_paper_scissors.play(:rock, :scissors) == ":rock beats :scissors!"
     assert rock_paper_scissors.play(:scissors, :paper) == ":scissors beats :paper!"
