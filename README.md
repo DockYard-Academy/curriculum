@@ -34,7 +34,11 @@ In the future when working with multiple Elixir projects, there is a tool called
 
 ### Windows
 
-1. Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and follow the instructions.
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+
+2. Install Elixir
+   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and follow the instructions.
 
 ### Windows+WSL (Ubuntu)
 
