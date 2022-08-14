@@ -815,7 +815,7 @@ defmodule Utils.Solutions do
         {:rock, :paper} -> ":paper beats :rock!"
         {:scissors, :rock} -> ":rock beats :scissors!"
         {:paper, :scissors} -> ":scissors beats :paper!"
-        _ -> "draw"
+        _ -> "draw!"
       end
     end
   end
