@@ -23,9 +23,10 @@ The recommended installation methods for this course are from the Elixir languag
 
 2. Install Elixir
    - `brew install elixir`
-
+   
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
    - `mix escript.install github livebook-dev/livebook`
+   - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
 
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
@@ -41,15 +42,11 @@ The recommended installation methods for this course are from the Elixir languag
    - Run `iex.bat --sname test` to trigger a firewall prompt that needs to be accepted to run Livebook.
    - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
 
-<!---
-ERROR WHEN INSTALLING WITH ESCRIPT GITHUB, WORKED WITH ESCRIPT HEX WHICH IS RECOMMENDED IN LIVEBOOK README
-ERROR: ** (Mix) You're trying to run :livebook on Elixir v1.13.4 but it has declared in its mix.exs file it supports only Elixir ~> 1.14-rc.0
--->
-
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
    - `mix escript install hex livebook`
    - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line. 
-
+   - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
+   
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
 
@@ -142,24 +139,6 @@ Now you can run Livebook using the `livebook` command.
 ```sh
 livebook server
 ```
-
-### LiveBook Desktop App (Currently) Not Supported
-
-Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
-
-For now, there is a workaround by running livebook with the **Mix standalone** runtime connected to the `utils` project.
-
-To run the project in **Mix Standalone** mode:
-1. start livebook.
-2. open the curriculum folder in livebook.
-3. open `start.livemd` or any other `.livemd` file in livebook.
-4. Go to **Runtime Settings**.
-5. Click the gear icon.
-6. Select **Mix standalone**.
-7. Select the `utils` project in the curriculum folder.
-8. Click **Connect**.
-
-You should be able to use the curriculum normally now.
 
 ### Livebook server not starting (Windows)
 
