@@ -25,7 +25,7 @@ The recommended installation methods for this course are from the Elixir languag
    - `brew install elixir`
    
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
-   - `mix escript.install github livebook-dev/livebook`
+   - `mix escript.install hex livebook`
    - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
 
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
@@ -72,7 +72,7 @@ The recommended installation methods for this course are from the Elixir languag
          - `sudo apt-get install elixir`
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
-   - `mix escript.install github livebook-dev/livebook`
+   - `mix escript.install hex livebook`
 
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
