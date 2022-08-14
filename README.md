@@ -14,9 +14,7 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
 
 ## QuickStart
 
-The recommended installation methods for this course are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs, please ensure your Livebook version is correct.
-
-In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
+The recommended installation methods for this course are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs, please ensure your Livebook version is correct. In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
 
 ### MacOS
 
@@ -38,7 +36,8 @@ In the future when working with multiple Elixir projects, there is a tool called
    - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
 
 2. Install Elixir
-   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice, don't worry as this only means you didn't download it from the Windows Store! Select "More info" and "Run anyways"then follow the instructions in the installer with the default settings. The Elixir commands are the same however you run `iex.bat` instead of `iex` when starting the interactive REPL.
+   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings. 
+   - NOTE: You need to type `iex.bat` instead of `iex` when starting the interactive REPL.
    - Run `iex.bat --sname test` to trigger a firewall prompt that needs to be accepted to run Livebook.
    - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
 
@@ -49,7 +48,7 @@ ERROR: ** (Mix) You're trying to run :livebook on Elixir v1.13.4 but it has decl
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
    - `mix escript install hex livebook`
-   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the Advanced tab choose `Environment Variables`, then select PATH and the Edit button. Select New and then enter the prompted path so that you can run `livebook` directly from the command line. 
+   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line. 
 
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
