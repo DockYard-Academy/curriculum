@@ -38,7 +38,21 @@ In the future when working with multiple Elixir projects, there is a tool called
    - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
 
 2. Install Elixir
-   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and follow the instructions.
+   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice, don't worry as this only means you didn't download it from the Windows Store! Select "More info" and "Run anyways"then follow the instructions in the installer with the default settings. The Elixir commands are the same however you run `iex.bat` instead of `iex` when starting the interactive REPL.
+   - Run `iex.bat --sname test` to trigger a firewall prompt that needs to be accepted to run Livebook.
+   - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
+
+<!---
+ERROR WHEN INSTALLING WITH ESCRIPT GITHUB, WORKED WITH ESCRIPT HEX WHICH IS RECOMMENDED IN LIVEBOOK README
+ERROR: ** (Mix) You're trying to run :livebook on Elixir v1.13.4 but it has declared in its mix.exs file it supports only Elixir ~> 1.14-rc.0
+-->
+
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript install hex livebook`
+   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the Advanced tab choose `Environment Variables`, then select PATH and the Edit button. Select New and then enter the prompted path so that you can run `livebook` directly from the command line. 
+
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
 
 ### Windows+WSL (Ubuntu)
 
@@ -51,7 +65,7 @@ In the future when working with multiple Elixir projects, there is a tool called
 1. Clone the project
    - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
 
-2. Install Erlang and Elixir
+2. Install Elixir
       - Add the Erlang Solutions repository
          - `wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && sudo dpkg -i erlang-solutions_2.0_all.deb`
       - Update the package repository list
