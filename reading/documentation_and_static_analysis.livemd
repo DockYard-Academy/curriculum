@@ -28,7 +28,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 As developers, we use a combination of documentation, static code analysis, and type specifications to improve the
 readability of our code, as well as catch possible bugs before compilation.
 
-In this lesson, we'll see how we can document our projects with [ExDoc], ensure consistent code style with [Credo],
+In this lesson, we'll see how we can document our projects with [ExDoc](https://hexdocs.pm/ex_doc), ensure consistent code style with [Credo](https://hexdocs.pm/credo),
 and enforce type specifications with [Dialyzer](https://www.erlang.org/doc/man/dialyzer.html)/[Dialyxir](https://github.com/jeremyjh/dialyxir).
 
 We will be re-using the `Math` project created in the previous [ExUnit](exunit.livemd) lesson,
@@ -43,47 +43,59 @@ Doctests automatically find lines containing `iex>` in the documentation and ens
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-@moduledoc """
-Documentation for `Math`.
-"""
+defmodule Math do
+  @moduledoc """
+  Documentation for `Math`.
+  """
 
-@doc """
-Adds two values.
+  @doc """
+  Adds two values.
 
-## Examples
-  iex> Math.add(2, 2)
-  4
-"""
+  ## Examples
+
+      iex> Math.add(2, 2)
+      4
+
+  """
+  def add(int1, int2) do
+    int1 + int2
+  end
+end
 ```
 
 ### Your Turn
 
 We can also read this documentation using the `h` helper from the IEx shell.
-Open the `IEx` shell from the `math` project folder, and read the docs for the math module.
+Open the `IEx` shell from the `math` project folder, and read the docs for the `Math` module.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 $ iex -S mix
-iex> h Math
-                                      Math
-Documentation for `Math`.
+iex(1)> h Math
 
-iex> h Math.add
-                                  def add()
+                                      Math
+
+Documentation for Math.
+
+iex(2)> h Math.add
+
+                              def add(int1, int2)
+
 Adds two values.
 
 ## Examples
-  iex> Math.add(2, 2)
-  4
+
+    iex> Math.add(2, 2)
+    4
 ```
 
-## ExDocs
+## ExDoc
 
 Alternatively, we can install [ExDoc](https://github.com/elixir-lang/ex_doc) and generate
 the same documentation seen on [HexDocs](https://hexdocs.pm/ex_doc/readme.html).
 
-First, add `ex_doc` to the list of dependencies in `mix.exs`. The latest version is
+First, add `:ex_doc` to the list of dependencies in `mix.exs`. The latest version is
 on [hex.pm](https://hex.pm/packages/ex_doc). We only need documentation for the `:dev`
 environment, and we do not need it during runtime.
 
@@ -92,7 +104,7 @@ environment, and we do not need it during runtime.
 ```elixir
   defp deps do
     [
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
     ]
   end
 ```
@@ -126,15 +138,15 @@ unreachable code, and other common issues.
 
 To use Dialyzer, we install [Dialyxir](https://github.com/jeremyjh/dialyxir), which provides conveniences for working with Dialyzer in an Elixir project.
 
-Add Dialyxir as a dependency to your `mix.exs` file in the `math` project.
+Add `:dialyxir` as a dependency to your `mix.exs` file in the `math` project.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
  defp deps do
     [
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 ```
@@ -205,7 +217,15 @@ defmodule Math do
     Math.add([1], [2])
   end
 
-  @spec add(number(), number()) :: number()
+  @doc """
+  Adds two values.
+
+  ## Examples
+
+      iex> Math.add(2, 2)
+      4
+
+  """
   def add(int1, int2) do
     int1 + int2
   end
@@ -253,14 +273,22 @@ defmodule Math do
     Math.add([1], [2])
   end
 
-  @spec add(number(), number()) :: number()
-  def add(int1, int2) do
-    int + int
+  @doc """
+  Adds two values.
+
+  ## Examples
+
+      iex> Math.add(2, 2)
+      4
+
+  """
+  @spec add(list(), list()) :: list()
+  def add(list1, list2) when is_list(list1) and is_list(list2) do
+    list1 ++ list2
   end
 
-  @spec add(list(), list()) :: list()
-  def add(list1, list2) do
-    list1 ++ list2
+  def add(int1, int2) do
+    int1 + int2
   end
 end
 ```
@@ -278,7 +306,7 @@ we could make a single specification that handles both numbers and lists.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  @spec add(number() | list(), number() | list()) :: number() | list()
+@spec add(number() | list(), number() | list()) :: number() | list()
 ```
 
 However, this becomes overly verbose if we define the types for integers, floats, strings, maps, lists, and keyword lists.
@@ -286,10 +314,12 @@ However, this becomes overly verbose if we define the types for integers, floats
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  @spec add(number() | list() | String.t(), number() | list() | String.t()) :: number() | list() | String.t()
+@spec add(number() | list() | String.t(), number() | list() | String.t()) :: number() | list() | String.t()
 ```
 
 Instead, we can use the `@type` module attribute to define a custom type.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 @type value() :: number() | list() | String.t()
@@ -314,20 +344,20 @@ done in 0m0.81s
 ## Credo
 
 Credo is another static analysis tool which focuses on teaching and code consistency.
-It scans a project's code for code anti-patterns and provides suggestions to improve it's quality and readability.
+It scans a project's code for anti-patterns and provides suggestions to improve it's quality and readability.
 
 ### Your Turn
 
-Install credo in your math project by adding it to your dependencies in `mix.exs`.
-You can find the latest credo version on [hex.pm](https://hex.pm/packages/credo)
+Install Credo in your math project by adding it to your dependencies in `mix.exs`.
+You can find the latest Credo version on [hex.pm](https://hex.pm/packages/credo).
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defp deps do
   [
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
-      {:dialyxir, "~> 2.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
   ]
 end
@@ -348,7 +378,7 @@ Analysis took 0.01 seconds (0.01s to load, 0.00s running 52 checks on 3 files)
 3 mods/funs, found no issues.
 ```
 
-For example, credo will warn you if you leave an `IO.inspect/2` in your project.
+For example, Credo will warn you if you leave an `IO.inspect/2` in your project.
 Add `IO.inspect/2` anywhere in your project, and run `mix credo` to see the error.
 
 ```
