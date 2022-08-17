@@ -49,60 +49,15 @@ Enter your answer in the Elixir cell below.
 
 ```elixir
 defmodule TrafficLightServer do
-  use GenServer
 
-  # Client API
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :green, opts)
-  end
-
-  def get_light(pid) do
-    GenServer.call(pid, :get_light)
-  end
-
-  def transition(pid) do
-    GenServer.call(pid, :transition)
-  end
-
-  # Server (callbacks)
-  @impl true
-  def init(state) do
-    {:ok, state}
-  end
-
-  @impl true
-  def handle_call(:get_light, _from, light) do
-    {:reply, light, light}
-  end
-
-  @impl true
-  def handle_call(:transition, _from, light) do
-    next_light =
-      case light do
-        :green -> :yellow
-        :yellow -> :red
-        :red -> :green
-      end
-
-    {:reply, :ok, next_light}
-  end
 end
-
-{:ok, pid} = TrafficLightServer.start_link([])
-```
-
-```elixir
-TrafficLightServer.get_light(pid)
-```
-
-```elixir
-:sys.get_state(pid)
 ```
 
 ## TrafficGrid
 
 Create a `TrafficGrid` which should manage 5 `TrafficLightServer`.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # {:ok, pid} = Grid
@@ -121,7 +76,8 @@ Every second, the grid should automatically transition one light in order.
 TrafficGrid.lights(pid)
 [:green, :green, :green, :green, :green]
 
-Process.sleep(1000) # This may need to sleep for 1001 milliseconds.
+# This may need to sleep for 1001 milliseconds.
+Process.sleep(1000)
 [:yellow, :green, :green, :green, :green]
 
 Process.sleep(1000)
@@ -146,63 +102,6 @@ Process.sleep(1000)
 ```
 
 Enter your answer in the Elixir cell below.
-
 ```elixir
-defmodule TrafficGrid do
-  use GenServer
 
-  def start_link(opts) do
-    pids =
-      Enum.map(1..5, fn _ ->
-        {:ok, pid} = TrafficLightServer.start_link([])
-        pid
-      end)
-
-    GenServer.start_link(__MODULE__, %{lights: pids, count: 0}, opts)
-  end
-
-  def lights(grid_pid) do
-    GenServer.call(grid_pid, :get_lights)
-  end
-
-  def handle_call(:transition, _from, state) do
-    light_pid = Enum.at(state.lights, state.count)
-
-    TrafficLightServer.transition(light_pid)
-
-    next_count = if state.count < length(state.lights) - 1, do: state.count + 1, else: 0
-    # next_count = rem(state.count, length(state.lights))
-
-    {:reply, :ok, Map.put(state, :count, next_count)}
-  end
-
-  def handle_call(:get_lights, from, state) do
-    lights =
-      Enum.map(state.lights, fn light_pid ->
-        TrafficLightServer.get_light(light_pid)
-      end)
-
-    {:reply, lights, state}
-  end
-
-  def init(state) do
-    {:ok, state}
-  end
-end
-
-{:ok, grid_pid} = TrafficGrid.start_link([])
-```
-
-```elixir
-TrafficGrid.lights(grid_pid)
-
-GenServer.call(grid_pid, :transition)
-
-TrafficGrid.lights(grid_pid)
-```
-
-```elixir
-int = 6
-
-rem(int, 5)
 ```

@@ -100,198 +100,6 @@ defmodule Utils.Feedback do
     assert {:ok, "Copy me!"} = File.read("../data/#{file_name}")
   end
 
-  feedback :custom_rps do
-    custom_game_module = get_answers()
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :new),
-           "Ensure you define the `new/3` function"
-
-    assert Keyword.get(custom_game_module.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
-
-    assert match?(%{rock: _, paper: _, scissors: _}, struct(custom_game_module)),
-           "Ensure you use `defstruct` with :rock, :paper, and :scissors."
-
-    assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
-             custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    assert 3 == Keyword.get(custom_game_module.__info__(:functions), :play),
-           "Ensure you define the `play/3` function"
-
-    game = custom_game_module.new(:custom_rock, :custom_paper, :custom_scissors)
-
-    beats? = fn p1, p2 ->
-      {p1, p2} in [
-        {:custom_rock, :custom_scissors},
-        {:custom_paper, :custom_rock},
-        {:custom_scissors, :custom_paper}
-      ]
-    end
-
-    for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
-        player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
-      result = custom_game_module.play(game, player1, player2)
-
-      expected_result =
-        cond do
-          beats?.(player1, player2) -> "#{player1} beats #{player2}"
-          beats?.(player2, player1) -> "#{player2} beats #{player1}"
-          true -> "draw"
-        end
-
-      assert result == expected_result
-    end
-  end
-
-  feedback :fizzbuzz do
-    fizz_buzz_module = get_answers()
-
-    assert fizz_buzz_module.run(1..15) == [
-             1,
-             2,
-             "fizz",
-             4,
-             "buzz",
-             "fizz",
-             7,
-             8,
-             "fizz",
-             "buzz",
-             11,
-             "fizz",
-             13,
-             14,
-             "fizzbuzz"
-           ]
-
-    assert fizz_buzz_module.run(1..100) == Utils.Solutions.FizzBuzz.run(1..100)
-  end
-
-  feedback :voter_count do
-    voter_count = get_answers()
-
-    assert voter_count.count([], :test), "Implement the `count` function."
-
-    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :dogs) == 3,
-           "failed on ([:dogs, :dogs, :dogs, :cats], :dogs)"
-
-    assert voter_count.count([:dogs, :dogs, :dogs, :cats], :cats) == 1,
-           "Failed on ([:dogs, :dogs, :dogs, :cats], :cats)"
-
-    assert voter_count.count([:apples, :oranges, :apples, :cats], :birds) == 0,
-           "Failed on ([:apples, :oranges, :apples, :cats], :birds)"
-
-    list = Enum.map(1..10, fn _ -> Enum.random([:cat, :dog, :bird, :apple, :orange]) end)
-    choice = Enum.random([:cat, :dog, :bird, :apple, :orange])
-    assert voter_count.count(list, choice) == Enum.count(list, fn each -> each == choice end)
-  end
-
-  feedback :is_anagram do
-    anagram_module = get_answers()
-
-    assert anagram_module.is_anagram?("stop", "pots") == true
-    refute anagram_module.is_anagram?("example", "nonanagram") == true
-
-    word = Utils.Factory.string()
-
-    generate_non_anagram = fn word ->
-      word <> Enum.random(["a", "b", "c"])
-    end
-
-    generate_anagram = fn word ->
-      String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
-    end
-
-    assert anagram_module.is_anagram?(word, generate_anagram.(word)),
-           "`is_anagram?/1` failed to identify anagram."
-
-    refute anagram_module.is_anagram?(word, generate_non_anagram.(word)),
-           "`is_anagram?/1` failed to identify non-anagram."
-
-    non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
-    anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
-
-    result = anagram_module.filter_anagrams(word, anagrams ++ non_anagrams)
-    assert is_list(result), "filter_anagrams/2 should return a list"
-
-    assert Enum.sort(result) == Enum.sort(anagrams), "filter_anagrams/2 failed to filter anagrams"
-  end
-
-  feedback :bottles_of_soda do
-    bottles_of_soda = get_answers()
-    result = bottles_of_soda.on_the_wall()
-    assert result, "Implement the `on_the_wall/0` function."
-    assert is_list(result), "`on_the_wall/0` should return a list."
-
-    assert Enum.at(result, 0) ==
-             "99 bottles of soda on the wall.\n99 bottles of soda.\nTake one down, pass it around.\n98 bottles of soda on the wall."
-
-    assert length(result) == 100, "There should be 100 total verses."
-
-    assert Enum.at(result, 97) ==
-             "2 bottles of soda on the wall.\n2 bottles of soda.\nTake one down, pass it around.\n1 bottle of soda on the wall."
-
-    assert Enum.at(result, 98) ==
-             "1 bottle of soda on the wall.\n1 bottle of soda.\nTake one down, pass it around.\n0 bottles of soda on the wall."
-
-    assert Enum.at(result, 99) ==
-             "No more bottles of soda on the wall, no more bottles of soda.\nGo to the store and buy some more, 99 bottles of soda on the wall."
-
-    assert result == Utils.Solutions.BottlesOfSoda.on_the_wall()
-  end
-
-  feedback :bottles_of_blank do
-    bottles_of_soda = get_answers()
-
-    result = bottles_of_soda.on_the_wall(50..0, "pop", "cans")
-
-    assert result, "Implement the `on_the_wall/3` function."
-
-    assert is_list(result), "`on_the_wall/3` should return a list."
-
-    assert Enum.at(result, 0) ==
-             "50 cans of pop on the wall.\n50 cans of pop.\nTake one down, pass it around.\n49 cans of pop on the wall."
-
-    assert length(result) == 51, "There should be 51 total verses."
-
-    assert Enum.at(result, 48) ==
-             "2 cans of pop on the wall.\n2 cans of pop.\nTake one down, pass it around.\n1 can of pop on the wall."
-
-    assert Enum.at(result, 49) ==
-             "1 can of pop on the wall.\n1 can of pop.\nTake one down, pass it around.\n0 cans of pop on the wall."
-
-    assert Enum.at(result, 50) ==
-             "No more cans of pop on the wall, no more cans of pop.\nGo to the store and buy some more, 99 cans of pop on the wall."
-  end
-
-  feedback :item_generator_item do
-    item = get_answers()
-
-    assert Keyword.get(item.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
-
-    assert match?(%{type: nil, effect: nil, level: nil, size: nil, style: nil}, struct(item)),
-           "Ensure you use `defstruct` with :type, :effect, :level, :size, and :style."
-  end
-
-  feedback :item_generator do
-    items = get_answers()
-
-    assert is_list(items), "`items` should be a list."
-
-    expected_items = Utils.Solutions.item_generator()
-
-    expected_length = length(expected_items)
-
-    assert length(items) == expected_length,
-           "There should be #{expected_length} permutations of items."
-
-    Enum.each(items, fn item ->
-      assert is_struct(item), "Each item should be an `Item` struct."
-      assert match?(%{type: _, effect: _, style: _, size: _, level: _, __struct__: _}, item)
-    end)
-  end
-
   feedback :item_generator_search do
     search = get_answers()
     items = [Utils.Factory.item(%{}), Utils.Factory.item()]
@@ -354,29 +162,6 @@ defmodule Utils.Feedback do
            "`all_items/2` should work with multiple inclusive filters."
   end
 
-  feedback :custom_enum do
-    list = Enum.to_list(1..10)
-
-    custom_enum = get_answers()
-    assert custom_enum.map(list, & &1), "Implement the `map/2` function."
-    assert is_list(custom_enum.map(list, & &1)), "`map/2` should return a list."
-
-    assert custom_enum.map([1, 2, 3], &(&1 * 2)) == [2, 4, 6]
-
-    assert custom_enum.each(list, & &1), "Implement the `each/2` function."
-    assert custom_enum.each(list, & &1) == :ok, "`each/2` should return :ok."
-
-    assert custom_enum.filter(list, & &1), "Implement the `filter/2` function."
-    assert is_list(custom_enum.filter(list, & &1)), "`each/2` should return a list."
-
-    assert custom_enum.filter(list, &(&1 < 5)) == Enum.filter(list, &(&1 < 5))
-
-    assert custom_enum.sum(list), "Implement the `sum/1` function."
-    assert is_integer(custom_enum.sum(list)), "`sum/1` should return an integer."
-
-    assert custom_enum.sum(list) == Enum.sum(list)
-  end
-
   feedback :voter_tally do
     voter_tally = get_answers()
     assert voter_tally.tally([]), "Implement the `tally/1` function."
@@ -403,40 +188,6 @@ defmodule Utils.Feedback do
     assert voter_tally.tally([:cats, dogs: 2]) == %{dogs: 2, cats: 1}
 
     assert voter_tally.tally([:dogs, :cats, birds: 3, dogs: 10]) == %{dogs: 11, cats: 1, birds: 3}
-  end
-
-  feedback :measurements do
-    measurements = get_answers()
-    list = Utils.Factory.integers()
-
-    assert measurements.increased([1, 1]), "Implement the `increased` function."
-    assert measurements.increased([1, 2, 1]) == 1
-    assert measurements.increased([3, 1, 2]) == 1, "Ensure you count each positive change."
-    assert measurements.increased([1, 1, 2, 3, 1]) == 2
-
-    assert measurements.increased(list) == Utils.Solutions.Measurements.increased(list),
-           "`increased/1 failed when called with #{inspect(list)}"
-
-    assert measurements.increased_by([1, 1]), "Implement the `increased_by` function."
-    assert measurements.increased_by([100, 150, 120, 130]) == 60
-    assert measurements.increased_by([10, 20, 10, 40]) == 40
-
-    assert measurements.increased_by(list) == Utils.Solutions.Measurements.increased_by(list),
-           "`increased_by/1 failed when called with #{inspect(list)}"
-
-    assert measurements.increments([1, 2]), "Implement the `increments` function."
-    assert measurements.increments([100, 150, 120, 130]) == [50, -30, 10]
-    assert measurements.increments([10, 20, 10, 40]) == [10, -10, 30]
-
-    assert measurements.increments(list) == Utils.Solutions.Measurements.increments(list),
-           "`increments/1 failed when called with #{inspect(list)}"
-
-    assert measurements.average([1, 1]), "Implement the `average` function."
-    assert measurements.average([4, 5, 6]) == 5
-    assert measurements.average([2, 10]) == 6
-
-    assert measurements.average(list) == Utils.Solutions.Measurements.average(list),
-           "`increments/1 failed when called with #{inspect(list)}"
   end
 
   feedback :keyword_list_hero do
@@ -1660,7 +1411,7 @@ defmodule Utils.Feedback do
 
     assert is_map(custom_maze), "`custom_maze` should be a map."
 
-    assert path == "Exit"
+    assert path == "Exit!"
   end
 
   feedback :treasure_map do
