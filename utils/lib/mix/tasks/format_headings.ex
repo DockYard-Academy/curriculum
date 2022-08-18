@@ -19,10 +19,4 @@ defmodule Mix.Tasks.FormatHeadins do
       File.write!(file_name, updated_file)
     end)
   end
-
-  defp fetch_livebooks(path) do
-    File.ls!(path)
-    |> Stream.filter(&String.ends_with?(&1, ".livemd"))
-    |> Enum.map(&(path <> &1))
-  end
 end
