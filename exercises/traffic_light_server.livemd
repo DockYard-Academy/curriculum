@@ -22,82 +22,330 @@ Mix.install([
 
 ## Traffic Light Server
 
-Create a `TrafficLightServer` which stores the state of the traffic light `:red`, `:green`, or `:yellow`.
+You're going to create a `TrafficLightServer` `GenServer` that mimics a traffic light.
 
-The `TrafficLightServer` should be able to transition from one color to another. It should start as `:green`.
+<!-- livebook:{"break_markdown":true} -->
 
-<!-- livebook:{"force_markdown":true} -->
+* Create a `TrafficLightServer` which stores the state of the traffic light `:red`, `:green`, or `:yellow`. It should start as `:green`.
+* Define a `current_light/1` function which returns the current light color.
+* Define a `transition/1` function which transitions the current light from its current color to the next color.
+* Prefer `call` over `cast` to avoid concurrency issues.
 
-```elixir
-{:ok, pid} = TrafficLightServer.start()
+`````mermaid
+flowchart LR
+Green --> Yellow --> Red --> Green
+style Green fill:lightgreen
+style Yellow fill:lightyellow
+style Red fill:lightcoral
+````
 
-:green = TrafficLightServer.light(pid)
+For example:
 
-TrafficLightServer.transition(pid)
-:yellow = TrafficLightServer.light(pid)
+`````
 
-TrafficLightServer.transition(pid)
-:red = TrafficLightServer.light(pid)
+{:ok, pid} = TrafficLightServer.start_link([])
 
-TrafficLightServer.transition(pid)
-:green = TrafficLightServer.light(pid)
+:green = TrafficLightServer.current_light(pid)
+
+:yellow = TrafficLightServer.transition(pid)
+:yellow = TrafficLightServer.current_light(pid)
+
+:red = TrafficLightServer.transition(pid)
+:red = TrafficLightServer.current_light(pid)
+
+:green = TrafficLightServer.transition(pid)
+:green = TrafficLightServer.current_light(pid)
+
 ```
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 Enter your answer in the Elixir cell below.
 
-```elixir
-defmodule TrafficLightServer do
+<!-- livebook:{"attrs":{"assertions":"assert Kernel.function_exported?(TrafficLightServer, :start_link, 1),\n       \"Ensure you define a start_link/1 function which accepts a list of options.\"\n\nassert Kernel.function_exported?(TrafficLightServer, :init, 1),\n       \"Ensure you define an init/1 function which returns `{:ok, initial_state}`\"\n\nassert {:ok, pid} = TrafficLightServer.start_link([])\n\nassert Kernel.function_exported?(TrafficLightServer, :current_light, 1),\n       \"Ensure you define a current_light/1 function which accepts a pid\"\n\nassert :green == TrafficLightServer.current_light(pid)\n\nassert Kernel.function_exported?(TrafficLightServer, :transition, 1),\n       \"Ensure you define a transition/1 function which accepts a pid\"\n\nTrafficLightServer.transition(pid)\nassert :yellow == TrafficLightServer.current_light(pid)\n\nTrafficLightServer.transition(pid)\nassert :red == TrafficLightServer.current_light(pid)\n\nTrafficLightServer.transition(pid)\nassert :green == TrafficLightServer.current_light(pid)","code":"defmodule TrafficLightServer do\r\n \r\nend","solution":"defmodule TrafficLightServer do\n  use GenServer\n  def start_link(opts) do\n    GenServer.start_link(__MODULE__, :green, opts)\n  end\n\n  @impl true\n  def init(state) do\n    {:ok, state}\n  end\n\n  def current_light(pid) do\n    GenServer.call(pid, :current_light)\n  end\n\n  def transition(pid) do\n    GenServer.call(pid, :transition)\n  end\n\n  @impl true\n  def handle_call(:transition, _from, :green) do\n    {:reply, :yellow, :yellow}\n  end\n\n  @impl true\n  def handle_call(:transition, _from, :yellow) do\n    {:reply, :red, :red}\n  end\n\n  @impl true\n  def handle_call(:transition, _from, :red) do\n    {:reply, :green, :green}\n  end\n\n  @impl true\n  def handle_call(:current_light, _from, light) do\n    {:reply, light, light}\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule TrafficLightServer do
+    end
+
+    assert Kernel.function_exported?(TrafficLightServer, :start_link, 1),
+           "Ensure you define a start_link/1 function which accepts a list of options."
+
+    assert Kernel.function_exported?(TrafficLightServer, :init, 1),
+           "Ensure you define an init/1 function which returns `{:ok, initial_state}`"
+
+    assert {:ok, pid} = TrafficLightServer.start_link([])
+
+    assert Kernel.function_exported?(TrafficLightServer, :current_light, 1),
+           "Ensure you define a current_light/1 function which accepts a pid"
+
+    assert :green == TrafficLightServer.current_light(pid)
+
+    assert Kernel.function_exported?(TrafficLightServer, :transition, 1),
+           "Ensure you define a transition/1 function which accepts a pid"
+
+    TrafficLightServer.transition(pid)
+    assert :yellow == TrafficLightServer.current_light(pid)
+
+    TrafficLightServer.transition(pid)
+    assert :red == TrafficLightServer.current_light(pid)
+
+    TrafficLightServer.transition(pid)
+    assert :green == TrafficLightServer.current_light(pid)
+  end
 end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+defmodule TrafficLightServer do
+end
+```
+
+You may find the following commented cell useful for testing your solution.
+
+```elixir
+# {:ok, pid} = TrafficLightServer.start_link([])
+
+# :green = TrafficLightServer.current_light(pid)
+
+# :yellow = TrafficLightServer.transition(pid)
+# :yellow = TrafficLightServer.current_light(pid)
+
+# :red = TrafficLightServer.transition(pid)
+# :red = TrafficLightServer.current_light(pid)
+
+# :green = TrafficLightServer.transition(pid)
+# :green = TrafficLightServer.current_light(pid)
 ```
 
 ## TrafficGrid
 
-Create a `TrafficGrid` which should manage 5 `TrafficLightServer`.
+You're going to create a `TrafficGrid` `GenServer` that manages five `TrafficLightServers`.
+
+* Create a `TrafficGrid` which stores the pids of five `TrafficLightServers`.
+* Define a `current_lights/1` function that returns the current light of each `TrafficLightServer`.
+* Define a `transition/1` function that transitions one of the five lights (in order, from beginning to end).
+* Prefer `call` over `cast` to avoid concurrency issues.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+TG[TrafficGrid]
+TLS1[TrafficLightServer]
+TLS2[TrafficLightServer]
+TLS3[TrafficLightServer]
+TLS4[TrafficLightServer]
+TLS5[TrafficLightServer]
+G1[Green]
+G2[Green]
+G3[Green]
+G4[Green]
+G5[Green]
+Y1[Yellow]
+Y2[Yellow]
+Y3[Yellow]
+Y4[Yellow]
+Y5[Yellow]
+R1[Red]
+R2[Red]
+R3[Red]
+R4[Red]
+R5[Red]
+
+TG --> TLS1
+TG --> TLS2
+TG --> TLS3
+TG --> TLS4
+TG --> TLS5
+
+TLS1 --> G1 --> Y1 --> R1 --> G1
+TLS2 --> G2 --> Y2 --> R2 --> G2
+TLS3 --> G3 --> Y3 --> R3 --> G3
+TLS4 --> G4 --> Y4 --> R4 --> G4
+TLS5 --> G5 --> Y5 --> R5 --> G5
+
+style G1 fill:lightgreen
+style G2 fill:lightgreen
+style G3 fill:lightgreen
+style G4 fill:lightgreen
+style G5 fill:lightgreen
+style Y1 fill:lightyellow
+style Y2 fill:lightyellow
+style Y3 fill:lightyellow
+style Y4 fill:lightyellow
+style Y5 fill:lightyellow
+style R1 fill:lightcoral
+style R2 fill:lightcoral
+style R3 fill:lightcoral
+style R4 fill:lightcoral
+style R5 fill:lightcoral
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = Grid
+{:ok, pid} = TrafficGrid.start_link([])
 
-TrafficGrid.lights(pid)
-[:green, :green, :green, :green, :green]
+
+# all lights start green
+[:green, :green, :green, :green, :green] = TrafficGrid.current_lights(pid)
+
+# transition the first light from green to yellow
+[:yellow, :green, :green, :green, :green] = TrafficGrid.transition(pid)
+[:yellow, :green, :green, :green, :green] = TrafficGrid.current_lights(pid)
+
+# transition the second light from green to yellow
+[:yellow, :yellow, :green, :green, :green] = TrafficGrid.transition(pid)
+[:yellow, :yellow, :green, :green, :green] = TrafficGrid.current_lights(pid)
+
+# transition the third light from green to yellow
+[:yellow, :yellow, :yellow, :green, :green] = TrafficGrid.transition(pid)
+[:yellow, :yellow, :yellow, :green, :green] = TrafficGrid.current_lights(pid)
+
+# transition the fourth light from green to yellow
+[:yellow, :yellow, :yellow, :yellow, :green] = TrafficGrid.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :green] = TrafficGrid.current_lights(pid)
+
+# transition the fifth light from green to yellow
+[:yellow, :yellow, :yellow, :yellow, :yellow] = TrafficGrid.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :yellow] = TrafficGrid.current_lights(pid)
+
+# transition the first light from yellow to red
+[:red, :yellow, :yellow, :yellow, :yellow] = TrafficGrid.transition(pid)
+[:red, :yellow, :yellow, :yellow, :yellow] = TrafficGrid.current_lights(pid)
+
+# ... etc
 ```
 
-Every second, the grid should automatically transition one light in order.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, pid} = Grid
-
-TrafficGrid.lights(pid)
-[:green, :green, :green, :green, :green]
-
-# This may need to sleep for 1001 milliseconds.
-Process.sleep(1000)
-[:yellow, :green, :green, :green, :green]
-
-Process.sleep(1000)
-[:yellow, :yellow, :green, :green, :green]
-
-Process.sleep(1000)
-[:yellow, :yellow, :yellow, :green, :green]
-
-Process.sleep(1000)
-[:yellow, :yellow, :yellow, :yellow, :green]
-
-Process.sleep(1000)
-[:yellow, :yellow, :yellow, :yellow, :yellow]
-
-Process.sleep(1000)
-[:red, :yellow, :yellow, :yellow, :yellow]
-# And so on...
-```
+<!-- livebook:{"break_markdown":true} -->
 
 Enter your answer in the Elixir cell below.
-```elixir
 
+<!-- livebook:{"attrs":{"assertions":"assert Kernel.function_exported?(TrafficGrid, :start_link, 1),\n       \"Ensure you define a start_link/1 function which accepts a list of options.\"\n\nassert Kernel.function_exported?(TrafficGrid, :init, 1),\n       \"Ensure you define an init/1 function which returns `{:ok, initial_state}`\"\n\nassert {:ok, pid} = TrafficGrid.start_link([])\n\nassert Kernel.function_exported?(TrafficGrid, :current_lights, 1),\n       \"Ensure you define a current_lights/1 function which accepts a pid\"\n\nassert [:green, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)\n\n\nassert Kernel.function_exported?(TrafficGrid, :transition, 1),\n       \"Ensure you define a transition/1 function which accepts a pid\"\n\n\nassert [:yellow, :green, :green, :green, :green] == TrafficGrid.transition(pid)\nassert [:yellow, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)\n\nassert [:yellow, :yellow, :green, :green, :green] == TrafficGrid.transition(pid)\nassert [:yellow, :yellow, :green, :green, :green] == TrafficGrid.current_lights(pid)\n\nassert [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.transition(pid)\nassert [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.current_lights(pid)\n\nassert [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.transition(pid)\nassert [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.current_lights(pid)\n\nassert [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)\nassert [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)\n\nassert [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)\nassert [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)\n\nassert [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)\nassert [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)\n\nassert [:red, :red, :red, :yellow, :yellow] == TrafficGrid.transition(pid)\nassert [:red, :red, :red, :yellow, :yellow] == TrafficGrid.current_lights(pid)\n\nassert [:red, :red, :red, :red, :yellow] == TrafficGrid.transition(pid)\nassert [:red, :red, :red, :red, :yellow] == TrafficGrid.current_lights(pid)\n\nassert [:red, :red, :red, :red, :red] == TrafficGrid.transition(pid)\nassert [:red, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)\n\nassert [:green, :red, :red, :red, :red] == TrafficGrid.transition(pid)\nassert [:green, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)","code":"defmodule TrafficGrid do\r\n \r\nend","solution":"defmodule TrafficGrid do\n  def start_link(opts) do\n    pids = Enum.map(1..5, fn _ -> \n      {:ok, pid} = TrafficLightServer.start_link([])\n      pid\n    end)\n    GenServer.start_link(__MODULE__, %{lights: pids, count: 0}, opts)\n  end\n\n  def init(state) do\n    {:ok, state}\n  end\n\n  \n  def current_lights(pid) do\n    GenServer.call(pid, :current_lights)\n  end\n\n  def transition(pid) do\n    GenServer.call(pid, :transition)\n  end\n\n  def handle_call(:current_lights, _from, state) do\n    light_colors = Enum.map(state.lights, fn pid ->\n      TrafficLightServer.current_light(pid)\n    end)\n\n    {:reply, light_colors, state}\n  end\n\n  def handle_call(:transition, _from, state) do\n    light_to_transition = Enum.at(state.lights, state.count)\n    TrafficLightServer.transition(light_to_transition)\n\n    new_count = if state.count == 4, do: 0, else: state.count + 1\n\n    light_colors = Enum.map(state.lights, fn pid ->\n      TrafficLightServer.current_light(pid)\n    end)\n\n    {:reply, light_colors, %{state | count: new_count}}\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "" do
+    defmodule TrafficGrid do
+    end
+
+    assert Kernel.function_exported?(TrafficGrid, :start_link, 1),
+           "Ensure you define a start_link/1 function which accepts a list of options."
+
+    assert Kernel.function_exported?(TrafficGrid, :init, 1),
+           "Ensure you define an init/1 function which returns `{:ok, initial_state}`"
+
+    assert {:ok, pid} = TrafficGrid.start_link([])
+
+    assert Kernel.function_exported?(TrafficGrid, :current_lights, 1),
+           "Ensure you define a current_lights/1 function which accepts a pid"
+
+    assert [:green, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+    assert Kernel.function_exported?(TrafficGrid, :transition, 1),
+           "Ensure you define a transition/1 function which accepts a pid"
+
+    assert [:yellow, :green, :green, :green, :green] == TrafficGrid.transition(pid)
+    assert [:yellow, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+    assert [:yellow, :yellow, :green, :green, :green] == TrafficGrid.transition(pid)
+    assert [:yellow, :yellow, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+    assert [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.transition(pid)
+    assert [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.current_lights(pid)
+
+    assert [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.transition(pid)
+    assert [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.current_lights(pid)
+
+    assert [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+    assert [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+    assert [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+    assert [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+    assert [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+    assert [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+    assert [:red, :red, :red, :yellow, :yellow] == TrafficGrid.transition(pid)
+    assert [:red, :red, :red, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+    assert [:red, :red, :red, :red, :yellow] == TrafficGrid.transition(pid)
+    assert [:red, :red, :red, :red, :yellow] == TrafficGrid.current_lights(pid)
+
+    assert [:red, :red, :red, :red, :red] == TrafficGrid.transition(pid)
+    assert [:red, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)
+
+    assert [:green, :red, :red, :red, :red] == TrafficGrid.transition(pid)
+    assert [:green, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+defmodule TrafficGrid do
+end
+```
+
+You may find the following commented cell useful for testing your solution.
+
+```elixir
+# {:ok, pid} = TrafficGrid.start_link([])
+
+# [:green, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+# [:yellow, :green, :green, :green, :green] == TrafficGrid.transition(pid)
+# [:yellow, :green, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+# [:yellow, :yellow, :green, :green, :green] == TrafficGrid.transition(pid)
+# [:yellow, :yellow, :green, :green, :green] == TrafficGrid.current_lights(pid)
+
+# [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.transition(pid)
+# [:yellow, :yellow, :yellow, :green, :green] == TrafficGrid.current_lights(pid)
+
+# [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.transition(pid)
+# [:yellow, :yellow, :yellow, :yellow, :green] == TrafficGrid.current_lights(pid)
+
+# [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+# [:yellow, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+# [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+# [:red, :yellow, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+# [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.transition(pid)
+# [:red, :red, :yellow, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+# [:red, :red, :red, :yellow, :yellow] == TrafficGrid.transition(pid)
+# [:red, :red, :red, :yellow, :yellow] == TrafficGrid.current_lights(pid)
+
+# [:red, :red, :red, :red, :yellow] == TrafficGrid.transition(pid)
+# [:red, :red, :red, :red, :yellow] == TrafficGrid.current_lights(pid)
+
+# [:red, :red, :red, :red, :red] == TrafficGrid.transition(pid)
+# [:red, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)
+
+# [:green, :red, :red, :red, :red] == TrafficGrid.transition(pid)
+# [:green, :red, :red, :red, :red] == TrafficGrid.current_lights(pid)
 ```
 
 ## Commit Your Progress

@@ -27,34 +27,26 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-We're going to add book content to books in our book_search application.
+We're going to add book contents to books in our `BookSearch` application.
+While we could simply add a `:contents` field in each `Book`, this would likely result in loading too much data when we list all of our books.
 
-`BookContent` will represent the contents of the book. It will have a `:summary` field
-with a text summary of the book, and a `:content` field will the full text contents of the book.
+Instead, we'll put book contents in a separate table. Each `BookContents` record will contain the full-text contents of the book in a `:content` field.
 
 ```mermaid
 classDiagram
-  class BookContent {
+  class BookContents {
     book_id: :id
-    summary: :text
     content: :text
   }
 ```
 
-Each `BookContent` record will **belong to** a `Book`. And each `Book` will **has one/have one** book.
-`Book`s and `BookContent` have a **one-to-one** relationship with each other.
+`Book`s and `BookContents` have a **one-to-one** relationship. Each `BookContent` record **belongs to** a `Book`. And each `Book` **has one** book.
 
-`BookContent` can hold a large amount of data, so we've chosen to put `BookContent` into a separate table to avoid loading too much data with each `Book`.
-Alternatively we could have simply added the `:content` and `:summary` fields to `Book`, but this could easily result in performance issues.
+Instead of creating a new table, we could have simply added a new `:content` field to each `Book`. However, this could result in each book having a huge amount of data, so we've instead chosen to put `BookContent` into a separate table to avoid potential performance issues.
 
-Arguably, we could still encounter performance issues by storing an entire book in a single text field, however we're not
-going to address that optimization as it's beyond the scope of this lesson.
+We could still have performance issues loading an entire book into memory, but that problem goes beyond the scope of this lesson.
 
-To model one-to-one relationships in a Database we store a foreign key in one table to the other.
-Typically one-to-one relationships have a parent and a child entity. One entity belongs to the other.
-The foreign key relationship is stored on the child entity that belongs to the parent.
-
-`Book` owns `BookContent`, so `BookContent` stores a foreign key to the `Book` that it belongs to.
+Typically one-to-one relationships have a parent and a child entity. In this case, the `Book` is the parent, and the `BookContents` is the child. Our Database stores the foreign key of the parent record on the child record to track the relationship.
 
 ### Books Table
 
@@ -62,7 +54,7 @@ The foreign key relationship is stored on the child entity that belongs to the p
 | --- | ---------------------------- |
 | 123 | "We are Legend (We are Bob)" |
 
-### book_contents Table
+### Book_contents Table
 
 | id  | book_id | content                                                                      |
 | --- | ------- | ---------------------------------------------------------------------------- |
@@ -77,19 +69,20 @@ classDiagram
     title: :string
   }
 
-  class BookContent {
+  class BookContents {
     book_id: :id
     content: :text
   }
 
-  BookContent "1" --> "1" Book :belongs_to
+  BookContents "1" --> "1" Book :belongs_to
 ```
 
 ## Run Book Search Project
 
 Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/BrooklinJazz/book_search/tree/tags) project on the `tags` branch.
+If you get stuck at any point during this lesson, you can reference the existing [BookSearch/book_content](https://github.com/BrooklinJazz/book_search/tree/book_content) branch with the completed version of this project.
 
-All tests should pass.
+Before starting, all tests should pass.
 
 ```
 $ mix test
@@ -103,7 +96,7 @@ $ mix phx.server
 
 ## Books Contents Migration
 
-We aren't going to use the Phoenix generators to create the book content resource because book content is going to be very closely tied to the existing book resource.
+`BookContents` will be closely tied to it's parent resource. When we create or update a `Book` we will also create or update `BookContents`.
 
 We need to create a book contents table, so let's generate a new migration.
 
@@ -202,7 +195,7 @@ end
 
 ## Create Book Content
 
-We want to create the associated book contents whenever we create a book. Let's start with a test.
+We want to create the associated book contents whenever we create a book. So let's start with a test. This test will ensure the created book has a `book_contents` association with a `content` field.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -217,7 +210,7 @@ test "create_book/1 with book content creates a book with book content" do
 end
 ```
 
-We can use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create associations from parameters. [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful when you want to manage associations with external data, such as parameters coming from a form.
+We can use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create associations from parameters. [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful when managing associations with external data, such as parameters coming from a form.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -302,7 +295,7 @@ def update_book(%Book{} = book, attrs) do
 end
 ```
 
-For the sake of completeness, let's make a test for the controller as well that will already pass. Add this test inside of the existing `"update book"` describe block.
+For the sake of completeness, let's make a test for the controller as well that will already pass. Add this test inside the existing `"update book"` describe block.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -325,7 +318,7 @@ end
 
 ## Managing Associations
 
-So far we've seen three different functions for managing associations.
+So far, we've seen three different functions for managing associations.
 
 * [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4)
 * [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3)
@@ -344,7 +337,7 @@ flowchart LR
 Record --> Association
 ```
 
-It allows you to add, remove, or change all associatiated records at once.
+It allows you to add, remove, or change all associated records at once.
 
 **Example Return Value**:
 
@@ -397,9 +390,9 @@ Parent --> Child
 }
 ```
 
-Keep in mind, for our example book search application we've chosen to use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) for the sake of demonstration, however we could have used [put_assoc/4](https://hexdocs.pm/ecto/Ecto.html#put_assoc/4) instead.
+We've chosen to use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) in the `BookSearch` project for demonstration purposes. However, we could have used [put_assoc/4](https://hexdocs.pm/ecto/Ecto.html#put_assoc/4) instead.
 
-For example, you can replace `create_book/1` with the following and all tests continue to pass.
+For example, you can replace `create_book/1` with the following, and tests continue to pass.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -426,9 +419,9 @@ end
 > Casts the given association with the changeset parameters.
 > This function should be used when working with the entire association at once (and not a single element of a many-style association) and receiving data external to the application.
 > 
-> * [cast_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+> * [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
 
-We use [cast_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) when we want to use parameters to create our association. This is often useful for external data such as the parameters we receive from a form.
+We use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) when we want to use parameters to create our association. (https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful for external data such as the parameters we receive from a form.
 
 ```mermaid
 flowchart LR
@@ -498,7 +491,7 @@ Modify the book form template file to include an input for book contents.
 </.form>
 ```
 
-We need to preload the book contents association otherwise this form will crash. Notice we have some failing tests.
+We need to preload the book contents association; otherwise, this form will crash. Notice we have some failing tests.
 
 ```sh
 $ mix test
@@ -533,7 +526,7 @@ $ mix test
 
 We can view our new book contents field when we visit http://localhost:4000/authors/1/books/new.
 
-Now that we have a form, ket's a test to ensure we can send the book contents in our `BookController.create/2` action, and that we display the book contents on the book show page. Put the following test inside of the existing `"create book"` describe block.
+Now that we have a form let's add a test to ensure we can send the book contents in our `BookController.create/2` action and that we display the book contents on the book show page. Put the following test inside the existing `"create book"` describe block.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -553,7 +546,7 @@ test "with book content", %{conn: conn} do
 end
 ```
 
-Add book contents to the book show page. We haven't enforced that a book must have book contents, so we'll make sure book contents exists before displaying them.
+Add book contents to the book show page. We haven't enforced that a book must have book contents, so we'll ensure book contents exist before displaying them.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -596,7 +589,7 @@ $ mix test
 
 ## Update Book
 
-We'll also want to update book content when we update a book. Let's write a test to ensure we can update the book content.
+We'll also want to update book content when we update a book. So let's write a test to ensure we can update the book content.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -665,7 +658,7 @@ $ mix test
 
 ## Large Data
 
-We want to make sure our book contents can contain a large amount of data. We can use the [Faker](https://github.com/elixirs/faker) library to generate large amounts of fake text.
+We want to ensure our book contains a large amount of data. We can use the [Faker](https://github.com/elixirs/faker) library to generate large amounts of fake text.
 
 Add `Faker` to our list of dependencies.
 
@@ -706,7 +699,7 @@ Make sure to install dependencies.
 $ mix deps.get
 ```
 
-The [Faker.Lorem](https://hexdocs.pm/faker/Faker.Lorem.html) module handles generating specified amounts of fake text. The `Faker.Lorem` module is named after [Lorem ipsum](https://simple.wikipedia.org/wiki/Lorem_ipsum) which is a commonly for fake text.
+The [Faker.Lorem](https://hexdocs.pm/faker/Faker.Lorem.html) module handles generating specified amounts of fake text. The `Faker.Lorem` module is named after [Lorem ipsum](https://simple.wikipedia.org/wiki/Lorem_ipsum), which is commonly used for fake text.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -729,3 +722,66 @@ end
 ```
 
 The test already passes, but it's good to verify we can have books with lots of content!
+
+## Seed Book Content
+
+Let's add a book with some large content to our seed file to manually test our application.
+
+```elixir
+alias BookSearch.Tags
+alias BookSearch.Authors
+alias BookSearch.Books
+
+if Mix.env() == :dev do
+  {:ok, author1} = Authors.create_author(%{name: "Patrick Rothfuss"})
+  {:ok, author2} = Authors.create_author(%{name: "Dennis E Taylor"})
+
+  [tag1, tag2, tag3, tag4] =
+    ["fiction", "fantasy", "history", "sci-fi"]
+    |> Enum.map(fn tag_name ->
+      {:ok, tag} = Tags.create_tag(%{name: tag_name})
+      tag
+    end)
+
+  Books.create_book(%{
+    title: "Name of the Wind",
+    author: author1,
+    tags: [tag1, tag2],
+    # Added book contents
+    book_contents: %{content: Faker.Lorem.paragraph(1000..2000)}
+  })
+
+  Books.create_book(%{
+    title: "We are Legend (We are Bob)",
+    author: author2,
+    tags: [tag3, tag4]
+  })
+end
+```
+
+Then reset the Database and run the seed file.
+
+```
+$ mix ecto.reset
+```
+
+Now we can visit http://localhost:4000/author/1/books/1 and see our book content.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_show_page_with_content.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In your seed file, change the size of `:content` in `:book_contents` to be significantly larger such as `100000..1000000` sentences. Do you experience any performance issues?
+
+## Commit Your Progress
+
+Run the following in your command line from the project folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish book search book content section"
+```

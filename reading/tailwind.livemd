@@ -1,0 +1,538 @@
+# Tailwind
+
+```elixir
+Mix.install([
+  {:kino, github: "livebook-dev/kino", override: true},
+  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
+  {:vega_lite, "~> 0.1.4"},
+  {:kino_vega_lite, "~> 0.1.1"},
+  {:benchee, "~> 0.1"},
+  {:ecto, "~> 3.7"},
+  {:math, "~> 0.7.0"},
+  {:faker, "~> 0.17.0"},
+  {:utils, path: "utils"},
+  {:httpoison, "~> 1.8"},
+  {:poison, "~> 5.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+Tailwind is a CSS utility framework. It allows us to use utility classes defined by Tailwind to conveniently apply css styles.
+
+For example, we can use the `underline` class to apply an underline to an HTML element.
+
+```html
+<h1 class="underline">
+  Hello world!
+</h1>
+```
+
+This applies the following CSS to the heading 3 element.
+
+```CSS
+text-decoration-line: underline;
+```
+
+Keep in mind, there is nothing we can do in Tailwind that we cannot do with pure CSS.
+Tailwind is purely for convenience. In general, you'll want to learn CSS styles, then learn the appropriate CSS class on Tailwind. Knowledge of pure CSS will always be more generally applicable than knowledge of Tailwind.
+
+However, Tailwind is a very popular and important CSS framework in the Elixir ecosystem. Many projects use Tailwind, and it's become part of the standard PETAL [Phoenix, Elixir Tailwind, AlpineJS and LiveView] stack, which is a set of common tools used to create Elixir web applications.
+
+## Play CDN
+
+To experiment with Tailwind, we can use the Tailwind CDN (Content Delivery Network) in an HTML file. This CDN provides the JavaScript necessary to run Tailwind.
+
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <h1 class="text-3xl font-bold underline">
+    Hello world!
+  </h1>
+</body>
+</html>
+```
+
+## Tailwind Play
+
+Alternatively, we can use the [Tailwind Play](https://play.tailwindcss.com/) playground to experiment with Tailwind classes.
+
+For example, go to [Tailwind Play](https://play.tailwindcss.com/) and enter the following html to create an HTML heading 3 element with bold font, an underline, and a triple extra large font size.
+
+```html
+<h1 class="font-bold underline text-3xl">
+  Hello world!
+</h1>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/tailwind_play_heading_3.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+This is the same as applying the following CSS styles.
+
+```css
+h1 {
+  // underline
+  text-decoration-line: underline;
+
+  // font-bold
+  font-weight: 700;
+
+  // text-3xl
+  font-size: 1.875rem; /* 30px */
+  line-height: 2.25rem; /* 36px */
+}
+```
+
+We're going to use [Tailwind Play](https://play.tailwindcss.com/) instead of a local HTML file for the sake of this lesson.
+
+## Documentation
+
+We can find all available Tailwind utility classes pm the [Tailwind Documentation](https://tailwindcss.com/docs/installation). They have a handy Quick Search for finding Tailwind classes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/tailwind_quick_search.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn (BONUS)
+
+Use the [Tailwind Documentation](https://tailwindcss.com/docs/installation) and the [Tailwind Play](https://play.tailwindcss.com/) playground to create the following button. This is a challenge of your resourcefulness at reading documentation and problem solving.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/tailwind_button_example.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+If you can't figure it out, don't worry, and don't spend too much time on this. Hopefully it will become clear after the rest of the lesson.
+
+## Background
+
+We're able to set the background color using the `bg-{color}-{shade}` class.
+
+Tailwind comes with a [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette). Each color has a base name such as `red` then a number to indicate the shade of color.
+
+The default colors are `slate`, `gray`, `zinc`, `neutral`, `stone`, `red`, `orange`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, and `rose`.
+
+The default shades are `50`, `100`, `200`, `300`, `400`, `500`, `600`, `700`, `800`, and `900`.
+
+So we can apply a background color to an HTML element like so.
+
+```html
+<h1 class="bg-orange-500"></h1>
+```
+
+Try using the `bg-{color}-{shade}` utility class in the [Tailwind Play](https://play.tailwindcss.com/) playground.
+
+## Text
+
+### [Font Size](https://tailwindcss.com/docs/font-size)
+
+We've already seen we can change font size using `text-{size}` utilities.
+
+```html
+<p class="text-3xl">
+```
+
+We have access to the following sizes: `xs`, `sm`, `base`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`, `6xl`, `7xl`, `8xl`, and `9xl`.
+
+With Tailwind, `<p>`, `h1`, `h2`, `h3`, `h4`, `h5`, and `h6` are purely semantic and do not apply any styles by default.
+
+Try putting the following HTML into the [Tailwind Playground](https://play.tailwindcss.com/) and notice there is no difference between each element.
+
+```html
+<p>paragraph</p>
+<h1>h1</h1>
+<h2>h2</h2>
+<h3>h3</h3>
+<h4>h4</h4>
+<h5>h5</h5>
+<h6>h6</h6>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Font Weight](https://tailwindcss.com/docs/font-weight)
+
+`font-{weight}` sets the font weight of text. The `weight` can be `thin`, `extralight`, `light`, `normal`, `medium`, `semibold`, `bold`, `extrabold`, and `black`.
+
+```html
+<p class="thin">100</p>
+<p class="extralight">200</p>
+<p class="light">300</p>
+<p class="normal">400</p>
+<p class="medium">500</p>
+<p class="semibold">600</p>
+<p class="bold">700</p>
+<p class="extrabold">800</p>
+<p class="black">900</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Text Color](https://tailwindcss.com/docs/text-color)
+
+We can use `text-{color}` with the [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette) to set the color of the text.
+
+```html
+<p class="text-red-500">red text</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Text Align](https://tailwindcss.com/docs/text-align)
+
+We can use `text-left`, `text-center`, and `text-right` as well as other [text-align](https://tailwindcss.com/docs/text-align) classes to align text inside its container.
+
+```html
+<p class="text-center">centered text</p>
+```
+
+## Height and Width
+
+We can set height and width using the `h-{size}` and `w-{size}` classes. Refer to the [Height](https://tailwindcss.com/docs/height) and [Width](https://tailwindcss.com/docs/width) documentation for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Fixed
+
+We can provide a fixed-size for the height and width of `0`, `0.5`, `1`, `1.5`, `2`, `2.5`, `3`, `3.5`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `14`, `16`, `20`, `24`, `28`, `32`, `36`, `40`, `44`, `48`, `52`, `56`, `60`, `64`, `72`, `80`, or `96`. These correspond to certain rem/px values.
+
+```html
+<!-- Height -->
+<h1 class="h-64">The height of this element is 16rem or 256px</h1>
+
+<!-- Width -->
+<h1 class="w-64">The width of this element is 16rem or 256px</h1>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Fractions
+
+The `size` can also be provided as a fraction of halves, thirds, fourths, fifths, sixths, or twelfths. For example: `1/2`, `2/3`, `3/4`, `2/5`, `4/6`, and `7/12`. This size will be relative to the parent container.
+
+```html
+<!-- Height -->
+<div class="h-64">
+  <h1 class="h-1/2">This height will be 8rem or 128px because it is half the height of `h-64`</h1>
+</div>
+
+<!-- Width -->
+<div class="w-64">
+  <h1 class="w-1/2">This width will be 8rem or 128px because it is half the width of `w-64`</h1>
+</div>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Full/Viewport
+
+We can use `-screen` to use the full height or width of the screen.
+
+```html
+<h1 class="h-screen">This will be the full height of the screen regardless of parent container</h1>
+<h1 class="w-screen">This will be the full width of the screen regardless of parent container</h1>
+```
+
+We can use `-full` to set the height or width to the full size of the parent container. This has the same effect as `-screen` if the parent container is already the size of the screen.
+
+```html
+<!-- Height -->
+<div class="h-64">
+  <h1 class="h-full">This height will be 16rem or 256px because it is the full the height of `h-64`</h1>
+</div>
+
+<!-- Width -->
+<div class="w-64">
+  <h1 class="w-full">This width will be 16rem or 256px because it is the full the width of `w-64`</h1>
+</div>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Max Height and Width
+
+We can set the max/min height/width using the `max-h-{size}`, `min-h-{size}`, `max-w-{size}`. The acceptable `size` values are specific for each. Refer to the [Max-Height](https://tailwindcss.com/docs/max-height), [Max-Width](https://tailwindcss.com/docs/max-width), [Min-Height](https://tailwindcss.com/docs/min-height), and [Min-Width](https://tailwindcss.com/docs/min-width) documentation for more.
+
+```html
+<p class="max-h-12">The max height of this paragraph will be 2rem or 48px</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the [Tailwind Playground] create a paragraph tag that will wrap text on a new line when wider than 10rem.
+
+<p style="width: 10rem; background-color: lightgrey">
+For example, this paragraph will wrap words when the text is wider than 10rem.<p>
+</p>
+
+## Padding and Margin
+
+We can use `p-{size}` and `m-{size}` to set padding and margin.
+
+The acceptable size values are the same integers as height and width: `0`, `0.5`, `1`, `1.5`, `2`, `2.5`, `3`, `3.5`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `14`, `16`, `20`, `24`, `28`, `32`, `36`, `40`, `44`, `48`, `52`, `56`, `60`, `64`, `72`, `80`, and `96`.
+
+```html
+<p class="p-10">This paragraph has 2.5 rem or 40px of padding on each side.</p>
+<p class="m-12">This paragraph has 3 rem or 48px of margin on each side.</p>
+```
+
+We can also set the horizontal padding/margin using `py`, `px`, `my`, and `mx`.
+
+```html
+<p class="px-10">This paragraph has 2.5 rem or 40px of padding on the left and right side.</p>
+<p class="my-12">This paragraph has 3 rem or 48px of margin on the top and bottom side.</p>
+```
+
+We can set padding/margin on a specific side using `pt`, `pr`, `pb`, `pl`, `mt`, `mr`, `mb`, or `ml`.
+
+```html
+<p class="pl-10">This paragraph has 2.5 rem or 40px of padding on the left side.</p>
+<p class="mt-12">This paragraph has 3 rem or 48px of margin on the top side.</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Auto and Centering Content.
+
+We're also able to set margin and padding to automatically fill the available space using `-auto`. For example, we can center content using `mx-auto`. Note that the content must have some width. We can sent the width of an element to be the size of its child content using `w-fit`.
+
+```html
+<p class="mx-auto w-fit">centered paragraph</p>
+```
+
+## Border
+
+We have several Tailwind classes for modifying the border of an HTML element.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Border Width](https://tailwindcss.com/docs/border-width)
+
+We can set the border-width to `1px` using `border` or provide a size using `border-{size}` where `size` is a valid integer `0`, `2`, `4`, or `8`.
+
+```html
+<!-- 1px -->
+<p class="border">bordered paragraph</p>
+
+<!-- 2px -->
+<p class="border-2">bordered paragraph</p>
+
+<!-- 4px -->
+<p class="border-4">bordered paragraph</p>
+
+<!-- 8px -->
+<p class="border-8">bordered paragraph</p>
+```
+
+We can also set the vertical border using `border-y` or the horizontal border using `border-x`.
+
+```html
+<p class="border-y-2">This paragraph has a 2px border on top and bottom side</p>
+<p class="border-x-2">This paragraph has a 2px border on left and right side</p>
+```
+
+Finally, we can set the border width on a specific side using `border-t`, `border-r`, `border-b`, and `border-l`.
+
+```html
+<p class="border-t-2">This paragraph has a 2px border on top side</p>
+<p class="border-l-2">This paragraph has a 2px border on left side</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Border Color](https://tailwindcss.com/docs/border-color)
+
+We can set the border-color using any colors from the [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette) using `border-{color}` in combination with `border-{size}`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<p class="border-2 border-red-500">bordered paragraph</p>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Border Radius](https://tailwindcss.com/docs/border-radius)
+
+We can round the corners of our border using `rounded`.
+
+```html
+<p class="rounded">This paragraph has a border-radius of 0.25rem or 4px </p>
+```
+
+We can set the border radius size using `rounded-{size}`. The `size` may be `none`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, or `full`.
+
+```html
+<p class="rounded-lg">This paragraph has a border-radius of 0.5 rem or 8px</p>
+```
+
+We can also set the radius of a specific border corner using `t`, `r`, `b`, `l`, `tl`, `tr`, `br`, and `bl`.
+
+```html
+<p class="rounded-r-lg">This paragraph has a top and bottom right border-radius of 0.5 rem or 8px</p>
+
+<p class="rounded-br-lg">This paragraph has a bottom right border-radius of 0.5 rem or 8px</p>
+```
+
+## Position
+
+We can set the position value of an HTML element using `static` (default), `fixed`, `absolute`, `relative`, and `sticky`. We often use position together with `top-{size}`, `right-{size}`, `left-{size}`, and `bottom-{size}` to adjust their positioning on the web page.
+
+```html
+<!-- positions an element at the bottom of the screen regardless of scroll position -->
+<p class="fixed bottom-0">
+
+<!-- positions an element at the top of their parent container  -->
+<p class="absolute top-0">
+
+<!-- An element will stick to the top of the current scroll position -->
+<p class="sticky top-0">
+
+<!-- positions an element 3rem or 48px downwards of where it would normally be -->
+<p class="sticky bottom-12">
+```
+
+## Hover, Focus, and Other States
+
+We can apply styles based on the state of the element.
+
+For example, we can use `hover:` with any style to only apply that style on hover.
+
+```html
+<button class="hover:bg-red-300 bg-red-500">hover button</button>
+```
+
+We can also use `focus:` with any style to apply that style on focusing an element. (`outline-none` removes the default outline on a text input.)
+
+```html
+<input class="border-4 focus:border-blue-200 outline-none"></input>
+```
+
+See the [Hover, Focus, and Other States](https://tailwindcss.com/docs/hover-focus-and-other-states) documentation for more.
+
+## Responsive Styles
+
+We can apply styles based on the screen size using `sm:`, `md:`, `lg:`, `xl:`, and `2xl:`.
+
+Try the following in [Tailwind Play](https://play.tailwindcss.com/) and change the width of your browser to see the text size change based on the size of the window.
+
+```html
+<p class="sm:text-sm lg:text-lg">Small on sm screen, Large on large screen.</p>
+```
+
+See [Responsive Design](https://tailwindcss.com/docs/responsive-design) for more.
+
+## Limitations & Configuration
+
+Tailwind is opinionated and purposely constrained. For example, Tailwind provides specific sizes when using fixed units. It also has a set color palette rather than allowing us to provide our own color values.
+
+By being opinionated, we're (hopefully) able to be more productive and consistent. However when we want to break out of the default options, we can provide custom tailwind configuration.
+
+In an HTML file we can write a script to change the tailwind configuration
+
+```html
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "my-color": '#76b5c5',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1 class="text-3xl font-bold underline text-my-color">
+        Hello world!
+    </h1>
+</body>
+
+</html>
+```
+
+In [Tailwind Play](https://play.tailwindcss.com/) there's a **Config** tab to change the tailwind configuration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'my-color': '#76b5c5',
+      },
+    },
+  },
+  plugins: [],
+}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+ 
+</body>
+</html>
+
+## Further Reading
+
+There's plenty more to learn! Here's a curated list of some optional reading you may find interesting and useful.
+
+* [Utility-First Fundamentals](https://tailwindcss.com/docs/utility-first) Tailwind has written an excellent overview of the benefits of using utility classes rather than an alternative approach.
+* [Tailwind Phoenix Guide](https://tailwindcss.com/docs/guides/phoenix). Tailwind includes an installation guide for using Tailwind in a Phoenix project. We'll learn more about Tailwind with Phoenix in a future lesson.
+* [Dark Mode](https://tailwindcss.com/docs/dark-mode) Tailwind includes a `dark:` class you can use to apply styles only in dark mode.
+* [Reusing Styles](https://tailwindcss.com/docs/reusing-styles) A guide on how to avoid repeating yourself with Tailwind.
+* [Adding Custom Styles](https://tailwindcss.com/docs/adding-custom-styles) how to add custom styles to Tailwind.
+
+Refer to the [Tailwind Documentation](https://tailwindcss.com/docs/installation) for more!
+
+## Commit Your Progress
+
+Run the following in your command line from the project folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish tailwind section"
+```
