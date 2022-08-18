@@ -4,8 +4,6 @@ defmodule UtilsTest do
   alias Utils.Factory
   alias Utils.Notebooks
   alias Utils.Solutions
-  alias Livebook.LiveMarkdown.MarkdownHelpers
-  @minor_words ["and", "the", "in", "to", "of"]
 
   test "slide/1" do
     Utils.Slide.__info__(:functions)
