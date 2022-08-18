@@ -116,7 +116,7 @@ defmodule UtilsTest do
              #{file_name}:#{line_number}.
 
              Expected: #{expected}
-             Recieved: #{heading}
+             Received: #{heading}
 
              Manually resolve the issue or run mix format_headings.
              """
