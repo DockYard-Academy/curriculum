@@ -14,26 +14,68 @@ See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculu
 
 ## QuickStart
 
-1. Clone the project `git clone <URL>`.
+The recommended installation methods for this course are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs, please ensure your Livebook version is correct. In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
 
-2. Install a compatible [Elixir and Erlang](https://elixir-lang.org/install.html) version. See [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions). You may wish to use [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-dependencies).
+### MacOS
 
-3. Install [Livebook](https://github.com/livebook-dev/livebook):
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
 
-   ```sh
-   mix escript.install github livebook-dev/livebook
-   ```
+2. Install Elixir
+   - `brew install elixir`
+   
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript.install hex livebook`
+   - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
 
-4. From the project folder run the command below. This opens the navigation
-   page where you can find the course reading material and associated
-   exercises.
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
 
-   ```sh
-   livebook server start.livemd
-   ```
+### Windows
 
-If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs,
-ensure your Livebook version is correct.
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+
+2. Install Elixir
+   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings. 
+   - NOTE: You need to type `iex.bat` instead of `iex` when starting the interactive REPL.
+   - Run `iex.bat --sname test` to trigger a firewall prompt that needs to be accepted to run Livebook.
+   - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
+
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript install hex livebook`
+   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line. 
+   - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
+   
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
+
+### Windows+WSL (Ubuntu)
+
+1. Install the Ubuntu distribution application from the Windows store [here](https://apps.microsoft.com/store/detail/ubuntu-on-windows/9NBLGGH4MSV6?hl=en-ca&gl=CA). Follow the instructions in the description to ensure WSL in enabled on your system.
+
+2. Follow the installation steps below for Linux (Ubuntu) inside the Ubuntu WSL application you just downloaded.
+
+### Linux (Ubuntu)
+
+1. Clone the project
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+
+2. Install Elixir
+      - Add the Erlang Solutions repository
+         - `wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && sudo dpkg -i erlang-solutions_2.0_all.deb`
+      - Update the package repository list
+         - `sudo apt-get update`
+      - Install Erlang
+         - `sudo apt-get install esl-erlang`
+      - Install Elixir
+         - `sudo apt-get install elixir`
+
+3. Install [Livebook](https://github.com/livebook-dev/livebook)
+   - `mix escript.install hex livebook`
+
+4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
+   - `livebook server start.livemd`
 
 ## Troubleshooting
 
@@ -98,24 +140,6 @@ Now you can run Livebook using the `livebook` command.
 livebook server
 ```
 
-### LiveBook Desktop App (Currently) Not Supported
-
-Unfortunately, the curriculum is intended to be run from the command line in the project folder. If you're using the livebook desktop app, livebook files will fail to correctly install dependencies. We're working on a fix as soon as possible!
-
-For now, there is a workaround by running livebook with the **Mix standalone** runtime connected to the `utils` project.
-
-To run the project in **Mix Standalone** mode:
-1. start livebook.
-2. open the curriculum folder in livebook.
-3. open `start.livemd` or any other `.livemd` file in livebook.
-4. Go to **Runtime Settings**.
-5. Click the gear icon.
-6. Select **Mix standalone**.
-7. Select the `utils` project in the curriculum folder.
-8. Click **Connect**.
-
-You should be able to use the curriculum normally now.
-
 ### Livebook server not starting (Windows)
 
 This is a known Livebook issue ([196](https://github.com/livebook-dev/livebook/issues/196), [194](https://github.com/livebook-dev/livebook/issues/194), [1042](https://github.com/livebook-dev/livebook/issues/1042)) that happens when some Erlang files don't show a dialog for its firewall approval on the first Livebook execution after being installed.
@@ -123,6 +147,10 @@ This is a known Livebook issue ([196](https://github.com/livebook-dev/livebook/i
 - Before calling Livebook, execute `iex --sname test` on terminal.
 - On appearing Windows firewall dialog, approve permission for `epmd.exe`.
 - Both `erl.exe` and `epmd.exe` should appear on firewall-allowed apps.
+
+## Unable to locate package (Linux, Windows+WSL)
+
+On a new install of a Linux distribution the package list does not come updated and you need to run (in Ubuntu) `sudo apt update`. This is also true when adding a new package such as when we add the Erlang Solutions repository.
 
 ## Spell Checking
 

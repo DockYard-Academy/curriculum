@@ -10,7 +10,7 @@ Mix.install([
   {:ecto, "~> 3.7"},
   {:math, "~> 0.7.0"},
   {:faker, "~> 0.17.0"},
-  {:utils, path: "utils"}
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -35,8 +35,8 @@ Without tests, it's easy to introduce breaking changes. With tests, when somethi
 > supposed to do. Testing gives us confidence that our code works as expected.
 > This is true for all kinds of testing, whether for automated tests performed
 > by a machine or for manual tests performed by a human.
->
-> * Testing Elixir by Andrea Leopardi and Jeffrey Matthias
+> 
+> * [Testing Elixir](https://pragprog.com/titles/lmelixir/testing-elixir/) by Andrea Leopardi and Jeffrey Matthias
 
 ## Test Behavior, Not Implementation
 
@@ -99,7 +99,7 @@ By planning test cases, we can anticipate possible edge cases and ensure we unde
 
 ## Test Driven Development
 
-Many developers follow a practice of **TDD (Test Driven Development)**, where
+Many developers follow a practice of **[TDD (Test Driven Development)](https://en.wikipedia.org/wiki/Test-driven_development)**, where
 they write the test for their feature before writing the implementation.
 
 These developers would likely claim that TDD leads to better-tested code, simpler interfaces, and other benefits. However, other developers use different approaches, and it's possible to take TDD too far or use it for the wrong situation.
@@ -154,14 +154,14 @@ A test can contain many assertions, and a test module can have many tests.
 
 ## Assertions
 
-`ExUnit` provides many different assertion macros from the [ExUnit.Assertion](https://hexdocs.pm/ex_unit/1.13/ExUnit.Assertions.html#functions)
+`ExUnit` provides many different assertion macros from the [ExUnit.Assertion](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html#functions)
 module. We'll focus on the following common assertions.
 
 * `assert` check if a value is truthy.
 * `refute` check if a value is falsy.
 * `assert_raise` check if the code raises an error.
 
-### assert
+### `assert`
 
 We can use the `assert` macro provided by ExUnit to assert that a value is truthy.
 
@@ -199,9 +199,9 @@ end
 ExUnit.run()
 ```
 
-### refute
+### `refute`
 
-The `refute` macro is the opposite of the `assert` macro. It checks that a value is falsy (`nil` or `false`)
+The `refute` macro is the opposite of the `assert` macro. It checks that a value is falsy (`nil` or `false`).
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -499,7 +499,7 @@ end
 ExUnit.run()
 ```
 
-## Types of Test
+## Types Of Test
 
 There are three primary types of tests.
 
@@ -707,7 +707,7 @@ files in the `test/` folder automatically compile, evaluate, and execute when we
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Run tests
+### Run Tests
 
 We can execute all tests by running the following from the command line in the project folder.
 
@@ -717,7 +717,7 @@ $ mix test
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Run tests in a file
+### Run Tests In A File
 
 We can run a single test file by providing its path.
 
@@ -733,7 +733,7 @@ $ mix test test/math_test.exs
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Run tests by line number
+### Run Tests By Line Number
 
 We can execute a specific test or several tests under a `describe` block by providing the line number.
 
@@ -790,7 +790,7 @@ $ mix test test/math_test.exs:1
 We can use `@moduletag`, `@describetag`, and `@tag` module attributes to tag our tests.
 Once tagged, we can configure ExUnit to exclude, include, or only run tests with specific tags.
 
-See the documentation for more on [ExUnit Configuration](https://hexdocs.pm/ex_unit/1.12/ExUnit.html#configure/1).
+See the documentation for more on [ExUnit Configuration](https://hexdocs.pm/ex_unit/ExUnit.html#configure/1).
 
 Notice below that the test suite passes because the failing test never runs.
 
@@ -859,7 +859,7 @@ ExUnit.run()
 Once tagged, we can use the flags `--only`, `--exclude`, and `--include` to run specific tests.
 
 ```
-mix test --exclude my_tag
+$ mix test --exclude my_tag
 ```
 
 Alternatively, we can place the `ExUnit.configure/1` function in `test_helpers.exs`.
@@ -883,7 +883,7 @@ Ensure tests with your skipped test do not run.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Documentation and Doc Testing
+### Documentation And Doc Testing
 
 We use the `@moduledoc` and `@doc` module attributes to document our code in a mix project.
 By documenting our project, we explain to other developers the purpose of our code.
@@ -916,8 +916,8 @@ end
 
 ```
 
-Notice the `Examples` section, which simulates an `IEx` shell. This is a doc test.
-doc tests are run by the corresponding test file `math_test.exs` using the `doctest` macro from `ExUnit`.
+Notice the `Examples` section, which simulates an `IEx` shell. This is a Doctest.
+Doctests are run by the corresponding test file `math_test.exs` using the `doctest` macro from `ExUnit`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -940,11 +940,11 @@ However, they can be a great way to TDD your code and ensure the documentation r
 
 ### Your Turn
 
-Add doctests for the `math.ex` the `add/2` and `subtract/2` functions. Include an example
+Add Doctests for the `math.ex` the `add/2` and `subtract/2` function. Include an example
 for each data type (integers, floats, strings, lists, maps, keyword lists).
 
-Generally, doctests go in an `Examples` section.
-You can write multiple doc tests like so.
+Generally, Doctests go in an `Examples` section.
+You can write multiple Doctests like so.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -966,9 +966,9 @@ You can write multiple doc tests like so.
 
 For more on testing, consider using the following resources.
 
-* [Mix Test](https://hexdocs.pm/mix/Mix.Tasks.Test.html) For more on how you can use the `mix test` command.
-* [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) For documentation on ExUnit.
-* [ElixirSchools: Documentation](https://elixirschool.com/en/lessons/basics/documentation) An lesson by Elixir schools on documentation and doc-testing.
+* [Mix Test](https://hexdocs.pm/mix/Mix.Tasks.Test.html), for more on how you can use the `mix test` command.
+* [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html), for documentation on ExUnit.
+* [ElixirSchools: Documentation](https://elixirschool.com/en/lessons/basics/documentation), an lesson by Elixir schools on documentation and doc-testing.
 
 ## Commit Your Progress
 
