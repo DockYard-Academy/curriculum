@@ -162,6 +162,14 @@ If contributing to the project, install codespell and run the following command 
 codespell --skip="./utils/deps/*,./.git/*,./utils/lib/assets/*" -w
 ```
 
+## Changing Mix Install
+
+Use the following Regulr Expression to rapidly change the `Mix.install/2` section in every livebook.
+
+```
+Mix\.install(.|\n(?!\]))*\n\]\)
+```
+
 ## Course Outcome
 Students will be competent developers prepared to excel in the Elixir industry. They will have
 a solid grasp of Elixir fundamentals, Elixir project development, Phoenix project development, LiveView, and OTP.

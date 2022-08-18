@@ -74,6 +74,29 @@ defmodule UtilsTest do
     end
   end
 
+  test "Ensure all external libraries are installed if used" do
+    # dependency install name, and usage indicator
+    possible_deps = [
+      {":youtube", "YouTube."},
+      {":tested_cell", "TestedCell."},
+      {":hidden_cell", "HiddenCell."},
+      {":httpoison", "HTTPoison."},
+      {":kino_db", "Elixir.KinoDB."},
+      {":postgrex", "Kino.start_child({Postgrex}"}
+    ]
+
+    Notebooks.all_livebooks()
+    |> Enum.each(fn file_name ->
+      file = File.read!(file_name)
+
+      Enum.each(possible_deps, fn {install, usage} ->
+        if String.contains?(file, usage) do
+          assert String.contains?(file, install), "#{file_name}: Add #{install} to Mix.install/2"
+        end
+      end)
+    end)
+  end
+
   test "Ensure no broken / empty links in livebooks" do
     Notebooks.stream_lines(Notebooks.reading() ++ Notebooks.exercises(), fn line ->
       refute Regex.match?(~r/\]\(\)/, line)
