@@ -148,7 +148,7 @@ This is a known Livebook issue ([196](https://github.com/livebook-dev/livebook/i
 - On appearing Windows firewall dialog, approve permission for `epmd.exe`.
 - Both `erl.exe` and `epmd.exe` should appear on firewall-allowed apps.
 
-## Unable to locate package (Linux, Windows+WSL)
+### Unable to locate package (Linux, Windows+WSL)
 
 On a new install of a Linux distribution the package list does not come updated and you need to run (in Ubuntu) `sudo apt update`. This is also true when adding a new package such as when we add the Erlang Solutions repository.
 
