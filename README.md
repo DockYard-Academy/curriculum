@@ -171,87 +171,96 @@ throughout their career. Students will be capable of delivering high-quality, we
 ## Curriculum Outline
 The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full weekly and daily breakdown.
 
-## Week 1 (Livebook Setup)
-1. Course Overview, Command Line, Git, Livebook, PATH
-2. Basics (Simple Types, Operators, Variables, Comments)
-3. Complex Types (atom, tuples, list, keyword list, map, mapset)
+<!-- course-outline-start -->
+
+## Week 1: Core Syntax
+
+1. Course Tools
+2. Basics
+3. Complex Types
 4. Modules, Functions, Structs, Control Flow
-5.
+5. Enumeration
 
-## Week 2
-1. Problem Solving & Enumeration (ranges, map, filter, all, any, count, find, random)
-2. Comprehensions, Enum.reduce
-3. Built-In Modules (Map, Tuple, List, Date & Time)
-4. Guards, Pattern Matching
-5. String Manipulation (Regex, Charlist vs Strings)
+## Week 2: Built-In Tools
 
-## Week 3
-1. Polymorphism, Protocols & Behaviors
-2. Performance (Immutability, Streams, Lists Vs Tuples Vs Maps Vs Mapsets, Big O, Benchee, :timer) & Recursion
-3.
-4. File, .iex Scripts, Persistence, Data Validation (Ecto Changesets) (+Binary)
-5. Processes (Processes, Generic Server, Genserver, Agents, ETS)
+1. Built-In Modules
+2. Dates and Time
+3. Guards, Pattern Matching
+4. String Manipulation
+5. Protocols, and Behaviors.
 
-## Week 4 (Dev Setup)
-1. Mix Tooling (Credo, Dialyzer, Config, Deps, Documentation, ExUnit)
-2. Supervisor Basics and Fault Tolerance (+Task)
-3. BEAM
-4. Ecto & Database Basics
-5.
+## Week 3: Performance, Persistence, and Processes
 
-## Week 5
-1. APIs & Parsing JSON
-2. Networking Basics & Plug
-3. Macros and `use`
-4. Deploying Mix Project
-5.
+1. Recursion
+2. Performance Optimization
+3. Files and Data Validation
+4. Processes
+5. Agent, Task, and ETS
 
-## Week 6 (Phoenix Setup)
-1. Phoenix Framework & Generators (+ Testing Patterns)
-2. HTML & CSS (+ Flex, Grid)
-3. Ecto & RDBMS & SQL & Seeding Data
-4. Tailwind
-5. UX/UI Design + Accessibility (ColorZilla, Axe, Figma)
+## Week 4: Mix Projects
 
-## Week 7
-1. Phoenix Authentication & Permissions
-2. LiveView (+ Testing Patterns)
-3. JavaScript & JS Interoperability & AlpineJS
+1. Elixir Build Tooling
+2. ExUnit & Testing
+3. Supervisor Basics and Fault Tolerance
+4. Relational Database Management Systems and Ecto
+5. Group Project
+
+## Week 5: Web Servers and Phoenix
+
+1. HTML & CSS
+2. APIs & Parsing JSON
+3. Phoenix
+4. Phoenix and Ecto
+5. Phoenix Authentication
+
+## Week 6: Ecto Associations
+
+1. Testing Phoenix
+2. Phoenix and Ecto One to Many Relationships
+3. Phoenix and Ecto Many to Many Relationships
+4. Phoenix and Ecto One to One Relationships
+5. Tailwind
+
+## Week 7: LiveView
+
+1. UX/UI Design + Accessibility
+2. Phoenix LiveView
+3. JavaScript & JS Interoptability & AlpineJS
 4. PubSub & Channels
 5. GraphQL & Absinthe (+ Testing Patterns)
 
-## Week 8
-1. TDD Techniques (Red Green Refactor), Code Clarity, Mix Testing Tools (--slowest, --stale, tags, Elixir Test extension)
+## Week 8: Quality Assurance
+
+1. TDD Techniques (Red Green Refactor)
 2. Metrics, Telemetry, Live Dashboard
-3. Factories & Mocks (ExMachina, Mox)
+3. Factories & Mocks
 4. Property Based Testing (Stream Data) + E2E Testing (Wallaby)
-5. Code Coverage, Github Actions & Hooks
+5. CI/CD, Code Coverage, GitHub Actions & Hooks
 
 ## Week 9 (Group Project)
+
 1. Software & Product Management (Agile, StandUps, Kanban)
 2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 3. Advanced Livebook (Graphs, Tables, Connecting Projects)
-4. Collaborative GitHub Patterns (PRs, Forking, Cloning, Issues)
+4. Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
 5.
 
 ## Week 10
+
 1. Emailing & Swoosh
-2. Oban
-3. Genserver Bottlenecks, Supervision Trees, Worker Pools, Tasks
-4. Umbrella Projects
-5. Nodes, Clustering
+2. Stripe
+3. Designing Elixir Systems
+4. Advanced Livebook
+5. Group Project Presentation
 
-## Week 11 (Final Project)
-1. 
-2. 
-3. 
-4.
-5.
+## Week 11: Scaling Elixir Applications
 
+1. Umbrella Projects
+2. Genserver Bottlenecks
+3. Worker Pools
+4. Nodes & Clustering
+5. Deployment
 
-## Week 12 (Final Project)
-1.
-2.
-3.
-4.
-5.
+## Week 12: (Final Project)
+
+<!-- course-outline-end -->
