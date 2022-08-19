@@ -79,16 +79,21 @@ For practical purposes, be aware most operations on a map will have $O(log(n))$ 
 
 Maps scale better for large values when compared with lists or keyword lists, which grow linearly instead of logarithmically.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
 Accessing any key in a map with a million elements is nearly instant, regardless of which key is accessed!
+
+First, we'll create the large map. This may take a moment.
 
 ```elixir
 large_map = Map.new(1..10_000_000, fn x -> {x, x} end)
 ```
 
-Try changing `key` to any integer between `0` and `999_999`. Notice that accessing the value is
-nearly instant.
+While creating the map took some time, reading a value should be extremely fast.
+
+Evaluate the cell below and notice how quickly we can access a value. Try changing `key` to any integer between `0` and `999_999`. Notice there is no significant affect on the speed of accessing a value.
 
 ```elixir
 key = 500_000
