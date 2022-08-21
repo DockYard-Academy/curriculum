@@ -752,36 +752,51 @@ iex(player2_node@COMPUTER-NAME)> Player.get(:player2)
 There are several bugs still present with the `RockPaperScissors` module.
 
 * guesses other than `:rock`, `:paper`, or `:scissors` are allowed.
-  ```elixir
-      RockPaperScissors.Player.guess(:player1, "any value!")
-      %RockPaperScissors.Player{draws: 1, guess: "any value!", loses: 0, wins: 0}
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.guess(:player1, "any value!")
+%RockPaperScissors.Player{draws: 1, guess: "any value!", loses: 0, wins: 0}
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
 * Neither player guessing is considered a draw when it should not be allowed.
-  ```elixir
-      RockPaperScissors.Player.play(:player1, :player2)
 
-      RockPaperScissors.Player.get(:player1)
-      %RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
+<!-- livebook:{"break_markdown":true} -->
 
-      RockPaperScissors.Player.get(:player2)
-      %RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
-  ```
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.play(:player1, :player2)
+
+RockPaperScissors.Player.get(:player1)
+%RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
+
+RockPaperScissors.Player.get(:player2)
+%RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
 * One player without a guess causes a crash.
-  ```elixir
-      RockPaperScissors.Player.guess(:player1, :rock)
-      RockPaperScissors.Player.play(:player1, :player2)
 
-  ```
-  <div style="color: red;">
-  ** (CondClauseError) no cond clause evaluated to a truthy value
-    (rock_paper_scissors 0.1.0) lib/rock_paper_scissors/player.ex:35: RockPaperScissors.Player.play/2
-  </div>
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  RockPaperScissors.Player.guess(:player1, :rock)
+  RockPaperScissors.Player.play(:player1, :player2)
+```
+
+<div style="color: white; padding: 0.5rem; background:lightcoral; margin-top: 0.5rem;">
+** (CondClauseError) no cond clause evaluated to a truthy value
+  (rock_paper_scissors 0.1.0) lib/rock_paper_scissors/player.ex:35: RockPaperScissors.Player.play/2
+</div>
 
 <!-- livebook:{"break_markdown":true} -->
 

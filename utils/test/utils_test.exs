@@ -74,6 +74,21 @@ defmodule UtilsTest do
     end
   end
 
+  test "Ensure all .livemd files are formatted. Run mix format_notebooks to resolve most issues." do
+    Notebooks.all_livebooks()
+    |> Enum.each(fn file_name ->
+      file = File.read!(file_name)
+      expected = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file)
+
+      assert file == expected
+            #  """
+            #  #{file_name}: Needs to be formatted.
+
+            #  Run mix format_notebooks to format all notebooks.
+            #  """
+    end)
+  end
+
   test "Ensure all external libraries are installed if used" do
     # dependency install name, and usage indicator
     possible_deps = [
