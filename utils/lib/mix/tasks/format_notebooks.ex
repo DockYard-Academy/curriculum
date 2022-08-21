@@ -10,7 +10,9 @@ defmodule Mix.Tasks.FormatNotebooks do
     Notebooks.all_livebooks()
     |> Enum.each(fn file_name ->
       file = File.read!(file_name)
-      new_file = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file)
+      # loading the file in livebook adds a newline, so we add it when we format
+      # to avoid changing the file everytime a student opens a .livemd file.
+      new_file = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n"
       File.write!(file_name, new_file)
     end)
   end
