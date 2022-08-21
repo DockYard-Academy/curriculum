@@ -98,16 +98,24 @@ defmodule UtilsTest do
   end
 
   test "Ensure no broken / empty links in livebooks" do
-    Notebooks.stream_lines(Notebooks.reading() ++ Notebooks.exercises(), fn line ->
+    Notebooks.stream_lines(Notebooks.reading() ++ Notebooks.exercises(), fn line, file_name ->
+      # Empty Links
       refute Regex.match?(~r/\]\(\)/, line)
-    end)
 
-    Notebooks.stream_lines(Notebooks.reading(), fn line ->
-      refute Regex.match?(~r/\]\(.*reading\/\w+.livemd\)/, line)
-    end)
+      # Invalid Links
+      found = Regex.scan(~r/\[(\w+)\]\(((\w|\/|\.)+)\)/, line)
 
-    Notebooks.stream_lines(Notebooks.exercises(), fn line ->
-      refute Regex.match?(~r/\]\(.*exercises\/\w+.livemd\)/, line)
+      Enum.each(found, fn [_full, name, path, _] ->
+        assert String.length(name) > 0, "Link name should not be empty"
+
+        if Regex.match?(~r/exercises|reading/, path) do
+          assert File.exists?(path)
+        else
+          # Relative Links
+          [base_path] = Regex.run(~r/\.\.\/\w+\//, file_name)
+          assert File.exists?(base_path <> path)
+        end
+      end)
     end)
   end
 
@@ -119,7 +127,7 @@ defmodule UtilsTest do
 
   test "Headings should be in title case" do
     Notebooks.all_livebooks()
-    |> Notebooks.stream_lines(fn line, [line_number: line_number, file_name: file_name] ->
+    |> Notebooks.stream_lines(fn line, file_name, line_number ->
       heading =
         case {line, line_number} do
           {"### " <> heading, _} -> heading

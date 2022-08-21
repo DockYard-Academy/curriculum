@@ -22,6 +22,7 @@ defmodule Utils.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:livebook, "~> 0.6.3", only: [:dev, :test], runtime: false},
       {:kino, "~> 0.6.2"},
       {:vega_lite, "~> 0.1.6"},
       {:kino_vega_lite, "~> 0.1.3"},

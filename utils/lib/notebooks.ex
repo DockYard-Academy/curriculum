@@ -9,9 +9,12 @@ defmodule Utils.Notebooks do
       |> File.stream!([], :line)
       |> Stream.with_index()
       |> Stream.map(fn {line, index} ->
+        line_number = index + 1
+
         case arity do
           1 -> function.(line)
-          2 -> function.(line, line_number: index + 1, file_name: file_name)
+          2 -> function.(line, file_name)
+          3 -> function.(line, file_name, line_number)
         end
       end)
       |> Stream.run()

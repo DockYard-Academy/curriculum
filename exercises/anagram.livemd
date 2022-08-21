@@ -46,10 +46,6 @@ Anagram.filter_anagrams("acres", ["cares", "races", "scare", "tree", "bear"])
 ["cares", "races", "scare"]
 ```
 
-```elixir
-TestedCell.show()
-```
-
 <!-- livebook:{"attrs":{"assertions":"assert Anagram.is_anagram?(\"stop\", \"pots\") == true\nrefute Anagram.is_anagram?(\"example\", \"nonanagram\") == true\n\nword = Utils.Factory.string()\n\ngenerate_non_anagram = fn word ->\n  word <> Enum.random([\"a\", \"b\", \"c\"])\nend\n\ngenerate_anagram = fn word ->\n  String.split(word, \"\", trim: true) |> Enum.shuffle() |> Enum.join(\"\")\nend\n\nassert Anagram.is_anagram?(word, generate_anagram.(word)),\n        \"`is_anagram?/1` failed to identify anagram.\"\n\nrefute Anagram.is_anagram?(word, generate_non_anagram.(word)),\n        \"`is_anagram?/1` failed to identify non-anagram.\"\n\nnon_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)\nanagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)\n\nresult = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)\nassert is_list(result), \"filter_anagrams/2 should return a list\"\n\nassert Enum.sort(result) == Enum.sort(anagrams), \"filter_anagrams/2 failed to filter anagrams\"","code":"defmodule Anagram do\r\n  def is_anagram?(word, possible_anagram) do\r\n  end\r\n\r\n  def filter_anagrams(word, possible_anagrams) do\r\n  end\r\nend","solution":"defmodule Anagram do\n  def is_anagram?(word, possible_anagram) do\n    sort_string(word) == sort_string(possible_anagram)\n  end\n\n  def filter_anagrams(word, possible_anagrams) do\n    Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)\n  end\n\n  defp sort_string(string) do\n    String.split(string, \"\", trim: true) |> Enum.sort() |> Enum.join()\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
@@ -109,6 +105,10 @@ defmodule Anagram do
 end
 ```
 
+```elixir
+Anagram.__info__(:functions)
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the project folder to track and save your progress in a Git commit.
@@ -120,6 +120,6 @@ $ git commit -m "finish anagram exercise"
 
 ## Up Next
 
-| Previous | Next |
-| :------- | ----:|
+| Previous                                       | Next                                                                   |
+| ---------------------------------------------- | ---------------------------------------------------------------------: |
 | [Voter Count](../exercises/voter_count.livemd) | [Custom Enum With Reduce](../exercises/custom_enum_with_reduce.livemd) |
