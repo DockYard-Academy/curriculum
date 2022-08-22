@@ -22,9 +22,7 @@
               export PATH=$MIX_HOME/bin:$PATH
               export PATH=$HEX_HOME/bin:$PATH
               export PATH=$MIX_HOME/escripts:$PATH
-              export LIVEBOOK_DEFAULT_RUNTIME=mix:$PWD/utils
               export LIVEBOOK_HOME=$PWD
-              export LIVEBOOK_SHUTDOWN_ENABLED=true
             '';
         };
       }
