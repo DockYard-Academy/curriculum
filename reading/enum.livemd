@@ -5,6 +5,7 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -233,9 +234,58 @@ Enum.reduce([1, 2, 3], 10, fn integer, accumulator -> integer + accumulator end)
 
 Let's break that down step by step.
 
+<!-- livebook:{"attrs":{"source":"frames = [\n      \"\nFirst, we define the call the `Enum.reduce/2` function with a list, and a function.\n```elixir\nEnum.reduce([1, 2, 3, 4], fn integer, accumulator -> integer + accumulator  end)\n```\n\",\n      \"\nThe first element in the list `1` is the initial accumulator value.\n```elixir\nEnum.reduce([2, 3, 4], fn integer, 1 -> integer + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `2`. The next accumulator is 2 + 1\n```elixir\nEnum.reduce([3, 4], fn 2, 1 -> 2 + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `3`. The next accumulator is 3 + 3\n```elixir\nEnum.reduce([4], fn 3, 3 -> 3 + 3  end)\n```\n\",\n      \"\nThe function is called on the next element `4`. The next accumulator is 4 + 6\n```elixir\nEnum.reduce([], fn 4, 6 -> 4 + 6  end)\n```\n\",\n      \"\n4 + 6 equals 10.\n```elixir\nEnum.reduce([], fn 4, 6 -> 10  end)\n```\n\",\n      \"\n`10` is the last accumulator value, so `Enum.reduce/2` returns `10`.\n```elixir\n                           10\n```\n\"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Kino.Markdown.new(Enum.at(frames, i))\nend)","title":"Reduce Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+frames = [
+  "
+First, we define the call the `Enum.reduce/2` function with a list, and a function.
 ```elixir
-Utils.slide(:reduce)
+Enum.reduce([1, 2, 3, 4], fn integer, accumulator -> integer + accumulator  end)
 ```
+",
+  "
+The first element in the list `1` is the initial accumulator value.
+```elixir
+Enum.reduce([2, 3, 4], fn integer, 1 -> integer + 1  end)
+```
+",
+  "
+The function is called on the next element `2`. The next accumulator is 2 + 1
+```elixir
+Enum.reduce([3, 4], fn 2, 1 -> 2 + 1  end)
+```
+",
+  "
+The function is called on the next element `3`. The next accumulator is 3 + 3
+```elixir
+Enum.reduce([4], fn 3, 3 -> 3 + 3  end)
+```
+",
+  "
+The function is called on the next element `4`. The next accumulator is 4 + 6
+```elixir
+Enum.reduce([], fn 4, 6 -> 4 + 6  end)
+```
+",
+  "
+4 + 6 equals 10.
+```elixir
+Enum.reduce([], fn 4, 6 -> 10  end)
+```
+",
+  "
+`10` is the last accumulator value, so `Enum.reduce/2` returns `10`.
+```elixir
+                           10
+```
+"
+]
+
+SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
+  Kino.Markdown.new(Enum.at(frames, i))
+end)
+````
 
 ## Enum.filter
 

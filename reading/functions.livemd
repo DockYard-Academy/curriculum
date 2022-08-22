@@ -5,6 +5,7 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -191,9 +192,44 @@ Under the hood, when the function runs, the parameter is bound to the argument's
 
 Let's break down how a function executes step by step in the following slideshow.
 
-```elixir
-Utils.slide(:functions)
-```
+<!-- livebook:{"attrs":{"source":"frames =     [\n      \"\n  First, we define the `double` function and call it.\n  ```elixir\n  double = fn number -> number * 2 end\n  double.(3)\n  ```\n  \",\n      \"\n  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.\n  ```elixir\n  double = fn number -> number * 2 end\n  fn 3 -> 3 * 2 end\n  ```\n  \",\n      \"\n  The function evaluates the function body between the `->` and the `end`\n  ```elixir\n  double = fn number -> number * 2 end\n  3 * 2\n  ```\n  \",\n      \"\n  `3` * `2` is `6`, so the function call returns `6`.\n  ```elixir\n  double = fn number -> number * 2 end\n  6\n  ```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Function Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+frames = [
+  "
+  First, we define the `double` function and call it.
+  ```elixir
+  double = fn number -> number * 2 end
+  double.(3)
+  ```
+  ",
+  "
+  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.
+  ```elixir
+  double = fn number -> number * 2 end
+  fn 3 -> 3 * 2 end
+  ```
+  ",
+  "
+  The function evaluates the function body between the `->` and the `end`
+  ```elixir
+  double = fn number -> number * 2 end
+  3 * 2
+  ```
+  ",
+  "
+  `3` * `2` is `6`, so the function call returns `6`.
+  ```elixir
+  double = fn number -> number * 2 end
+  6
+  ```
+  "
+]
+
+SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
+  Enum.at(frames, i) |> Kino.Markdown.new()
+end)
+````
 
 As expected, `double.(3)` returns `6`.
 

@@ -5,13 +5,6 @@ defmodule UtilsTest do
   alias Utils.Notebooks
   alias Utils.Solutions
 
-  test "slide/1" do
-    Utils.Slide.__info__(:functions)
-    |> Enum.each(fn {slide_name, _arity} ->
-      assert %Kino.JS.Live{} = Utils.slide(slide_name)
-    end)
-  end
-
   test "table/1" do
     Utils.Table.__info__(:functions)
     |> Enum.each(fn {table_name, _arity} ->
