@@ -5,6 +5,7 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -161,7 +162,7 @@ Throughout this course, you will perform exercises with test feedback. Under the
 
 Evaluate the Elixir cell below to see a failing test. Then change `4` to `5` to see a passing test.
 
-<!-- livebook:{"attrs":{"assertions":"assert five == 5","code":"five = 4","solution":"five = 5"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"assert five == 5","attempts":1,"code":"five = 4","solution":"five = 5","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -169,9 +170,53 @@ ExUnit.start(auto_run: false)
 defmodule Assertion do
   use ExUnit.Case
 
-  test "" do
-    five = 4
-    assert five == 5
+  test "Exercise" do
+    try do
+      Process.flag(:trap_exit, true)
+      five = 4
+      assert five == 5
+    catch
+      error ->
+        flunk("""
+          Your solution threw the following error:
+
+          #{inspect(error)}
+        """)
+
+      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
+        flunk("""
+            GenServer crashed with the following error:
+
+            #{inspect(error)}
+
+            When it recieved: #{inspect(message)} #{message_type}
+
+            Likely you need to define the corresponding handler for #{inspect(message)}.
+
+            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
+
+              def handle_call(:message, _from, state) do
+                ...
+              end
+
+            Then ensure you call `GenServer.call/2`, `GenServer.cast/2`, or otherwise send the message correctly.
+
+              GenServer.call(pid, :message)
+        """)
+
+      :exit, error ->
+        flunk("""
+          Unhandled exit with the following error:
+
+          #{inspect(error)}
+        """)
+    after
+      # all warnings and errors are printed to the previous Kino Frame
+      # to avoid cluttering the test results display.
+      Process.sleep(10)
+      Kino.render(Kino.Markdown.new("### Test Results 
+<hr/>"))
+    end
   end
 end
 
@@ -179,6 +224,7 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
+# Unfortunately, this results in duplication of warnings.
 five = 4
 ```
 
@@ -250,11 +296,3 @@ Randomized with seed 736220
 | Previous                     | Next                                           |
 | ---------------------------- | ---------------------------------------------: |
 | [Git](../reading/git.livemd) | [Code Editors](../reading/code_editors.livemd) |
-
-<!-- livebook:{"break_markdown":true} -->
-
-[Git](./git.livemd)
-
-<a href="./git.livemd">
-Child
-</a>

@@ -90,6 +90,7 @@ defmodule UtilsTest do
     possible_deps = [
       {":youtube", "YouTube."},
       {":tested_cell", "TestedCell."},
+      {":smart_animation", "SmartAnimation."},
       {":hidden_cell", "HiddenCell."},
       {":httpoison", "HTTPoison."},
       {":kino_db", "Elixir.KinoDB."},

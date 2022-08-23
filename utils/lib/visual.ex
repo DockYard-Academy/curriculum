@@ -1,11 +1,4 @@
 defmodule Utils.Visual do
-  def visual(:biggest_integer, integer) do
-    Kino.Markdown.new(~s(
-integer: #{integer}\n
-digits: #{integer |> Integer.digits() |> Enum.count()}
-    ))
-  end
-
   def visual(:loading_bar, percentage) do
     Kino.Markdown.new(~s(
 <div style=\"height: 20px; width: 100%; background-color: grey\">

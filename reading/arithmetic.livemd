@@ -5,6 +5,8 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:visual, github: "brooklinjazz/visual"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -75,16 +77,33 @@ in Elixir are unbounded, meaning they have no maximum size.
 Contrast that with a language like JavaScript which has a maximum safe integer size of `9007199254740991`.
 Elixir makes that look tiny!
 
-```elixir
-biggest_integer = 0
+<!-- livebook:{"attrs":{"code":"biggest_integer = 1","source":"Kino.Markdown.new(~s(\ninteger: #{biggest_integer}\\n\ndigits: #{biggest_integer |> Integer.digits() |> Enum.count()}\n))","title":"Biggest Integer Visual"},"kind":"Elixir.Visual","livebook_object":"smart_cell"} -->
 
-Utils.visual(:biggest_integer, biggest_integer)
+```elixir
+biggest_integer = 1
+Kino.Markdown.new(~s(
+integer: #{biggest_integer}\n
+digits: #{biggest_integer |> Integer.digits() |> Enum.count()}
+))
 ```
 
 You can see unbounded integers in action in the following animation. Watch how the number of digits constantly
 grows! Move on to the next section when you're satisfied that integers are truly unbounded.
 
 To avoid distorting your screen we use mathematical notation $10^{n}$ after 80 digits.
+
+<!-- livebook:{"attrs":{"source":"\n\nSmartAnimation.new(1..100000000, fn i ->\n    max = 10 ** 80\n    integer_display = (10 ** i < max && 10 ** i) || \"$10^{#{i}}$\"\n    Kino.Markdown.new(\"\ninteger: #{integer_display}\\n\ndigits: #{Integer.digits(10 ** i) |> Enum.count()}\n    \")\nend)","title":"Hidden Cell"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+SmartAnimation.new(1..100_000_000, fn i ->
+  max = 10 ** 80
+  integer_display = (10 ** i < max && 10 ** i) || "$10^{#{i}}$"
+  Kino.Markdown.new("
+integer: #{integer_display}\n
+digits: #{Integer.digits(10 ** i) |> Enum.count()}
+    ")
+end)
+```
 
 ```elixir
 Utils.animate(:biggest_integer)
