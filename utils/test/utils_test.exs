@@ -92,6 +92,7 @@ defmodule UtilsTest do
       {":tested_cell", "TestedCell."},
       {":smart_animation", "SmartAnimation."},
       {":hidden_cell", "HiddenCell."},
+      {":benchee", "Benchee."},
       {":httpoison", "HTTPoison."},
       {":kino_db", "Elixir.KinoDB."},
       {":postgrex", "Kino.start_child({Postgrex}"}
