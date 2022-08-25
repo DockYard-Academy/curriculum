@@ -12,7 +12,7 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
       file = File.read!(file_name)
 
       file =
-        Regex.replace(~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+)\/([1-9])\`/, file, fn
+        Regex.replace(~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*)\/([1-9])\`/, file, fn
           full, "Math", _, _, _ ->
             full
 
@@ -29,6 +29,7 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
             end
 
           full, _, module, function, arity ->
+            IO.inspect(function)
             if Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or module in @libraries do
               doc_link = doc_link_from_module(module)
 

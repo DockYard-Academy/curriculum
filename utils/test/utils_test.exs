@@ -99,7 +99,7 @@ defmodule UtilsTest do
 
     Notebooks.all_livebooks()
     |> Notebooks.stream_lines(fn line, file_name, line_number ->
-      Regex.scan(~r/\`([A-Z]\w+)\`|\`([A-Z]\w+)\.\w+\/[1-9]\`/, line)
+      Regex.scan(~r/\`([A-Z]\w+)\`|\`([A-Z]\w+)\.\w+|!\/[1-9]\`/, line)
       |> Enum.map(fn
         [_, module, ""] ->
           module
