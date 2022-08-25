@@ -12,7 +12,7 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
       file = File.read!(file_name)
 
       file =
-        Regex.replace(~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*)\/([1-9])\`/, file, fn
+        Regex.replace(~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*\?*)\/([1-9])\`/, file, fn
           full, "Math", _, _, _ ->
             full
 

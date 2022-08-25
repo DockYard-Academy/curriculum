@@ -21,8 +21,8 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Enum Vs Stream
 
-Currently, we typically use the `Enum` module to work with collections.
-The `Enum` module uses [**eager evaluation**](https://en.wikipedia.org/wiki/Eager_evaluation). That means any
+Currently, we typically use the [Enum](https://hexdocs.pm/elixir/Enum.html) module to work with collections.
+The [Enum](https://hexdocs.pm/elixir/Enum.html) module uses [**eager evaluation**](https://en.wikipedia.org/wiki/Eager_evaluation). That means any
 instruction we provide is immediately executed. This requires each element in the enumeration to be stored in
 memory during execution.
 
@@ -33,7 +33,7 @@ memory during execution.
 |> Enum.take(4)
 ```
 
-Each `Enum` function stores a copy of the the enumerable it creates and executes sequentially as
+Each [Enum](https://hexdocs.pm/elixir/Enum.html) function stores a copy of the the enumerable it creates and executes sequentially as
 seen in this slide.
 
 ```elixir
@@ -41,7 +41,7 @@ Utils.animate(:eager_evaluation)
 ```
 
 While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by
-the end of the execution the `Enum.take/2` function only needs two elements.
+the end of the execution the [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2) function only needs two elements.
 
 It seems like a waste of resources to execute every operation on every element, and it is.
 As the list grows, this becomes a massive waste of computation. It would be far more performant if we
@@ -51,13 +51,13 @@ could instead build up a series of functions and run them one by one only when n
 Utils.animate(:lazy_evaluation)
 ```
 
-We can't accomplish this with the `Enum` module, however we can with `Stream`.
+We can't accomplish this with the [Enum](https://hexdocs.pm/elixir/Enum.html) module, however we can with [Stream](https://hexdocs.pm/elixir/Stream.html).
 [Streams](https://hexdocs.pm/elixir/Stream.html) are composable, lazy enumerables.
 **Lazy** means they execute on each element in the stream one by one. **Composable**
 means that we build up functions to execute on each element in the stream.
 
 Notice that the following does not execute, it instead builds up future work to execute and returns
-a `Stream` data structure.
+a [Stream](https://hexdocs.pm/elixir/Stream.html) data structure.
 
 ```elixir
 1..10
@@ -67,7 +67,7 @@ a `Stream` data structure.
 ```
 
 The Stream stores the enumerable, and the list of functions to call on it. The Stream will only evaluate
-when it's called with any eager function from the `Enum` module. For example,
+when it's called with any eager function from the [Enum](https://hexdocs.pm/elixir/Enum.html) module. For example,
 
 ```elixir
 1..10
@@ -78,7 +78,7 @@ when it's called with any eager function from the `Enum` module. For example,
 ```
 
 As the collection grows, the performance benefits become more clear. Let's compare the same
-functionality from the `Stream` module and the `Enum` module.
+functionality from the [Stream](https://hexdocs.pm/elixir/Stream.html) module and the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
 
 <!-- livebook:{"branch_parent_index":1} -->
 
@@ -127,7 +127,7 @@ enum         191.88 KB - 6.14x memory usage +160.63 KB
 
 ### Your Turn
 
-In the Elixir cell below, try refactoring this code using the `Stream` module.
+In the Elixir cell below, try refactoring this code using the [Stream](https://hexdocs.pm/elixir/Stream.html) module.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -158,7 +158,7 @@ That's because we only gain performance benefits when sequential execution on ea
 collection reduces the amount of computation and/or memory necessary.
 
 Notice how when we string
-multiple maps together, the `Enum` module is still just as fast or even faster than the `Stream` module.
+multiple maps together, the [Enum](https://hexdocs.pm/elixir/Enum.html) module is still just as fast or even faster than the [Stream](https://hexdocs.pm/elixir/Stream.html) module.
 
 ```elixir
 stream_fn = fn ->
@@ -184,7 +184,7 @@ reduce the number of elements in the enumerable.
 
 As you've seen, Streams generate elements one by one and can improve performance.
 They are often beneficial when working with large data as they only consume the amount of data
-necessary for each operation. On the other hand, `Enum` will create an entire copy of
+necessary for each operation. On the other hand, [Enum](https://hexdocs.pm/elixir/Enum.html) will create an entire copy of
 the collection for each intermediate step.
 
 ```mermaid
@@ -228,7 +228,7 @@ flowchart LR
 1 --> 2 --> 3 --> 1
 ```
 
-Here's that shown using `Stream.cycle/2`, which cycles through an enumerable.
+Here's that shown using [Stream.cycle/2](https://hexdocs.pm/elixir/Stream.html#cycle/2), which cycles through an enumerable.
 
 ```elixir
 Stream.cycle([1, 2, 3])
@@ -239,7 +239,7 @@ We've been using Streams for a while now! Did you know that ranges are Streams? 
 in the range is only created as necessary. For example, we can create an incredibly massive range in a
 single moment.
 
-But when we use that massive range with an `Enum` operation, then we pay the computational price!
+But when we use that massive range with an [Enum](https://hexdocs.pm/elixir/Enum.html) operation, then we pay the computational price!
 
 ```elixir
 {creation_time, _result} = :timer.tc(fn -> 1..10_000_000_000_000_000_000_000_000_000 end)
@@ -251,7 +251,7 @@ But when we use that massive range with an `Enum` operation, then we pay the com
 
 ### Stream.iterate/2
 
-We can use `Stream.iterate/2` to iterate over an accumulator.
+We can use [Stream.iterate/2](https://hexdocs.pm/elixir/Stream.html#iterate/2) to iterate over an accumulator.
 For example, we could start at `0`, and then add `1` to it for every iteration.
 
 ```mermaid
@@ -330,7 +330,7 @@ Stream.iterate(starting_integer, fn n -> if rem(n, 2) === 0, do: div(n, 2), else
 
 ### Stream.unfold/2
 
-While `Stream.iterate/2` treats the accumulator as the value, `unfold/2` separates the accumulator and
+While [Stream.iterate/2](https://hexdocs.pm/elixir/Stream.html#iterate/2) treats the accumulator as the value, `unfold/2` separates the accumulator and
 the return value. So you can accumulate, and then generate a separate value from the accumulator.
 
 ```mermaid
@@ -348,7 +348,7 @@ end)
 |> Enum.take(5)
 ```
 
-You can use `Stream.unfold/2` with `Enum.to_list/2` so long as you specify when the stream should end.
+You can use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) with [Enum.to_list/2](https://hexdocs.pm/elixir/Enum.html#to_list/2) so long as you specify when the stream should end.
 Otherwise, the stream would be infinite and run forever. To specify when the stream should end, you return `nil`.
 
 You could do this with a separate function head, or some other control flow.
@@ -366,7 +366,7 @@ end)
 |> Enum.take(5)
 ```
 
-For example, we could use `Stream.unfold/2` to improve the **Collatz Conjecture** function from above
+For example, we could use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) to improve the **Collatz Conjecture** function from above
 to simply stop when the element reaches `4`. That way if it ever stops, it must have
 reached `4` and we've proven the conjecture.
 
@@ -388,7 +388,7 @@ end)
 
 ### Your Turn
 
-In the Elixir cell below, use `Stream.unfold/2` to generate a list of cubed numbers. Use `Enum.take/2`
+In the Elixir cell below, use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) to generate a list of cubed numbers. Use [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2)
 to evaluate the first `100` numbers. You need to reverse the generated stream before you evaluate the first
 `100` numbers
 

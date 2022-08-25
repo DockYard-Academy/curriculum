@@ -111,7 +111,7 @@ pid = spawn(fn -> IO.puts("I was called") end)
 Process.alive?(pid) && IO.puts("I am alive!")
 ```
 
-We can use `Process.sleep/1` to pause the execution and show that the spawned process dies
+We can use [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to pause the execution and show that the spawned process dies
 after it is called.
 
 ```elixir
@@ -168,7 +168,7 @@ pid1 = spawn_link(fn -> raise "oops" end)
 "I will not run, because the above crashes"
 ```
 
-Or manually link a process with `Process.link/1`.
+Or manually link a process with [Process.link/1](https://hexdocs.pm/elixir/Process.html#link/1).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -214,7 +214,7 @@ pid1 =
 ```
 
 Evaluate the cell above to create a process waiting to receive a message, then evaluate
-the cell below to send that message a process. You'll notice the `IO.puts/1` logs in the cell below.
+the cell below to send that message a process. You'll notice the [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) logs in the cell below.
 
 As soon as the spawned process receives a message, it dies. You'll notice you can only send
 and receive a single message. You can re-evaluate the cell above and the cell below to
@@ -272,7 +272,7 @@ end
 server_process = spawn(fn -> ServerProcess.loop() end)
 ```
 
-We've used `Enum.random/1` to show that the process continues to loop and receive messages.
+We've used [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to show that the process continues to loop and receive messages.
 
 ```elixir
 send(server_process, "message")

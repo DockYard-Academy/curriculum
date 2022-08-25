@@ -28,7 +28,7 @@ We can create a regular expression with the `~r` sigil in Elixir.
 ~r/hello/
 ```
 
-We use regular expressions to find matching patterns in a string. We'll use `Regex.scan/3` to
+We use regular expressions to find matching patterns in a string. We'll use [Regex.scan/3](https://hexdocs.pm/elixir/Regex.html#scan/3) to
 show all of the values the regular expression matches on.
 
 For example, the expression `~r/h/` will match the `"h"` character.
@@ -37,7 +37,7 @@ For example, the expression `~r/h/` will match the `"h"` character.
 Regex.scan(~r/h/, "hello")
 ```
 
-`Regex.scan/3` will find all matches in a string.
+[Regex.scan/3](https://hexdocs.pm/elixir/Regex.html#scan/3) will find all matches in a string.
 
 Below we see that `~r/l/` matches on `"l"` twice in the `"hello"` string.
 
@@ -207,25 +207,25 @@ The [Regex](https://hexdocs.pm/elixir/Regex.html#functions) module provides func
 
 <!-- livebook:{"break_markdown":true} -->
 
-`Regex.run/3` will run through a regular expression until the first match.
+[Regex.run/3](https://hexdocs.pm/elixir/Regex.html#run/3) will run through a regular expression until the first match.
 
 ```elixir
 Regex.run(~r/\d/, "aa1234")
 ```
 
-As we've already seen, `Regex.scan/3` runs through a regular expression finding all matches.
+As we've already seen, [Regex.scan/3](https://hexdocs.pm/elixir/Regex.html#scan/3) runs through a regular expression finding all matches.
 
 ```elixir
 Regex.scan(~r/\d/, "aa1234")
 ```
 
-`Regex.replace/4` replaces matches with a given string.
+[Regex.replace/4](https://hexdocs.pm/elixir/Regex.html#replace/4) replaces matches with a given string.
 
 ```elixir
 Regex.replace(~r/Peter Parker/, "Peter Parker is spiderman", "--secret--")
 ```
 
-`Regex.replace/3` can also accept an anonymous function to use the matched value to determine how
+[Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) can also accept an anonymous function to use the matched value to determine how
 to replace it.
 
 ```elixir
@@ -234,7 +234,7 @@ Regex.replace(~r/\d/, "12345", fn each ->
 end)
 ```
 
-`Regex.split/3` splits a string on all matches the same way that `String.split/3` will split a string by a specific value.
+[Regex.split/3](https://hexdocs.pm/elixir/Regex.html#split/3) splits a string on all matches the same way that [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) will split a string by a specific value.
 
 ```elixir
 String.split("one,two,three", ",")
@@ -244,7 +244,7 @@ String.split("one,two,three", ",")
 Regex.split(~r/\d/, "one1two2three")
 ```
 
-`Regex.match/2` checks if a string contains any match of the regular expression.
+[Regex.match/2](https://hexdocs.pm/elixir/Regex.html#match/2) checks if a string contains any match of the regular expression.
 
 ```elixir
 Regex.match?(~r/\d/, "hello")
@@ -260,7 +260,7 @@ The [String](https://hexdocs.pm/elixir/String.html) module provides some functio
 * `match?/2`
 * `split?/3`
 
-These functions are the same as the `Regex` module, except they take the string as the first argument to
+These functions are the same as the [Regex](https://hexdocs.pm/elixir/Regex.html) module, except they take the string as the first argument to
 make it easier to pipe functions together.
 
 ```elixir
@@ -302,7 +302,7 @@ We can separate the match into multiple capture groups.
 Regex.run(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111")
 ```
 
-Now we can use these capture groups in `Regex.replace/3`.
+Now we can use these capture groups in [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3).
 
 ```elixir
 Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111", fn full_match, capture_group ->
@@ -327,7 +327,7 @@ end)
 
 Create an `obfuscate/1` function that expects a string with one or more phone numbers in the format `999-999-9999`.
 
-Use `Regex.replace/3` and capture groups to obfuscate the phone number from `999-999-9999` into `XXX-999-XXXX`.
+Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) and capture groups to obfuscate the phone number from `999-999-9999` into `XXX-999-XXXX`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -412,7 +412,7 @@ Regex.scan(~r/(?<=\d\. )\w+/, text)
 
 ### Your Turn
 
-Use `Regex.replace/3` to convert all phone numbers preceded by the `#` symbol in the format `1231231234`
+Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) to convert all phone numbers preceded by the `#` symbol in the format `1231231234`
 into the format `123-123-1234`.
 
 For example,
@@ -444,7 +444,7 @@ We recommend you do further research and use the available tools to learn more a
 expressions as required.
 
 * [Elixre](http://elixre.lpil.uk/) provides a regular expression reference guide and allows you to build and test regular expressions.
-* [Regex Module](https://hexdocs.pm/elixir/Regex.html) documentation for a full list of `Regex` functions and advanced use.
+* [Regex Module](https://hexdocs.pm/elixir/Regex.html) documentation for a full list of [Regex](https://hexdocs.pm/elixir/Regex.html) functions and advanced use.
 
 Not all languages use the same standard for regular expressions, so you may find information online that does not
 apply to Elixir.

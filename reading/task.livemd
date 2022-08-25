@@ -27,7 +27,7 @@ on the [Task](https://hexdocs.pm/elixir/Task.html) module which provides conveni
 
 ### Starting A Process
 
-Similar to `spawn` we can use `Task.start/1` to create a new short-lived process that dies when it's function executes.
+Similar to `spawn` we can use [Task.start/1](https://hexdocs.pm/elixir/Task.html#start/1) to create a new short-lived process that dies when it's function executes.
 
 ```elixir
 # using spawn
@@ -88,7 +88,7 @@ receive do
 end
 ```
 
-With `Task`, we can use `async/1` and `await/1` to spawn a process, perform some calculation,
+With [Task](https://hexdocs.pm/elixir/Task.html), we can use `async/1` and `await/1` to spawn a process, perform some calculation,
 and the retrieve the value when it's finished.
 
 ```elixir
@@ -102,7 +102,7 @@ task =
 Task.await(task)
 ```
 
-Keep in mind that `Task.async/1` returns a `Task` struct, not a pid. The `Task` struct
+Keep in mind that [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) returns a [Task](https://hexdocs.pm/elixir/Task.html) struct, not a pid. The [Task](https://hexdocs.pm/elixir/Task.html) struct
 contains information about who the parent (`:owner`) process is, the task's pid (`:pid`), and a reference (`:ref`) used
 to monitor if the task crashes.
 
@@ -150,10 +150,10 @@ microseconds / 1000 / 1000
 
 ### Your Turn
 
-Use `Task.async/1` and `Task.await/1` to demonstrate the performance benefits between synchronous
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/1](https://hexdocs.pm/elixir/Task.html#await/1) to demonstrate the performance benefits between synchronous
 execution and parallel execution.
 
-You may consider using `Process.sleep/1` to simulate an expensive computation.
+You may consider using [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to simulate an expensive computation.
 
 ```elixir
 
@@ -179,7 +179,7 @@ Then we can also use enumeration to `await/1` each task.
 Enum.map(tasks, fn task -> Task.await(task) end)
 ```
 
-You may also choose to use the `await_many/1` convenience function provided by the `Task` module.
+You may also choose to use the `await_many/1` convenience function provided by the [Task](https://hexdocs.pm/elixir/Task.html) module.
 
 ```elixir
 tasks =
@@ -195,8 +195,8 @@ Task.await_many(tasks)
 
 ## Timeouts
 
-`Task.await/1` pauses the current execution to wait until a task has finished. However, it
-will not wait forever. By default, `Task.await/1` and `Task.await_many/1` will wait for five seconds for
+[Task.await/1](https://hexdocs.pm/elixir/Task.html#await/1) pauses the current execution to wait until a task has finished. However, it
+will not wait forever. By default, [Task.await/1](https://hexdocs.pm/elixir/Task.html#await/1) and [Task.await_many/1](https://hexdocs.pm/elixir/Task.html#await_many/1) will wait for five seconds for
 the task to complete. If the task does not finish, it will raise an error.
 
 ```elixir
@@ -232,7 +232,7 @@ In the Elixir cell below, spawn a task which takes one second to complete.
 
 ### Further Reading
 
-For more on `Task`, consider reading:
+For more on [Task](https://hexdocs.pm/elixir/Task.html), consider reading:
 
 * The [Task HexDocs](https://hexdocs.pm/elixir/Task.html)
 

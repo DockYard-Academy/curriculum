@@ -37,9 +37,9 @@ as [Timex](https://github.com/bitwalker/timex).
 
 Generally, you will most commonly work with the [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct.
 
-A `DateTime` struct is a snapshot of a date and time in a given timezone.
+A [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct is a snapshot of a date and time in a given timezone.
 
-You can retrieve the current `DateTime` with `DateTime.utc_now/0`.
+You can retrieve the current [DateTime](https://hexdocs.pm/elixir/DateTime.html) with `DateTime.utc_now/0`.
 
 ```elixir
 DateTime.utc_now()
@@ -53,9 +53,9 @@ explanation of sigils on the [Elixir Lang Sigil Getting Started Guide](https://e
 Sigils use a tilda `~` and a character for the type of data they represent. For example,
 the date above uses the `~U` sigil to represent a UTC datetime.
 
-Under the hood, `DateTime` is a struct, we can see the full data contained in the struct below.
+Under the hood, [DateTime](https://hexdocs.pm/elixir/DateTime.html) is a struct, we can see the full data contained in the struct below.
 
-`DateTime` contains date information such as `:day`, `:month`, and `:year`. `DateTime` also contains time information such as `:hour`, `:minute`, `:second`
+[DateTime](https://hexdocs.pm/elixir/DateTime.html) contains date information such as `:day`, `:month`, and `:year`. [DateTime](https://hexdocs.pm/elixir/DateTime.html) also contains time information such as `:hour`, `:minute`, `:second`
 and even `:microsecond`.
 
 ```elixir
@@ -64,11 +64,11 @@ Map.from_struct(DateTime.utc_now())
 
 ## DateTime
 
-In order to understand `DateTime`, we also need to consider two other structs
+In order to understand [DateTime](https://hexdocs.pm/elixir/DateTime.html), we also need to consider two other structs
 [Date](https://hexdocs.pm/elixir/Date.html) and [Time](https://hexdocs.pm/elixir/Time.html).
 
-A `DateTime` struct is built using a both a `Date` and a `Time` struct. `Date` represents the calendar
-date with `:year`, `:month`, and `:day`. `Time` represents the time of day with `:hour`, `:minute`, and `:second`.
+A [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct is built using a both a [Date](https://hexdocs.pm/elixir/Date.html) and a [Time](https://hexdocs.pm/elixir/Time.html) struct. [Date](https://hexdocs.pm/elixir/Date.html) represents the calendar
+date with `:year`, `:month`, and `:day`. [Time](https://hexdocs.pm/elixir/Time.html) represents the time of day with `:hour`, `:minute`, and `:second`.
 
 ```elixir
 {:ok, date} = Date.new(2022, 6, 24)
@@ -82,15 +82,15 @@ date with `:year`, `:month`, and `:day`. `Time` represents the time of day with 
 {:ok, datetime} = DateTime.new(date, time)
 ```
 
-Here we can see the `DateTime` struct contains all of the information from the `time` and `date` we created above, as
+Here we can see the [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct contains all of the information from the `time` and `date` we created above, as
 well as utc timezone information.
 
 ```elixir
 Map.from_struct(datetime)
 ```
 
-`DateTime` is also timezone aware unlike it's counterpart [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html). You can
-see that `NaiveDateTime` is missing timezone information such as `:time_zone` and `:zone_abbr`.
+[DateTime](https://hexdocs.pm/elixir/DateTime.html) is also timezone aware unlike it's counterpart [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html). You can
+see that [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html) is missing timezone information such as `:time_zone` and `:zone_abbr`.
 
 ```elixir
 {:ok, naive_datetime} = NaiveDateTime.new(date, time)
@@ -100,19 +100,19 @@ see that `NaiveDateTime` is missing timezone information such as `:time_zone` an
 Map.from_struct(naive_datetime)
 ```
 
-As a shorter syntax, it's common to use the `~T` sigil for the `Time` struct and the `~D` sigil for the `Date` struct.
+As a shorter syntax, it's common to use the `~T` sigil for the [Time](https://hexdocs.pm/elixir/Time.html) struct and the `~D` sigil for the [Date](https://hexdocs.pm/elixir/Date.html) struct.
 
 ```elixir
 {:ok, datetime} = DateTime.new(~D[2022-06-24], ~T[12:30:00])
 ```
 
-You could also create the `DateTime` directly using the `~U` sigil.
+You could also create the [DateTime](https://hexdocs.pm/elixir/DateTime.html) directly using the `~U` sigil.
 
 ```elixir
 datetime = ~U[2022-06-24 12:30:00Z]
 ```
 
-Under the hood, this is still the same `DateTime` struct.
+Under the hood, this is still the same [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct.
 
 ```elixir
 Map.from_struct(datetime)
@@ -132,7 +132,7 @@ When you want to display time information you can use the [Calendar](https://hex
 Calendar.strftime(DateTime.utc_now(), "%y-%m-%d %I:%M:%S %p")
 ```
 
-The `strftime/3` function accepts a `Date`, `Time`, `DateTime`, or `NaiveDateTime` and uses the
+The `strftime/3` function accepts a [Date](https://hexdocs.pm/elixir/Date.html), [Time](https://hexdocs.pm/elixir/Time.html), [DateTime](https://hexdocs.pm/elixir/DateTime.html), or [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html) and uses the
 information in the struct to display a formatted string.
 
 You can use a percent `%` symbol and then one of the [accepted format options](https://hexdocs.pm/elixir/Calendar.html#strftime/3-accepted-formats)
@@ -161,14 +161,14 @@ The [DateTime](https://hexdocs.pm/elixir/DateTime.html) module contains function
 
 Here are a few common functions to get you started.
 
-* `add/4` add time to an existing `DateTime` struct.
-* `compare/2` compare two `DateTime` structs to see if one is before, after, or the same as another.
-* `diff/3` determine the time between two `DateTime` structs.
-* `new/4` create a new `DateTime` struct and return an `{:ok, datetime}` tuple.
-* `new!/4` create a new `DateTime` struct or raise an error.
-* `utc_now/2` get the current utc `DateTime`.
+* `add/4` add time to an existing [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct.
+* `compare/2` compare two [DateTime](https://hexdocs.pm/elixir/DateTime.html) structs to see if one is before, after, or the same as another.
+* `diff/3` determine the time between two [DateTime](https://hexdocs.pm/elixir/DateTime.html) structs.
+* `new/4` create a new [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct and return an `{:ok, datetime}` tuple.
+* `new!/4` create a new [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct or raise an error.
+* `utc_now/2` get the current utc [DateTime](https://hexdocs.pm/elixir/DateTime.html).
 
-Versions of these functions also exist for the `Date` module if you do not need to consider the time, but
+Versions of these functions also exist for the [Date](https://hexdocs.pm/elixir/Date.html) module if you do not need to consider the time, but
 are only concerned about the calendar date.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -177,7 +177,7 @@ are only concerned about the calendar date.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use `DateTime.new!/4` to create a `DateTime` for April 18, 1938 at noon.
+Use [DateTime.new!/4](https://hexdocs.pm/elixir/DateTime.html#new!/4) to create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for April 18, 1938 at noon.
 Replace `nil` with your answer.
 
 ```elixir
@@ -186,7 +186,7 @@ date = nil
 Utils.feedback(:datetime_new, date)
 ```
 
-Create a `DateTime` for today at the current time.
+Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for today at the current time.
 Replace `nil` with your answer.
 
 ```elixir
@@ -195,7 +195,7 @@ today = nil
 Utils.feedback(:datetime_today, today)
 ```
 
-Create a `DateTime` for tomorrow at the current time. You may wish to use `DateTime.add/4`.
+Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for tomorrow at the current time. You may wish to use [DateTime.add/4](https://hexdocs.pm/elixir/DateTime.html#add/4).
 
 ```elixir
 tomorrow = nil
@@ -203,7 +203,7 @@ tomorrow = nil
 Utils.feedback(:datetime_tomorrow, tomorrow)
 ```
 
-Use `DateTime.compare/2` to check if the current time is greater than the `datetime` below. `comparison` should be either `:lt` or `:gt`.
+Use [DateTime.compare/2](https://hexdocs.pm/elixir/DateTime.html#compare/2) to check if the current time is greater than the `datetime` below. `comparison` should be either `:lt` or `:gt`.
 
 Replace `nil` with your answer.
 
@@ -215,8 +215,8 @@ comparison = nil
 Utils.feedback(:datetime_compare, comparison)
 ```
 
-Use `DateTime.diff/3` to find the time difference from the first date to the second date. Your answer should
-be a positive integer. Keep in mind that `DateTime.diff/3` subtracts the first argument by the second argument.
+Use [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) to find the time difference from the first date to the second date. Your answer should
+be a positive integer. Keep in mind that [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) subtracts the first argument by the second argument.
 
 Replace `nil` with your answer.
 
@@ -236,10 +236,10 @@ for working with dates in Elixir. It is not built-in to Elixir and needs to be i
 
 `Timex` is not currently within the scope of this course, however we have installed `Timex` specifically
 in this livebook file only. You will not normally have access to `Timex` as the purpose of this section is to build familiarity
-with `DateTime`.
+with [DateTime](https://hexdocs.pm/elixir/DateTime.html).
 
 `Timex` uses the [tzdata](https://github.com/lau/tzdata) timezone database for Elixir.
-You can create a timezone aware `DateTime` using `Timex.now/1` and the name of a timezone.
+You can create a timezone aware [DateTime](https://hexdocs.pm/elixir/DateTime.html) using `Timex.now/1` and the name of a timezone.
 
 ```elixir
 Timex.now("Asia/Kabul")
