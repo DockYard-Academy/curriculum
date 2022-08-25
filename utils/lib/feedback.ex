@@ -902,36 +902,6 @@ defmodule Utils.Feedback do
     "
   end
 
-  feedback :caesar_cypher do
-    caesar_cypher = get_answers()
-
-assert CaesarCypher.encode("", 1), "Ensure you implement the `encode/2` function."
-assert CaesarCypher.encode("", 1) == ""
-assert CaesarCypher.encode("a", 1) == "b"
-assert CaesarCypher.encode("a", 14) == "o"
-assert CaesarCypher.encode("a", 25) == "z"
-assert CaesarCypher.encode("z", 1) == "a"
-assert CaesarCypher.encode("z", 14) == "n"
-assert CaesarCypher.encode("z", 25) == "y"
-assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1) == "bcdefghijklmnopqrstuvwxyza"
-assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14) == "opqrstuvwxyzabcdefghijklmn"
-assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 25) == "zabcdefghijklmnopqrstuvwxy"
-assert CaesarCypher.encode("et tu, brute?", 2) == "gv vw, dtwvg?"
-
-assert CaesarCypher.decode("", 1), "Ensure you implement the `decode/2` function."
-assert CaesarCypher.decode("", 1) == ""
-assert CaesarCypher.decode("b", 1) == "a"
-assert CaesarCypher.decode("o", 14) == "a"
-assert CaesarCypher.decode("z", 25) == "a"
-assert CaesarCypher.decode("a", 1) == "z"
-assert CaesarCypher.decode("n", 14) == "z"
-assert CaesarCypher.decode("y", 25) == "z"
-assert CaesarCypher.decode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
-assert CaesarCypher.decode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
-assert CaesarCypher.decode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
-assert CaesarCypher.decode("gv vw, dtwvg?", 2) == "et tu, brute?"
-  end
-
   feedback :rollable_expressions do
     rollable = get_answers()
 

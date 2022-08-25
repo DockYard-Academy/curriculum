@@ -85,6 +85,48 @@ defmodule UtilsTest do
     end)
   end
 
+  test "Prefer links to documentation over backticks" do
+    # i.e. prefer [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) over `Enum.map/2`
+    libraries = [
+      "Kino",
+      "ExUnit",
+      "Benchee",
+      "IEx",
+      "Mix",
+      "Poison",
+      "HTTPoison"
+    ]
+
+    Notebooks.all_livebooks()
+    |> Notebooks.stream_lines(fn line, file_name, line_number ->
+      Regex.scan(~r/\`([A-Z]\w+)\`|\`([A-Z]\w+)\.\w+\/[1-9]\`/, line)
+      |> Enum.map(fn
+        [_, module, ""] ->
+          module
+
+        [_, "", module] ->
+          module
+
+        [_, module] ->
+          module
+      end)
+      |> Enum.each(fn module ->
+        should_use_documentation =
+          module !== "Math" and
+            (Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or
+               module in libraries)
+
+        if should_use_documentation do
+          flunk("""
+          #{file_name}:#{line_number} #{module} should use a documentation link [module](url) instead of backticks.
+
+          run mix update_documentation_links to resolve this issue.
+          """)
+        end
+      end)
+    end)
+  end
+
   test "Ensure all external libraries are installed if used" do
     # dependency install name, and usage indicator
     possible_deps = [
@@ -163,5 +205,24 @@ defmodule UtilsTest do
              Manually resolve the issue or run mix format_headings.
              """
     end)
+  end
+
+  defp doc_link_from_module(module) do
+    cond do
+      module == "IEx" ->
+        "iex"
+
+      module == "HTTPoison" ->
+        "httpoison"
+
+      module in @libraries ->
+        doc_link =
+          Regex.scan(~r/[A-Z][a-z]+/, module)
+          |> Enum.map(fn [word] -> String.downcase(word) end)
+          |> Enum.join("_")
+
+      true ->
+        "elixir"
+    end
   end
 end
