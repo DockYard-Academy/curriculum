@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.FormatNotebooks do
-  @moduledoc "Formats Live Markdown Headings. Run: mix format_notebooks"
+  @moduledoc "Formats Live Markdown Headings. Run: MIX_ENV=test mix format_notebooks"
   @shortdoc "Formats Live Markdown Notebooks According To Livebook Specification"
   alias Utils.Notebooks
 
