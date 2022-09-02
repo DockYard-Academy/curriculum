@@ -1,10 +1,4 @@
 defmodule Utils.Graph do
-  defp factorial(0), do: 1
-
-  defp factorial(n) when n > 0 do
-    Enum.reduce(1..n, &*/2)
-  end
-
   def binary_search do
     size = 600
 
