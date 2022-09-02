@@ -164,7 +164,7 @@ codespell --skip="./utils/deps/*,./.git/*,./utils/lib/assets/*" -w
 
 ## Changing Mix Install
 
-Use the following Regulr Expression to rapidly change the `Mix.install/2` section in every livebook.
+Use the following Regular Expression to rapidly change the `Mix.install/2` section in every livebook.
 
 ```
 Mix\.install(.|\n(?!\]))*\n\]\)
