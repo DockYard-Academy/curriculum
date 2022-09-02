@@ -29,7 +29,6 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
             end
 
           full, _, module, function, arity ->
-            IO.inspect(function)
             if Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or module in @libraries do
               doc_link = doc_link_from_module(module)
 

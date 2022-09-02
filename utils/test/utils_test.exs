@@ -206,23 +206,4 @@ defmodule UtilsTest do
              """
     end)
   end
-
-  defp doc_link_from_module(module) do
-    cond do
-      module == "IEx" ->
-        "iex"
-
-      module == "HTTPoison" ->
-        "httpoison"
-
-      module in @libraries ->
-        doc_link =
-          Regex.scan(~r/[A-Z][a-z]+/, module)
-          |> Enum.map(fn [word] -> String.downcase(word) end)
-          |> Enum.join("_")
-
-      true ->
-        "elixir"
-    end
-  end
 end

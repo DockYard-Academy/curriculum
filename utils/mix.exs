@@ -26,7 +26,6 @@ defmodule Utils.MixProject do
       {:kino, "~> 0.6.2"},
       {:vega_lite, "~> 0.1.6"},
       {:kino_vega_lite, "~> 0.1.3"},
-      {:math, "~> 0.7.0"},
       {:faker, "~> 0.17.0"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
