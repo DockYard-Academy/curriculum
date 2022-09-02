@@ -10,7 +10,7 @@ Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https:
 
 Contributors and beta testers are welcome to go through the course, raise issues, and make PRs. See the [Contributor Guide](https://github.com/DockYard-Academy/beta_curriculum/wiki/Beta-Tester-Guide-&-Contributor-Setup).
 
-See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculum/issues). Comment on any issue and mention @brooklinjazz to get support.
+See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculum/issues). You can raise an issue to get support.
 
 ## QuickStart
 
