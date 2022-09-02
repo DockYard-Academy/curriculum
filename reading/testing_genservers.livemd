@@ -27,14 +27,17 @@ Let's consider how we could test a simple `Counter` process that should store an
 defmodule Counter do
   use GenServer
 
+  @impl true
   def init(state) do
     {:ok, state}
   end
 
+  @impl true
   def handle_call(:increment, _from, state) do
     {:reply, state + 1, state + 1}
   end
 
+  @impl true
   def handle_call(:get_count, _from, state) do
     {:reply, state, state}
   end
@@ -88,14 +91,17 @@ defmodule Counter do
 
   # Server
 
+  @impl true
   def init(state) do
     {:ok, state}
   end
 
+  @impl true
   def handle_call(:get_count, _from, state) do
     {:reply, state, state}
   end
 
+  @impl true
   def handle_call(:increment, _from, state) do
     {:reply, state, state + 1}
   end
@@ -143,14 +149,17 @@ defmodule Counter do
 
   # Server
 
+  @impl true
   def init(state) do
     {:ok, state}
   end
 
+  @impl true
   def handle_call(:get_count, _from, state) do
     {:reply, state.count, state}
   end
 
+  @impl true
   def handle_call(:increment, _from, state) do
     {:reply, state.count + 1, %{state | count: state.count + 1}}
   end

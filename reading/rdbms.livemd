@@ -61,7 +61,7 @@ We recommend keeping this as the default to ensure consistency with this lesson.
 You can check that PostgreSQL is installed and running with the following command on Mac or Linux:
 
 ```
-pgrep -u postgres -fa -- -D
+$ pgrep -u postgres -fa -- -D
 ```
 
 If PostgreSQL is running on your computer, you should see a similar output to the following:
@@ -87,10 +87,10 @@ $ psql
 postgres-#
 ```
 
-Close the prompt with `/q`.
+Close the prompt with `\q`.
 
 ```
-postgres-# /q
+postgres-# \q
 ```
 
 ## Debugging
@@ -98,9 +98,9 @@ postgres-# /q
 Unfortunately, It's common to run into issues when setting up PostgreSQL. Every student
 has a different environment, so it's difficult to anticipate issues you may encounter.
 
-If you get stuck, please speak to a classmate, speak to your teacher, or [raise an issue] on the Dockyard Academy repository. You may also attempt to debug the issue by researching the error message and finding recommendations online.
+If you get stuck, please speak to a classmate, speak to your teacher, or [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) on the Dockyard Academy repository. You may also attempt to debug the issue by researching the error message and finding recommendations online.
 
-We recommend caution when running commands found on the internet, as they can cause further issues. We also recommend you keep a journal of everything you try. This journal can help you and others identify issues and may help if you encounter the same problem in the future.
+We recommend caution when running commands found on the Internet, as they can cause further issues. We also recommend you keep a journal of everything you try. This journal can help you and others identify issues and may help if you encounter the same problem in the future.
 
 It often helps to "turn it off and on again." In this case, uninstall and re-install PostgreSQL.
 
@@ -123,7 +123,7 @@ $ postgres -D /usr/local/var/postgres
 Then test if PostgreSQL is running on your computer again.
 
 ```
-pgrep -u postgres -fa -- -D
+$ pgrep -u postgres -fa -- -D
 ```
 
 #### Role Does Not Exist
@@ -131,7 +131,7 @@ pgrep -u postgres -fa -- -D
 PostgreSQL uses different roles to manage permissions when communicating with your PostgreSQL databases. Ensure you are using the correct `postgres` role with the following command.
 
 ```
-sudo -i -u postgres
+$ sudo -i -u postgres
 ```
 
 Then ensure you can start the PostgreSQL command-line tool.
@@ -205,7 +205,7 @@ The [SQL Cheatcheet](https://www.sqltutorial.org/sql-cheat-sheet/) also provides
 We will use SQL to create a users table in our example database.
 We can create a table with the `CREATE TABLE` query, which creates a table and defines how the table stores records.
 
-Copy and past the following into the psql prompt.
+Copy and past the following into the `psql` prompt.
 
 ```sql
 CREATE TABLE USERS (
@@ -216,7 +216,7 @@ CREATE TABLE USERS (
 );
 ```
 
-`INT` and `VARCHAR` are both SQL data types. Here's a full list of [sql-data-types](https://www.tutorialspoint.com/sql/sql-data-types.htm). `INT` is conceptually the same as an integer in Elixir, and `VARCHAR` is conceptually similar to a string in Elixir.
+`INT` and `VARCHAR` are both SQL data types. Here's a full list of [SQL data types](https://www.postgresql.org/docs/current/datatype.html) supported by PostgreSQL. `INT` is conceptually the same as an integer in Elixir, and `VARCHAR` is conceptually similar to a string in Elixir.
 
 `NOT NULL` specifies that the field in the table must exist.
 
@@ -353,7 +353,8 @@ opts = [
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "example"
+  database: "example",
+  socket_options: [:inet6]
 ]
 
 {:ok, conn} = Kino.start_child({Postgrex, opts})
@@ -449,7 +450,7 @@ graph TD;
 
 Each entry would store a foreign key for the user. In addition, we might create an index of each entry id to make querying faster.
 
-For more on indexes, consider reading [PostgreSQL - INDEXES](https://www.tutorialspoint.com/postgresql/postgresql_indexes.htm) on Tutorials Point.
+For more on indexes, consider reading [indexes usage in PostgreSQL](https://www.postgresql.org/docs/current/indexes-intro.html).
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -472,7 +473,6 @@ However, if you do want to dive deeper into PostgreSQL and SQL,
 you might consider the following resources.
 
 * [SQL Tutorial Org](https://www.sqltutorial.org/)
-* [Tutorials Point SQL](https://www.tutorialspoint.com/sql/index.htm)
 * [PostgreSQL Tutorial](https://www.postgresqltutorial.com/)
 
 ## Commit Your Progress
