@@ -615,41 +615,41 @@ defmodule Utils.Solutions do
     Rollable
   end
 
-defmodule CaesarCypher do
-  def decode(string, key) do
-    String.to_charlist(string)
-    |> Enum.map(fn char ->
-      cond do
-        char < ?a or ?z < char ->
-          char
+  defmodule CaesarCypher do
+    def decode(string, key) do
+      String.to_charlist(string)
+      |> Enum.map(fn char ->
+        cond do
+          char < ?a or ?z < char ->
+            char
 
-        char - key < ?a ->
-          ?z - (?a - (char - key)) + 1
+          char - key < ?a ->
+            ?z - (?a - (char - key)) + 1
 
-        true ->
-          char - key
-      end
-    end)
-    |> List.to_string()
+          true ->
+            char - key
+        end
+      end)
+      |> List.to_string()
+    end
+
+    def encode(string, key) do
+      String.to_charlist(string)
+      |> Enum.map(fn char ->
+        cond do
+          char < ?a or ?z < char ->
+            char
+
+          char + key > ?z ->
+            ?a + (char + key - ?z) - 1
+
+          true ->
+            char + key
+        end
+      end)
+      |> List.to_string()
+    end
   end
-
-  def encode(string, key) do
-    String.to_charlist(string)
-    |> Enum.map(fn char ->
-      cond do
-        char < ?a or ?z < char ->
-          char
-
-        char + key > ?z ->
-          ?a + (char + key - ?z) - 1
-
-        true ->
-          char + key
-      end
-    end)
-    |> List.to_string()
-  end
-end
 
   def caesar_cypher do
     CaesarCypher

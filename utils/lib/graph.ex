@@ -74,8 +74,6 @@ defmodule Utils.Graph do
     widget
   end
 
-
-
   def polynomial_complexity do
     size = 600
 
