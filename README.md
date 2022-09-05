@@ -125,7 +125,7 @@ Different operating systems use different configuration files, typically either 
 If you want to run `livebook` instead of  `~/.mix/escripts/livebook`, add the following at the bottom of the appropriate configuration file.
 
 ```sh
-PATH=$PATH:~/.mix/escript
+PATH=$PATH:~/.mix/escripts
 ```
 
 Then close your terminal and reload it, or run the following. Replace `.bashrc` with the appropriate configuration file.
