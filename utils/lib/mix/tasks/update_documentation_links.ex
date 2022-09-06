@@ -10,17 +10,12 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
     Notebooks.all_livebooks()
     |> Enum.map(fn file_name ->
       file = File.read!(file_name)
+      livebook_link_regex = ~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*\?*)\/([1-9])\`/
 
       file =
-        Regex.replace(~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*\?*)\/([1-9])\`/, file, fn
-          full, "Math", _, _, _ ->
-            full
-
-          full, _, "Math", _, _ ->
-            full
-
+        Regex.replace(livebook_link_regex, file, fn
           full, module, "", "", "" ->
-            if Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or module in @libraries do
+            if is_documented_module?(module) do
               doc_link = doc_link_from_module(module)
 
               "[#{module}](https://hexdocs.pm/#{doc_link}/#{module}.html)"
@@ -29,7 +24,7 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
             end
 
           full, _, module, function, arity ->
-            if Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or module in @libraries do
+            if is_documented_module?(module) do
               doc_link = doc_link_from_module(module)
 
               "[#{module}.#{function}/#{arity}](https://hexdocs.pm/#{doc_link}/#{module}.html##{function}/#{arity})"
@@ -57,6 +52,13 @@ defmodule Mix.Tasks.UpdateDocumentationLinks do
 
       true ->
         "elixir"
+    end
+  end
+
+  defp is_documented_module?(module) do
+    case Code.ensure_compiled(String.to_atom("Elixir.#{module}")) do
+      {:module, _} -> true
+      _ -> module in @libraries
     end
   end
 end

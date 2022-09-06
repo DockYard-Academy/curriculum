@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.AddGitSection do
   @moduledoc "The add git section mix task: `mix help add_git_section`"
-  @shortdoc "Adds git commit section to files"
 
   use Mix.Task
 

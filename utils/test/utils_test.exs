@@ -112,9 +112,8 @@ defmodule UtilsTest do
       end)
       |> Enum.each(fn module ->
         should_use_documentation =
-          module !== "Math" and
-            (Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or
-               module in libraries)
+          Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or
+            module in libraries
 
         if should_use_documentation do
           flunk("""

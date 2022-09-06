@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.AddNavigation do
   @moduledoc "Add Previous and Next Navigation. Run: mix add_navigation"
-  @shortdoc "Add Previous and Next Navigation"
   use Mix.Task
 
   @impl Mix.Task

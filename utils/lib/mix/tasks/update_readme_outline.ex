@@ -1,6 +1,5 @@
 defmodule Mix.Tasks.UpdateReadmeOutline do
   @moduledoc "The update readme outline mix task: `mix help update_readme_outline`"
-  @shortdoc "Updates the README with course outline from start.livemd file"
 
   use Mix.Task
 
