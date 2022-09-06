@@ -2,16 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -52,7 +46,7 @@ Anagram.filter_anagrams("acres", ["cares", "races", "scare", "tree", "bear"])
 ["cares", "races", "scare"]
 ```
 
-<!-- livebook:{"attrs":{"assertions":"assert Anagram.is_anagram?(\"stop\", \"pots\") == true\nrefute Anagram.is_anagram?(\"example\", \"nonanagram\") == true\n\nword = Utils.Factory.string()\n\ngenerate_non_anagram = fn word ->\n  word <> Enum.random([\"a\", \"b\", \"c\"])\nend\n\ngenerate_anagram = fn word ->\n  String.split(word, \"\", trim: true) |> Enum.shuffle() |> Enum.join(\"\")\nend\n\nassert Anagram.is_anagram?(word, generate_anagram.(word)),\n        \"`is_anagram?/1` failed to identify anagram.\"\n\nrefute Anagram.is_anagram?(word, generate_non_anagram.(word)),\n        \"`is_anagram?/1` failed to identify non-anagram.\"\n\nnon_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)\nanagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)\n\nresult = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)\nassert is_list(result), \"filter_anagrams/2 should return a list\"\n\nassert Enum.sort(result) == Enum.sort(anagrams), \"filter_anagrams/2 failed to filter anagrams\"","code":"defmodule Anagram do\r\n  def is_anagram?(word, possible_anagram) do\r\n  end\r\n\r\n  def filter_anagrams(word, possible_anagrams) do\r\n  end\r\nend","solution":"defmodule Anagram do\n  def is_anagram?(word, possible_anagram) do\n    sort_string(word) == sort_string(possible_anagram)\n  end\n\n  def filter_anagrams(word, possible_anagrams) do\n    Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)\n  end\n\n  defp sort_string(string) do\n    String.split(string, \"\", trim: true) |> Enum.sort() |> Enum.join()\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"assert Anagram.is_anagram?(\"stop\", \"pots\") == true\nrefute Anagram.is_anagram?(\"example\", \"nonanagram\") == true\n\nword = Utils.Factory.string()\n\ngenerate_non_anagram = fn word ->\n  word <> Enum.random([\"a\", \"b\", \"c\"])\nend\n\ngenerate_anagram = fn word ->\n  String.split(word, \"\", trim: true) |> Enum.shuffle() |> Enum.join(\"\")\nend\n\nassert Anagram.is_anagram?(word, generate_anagram.(word)),\n        \"`is_anagram?/1` failed to identify anagram.\"\n\nrefute Anagram.is_anagram?(word, generate_non_anagram.(word)),\n        \"`is_anagram?/1` failed to identify non-anagram.\"\n\nnon_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)\nanagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)\n\nresult = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)\nassert is_list(result), \"filter_anagrams/2 should return a list\"\n\nassert Enum.sort(result) == Enum.sort(anagrams), \"filter_anagrams/2 failed to filter anagrams\"","attempts":1,"code":"defmodule Anagram do\r\n  def is_anagram?(_word, _possible_anagram) do\r\n  end\r\n\r\n  def filter_anagrams(_word, _possible_anagrams) do\r\n  end\r\nend","solution":"defmodule Anagram do\n  def is_anagram?(word, possible_anagram) do\n    sort_string(word) == sort_string(possible_anagram)\n  end\n\n  def filter_anagrams(word, possible_anagrams) do\n    Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)\n  end\n\n  defp sort_string(string) do\n    String.split(string, \"\", trim: true) |> Enum.sort() |> Enum.join()\n  end\nend","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 ExUnit.start(auto_run: false)
@@ -60,41 +54,87 @@ ExUnit.start(auto_run: false)
 defmodule Assertion do
   use ExUnit.Case
 
-  test "" do
-    defmodule Anagram do
-      def is_anagram?(word, possible_anagram) do
+  test "Exercise" do
+    try do
+      Process.flag(:trap_exit, true)
+
+      defmodule Anagram do
+        def is_anagram?(_word, _possible_anagram) do
+        end
+
+        def filter_anagrams(_word, _possible_anagrams) do
+        end
       end
 
-      def filter_anagrams(word, possible_anagrams) do
+      assert Anagram.is_anagram?("stop", "pots") == true
+      refute Anagram.is_anagram?("example", "nonanagram") == true
+
+      word = Utils.Factory.string()
+
+      generate_non_anagram = fn word ->
+        word <> Enum.random(["a", "b", "c"])
       end
+
+      generate_anagram = fn word ->
+        String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
+      end
+
+      assert Anagram.is_anagram?(word, generate_anagram.(word)),
+             "`is_anagram?/1` failed to identify anagram."
+
+      refute Anagram.is_anagram?(word, generate_non_anagram.(word)),
+             "`is_anagram?/1` failed to identify non-anagram."
+
+      non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
+      anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
+
+      result = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)
+      assert is_list(result), "filter_anagrams/2 should return a list"
+
+      assert Enum.sort(result) == Enum.sort(anagrams),
+             "filter_anagrams/2 failed to filter anagrams"
+    catch
+      error ->
+        flunk("""
+          Your solution threw the following error:
+
+          #{inspect(error)}
+        """)
+
+      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
+        flunk("""
+            GenServer crashed with the following error:
+
+            #{inspect(error)}
+
+            When it received: #{inspect(message)} #{message_type}
+
+            Likely you need to define the corresponding handler for #{inspect(message)}.
+
+            Ensure you defined a handle_call/3, handle_info/2, or handle_cast/2 or appropriate handler function.
+
+              def handle_call(:message, _from, state) do
+                ...
+              end
+
+            Also ensure you call GenServer.call/2, GenServer.cast/2, or otherwise send the message correctly.
+
+              GenServer.call(pid, :message)
+        """)
+
+      :exit, error ->
+        flunk("""
+          Unhandled exit with the following error:
+
+          #{inspect(error)}
+        """)
+    after
+      # all warnings and errors are printed to the previous Kino Frame
+      # to avoid cluttering the test results display.
+      Process.sleep(10)
+      Kino.render(Kino.Markdown.new("### Test Results 
+<hr/>"))
     end
-
-    assert Anagram.is_anagram?("stop", "pots") == true
-    refute Anagram.is_anagram?("example", "nonanagram") == true
-
-    word = Utils.Factory.string()
-
-    generate_non_anagram = fn word ->
-      word <> Enum.random(["a", "b", "c"])
-    end
-
-    generate_anagram = fn word ->
-      String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
-    end
-
-    assert Anagram.is_anagram?(word, generate_anagram.(word)),
-           "`is_anagram?/1` failed to identify anagram."
-
-    refute Anagram.is_anagram?(word, generate_non_anagram.(word)),
-           "`is_anagram?/1` failed to identify non-anagram."
-
-    non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
-    anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
-
-    result = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)
-    assert is_list(result), "filter_anagrams/2 should return a list"
-
-    assert Enum.sort(result) == Enum.sort(anagrams), "filter_anagrams/2 failed to filter anagrams"
   end
 end
 
@@ -102,11 +142,12 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
+# Unfortunately, this results in duplication of warnings.
 defmodule Anagram do
-  def is_anagram?(word, possible_anagram) do
+  def is_anagram?(_word, _possible_anagram) do
   end
 
-  def filter_anagrams(word, possible_anagrams) do
+  def filter_anagrams(_word, _possible_anagrams) do
   end
 end
 ```
@@ -119,3 +160,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish anagram exercise"
 ```
+
+## Up Next
+
+| Previous                                       | Next                                                                   |
+| ---------------------------------------------- | ---------------------------------------------------------------------: |
+| [Voter Count](../exercises/voter_count.livemd) | [Custom Enum With Reduce](../exercises/custom_enum_with_reduce.livemd) |

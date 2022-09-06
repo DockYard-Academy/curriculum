@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -71,25 +66,42 @@ Utils.visual(:light_control, is_powered)
 The boolean operators are `and`, `or`, and `not`.
 
 * `and` checks if two booleans are true
-  ```mermaid
-                  flowchart LR
-                  A[true] --> C
-                  B[true] --> C
-                  C[and] --> D[true]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  A[true] --> C
+  B[true] --> C
+  C[and] --> D[true]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 * `or` checks if one or more booleans are true
-  ```mermaid
-                  flowchart LR
-                  A[false] --> C
-                  B[true] --> C
-                  C[or] --> D[true]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  A[false] --> C
+  B[true] --> C
+  C[or] --> D[true]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 * `not` flips the value of a boolean.
-  ```mermaid
-                  flowchart LR
-                  not --> false --> true
-                  a[not] --> b[true] --> c[false]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  not --> false --> true
+  a[not] --> b[true] --> c[false]
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 By comparing booleans, you can create branching paths in your code depending on certain conditions.
 
@@ -98,6 +110,8 @@ to let them know that it's going to be a sunny day.
 
 You might check that the user **is subscribed**, that it **is morning**, and that it
 **is sunny**.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
@@ -109,6 +123,8 @@ flowchart LR
   and --> false
   false --> E[don't send notification]
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 Converted into Elixir pseudo code that might look like this:
 
@@ -216,25 +232,42 @@ Sometimes it can be helpful to check a value exists rather than checking a boole
 `&&`, `||`, and `!`.
 
 * The **and** `&&` operator checks if two values are truthy and returns the right-hand truthy value.
-  ```mermaid
-                  flowchart LR
-                  truthy1 --> op["and (&&)"]
-                  truthy2 --> op
-                  op --> a[truthy2]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  truthy1 --> op["and (&&)"]
+  truthy2 --> op
+  op --> a[truthy2]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 * The **or** `||` operator checks if one value is truthy and returns the first truthy value.
-  ```mermaid
-                  flowchart LR
-                  truthy1 --> op["or (||)"]
-                  falsy1 --> op
-                  op --> a[truthy1]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  truthy1 --> op["or (||)"]
+  falsy1 --> op
+  op --> a[truthy1]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 * The **not** flips a **falsy** value to `true` and a **truthy** value to `false`.
-  ```mermaid
-                  flowchart LR
-                  not --> truthy --> false
-                  a[not] --> falsy --> b[true]
-  ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+  flowchart LR
+  not --> truthy --> false
+  a[not] --> falsy --> b[true]
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 While `&&`, `||`, and `!` work with booleans, it's conventional to use `and`, `or`, and `not`
 for booleans, and `&&`, `||`, and `!` when you expect non-boolean values.
@@ -300,3 +333,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish booleans section"
 ```
+
+## Up Next
+
+| Previous                             | Next                                                           |
+| ------------------------------------ | -------------------------------------------------------------: |
+| [Strings](../reading/strings.livemd) | [Comparison Operators](../reading/comparison_operators.livemd) |

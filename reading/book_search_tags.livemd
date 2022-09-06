@@ -2,17 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:httpoison, "~> 1.8"},
-  {:poison, "~> 5.0"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -354,7 +347,7 @@ Here's the `book_params` value in `BookController.create/2` when we submit the f
 %{"tags" => ["1", "2", "3"], "title" => ""}
 ```
 
-Feel free to `IO.inspect/2` the `book_params` in `BookController.create/2`, then create a book with tags selected to verify this is true.
+Feel free to [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) the `book_params` in `BookController.create/2`, then create a book with tags selected to verify this is true.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -471,7 +464,7 @@ However, if we visit http://localhost:4000/authors/1/books/new and submit the fo
 
 That's because `Books.create_book/1` expects `attrs` to contain a `:tags` field that is a list of tags. However, we're passing it a `"tags"` field that is a list of tag ids.
 
-Let's retrieve the tag for each tag id, and `Map.put/2` the `:tags` field into the `book_params` map. Also, we'll provide a default value for tags to avoid breaking existing controller tests.
+Let's retrieve the tag for each tag id, and [Map.put/2](https://hexdocs.pm/elixir/Map.html#put/2) the `:tags` field into the `book_params` map. Also, we'll provide a default value for tags to avoid breaking existing controller tests.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -496,7 +489,7 @@ def create(conn, %{"book" => book_params, "author_id" => author_id}) do
 end
 ```
 
-We're not allowed to pass a map with both string keys and atom keys to `Ecto.Changeset.cast/4`, so let's `Map.pop/2` the `:tags` field in `Books.create_book/1`.
+We're not allowed to pass a map with both string keys and atom keys to `Ecto.Changeset.cast/4`, so let's [Map.pop/2](https://hexdocs.pm/elixir/Map.html#pop/2) the `:tags` field in `Books.create_book/1`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1342,3 +1335,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish book search tags section"
 ```
+
+## Up Next
+
+| Previous                                                     | Next                                                 |
+| ------------------------------------------------------------ | ---------------------------------------------------: |
+| [Portfolio Comments](../exercises/portfolio_comments.livemd) | [Portfolio Tags](../exercises/portfolio_tags.livemd) |

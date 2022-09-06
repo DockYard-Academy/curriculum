@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -34,7 +29,7 @@ non-enumerable data into an enumerable data type.
 ### Integers
 
 How would you convert integers into an Enumerable?
-You can use the `Integer.digits/1` function.
+You can use the [Integer.digits/1](https://hexdocs.pm/elixir/Integer.html#digits/1) function.
 
 ```elixir
 Integer.digits(123)
@@ -54,7 +49,7 @@ Despite being so similar to lists, tuples are not considered collections.
 That's primarily because they are intended as fixed-sized containers, and any case that requires
 enumeration would likely be better served with lists.
 
-To get around this if needed, you can convert a tuple to a list with `Tuple.to_list/1`.
+To get around this if needed, you can convert a tuple to a list with [Tuple.to_list/1](https://hexdocs.pm/elixir/Tuple.html#to_list/1).
 Now you have a list that you can work with as a collection if necessary.
 
 However, if you find yourself doing this often, it may be a better
@@ -68,12 +63,12 @@ Tuple.to_list({1, 2, 3})
 
 Strings are not enumerable, however there are several methods to convert strings to lists.
 
-Strings can be converted into lists with either `String.graphemes/1`
-or `String.codepoints/1`.
+Strings can be converted into lists with either [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1)
+or [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
 
 Under the hood, strings are represented with a **codepoint**. A codepoint is an integer that represents
 the character. Each character such as `"a"` has a corresponding codepoint. That's why the
-function is called `String.codepoints/1`.
+function is called [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
 
 ```elixir
 String.split("abc", "", trim: true)
@@ -102,11 +97,11 @@ You do not need to memorize these values! You only need to be aware that each ch
 Utils.table(:unicode)
 ```
 
-#### `String.graphemes/1`
+#### [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1)
 
 Some special characters are actually multiple characters combined.
 
-You'll notice that é is actually 2 characters if you use `String.codepoints/1`.
+You'll notice that é is actually 2 characters if you use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
 Each character has its own codepoint.
 
 ```elixir
@@ -121,14 +116,14 @@ formed from multiple codepoints.
 String.graphemes("é")
 ```
 
-Alternatively, you can use `String.split/3` to split a string based on some value.
+Alternatively, you can use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split a string based on some value.
 For example, we can split a string by every comma like so:
 
 ```elixir
 String.split("a,b,c,d", ",")
 ```
 
-You can use this to accomplish the same behavior as `String.graphemes/1` by passing a string as the second argument.
+You can use this to accomplish the same behavior as [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) by passing a string as the second argument.
 However this leaves whitespace from the start and end of the string in.
 
 ```elixir
@@ -159,3 +154,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish non enumerables section"
 ```
+
+## Up Next
+
+| Previous                       | Next                                               |
+| ------------------------------ | -------------------------------------------------: |
+| [Enum](../reading/enum.livemd) | [Comprehensions](../reading/comprehensions.livemd) |

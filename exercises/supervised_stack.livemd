@@ -2,16 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -68,7 +62,7 @@ Stack.push(pid, 2)
 However, there's a bug. If we try to `pop/1` an item off of an empty stack, the process
 will crash due to a function clause error because the `handle_call/2` function expects a list with one or more elements.
 
-Here we use `GenServer.start/2` to avoid crashing the livebook.
+Here we use [GenServer.start/2](https://hexdocs.pm/elixir/GenServer.html#start/2) to avoid crashing the livebook.
 
 ```elixir
 {:ok, pid} = GenServer.start(Stack, [])
@@ -90,3 +84,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish supervised stack exercise"
 ```
+
+## Up Next
+
+| Previous                                                           | Next                                     |
+| ------------------------------------------------------------------ | ---------------------------------------: |
+| [Supervised Mix Project](../reading/supervised_mix_project.livemd) | [Dominoes](../exercises/dominoes.livemd) |

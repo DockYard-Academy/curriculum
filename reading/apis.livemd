@@ -2,17 +2,11 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:httpoison, "~> 1.8"},
-  {:poison, "~> 5.0"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"},
+  {:httpoison, "~> 1.8"}
 ])
 ```
 
@@ -35,7 +29,7 @@ Generally, API refers to web APIs, which are programs that run on the internet. 
 We won't go deep into networking or how the internet works, as that is beyond the scope of this course. However, Crash Course Computer Science provides an excellent overview.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=AEaKrq3SpW8")
+YouTube.new("https://www.youtube.com/watch?v=AEaKrq3SpW8")
 ```
 
 ### Client-Server Model
@@ -104,13 +98,13 @@ We use HTTP to communicate with web APIs. The browser hides the details of how w
 
 In Elixir, we use an HTTP client to make HTTP requests. We've installed the popular [HTTPoison](https://github.com/edgurgel/httpoison) HTTP client library for you in this livebook to demonstrate how to make HTTP requests.
 
-With `HTTPoison` we can programmatically request information from the same Joke API you visited in the browser.
+With [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) we can programmatically request information from the same Joke API you visited in the browser.
 
 ```elixir
 HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
 ```
 
-We use the `HTTPoison.get/3` function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
+We use the [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
 
 The `:body` is the JSON response you saw previously in the browser, and `:headers` provide additional context and meta-data about the response. The `:status_code` specifies the response's status, where `200` indicates a successful response. The `:request_url` is simply the URL.
 
@@ -145,7 +139,7 @@ converts the string representation of the JSON into an Elixir value.
 Poison.decode!("{\"key\"\: \"value\"}")
 ```
 
-By combining `HTTPoison` and `Poison` we can retrieve the JSON from the Joke API and return
+By combining [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Poison](https://hexdocs.pm/poison/Poison.html) we can retrieve the JSON from the Joke API and return
 an Elixir map.
 
 ```elixir
@@ -168,7 +162,7 @@ IO.puts("""
 
 ### Your Turn
 
-Use `Poison.decode!/2` to decode the following json string.
+Use [Poison.decode!/2](https://hexdocs.pm/poison/Poison.html#decode!/2) to decode the following json string.
 
 ```elixir
 string = "{\"hello\"\: \"world\"}"
@@ -178,8 +172,8 @@ string = "{\"hello\"\: \"world\"}"
 
 HTTP GET requests retrieve data from a server and HTTP POST requests send data to a server.
 
-We've already seen how we can use `HTTPoison.get/3` to make an HTTP GET request.
-We can also use the `HTTPoison.post/4` function to make an HTTP POST request.
+We've already seen how we can use [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) to make an HTTP GET request.
+We can also use the [HTTPoison.post/4](https://hexdocs.pm/httpoison/HTTPoison.html#post/4) function to make an HTTP POST request.
 
 POST requests include **body** and **headers**. The body contains the data to send to the server. The headers contain context and metadata about the body of data being sent, which is the data to send to the server. The POST request also includes **headers** which
 contain context and metadata about the data. For example, the `Content-Type` header tells the server the format of data being sent.
@@ -195,7 +189,7 @@ HTTPoison.post("http://httparrot.herokuapp.com/post", "{\"body\": \"test\"}", [
 
 ## Private APIs
 
-So far, we've seen how to use `HTTPoison` and `Poison` to retrieve information from a public API. However, some APIs are private.
+So far, we've seen how to use [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Poison](https://hexdocs.pm/poison/Poison.html) to retrieve information from a public API. However, some APIs are private.
 
 Private APIs require an API key to communicate with them. This key is then included in the HTTP request to authenticate the request.
 
@@ -240,7 +234,7 @@ api_key = ""
   )
 ```
 
-Once you are sure the above works correctly, use `Poison.decode/2` to decode the `response` into an Elixir map.
+Once you are sure the above works correctly, use [Poison.decode/2](https://hexdocs.pm/poison/Poison.html#decode/2) to decode the `response` into an Elixir map.
 
 ```elixir
 response
@@ -254,3 +248,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish apis section"
 ```
+
+## Up Next
+
+| Previous                                   | Next                                                   |
+| ------------------------------------------ | -----------------------------------------------------: |
+| [Home Page](../exercises/home_page.livemd) | [Public Chat Api](../exercises/public_chat_api.livemd) |

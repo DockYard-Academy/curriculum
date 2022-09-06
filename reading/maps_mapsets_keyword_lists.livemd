@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -84,16 +79,21 @@ For practical purposes, be aware most operations on a map will have $O(log(n))$ 
 
 Maps scale better for large values when compared with lists or keyword lists, which grow linearly instead of logarithmically.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
 Accessing any key in a map with a million elements is nearly instant, regardless of which key is accessed!
+
+First, we'll create the large map. This may take a moment.
 
 ```elixir
 large_map = Map.new(1..10_000_000, fn x -> {x, x} end)
 ```
 
-Try changing `key` to any integer between `0` and `999_999`. Notice that accessing the value is
-nearly instant.
+While creating the map took some time, reading a value should be extremely fast.
+
+Evaluate the cell below and notice how quickly we can access a value. Try changing `key` to any integer between `0` and `999_999`. Notice there is no significant affect on the speed of accessing a value.
 
 ```elixir
 key = 500_000
@@ -184,7 +184,7 @@ set = MapSet.new([1, 2, 3])
 MapSet.delete(set, 2)
 ```
 
-MapSet is enumerable. However, any `Enum` function with a MapSet returns a list.
+MapSet is enumerable. However, any [Enum](https://hexdocs.pm/elixir/Enum.html) function with a MapSet returns a list.
 
 ```elixir
 MapSet.new([1, 2, 3]) |> Enum.map(fn each -> each + 1 end)
@@ -197,7 +197,7 @@ where there should never be duplicate elements and order is not important, it's 
 
 ### Your Turn
 
-Create a MapSet with the elements `1, 2, 3`. Use `MapSet.member?/2` to check if your MapSet contains
+Create a MapSet with the elements `1, 2, 3`. Use [MapSet.member?/2](https://hexdocs.pm/elixir/MapSet.html#member?/2) to check if your MapSet contains
 the element `2`. Your answer should return `true`.
 
 ```elixir
@@ -212,3 +212,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish maps mapsets keyword lists section"
 ```
+
+## Up Next
+
+| Previous                                             | Next                                       |
+| ---------------------------------------------------- | -----------------------------------------: |
+| [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) | [Fibonacci](../exercises/fibonacci.livemd) |

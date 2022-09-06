@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -103,14 +98,14 @@ your application rather than immediately reaching for a cache.
 For example, a slow Fibonacci function with a cache is no replacement for a fast Fibonacci function!
 
 There are many ways to implement a cache. Using tools already covered in this course, you could use a simple map with keys for the input and values for the output. Alternatively, you could
-use a `GenServer` with changing state.
+use a [GenServer](https://hexdocs.pm/elixir/GenServer.html) with changing state.
 
-In this lesson, we'll also cover how you can use `Agent` and `:ets` tables
+In this lesson, we'll also cover how you can use [Agent](https://hexdocs.pm/elixir/Agent.html) and `:ets` tables
 to build in-memory caches.
 
 ### Your Turn
 
-Create a `Cache` `GenServer` that
+Create a `Cache` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that
 can hold some cached state. We should be able to set a value
 and retrieve a value like so.
 
@@ -132,24 +127,24 @@ end
 
 ## Agent
 
-We don't necessarily need a `GenServer` when creating a simple cache.
+We don't necessarily need a [GenServer](https://hexdocs.pm/elixir/GenServer.html) when creating a simple cache.
 
-For a more lightweight solution, we can use an `Agent`.
-An `Agent` is a simple wrapper around state.
+For a more lightweight solution, we can use an [Agent](https://hexdocs.pm/elixir/Agent.html).
+An [Agent](https://hexdocs.pm/elixir/Agent.html) is a simple wrapper around state.
 
-We can start an `Agent` process with `start_link/2`.
+We can start an [Agent](https://hexdocs.pm/elixir/Agent.html) process with `start_link/2`.
 
 ```elixir
 {:ok, agent} = Agent.start_link(fn -> "initial state" end)
 ```
 
-We retrieve the state of an `Agent` process with `get/2`.
+We retrieve the state of an [Agent](https://hexdocs.pm/elixir/Agent.html) process with `get/2`.
 
 ```elixir
 Agent.get(agent, fn state -> state end)
 ```
 
-We can update the state of an `Agent` process with `update/2`. After `update/2` is called, `get/2` will return the newly updated state.
+We can update the state of an [Agent](https://hexdocs.pm/elixir/Agent.html) process with `update/2`. After `update/2` is called, `get/2` will return the newly updated state.
 
 ```elixir
 :ok = Agent.update(agent, fn _state -> "new state" end)
@@ -183,7 +178,7 @@ Agent.start_link(fn -> "initial state" end, name: :my_agent)
 Agent.get(:my_agent, fn state -> state end)
 ```
 
-You can store state in an `Agent` process and access it from any module. This is useful for sharing data across multiple processes.
+You can store state in an [Agent](https://hexdocs.pm/elixir/Agent.html) process and access it from any module. This is useful for sharing data across multiple processes.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -231,7 +226,7 @@ Cache.start_link(%{})
 ```
 
 Because we've used `__MODULE__` for the name of
-the `Agent` process, any process can access the `Cache`'s state using the `Cache` module.
+the [Agent](https://hexdocs.pm/elixir/Agent.html) process, any process can access the `Cache`'s state using the `Cache` module.
 
 ```elixir
 Cache.set(:key, "value")
@@ -273,12 +268,12 @@ We can use [ETS](https://elixir-lang.org/getting-started/mix-otp/ets.html)
 tables for a convenient in-memory cache. `:ets` is a library provided by Erlang
 through the `:ets` module.
 
-While an `Agent` is a simple solution for an in-memory cache best for small loads or non-concurrent operations, an `:ets` table generally
+While an [Agent](https://hexdocs.pm/elixir/Agent.html) is a simple solution for an in-memory cache best for small loads or non-concurrent operations, an `:ets` table generally
 performs better and can support concurrent read and write operations.
 
 Generally, We can use `:ets` for a more performant in-memory key-value store.
 
-`:ets` tables are much like a `GenServer` except designed explicitly for in-memory key-value storage.
+`:ets` tables are much like a [GenServer](https://hexdocs.pm/elixir/GenServer.html) except designed explicitly for in-memory key-value storage.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -378,7 +373,7 @@ default_table = :ets.new(:default_table, [:set, :protected])
 default_table
 ```
 
-With `:protected` access control, the `:ets` raises an `ArgumentError` if another process attempts to write to it.
+With `:protected` access control, the `:ets` raises an [ArgumentError](https://hexdocs.pm/elixir/ArgumentError.html) if another process attempts to write to it.
 
 Uncomment and execute this code. Notice that the child process crashes.
 
@@ -509,7 +504,7 @@ table
 For an overview of race conditions and how large systems deal with many concurrent operations, there is an excellent video by Tom Scott.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=RY_2gElt3SA")
+YouTube.new("https://www.youtube.com/watch?v=RY_2gElt3SA")
 ```
 
 ### Further Reading
@@ -527,3 +522,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish caching agent ets section"
 ```
+
+## Up Next
+
+| Previous                       | Next                                                             |
+| ------------------------------ | ---------------------------------------------------------------: |
+| [Task](../reading/task.livemd) | [Inventory Management](../exercises/inventory_management.livemd) |

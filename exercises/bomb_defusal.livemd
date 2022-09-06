@@ -2,16 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -66,12 +60,12 @@ Dialyzer, Credo, and ExDoc are optional for this project.
 
 ## Create the Bomb GenServer
 
-Create a `Bomb` `GenServer`. It should start as a minimal `GenServer` with no functionality.
+Create a `Bomb` [GenServer](https://hexdocs.pm/elixir/GenServer.html). It should start as a minimal [GenServer](https://hexdocs.pm/elixir/GenServer.html) with no functionality.
 
 ## Configure the BombSupervisor
 
 Configure the BombSupervisor to start in `application.ex`.
-It should start with 3 `Bomb` `GenServer`s as children.
+It should start with 3 `Bomb` [GenServer](https://hexdocs.pm/elixir/GenServer.html)s as children.
 
 ## :explode
 
@@ -79,6 +73,7 @@ Send a `Bomb` an `:explode` message. It should handle the message by terminating
 The `BombSupervisor` should automatically restart all of the `Bomb` processes.
 
 ## (Bonus) :cut
+
 We will defuse bombs by sending them a `:cut` message with a `:red`, `:white`, or `:black` wire.
 
 When a `Bomb` is initialized, it should store a randomized wire of either `:red`, `:white`, or `:black` in
@@ -90,7 +85,7 @@ A defused bomb will no longer terminal when sent the `:explode` message.
 
 ## (Bonus) Timer
 
-Add a `Timer` `GenServer` under the `BombSupervisor` tree.
+Add a `Timer` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under the `BombSupervisor` tree.
 
 The `Timer` should store a `5` minute timer which decrements every second.
 

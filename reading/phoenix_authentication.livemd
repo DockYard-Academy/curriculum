@@ -2,17 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:httpoison, "~> 1.8"},
-  {:poison, "~> 5.0"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -376,7 +369,7 @@ Hashing is a way of encrypting data using a mathematical algorithm. Hashing algo
 We store the hash of the password rather than the actual password to improve security. For an overview of hashing, here's a video by Seytonic.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=--tnZMuoK3E")
+YouTube.new("https://www.youtube.com/watch?v=--tnZMuoK3E")
 ```
 
 The user schema includes a `:password` and a `:hashed_password` field.
@@ -401,7 +394,7 @@ defmodule Diary.Accounts.User do
   ...
 ```
 
-The `redact: true` option redacts the `:hashed_password` and the `:password` if we attempt to `IO.inspect/2` their values. See [Redacting Fields](https://hexdocs.pm/ecto/Ecto.Schema.html#module-redacting-fields) for a full explanation.
+The `redact: true` option redacts the `:hashed_password` and the `:password` if we attempt to [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) their values. See [Redacting Fields](https://hexdocs.pm/ecto/Ecto.Schema.html#module-redacting-fields) for a full explanation.
 
 The `virtual: true` means the Database doesn't store the `:password`.
 For security reasons, the users table only stores the `:hashed_password`.
@@ -736,7 +729,7 @@ Make sure to run migrations.
 $ mix ecto.migrate
 ```
 
-Everything other than `user_id:references:users` should be familiar from when we created a journal application in the previous [Phoenix](../phoenix.livemd) section.
+Everything other than `user_id:references:users` should be familiar from when we created a journal application in the previous [Phoenix](./phoenix.livemd) section.
 
 This time, we need to associate each diary entry with a user and ensure users can only access their own entries.
 
@@ -1161,3 +1154,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish phoenix authentication section"
 ```
+
+## Up Next
+
+| Previous                                                       | Next                                                                     |
+| -------------------------------------------------------------- | -----------------------------------------------------------------------: |
+| [Portfolio Blog Page](../exercises/portfolio_blog_page.livemd) | [Portfolio Auth Blog Page](../exercises/portfolio_auth_blog_page.livemd) |

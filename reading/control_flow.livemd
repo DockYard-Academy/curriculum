@@ -2,14 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -190,7 +186,7 @@ flowchart
 <!-- livebook:{"break_markdown":true} -->
 
 Converting that into code, we would get the following. Readability is sometimes subjective, but
-we can probably agree that this is easier to understand.
+we can probably agree that this is easier to understand, though it's still not great.
 
 ```elixir
 defmodule RockPaperScissors do
@@ -523,9 +519,93 @@ end
 Under the hood, Elixir is checking the value given to the case statement, and then checking
 if it matches any of the cases. It then executes the first case that matches.
 
+<!-- livebook:{"attrs":{"source":"frames = [\n      \"\new create a case statement.\n```elixir\ncase \\\"snowy\\\" do\n  \\\"sunny\\\" -> \\\"wear a t-shirt\\\"\n  \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nCheck if snowy equals sunny.\n```elixir\ncase \\\"snowy\\\" do\n  \\\"snowy\\\" === \\\"sunny\\\" -> \\\"wear a t-shirt\\\"\n  \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals rainy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  \\\"snowy\\\" === \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals cold.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  \\\"snowy\\\" === \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals snowy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  false -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" === \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nsnowy equals snowy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  false -> \\\"wear a sweater\\\"\n  true -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nReturn wear a thick coat.\n```elixir\n\n\n\n\n          \\\"wear a thick coat\\\"\n \n```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Case Visualization"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+frames = [
+  "
+We create a case statement.
 ```elixir
-Utils.slide(:case)
+case \"snowy\" do
+  \"sunny\" -> \"wear a t-shirt\"
+  \"rainy\" -> \"wear a rain jacket\"
+  \"cold\" -> \"wear a sweater\"
+  \"snowy\" -> \"wear a thick coat\"
+end
 ```
+  ",
+  "
+Check if snowy equals sunny.
+```elixir
+case \"snowy\" do
+  \"snowy\" === \"sunny\" -> \"wear a t-shirt\"
+  \"rainy\" -> \"wear a rain jacket\"
+  \"cold\" -> \"wear a sweater\"
+  \"snowy\" -> \"wear a thick coat\"
+end
+```
+  ",
+  "
+It's false, so check if snowy equals rainy.
+```elixir
+case \"snowy\" do
+  false -> \"wear a t-shirt\"
+  \"snowy\" === \"rainy\" -> \"wear a rain jacket\"
+  \"cold\" -> \"wear a sweater\"
+  \"snowy\" -> \"wear a thick coat\"
+end
+```
+  ",
+  "
+It's false, so check if snowy equals cold.
+```elixir
+case \"snowy\" do
+  false -> \"wear a t-shirt\"
+  false -> \"wear a rain jacket\"
+  \"snowy\" === \"cold\" -> \"wear a sweater\"
+  \"snowy\" -> \"wear a thick coat\"
+end
+```
+  ",
+  "
+It's false, so check if snowy equals snowy.
+```elixir
+case \"snowy\" do
+  false -> \"wear a t-shirt\"
+  false -> \"wear a rain jacket\"
+  false -> \"wear a sweater\"
+  \"snowy\" === \"snowy\" -> \"wear a thick coat\"
+end
+```
+  ",
+  "
+snowy equals snowy.
+```elixir
+case \"snowy\" do
+  false -> \"wear a t-shirt\"
+  false -> \"wear a rain jacket\"
+  false -> \"wear a sweater\"
+  true -> \"wear a thick coat\"
+end
+```
+  ",
+  "
+Return wear a thick coat.
+```elixir
+
+
+
+
+          \"wear a thick coat\"
+ 
+```
+  "
+]
+
+SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
+  Enum.at(frames, i) |> Kino.Markdown.new()
+end)
+````
 
 Now, you may notice that if you give the `case` statement a value that doesn't match any case,
 the program crashes with a **CaseClauseError** error. In general, it's wise to have a default
@@ -628,9 +708,106 @@ end
 
 Let's follow the flow of execution to try to make this more clear.
 
+<!-- livebook:{"attrs":{"source":"frames = [\n      \"\nCheck if plant is dead.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  plant === \\\"dead\\\" -> \\\"get a new plant\\\"\n  plant === \\\"wilting\\\" && !daylight -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if plant is wilting and it's dark.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  plant === \\\"wilting\\\" && !daylight -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if plant is wilting and it's sunny.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if days_since_watered is >= 14.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  false -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`true`! days_since_watered is >= 14.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  false -> \\\"put the plant in sunlight\\\"\n  true -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\nWater the plant.\n```elixir\n\n\n\n\n\n\n\n\n          \\\"water the plant\\\"\n \n```\n \"\n    ]\n\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Cond Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+frames = [
+  "
+Check if plant is dead.
 ```elixir
-Utils.slide(:cond)
+daylight = true
+days_since_watered = 14
+plant = \"healthy\"
+
+cond do
+  plant === \"dead\" -> \"get a new plant\"
+  plant === \"wilting\" && !daylight -> \"use a UV light\"
+  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
+  days_since_watered >= 14 -> \"water the plant\"
+end
 ```
+ ",
+  "
+`false`, so check if plant is wilting and it's dark.
+```elixir
+daylight = true
+days_since_watered = 14
+plant = \"healthy\"
+
+cond do
+  false -> \"get a new plant\"
+  plant === \"wilting\" && !daylight -> \"use a UV light\"
+  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
+  days_since_watered >= 14 -> \"water the plant\"
+end
+```
+ ",
+  "
+`false`, so check if plant is wilting and it's sunny.
+```elixir
+daylight = true
+days_since_watered = 14
+plant = \"healthy\"
+
+cond do
+  false -> \"get a new plant\"
+  false -> \"use a UV light\"
+  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
+  days_since_watered >= 14 -> \"water the plant\"
+end
+```
+ ",
+  "
+`false`, so check if days_since_watered is >= 14.
+```elixir
+daylight = true
+days_since_watered = 14
+plant = \"healthy\"
+
+cond do
+  false -> \"get a new plant\"
+  false -> \"use a UV light\"
+  false -> \"put the plant in sunlight\"
+  days_since_watered >= 14 -> \"water the plant\"
+end
+```
+ ",
+  "
+`true`! days_since_watered is >= 14.
+```elixir
+daylight = true
+days_since_watered = 14
+plant = \"healthy\"
+
+cond do
+  false -> \"get a new plant\"
+  false -> \"use a UV light\"
+  false -> \"put the plant in sunlight\"
+  true -> \"water the plant\"
+end
+```
+ ",
+  "
+Water the plant.
+```elixir
+
+
+
+
+
+
+
+
+          \"water the plant\"
+ 
+```
+ "
+]
+
+SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
+  Enum.at(frames, i) |> Kino.Markdown.new()
+end)
+````
 
 ### Your Turn
 
@@ -658,3 +835,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish control flow section"
 ```
+
+## Up Next
+
+| Previous                             | Next                                                 |
+| ------------------------------------ | ---------------------------------------------------: |
+| [Structs](../reading/structs.livemd) | [Naming Numbers](../exercises/naming_numbers.livemd) |

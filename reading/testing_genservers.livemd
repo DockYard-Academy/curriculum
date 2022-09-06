@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -50,7 +45,7 @@ end
 ```
 
 Generally, we don't want to test the implementation of the counter, so we don't
-want to specifically send it messages using the `GenServer` module, nor do we want
+want to specifically send it messages using the [GenServer](https://hexdocs.pm/elixir/GenServer.html) module, nor do we want
 to test on the state of the process.
 
 For example, the following test is coupled to implementation.
@@ -72,7 +67,7 @@ ExUnit.run()
 ```
 
 So if any of the internals change, these tests could break, even though the behavior of the counter module doesn't.
-Instead, we generally want to test on the [client interface](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis) of the `GenServer`.
+Instead, we generally want to test on the [client interface](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis) of the [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 Here's the `Counter` module separated into the `Client` and `Server` interface.
 
@@ -207,10 +202,10 @@ end
 ExUnit.run()
 ```
 
-For more on testing `GenServer`s, there is an excellent talk by Tyler Young.
+For more on testing [GenServer](https://hexdocs.pm/elixir/GenServer.html)s, there is an excellent talk by Tyler Young.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=EZFLPG7V7RM")
+YouTube.new("https://www.youtube.com/watch?v=EZFLPG7V7RM")
 ```
 
 ### Your Turn
@@ -241,3 +236,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish testing genservers section"
 ```
+
+## Up Next
+
+| Previous                                             | Next                               |
+| ---------------------------------------------------- | ---------------------------------: |
+| [Metaprogramming](../reading/metaprogramming.livemd) | [Stack](../exercises/stack.livemd) |

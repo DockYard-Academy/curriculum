@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -328,13 +323,13 @@ It's useful to build your own generic server for the purpose of understanding ho
 However, we can and should rely on the built-in [GenServer](https://hexdocs.pm/elixir/GenServer.html)
 provided by Elixir.
 
-We `use` the `GenServer` provided by Elixir. Under the hood, this defines the generic server functionality
+We `use` the [GenServer](https://hexdocs.pm/elixir/GenServer.html) provided by Elixir. Under the hood, this defines the generic server functionality
 for the module.
 
 Then much like our `GenericServer` we can define an `init` function. The init function
 now accepts options, which we could use to set the initial state. We'll ignore `_opts` for now.
 
-We use `@impl` to specify that `init` is a callback function for the `GenServer`. You can
+We use `@impl` to specify that `init` is a callback function for the [GenServer](https://hexdocs.pm/elixir/GenServer.html). You can
 see the [@impl documentation](https://hexdocs.pm/elixir/main/Module.html#module-impl) for
 more on why.
 
@@ -349,7 +344,7 @@ defmodule Counter do
 end
 ```
 
-We use `GenServer.start_link/2` to start the new `Counter` process with the new counter process.
+We use [GenServer.start_link/2](https://hexdocs.pm/elixir/GenServer.html#start_link/2) to start the new `Counter` process with the new counter process.
 There are no options, so the second parameter is an empty list.
 
 ```elixir
@@ -388,7 +383,7 @@ that the count increments.
 GenServer.call(pid, :increment)
 ```
 
-`call` executes the `handle_call/3` function in the internal code of `GenServer`, just like our
+`call` executes the `handle_call/3` function in the internal code of [GenServer](https://hexdocs.pm/elixir/GenServer.html), just like our
 `GenericServer`. The parent process then receives a response.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -403,7 +398,7 @@ flowchart
 
 This is the heart of generic servers. We can create an in-memory process have it store some state. Then, we send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
 
-The built-in `GenServer` also has some additional functionality, which will become more important
+The built-in [GenServer](https://hexdocs.pm/elixir/GenServer.html) also has some additional functionality, which will become more important
 as you work with concurrency. But, for now, we're going to focus on using it as a tool for persistence, so
 you have everything you currently need.
 
@@ -411,7 +406,7 @@ you have everything you currently need.
 
 ### Your Turn
 
-In the Elixir cell below, use the built-in `GenServer` module to create a `Journal` module where you can `:add_entry`.
+In the Elixir cell below, use the built-in [GenServer](https://hexdocs.pm/elixir/GenServer.html) module to create a `Journal` module where you can `:add_entry`.
 All journal entries should be stored in state and returned as a `list` for the response.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -439,3 +434,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish generic server section"
 ```
+
+## Up Next
+
+| Previous                                 | Next                                                             |
+| ---------------------------------------- | ---------------------------------------------------------------: |
+| [Processes](../reading/processes.livemd) | [Traffic Light Server](../exercises/traffic_light_server.livemd) |

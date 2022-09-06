@@ -2,16 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -30,7 +24,7 @@ We're going to create a gold mining simulator game.
 
 This project is designed to learn about supervisors and fault tolerance.
 
-A `MineSupervisor` will supervise a dynamic number of `Mine` workers. Each `Mine` will be a `GenServer`.
+A `MineSupervisor` will supervise a dynamic number of `Mine` workers. Each `Mine` will be a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 ```mermaid
 flowchart
@@ -46,7 +40,7 @@ flowchart
 
 Each `Mine` will harvest `5` gold every `5` seconds.
 
-Upon harvesting, each `Mine` will send a message to the `ResourceStore` `GenServer` to store `5` more gold.
+Upon harvesting, each `Mine` will send a message to the `ResourceStore` [GenServer](https://hexdocs.pm/elixir/GenServer.html) to store `5` more gold.
 
 ```mermaid
 flowchart
@@ -79,11 +73,11 @@ The MineSupervisor should be able to dynamically supervise its child `Mine` work
 ## Configure the ResourceStore
 
 Configure the `ResourceStore` to start in `application.ex`.
-The `ResourceStore` should be a `GenServer` or `Agent`, which starts with `200` gold in its state.
+The `ResourceStore` should be a [GenServer](https://hexdocs.pm/elixir/GenServer.html) or [Agent](https://hexdocs.pm/elixir/Agent.html), which starts with `200` gold in its state.
 
 ## MiningSimulator.new_mine/0
 
-The `MiningSimulator.new_mine/0` function should start a `Mine` `GenServer` under the `MineSupervisor`.
+The `MiningSimulator.new_mine/0` function should start a `Mine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under the `MineSupervisor`.
 It should remove `200` gold from the `ResourceStore`.
 
 The `Mine` harvests resources on an interval and sends a message to add gold to the `ResourceStore`.

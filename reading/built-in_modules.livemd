@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -42,7 +37,7 @@ the Kernel.
 Kernel.+(3, 3)
 ```
 
-`Kernel` contains many functions for determining a values type such as `is_atom/1`, `is_binary/1`, `is_map/1`, and `is_integer/1`.
+[Kernel](https://hexdocs.pm/elixir/Kernel.html) contains many functions for determining a values type such as `is_atom/1`, `is_binary/1`, `is_map/1`, and `is_integer/1`.
 
 ```elixir
 true = Kernel.is_map(%{})
@@ -51,19 +46,19 @@ true = Kernel.is_binary("")
 true = Kernel.is_integer(1)
 ```
 
-We can use `Kernel` functions without using the `Kernel` namespace.
+We can use [Kernel](https://hexdocs.pm/elixir/Kernel.html) functions without using the [Kernel](https://hexdocs.pm/elixir/Kernel.html) namespace.
 
 ```elixir
 is_map(%{})
 ```
 
-The `Kernel` is reasonably large. Remember, our goal is not to memorize every function but to develop familiarity with repeated practice.
+The [Kernel](https://hexdocs.pm/elixir/Kernel.html) is reasonably large. Remember, our goal is not to memorize every function but to develop familiarity with repeated practice.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-In the Elixir cell below, use the correct function from `Kernel` to determine if each value below matches its type.
+In the Elixir cell below, use the correct function from [Kernel](https://hexdocs.pm/elixir/Kernel.html) to determine if each value below matches its type.
 The first `is_a_atom` value is filled in to demonstrate the goal.
 
 Replace `nil` with your answers.
@@ -112,8 +107,8 @@ Here are a few functions to get you started.
 
 ### Your Turn
 
-Use the `Integer.parse/2` function to convert `"2"` to an integer. Notice that the return value should
-be `{2, ""}` Because `Integer.parse/2` returns a tuple with the parsed integer and the remaining string.
+Use the [Integer.parse/2](https://hexdocs.pm/elixir/Integer.html#parse/2) function to convert `"2"` to an integer. Notice that the return value should
+be `{2, ""}` Because [Integer.parse/2](https://hexdocs.pm/elixir/Integer.html#parse/2) returns a tuple with the parsed integer and the remaining string.
 
 Replace `nil` with your answer.
 
@@ -123,7 +118,7 @@ parsed = nil
 Utils.feedback(:integer_parse, parsed)
 ```
 
-Use the `Integer.digits/2` function to split `123456789` into a list of integers.
+Use the [Integer.digits/2](https://hexdocs.pm/elixir/Integer.html#digits/2) function to split `123456789` into a list of integers.
 
 Replace `nil` with your answer.
 
@@ -133,7 +128,7 @@ digits = nil
 Utils.feedback(:integer_digits, digits)
 ```
 
-Use the `Integer.gcd/2` function to determine the greatest common denominator of
+Use the [Integer.gcd/2](https://hexdocs.pm/elixir/Integer.html#gcd/2) function to determine the greatest common denominator of
 `10` and `15`. The greatest common divisor (GCD) is the largest
 positive integer that divides both 10 and 15 evenly.
 
@@ -211,7 +206,7 @@ flowchart TB
 
 ### Your Turn
 
-Use the `String.at/2` function to get the character at index `2` of `"hello"`.
+Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to get the character at index `2` of `"hello"`.
 The result should be the character `l`.
 
 Replace `nil` with your answer.
@@ -222,7 +217,7 @@ answer = nil
 Utils.feedback(:string_at, answer)
 ```
 
-Use the `String.contains?/2` function to determine if `"Hello"` contains `"lo"`. Replace `nil` with your answer.
+Use the [String.contains?/2](https://hexdocs.pm/elixir/String.html#contains?/2) function to determine if `"Hello"` contains `"lo"`. Replace `nil` with your answer.
 
 ```elixir
 answer = nil
@@ -230,7 +225,7 @@ answer = nil
 Utils.feedback(:string_contains, answer)
 ```
 
-Use `String.capitalize/2` to capitalize `"hello"`. Replace `nil` with your answer.
+Use [String.capitalize/2](https://hexdocs.pm/elixir/String.html#capitalize/2) to capitalize `"hello"`. Replace `nil` with your answer.
 
 ```elixir
 answer = nil
@@ -238,7 +233,7 @@ answer = nil
 Utils.feedback(:string_capitalize, answer)
 ```
 
-Use `String.split/3` to split the following comma-separated list of strings into a list of words.
+Use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split the following comma-separated list of strings into a list of words.
 Replace `nil` with your answer.
 
 ```elixir
@@ -249,7 +244,7 @@ words = nil
 Utils.feedback(:string_split, words)
 ```
 
-Use `String.trim/1` to remove whitespace from the following string.
+Use [String.trim/1](https://hexdocs.pm/elixir/String.html#trim/1) to remove whitespace from the following string.
 Replace `nil` with your answer.
 
 ```elixir
@@ -260,7 +255,7 @@ trimmed_string = nil
 Utils.feedback(:string_trim, trimmed_string)
 ```
 
-Use `String.upcase/1` to convert the following string to all caps.
+Use [String.upcase/1](https://hexdocs.pm/elixir/String.html#upcase/1) to convert the following string to all caps.
 Replace `nil` with your answer.
 
 ```elixir
@@ -297,7 +292,7 @@ Use `delete_at/2` to remove `2` from this list.
 list = [1, 2, 3]
 ```
 
-`first/2` retrieves the first element in a list. We can also use `hd/1`, `Enum.at/2`, or pattern matching.
+`first/2` retrieves the first element in a list. We can also use `hd/1`, [Enum.at/2](https://hexdocs.pm/elixir/Enum.html#at/2), or pattern matching.
 
 ```elixir
 head = List.first([1, 2, 3])
@@ -316,38 +311,38 @@ hd([1, 2, 3])
 head = Enum.at([1, 2, 3], 0)
 ```
 
-Try pattern matching, `List.first/2`, `Enum.at/2`, and `hd/1` to retrieve the first element of
+Try pattern matching, [List.first/2](https://hexdocs.pm/elixir/List.html#first/2), [Enum.at/2](https://hexdocs.pm/elixir/Enum.html#at/2), and `hd/1` to retrieve the first element of
 the list below.
 
 ```elixir
 list = [1, 2, 3]
 ```
 
-Use `List.flatten/1` to flatten the following list into [1, 2, 3, 4, 5, 6, 7, 8, 9]
+Use [List.flatten/1](https://hexdocs.pm/elixir/List.html#flatten/1) to flatten the following list into [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 ```elixir
 list = [1, 2, [3, 4, 5], 6, [7, [8, [9]]]]
 ```
 
-Use `List.insert_at/3` to insert `2` into the following list to make `[1, 2, 3]`.
+Use [List.insert_at/3](https://hexdocs.pm/elixir/List.html#insert_at/3) to insert `2` into the following list to make `[1, 2, 3]`.
 
 ```elixir
 List.insert_at([1, 3], 1, 2)
 ```
 
-Use `List.last/2` to retrieve the last element `10000` in the list below.
+Use [List.last/2](https://hexdocs.pm/elixir/List.html#last/2) to retrieve the last element `10000` in the list below.
 
 ```elixir
 list = Enum.to_list(1..10000)
 ```
 
-Use `List.update_at/3` to replace `4` with `2` in the following list to make `[1, 2, 3]`.
+Use [List.update_at/3](https://hexdocs.pm/elixir/List.html#update_at/3) to replace `4` with `2` in the following list to make `[1, 2, 3]`.
 
 ```elixir
 list = [1, 4, 3]
 ```
 
-Use `List.zip/1` to combine these two lists to make `[{"a", 1}, {"b", 2}, {"c", 3}]`.
+Use [List.zip/1](https://hexdocs.pm/elixir/List.html#zip/1) to combine these two lists to make `[{"a", 1}, {"b", 2}, {"c", 3}]`.
 
 ```elixir
 lista = ["a", "b", "c"]
@@ -369,7 +364,7 @@ Here are a few common functions to get you started.
 
 Keep in mind operations do not mutate a value.
 
-For example, if we use `Map.put/3` to put a new value in a map, the original variable is not
+For example, if we use [Map.put/3](https://hexdocs.pm/elixir/Map.html#put/3) to put a new value in a map, the original variable is not
 changed. Functions return a new value rather than modifying the original one.
 
 ```elixir
@@ -384,7 +379,7 @@ So the `original_map` is still an empty map `%{}`.
 original_map
 ```
 
-And the `new_map` has been bound to the result of `Map.put/3`.
+And the `new_map` has been bound to the result of [Map.put/3](https://hexdocs.pm/elixir/Map.html#put/3).
 
 ```elixir
 new_map
@@ -394,7 +389,7 @@ new_map
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use `Map.get/3` to retrieve the value for the `:hello` key in the following map.
+Use [Map.get/3](https://hexdocs.pm/elixir/Map.html#get/3) to retrieve the value for the `:hello` key in the following map.
 Replace `nil` with your answer.
 
 ```elixir
@@ -405,7 +400,7 @@ retrieved_value = nil
 Utils.feedback(:map_get, retrieved_value)
 ```
 
-Use `Map.put/3` to add the key `:two` with the value `2` to the following map. Replace `nil` with your answer.
+Use [Map.put/3](https://hexdocs.pm/elixir/Map.html#put/3) to add the key `:two` with the value `2` to the following map. Replace `nil` with your answer.
 
 ```elixir
 map = %{one: 1}
@@ -415,7 +410,7 @@ new_map = nil
 Utils.feedback(:map_put, new_map)
 ```
 
-Use `Map.keys/1` to retrieve the keys for the following map. Replace `nil` with your answer.
+Use [Map.keys/1](https://hexdocs.pm/elixir/Map.html#keys/1) to retrieve the keys for the following map. Replace `nil` with your answer.
 
 ```elixir
 map = %{key1: 1, key2: 2, key3: 3}
@@ -425,7 +420,7 @@ keys = nil
 Utils.feedback(:map_keys, keys)
 ```
 
-Use `Map.delete/2` to remove `:key1` from the following map.
+Use [Map.delete/2](https://hexdocs.pm/elixir/Map.html#delete/2) to remove `:key1` from the following map.
 
 ```elixir
 map = %{key1: 1, key2: 2, key3: 3}
@@ -435,7 +430,7 @@ new_map = nil
 Utils.feedback(:map_delete, new_map)
 ```
 
-Use `Map.merge/2` to combine `%{one: 1}` and `%{two: 2}`. Replace `nil` with your answer.
+Use [Map.merge/2](https://hexdocs.pm/elixir/Map.html#merge/2) to combine `%{one: 1}` and `%{two: 2}`. Replace `nil` with your answer.
 
 ```elixir
 merged_map = nil
@@ -443,7 +438,7 @@ merged_map = nil
 Utils.feedback(:merged_map, merged_map)
 ```
 
-Use `Map.values/1` to retrieve the values in the following map. Replace `nil` with your answer.
+Use [Map.values/1](https://hexdocs.pm/elixir/Map.html#values/1) to retrieve the values in the following map. Replace `nil` with your answer.
 
 ```elixir
 map = %{key1: 1, key2: 2, key3: 3}
@@ -464,14 +459,14 @@ Here are a few common functions to get you started.
 * `keyword?/1` check if some data is a keyword list.
 
 We often use keyword lists to provide optional arguments to a function.
-For example, `IO.inspect/2` has [many optional arguments](https://hexdocs.pm/elixir/Inspect.Opts.html)
+For example, [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) has [many optional arguments](https://hexdocs.pm/elixir/Inspect.Opts.html)
 Including `:label`.
 
 ```elixir
 IO.inspect("world", label: "hello")
 ```
 
-Under the hood, these functions may use `Keyword.get/3` to retrieve optional arguments or provide
+Under the hood, these functions may use [Keyword.get/3](https://hexdocs.pm/elixir/Keyword.html#get/3) to retrieve optional arguments or provide
 default arguments.
 
 ```elixir
@@ -495,7 +490,7 @@ MyIO.inspect("world", label: "hello")
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use `Keyword.get/3` to access the value for the `:color` key in the following keyword list.
+Use [Keyword.get/3](https://hexdocs.pm/elixir/Keyword.html#get/3) to access the value for the `:color` key in the following keyword list.
 Replace `nil`  with your answer.
 
 ```elixir
@@ -506,7 +501,7 @@ color = nil
 Utils.feedback(:keyword_get, color)
 ```
 
-Use the `Keyword.keys/1` function to list all of the keys in the following keyword list.
+Use the [Keyword.keys/1](https://hexdocs.pm/elixir/Keyword.html#keys/1) function to list all of the keys in the following keyword list.
 Replace `nil` with your answer.
 
 ```elixir
@@ -517,7 +512,7 @@ keys = nil
 Utils.feedback(:keyword_keys, keys)
 ```
 
-Use the `Keyword.keyword?/1` function to determine if the following is a keyword list.
+Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) function to determine if the following is a keyword list.
 Replace `nil` with your answer.
 
 ```elixir

@@ -2,14 +2,11 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:visual, github: "brooklinjazz/visual"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -80,16 +77,33 @@ in Elixir are unbounded, meaning they have no maximum size.
 Contrast that with a language like JavaScript which has a maximum safe integer size of `9007199254740991`.
 Elixir makes that look tiny!
 
-```elixir
-biggest_integer = 0
+<!-- livebook:{"attrs":{"code":"biggest_integer = 1","source":"Kino.Markdown.new(~s(\ninteger: #{biggest_integer}\\n\ndigits: #{biggest_integer |> Integer.digits() |> Enum.count()}\n))","title":"Biggest Integer Visual"},"kind":"Elixir.Visual","livebook_object":"smart_cell"} -->
 
-Utils.visual(:biggest_integer, biggest_integer)
+```elixir
+biggest_integer = 1
+Kino.Markdown.new(~s(
+integer: #{biggest_integer}\n
+digits: #{biggest_integer |> Integer.digits() |> Enum.count()}
+))
 ```
 
 You can see unbounded integers in action in the following animation. Watch how the number of digits constantly
 grows! Move on to the next section when you're satisfied that integers are truly unbounded.
 
 To avoid distorting your screen we use mathematical notation $10^{n}$ after 80 digits.
+
+<!-- livebook:{"attrs":{"source":"\n\nSmartAnimation.new(1..100000000, fn i ->\n    max = 10 ** 80\n    integer_display = (10 ** i < max && 10 ** i) || \"$10^{#{i}}$\"\n    Kino.Markdown.new(\"\ninteger: #{integer_display}\\n\ndigits: #{Integer.digits(10 ** i) |> Enum.count()}\n    \")\nend)","title":"Hidden Cell"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+SmartAnimation.new(1..100_000_000, fn i ->
+  max = 10 ** 80
+  integer_display = (10 ** i < max && 10 ** i) || "$10^{#{i}}$"
+  Kino.Markdown.new("
+integer: #{integer_display}\n
+digits: #{Integer.digits(10 ** i) |> Enum.count()}
+    ")
+end)
+```
 
 ```elixir
 Utils.animate(:biggest_integer)
@@ -161,7 +175,7 @@ how the computer hardware works under the hood. For our purposes it's enough to 
 If you are curious, Computerphile has an excellent video on why
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=PZRI1IfStY0")
+YouTube.new("https://www.youtube.com/watch?v=PZRI1IfStY0")
 ```
 
 Due to these errors, **do not use floats to represent money** even though it might seem
@@ -206,7 +220,7 @@ valid number (integer or float) on the operator's left and right hand side.
 4 + 3 + 2 + 1
 ```
 
-The following code will crash because there is a dangling `+` operator. The error says `TokenMissingError` and `expression is incomplete` because we did not complete the mathematical expression. Whenever our code crashes,
+The following code will crash because there is a dangling `+` operator. The error says [TokenMissingError](https://hexdocs.pm/elixir/TokenMissingError.html) and `expression is incomplete` because we did not complete the mathematical expression. Whenever our code crashes,
 Elixir lets you know why with an error message.
 
 ```elixir
@@ -373,7 +387,7 @@ That means that `10 ** 2` is 10 to the power of 2. Mathematically that's the sam
 a video by Khan Academy.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=XZRQhkii0h0")
+YouTube.new("https://www.youtube.com/watch?v=XZRQhkii0h0")
 ```
 
 ```elixir
@@ -469,7 +483,7 @@ That's because `2` goes into `5` twice and leaves a remainder of `1`.
 If you're not familiar with remainders, here's a video by Khan Academy.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=P1qyjdh_sIw")
+YouTube.new("https://www.youtube.com/watch?v=P1qyjdh_sIw")
 ```
 
 ```elixir
@@ -517,3 +531,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish arithmetic section"
 ```
+
+## Up Next
+
+| Previous                               | Next                                 |
+| -------------------------------------- | -----------------------------------: |
+| [Comments](../reading/comments.livemd) | [Strings](../reading/strings.livemd) |

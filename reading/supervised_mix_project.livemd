@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -100,7 +95,7 @@ This `:mod` key defines the args value when the `RockPaperScissors.Application.s
 The `RockPaperScissors.Application.start/2` function is called when we run the project, and
 the `:mod` value in `Utils.MixProject` defines second value.
 
-Let's prove that. Add an `IO.puts/2` message in the `start/2` function. We'll also remove the comments
+Let's prove that. Add an [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) message in the `start/2` function. We'll also remove the comments
 for the sake of conciseness, but you can leave them in if you prefer.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -129,7 +124,7 @@ We'll also modify `args` to prove the connection.
   end
 ```
 
-Now start the project in the `IEx` shell and you should see `"Starting Application"` in the logs.
+Now start the project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell and you should see `"Starting Application"` in the logs.
 
 ```
 $ iex -S mix
@@ -141,7 +136,7 @@ iex(1)>
 ```
 
 Since the `RockPaperScissors.Application.start/2` function starts the `RockPaperScissors.Supervisor` it
-should be alive. We can use `Supervisor.count_children/1` to see that the `RockPaperScissors.Supervisor` has
+should be alive. We can use [Supervisor.count_children/1](https://hexdocs.pm/elixir/Supervisor.html#count_children/1) to see that the `RockPaperScissors.Supervisor` has
 started with no child workers.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -154,10 +149,10 @@ iex(1)> Supervisor.count_children(RockPaperScissors.Supervisor)
 ## Starting Child Workers
 
 We're going to create a `RockPaperScissors` worker in the `lib/rock_paper_scissors.ex` file which handles the logic for playing our game.
-We've seen that a `GenServer` can be a worker. However, we're not limited to `GenServers`.
-Let's change things up and use an `Agent` instead.
+We've seen that a [GenServer](https://hexdocs.pm/elixir/GenServer.html) can be a worker. However, we're not limited to `GenServers`.
+Let's change things up and use an [Agent](https://hexdocs.pm/elixir/Agent.html) instead.
 
-We'll create a very basic named `Agent` for now and an `IO.puts/2` message to ensure it starts correctly.
+We'll create a very basic named [Agent](https://hexdocs.pm/elixir/Agent.html) for now and an [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) message to ensure it starts correctly.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -193,7 +188,7 @@ def start(_type, args) do
 end
 ```
 
-Quit and restart the `IEx` shell. You should see the `Started RockPaperScissors` message in the output.
+Quit and restart the [IEx](https://hexdocs.pm/iex/IEx.html) shell. You should see the `Started RockPaperScissors` message in the output.
 
 ```
 Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
@@ -205,7 +200,7 @@ Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
 ```
 
 We can confirm the `RockPaperScissors` worker is being supervised by the `RockPaperScissors.Supervisor` using
-`Supervisor.which_children/1`.
+[Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -226,7 +221,7 @@ $ iex -S mix
 iex>
 ```
 
-This is going to require message passing, so let's change the `RockPaperScissors` module into a `GenServer`.
+This is going to require message passing, so let's change the `RockPaperScissors` module into a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -272,7 +267,7 @@ defmodule RockPaperScissors do
 end
 ```
 
-Now, you'll notice that if we try to start the project in the `IEx` shell,
+Now, you'll notice that if we try to start the project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell,
 we can't actually interact with the console to provide the player's choice.
 
 ```
@@ -395,3 +390,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish supervised mix project section"
 ```
+
+## Up Next
+
+| Previous                                     | Next                                                     |
+| -------------------------------------------- | -------------------------------------------------------: |
+| [Supervisors](../reading/supervisors.livemd) | [Supervised Stack](../exercises/supervised_stack.livemd) |

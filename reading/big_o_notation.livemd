@@ -2,16 +2,19 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
+
+defmodule Factorial do
+  def of(0), do: 1
+
+  def of(n) when n > 0 do
+    Enum.reduce(1..n, &*/2)
+  end
+end
 ```
 
 ## Navigation
@@ -41,7 +44,7 @@ of the data.
 Here's a video by Tom Scott for an introductory overview.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=RGuJga2Gl_k")
+YouTube.new("https://www.youtube.com/watch?v=RGuJga2Gl_k")
 ```
 
 As you work with larger amounts of data, different big $O$ complexities grow faster than others.
@@ -75,8 +78,28 @@ mathematical guarantee that for some size of data, a pigeon will be faster than 
 We can see the nature of how a constant travel time for some amount of data always intersects with the
 expected internet speed in the graph below.
 
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"data\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 200\n\ninternet = for n <- init..max, do: %{data: n, time: n, type: \"Internet\"}\npigeon = for n <- init..max, do: %{data: n, time: 100, type: \"Pigeon\"}\n\nKino.VegaLite.push_many(widget, internet)\nKino.VegaLite.push_many(widget, pigeon)\nwidget","title":"Pigeon Beats The Internet Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.graph(:pigeon_beats_internet)
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "data", type: :quantitative)
+  |> VegaLite.encode_field(:y, "time", type: :quantitative)
+  |> VegaLite.encode_field(:color, "type", title: "Linear Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+
+init = 1
+max = 200
+
+internet = for n <- init..max, do: %{data: n, time: n, type: "Internet"}
+pigeon = for n <- init..max, do: %{data: n, time: 100, type: "Pigeon"}
+
+Kino.VegaLite.push_many(widget, internet)
+Kino.VegaLite.push_many(widget, pigeon)
+widget
 ```
 
 ## Linear Complexity
@@ -95,8 +118,23 @@ perform approximately the same number of additional calculations.
 
 Plotted onto a graph you would expect that as we increase the number of elements, time grows in a constant line upward.
 
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nlinear = for n <- 1..100, do: %{\"number of elements\": n, time: n, type: \"O(n)\"}\n\nKino.VegaLite.push_many(widget, linear)\nwidget","title":"Linear Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.graph(:linear_complexity)
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "number of elements", type: :quantitative)
+  |> VegaLite.encode_field(:y, "time", type: :quantitative)
+  |> VegaLite.encode_field(:color, "type", title: "Linear Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+
+linear = for n <- 1..100, do: %{"number of elements": n, time: n, type: "O(n)"}
+
+Kino.VegaLite.push_many(widget, linear)
+widget
 ```
 
 ## Polynomial Complexity
@@ -383,8 +421,24 @@ For example $5!$ is $5 * 4 * 3 * 2 * 1$.
 Factorial complexity grows incredibly fast, as you can see according to this graph and corresponding
 data table.
 
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Factorial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nfactorial = for n <- 1..5, do: %{x: n, y: Factorial.of(n), type: \"n!\"}\n\nKino.VegaLite.push_many(widget, factorial)\nwidget","title":"Factorial Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.graph(:factorial_complexity)
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "x", type: :quantitative)
+  |> VegaLite.encode_field(:y, "y", type: :quantitative)
+  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+  |> VegaLite.encode_field(:color, "type", title: "Factorial Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+
+factorial = for n <- 1..5, do: %{x: n, y: Factorial.of(n), type: "n!"}
+
+Kino.VegaLite.push_many(widget, factorial)
+widget
 ```
 
 ```elixir
@@ -399,3 +453,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish big o notation section"
 ```
+
+## Up Next
+
+| Previous                                             | Next                                 |
+| ---------------------------------------------------- | -----------------------------------: |
+| [Anagram Solver](../exercises/anagram_solver.livemd) | [Streams](../reading/streams.livemd) |

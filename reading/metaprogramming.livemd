@@ -2,16 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:httpoison, "~> 1.8"},
-  {:poison, "~> 5.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -32,7 +25,7 @@ Metaprogramming is the process of writing code that generates code.
 In Elixir, we use macros for code generation. Macros are a powerful tool for generating code. But, as always, with great power comes great responsibility.
 
 > Even though Elixir attempts its best to provide a safe environment for macros, the major responsibility of writing clean code with macros falls on developers. Macros are harder to write than ordinary Elixir functions and it’s considered to be bad style to use them when they’re not necessary. So write macros responsibly.
->
+> 
 > * [elixir-lang.org](https://elixir-lang.org/getting-started/meta/macros.html)
 
 ## Quote
@@ -379,7 +372,7 @@ defmodule Assertion do
 end
 ```
 
-You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without causing a `FunctionClauseError`.
+You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without causing a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
 
 ```elixir
 require Assertion
@@ -398,7 +391,7 @@ Assertion.assert(1 === 1.0)
 While you may not write macros often, you are likely to use them daily.
 For example, we have already relied on macros with the `use` keyword.
 
-When we `use GenServer`, a macro generates the necessary boilerplate code to make a `GenServer`.
+When we `use GenServer`, a macro generates the necessary boilerplate code to make a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 ```elixir
 defmodule Server do
@@ -430,7 +423,7 @@ defmodule Template do
 end
 ```
 
-Conceptually, it may help think of modules that define macros as templates or common patterns that we can reuse throughout a program. For example, `GenServer` is a common pattern we want to extend and reuse.
+Conceptually, it may help think of modules that define macros as templates or common patterns that we can reuse throughout a program. For example, [GenServer](https://hexdocs.pm/elixir/GenServer.html) is a common pattern we want to extend and reuse.
 
 ```elixir
 defmodule ExtendedTemplate do
@@ -511,3 +504,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish metaprogramming section"
 ```
+
+## Up Next
+
+| Previous                                                                                 | Next                                                       |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------: |
+| [Documentation And Static Analysis](../reading/documentation_and_static_analysis.livemd) | [Testing Genservers](../reading/testing_genservers.livemd) |

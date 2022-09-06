@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -29,7 +24,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 > Processes are isolated from each other, run concurrent to one another
 > and communicate via message passing. Processes are not only the basis for concurrency in Elixir,
 > but they also provide the means for building distributed and fault-tolerant programs.
->
+> 
 > * [Elixir Documentation](https://elixir-lang.org/getting-started/processes.html#:~:text=In%20Elixir%2C%20all%20code%20runs,distributed%20and%20fault%2Dtolerant%20programs.)
 
 So all Elixir code runs inside of a process.
@@ -120,7 +115,7 @@ pid = spawn(fn -> IO.puts("I was called") end)
 Process.alive?(pid) && IO.puts("I am alive!")
 ```
 
-We can use `Process.sleep/1` to pause the execution and show that the spawned process dies
+We can use [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to pause the execution and show that the spawned process dies
 after it is called.
 
 ```elixir
@@ -177,7 +172,7 @@ pid1 = spawn_link(fn -> raise "oops" end)
 "I will not run, because the above crashes"
 ```
 
-Or manually link a process with `Process.link/1`.
+Or manually link a process with [Process.link/1](https://hexdocs.pm/elixir/Process.html#link/1).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -223,7 +218,7 @@ pid1 =
 ```
 
 Evaluate the cell above to create a process waiting to receive a message, then evaluate
-the cell below to send that message a process. You'll notice the `IO.puts/1` logs in the cell below.
+the cell below to send that message a process. You'll notice the [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) logs in the cell below.
 
 As soon as the spawned process receives a message, it dies. You'll notice you can only send
 and receive a single message. You can re-evaluate the cell above and the cell below to
@@ -281,7 +276,7 @@ end
 server_process = spawn(fn -> ServerProcess.loop() end)
 ```
 
-We've used `Enum.random/1` to show that the process continues to loop and receive messages.
+We've used [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to show that the process continues to loop and receive messages.
 
 ```elixir
 send(server_process, "message")
@@ -368,3 +363,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish processes section"
 ```
+
+## Up Next
+
+| Previous                                         | Next                                               |
+| ------------------------------------------------ | -------------------------------------------------: |
+| [Sign Up Form](../exercises/sign_up_form.livemd) | [Generic Server](../reading/generic_server.livemd) |

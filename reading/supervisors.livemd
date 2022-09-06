@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -38,7 +33,7 @@ Therefore, we can let a process crash, and it will not affect the rest of our sy
 > completely separated; they share no memory, and a crash in one process can’t by default compromise the execution flow of another.
 > Process isolation allows you to confine the negative effects of an error to a single process or a small group of related processes,
 > which keeps most of the system functioning normally.
->
+> 
 > * Sasa Juric, [Elixir in Action](https://www.manning.com/books/elixir-in-action-second-edition).
 
 For example, We can spawn a process and raise an error. Unless we explicitly link the process with `spawn_link/1`
@@ -65,10 +60,10 @@ processes and attempt to restart them.
 
 The term restart is a bit misleading. To be clear, we cannot restart a process. Restart in this case means that we kill the process and start a new one in its place. However, it's conceptually easier to think of it as restarting.
 
-Why would we want to restart the process? Well, most technical issues are the result of state. Our system gets into a bad state and cannot recover. Turning a system on and off again clears the state and often resolves the issue. Using a `Supervisor` is like adding an automatic on/off switch to your application.
+Why would we want to restart the process? Well, most technical issues are the result of state. Our system gets into a bad state and cannot recover. Turning a system on and off again clears the state and often resolves the issue. Using a [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) is like adding an automatic on/off switch to your application.
 
-A `Supervisor` monitors one or more child processes. We generally refer to these processes as **workers**.
-The `Supervisor` can use different strategies for restarting its child workers. The `:one_for_one` strategy individually restarts any worker that dies.
+A [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) monitors one or more child processes. We generally refer to these processes as **workers**.
+The [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) can use different strategies for restarting its child workers. The `:one_for_one` strategy individually restarts any worker that dies.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -107,7 +102,7 @@ defmodule Bomb do
 end
 ```
 
-The `Supervisor.start_link/2` function accepts a list of child processes. Each child must define a
+The [Supervisor.start_link/2](https://hexdocs.pm/elixir/Supervisor.html#start_link/2) function accepts a list of child processes. Each child must define a
 `start_link/1` function, which `Bomb` already does.
 
 By default, a Supervisor limits the number of
@@ -335,3 +330,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish supervisors section"
 ```
+
+## Up Next
+
+| Previous                                                     | Next                                                               |
+| ------------------------------------------------------------ | -----------------------------------------------------------------: |
+| [Wordle Application](../exercises/wordle_application.livemd) | [Supervised Mix Project](../reading/supervised_mix_project.livemd) |

@@ -2,16 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"},
-  {:tested_cell, git: "https://github.com/BrooklinJazz/tested_cell"}
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
 
@@ -73,7 +67,101 @@ CaesarCypher.encode("et tu, brute?", 2)
 
 Enter your solution below.
 
+<!-- livebook:{"attrs":{"assertions":"assert CaesarCypher.encode(\"\", 1), \"Ensure you implement the `encode/2` function.\"\nassert CaesarCypher.encode(\"\", 1) == \"\"\nassert CaesarCypher.encode(\"a\", 1) == \"b\"\nassert CaesarCypher.encode(\"a\", 14) == \"o\"\nassert CaesarCypher.encode(\"a\", 25) == \"z\"\nassert CaesarCypher.encode(\"z\", 1) == \"a\"\nassert CaesarCypher.encode(\"z\", 14) == \"n\"\nassert CaesarCypher.encode(\"z\", 25) == \"y\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 1) == \"bcdefghijklmnopqrstuvwxyza\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 14) == \"opqrstuvwxyzabcdefghijklmn\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 25) == \"zabcdefghijklmnopqrstuvwxy\"\nassert CaesarCypher.encode(\"et tu, brute?\", 2) == \"gv vw, dtwvg?\"\n\nassert CaesarCypher.decode(\"\", 1), \"Ensure you implement the `decode/2` function.\"\nassert CaesarCypher.decode(\"\", 1) == \"\"\nassert CaesarCypher.decode(\"b\", 1) == \"a\"\nassert CaesarCypher.decode(\"o\", 14) == \"a\"\nassert CaesarCypher.decode(\"z\", 25) == \"a\"\nassert CaesarCypher.decode(\"a\", 1) == \"z\"\nassert CaesarCypher.decode(\"n\", 14) == \"z\"\nassert CaesarCypher.decode(\"y\", 25) == \"z\"\nassert CaesarCypher.decode(\"bcdefghijklmnopqrstuvwxyza\", 1) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"opqrstuvwxyzabcdefghijklmn\", 14) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"zabcdefghijklmnopqrstuvwxy\", 25) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"gv vw, dtwvg?\", 2) == \"et tu, brute?\"","attempts":7,"code":"defmodule CaesarCypher do\r\n  def encode(string, key) do\r\n  end\r\n\r\n  def decode(string, key) do\r\n  end\r\nend","solution":"defmodule CaesarCypher do\n  def decode(string, key) do\n    String.to_charlist(string)\n    |> Enum.map(fn char ->\n      cond do\n        char < ?a or ?z < char ->\n          char\n\n        char - key < ?a ->\n          ?z - (?a - (char - key)) + 1\n\n        true ->\n          char - key\n      end\n    end)\n    |> List.to_string()\n  end\n\n  def encode(string, key) do\n    String.to_charlist(string)\n    |> Enum.map(fn char ->\n      cond do\n        char < ?a or ?z < char ->\n          char\n\n        char + key > ?z ->\n          ?a + (char + key - ?z) - 1\n\n        true ->\n          char + key\n      end\n    end)\n    |> List.to_string()\n  end\nend","title":"Caesar Cypher Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+
 ```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "Caesar Cypher Exercise" do
+    try do
+      Process.flag(:trap_exit, true)
+
+      defmodule CaesarCypher do
+        def encode(string, key) do
+        end
+
+        def decode(string, key) do
+        end
+      end
+
+      assert CaesarCypher.encode("", 1), "Ensure you implement the `encode/2` function."
+      assert CaesarCypher.encode("", 1) == ""
+      assert CaesarCypher.encode("a", 1) == "b"
+      assert CaesarCypher.encode("a", 14) == "o"
+      assert CaesarCypher.encode("a", 25) == "z"
+      assert CaesarCypher.encode("z", 1) == "a"
+      assert CaesarCypher.encode("z", 14) == "n"
+      assert CaesarCypher.encode("z", 25) == "y"
+      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1) == "bcdefghijklmnopqrstuvwxyza"
+      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14) == "opqrstuvwxyzabcdefghijklmn"
+      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 25) == "zabcdefghijklmnopqrstuvwxy"
+      assert CaesarCypher.encode("et tu, brute?", 2) == "gv vw, dtwvg?"
+
+      assert CaesarCypher.decode("", 1), "Ensure you implement the `decode/2` function."
+      assert CaesarCypher.decode("", 1) == ""
+      assert CaesarCypher.decode("b", 1) == "a"
+      assert CaesarCypher.decode("o", 14) == "a"
+      assert CaesarCypher.decode("z", 25) == "a"
+      assert CaesarCypher.decode("a", 1) == "z"
+      assert CaesarCypher.decode("n", 14) == "z"
+      assert CaesarCypher.decode("y", 25) == "z"
+      assert CaesarCypher.decode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
+      assert CaesarCypher.decode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
+      assert CaesarCypher.decode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
+      assert CaesarCypher.decode("gv vw, dtwvg?", 2) == "et tu, brute?"
+    catch
+      error ->
+        flunk("""
+          Your solution threw the following error:
+
+          #{inspect(error)}
+        """)
+
+      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
+        flunk("""
+            GenServer crashed with the following error:
+
+            #{inspect(error)}
+
+            When it received: #{inspect(message)} #{message_type}
+
+            Likely you need to define the corresponding handler for #{inspect(message)}.
+
+            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
+
+              def handle_call(:message, _from, state) do
+                ...
+              end
+
+            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
+
+              GenServer.call(pid, :message)
+        """)
+
+      :exit, error ->
+        flunk("""
+          Unhandled exit with the following error:
+
+          #{inspect(error)}
+        """)
+    after
+      # all warnings and errors are printed to the previous Kino Frame
+      # to avoid cluttering the test results display.
+      Process.sleep(10)
+      Kino.render(Kino.Markdown.new("### Test Results 
+<hr/>"))
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+# Unfortunately, this results in duplication of warnings.
 defmodule CaesarCypher do
   def encode(string, key) do
   end
@@ -81,8 +169,6 @@ defmodule CaesarCypher do
   def decode(string, key) do
   end
 end
-
-Utils.feedback(:caesar_cypher, CaesarCypher)
 ```
 
 ## Commit Your Progress
@@ -93,3 +179,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish caesar cypher exercise"
 ```
+
+## Up Next
+
+| Previous                                     | Next                                                             |
+| -------------------------------------------- | ---------------------------------------------------------------: |
+| [Classified](../exercises/classified.livemd) | [Rollable Expressions](../exercises/rollable_expressions.livemd) |

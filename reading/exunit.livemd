@@ -2,14 +2,9 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -115,7 +110,7 @@ TDD has three main phases, often called **Red, Green, and Refactor**.
 You will have the opportunity to practice TDD throughout this course. For a deeper dive on TDD and testing, you might consider watching this video by Ian Cooper. It's over an hour and completely optional.
 
 ```elixir
-Kino.YouTube.new("https://www.youtube.com/watch?v=EZ05e7EMOLM")
+YouTube.new("https://www.youtube.com/watch?v=EZ05e7EMOLM")
 ```
 
 ## ExUnit
@@ -138,7 +133,7 @@ end
 ExUnit.run()
 ```
 
-First, we start `ExUnit`.
+First, we start [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html).
 
 Next, we define a test module, `ExampleTest`. The name of this module does not matter. However, it's common to end the module name in `Test`.
 
@@ -154,7 +149,7 @@ A test can contain many assertions, and a test module can have many tests.
 
 ## Assertions
 
-`ExUnit` provides many different assertion macros from the [ExUnit.Assertion](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html#functions)
+[ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) provides many different assertion macros from the [ExUnit.Assertion](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html#functions)
 module. We'll focus on the following common assertions.
 
 * `assert` check if a value is truthy.
@@ -668,7 +663,7 @@ underlying implementation of the `Math` module.
 
 ## Testing Mix Projects
 
-Mix projects provide some conveniences when working with `ExUnit`.
+Mix projects provide some conveniences when working with [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html).
 
 Let's see how we would test the `Math` module if it were a Mix project.
 First, create a new mix project called `math`.
@@ -862,7 +857,7 @@ Once tagged, we can use the flags `--only`, `--exclude`, and `--include` to run 
 $ mix test --exclude my_tag
 ```
 
-Alternatively, we can place the `ExUnit.configure/1` function in `test_helpers.exs`.
+Alternatively, we can place the [ExUnit.configure/1](https://hexdocs.pm/ex_unit/ExUnit.html#configure/1) function in `test_helpers.exs`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -916,8 +911,8 @@ end
 
 ```
 
-Notice the `Examples` section, which simulates an `IEx` shell. This is a Doctest.
-Doctests are run by the corresponding test file `math_test.exs` using the `doctest` macro from `ExUnit`.
+Notice the `Examples` section, which simulates an [IEx](https://hexdocs.pm/iex/IEx.html) shell. This is a Doctest.
+Doctests are run by the corresponding test file `math_test.exs` using the `doctest` macro from [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -978,3 +973,9 @@ Run the following in your command line from the project folder to track and save
 $ git add .
 $ git commit -m "finish exunit section"
 ```
+
+## Up Next
+
+| Previous                                                                   | Next                                                                                     |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------: |
+| [Games Rock Paper Scissors](../exercises/games_rock_paper_scissors.livemd) | [Documentation And Static Analysis](../reading/documentation_and_static_analysis.livemd) |

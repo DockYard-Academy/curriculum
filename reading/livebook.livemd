@@ -2,14 +2,10 @@
 
 ```elixir
 Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -164,47 +160,76 @@ code is invalid. Notice that you cannot use <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd
           1 +
 ```
 
-## Utils
+## Tests
 
-We use a `Utils` project to power certain functionality.
-
-The `Utils` project is installed (when necessary) in a **Setup** section like so:
-
-```elixir
-Mix.install([
-  {:kino, github: "livebook-dev/kino", override: true},
-  {:kino_lab, "~> 0.1.0-dev", github: "jonatanklosko/kino_lab"},
-  {:vega_lite, "~> 0.1.4"},
-  {:kino_vega_lite, "~> 0.1.1"},
-  {:benchee, "~> 0.1"},
-  {:ecto, "~> 3.7"},
-  {:math, "~> 0.7.0"},
-  {:faker, "~> 0.17.0"},
-  {:utils, path: "#{__DIR__}/../utils"}
-])
-```
-
-We use `Utils` to display graphs, animations, and other visuals like so.
-
-```elixir
-Utils.table(:example)
-```
-
-You can generally ignore the `Utils` project. However, you should not edit any references to `Utils` unless specifically directed to.
-
-`Utils` also provides feedback for exercises. Under the hood it uses a project for
-writing tests called `ExUnit`.
-
-ExUnit is the same tool that you will eventually use to test
-your Elixir code, so you'll want to get used to reading this kind of message.
+Throughout this course, you will perform exercises with test feedback. Under the hood we use a project called [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which you will use in the future to write tests.
 
 Evaluate the Elixir cell below to see a failing test. Then change `4` to `5` to see a passing test.
 
-```elixir
-example = 4
+<!-- livebook:{"attrs":{"assertions":"assert five == 5","attempts":1,"code":"five = 4","solution":"five = 5","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
-# You should not edit this code below
-Utils.feedback(:example, example)
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Assertion do
+  use ExUnit.Case
+
+  test "Exercise" do
+    try do
+      Process.flag(:trap_exit, true)
+      five = 4
+      assert five == 5
+    catch
+      error ->
+        flunk("""
+          Your solution threw the following error:
+
+          #{inspect(error)}
+        """)
+
+      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
+        flunk("""
+            GenServer crashed with the following error:
+
+            #{inspect(error)}
+
+            When it received: #{inspect(message)} #{message_type}
+
+            Likely you need to define the corresponding handler for #{inspect(message)}.
+
+            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
+
+              def handle_call(:message, _from, state) do
+                ...
+              end
+
+            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
+
+              GenServer.call(pid, :message)
+        """)
+
+      :exit, error ->
+        flunk("""
+          Unhandled exit with the following error:
+
+          #{inspect(error)}
+        """)
+    after
+      # all warnings and errors are printed to the previous Kino Frame
+      # to avoid cluttering the test results display.
+      Process.sleep(10)
+      Kino.render(Kino.Markdown.new("### Test Results 
+<hr/>"))
+    end
+  end
+end
+
+ExUnit.run()
+
+# Make variables and modules defined in the test available.
+# Also allows for exploration using the output of the cell.
+# Unfortunately, this results in duplication of warnings.
+five = 4
 ```
 
 Let's break down the test feedback.
@@ -212,14 +237,14 @@ Let's break down the test feedback.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  1) test example (Utils.Example)
-     utils/lib/utils.ex:972
+1) test  (Assertion)
+     reading/livebook.livemd#cell:5
      Assertion with == failed
-     code:  assert example == 5
+     code:  assert five == 5
      left:  4
      right: 5
      stacktrace:
-       utils/lib/utils.ex:973: (test)
+       reading/livebook.livemd#cell:7: (test)
 
 
 
@@ -227,14 +252,6 @@ Finished in 0.00 seconds (0.00s async, 0.00s sync)
 1 test, 1 failure
 
 Randomized with seed 613714
-```
-
-We can see the name of this test is `example`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  1) test example (Utils.Example)
 ```
 
 ExUnit tells you that the test failed.
@@ -253,7 +270,7 @@ For this example, the test asserted that the answer should have been 5.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-     code:  assert @answer === 5
+code:  assert five == 5
 ```
 
 Generally, **left** is the provided answer, and **right** is the expected answer.
@@ -261,11 +278,9 @@ Generally, **left** is the provided answer, and **right** is the expected answer
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-     left:  4
-     right: 5
+left:  4
+right: 5
 ```
-
-For our purposes, We can ignore the other information.
 
 Passing tests are more straightforward. Each `.` is a passing test.
 
@@ -278,5 +293,10 @@ Finished in 0.00 seconds (0.00s async, 0.00s sync)
 1 test, 0 failures
 
 Randomized with seed 736220
-
 ```
+
+## Up Next
+
+| Previous                     | Next                                           |
+| ---------------------------- | ---------------------------------------------: |
+| [Git](../reading/git.livemd) | [Code Editors](../reading/code_editors.livemd) |
