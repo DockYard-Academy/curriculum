@@ -112,7 +112,7 @@ defmodule UtilsTest do
       end)
       |> Enum.each(fn module ->
         should_use_documentation =
-          Code.ensure_compiled?(String.to_atom("Elixir.#{module}")) or
+          match?({:module, _}, Code.ensure_compiled(String.to_atom("Elixir.#{module}"))) or
             module in libraries
 
         if should_use_documentation do
