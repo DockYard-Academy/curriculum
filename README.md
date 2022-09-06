@@ -19,7 +19,7 @@ The recommended installation methods for this course are from the Elixir languag
 ### MacOS
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
 
 2. Install Elixir
    - `brew install elixir`
