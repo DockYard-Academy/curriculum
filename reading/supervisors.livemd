@@ -123,9 +123,78 @@ Process.exit(supervisor_pid, :normal)
 
 Supervisors have different strategies for when one of their workers crashes.
 
-* `:one_to_one` - restart only the worker that crashed.
-* `:one_for_all` - restart all of the child workers.
-* `:rest_for_one` - restart child workers ordered after the crashed process.
+### One to one
+
+Restart only the worker that crashed.
+
+```mermaid
+flowchart TD 
+    Supervisor
+    Supervisor --> P1
+    Supervisor --> P2
+    Supervisor --> P3
+    Supervisor --> ..
+    Supervisor --> Pn
+
+    classDef crashed fill:#fe8888;
+    classDef restarted stroke:#0cac08,stroke-width:4px
+
+    class P2 crashed
+    class P2 restarted
+
+```
+
+In the diagram above, only P2 crashed, so only P2 will be restarted by the supervisor.
+
+### One for all
+
+Restart all of the child workers.
+
+```mermaid
+flowchart TD 
+    Supervisor
+    Supervisor --> P1
+    Supervisor --> P2
+    Supervisor --> P3
+    Supervisor --> ..
+    Supervisor --> Pn
+
+    classDef crashed fill:#fe8888;
+    classDef terminated fill:#fbab04;
+    classDef restarted stroke:#0cac08,stroke-width:4px
+
+    class P2 crashed
+    class P1,P3,..,Pn terminated
+    class P1,P2,P3,..,Pn restarted
+```
+
+P2 crashed, which led to all the other child processes to be terminated, then all the child processes are restarted.
+
+### Rest for one
+
+Restart child workers orderer after the crashed process.
+
+```mermaid
+flowchart TD 
+    Supervisor
+    Supervisor --> P1
+    Supervisor --> P2
+    Supervisor --> P3
+    Supervisor --> ..
+    Supervisor --> Pn
+
+    classDef crashed fill:#fe8888;
+    classDef terminated fill:#fbab04;
+    classDef restarted stroke:#0cac08,stroke-width:4px
+
+    class P2 crashed
+    class P3,..,Pn terminated
+    class P2,P3,..,Pn restarted
+```
+
+P2 crashed, the child processes after it in the start order are terminated, then P2 and the other terminated child processes are are restarted.
+
+---
 
 To better understand how we can use a supervisor with different restart strategies, we're going to
 supervise multiple bomb processes.
