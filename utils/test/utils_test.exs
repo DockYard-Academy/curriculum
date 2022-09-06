@@ -67,6 +67,7 @@ defmodule UtilsTest do
     end
   end
 
+  @tag :local
   test "Ensure all .livemd files are formatted." do
     Notebooks.all_livebooks()
     |> Enum.each(fn file_name ->
