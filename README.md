@@ -34,7 +34,7 @@ The recommended installation methods for this course are from the Elixir languag
 ### Windows
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
 
 2. Install Elixir
    - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings. 
@@ -59,7 +59,7 @@ The recommended installation methods for this course are from the Elixir languag
 ### Linux (Ubuntu)
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`.
+   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
 
 2. Install Elixir
       - Add the Erlang Solutions repository
