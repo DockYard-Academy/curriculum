@@ -67,21 +67,21 @@ defmodule UtilsTest do
     end
   end
 
-  test "Ensure all .livemd files are formatted. Run mix format_notebooks to resolve most issues." do
+  test "Ensure all .livemd files are formatted." do
     Notebooks.all_livebooks()
     |> Enum.each(fn file_name ->
       file = File.read!(file_name)
       # loading the file in livebook adds a newline, so we add it when we format
       # to avoid changing the file every time a student opens a .livemd file.
       expected = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n"
-      assert file == expected
 
-      """
-      #{file_name}: Needs to be formatted.
+      assert file == expected,
+             """
+             #{file_name}: Needs to be formatted.
 
-      Run mix format_notebooks to format all notebooks.
-      Sometimes bullet points * can cause formatting issues.
-      """
+             Run mix format_notebooks to format all notebooks.
+             Sometimes bullet points * can cause formatting issues.
+             """
     end)
   end
 
