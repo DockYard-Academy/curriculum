@@ -20,9 +20,9 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-The Phoenix Framework is the most popular web development framework for Elixir. Using Phoenix, we can build rich interactive and real-time web applications quickly.
+The [Phoenix Framework](https://phoenixframework.org/) is the most popular web development framework for Elixir. Using Phoenix, we can build rich interactive and real-time web applications quickly.
 
-Chris McChord, The creator of Phoenix, has an excellent video to demonstrate the power of Phoenix. Follow along and build a Twitter clone application in only 15 minutes.
+[Chris McCord](http://chrismccord.com/), the creator of Phoenix, has an excellent video to demonstrate the power of Phoenix. Follow along and build a Twitter clone application in only 15 minutes.
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=MZvmYaFkNJI")
@@ -30,7 +30,7 @@ YouTube.new("https://www.youtube.com/watch?v=MZvmYaFkNJI")
 
 The video above uses [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html) to create interactive and real-time features. We will cover LiveView in a future lesson.
 
-By default, Phoenix separates the application into several layers using Model View Controller (MVC) architecture.
+By default, Phoenix separates the application into several layers using [Model-View-Controller (MVC)](https://en.wikipedia.org/wiki/Model–view–controller) architecture.
 
 * **Model**: Manages the data and business logic of the application.
 * **View**: Represents visual information.
@@ -92,7 +92,7 @@ Phoenix breaks the complexity of our application into several layers with differ
 * **Controller**: Handles the request—generally, the controller delegates to the Model and View to manipulate business logic and return a response.
 * **Model**: Contains the application's business logic, often separated into the **Context** and the **Schema** if the application has a data layer.
 * **View**: Handles returning the response, may delegate to a template.
-* **Template**: Builds a response, typically using HEEx (HTML + Elixir) to programmatically build an HTML web page using both HTML and Elixir.
+* **Template**: Builds a response, typically using HEEx (HTML + Embedded Elixir) to programmatically build an HTML web page using both HTML and Elixir.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -101,7 +101,7 @@ Phoenix breaks the complexity of our application into several layers with differ
 ## Install Phoenix
 
 To use Phoenix, we need to install it and several prerequisite programs.
-At this point in the course, you should already have Erlang, Elixir, and Postgres installed.
+At this point in the course, you should already have Erlang, Elixir, and PostgreSQL installed.
 
 You'll also need to install the Hex package manager. [Hex](https://hex.pm/) manages elixir dependencies.
 
@@ -109,40 +109,40 @@ You'll also need to install the Hex package manager. [Hex](https://hex.pm/) mana
 $ mix local.hex
 ```
 
-Install the `phx_new` dependency, which we'll use to generate a phoenix project.
+Install the `phx_new` dependency, which we'll use to generate a Phoenix project.
 
 ```sh
 $ mix archive.install hex phx_new
 ```
 
 Phoenix projects reload the project anytime a project file changes.
-macOS and Windows users will have this feature by default, but students using Linux or Windows + WSL must install inotify-tools to use this feature.
+macOS and Windows users will have this feature by default, but students using GNU/Linux or Windows + WSL must install `inotify-tools` to use this feature.
 
 Consult the [inotify-tools](https://github.com/inotify-tools/inotify-tools/wiki) documentation for installation instructions.
-Installing inotify-tools is optional but highly recommended.
+Installing `inotify-tools` is optional but highly recommended.
 
 If you have any issues, consult the [Phoenix Installation Guide](https://hexdocs.pm/phoenix/installation.html) or speak with
 your teacher.
 
 ## Create A Phoenix App
 
-The `phx_new` dependency provides the `mix phx.new` task, which we can use to generate a new phoenix project.
+The `phx_new` dependency provides the `mix phx.new` task, which we can use to generate a new Phoenix project.
 
 We're going to create a counter project which stores an in-memory integer we can increment and display using HTTP requests.
 
-Run the following in your command line to create a new phoenix project.
+Run the following in your command line to create a new Phoenix project.
 
 ```
 mix phx.new counter --no-ecto
 ```
 
-The `--no-ecto` command omits the ecto database, which we will not need for this lesson.
+The `--no-ecto` command omits files generated for using Ecto to connect to the database, which we will not need for this lesson.
 
 When prompted to install dependencies, type `Y` and press enter.
 This runs `mix deps.get` and `mix deps.compile`.
 
 ```
-Fetch and install dependencies? [Yn] Y 
+Fetch and install dependencies? [Yn] Y
 * running mix deps.get
 * running mix deps.compile
 ```
@@ -191,11 +191,12 @@ $ mix phx.server
 
 When you start a Phoenix project, it runs the `Counter.Application.start/2` function in `lib/counter/application.ex`, which starts several workers under a supervisor.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
+@impl true
 def start(_type, _args) do
   children = [
-    # Start the Ecto repository
-    Counter.Repo,
     # Start the Telemetry supervisor
     CounterWeb.Telemetry,
     # Start the PubSub system
@@ -229,7 +230,7 @@ A few things happen when we navigate to http://localhost:4000.
 3. The `CounterWeb.Router` module in `lib/counter_web/router.ex` routes the request to a controller.
 4. The `CounterWeb.PageController` module in `lib/counter_web/controllers/page_controller.ex` module handles the request and response, and delegates to a view to render the response.
 5. The `CounterWeb.PageView` module in `lib/counter_web/views/page_view.ex` renders a response using a template `.heex` file.
-6. The template in `index.html.heex` uses the Phoenix template language HEEx (HTML + EEX) to build an HTML web page which will be the response to GET request.
+6. The template in `index.html.heex` uses the Phoenix template language HEEx (HTML + Embedded Elixir) to build an HTML web page which will be the response to GET request.
 7. The HTML response is sent back to the browser.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -437,7 +438,7 @@ To make our counter, we need to define the `CounterController` controller. Creat
 defmodule CounterWeb.CounterController do
   use CounterWeb, :controller
 
-  
+
   def index(conn, _params) do
   end
 end
@@ -1006,7 +1007,7 @@ We'll dive deeper into forms in a later lesson. For now, know that the `form_for
 </form>
 ```
 
-The Cross-Site Request Forgery (CSRF) security token helps prevent CSRF attacks. Otherwise, this form sends a POST request to the `/count` route.
+The [Cross-Site Request Forgery (CSRF)](https://en.wikipedia.org/wiki/Cross-site_request_forgery) security token helps prevent CSRF attacks. Otherwise, this form sends a POST request to the `/count` route.
 
 Visit http://localhost:4000/count and press the increment button. The count should increment on the page.
 
@@ -1026,7 +1027,7 @@ Let's add a number input. `counter_web/templates/count/index.html.heex` should c
 
 ```elixir
 <h1>The current count is: <%= @count %></h1>
-<%= form_for @conn, "/count", fn f -> %> 
+<%= form_for @conn, "/count", fn f -> %>
   <%= number_input f, :increment %>
   <%= submit "Increment" %>
 <% end %>
@@ -1035,7 +1036,7 @@ Let's add a number input. `counter_web/templates/count/index.html.heex` should c
 The `:increment` atom is the key of the value associated with the input.
 We can retrieve the value in the form using `conn.body_params` in the controller.
 
-Let's inspect `conn.body_params` in the `CounterController`
+Let's inspect `conn.body_params` in the `CounterController`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1070,7 +1071,7 @@ We need to parse the integer from the string and use it to increment the count. 
   def update(conn, _params) do
     increment =
       case Integer.parse(conn.params["increment"]) do
-        {integer, _binary} ->
+        {integer, _remainder_of_binary} ->
           integer
 
         _ ->
@@ -1144,7 +1145,7 @@ We've been using static routes for demonstration purposes. However, we recommend
 
 Path helpers are dynamically defined functions that return the route for the corresponding controller action.
 
-For example, we can use the `Routes.counter_path(@conn, :update)` to return the `"/count"`. route for the `CounterController.update/2` function.
+For example, we can use the `Routes.counter_path(@conn, :update)` to return the `"/count"` route for the `CounterController.update/2` function.
 
 Let's replace the `"/count"` value in `lib/counter_web/templates/count/index.html.heex`.
 
@@ -1152,7 +1153,7 @@ Let's replace the `"/count"` value in `lib/counter_web/templates/count/index.htm
 
 ```elixir
 <h1>The current count is: <%= @count %></h1>
-<%= form_for @conn, Routes.counter_path(@conn, :update), fn f -> %> 
+<%= form_for @conn, Routes.counter_path(@conn, :update), fn f -> %>
   <%= number_input f, :increment %>
   <%= submit "Increment" %>
 <% end %>
@@ -1166,7 +1167,7 @@ And the `"/count"` value with query parameters in `lib/counter_web/controllers/c
 def update(conn, _params) do
   increment =
     case Integer.parse(conn.params["increment"]) do
-      {integer, _binary} ->
+      {integer, _remainder_of_binary} ->
         integer
 
       _ ->
