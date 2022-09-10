@@ -34,7 +34,7 @@ classDiagram
   }
   class Entry {
     user_id: :id
-    title: 
+    title:
   }
   User --> Entry : Has many
   Entry --> User : Belongs to
@@ -435,7 +435,7 @@ def deliver_user_confirmation_instructions(%User{} = user, confirmation_url_fun)
 end
 ```
 
-The `UserNotifier` module in `lib/diary/accounts/user_notifier.ex` uses [Swoosh](https://github.com/swoosh/swoosh) to send emails. Swoosh provides a `deliver/2` function which takes an email address and a string with the desired email content to send.
+The `UserNotifier` module in `lib/diary/accounts/user_notifier.ex` uses [Swoosh](https://hexdocs.pm/swoosh/) to send emails. Swoosh provides a [Swoosh.deliver/2](https://hexdocs.pm/swoosh/Swoosh.Mailer.html#deliver/2) function which takes an email address and a string with the desired email content to send.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -480,7 +480,7 @@ We can view this cookie. First, ensure the diary server is running, then visit h
 
 <!-- livebook:{"break_markdown":true} -->
 
-For each client connection, Phoenix stores a session in memory. The session stores client-specific information. We can set and retrieve values on the session using the `get_session/2` and `put_session/2` functions on the [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct .
+For each client connection, Phoenix stores a session in memory. The session stores client-specific information. We can set and retrieve values on the session using the [Plug.Conn.get_session/2](https://hexdocs.pm/plug/Plug.Conn.html#get_session/2) and [Plug.Conn.put_session/3](https://hexdocs.pm/plug/Plug.Conn.html#put_session/3) functions on the [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct .
 
 Earlier, when we triggered the `UserRegistrationController.create/2` function in `lib/diary_web/controllers/user_registration_controller.ex` we called the `UserAuth.log_in_user/3` function.
 
@@ -522,7 +522,7 @@ subgraph Server
     subgraph Session
       UT[User Token]
       U[User]
-      UT --retrieve--> U 
+      UT --retrieve--> U
     end
   end
 end
@@ -1006,15 +1006,15 @@ end
 To fix these tests, we need to ensure the created entry belongs to a user, and that the user is logged in.
 
 The `Diary.AccountsFixture` module provides a `user_fixture/1` function for creating users. Import the module to get access to this function in our tests.
-It's conventional for imports to be grouped together, so add the new import statement below the existing `import Diary.EntriesFixture` statement.
+It's conventional for imports to be grouped together and sorted in alphanumerical order, so add the new import statement before the existing `import Diary.EntriesFixture` statement.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # test/diary_web/controllers/entry_controller_test.exs
 
-import Diary.EntriesFixtures
 import Diary.AccountsFixtures
+import Diary.EntriesFixtures
 ```
 
 Now remove all instances of `setup [:create_entry]` from the `EntryControllerTest` module. Also remove `entry: entry` from the map passed to each test that was making use of `setup [:create_entry]`. We can also remove the private `create_entry/1` function since it's no longer used.
