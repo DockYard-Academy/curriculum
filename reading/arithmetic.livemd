@@ -506,9 +506,17 @@ a limit. You don't need to know how to do this yet, but it will be helpful in fu
 Here we have an animation to show the remainder of a growing number divided by 10 to help you
 visualize this effect.
 
-```elixir
-Utils.animate(:remainder)
-```
+<!-- livebook:{"attrs":{"source":"SmartAnimation.new(1..100_000_000, fn i ->\n  Kino.Markdown.new(\"\"\"\n  ```elixir\n  rem(#{i}, 10) = #{rem(i, 10)}\n  ```\n  \"\"\")\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+SmartAnimation.new(1..100_000_000, fn i ->
+  Kino.Markdown.new("""
+  ```elixir
+  rem(#{i}, 10) = #{rem(i, 10)}
+  ```
+  """)
+end)
+````
 
 ### Your Turn
 
