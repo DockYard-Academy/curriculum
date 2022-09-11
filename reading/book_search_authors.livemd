@@ -34,9 +34,10 @@ Initialize a new Phoenix project and install dependencies when prompted.
 $ mix phx.new book_search
 ```
 
-Then create the Database.
+Then create the database.
 
 ```
+$ cd book_search
 $ mix ecto.create
 ```
 
@@ -183,7 +184,7 @@ The `"index"` test uses `%{conn: conn}` defined in `BookSearch.ConnCase`. `conn`
 The [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function accepts the `conn` and simulates an HTTP GET request.
 `Routes.author_path(conn, :index)` returns the `"/authors"` route.
 
-[html_response](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#html_response/2) retrieves the HTML response. `200` is the success code for an HTTP response. after the HTTP GET request to the
+[html_response/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#html_response/2) retrieves the HTML response. `200` is the success code for an HTTP response. After the HTTP GET request to the
 `"/authors"` route. We then use `=~` to assert that `"Listing Authors"` was found on the HTML web page response.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -317,7 +318,7 @@ See if you can find `<h1>Search Authors</h1>` in the test failure output.
 </html>
 ```
 
-To fix this test, we need to change our assertion.
+To fix this test, we need to change our assertion to find `"Search Authors"` on the HTML web page response.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -641,7 +642,7 @@ To display the message, we call the [get_flash/2](https://hexdocs.pm/phoenix/Pho
 
 Our application displays a flash message when we create an author. However, this behavior is untested.
 
-We can use the test-specific [get_flash](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) from `ConnTest` to check if there's a flash message.
+We can use the test-specific [get_flash/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) from `ConnTest` to check if there's a flash message.
 
 Replace the `"redirect to show when data is valid"` test with the following.
 
@@ -670,7 +671,7 @@ Ensure you fix the `AuthorController` so that all tests pass.
 
 ## HTTP PUT "/authors/:id"
 
-The `"update author"` test verifies we can successfully update an author. it's essentially the same as the `"create author"` test except it uses [put/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3) instead of [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3).
+The `"update author"` test verifies we can successfully update an author. It's essentially the same as the `"create author"` test except it uses [put/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3) instead of [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -851,7 +852,7 @@ $ mix test
 20 tests, 0 failures
 ```
 
-Unfortunately, that's because we're not filtering at all! We'll have to write another test for filtering out authors. We'll [refute/1](https://hexdocs.pm/ex_unit/1.12/ExUnit.Assertions.html#refute/2) that the author's name is on the page this time.
+Unfortunately, that's because we're not filtering at all! We'll have to write another test for filtering out authors. We'll [refute/1](https://hexdocs.pm/ex_unit/ExUnit.Assertions.html#refute/2) that the author's name is on the page this time.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -936,7 +937,7 @@ end
 
 To make our tests pass, we need to filter the query. By default we're passing the `Author` schema to [Repo.all/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2).
 
-Let's consider a few solutions to the problem. First, we could retrieve the list of `Author` structs from the Database and filter them using [Enum](https://hexdocs.pm/elixir/Enum.html).
+Let's consider a few solutions to the problem. First, we could retrieve the list of `Author` structs from the database and filter them using [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -948,11 +949,11 @@ def list_authors(name) do
 end
 ```
 
-Our tests pass. However, this is **NOT RECOMMENDED**. Why do you think that is? The answer is performance. This solution loads all of the authors from the Database, and then filters them in memory. That's not a problem if we only have a few authors. However, it becomes a massive problem as the list of authors grows.
+Our tests pass. However, this is **NOT RECOMMENDED**. Why do you think that is? The answer is performance. This solution loads all of the authors from the database, and then filters them in memory. That's not a problem if we only have a few authors. However, it becomes a massive problem as the list of authors grows.
 
 Instead, rely on the database query for filtering results when possible/appropriate.
 
-[Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) provides functions for writing queries to the Database.
+[Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) provides functions for writing queries to the database.
 
 We can filter our query using [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function. The pin `^` operator with `^name` allows us to inject variables into the query expression.
 
@@ -1064,7 +1065,7 @@ test "list_authors/1 _ case insensitive match" do
 end
 ```
 
-To make this test pass, we can use [ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2), which is a case insensitive version of `like`.
+To make this test pass, we can use [ilike/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2), which is a case insensitive version of `like/2`.
 
 <!-- livebook:{"force_markdown":true} -->
 
