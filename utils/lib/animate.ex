@@ -1,18 +1,4 @@
 defmodule Utils.Animate do
-  def animate(:biggest_integer) do
-    max = 10 ** 80
-
-    Kino.animate(100, 1, fn i ->
-      integer_display = (10 ** i < max && 10 ** i) || "$10^{#{i}}$"
-      md = Kino.Markdown.new("
-integer: #{integer_display}\n
-digits: #{Integer.digits(10 ** i) |> Enum.count()}
-  ")
-
-      {:cont, md, i + 1}
-    end)
-  end
-
   def animate(:eager_evaluation) do
     sequence = [
       "
@@ -66,18 +52,6 @@ digits: #{Integer.digits(10 ** i) |> Enum.count()}
       next_row = rem(current_row + 1, 4)
       next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)
       {:cont, md, {next_row, next_column}}
-    end)
-  end
-
-  def animate(:remainder) do
-    Kino.animate(500, 0, fn i ->
-      md = Kino.Markdown.new("
-  ```elixir
-  rem(#{i}, 10) = #{rem(i, 10)}
-  ```
-  ")
-
-      {:cont, md, i + 1}
     end)
   end
 
