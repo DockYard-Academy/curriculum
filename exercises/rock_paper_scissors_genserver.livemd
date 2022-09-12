@@ -42,8 +42,10 @@ flowchart
   GS[State]
 
   P1 --> P1S
-  P1 --> P2S
-  G --> GS
+  
+  P2 --> P2S
+
+  G  --> GS
 
   P1S --> P1W[wins]
   P1S --> P1L[loses]
@@ -52,6 +54,10 @@ flowchart
   P2S --> P2W[wins]
   P2S --> P2L[loses]
   P2S --> P2T[ties]
+
+  GS  --> Player1[Player1 Pid]
+  GS  --> Player2[Player2 Pid]
+  GS  --> Round[Round]
 ```
 
 We'll use message passing to have each `Player` submit their choice to the `Game` server. Once both players submit their
