@@ -67,7 +67,7 @@ Often you'll use integers for representing ages, days, years, cash values, and m
 
 ### Your Turn
 
-In the Elixir cell below, replace `0` the biggest integer you can think of (until you get bored).
+In the Elixir cell below, replace `1` the biggest integer you can think of (until you get bored).
 
 We'll show you how many digits the number has when you re-evaluate the Elixir cell.
 
@@ -92,21 +92,18 @@ grows! Move on to the next section when you're satisfied that integers are truly
 
 To avoid distorting your screen we use mathematical notation $10^{n}$ after 80 digits.
 
-<!-- livebook:{"attrs":{"source":"\n\nSmartAnimation.new(1..100000000, fn i ->\n    max = 10 ** 80\n    integer_display = (10 ** i < max && 10 ** i) || \"$10^{#{i}}$\"\n    Kino.Markdown.new(\"\ninteger: #{integer_display}\\n\ndigits: #{Integer.digits(10 ** i) |> Enum.count()}\n    \")\nend)","title":"Hidden Cell"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"SmartAnimation.new(1..100_000_000, fn i ->\n  max = 10 ** 80\n  integer_display = (10 ** i < max && 10 ** i) || \"$10^{#{i}}$\"\n\n  Kino.Markdown.new(\"\"\"\n  integer: #{integer_display}\\n\n  digits: #{Integer.digits(10 ** i) |> Enum.count()}\n  \"\"\")\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 SmartAnimation.new(1..100_000_000, fn i ->
   max = 10 ** 80
   integer_display = (10 ** i < max && 10 ** i) || "$10^{#{i}}$"
-  Kino.Markdown.new("
-integer: #{integer_display}\n
-digits: #{Integer.digits(10 ** i) |> Enum.count()}
-    ")
-end)
-```
 
-```elixir
-Utils.animate(:biggest_integer)
+  Kino.Markdown.new("""
+  integer: #{integer_display}\n
+  digits: #{Integer.digits(10 ** i) |> Enum.count()}
+  """)
+end)
 ```
 
 ## Floats
@@ -509,9 +506,17 @@ a limit. You don't need to know how to do this yet, but it will be helpful in fu
 Here we have an animation to show the remainder of a growing number divided by 10 to help you
 visualize this effect.
 
-```elixir
-Utils.animate(:remainder)
-```
+<!-- livebook:{"attrs":{"source":"SmartAnimation.new(1..100_000_000, fn i ->\n  Kino.Markdown.new(\"\"\"\n  ```elixir\n  rem(#{i}, 10) = #{rem(i, 10)}\n  ```\n  \"\"\")\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+````elixir
+SmartAnimation.new(1..100_000_000, fn i ->
+  Kino.Markdown.new("""
+  ```elixir
+  rem(#{i}, 10) = #{rem(i, 10)}
+  ```
+  """)
+end)
+````
 
 ### Your Turn
 
