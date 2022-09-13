@@ -36,7 +36,7 @@ defmodule Anagram do
   end
 
   defp sort_string(string) do
-    String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
+    String.split(string, "", trim: true) |> Enum.sort()
   end
 end
 ```
@@ -58,8 +58,11 @@ defmodule Anagram do
 
     iex> Anagram.is_anagram?("")
   """
-
   def is_anagram?(string1, string2) do
+    split_string1 = String.split(string1, "", trim: true)
+    split_string2 = String.split(string2, "", trim: true)
+
+    Enum.sort(split_string1) == Enum.sort(split_string2)
   end
 
   @doc """
@@ -77,8 +80,12 @@ defmodule Anagram do
     []
   """
   def filter_anagrams(word_list, anagram) do
+    Enum.filter(word_list, fn word -> is_anagram?(word, anagram) end)
   end
 end
+
+Anagram.is_anagram?("robed", "bored")
+Anagram.filter_anagrams(["robed", "bored"], "robed")
 ```
 
 ## Bonus: Anagram Solver

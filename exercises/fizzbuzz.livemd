@@ -35,10 +35,6 @@ FizzBuzz.run(1..15)
 ```
 
 ```elixir
-Enum.map(1..10, fn integer -> integer * 2 end)
-```
-
-```elixir
 defmodule FizzBuzz do
   @doc """
   FizzBuzz.
@@ -52,8 +48,18 @@ defmodule FizzBuzz do
     ["buzz", 11, "fizz", 13, 14, "fizzbuzz"]
   """
   def run(range) do
+    Enum.map(1..15, fn int ->
+      case {rem(int, 3), rem(int, 5)} do
+        {0, 0} -> "fizzbuzz"
+        {0, _} -> "fizz"
+        {_, 0} -> "buzz"
+        _ -> int
+      end
+    end)
   end
 end
+
+FizzBuzz.run(1..15)
 ```
 
 ## Commit Your Progress

@@ -92,14 +92,6 @@ With enumeration, we can `calculate_tax/1` on any number of items with a single 
 Enum.map(list, fn item -> calculate_tax(item) end)
 ```
 
-This lesson will cover tools and techniques to accomplish enumeration.
-In total we will cover:
-
-* **Enumerable** **Collections** that support enumeration.
-* How to use the **Enum** module's built-in functionality with **Collections**.
-
-First, it's useful to know what we can enumerate on.
-
 ## Enum
 
 We use the [Enum](https://hexdocs.pm/elixir/Enum.html) module to accomplish enumeration. The Enum module contains
@@ -189,82 +181,15 @@ Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) to convert ever
 ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 ```
 
-Bind `string_list` to your answer.
-
-<!-- livebook:{"attrs":{"assertions":"","attempts":1,"code":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\r\n\r\nstring_list = nil","solution":"","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Exercise" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-      string_list = nil
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results 
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
 list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-string_list = nil
 ```
 
 ### Your Turn
 
-Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) with `list` to convert a list such as `[1, 2]` into `[{:one, 1}, {:two, 2}]`. bind `keyword_list` to your answer. You only need to handle integers from `1` to `9`.
+Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) with `list` to create a keyword list `[{:one, 1}, {:two, 2}]`.
 
-Next, try changing `list` to `[1, 2, 3, 4, 5, 6, 7, 8, 9]` and ensure your solution returns the following:
+**Bonus**: change `list` to `[1, 2, 3, 4, 5, 6, 7, 8, 9]` and ensure your solution returns the following:
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -272,94 +197,8 @@ Next, try changing `list` to `[1, 2, 3, 4, 5, 6, 7, 8, 9]` and ensure your solut
 [one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9]
 ```
 
-<!-- livebook:{"attrs":{"assertions":"case list do\n    [1, 2] -> \n         assert keyword_list == [one: 1, two: 2]\n    [1, 2, 3, 4, 5, 6, 7, 8, 9] ->\n        assert keyword_list == [one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9]\n    _ -> flunk(\"`list` should be either [1, 2] or [1, 2, 3, 4, 5, 6, 7, 8, 9]\")\nend","attempts":1,"code":"list = [1, 2]\r\n\r\nkeyword_list = nil","solution":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nkeyword_list = Enum.map(list, fn integer ->\n  key = case integer do\n    1 -> :one\n    2 -> :two\n    3 -> :three\n    4 -> :four\n    5 -> :five\n    6 -> :six\n    7 -> :seven\n    8 -> :eight\n    9 -> :nine\n  end\n\n  {key, integer}\nend)","title":"Create A Keyword List"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Create A Keyword List" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2]
-
-      keyword_list = nil
-
-      case list do
-        [1, 2] ->
-          assert keyword_list == [one: 1, two: 2]
-
-        [1, 2, 3, 4, 5, 6, 7, 8, 9] ->
-          assert keyword_list == [
-                   one: 1,
-                   two: 2,
-                   three: 3,
-                   four: 4,
-                   five: 5,
-                   six: 6,
-                   seven: 7,
-                   eight: 8,
-                   nine: 9
-                 ]
-
-        _ ->
-          flunk("`list` should be either [1, 2] or [1, 2, 3, 4, 5, 6, 7, 8, 9]")
-      end
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results 
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
 list = [1, 2]
-
-keyword_list = nil
 ```
 
 ## Enum.reduce/2 and Enum.reduce/3
@@ -490,7 +329,7 @@ defmodule Assertion do
 
             #{inspect(error)}
 
-            When it received: #{inspect(message)} #{message_type}
+            When it recieved: #{inspect(message)} #{message_type}
 
             Likely you need to define the corresponding handler for #{inspect(message)}.
 
@@ -500,7 +339,7 @@ defmodule Assertion do
                 ...
               end
 
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
+            Then ensure you call `GenServer.call/2`, `GenServer.cast/2`, or otherwise send the message correctly.
 
               GenServer.call(pid, :message)
         """)
@@ -586,7 +425,7 @@ defmodule Assertion do
 
             #{inspect(error)}
 
-            When it received: #{inspect(message)} #{message_type}
+            When it recieved: #{inspect(message)} #{message_type}
 
             Likely you need to define the corresponding handler for #{inspect(message)}.
 
@@ -596,7 +435,7 @@ defmodule Assertion do
                 ...
               end
 
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
+            Then ensure you call `GenServer.call/2`, `GenServer.cast/2`, or otherwise send the message correctly.
 
               GenServer.call(pid, :message)
         """)
@@ -736,77 +575,10 @@ Enum.find(["h", "e", "l", "l", "o"], 10, fn each -> is_integer(each) end)
 
 ### Your Turn
 
-In the Elixir cell below, use [Enum.find/2](https://hexdocs.pm/elixir/Enum.html#find/2) to find the first even number in this list. Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert list == [1, 2, 3, 4, 5], \"`list` should be [1, 2, 3, 4, 5]\"\nassert found == 2","attempts":1,"code":"list = [1, 2, 3, 4, 5]\r\n\r\nfound = nil","solution":"Enum.find(list, fn int -> rem(int, 2) == 0 end)","title":"Find The Even Number"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+In the Elixir cell below, use [Enum.find/2](https://hexdocs.pm/elixir/Enum.html#find/2) to find the first even number in this list, which should be `2`.
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Find The Even Number" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5]
-
-      found = nil
-      assert list == [1, 2, 3, 4, 5], "`list` should be [1, 2, 3, 4, 5]"
-      assert found == 2
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results 
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
 list = [1, 2, 3, 4, 5]
-
-found = nil
 ```
 
 ## Enum.random/1
@@ -827,9 +599,9 @@ collection = ["one", 3, {}]
 
 ## Capture Operator and Module Functions
 
-When we provide a function to any of the [Enum](https://hexdocs.pm/elixir/Enum.html) we're passing an anonymous function, which will be called under the hood.
+When we provide a function to any of the [Enum](https://hexdocs.pm/elixir/Enum.html) functions. When we pass a function as the argument to another function it's called a **callback function**.
 
-We'll bind this function to a variable and inspect every value to demonstrate.
+That's because the function is called by the function it is passed into. We'll bind this function to a variable and inspect every value to demonstrate.
 
 ```elixir
 my_function = fn element -> IO.inspect(element) end
@@ -837,7 +609,7 @@ my_function = fn element -> IO.inspect(element) end
 Enum.map(1..10, my_function)
 ```
 
-We can use the capture operator `&` syntax to provide module functions.
+Instead of providing an anonymous function, we can use the capture operator `&` syntax to provide module functions.
 
 ```elixir
 defmodule NonAnonymous do
@@ -853,6 +625,12 @@ We can also use the capture operator alone to create an anonymous function. Howe
 
 ```elixir
 Enum.map(1..10, &(&1 * 2))
+```
+
+Alternatively, we can simply use an anonymous function with the module function. This is especially necessary if each element of the collection doesn't match the arity or type of the arguments to the module function.
+
+```elixir
+Enum.map(1..10, fn int -> NonAnonymous.function(int) end)
 ```
 
 ## Further Reading
