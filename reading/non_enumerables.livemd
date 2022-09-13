@@ -24,12 +24,11 @@ Data types that do not contain multiple elements are not enumerable.
 However, it's still sometimes useful to enumerate over non-enumerable data types.
 
 Even though you can't enumerate over them directly, the trick is to convert
-non-enumerable data into an enumerable data type.
+non-enumerable data into an enumerable data type, then convert them back if necessary.
 
-### Integers
+## Integers
 
-How would you convert integers into an Enumerable?
-You can use the [Integer.digits/1](https://hexdocs.pm/elixir/Integer.html#digits/1) function.
+You can use the [Integer.digits/1](https://hexdocs.pm/elixir/Integer.html#digits/1) function to convert integers to a list of digits.
 
 ```elixir
 Integer.digits(123)
@@ -43,7 +42,15 @@ In the Elixir cell below, convert the integer `4389` into a list of digits.
 
 ```
 
-### Tuples
+### Undigits
+
+We can convert a list of digits back into a single integer using [Integer.undigits/2](https://hexdocs.pm/elixir/Integer.html#undigits/2).
+
+```elixir
+Integer.undigits([1, 2, 3])
+```
+
+## Tuples
 
 Despite being so similar to lists, tuples are not considered collections.
 That's primarily because they are intended as fixed-sized containers, and any case that requires
@@ -59,20 +66,21 @@ choice to start with a list instead of a tuple.
 Tuple.to_list({1, 2, 3})
 ```
 
-### Strings
+We can then convert a list back into a tuple using [List.to_tuple/1](https://hexdocs.pm/elixir/List.html#to_tuple/1)
+
+```elixir
+List.to_tuple([1, 2, 3])
+```
+
+## Strings
 
 Strings are not enumerable, however there are several methods to convert strings to lists.
 
-Strings can be converted into lists with either [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1)
-or [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
+Strings can be converted into lists with either [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1), [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1), or [String.split/3](https://hexdocs.pm/elixir/String.html#split/3).
 
 Under the hood, strings are represented with a **codepoint**. A codepoint is an integer that represents
 the character. Each character such as `"a"` has a corresponding codepoint. That's why the
 function is called [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
-
-```elixir
-String.split("abc", "", trim: true)
-```
 
 ```elixir
 String.codepoints("abcdefghijklmnopqrstuvwxyz")
@@ -116,6 +124,8 @@ formed from multiple codepoints.
 String.graphemes("é")
 ```
 
+### String.split/3
+
 Alternatively, you can use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split a string based on some value.
 For example, we can split a string by every comma like so:
 
@@ -123,7 +133,7 @@ For example, we can split a string by every comma like so:
 String.split("a,b,c,d", ",")
 ```
 
-You can use this to accomplish the same behavior as [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) by passing a string as the second argument.
+You can use this to accomplish a similar behavior as [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) by passing a string as the second argument.
 However this leaves whitespace from the start and end of the string in.
 
 ```elixir
@@ -144,6 +154,26 @@ In the Elixir cell below, convert the string `"Hello, world!"` into a list of si
 
 ```elixir
 
+```
+
+### Joining Strings
+
+Once you've applied your transformation to the list of string characters, you can rejoin them using [Enum.join/2](https://hexdocs.pm/elixir/Enum.html#join/2)
+
+```elixir
+Enum.join(["a", "b", "c"], "")
+```
+
+The default joiner is a string, so you can omit the second argument.
+
+```elixir
+Enum.join(["a", "b", "c"])
+```
+
+Alternatively you can join the strings by some joining character.
+
+```elixir
+Enum.join(["a", "b", "c"], "_")
 ```
 
 ## Commit Your Progress

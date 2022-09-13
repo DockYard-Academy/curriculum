@@ -1,0 +1,125 @@
+# Counting Votes
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Counting Votes
+
+You're creating a voting system. Voters are entered in a list of votes. You will be given a specific vote to count.
+
+For example, you might take a class vote of cats vs dogs vs birds to decide which animal is most popular.
+
+```mermaid
+flowchart
+D1[dog]
+D2[dog]
+D3[dog]
+C1[cat]
+C2[cat]
+B1[bird]
+```
+
+We'll determine the number of votes for a single value. For example, there are `3` dogs.
+
+```mermaid
+flowchart
+D1[dog]
+D2[dog]
+D3[dog]
+C1[cat]
+C2[cat]
+B1[bird]
+
+style D1 fill:lightgreen
+style D2 fill:lightgreen
+style D3 fill:lightgreen
+```
+
+So we would return `3` votes for dogs.
+
+```elixir
+defmodule Votes do
+  @doc """
+  Count the number of votes.
+
+  ## Examples
+
+    iex> VoterCount.count([:dogs, :dogs, :dogs, :cats], :dogs)
+    3
+
+    iex> VoterCount.count([:dogs, :dogs, :dogs, :cats], :cats)
+    1
+
+    iex> VoterCount.count([:apples, :oranges, :apples, :cats], :birds)
+    0
+  """
+  def count(votes, vote) do
+  end
+end
+```
+
+## Bonus: Voter Tally
+
+Counting each vote for dogs, cats, and birds becomes tedius. So, we instead want to determine the number of votes for each all at once.
+
+```mermaid
+flowchart
+D1[dog]
+D2[dog]
+D3[dog]
+C1[cat]
+C2[cat]
+B1[bird]
+
+style D1 fill:lightgreen
+style D2 fill:lightgreen
+style D3 fill:lightgreen
+
+style C1 fill:orange
+style C2 fill:orange
+style B1 fill:lightblue
+
+```
+
+There are `3` dogs, `2` cats, and `1` bird.
+
+```elixir
+defmodule Votes do
+  @doc """
+  Determine the number of votes for each option received.
+
+  ## Examples
+
+    iex> Votes.tally([:dog, :dog, :cat, :cat, :cat, :bird])
+    %{dog: 2, cat: 3, bird: 1}
+  """
+  def tally(votes) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the project folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish voter count exercise"
+```
+
+## Up Next
+
+| Previous                                 | Next                                   |
+| ---------------------------------------- | -------------------------------------: |
+| [Fizzbuzz](../exercises/fizzbuzz.livemd) | [Anagram](../exercises/anagram.livemd) |
