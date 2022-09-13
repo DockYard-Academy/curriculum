@@ -35,9 +35,45 @@ to accomplish the same functionality as the [Enum](https://hexdocs.pm/elixir/Enu
 * `filter/2`
 * `sum/1`
 
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem;">
+<summary>Possible Solution</summary>
+
 ```elixir
-defmodule(CustomEnum)
+defmodule CustomEnum do
+  def map(collection, function) do
+    Enum.reduce(collection, [], fn each, acc ->
+      [function.(each) | acc]
+    end)
+    |> Enum.reverse()
+  end
+
+  def each(collection, function) do
+    Enum.reduce(collection, fn each, _acc ->
+      function.(each)
+      :ok
+    end)
+  end
+
+  def filter(collection, function) do
+    Enum.reduce(collection, [], fn each, acc ->
+      if function.(each) do
+        [each | acc]
+      else
+        acc
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  def sum(collection) do
+    Enum.reduce(collection, 0, fn each, acc -> acc + each end)
+  end
+end
 ```
+
+</details>
 
 <!-- livebook:{"attrs":{"assertions":"list = Enum.to_list(1..10)\n\nassert CustomEnum.map(list, & &1), \"Implement the `map/2` function.\"\nassert is_list(CustomEnum.map(list, & &1)), \"`map/2` should return a list.\"\n\nassert CustomEnum.map([1, 2, 3], &(&1 * 2)) == [2, 4, 6]\n\nassert CustomEnum.each(list, & &1), \"Implement the `each/2` function.\"\nassert CustomEnum.each(list, & &1) == :ok, \"`each/2` should return :ok.\"\n\nassert CustomEnum.filter(list, & &1), \"Implement the `filter/2` function.\"\nassert is_list(CustomEnum.filter(list, & &1)), \"`each/2` should return a list.\"\n\nassert CustomEnum.filter(list, &(&1 < 5)) == Enum.filter(list, &(&1 < 5))\n\nassert CustomEnum.sum(list), \"Implement the `sum/1` function.\"\nassert is_integer(CustomEnum.sum(list)), \"`sum/1` should return an integer.\"\n\nassert CustomEnum.sum(list) == Enum.sum(list)","attempts":1,"code":"defmodule CustomEnum do\r\n  def map(collection, function) do\r\n  end\r\n\r\n  def each(collection, function) do\r\n  end\r\n\r\n  def filter(collection, function) do\r\n  end\r\n\r\n  def sum(collection) do\r\n  end\r\nend","solution":"defmodule CustomEnum do\n  def map(collection, function) do\n    Enum.reduce(collection, [], fn each, acc ->\n      [function.(each) | acc]\n    end)\n    |> Enum.reverse()\n  end\n\n  def each(collection, function) do\n    Enum.reduce(collection, fn each, _acc ->\n      function.(each)\n      :ok\n    end)\n  end\n\n  def filter(collection, function) do\n    Enum.reduce(collection, [], fn each, acc ->\n      if function.(each) do\n        [each | acc]\n      else\n        acc\n      end\n    end)\n    |> Enum.reverse()\n  end\n\n  def sum(collection) do\n    Enum.reduce(collection, 0, fn each, acc -> acc + each end)\n  end\nend","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
@@ -98,7 +134,7 @@ defmodule Assertion do
 
             #{inspect(error)}
 
-            When it recieved: #{inspect(message)} #{message_type}
+            When it received: #{inspect(message)} #{message_type}
 
             Likely you need to define the corresponding handler for #{inspect(message)}.
 
