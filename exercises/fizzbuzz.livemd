@@ -34,60 +34,23 @@ FizzBuzz.run(1..15)
 [1, 2, "fizz", 4, "buzz", "fizz", 7, 8, "fizz", "buzz", 11, "fizz", 13, 14, "fizzbuzz"]
 ```
 
-<!-- livebook:{"attrs":{"assertions":"defmodule Solutions.FizzBuzz do\n  def run(range) do\n    Enum.map(range, fn n ->\n      cond do\n        rem(n, 15) == 0 -> \"fizzbuzz\"\n        rem(n, 3) == 0 -> \"fizz\"\n        rem(n, 5) == 0 -> \"buzz\"\n        true -> n\n      end\n    end)\n  end\nend\n\nassert FizzBuzz.run(1..15) == [\n          1,\n          2,\n          \"fizz\",\n          4,\n          \"buzz\",\n          \"fizz\",\n          7,\n          8,\n          \"fizz\",\n          \"buzz\",\n          11,\n          \"fizz\",\n          13,\n          14,\n          \"fizzbuzz\"\n        ]\n\nassert FizzBuzz.run(1..100) == Solutions.FizzBuzz.run(1..100)","code":"defmodule FizzBuzz do\r\n  def run(range) do\r\n  end\r\nend","solution":"defmodule FizzBuzz do\n  def run(range) do\n    Enum.map(range, fn n ->\n      cond do\n        rem(n, 15) == 0 -> \"fizzbuzz\"\n        rem(n, 3) == 0 -> \"fizz\"\n        rem(n, 5) == 0 -> \"buzz\"\n        true -> n\n      end\n    end)\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+```elixir
+Enum.map(1..10, fn integer -> integer * 2 end)
+```
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    defmodule FizzBuzz do
-      def run(range) do
-      end
-    end
-
-    defmodule Solutions.FizzBuzz do
-      def run(range) do
-        Enum.map(range, fn n ->
-          cond do
-            rem(n, 15) == 0 -> "fizzbuzz"
-            rem(n, 3) == 0 -> "fizz"
-            rem(n, 5) == 0 -> "buzz"
-            true -> n
-          end
-        end)
-      end
-    end
-
-    assert FizzBuzz.run(1..15) == [
-             1,
-             2,
-             "fizz",
-             4,
-             "buzz",
-             "fizz",
-             7,
-             8,
-             "fizz",
-             "buzz",
-             11,
-             "fizz",
-             13,
-             14,
-             "fizzbuzz"
-           ]
-
-    assert FizzBuzz.run(1..100) == Solutions.FizzBuzz.run(1..100)
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
 defmodule FizzBuzz do
+  @doc """
+  FizzBuzz.
+
+  ## Examples
+
+    iex> FizzBuzz.run(1..15)
+    [1, 2, "fizz", 4, "buzz", "fizz", 7, 8, "fizz", "buzz", 11, "fizz", 13, 14, "fizzbuzz"]
+
+    iex> FizzBuzz.run(10..15)
+    ["buzz", 11, "fizz", 13, 14, "fizzbuzz"]
+  """
   def run(range) do
   end
 end

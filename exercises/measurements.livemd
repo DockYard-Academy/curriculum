@@ -17,170 +17,102 @@ Mix.install([
 ## Measurements
 
 You are going to make a utility module for working with measurements.
+This exercise was inspired by [Advent of Code 2021](https://adventofcode.com/), which is a fantastic resource for learning about Elixir through practical problems.
 
-### increased/1
+<!-- livebook:{"break_markdown":true} -->
 
-Given a list of measurements as integers, determine how many have increased.
-Each positive change since the previous integer in the list should count as an increase.
-
-For example:
-
-<!-- livebook:{"force_markdown":true} -->
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem;">
+<summary>Example Solution</summary>
 
 ```elixir
-Measurements.increased([1, 1, 2, 3, 1])
-2
-
-Measurements.increased([1, 2, 1])
-1
-
-Measurements.increased([3, 1, 2])
-1
-```
-
-### increased_by/1
-
-Given a list of measurements as integers, sum the amount they have increased by.
-
-For example:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Measurements.increased_by([100, 150, 120, 130])
-60
-
-Measurements.increased_by([10, 20, 10, 40])
-40
-```
-
-### increments/1
-
-Given a list of measurements as integers, determine the increment between each integer.
-
-For example:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Measurements.increments([100, 150, 120, 130])
-[50, -30, 10]
-
-Measurements.increments([10, 20, 10, 40])
-[10, -10, 30]
-```
-
-### average/1
-
-Find the average of a list of numbers. You can calculate average as $\frac{sum}{length}$.
-
-For example:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Measurements.average([4, 5, 6])
-5
-
-Measurements.average([2, 10])
-6
-```
-
-<!-- livebook:{"attrs":{"assertions":"defmodule Solutions.Measurements do\n  def increments(measurements) do\n    measurements\n    |> Enum.chunk_every(2, 1, :discard)\n    |> Enum.map(fn [x, y] -> y - x end)\n  end\n\n  def increased(measurements) do\n    measurements\n    |> increments()\n    |> Enum.count(&(&1 > 0))\n  end\n\n  def increased_by(measurements) do\n    measurements\n    |> increments()\n    |> Enum.filter(&(&1 > 0))\n    |> Enum.sum()\n  end\n\n  def average(measurements) do\n    Enum.sum(measurements) / Enum.count(measurements)\n  end\nend\n\nlist = Utils.Factory.integers()\n\nassert Measurements.increased([1, 1]), \"Implement the `increased` function.\"\nassert Measurements.increased([1, 2, 1]) == 1\nassert Measurements.increased([3, 1, 2]) == 1, \"Ensure you count each positive change.\"\nassert Measurements.increased([1, 1, 2, 3, 1]) == 2\n\nassert Measurements.increased(list) == Solutions.Measurements.increased(list),\n        \"`increased/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.increased_by([1, 1]), \"Implement the `increased_by` function.\"\nassert Measurements.increased_by([100, 150, 120, 130]) == 60\nassert Measurements.increased_by([10, 20, 10, 40]) == 40\n\nassert Measurements.increased_by(list) == Solutions.Measurements.increased_by(list),\n        \"`increased_by/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.increments([1, 2]), \"Implement the `increments` function.\"\nassert Measurements.increments([100, 150, 120, 130]) == [50, -30, 10]\nassert Measurements.increments([10, 20, 10, 40]) == [10, -10, 30]\n\nassert Measurements.increments(list) == Solutions.Measurements.increments(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"\n\nassert Measurements.average([1, 1]), \"Implement the `average` function.\"\nassert Measurements.average([4, 5, 6]) == 5\nassert Measurements.average([2, 10]) == 6\n\nassert Measurements.average(list) == Solutions.Measurements.average(list),\n        \"`increments/1 failed when called with #{inspect(list)}\"","code":"defmodule Measurements do\r\n  def increments(measurements) do\r\n  end\r\n\r\n  def increased(measurements) do\r\n  end\r\n\r\n  def increased_by(measurements) do\r\n  end\r\n\r\n  def average(measurements) do\r\n  end\r\nend","solution":"defmodule Measurements do\n  def increments(measurements) do\n    measurements\n    |> Enum.chunk_every(2, 1, :discard)\n    |> Enum.map(fn [x, y] -> y - x end)\n  end\n\n  def increased(measurements) do\n    measurements\n    |> increments()\n    |> Enum.count(&(&1 > 0))\n  end\n\n  def increased_by(measurements) do\n    measurements\n    |> increments()\n    |> Enum.filter(&(&1 > 0))\n    |> Enum.sum()\n  end\n\n  def average(measurements) do\n    Enum.sum(measurements) / Enum.count(measurements)\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    defmodule Measurements do
-      def increments(measurements) do
-      end
-
-      def increased(measurements) do
-      end
-
-      def increased_by(measurements) do
-      end
-
-      def average(measurements) do
-      end
-    end
-
-    defmodule Solutions.Measurements do
-      def increments(measurements) do
-        measurements
-        |> Enum.chunk_every(2, 1, :discard)
-        |> Enum.map(fn [x, y] -> y - x end)
-      end
-
-      def increased(measurements) do
-        measurements
-        |> increments()
-        |> Enum.count(&(&1 > 0))
-      end
-
-      def increased_by(measurements) do
-        measurements
-        |> increments()
-        |> Enum.filter(&(&1 > 0))
-        |> Enum.sum()
-      end
-
-      def average(measurements) do
-        Enum.sum(measurements) / Enum.count(measurements)
-      end
-    end
-
-    list = Utils.Factory.integers()
-
-    assert Measurements.increased([1, 1]), "Implement the `increased` function."
-    assert Measurements.increased([1, 2, 1]) == 1
-    assert Measurements.increased([3, 1, 2]) == 1, "Ensure you count each positive change."
-    assert Measurements.increased([1, 1, 2, 3, 1]) == 2
-
-    assert Measurements.increased(list) == Solutions.Measurements.increased(list),
-           "`increased/1 failed when called with #{inspect(list)}"
-
-    assert Measurements.increased_by([1, 1]), "Implement the `increased_by` function."
-    assert Measurements.increased_by([100, 150, 120, 130]) == 60
-    assert Measurements.increased_by([10, 20, 10, 40]) == 40
-
-    assert Measurements.increased_by(list) == Solutions.Measurements.increased_by(list),
-           "`increased_by/1 failed when called with #{inspect(list)}"
-
-    assert Measurements.increments([1, 2]), "Implement the `increments` function."
-    assert Measurements.increments([100, 150, 120, 130]) == [50, -30, 10]
-    assert Measurements.increments([10, 20, 10, 40]) == [10, -10, 30]
-
-    assert Measurements.increments(list) == Solutions.Measurements.increments(list),
-           "`increments/1 failed when called with #{inspect(list)}"
-
-    assert Measurements.average([1, 1]), "Implement the `average` function."
-    assert Measurements.average([4, 5, 6]) == 5
-    assert Measurements.average([2, 10]) == 6
-
-    assert Measurements.average(list) == Solutions.Measurements.average(list),
-           "`increments/1 failed when called with #{inspect(list)}"
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
 defmodule Measurements do
   def increments(measurements) do
+    measurements
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.map(fn [x, y] -> y - x end)
   end
 
   def increased(measurements) do
+    measurements
+    |> increments()
+    |> Enum.count(&(&1 > 0))
   end
 
   def increased_by(measurements) do
+    measurements
+    |> increments()
+    |> Enum.filter(&(&1 > 0))
+    |> Enum.sum()
   end
 
+  def average(measurements) do
+    Enum.sum(measurements) / Enum.count(measurements)
+  end
+end
+```
+</details>
+
+```elixir
+defmodule Measurements do
+  @doc """
+  Given a list of measurements as integers, determine how many have increased. 
+  Each positive change since the previous integer in the list should count as an increase.
+  
+  ## Examples
+  
+    iex> Measurements.increased([1, 1, 2, 3, 1])
+    2
+  
+    iex> Measurements.increased([1, 2, 1])
+    1
+  
+    iex> Measurements.increased([3, 1, 2])
+    1
+  """
+  def increased(measurements) do
+  end
+
+  @doc """
+  Given a list of measurements as integers, determine the increment between each integer.
+  
+  ## Examples
+  
+    iex> Measurements.increments([100, 150, 120, 130])
+    [50, -30, 10]
+  
+    iex> Measurements.increments([10, 20, 10, 40])
+    [10, -10, 30]
+  """
+  def increments(measurements) do
+  end
+
+  @doc """
+  Given a list of measurements as integers, sum the amount they have increased by.
+  Only positive increments are taken into account.
+  
+  ## Examples
+  
+    iex> Measurements.increased_by([100, 150, 120, 130])
+    60
+  
+    iex> Measurements.increased_by([10, 20, 10, 40])
+    40
+  """
+  def increased_by(measurements) do
+  end
+
+  @doc """
+  Find the average of a list of numbers. 
+  You can calculate average as sum of integers / length of list.
+  
+  ## Examples
+  
+    iex> Measurements.average([4, 5, 6])
+    5
+  
+    iex> Measurements.average([2, 10])
+    6
+  """
   def average(measurements) do
   end
 end

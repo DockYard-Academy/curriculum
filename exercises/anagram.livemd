@@ -19,135 +19,89 @@ Mix.install([
 Two words that contain all the same letters are anagrams.
 For example **bored** and **robed** are anagrams.
 
-In the Elixir cell below:
+* Create a function `is_anagram?/2` which determines if two strings are anagrams.
+* Create a function `filter_anagrams/2` which filters a list based on if they are anagrams of a provided string.
 
-### Step 1
-
-* Create a module `Anagram`
-* Create a function on the `Anagram` module `is_anagram?/2`
-* `is_anagram?/2` should accept two lowercase strings and determine if they are anagrams.
-
-### Step 2
-
-* Create a function on the `Anagram` module `filter_anagrams/2`.
-* `filter_anagrams/2` should accept a string as the first parameter, and a list of strings as the second
-  parameter.
-* `filter_anagrams/2` should filter out values in the list of strings that are not anagrams of the first parameter string.
-
-For example:
-
-<!-- livebook:{"force_markdown":true} -->
+<details style="background-color: lightgreen; padding: 12px">
+<summary>Solution Example</summary>
 
 ```elixir
-Anagram.is_anagram?("stop", "pots")
-true
+defmodule Anagram do
+  def is_anagram?(string1, string2) do
+    sort_string(word) == sort_string(possible_anagram)
+  end
 
-Anagram.filter_anagrams("acres", ["cares", "races", "scare", "tree", "bear"])
-["cares", "races", "scare"]
-```
+  def filter_anagrams(words, string) do
+    Enum.filter(words, fn word -> is_anagram?(word, string) end)
+  end
 
-<!-- livebook:{"attrs":{"assertions":"assert Anagram.is_anagram?(\"stop\", \"pots\") == true\nrefute Anagram.is_anagram?(\"example\", \"nonanagram\") == true\n\nword = Utils.Factory.string()\n\ngenerate_non_anagram = fn word ->\n  word <> Enum.random([\"a\", \"b\", \"c\"])\nend\n\ngenerate_anagram = fn word ->\n  String.split(word, \"\", trim: true) |> Enum.shuffle() |> Enum.join(\"\")\nend\n\nassert Anagram.is_anagram?(word, generate_anagram.(word)),\n        \"`is_anagram?/1` failed to identify anagram.\"\n\nrefute Anagram.is_anagram?(word, generate_non_anagram.(word)),\n        \"`is_anagram?/1` failed to identify non-anagram.\"\n\nnon_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)\nanagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)\n\nresult = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)\nassert is_list(result), \"filter_anagrams/2 should return a list\"\n\nassert Enum.sort(result) == Enum.sort(anagrams), \"filter_anagrams/2 failed to filter anagrams\"","attempts":1,"code":"defmodule Anagram do\r\n  def is_anagram?(_word, _possible_anagram) do\r\n  end\r\n\r\n  def filter_anagrams(_word, _possible_anagrams) do\r\n  end\r\nend","solution":"defmodule Anagram do\n  def is_anagram?(word, possible_anagram) do\n    sort_string(word) == sort_string(possible_anagram)\n  end\n\n  def filter_anagrams(word, possible_anagrams) do\n    Enum.filter(possible_anagrams, fn each -> is_anagram?(word, each) end)\n  end\n\n  defp sort_string(string) do\n    String.split(string, \"\", trim: true) |> Enum.sort() |> Enum.join()\n  end\nend","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Exercise" do
-    try do
-      Process.flag(:trap_exit, true)
-
-      defmodule Anagram do
-        def is_anagram?(_word, _possible_anagram) do
-        end
-
-        def filter_anagrams(_word, _possible_anagrams) do
-        end
-      end
-
-      assert Anagram.is_anagram?("stop", "pots") == true
-      refute Anagram.is_anagram?("example", "nonanagram") == true
-
-      word = Utils.Factory.string()
-
-      generate_non_anagram = fn word ->
-        word <> Enum.random(["a", "b", "c"])
-      end
-
-      generate_anagram = fn word ->
-        String.split(word, "", trim: true) |> Enum.shuffle() |> Enum.join("")
-      end
-
-      assert Anagram.is_anagram?(word, generate_anagram.(word)),
-             "`is_anagram?/1` failed to identify anagram."
-
-      refute Anagram.is_anagram?(word, generate_non_anagram.(word)),
-             "`is_anagram?/1` failed to identify non-anagram."
-
-      non_anagrams = Enum.map(1..5, fn _ -> generate_non_anagram.(word) end)
-      anagrams = Enum.map(1..5, fn _ -> generate_anagram.(word) end)
-
-      result = Anagram.filter_anagrams(word, anagrams ++ non_anagrams)
-      assert is_list(result), "filter_anagrams/2 should return a list"
-
-      assert Enum.sort(result) == Enum.sort(anagrams),
-             "filter_anagrams/2 failed to filter anagrams"
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a handle_call/3, handle_info/2, or handle_cast/2 or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Also ensure you call GenServer.call/2, GenServer.cast/2, or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results 
-<hr/>"))
-    end
+  defp sort_string(string) do
+    String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
   end
 end
+```
 
-ExUnit.run()
+</details>
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
+```elixir
 defmodule Anagram do
-  def is_anagram?(_word, _possible_anagram) do
+  @doc """
+  Determine if two strings are anagrams.
+
+  ## Examples
+
+    iex> Anagram.is_anagram?("stop", "pots")
+    true
+
+    iex> Anagram.is_anagram?("cats", "dogs")
+    false
+
+    iex> Anagram.is_anagram?("")
+  """
+
+  def is_anagram?(string1, string2) do
   end
 
-  def filter_anagrams(_word, _possible_anagrams) do
+  @doc """
+  Filter anagrams.
+
+  ## Examples
+
+    iex> Anagram.filter_anagrams(["abc", "bca", "abcd", "cat"], "bac")
+    ["abc", "bca"]
+
+    iex> Anagram.filter_anagrams(["rams", "mars", "arms", "alarms"], "arms")
+    ["rams", "mars", "arms"]
+
+    iex> Anagram.filter_anagrams(["stop"], "go")
+    []
+  """
+  def filter_anagrams(word_list, anagram) do
+  end
+end
+```
+
+## Bonus: Anagram Solver
+
+Given a string, return all possible permutations of the string to return a list of potential anagrams.
+
+```elixir
+defmodule Anagram do
+  @doc """
+  Return a list of all string permutations to solve for all anagrams.
+
+  ## Examples
+    
+    iex> Anagram.solve("a")
+    ["a"]
+
+    iex> Anagram.solve("ab")
+    ["ab", "ba"]
+
+    iex> Anagram.solve("abc")
+    ["abc", "acb", "bac", "bca", "cab", "cba"]
+  """
+  def solve(string) do
   end
 end
 ```

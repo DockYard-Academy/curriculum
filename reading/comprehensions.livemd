@@ -117,11 +117,6 @@ flowchart
     5b[5]
     6b[6]
   end
-  subgraph B[generator 2]
-    4c[4]
-    5c[5]
-    6c[6]
-  end
   subgraph A[generator 1]
     1 --> B
     2 --> C
@@ -170,25 +165,11 @@ flowchart
 There's no real limit to the number of generators that you can use, but
 each generator creates another nested loop and therefore has a significant performance impact.
 
-That means generally, a comprehension with a single generator will have linear complexity $O(n)$.
-A comprehension with two generators will have polynomial time $O(n^2)$. A comprehension with
-three generators will also have polynomial time but $O(n^3)$.
-
-So the performance follows Big $On^g$ where $g$ is
-the number of generators that you use.
-
-```elixir
-Utils.graph(:comprehension_big_o)
-```
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
 In the Elixir cell below, use a comprehension to create a list of even integers from `2` to `100`.
-
-<details>
-<summary>Hint</summary>
-Remember that ranges can have steps! e.g. <code>1..10//3</code>
-</details>
 
 ```elixir
 
@@ -334,34 +315,11 @@ You can use <code>:binary.first/1</code> to convert a variable bound to a string
 
 ## Why Use A Comprehension?
 
-In general, you should probably lean on the [Enum](https://hexdocs.pm/elixir/Enum.html) module more often than comprehensions. The
-[Enum](https://hexdocs.pm/elixir/Enum.html) module can accomplish all of the same functionality with `map` and `reduce` as a comprehension.
+[Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2), and [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) can accomplish all of the same functionality as a comprehension. In general, the [Enum](https://hexdocs.pm/elixir/Enum.html) is more broadly used than comprehensions.
 
-This is especially true if you're coming from an OOP background and feel tempted to use comprehensions
-because they feel like for loops.
+Consider using comprehensions as a refactoring tool to improve the clarity of your code. They are particularely useful for building and generating collections of data. It's typically non-idiomatic to use a comprehension when the [Enum](https://hexdocs.pm/elixir/Enum.html) module would work instead.
 
-Instead, consider using comprehensions to refactor (improve) your code after you've already written it.
-
-For example, in the creation of the graph for how nested generators have $O(n^g)$ performance where
-$g$ is the number of generators, we originally wrote the following code to display $O(n^2)$ complexity.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Enum.map(init..max, fn number_of_elements ->
-  %{"number of elements": number_of_elements, time: number_of_elements ** 2, type: "2"}
-end)
-```
-
-But then while writing, realized we could refactor it into a one-line statement using comprehensions.
-
-What do you think? Is this more clear or not?
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-for n <- init..max, do: %{"number of elements": n, time: n ** 2, type: "2"}
-```
+Avoid over relying on comprehensions, especially if you're from an Object Oriented Programming background and feel tempted to use comprehensions because they feel like for loops. Comprehensions are not for loops! Instead, consider using comprehensions to refactor and improve your code after you've already written it.
 
 ### Your Turn
 
