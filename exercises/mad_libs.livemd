@@ -14,141 +14,58 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
+## Madlibs
+
+You're going to create some mad lib games A madlib is a game where the player can enter in a word or sentence to fill in the blanks.
+
 ## String Concatenation Madlib
 
-In this exercise, you're going to recreate the following madlib game. A madlib is a game where the player
-can enter in a word or sentence to fill in the blanks.
+In the Elixir cell below, bind each blank word to a variable. Then use **string concatenation** to combine these values into a single string madlib.
 
-![](images/madlib.jpg)
+> A programmer is a ____ that turns ____ into ____.
 
-<!-- livebook:{"break_markdown":true} -->
-
-In the Elixir cell below bind `name_of_company`, `a_defined_offering`, `a_defined_audience`, `solve_a_problem`, and `secret_sauce` to a string.
-
-Then use string concatenation to concentenate the variables to create the madlib above.
-
-<!-- livebook:{"attrs":{"assertions":"assert is_binary(name_of_company) and name_of_company != \"\", \"name_of_company should be a non-empty string\"\nassert is_binary(a_defined_offering) and a_defined_offering != \"\", \"a_defined_offering should be a non-empty string\"\nassert is_binary(a_defined_audience) and a_defined_audience != \"\", \"a_defined_audience should be a non-empty string\"\nassert is_binary(solve_a_problem) and solve_a_problem != \"\", \"solve_a_problem should be a non-empty string\"\nassert is_binary(secret_sauce) and secret_sauce != \"\", \"secret_sauce should be a non-empty string\"\nassert String.contains?(madlib, name_of_company), \"name_of_company should be used in the madlib\"\nassert String.contains?(madlib, a_defined_offering), \"a_defined_offering should be used in the madlib\"\nassert String.contains?(madlib, a_defined_audience), \"a_defined_audience should be used in the madlib\"\nassert String.contains?(madlib, solve_a_problem), \"solve_a_problem should be used in the madlib\"\nassert String.contains?(madlib, secret_sauce), \"secret_sauce should be used in the madlib\"\nmadlib = \"My company, \" <> name_of_company <> \", is developing \" <> a_defined_offering <> \" to help \" <> a_defined_audience <> \" \" <> solve_a_problem <> \" with \" <> secret_sauce <> \".\"","code":"name_of_company = nil\r\na_defined_offering = nil\r\na_defined_audience = nil\r\nsolve_a_problem = nil\r\nsecret_sauce = nil\r\n\r\nmadlib = nil","solution":"name_of_company = \"DockYard\"\na_defined_offering = \"DockYard Academy\"\na_defined_audience = \"students\"\nsolve_a_problem = \"learn Elixir\"\nsecret_sauce = \"Livebook\"\n\nmadlib =\n  \"My company, \" <>\n    name_of_company <>\n    \", is developing \" <>\n    a_defined_offering <>\n    \" to help \" <> a_defined_audience <> \" \" <> solve_a_problem <> \" with \" <> secret_sauce <> \".\""},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
+blank1 = "person"
+blank2 = "coffee"
+blank3 = "code"
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    name_of_company = nil
-    a_defined_offering = nil
-    a_defined_audience = nil
-    solve_a_problem = nil
-    secret_sauce = nil
-
-    madlib = nil
-
-    assert is_binary(name_of_company) and name_of_company != "",
-           "name_of_company should be a non-empty string"
-
-    assert is_binary(a_defined_offering) and a_defined_offering != "",
-           "a_defined_offering should be a non-empty string"
-
-    assert is_binary(a_defined_audience) and a_defined_audience != "",
-           "a_defined_audience should be a non-empty string"
-
-    assert is_binary(solve_a_problem) and solve_a_problem != "",
-           "solve_a_problem should be a non-empty string"
-
-    assert is_binary(secret_sauce) and secret_sauce != "",
-           "secret_sauce should be a non-empty string"
-
-    assert String.contains?(madlib, name_of_company),
-           "name_of_company should be used in the madlib"
-
-    assert String.contains?(madlib, a_defined_offering),
-           "a_defined_offering should be used in the madlib"
-
-    assert String.contains?(madlib, a_defined_audience),
-           "a_defined_audience should be used in the madlib"
-
-    assert String.contains?(madlib, solve_a_problem),
-           "solve_a_problem should be used in the madlib"
-
-    assert String.contains?(madlib, secret_sauce), "secret_sauce should be used in the madlib"
-
-    madlib =
-      "My company, " <>
-        name_of_company <>
-        ", is developing " <>
-        a_defined_offering <>
-        " to help " <>
-        a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-name_of_company = nil
-a_defined_offering = nil
-a_defined_audience = nil
-solve_a_problem = nil
-secret_sauce = nil
-
-madlib = nil
+"A programmer is a " <> blank1 <> " that turns " <> blank2 <> " into " <> blank3
 ```
 
-```elixir
-name_of_company = "DockYard"
-a_defined_offering = "DockYard Academy"
-a_defined_audience = "students"
-solve_a_problem = "learn Elixir"
-secret_sauce = "Livebook"
+</details>
 
-madlib =
-  "My company, " <>
-    name_of_company <>
-    ", is developing " <>
-    a_defined_offering <>
-    " to help " <> a_defined_audience <> " " <> solve_a_problem <> " with " <> secret_sauce <> "."
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## String Interpolation Madlib
 
-In the Elixir cell below, fill in `blank1`, `blank2`, and `blank3` with a word to replace the blanks in the sentence.
+In the Elixir cell below, bind each blank word to a variable. Then use **string interpolation** to combine these values into a single string madlib.
 
-> A programmer is a ____ that turns ____ into ____.
+> ____ and ____ combined makes ____.
 
-Then use string interpololation to interpolate these values into a single string bound to the `madlib` variable.
-
-<!-- livebook:{"attrs":{"assertions":"assert is_binary(blank1) and blank1 != \"\", \"blank1 should be a non-empty string\"\nassert is_binary(blank2) and blank2 != \"\", \"blank2 should be a non-empty string\"\nassert is_binary(blank3) and blank3 != \"\", \"blank3 should be a non-empty string\"\nassert madlib == \"A programmer is a #{blank1} that turns #{blank2} into #{blank3}.\"","code":"blank1 = nil\r\nblank2 = nil\r\nblank3 = nil\r\n\r\nmadlib = nil","solution":"blank1 = \"machine\"\nblank2 = \"coffee\"\nblank3 = \"code\"\n\nmadlib = \"A programmer is a #{blank1} that turns #{blank2} into #{blank3}.\""},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
+blank1 = "foo"
+blank2 = "bar"
+blank3 = "foobar"
 
-defmodule Assertion do
-  use ExUnit.Case
+"#{blank1} and #{blank2} combined makes #{blank3}."
+```
 
-  test "" do
-    blank1 = nil
-    blank2 = nil
-    blank3 = nil
+</details>
 
-    madlib = nil
-    assert is_binary(blank1) and blank1 != "", "blank1 should be a non-empty string"
-    assert is_binary(blank2) and blank2 != "", "blank2 should be a non-empty string"
-    assert is_binary(blank3) and blank3 != "", "blank3 should be a non-empty string"
-    assert madlib == "A programmer is a #{blank1} that turns #{blank2} into #{blank3}."
-  end
-end
+Enter your solution below.
 
-ExUnit.run()
+```elixir
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-blank1 = nil
-blank2 = nil
-blank3 = nil
-
-madlib = nil
 ```
 
 ## Commit Your Progress
