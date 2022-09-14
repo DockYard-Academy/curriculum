@@ -26,7 +26,7 @@ We need to associate books with a particular author.
 If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/BrooklinJazz/book_search/tree/books) project.
 
 To associate books with an author, we need to model their relationship in our Database.
-Ecto handles the data layer in our application. By default, Ecto uses Postgres, which is a relational database.
+Ecto handles the data layer in our application. By default, Ecto uses PostgreSQL, which is a relational database.
 
 Relational databases store data in any number of tables and use foreign keys to relate data to one another.
 One of the most common data relationships is **one-to-many**.
@@ -44,7 +44,7 @@ flowchart
   Author --> Book3
 ```
 
-Sometimes we model relationships and data tables using diagrams. For example, there is a specific diagram specification called a UML (Unified Modelling Language) with particular rules and symbols. However, we'll use a more lightweight style. Generally, `1` represents the **one** in the relationship, and `*` represent **many**.
+Sometimes we model relationships and data tables using diagrams. For example, there is a specific diagram specification called a [UML (Unified Modelling Language)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) with particular rules and symbols. However, we'll use a more lightweight style. Generally, `1` represents the **one** in the relationship, and `*` represent **many**.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -154,7 +154,7 @@ $ mix ecto.migrate
 Schemas describe the application domain representation of data in our Database.
 We've associated authors and books in our Database. However, we have not associated them in our application schemas. We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
 
-We can use the [has_many/3] macro to indicate a one-to-many association with another schema.
+We can use the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) macro to indicate a one-to-many association with another schema.
 
 Add `has_many/3` to the `Author` schema.
 
@@ -213,7 +213,7 @@ end
 
 ## Books Context
 
-Because we added the `null: false` constraint on the `BookSearch.Repo.Migrations.CreateBooks` migration, we have seven failing tests in the `Books` context.
+Because we added the `null: false` constraint on the `BookSearch.Repo.Migrations.CreateBooks` migration, we have eight failing tests in the `Books` context.
 
 Run the following to execute the failing tests.
 
@@ -229,10 +229,10 @@ The test output should include errors similar to the following.
 
 ```elixir
 ** (Postgrex.Error) ERROR 23502 (not_null_violation) null value in column "author_id" violates not-null constraint
-     
+
          table: books
          column: author_id
-     
+
      Failing row contains (18, some title, null, 2022-07-28 03:33:48, 2022-07-28 03:33:48).
 ```
 
@@ -244,7 +244,7 @@ Let's fix these tests, starting with `"list_books/0 returns all books"`.
 
 ```elixir
 # test/book_search/books_test.exs
-   
+
 test "list_books/0 returns all books" do
   book = book_fixture()
   assert Books.list_books() == [book]
@@ -303,7 +303,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-We can use [Ecto.build_assoc](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to associate the author with the book. 
+We can use [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to associate the author with the book.
 Replace the `create_book/1` function with the following.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -721,7 +721,7 @@ Replace `Routes.book_path` with `Routes.author_book_path`. `Routes.author_book_p
 ```
 
 We have access to the `"author_id"` in the second argument controller because we nested our author and book routes.
-We need to pass the `author_id` into the [render](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function to provide it to the template.
+We need to pass the `author_id` into the [render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function to provide it to the template.
 
 Replace `BookController.index/2` with the following.
 
@@ -922,7 +922,7 @@ $ mix test test/book_search_web/controllers/book_controller_test.exs:28
 
 That's because [Ecto.Changeset.cast/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) expects a map with either string keys, or atom keys, not both.
 
-There are a few solutions to this problem. We've chosen to use [Map.pop!](https://hexdocs.pm/elixir/Map.html#pop!/2) to separate the `:author` key and the rest of the parameters. However, we could have changed the interface to the `Books.create_book/1` function.
+There are a few solutions to this problem. We've chosen to use [Map.pop!/2](https://hexdocs.pm/elixir/Map.html#pop!/2) to separate the `:author` key and the rest of the parameters. However, we could have changed the interface to the `Books.create_book/1` function.
 
 ```elixir
 author = %{name: "Dennis E Taylor"}
@@ -1463,7 +1463,7 @@ def index(conn, _params) do
 end
 ```
 
-We need to handle the case where there's no author_id in the index template. We can use the `book.author_id` instead of `@author_id` for the list of books.
+We need to handle the case where there's no author id in the index template. We can use the `book.author_id` instead of `@author_id` for the list of books.
 
 We can wrap the **New Book** button in an if statement to only render if there is an `@author_id` value. We can use `assigns` with square bracket syntax to safely access a value that's may not exist.
 
@@ -1616,7 +1616,7 @@ def index(conn, %{"author_id" => author_id}) do
 end
 ```
 
-We'll need to implement the `Books.list_book/1` function. Create a new function clause as we still want the `Books.list_book/0` function to work. We can filter books by a matching author id with[where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3).
+We'll need to implement the `Books.list_book/1` function. Create a new function clause as we still want the `Books.list_book/0` function to work. We can filter books by a matching author id with [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1809,7 +1809,7 @@ We omitted tests for `Books.list_books(name: name)`. Create tests to ensure we c
 
 For more on Ecto and Phoenix, consider the following resources.
 
-* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html#where/3)
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
 * [BookSearch Project With Books](https://github.com/BrooklinJazz/book_search/tree/books)
 
 ## Commit Your Progress
