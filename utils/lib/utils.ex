@@ -5,7 +5,6 @@ defmodule Utils do
   alias Kino.ValidatedForm
 
   defdelegate visual(visual_name, params), to: Utils.Visual
-  defdelegate animate(visual_name), to: Utils.Animate
 
   def form(form_name), do: ValidatedForm.new(apply(Utils.Form, form_name, []))
   def constants(constant), do: apply(Utils.Constants, constant, [])
