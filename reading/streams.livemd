@@ -36,8 +36,63 @@ memory during execution.
 Each [Enum](https://hexdocs.pm/elixir/Enum.html) function stores a copy of the the enumerable it creates and executes sequentially as
 seen in this slide.
 
+<!-- livebook:{"attrs":{"source":"defmodule Boxes do\n  def space, do: box(\"\", %{background: \"none\", border: \"none\"})\n  def spaces(0), do: []\n  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)\n  def green_box(text), do: box(text, %{background: \"#D5E8D4\", border: \"#82B366\"})\n  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)\n  def grey_box(text), do: box(text, %{background: \"#F5F5F5\", border: \"#666666\"})\n  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)\n\n  def box(text, style) do\n    \"<div style=\\\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\\\">#{text}</div>\"\n  end\n\n  def row(title, items) do\n    \"<div style=\\\"height: 80px; display: flex; width: 100%; align-items: center;\\\">\n    <p style=\\\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\\\">#{title}</p>\n    <div style=\\\"display: flex; width: 90%;\\\">#{items}</div>\n  </div>\"\n  end\n\n  def sequence do\n    [\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", [])}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}\n  \"\n    ]\n  end\nend\n\nKino.animate(2000, 0, fn i ->\n  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))\n  {:cont, md, rem(i + 1, length(Boxes.sequence()))}\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.animate(:eager_evaluation)
+defmodule Boxes do
+  def space, do: box("", %{background: "none", border: "none"})
+  def spaces(0), do: []
+  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)
+  def green_box(text), do: box(text, %{background: "#D5E8D4", border: "#82B366"})
+  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)
+  def grey_box(text), do: box(text, %{background: "#F5F5F5", border: "#666666"})
+  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)
+
+  def box(text, style) do
+    "<div style=\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\">#{text}</div>"
+  end
+
+  def row(title, items) do
+    "<div style=\"height: 80px; display: flex; width: 100%; align-items: center;\">
+    <p style=\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\">#{title}</p>
+    <div style=\"display: flex; width: 90%;\">#{items}</div>
+  </div>"
+  end
+
+  def sequence do
+    [
+      "
+  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
+  #{row("map", [])}
+  #{row("filter", [])}
+  #{row("take", [])}
+",
+      "
+  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
+  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
+  #{row("filter", [])}
+  #{row("take", [])}
+",
+      "
+  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
+  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
+  #{row("filter", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}
+  #{row("take", [])}
+",
+      "
+  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
+  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
+  #{row("filter", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}
+  #{row("take", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}
+  "
+    ]
+  end
+end
+
+Kino.animate(2000, 0, fn i ->
+  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))
+  {:cont, md, rem(i + 1, length(Boxes.sequence()))}
+end)
 ```
 
 While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by
@@ -47,8 +102,31 @@ It seems like a waste of resources to execute every operation on every element, 
 As the list grows, this becomes a massive waste of computation. It would be far more performant if we
 could instead build up a series of functions and run them one by one only when needed.
 
+<!-- livebook:{"attrs":{"source":"Kino.animate(500, {0, 0}, fn {current_row, current_column} ->\n  current_element = current_column + 1\n  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)\n\n  maybe_display = fn expected_row, display ->\n    if current_row === expected_row, do: display, else: []\n  end\n\n  indent = Boxes.spaces(current_column)\n\n  md =\n    Kino.Markdown.new(\"\"\"\n    #{Boxes.row(\"1..10\", range)}\n    #{Boxes.row(\"map\", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"filter\", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"take\", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}\n    \"\"\")\n\n  next_row = rem(current_row + 1, 4)\n  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)\n  {:cont, md, {next_row, next_column}}\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.animate(:lazy_evaluation)
+Kino.animate(500, {0, 0}, fn {current_row, current_column} ->
+  current_element = current_column + 1
+  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)
+
+  maybe_display = fn expected_row, display ->
+    if current_row === expected_row, do: display, else: []
+  end
+
+  indent = Boxes.spaces(current_column)
+
+  md =
+    Kino.Markdown.new("""
+    #{Boxes.row("1..10", range)}
+    #{Boxes.row("map", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}
+    #{Boxes.row("filter", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}
+    #{Boxes.row("take", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}
+    """)
+
+  next_row = rem(current_row + 1, 4)
+  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)
+  {:cont, md, {next_row, next_column}}
+end)
 ```
 
 We can't accomplish this with the [Enum](https://hexdocs.pm/elixir/Enum.html) module, however we can with [Stream](https://hexdocs.pm/elixir/Stream.html).
