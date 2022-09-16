@@ -21,7 +21,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 ## Overview
 
 We will add tags to our `BookSearch` application from the previous lesson.
-If you need clarification during this reading, you can reference the completed [BookSearch/tags](https://github.com/BrooklinJazz/book_search/tree/tags) project.
+If you need clarification during this reading, you can reference the completed [BookSearch/tags](https://github.com/BrooklinJazz/book_search/tree/tags) project on the `tags` branch.
 
 Tags describe the type of book. For example we might have `"fiction"` or `"history"` tags.
 
@@ -87,9 +87,15 @@ The `"book_tags"` table stores a foreign key to both the book and the tag. We ca
 
 Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/BrooklinJazz/book_search/tree/books) project on the `books` branch.
 
+```
+$ git clone https://github.com/BrooklinJazz/book_search
+$ git checkout books
+```
+
 All tests should pass.
 
 ```
+$ mix deps.get
 $ mix test
 ```
 
@@ -112,6 +118,8 @@ Then add the `"/tags"` resource to our router.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# lib/book_search_web/router.ex
+
   scope "/", BookSearchWeb do
     pipe_through :browser
 
@@ -154,7 +162,7 @@ $ mix ecto.gen.migration create_book_tags
 ```
 
 Now we need to create our join table migration in the generated migration `priv/repo/migrations/_create_book_tags.exs` file.
-The `:book_tags` table should contain a reference to `:book_id` and `:tag_id`. We want to delete the association if the book or the tag are deleted. We also want to enforce that both the `:book_id` and `:tag_id` cannot be null.
+The `:book_tags` table should contain a reference to `:book_id` and `:tag_id`. We want to delete the association if the book or the tag are deleted. We also want to enforce that both the `:book_id` and `:tag_id` cannot be `null`.
 
 The `create unique_index(:book_tags, [:book_id, :tag_id])` ensures we don't associate a book with the same tag multiple times. Each association must be unique.
 
@@ -244,6 +252,8 @@ We can map over the tags to create the list of `{label, value}` tuples.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# lib/book_search_web/views/book_view.ex
+
 defmodule BookSearchWeb.BookView do
   use BookSearchWeb, :view
 
@@ -278,21 +288,21 @@ Add the following content to `priv/repo/seeds.exs`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-alias BookSearch.Tags
 alias BookSearch.Authors
 alias BookSearch.Books
+alias BookSearch.Tags
 
 if Mix.env() == :dev do
-  {:ok, author1} = BookSearch.Authors.create_author(%{name: "Patrick Rothfuss"})
-  {:ok, author2} = BookSearch.Authors.create_author(%{name: "Dennis E Taylor"})
+  {:ok, author1} = Authors.create_author(%{name: "Patrick Rothfuss"})
+  {:ok, author2} = Authors.create_author(%{name: "Dennis E Taylor"})
 
   ["fiction", "fantasy", "history", "sci-fi"]
   |> Enum.each(fn tag_name ->
-    BookSearch.Tags.create_tag(%{name: tag_name})
+    Tags.create_tag(%{name: tag_name})
   end)
 
-  BookSearch.Books.create_book(%{title: "Name of the Wind", author: author1})
-  BookSearch.Books.create_book(%{title: "We are Legend (We are Bob)", author: author2})
+  Books.create_book(%{title: "Name of the Wind", author: author1})
+  Books.create_book(%{title: "We are Legend (We are Bob)", author: author2})
 end
 ```
 
@@ -379,8 +389,8 @@ Now that we know we can send a list of tags, let's start writing a test for the 
 ```elixir
 # test/book_search/books_test.exs
 
-import BookSearch.BooksFixtures
 import BookSearch.AuthorsFixtures
+import BookSearch.BooksFixtures
 import BookSearch.TagsFixtures
 ```
 
@@ -420,11 +430,13 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-To let `Ecto` handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
+To let `Ecto` handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# lib/book_search/book.ex
+
 defmodule BookSearch.Books.Book do
   use Ecto.Schema
   import Ecto.Changeset
@@ -591,7 +603,7 @@ def show(conn, %{"id" => id, "author_id" => author_id}) do
 end
 ```
 
-To load associations from other tables, we can use [preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
+To load associations from other tables, we can use [Ecto.Query.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -601,7 +613,7 @@ To load associations from other tables, we can use [preload/3](https://hexdocs.p
 def get_book!(id), do: Book |> preload(:tags) |> Repo.get!(id)
 ```
 
-`preload/3` loads the associated `tags` table through the `book_tags` table to preload each associated `BookSearch.Tags.Tag` struct. Now we have access to `book.tags` and our test passes!
+`Ecto.Query.preload/3` loads the associated `tags` table through the `book_tags` table to preload each associated `BookSearch.Tags.Tag` struct. Now we have access to `book.tags` and our test passes!
 
 ```sh
 $ mix test
@@ -767,24 +779,24 @@ $ mix test test/book_search/books_test.exs:57
 ** (RuntimeError) you are attempting to change relation :tags of
      BookSearch.Books.Book but the `:on_replace` option of this relation
      is set to `:raise`.
-     
+
      By default it is not possible to replace or delete embeds and
      associations during `cast`. Therefore Ecto requires the parameters
      given to `cast` to have IDs matching the data currently associated
      to BookSearch.Books.Book. Failing to do so results in this error message.
-     
+
      If you want to replace data or automatically delete any data
      not sent to `cast`, please set the appropriate `:on_replace`
      option when defining the relation. The docs for `Ecto.Changeset`
      covers the supported options in the "Associations, embeds and on
      replace" section.
-     
+
      However, if you don't want to allow data to be replaced or
      deleted, only updated, make sure that:
-     
+
        * If you are attempting to update an existing entry, you
          are including the entry primary key (ID) in the data.
-     
+
        * If you have a relationship with many children, all children
          must be given on update.
 ```
@@ -966,7 +978,7 @@ However, this association isn't loaded when we retrieve the tag, so we encounter
 
 <!-- livebook:{"break_markdown":true} -->
 
-That's because while we've defined the [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) relationship for books, we have not defined this relationship for tags. So let's add this now.
+That's because while we've defined the [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) relationship for books, we have not defined this relationship for tags. So let's add this now.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -998,6 +1010,8 @@ Tags can also have many books through the same `book_tags` table.
 ```mermaid
 flowchart LR
 T1[Tag]
+T2[Tag]
+T3[Tag]
 BT[Book Tags]
 B1[Book]
 B2[Book]
@@ -1006,7 +1020,9 @@ B3[Book]
 B1 --> BT
 B2 --> BT
 B3 --> BT
-BT --> T1
+BT <-- T1
+BT <-- T2
+BT <-- T3
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -1068,7 +1084,7 @@ T1 --> B1 --> A1 --> n
 
 <!-- livebook:{"break_markdown":true} -->
 
-To resolve this, we can preload the author for each book by passing a keyword list to [preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
+To resolve this, we can preload the author for each book by passing a keyword list to [Ecto.Query.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1222,7 +1238,7 @@ def index(conn, %{"title" => title, "tags" => tag_ids}) do
 end
 ```
 
-We can search for tags by using [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) to join the tags table. Then check if the book has any tags whose id is in the list of tag ids.
+We can search for tags by using [Ecto.Query.join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) to join the tags table. Then check if the book has any tags whose id is in the list of tag ids.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -1280,7 +1296,7 @@ def index(conn, %{"title" => title} = params) do
 end
 ```
 
-The test still fails because of how we've written the query. For example, if tags is an empty list, then our [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) query is always false.
+The test still fails because of how we've written the query. For example, if tags is an empty list, then our [Ecto.Query.where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) query is always false.
 
 <!-- livebook:{"force_markdown":true} -->
 
