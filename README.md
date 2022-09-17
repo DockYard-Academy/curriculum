@@ -224,9 +224,9 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Week 6: Ecto Associations
 
 1. Testing Phoenix
-2. Phoenix and Ecto One to Many Relationships
-3. Phoenix and Ecto Many to Many Relationships
-4. Phoenix and Ecto One to One Relationships
+2. Phoenix and Ecto One-to-Many Relationships
+3. Phoenix and Ecto Many-to-Many Relationships
+4. Phoenix and Ecto One-to-One Relationships
 5. Tailwind
 
 ## Week 7: LiveView
