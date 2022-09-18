@@ -73,7 +73,13 @@ classDiagram
 ## Run Book Search Project
 
 Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/BrooklinJazz/book_search/tree/tags) project on the `tags` branch.
-If you get stuck at any point during this lesson, you can reference the existing [BookSearch/book_content](https://github.com/BrooklinJazz/book_search/tree/book_content) branch with the completed version of this project.
+
+```
+$ git clone https://github.com/BrooklinJazz/book_search
+$ git checkout tags
+```
+
+If you get stuck at any point during this lesson, you can reference the existing [BookSearch/book_content](https://github.com/BrooklinJazz/book_search/tree/book_content) project on the `book_content` branch with the completed version of this project.
 
 Before starting, all tests should pass.
 
@@ -157,7 +163,7 @@ end
 
 ## Book Schema
 
-We'll use [has_one/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_one/3) to define the relationship between books and book contents.
+We'll use [Ecto.Schema.has_one/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_one/3) to define the relationship between books and book contents.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -193,6 +199,8 @@ We want to create the associated book contents whenever we create a book. So let
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# test/book_search/books_test.exs
+
 test "create_book/1 with book content creates a book with book content" do
   author = author_fixture()
   valid_attrs = %{title: "some title", author: author, book_contents: %{content: "some content"}}
@@ -203,7 +211,7 @@ test "create_book/1 with book content creates a book with book content" do
 end
 ```
 
-We can use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create associations from parameters. [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful when managing associations with external data, such as parameters coming from a form.
+We can use [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create associations from parameters. [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful when managing associations with external data, such as parameters coming from a form.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -245,6 +253,8 @@ We need want to be able to update the associated book contents, so let's write o
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# test/book_search/books_test.exs
+
 test "update_book/2 with book content" do
   author = author_fixture()
   book = book_fixture(author: author, book_contents: %{content: "some content"})
@@ -277,6 +287,7 @@ Make it pass by casting the association.
 
 ```elixir
 # lib/book_search/books.ex
+
 def update_book(%Book{} = book, attrs) do
   {tags, attrs} = Map.pop(attrs, :tags, [])
 
@@ -295,17 +306,16 @@ For the sake of completeness, let's make a test for the controller as well that 
 ```elixir
 # test/book_search_web/controllers/book_controller_test.exs
 
-test "with book content", %{conn: conn, book: book} do
-  tag = tag_fixture(name: "Fantasy")
-  update_attrs = %{title: "Name of the Wind", }
+test "with book content", %{conn: conn} do
+  author = author_fixture()
+  create_attrs = %{title: "some title", tags: [], book_contents: %{content: "some content"}}
+  conn = post(conn, Routes.author_book_path(conn, :create, author), book: create_attrs)
 
-  conn =
-    put(conn, Routes.author_book_path(conn, :update, book.author_id, book), book: update_attrs)
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == Routes.author_book_path(conn, :show, author, id)
 
-  assert redirected_to(conn) == Routes.author_book_path(conn, :show, book.author_id, book)
-  conn = get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
-  
-  assert html_response(conn, 200) =~ tag.name
+  conn = get(conn, Routes.author_book_path(conn, :show, author, id))
+  assert html_response(conn, 200) =~ "some content"
 end
 ```
 
@@ -383,7 +393,7 @@ Parent --> Child
 }
 ```
 
-We've chosen to use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) in the `BookSearch` project for demonstration purposes. However, we could have used [put_assoc/4](https://hexdocs.pm/ecto/Ecto.html#put_assoc/4) instead.
+We've chosen to use [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) in the `BookSearch` project for demonstration purposes. However, we could have used [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) instead.
 
 For example, you can replace `create_book/1` with the following, and tests continue to pass.
 
@@ -411,10 +421,10 @@ end
 
 > Casts the given association with the changeset parameters.
 > This function should be used when working with the entire association at once (and not a single element of a many-style association) and receiving data external to the application.
-> 
-> * [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+>
+> * [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
 
-We use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) when we want to use parameters to create our association. (https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful for external data such as the parameters we receive from a form.
+We use [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) when we want to use parameters to create our association. [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is often useful for external data such as the parameters we receive from a form.
 
 ```mermaid
 flowchart LR
@@ -447,9 +457,9 @@ Params --> Association
 
 ## Book Contents Form Input
 
-We've already mentioned that [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is useful for params from a form, so let's add book contents to our existing book form.
+We've already mentioned that [Ecto.Changeset.cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) is useful for params from a form, so let's add book contents to our existing book form.
 
-We can use [inputs_for/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#inputs_for/4) to create inputs for an association.
+We can use [Phoenix.HTML.Form.inputs_for/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#inputs_for/4) to create inputs for an association.
 
 Modify the book form template file to include an input for book contents.
 
@@ -559,7 +569,7 @@ Add book contents to the book show page. We haven't enforced that a book must ha
     <% end %>
   </li>
 
-  <%= if @book.book_contents do %> 
+  <%= if @book.book_contents do %>
     <li>
       <strong>Content:</strong>
       <%= @book.book_contents.content %>
@@ -587,6 +597,8 @@ We'll also want to update book content when we update a book. So let's write a t
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# test/book_search/books_test.exs
+
 test "update_book/2 with book content" do
   author = author_fixture()
   book = book_fixture(author: author, book_contents: %{content: "some content"})
@@ -602,7 +614,7 @@ test "update_book/2 with book content" do
 end
 ```
 
-Now we need to create the `:book_contents` association using [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4).
+Now we need to create the `:book_contents` association using [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -721,9 +733,11 @@ The test already passes, but it's good to verify we can have books with lots of 
 Let's add a book with some large content to our seed file to manually test our application.
 
 ```elixir
-alias BookSearch.Tags
+# /priv/repo/seeds.exs
+
 alias BookSearch.Authors
 alias BookSearch.Books
+alias BookSearch.Tags
 
 if Mix.env() == :dev do
   {:ok, author1} = Authors.create_author(%{name: "Patrick Rothfuss"})
@@ -768,7 +782,7 @@ Now we can visit http://localhost:4000/author/1/books/1 and see our book content
 
 ### Your Turn
 
-In your seed file, change the size of `:content` in `:book_contents` to be significantly larger such as `100000..1000000` sentences. Do you experience any performance issues?
+In your seed file, change the size of `:content` in `:book_contents` to be significantly larger such as `100_000..1_000_000` sentences. Do you experience any performance issues?
 
 ## Commit Your Progress
 
