@@ -20,170 +20,163 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Card Counting
 
-Card counting is a strategy used in card games to determine if there are more high cards or low cards in the deck.
+We're going to build some logic for a card counting application. Card counting is a strategy used in card games to determine if there are more high cards or low cards in the deck.
 
-The most common strategy is the **Hi-Lo** strategy where we keep a running total based on the cards dealt. The higher the running total, the better the deck is for players.
+There are **13** numbered cards in a common deck of playing cards.
 
-Don't worry if you aren't familiar with cards. We'll break down the goal without needing to know the rules of card games!
+We'll use integers `1` to `13` to represent playing cards. Cards are either **low**, **normal**, or **high**.
 
-We'll use integers to represent cards from `1` to `13`.
+<!-- livebook:{"break_markdown":true} -->
 
-We either add 1, subtract 1, or do nothing based on the card's value.
-
-* When the card is between `1` and `6` we increment `(+1)` the count.
-* When the card is between `7` and `9` we do nothing.
-* When the card is between `10` and `13` we decrenent `(-1)` the count.
-
-### Card (4)
-
-When the current card is `4` and the current count is `0` what is the `next_count`?  
-Use arithmetic operators `+` or `-` with the `count` variable to set the `next_count`.  
-Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert next_count === 1","code":"card = 4\r\ncount = 0\r\n\r\nnext_count = nil","solution":"next_count = count + 1"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    card = 4
-    count = 0
-
-    next_count = nil
-    assert next_count === 1
-  end
+```mermaid
+flowchart LR
+subgraph low cards
+  direction LR
+  1 --- 2 --- 3 --- 4 --- 5 --- 6
 end
 
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-card = 4
-count = 0
-
-next_count = nil
-```
-
-### Card (7)
-
-When the current card is `7` and the current count is `3` what is the `next_count`?
-
-Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert next_count == count","code":"card = 7\r\ncount = 3\r\n\r\nnext_count = nil","solution":"next_count = count"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    card = 7
-    count = 3
-
-    next_count = nil
-    assert next_count == count
-  end
+subgraph Normal Cards
+  direction LR
+  7 --- 8 --- 9
 end
 
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-card = 7
-count = 3
-
-next_count = nil
-```
-
-### Card King (13)
-
-When the current card is a King `(13)` and the current count is `5` what is the `next_count`?  
-Use arithmetic operators `+` or `-` with the `count` variable to set the `next_count`.  
-Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert next_count === 4","code":"card = 13\r\ncount = 5\r\n\r\nnext_count = nil","solution":"next_count = count - 1"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    card = 13
-    count = 5
-
-    next_count = nil
-    assert next_count === 4
-  end
+subgraph High Cards
+  direction LR
+  10 --- 11 --- 12 --- 13
 end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-card = 13
-count = 5
-
-next_count = nil
 ```
 
-### Random Card and Count (BONUS)
+<!-- livebook:{"break_markdown":true} -->
 
-Now the `card` is a random card between `2` and `14`, and the current `count` is a random number between `1` and `10`.
+In order to track if there are more high cards left in the deck, or low cards left in the deck, you'll track a running count starting at `0`.
 
-* `Enum.random(2..14)` generates a `card` between `2` and `14`.
-* `Enum.random(1..10)` generates a `count` between `2` and `14`.
+* When dealt a **low** card decrease the count by `1`.
+* When dealt a **high** card increase the count by `1`.
+* When dealth a **normal** card do nothing.
 
-Based on the value of `random_card` and `count`, what is the `next_count`?
-Use arithmetic operators `+` or `-` with the `count` variable to set the `next_count`.
+## Bind Card Counts
 
-Replace `nil` with your answer.
+Bind integers `low`, `normal`, and `high` to track the amount to increase or decrease the current count by. You will use these variables in further exercises.
 
-<details>
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Hint</summary>
-There are multiple possible solutions. You might consider:
 
-1. comparison operators `card <= 6 && count + 1 || card >= 10 && count - 1 || count`
-2. Use control flow such as `cond` or `case`.
+```elixir
+low = -1
+normal = 0
+high = 1
+```
+
 </details>
 
-<!-- livebook:{"attrs":{"assertions":"cond do\n  card in 2..6 -> assert next_count === count + 1\n  card  in 7..9 -> assert next_count === count\n  card in 10..14 -> assert next_count === count - 1\n  true -> raise \"Something went wrong. Please reset the exercise.\"\nend","code":"card = Enum.random(2..14)\r\ncount = Enum.random(1..10)\r\n\r\nnext_count = nil","solution":"next_count = \n  cond do\n    card in 2..6 -> count + 1\n    card in 7..9 -> count\n    card in 10..14 -> count - 1\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
+```
 
-  test "" do
-    card = Enum.random(2..14)
-    count = Enum.random(1..10)
+## High Card
 
-    next_count = nil
+The initial count is `0`. You have been dealt one **high** card. Use arithmetic operators and the bound variables above to determine the new count.
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+initial_count = 0
+initial_count + high
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Low Card
+
+The initial count is `0`. You have been dealt one **low** card. Use arithmetic operators and the bound variables above to determine the new count.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+initial_count = 0
+initial_count + low
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Multiple Cards
+
+The initial count is `5`. You have been dealt five **high** cards, two **low** cards, and two **normal** cards. Use arithmetic operators and the bound variables above to determine the new count.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+initial_count = 5
+initial_count + high * 5 + low * 2 + normal * 2
+```
+
+You could omit the **normal** cards or allow **high** and **low** cards to balance each other, however if the increment/decrement value changes then your code would break.
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Bonus: Determining Card Values
+
+You are dealt three cards of a random value between `1` and `13`. You can use [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to generate a random number.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+random_card = Enum.random(1..13)
+```
+
+Generate three random cards, use the values of the three randomly generated cards to determine the current count given the initial count is `0`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+random_card1 = Enum.random(1..13)
+random_card2 = Enum.random(1..13)
+random_card3 = Enum.random(1..13)
+
+cards =
+  Enum.map([random_card1, random_card2, random_card3], fn random_card ->
     cond do
-      card in 2..6 -> assert next_count === count + 1
-      card in 7..9 -> assert next_count === count
-      card in 10..14 -> assert next_count === count - 1
-      true -> raise "Something went wrong. Please reset the exercise."
+      random_card <= 6 -> low
+      random_card >= 10 -> high
+      true -> normal
     end
-  end
-end
+  end)
 
-ExUnit.run()
+Enum.sum(cards)
+```
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-card = Enum.random(2..14)
-count = Enum.random(1..10)
+You could omit the **normal** cards or allow **high** and **low** cards to balance each other, however if the increment/decrement value changes then your code would break.
 
-next_count = nil
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Commit Your Progress

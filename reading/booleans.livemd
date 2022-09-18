@@ -5,6 +5,7 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:visual, github: "brooklinjazz/visual"},
   {:utils, path: "#{__DIR__}/../utils"}
 ])
 ```
@@ -30,12 +31,10 @@ true
 false
 ```
 
-As part of programming, you'll often create branching paths. Essentially there are multiple things
-that could happen depending on certain conditions.
+As part of programming, you'll often create branching paths. Essentially there are multiple things that could happen depending on certain conditions. We often call this **control flow**.
 
 Let's take an example and say we have a program that controls a light.
-Either we can tell the light to power `on` or power `off`. In this case, `on` would be `true` and
-`off` would be `false`.
+Either we can tell the light to power `on` or power `off`. In this case, `on` would be `true` and `off` would be `false`.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -49,25 +48,31 @@ flowchart LR
 
 ### Your Turn
 
-In the Elixir cell below, turn the power on in our light control program to see the light turn on!
+In the Elixir cell below, turn the power on in our light control program to see the light turn on! Replace `false` with `true`.
 
-Replace `false` with `true`.
+<!-- livebook:{"attrs":{"code":"power = false","source":"content = if power, do: \"/images/on.png\", else: \"/images/off.png\"\nKino.Image.new(File.read!(__DIR__ <> content), :png)","title":"Power on!"},"kind":"Elixir.Visual","livebook_object":"smart_cell"} -->
 
 ```elixir
-is_powered = false
+power = false
+content = if power, do: "/images/on.png", else: "/images/off.png"
+Kino.Image.new(File.read!(__DIR__ <> content), :png)
+```
 
-Utils.visual(:light_control, is_powered)
+For more on booleans consider this video by Crash Course Computer Science.
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=gI-qXk7XojA")
 ```
 
 ## Boolean Operators
 
-**Boolean operators** allow you to compare booleans and return a boolean based on the comparison.
-
-The boolean operators are `and`, `or`, and `not`.
-
-* `and` checks if two booleans are true
+Using the **boolean operators** `and`, `or` and `not` we can compare and manipulate booleans.
 
 <!-- livebook:{"break_markdown":true} -->
+
+### `and`: Check If Two Booleans Are `true`.
+
+Returns `true` if left and right-hand side are true. Returns `false` if either the left side and/or right side of the operator are `false`.
 
 ```mermaid
   flowchart LR
@@ -76,9 +81,25 @@ The boolean operators are `and`, `or`, and `not`.
   C[and] --> D[true]
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+```elixir
+true and true
+```
 
-* `or` checks if one or more booleans are true
+```elixir
+true and false
+```
+
+```elixir
+false and true
+```
+
+```elixir
+false and false
+```
+
+### `or`: Check If One Or More Booleans Are True.
+
+Returns `true` if either the left side or the right side of the operator are `true`.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -89,19 +110,117 @@ The boolean operators are `and`, `or`, and `not`.
   C[or] --> D[true]
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-* `not` flips the value of a boolean.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-  flowchart LR
-  not --> false --> true
-  a[not] --> b[true] --> c[false]
+```elixir
+true or true
 ```
 
+```elixir
+true or false
+```
+
+```elixir
+false or true
+```
+
+```elixir
+false or false
+```
+
+### `not`: Flip A Booleans Value
+
+Flips `false` -> `true` and `true` -> `false`.
+
+```elixir
+not true
+```
+
+```elixir
+not false
+```
+
+## Strict and Non-Strict Operators
+
+`and`, `or`, and `not` are strict boolean operators, meaning they should only be used with booleans, otherwise they will raise an error.
+
+```elixir
+1 and 1
+```
+
+Sometimes we want to make logical comparison using **truthy** and **falsy** values. `nil` and `false` are falsy values, and every thing else is a truthy value.
+
+We can use non-strict boolean operators `&&` (and), `||` (or), and `!` (not) to work with truthy and falsy values.
+
 <!-- livebook:{"break_markdown":true} -->
+
+### `&&` Check If Two Values Are Truthy.
+
+Returns the right-hand side value if the left-hand side value is truthy.
+
+```elixir
+1 && 2
+```
+
+Returns the left-hand side value if it is falsy.
+
+```elixir
+nil && 2
+```
+
+```elixir
+false && 2
+```
+
+### `||` Checks If One Or More Values Are Truthy.
+
+Returns the first truthy value on either the left-hand side or the right-hand side.
+
+```elixir
+2 || nil
+```
+
+```elixir
+1 || 2
+```
+
+```elixir
+nil || 2
+```
+
+### `!`: Flips the Falsy Or Truthy Value to `true` Or `false`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Flips truthy -> `false` and falsy -> `true`.
+
+```elixir
+!1
+```
+
+```elixir
+!nil
+```
+
+## When Should You Use Strict Or Non-strict Operators?
+
+You might wonder why you shouldn't simply always use non-strict operators `&&`, `||`, and `!` since they also work with booleans.
+
+```elixir
+true && true
+```
+
+```elixir
+false || true
+```
+
+```elixir
+!true
+```
+
+The primary reason is communication. We want our code to communicate to other developers, so it's useful to use `and`, `or`, and `not` to communicate to other developers reading our code that we are working with boolean values.
+
+Generally, prefer `and`, `or`, and `not` with booleans, and use `&&`, `||`, and `!` with non-boolean values.
+
+## Control Flow
 
 By comparing booleans, you can create branching paths in your code depending on certain conditions.
 
@@ -109,7 +228,7 @@ For example, let's say we're building a weather app. This app might send morning
 to let them know that it's going to be a sunny day.
 
 You might check that the user **is subscribed**, that it **is morning**, and that it
-**is sunny**.
+**is sunny**. If all of these things are true, then we want to send a notification.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -126,203 +245,53 @@ flowchart LR
 
 <!-- livebook:{"break_markdown":true} -->
 
-Converted into Elixir pseudo code that might look like this:
-
-<!-- livebook:{"force_markdown":true} -->
+We can cleverly use boolean operators to write this logic. Try changing any of the `true` values to `false` and you'll see we no longer simulate sending a notification.
 
 ```elixir
-is_morning and is_sunny and is_subscribed
+is_subscribed = true
+is_morning = true
+is_sunny = true
+
+is_subscribed and is_morning and is_sunny && "send notification!"
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+### `if`
 
-### Your Turn `and`
-
-In the Elixir cell below, compare `true and true`.
+Rather than rely on boolean operators entirely, it's more common to use specific control flow structures. For example, we can replicate the code above using [if](https://elixir-lang.org/getting-started/case-cond-and-if.html#if-and-unless) statements.
 
 ```elixir
-
+if is_subscribed and is_morning and is_sunny do
+  "send notification"
+end
 ```
 
-Compare `true and false`.
+### `else`
 
-```elixir
+`if` statements allow use to trigger some code when some condition is truthy. We often use `if` statements in combination with `else` statements to create two separate branching paths in our code.
 
-```
-
-Compare `false and false`.
-
-```elixir
-
-```
-
-### Your Turn `or`
-
-In the Elixir cell below, compare `false or true`.
-
-```elixir
-
-```
-
-Compare `true or true`.
-
-```elixir
-
-```
-
-Compare `false or false`.
-
-```elixir
-
-```
-
-### Your Turn `not`
-
-<!-- livebook:{"break_markdown":true} -->
-
-In the Elixir cell below, evaluate `not true`.
-
-```elixir
-
-```
-
-Evaluate `not false`.
-
-```elixir
-
-```
-
-### Combining Boolean Operators
-
-You can use `not`, `and`, and `or` in combination.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-In the Elixir cell below, compare `true and not false`
+For example, let's say we're creating a coin flip game. The user provides a `guess` of `:heads` or `:tails`, and we have `coin` flip of `:heads` or `:tails`.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
-  1[true] --> 2[and]
-  3[not false] --> 4[true]
-  4 --> 2
-  2 --> 5[true]
-```
-
-```elixir
-
-```
-
-Compare `false or not true`
-
-```elixir
-
-```
-
-## Truthy and Falsy
-
-Sometimes it can be helpful to check a value exists rather than checking a boolean is true. A value is **truthy** if it exists and **falsy** if it does not.
-
-`nil` and `false` are **falsy** because we treat them as `false` for the sake of comparison. All other values are **truthy** because we treat them as `true` for the sake of comparison.
-
-`and`, `or`, and `not` will not work on non-boolean values. Instead, you can use
-`&&`, `||`, and `!`.
-
-* The **and** `&&` operator checks if two values are truthy and returns the right-hand truthy value.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-  flowchart LR
-  truthy1 --> op["and (&&)"]
-  truthy2 --> op
-  op --> a[truthy2]
+if/else --> c[coin == guess] --true--> w[You win!]
+c --false--> l[You lose!]
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-* The **or** `||` operator checks if one value is truthy and returns the first truthy value.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-  flowchart LR
-  truthy1 --> op["or (||)"]
-  falsy1 --> op
-  op --> a[truthy1]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-* The **not** flips a **falsy** value to `true` and a **truthy** value to `false`.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-  flowchart LR
-  not --> truthy --> false
-  a[not] --> falsy --> b[true]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-While `&&`, `||`, and `!` work with booleans, it's conventional to use `and`, `or`, and `not`
-for booleans, and `&&`, `||`, and `!` when you expect non-boolean values.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-In the Elixir cell below, compare `7 && 8`
+Here's how we could write this in code. Try changing `guess` to `:heads` to win the coin flip game.
 
 ```elixir
+coin = :heads
+guess = :tails
 
-```
-
-Compare `7 || 8`.
-
-```elixir
-
-```
-
-Compare `nil || 10`.
-
-```elixir
-
-```
-
-Compare `true && 20`.
-
-```elixir
-
-```
-
-Compare `10 || "hello"`.
-
-```elixir
-
-```
-
-Evaluate `!20`.
-
-```elixir
-
-```
-
-Evaluate `!nil`.
-
-```elixir
-
-```
-
-Evaluate `!!30`. Notice that you can use this to convert a truthy to `true` and a falsy to `false`.
-This is useful if you ever need to convert some non-boolean data into a boolean.
-
-```elixir
-
+if coin == guess do
+  "You win!"
+else
+  "You lose!"
+end
 ```
 
 ## Commit Your Progress

@@ -16,97 +16,110 @@ Mix.install([
 
 ## Guess the Word
 
-In the Elixir cell below create a word guessing game.
+Create a word guessing game. Manually bind a `guess` and an `answer`. Return `"Correct"` if the guess is equal to the answer, and otherwise return `"Incorrect."`
 
-* Bind a variable `guess` to the player's guess as a string.
-* Bind a variable `answer` to the actual answer as a string.
-* Check that the `guess` matches the answer. Bind `correct` to `"Correct!"`
-  if the answer and guess match or `"Incorrect."` if they don't.
+Ensure your solutions works for both an incorrect and correct player guess.
 
-Run the code with a correct and incorrect `guess` to ensure
-your code passes the tests.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Possible Solution</summary>
 
-<!-- livebook:{"attrs":{"assertions":"assert Enum.all?([guess, answer, correct], &is_binary/1),\n  \"Ensure `guess`, `answer`, and `correct` are all strings\"\n\nif guess == answer do\n  assert correct == \"Correct!\"\nelse\n  assert correct == \"Incorrect.\"\nend","code":"guess = nil\r\nanswer = nil\r\n\r\ncorrect = nil","solution":"correct = if guess == answer, do: \"Correct!\", else: \"Incorrect.\""},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+  ```elixir
+  guess = "hello"
+  answer = "hello"
+
+  guess == answer && "Correct!" || "Incorrect."
+  ```
+
+</details>
+
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    guess = nil
-    answer = nil
-
-    correct = nil
-
-    assert Enum.all?([guess, answer, correct], &is_binary/1),
-           "Ensure `guess`, `answer`, and `correct` are all strings"
-
-    if guess == answer do
-      assert correct == "Correct!"
-    else
-      assert correct == "Incorrect."
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-guess = nil
-answer = nil
-
-correct = nil
 ```
 
-## Guess the Number
+## Bonus: Guess the Random Word
 
-In the Elixir cell below create a number guessing game.
-
-* Bind a variable `guess` to the player's guess as an integer.
-* Bind a variable `answer` to the actual answer as an integer.
-* If `guess` equals `answer` bind `correct` to `"Correct!"`
-* If `guess` is less than `answer` bind `correct` to `"Too low!"`
-* If `guess` is greater than `answer` bind `correct` to `"Too high!"`
-
-Run your code with an equal, smaller, and larger `guess` than the `answer` to ensure your
-code passes all tests.
-
-<!-- livebook:{"attrs":{"assertions":"assert is_integer(guess), \"Ensure `guess` is an integer\"\nassert is_integer(answer), \"Ensure `answer` is an integer\"\nassert is_binary(correct), \"Ensure `correct` is a string\"\n\ncond do\n  guess == answer -> assert correct == \"Correct!\"\n  guess < answer -> assert correct == \"Too low!\"\n  guess > answer -> assert correct == \"Too high!\"\nend","code":"guess = nil\r\nanswer = nil\r\n\r\ncorrect = nil","solution":"correct =\n  cond do\n    guess == answer -> \"Correct!\"\n    guess < answer -> \"Too low!\"\n    guess > answer -> \"Too high!\"\n  end"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+We can use [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to pick a random value from a list.
 
 ```elixir
-ExUnit.start(auto_run: false)
+Enum.random(["hello", "hi", "howdy"])
+```
 
-defmodule Assertion do
-  use ExUnit.Case
+Armed with this knowledge, you're going to create a word guessing game.
 
-  test "" do
-    guess = nil
-    answer = nil
+* Bind a variable `guess` to the player's guess as a string.
+* Bind a variable `answer` to a random word (you may create a list of random words to choose from)
+* If the `guess` matches the answer, return `"Correct!"`, otherwise return `"Incorrect."`.
 
-    correct = nil
-    assert is_integer(guess), "Ensure `guess` is an integer"
-    assert is_integer(answer), "Ensure `answer` is an integer"
-    assert is_binary(correct), "Ensure `correct` is a string"
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Possible Solution</summary>
 
-    cond do
-      guess == answer -> assert correct == "Correct!"
-      guess < answer -> assert correct == "Too low!"
-      guess > answer -> assert correct == "Too high!"
-    end
+  ```elixir
+  guess = "hello"
+  answer = Enum.random(["hello", "hi", "howdy"])
+
+  guess == answer && "Correct!" || "Incorrect."
+  ```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Bonus: Guess the Number
+
+We can generate a random integer between two values by providing a range to [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1).
+
+```elixir
+Enum.random(1..10)
+```
+
+Now let's build a number guessing game
+
+* Bind a variable `answer` to a random integer between `1` and `10`.
+* Bind a variable `guess` to the player's guess.
+* If the `guess` equals `answer`, return `"Correct!"`.
+* If the `guess` is lower than the answer, return `"Too low!"`.
+* If the `guess` is higher than the answer, return `"Too high!"`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Possible Solution</summary>
+
+
+  `cond` allows us to handle several different conditions.
+
+  ```elixir
+  guess = Enum.random(1..10)
+  answer = 7
+
+  cond do
+    guess == answer -> "Correct!"
+    guess < answer -> "Too low!"
+    guess > answer -> "Too high!"
   end
-end
+  ```
 
-ExUnit.run()
+  However, we can also solve this problem using purely boolean operators.
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-guess = nil
-answer = nil
+  ```elixir
+  guess = Enum.random(1..10)
+  answer = 7
 
-correct = nil
+  guess == answer && "Correct" || guess < answer && "Too low!" || guess > answer && "Too high!"
+  ```
+
+  We can optionally simplify the solution by omitting the last condition. However, this could lead to unhandled bugs.
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Commit Your Progress

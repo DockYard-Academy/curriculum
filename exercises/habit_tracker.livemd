@@ -20,9 +20,13 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Habit Tracker
 
-We are building a habit tracking app.
+You are going to build some logic for a habit tracking app. Habit tracking apps such as [Habitica](https://habitica.com/) help users developer healthy habits.
 
-Each task has been assigned a different point value. Users earn points based on the tasks they complete and track progress on daily goals.
+Each habit is assigned a size such as small, medium, or large. Each size is assigned a different point value. Users earn points based on the habits they complete.
+
+* A large habit is worth 30 points
+* A medium habit is worth 20 points
+* A small habit is worth 5 points.
 
 ```mermaid
 flowchart
@@ -31,208 +35,138 @@ flowchart
   C["Small (5 points)"]
 ```
 
-### Define Tasks
+## Bind Habit Variables
 
-Bind a variable `small`, `medium`, and `large` to represent the point value as an integer (see above) for each task.
+Bind a variable `small`, `medium`, and `large` to represent the point value as an integer (see above) for each habit. You will use these variables in further solutions.
 
-Replace `nil` with your answers.
-
-<!-- livebook:{"attrs":{"assertions":"assert small == 5\nassert medium == 20\nassert large == 30","code":"small = nil\r\nmedium = nil\r\nlarge = nil","solution":"small = 5\nmedium = 20\nlarge = 30"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    small = nil
-    medium = nil
-    large = nil
-    assert small == 5
-    assert medium == 20
-    assert large == 30
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-small = nil
-medium = nil
-large = nil
-```
-
-### Add Tasks
-
-Given a user has completed a small and medium task, how many points do the have?
-
-Use the `small` and `medium` variables to calculate your answer.
-
-Replace `nil` with your answer below.
-
-<!-- livebook:{"attrs":{"assertions":"assert total_points == 20 + 5","code":"total_points = nil","solution":"total_points = small + medium"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    total_points = nil
-    assert total_points == 20 + 5
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-total_points = nil
+large = 30
+medium = 20
+small = 5
 ```
 
-### Point Goal Percentages
+</details>
 
-Users define a number of points they would like to earn each day.
-
-What percentage progress have they made if they would like to earn `40` points and have
-completed a `small` and a `medium` task?
-
-Remember that you can calculate percentage with $\frac{points}{point\ goal} * 100$
-
-Replace `nil` with your answer below.
-
-<!-- livebook:{"attrs":{"assertions":"assert percentage == (5 + 20) / 40 * 100","code":"point_goal = 40\r\n\r\npercentage = nil","solution":"percentage = (small + medium) / point_goal * 100"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    point_goal = 40
-
-    percentage = nil
-    assert percentage == (5 + 20) / 40 * 100
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-point_goal = 40
-
-percentage = nil
 ```
 
-### New Feature Added - Penalties
+## Small, Medium, Large
 
-A new feature is added. Users now must complete tasks within a time limit or receive a penalty.
+Given a user has completed one small habit, one medium habit, and one large habit, use arithmetic operators and your previously bound variables `small`, `medium`, and `large` to determine how many points they have in total.
 
-Late tasks earn `50%` their normal value. So a task worth `10` points is now worth `5` when late.
+```mermaid
+flowchart LR
+  A["Large (30 points)"]
+  B["Medium (20 points)"]
+  C["Small (5 points)"]
+  T[total?]
+  A --+--> B
+  B --+--> C
+  C --+--> T
+```
 
-A user has completed
-
-* a medium task
-* a small task
-* a late large task
-
-What is their total point score? Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert total_points == 5 + 20 + 30 * 0.5","code":"total_points = nil","solution":"total_points = small + medium + large * 0.5"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    total_points = nil
-    assert total_points == 5 + 20 + 30 * 0.5
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-total_points = nil
+small + medium + large
 ```
 
-A user has completed
+</details>
 
-* three late `medium` tasks
-* three late `small` tasks.
-
-What is their total point score? Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert total_points == 5 / 2 * 3 + 20 / 2 * 3","code":"total_points = nil","solution":"total_points = small / 2 * 3 + medium / 2 * 3"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+Enter your answer in the code cell below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    total_points = nil
-    assert total_points == 5 / 2 * 3 + 20 / 2 * 3
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-total_points = nil
 ```
 
-### New Feature Added - Rewards
+## Multiples
 
-<!-- livebook:{"break_markdown":true} -->
+Given a user has completed **ten small** habits, **five medium** habits, and **three large** habits, use arithmetic operators to determine how many points they have in total.
 
-A new feature is added. Users now must complete tasks within a time limit or receive a penalty.
-
-Early tasks earn an additional `60%` of their normal value. So a task worth `10` points is now worth `16` when early.
-
-A user has completed:
-
-* one early medium task
-* one early small
-* one late large task
-
-What is their total point score? Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5","code":"total_points = nil","solution":"total_points = medium * 1.6 + small * 1.6 + large * 0.5"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem;">
+<summary>Hint</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    total_points = nil
-    assert total_points == 20 * 1.6 + 5 * 1.6 + 30 * 0.5
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-total_points = nil
+small * 10 + medium * 5 + large * 3
 ```
 
-### (BONUS): Add Your Own Feature
+</details>
+
+Enter your answer below.
+
+```elixir
+
+```
+
+## Progress Bar
+
+Users define a a `goal` number of points to earn each day. Determine what percentage progress have they made if they would like to earn `40` points and have completed a `small` and a `medium` habit.
+
+Remember that you can calculate percentage with $\frac{points}{goal} * 100$
+
+<details style="background-color: lightgreen; padding: 1rem;">
+<summary>Hint</summary>
+
+```elixir
+goal = 40
+(small + medium) / goal
+```
+
+Or you might consider binding `points` as a variable.
+
+
+```elixir
+goal = 40
+points = small + medium 
+points / goal
+```
+
+</details>
+
+Enter your answer below.
+
+```elixir
+
+```
+
+## Penalties and Rewards
+
+To motivate users to complete their habits quickly, we add a time-limit feature where users will receive a `60%` point bonus if they complete their habit early, and a `50%` point penalty if they complete their habit late.
+
+Determine the users total point score when they complete:
+
+* three early small habits
+* two normal medium habits
+* two late large habits
+
+<details style="background-color: lightgreen; padding: 1rem;">
+<summary>Hint</summary>
+
+```elixir
+goal = 40
+
+small * 1.6 * 3 + medium * 2 + large * 2 * 0.5
+```
+
+</details>
+
+Enter your answer below.
+
+```elixir
+
+```
+
+## Bonus: Add Your Own Feature
 
 Add your own feature to the habit tracking app. Use comments to describe your feature and show
-how it would affect calculating the total score and or the total percentage of completed tasks.
+how it would affect calculating the total score and/or the total percentage of completed habits.
 
 ```elixir
 
