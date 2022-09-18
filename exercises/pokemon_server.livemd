@@ -22,177 +22,192 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 You're going to create a pokemon battle game with persistence.
 
-Pokemon will each be their own process storing the stats of a pokemon.
+Each Pokemon will be a `GenServer` process storing the pokemon's stats in state.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-PK[Pokemon]
-PS[PokemonServer]
-PS --> PK
-PK --> name[name: charmander]
-PK --> type[type: fire]
-PK --> hp[health: 20]
-PK --> at[attack: 5]
+classDiagram
+ class Pokemon {
+  health: 20
+  attack: 5
+  type: :fire
+  name: "charmander"
+ }
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-Pokemon can attack each other. An attack should update the `Pokemon`'s health in the `PokemonServer`'s state.
+Pokemon can attack each other. An attack should update the `Pokemon`'s health in the `GenServer`'s state.
 
-```mermaid
-flowchart
-PK1[Pokemon]
-PK2[Pokemon]
-PS1[PokemonServer]
-PS2[PokemonServer]
+## Create Pokemon Server
 
-PS1 --> PK1
-PS2 --> PK2
-PS1 --attack--> PS2
-PK2 --> hp[health: 10]
-```
-
-## Define A Pokemon Struct
-
-In the Elixir cell below, define a `Pokemon` struct. Use `Ecto.Changeset`
-to validate the struct fields and ensure that:
+Create a `Pokemon` module which will be a `GenServer` and a struct definition. It should store the following in values in state.
 
 * `:name` will be a string.
 * `:type` will be an atom of either `:grass`, `:water`, or `:fire`
-* `:health` will be an integer `0` or greater with a default value of `20`
-* `:attack` will be an integer `1` or greater with a default value of `5`
+* `:health` will be an integer with a default value of `20`
+* `:attack` will be an integer with a default value of `5`
 
-We should be able to create a new pokemon like so:
-
-<!-- livebook:{"break_markdown":true} -->
+You should be able to create a `Pokemon` struct.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Using default values
-{:ok, %Pokemon{name: "charmander", type: "fire", health: 20, attack: 20}} =
-Pokemon.new(%{name: "charmander", type: "fire"})
-
-# Or manually setting all values
-{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 30, attack: 2})
+%Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5}
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-And we should get an error if we enter invalid input.
-
-<!-- livebook:{"break_markdown":true} -->
+`Pokemon` `GenServer`s should be able to attack one another. This should subtract one pokemon's `:attack` from the other pokemon's `:health`, and update the value in the state of the `GenServer`. A pokemon's health should not be able to fall below `0`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Pokemon.new(%{name: 1, type: "fire"})
-{:error, changeset} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 30, attack: 2})
+attacker = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass})
+defender = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass})
+
+Pokemon.attack(attacker, defender)
+
+%Pokemon{name: "Bulbasaur1", type: :grass, health: 15, attack: 20} = :sys.get_state(defender)
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-Pokemon should be able to `attack/2` other pokemon. Take type advantage into consideration.
-see [Pokemon Battle](pokemon_battle.livemd) for a reminder on type advantages.
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 20})
-{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 100})
-
-Pokemon.attack(charmander, bulbasaur)
-%Pokemon{name: "bulbasaur", type: "water", damage: 5, health: 90}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Pokemon health should not fall below 0.
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 110})
-{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "fire", health: 100})
-
-Pokemon.attack(charmander, bulbasaur)
-%Pokemon{name: "charmader", type: "fire", damage: 5, health: 0}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Solution
-
-Enter your solution in the Elixir cell below.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Possible Solution</summary>
 
 ```elixir
 defmodule Pokemon do
+  use GenServer
+  @enforce_keys [:name, :type]
+  defstruct @enforce_keys ++ [health: 20, attack: 5]
+
+  def start_link(opts \\ []) do
+    {pokemon, opts} = Keyword.pop!(opts, :pokemon)
+    GenServer.start_link(__MODULE__, pokemon, opts)
+  end
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  def attack(attacker, defender) do
+    attacker_type = Pokemon.get(attacker, :type)
+    defender_type = Pokemon.get(defender, :type)
+    damage_amount = Pokemon.get(attacker, :attack) * multiplier(attacker_type, defender_type)
+    GenServer.call(defender, {:apply_damage, damage_amount})
+  end
+
+  def multiplier(attacker_type, defender_type) do
+    case {attacker_type, defender_type} do
+      {:fire, :grass} -> 2
+      {:grass, :water} -> 2
+      {:water, :fire} -> 2
+      {:fire, :water} -> 0.5
+      {:grass, :fire} -> 0.5
+      {:water, :grass} -> 0.5
+      _ -> 1
+    end
+  end
+
+  def get(pokemon, key) do
+    GenServer.call(pokemon, {:get, key})
+  end
+
+  def handle_call({:get, key}, _from, pokemon) do
+    {:reply, Map.get(pokemon, key), pokemon}
+  end
+
+  @impl true
+  def handle_call({:apply_damage, amount}, _from, pokemon) do
+    updated_pokemon = Map.update!(pokemon, :health, fn health -> max(health - amount, 0) end)
+    {:reply, updated_pokemon, updated_pokemon}
+  end
 end
 ```
 
-## Create A Pokemon Genserver
+</details>
 
-In the Elixir cell below, create a `PokemonServer` Genserver which should store a `Pokemon` struct in it's state.
-
-We should be able to `start/1` a new pokemon server.
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
+Enter your solution below.
 
 ```elixir
-{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire"})
+defmodule Pokemon do
+  @moduledoc """
+  Pokemon Server
+  
+  Defines a Pokemon GenServer and struct.
+  
+  ## Examples
+  
+    iex> %Pokemon{name: "Charmander", type: :fire}
+    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5}
+  """
+  use GenServer
 
-charmander_server = PokemonServer.start(charmander)
-```
+  @doc """
+  Start the Pokemon GenServer.
+  
+  ## Examples
+      iex> {:ok, pokemon} = Pokemon.start_link([pokemon: %Pokemon{name: "Charmander", type: :fire}])
+  """
+  def start_link(opts \\ []) do
+  end
 
-<!-- livebook:{"break_markdown":true} -->
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
 
-We should be able to retrieve current stats of the Pokemon.
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-PokemonServer.stats(charmander_server)
-%Pokemon{name: "charmander", type: "fire", health: 20, damage: 5}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-We should be able to attack another pokemon.
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, charmander} = Pokemon.new(%{name: "charmander", type: "fire", damage: 20})
-{:ok, bulbasaur} = Pokemon.new(%{name: "bulbasaur", type: "water", health: 100})
-
-charmander_server = PokemonServer.start(charmander)
-bulbasaur_server = PokemonServer.start(charmander)
-PokemonServer.attack(charmander, bulbasaur)
-
-PokemonServer.stats(bulbasaur_server)
-%Pokemon{name: "bulbasaur", type: "water", damage: 5, health: 90}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Solution
-
-Enter your answer in the Elixir cell below.
-
-```elixir
-defmodule PokemonServer do
+  @doc """
+  Apply the attacker's attack damage to the defender's health.
+  
+  ## Examples
+  
+    With default values.
+    iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass})
+    iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass})
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 15, attack: 5}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 10, attack: 5}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 5, attack: 5}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
+  
+    Ensure you use the attacking pokemon's attack number to apply damage to the defending pokemon's health.
+  
+    iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass, attack: 20})
+    iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass, health: 45})
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Bulbasaur2", type: :grass, health: 25, attack: 5}
+  """
+  def attack(attacker, defender) do
+  end
 end
 ```
+
+```elixir
+
+```
+
+### Bonus: Type Advantages and Weaknesses
+
+Multiply the damage dealt by an attack by `2` if the attacker has a type advantage. Multiply the damage applied by `0.5` if the attacker has a type weakness.
+
+Type Advantages are:
+
+* fire -> grass
+* grass -> water
+* water -> fire
+
+Type weaknesses are:
+
+* fire -> water
+* grass -> fire
+* water -> grass
+
+Modify your solution above to complete this bonus section.
 
 ## Commit Your Progress
 
