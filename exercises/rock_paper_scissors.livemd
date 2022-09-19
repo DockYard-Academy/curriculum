@@ -20,132 +20,139 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Create the Perfect AI
 
-In the Elixir cell below, you're going to create the perfect AI for rock paper scissors.
+You're going to create the perfect AI for rock paper scissors that will always win.
 
 ```mermaid
 flowchart LR
 scissors --beats--> paper --beats--> rock --beats--> scissors
 ```
 
-You are **only** allowed to use boolean operators `&&`, `==`, and `||` and the match operator `=`.
+The player will enter a `player_choice` of `:rock`, `:paper`, or `:scissors`. Then the AI program will return the answwer that beats the player choice.
 
-Remember that you can conditionally return a value with:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-player_choice = :rock
-
-ai_choice = player_choice == :rock && :paper
-```
+So if the player chooses `:rock`, the program should return `:paper`.
 
 Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determining the winning
 `ai_choice`.
 
-Replace `nil` with your answer. Change `player_choice` to `:rock`, `:paper`, and `:scissors` to ensure
-your solution works correctly.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Hint</summary>
 
-<!-- livebook:{"attrs":{"assertions":"case player_choice do\n  :rock ->\n    assert ai_choice === :paper,\n      \"when player_choice is :rock, ai_choice should be :paper.\"\n\n  :paper ->\n    assert ai_choice === :scissors,\n      \"when player_choice is :paper, ai_choice should be :scissors.\"\n\n  :scissors ->\n    assert ai_choice === :rock,\n      \"when player_choice is :scissors, ai_choice should be :rock.\"\nend","code":"player_choice = :rock\r\n\r\nai_choice = nil","solution":"ai_choice =\n  (player_choice == :scissors && :rock) ||\n    (player_choice == :rock && :paper) ||\n    (player_choice == :paper && :scissors)"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+  Remember you can conditionally return values using boolean operators.
+  For example, you can use this to return `:paper` if the `player_choice` is `:rock`.
+
+  ```elixir
+  player_choice = :rock
+
+  player_choice == :rock && :paper
+  ```
+
+  Alternatively you can use `if` statements.
+
+  ```elixir
+  if player_choice == :rock, do: :paper
+  ```
+
+  You can use this in combination with re-binding the variable to
+  return the winning choice.
+
+  ```elixir
+  player_choice = :scissors
+  ai_choice = if player_choice == :rock, do: :paper
+  ai_choice = if player_choice == :paper, do: :scissors, else: ai_choice
+  if player_choice == :scissors, do: :rock, else: ai_choice
+  ```
+
+  Or you could chain a series of conditions without re-binding `player_choice`.
+
+  ```elixir
+  player_choice = :scissors
+(player_choice == :rock && :paper) || (player_choice == :paper && :scissors) ||
+  (player_choice == :scissors && :rock)
+  ```
+
+  There are also cleaner solutions using language features we have not yet covered
+  such as the `case` statement.
+
+  ```elixir
+  player_choice = :scissors
+  
+  case player_choice do
+    :rock -> :paper
+    :paper -> :scissors
+    :scissors -> :rock
+  end
+  ```
+</details>
+
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    player_choice = :rock
-
-    ai_choice = nil
-
-    case player_choice do
-      :rock ->
-        assert ai_choice === :paper,
-               "when player_choice is :rock, ai_choice should be :paper."
-
-      :paper ->
-        assert ai_choice === :scissors,
-               "when player_choice is :paper, ai_choice should be :scissors."
-
-      :scissors ->
-        assert ai_choice === :rock,
-               "when player_choice is :scissors, ai_choice should be :rock."
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-player_choice = :rock
-
-ai_choice = nil
 ```
 
 ## Create Two Player Rock Paper Scissors
 
-In the Elixir cell below, you're going to create a two player game of rock paper scissors.
+Now that you know how to create a rock paper scissors AI, you're going to create a two player game of rock paper scissors.
 
-As earlier, you should **only** use the `&&`, `=`, `===`, and `||` operators.
+Given `player1` and `player2` select either `:rock`, `:paper`, or `:scissors`, return `"Player1"`, `"Player2"`, or `"Draw"`.
 
-Given `player1_choice` and `player2_choice` are either `:rock`, `:paper`, or `:scissors`.
-Determine the `winner` as either `:player1` or `:player2`.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Hint</summary>
+  
+  We can use boolean operators and/or `if` statements to create a sequence of conditions to determine the winner message.
 
-```mermaid
-flowchart LR
-p1c[player_1_choice]
-p2c[player_2_choice]
-w[winner]
-p1[:player1]
-p2[:player2]
+  ```elixir
+  player1 = :rock
+  player2 = :scissors
 
-p1c --> w
-p2c --> w
-w --> p1
-w --> p2
-```
+  player1_won = player1 == :rock and player2 == :scissors or player1 == :paper and player2 == :rock or player1 == :scissors and player2 == :paper
+  draw = player1 == player2
 
-Replace `nil` with your answer.
 
-<!-- livebook:{"attrs":{"assertions":"case {player1_choice, player2_choice} do\n  {:rock, :scissors} -> assert winner == :player1\n  {:paper, :rock} -> assert winner == :player1\n  {:scissors, :paper} -> assert winner == :player1\n  {:scissors, :rock} -> assert winner == :player2\n  {:rock, :paper} -> assert winner == :player2\n  {:paper, :scissors} -> assert winner == :player2\n  _ -> assert winner == :draw\nend","code":"# Will be either :rock, :paper, or :scissors\r\nplayer1_choice = Utils.random(:rock_paper_scissors)\r\n# Will be either :rock, :paper, or :scissors\r\nplayer2_choice = Utils.random(:rock_paper_scissors)\r\n\r\nwinner = nil","solution":"winner =\n  (player1_choice == :scissors && player2_choice == :rock && :player2) ||\n    (player1_choice == :rock && player2_choice == :paper && :player2) ||\n    (player1_choice == :paper && player2_choice == :scissors && :player2) ||\n    (player1_choice == player2_choice && :draw) ||\n    :player1"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+  winner_message = if player1_won, do: "Player1", else: "Player2"
+  winner_message = if draw, do: "Draw", else: winner_message
+  ```
+
+  There are cleaner solutions using language features we have not covered yet such as `case`.
+
+  ```elixir
+  player1 = :rock
+  player2 = :scissors
+
+  case {player1, player2} do
+    {:rock, :scissors} -> "Player1"
+    {:paper, :rock} -> "Player1"
+    {:scissors, :paper} -> "Player1"
+    {:rock, :paper} -> "Player2"
+    {:paper, :scissors} -> "Player2"
+    {:scissors, :rock} -> "Player2"
+    {_same, _same} -> "Draw"
+  end
+  ```
+
+  You can also reduce code repetition using functions, which we have also not yet covered.
+
+  ```elixir
+  player1 = :rock
+  player2 = :scissors
+
+  beats? = fn choice1, choice2 ->
+    {choice1, choice2} in [{:rock, :scissors}, {:paper, :rock}, {:scissors, :paper}]
+  end
+
+  cond do
+    beats?(player1, player2) -> "Player1"
+    beats?(player2, player1) -> "Player2"
+    player1 == player2 -> "Draw"
+  end
+  ```
+
+</details>
+
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    # Will be either :rock, :paper, or :scissors
-    player1_choice = Utils.random(:rock_paper_scissors)
-    # Will be either :rock, :paper, or :scissors
-    player2_choice = Utils.random(:rock_paper_scissors)
-
-    winner = nil
-
-    case {player1_choice, player2_choice} do
-      {:rock, :scissors} -> assert winner == :player1
-      {:paper, :rock} -> assert winner == :player1
-      {:scissors, :paper} -> assert winner == :player1
-      {:scissors, :rock} -> assert winner == :player2
-      {:rock, :paper} -> assert winner == :player2
-      {:paper, :scissors} -> assert winner == :player2
-      _ -> assert winner == :draw
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Will be either :rock, :paper, or :scissors
-player1_choice = Utils.random(:rock_paper_scissors)
-# Will be either :rock, :paper, or :scissors
-player2_choice = Utils.random(:rock_paper_scissors)
-
-winner = nil
 ```
 
 ## Commit Your Progress
