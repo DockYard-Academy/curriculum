@@ -1,5 +1,7 @@
-defmodule Mix.Tasks.FormatHeadings do
-  @moduledoc "Formats Live Markdown Headings. Run: mix format_headings"
+defmodule Mix.Tasks.Bc.FormatHeadings do
+  @moduledoc "Format headings of Livebook notebooks."
+  @shortdoc @moduledoc
+
   alias Utils.Notebooks
 
   use Mix.Task

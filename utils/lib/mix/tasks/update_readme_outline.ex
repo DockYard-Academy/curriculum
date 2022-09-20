@@ -1,5 +1,6 @@
-defmodule Mix.Tasks.UpdateReadmeOutline do
-  @moduledoc "The update readme outline mix task: `mix help update_readme_outline`"
+defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
+  @moduledoc "Update outline for README.md."
+  @shortdoc @moduledoc
 
   use Mix.Task
 
