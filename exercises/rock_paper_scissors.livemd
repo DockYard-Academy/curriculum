@@ -105,9 +105,11 @@ Given `player1` and `player2` select either `:rock`, `:paper`, or `:scissors`, r
   player1 = :rock
   player2 = :scissors
 
-  player1_won = player1 == :rock and player2 == :scissors or player1 == :paper and player2 == :rock or player1 == :scissors and player2 == :paper
-  draw = player1 == player2
+  player1_won =
+    (player1 == :rock and player2 == :scissors) or (player1 == :paper and player2 == :rock) or
+      (player1 == :scissors and player2 == :paper)
 
+  draw = player1 == player2
 
   winner_message = if player1_won, do: "Player1", else: "Player2"
   winner_message = if draw, do: "Draw", else: winner_message
