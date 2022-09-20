@@ -36,8 +36,6 @@ For example, let's say we have an empty board like so:
 ]
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 We'll mark matching numbers using `"X"`.
 
 A winning board would look like:
@@ -69,40 +67,38 @@ A winning board would look like:
 
 <!-- livebook:{"break_markdown":true} -->
 
-Create a `BingoWinner` module below with an `is_winner?/1` function. It should
-determine if a board is a winner and return either `false` or `true`.
+### Determine the Winner
+
+Create a `Bingo.is_winner?/1` function that accepts a board and returns `true` if the board is a winner.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-board = [
+winning_board = [
   [nil, nil, "X"],
   [nil, "X", nil],
   ["X", nil, nil],
 ]
 
-BingoWinner.is_winner?(board)
+losing_board = [
+  ["X", nil, "X"],
+  [nil, nil, nil],
+  ["X", "X", nil],
+]
+
+Bingo.is_winner?(winning_board)
 true
+
+Bingo.is_winner?(losing_board)
+false
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-Enter your answer below.
+### Play the Game
 
-```elixir
-defmodule BingoWinner do
-  def is_winner?(board) do
-  end
-end
-
-Utils.feedback(:bingo_winner, BingoWinner)
-```
-
-## Play Bingo
-
-The Bingo game will now use integers instead of `"X"` and `nil`.
-
-The `Bingo` game will take a list of called numbers and a board.
+Create a `Bingo.play/2` function which accepts a board of numbers and a list of called numbers.
+The board should return an output we can use with the `Bingo.is_winner?/1` function to determine if the player won.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -110,29 +106,88 @@ The `Bingo` game will take a list of called numbers and a board.
 board = [
   [3, 2, 5],
   [1, 6, 7],
-  [4, 8, 9],
+  [4, 8, 9]
 ]
 
 called_numbers = [1, 2, 3]
 
-Bingo.is_winner?(board, called_numbers)
+completed_board = Bingo.play(board, called_numbers)
+[
+  ["X", "X", nil],
+  ["X", nil, nil],
+  [nil, nil, nil],
+]
+
+Bingo.is_winner?(completed_board)
 false
-
-called_numbers = [1, 3, 4]
-
-Bingo.is_winner?(board, called_numbers)
-true
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 Enter your answer below.
 
 ```elixir
 defmodule Bingo do
-  def is_winner?(board, called_numbers) do
+  @doc """
+  Determine if a completed bingo board is a winner.
+
+  ## Examples
+
+    iex> Bingo.is_winner?([["X", "X", "X"], ["X", "X", "X"], ["X", "X", "X"]])
+    
+    Row Cases
+
+    iex> Bingo.is_winner?([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+    true
+
+    Diagonal Cases
+
+    iex> Bingo.is_winner?([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+
+    Column Cases
+
+    iex> Bingo.is_winner?([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+    true
+    
+    Losing Cases
+
+    iex> Bingo.is_winner?([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+    false
+    iex> Bingo.is_winner?([["X", nil, "X"], ["X", nil, nil], [nil, nil, "X"]])
+    false
+    iex> Bingo.is_winner?([["X", nil, "X"], [nil, nil, nil], ["X", nil, "X"]])
+    false
+  """
+  def is_winner?(completed_board) do
+  end
+
+  @doc """
+  Fill called numbers in a board with `"X"` and not called numbers with `nil`.
+
+  ## Examples
+
+    iex> Bingo.play([[1, 1, 1], [1, 1, 1], [1, 1, 1]], [])
+    [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]]
+    iex> Bingo.play([[1, 1, 1], [1, 1, 1], [1, 1, 1]], [1])
+    [["X", "X", "X"], ["X", "X", "X"], ["X", "X", "X"]]
+     iex> Bingo.play([[3, 2, 5], [1, 6, 7], [4, 8, 9]], [1, 2, 3])
+    [["X", "X", nil], ["X", nil, nil], [nil, nil, nil]]
+    iex> Bingo.play([[3, 2, 5], [1, 6, 7], [4, 8, 9]], [1, 2, 3, 6, 8, 9])
+    [["X", "X", nil], ["X", "X", nil], [nil, "X", "X"]]
+  """
+  def play(numbered_board, called_numbers) do
   end
 end
-
-Utils.feedback(:bingo, Bingo)
 ```
 
 ## Commit Your Progress

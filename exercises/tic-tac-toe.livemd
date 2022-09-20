@@ -51,22 +51,57 @@ TicTacToe.play(move1, {1, 1}, "O")
 ]
 ```
 
-* **BONUS**: Ensure that the same player cannot play twice in a row.
-
-* **BONUS**: Ensure that a player cannot play in an already filled spot.
-
-* **BONUS**: Omit the `"X"` and `"O"` parameter and instead automatically figure out who's turn it is.
-  (X always plays first)
-
 Enter your answer below.
 
 ```elixir
 defmodule TicTacToe do
+  @doc """
+  Given a board, coordinate, and symbol of either `"X"` or `"O"`,
+  returns a new updated board.
+
+  ## Examples
+  iex> TicTacToe.play([[nil, nil, nil], [nil, nil, nil],[nil, nil, nil]], {0, 0}, "X")
+  [["X", nil, nil], [nil, nil, nil], [nil, nil, nil]]
+  iex> TicTacToe.play([["X", nil, nil], [nil, nil, nil],[nil, nil, nil]], {1, 0}, "O")
+  [["X", nil, nil], ["O", nil, nil], [nil, nil, nil]]
+  iex> TicTacToe.play([["X", nil, nil], ["O", nil, nil],[nil, nil, nil]], {1, 1}, "X")
+  [["X", nil, nil], ["O", "X", nil], [nil, nil, nil]]
+  iex> TicTacToe.play( [["X", nil, nil], ["O", "X", nil],[nil, nil, nil]], {2, 2}, "O")
+  [["X", nil, nil], ["O", "X", nil], [nil, nil, "O"]]
+  """
   def play(board, coordinate, symbol) do
   end
 end
+```
 
-Utils.feedback(:tic_tac_toe, TicTacToe)
+### Bonus: Smart Tic Tac Toe
+
+Create a `SmartTicTacToe` module which automatically determines if it should place an `"X"` or an `"O"` and ensures that a player cannot play in an already filled spot. The game should always start with `"X"`.
+
+```elixir
+defmodule SmartTicTacToe do
+  defmodule TicTacToe do
+    @doc """
+    Given a board, coordinate, and symbol of either `"X"` or `"O"`,
+    returns a new updated board.
+
+    ## Examples
+    iex> TicTacToe.play([[nil, nil, nil], [nil, nil, nil],[nil, nil, nil]], {0, 0})
+    [["X", nil, nil], [nil, nil, nil], [nil, nil, nil]]
+    iex> TicTacToe.play([["X", nil, nil], [nil, nil, nil],[nil, nil, nil]], {1, 0})
+    [["X", nil, nil], ["O", nil, nil], [nil, nil, nil]]
+    iex> TicTacToe.play([["X", nil, nil], ["O", nil, nil],[nil, nil, nil]], {1, 1})
+    [["X", nil, nil], ["O", "X", nil], [nil, nil, nil]]
+    iex> TicTacToe.play( [["X", nil, nil], ["O", "X", nil],[nil, nil, nil]], {2, 2})
+    [["X", nil, nil], ["O", "X", nil], [nil, nil, "O"]]
+    """
+    def play(board, coordinate) do
+    end
+  end
+
+  def play do
+  end
+end
 ```
 
 ## Commit Your Progress
