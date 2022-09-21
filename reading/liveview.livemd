@@ -44,9 +44,9 @@ Client <-- two-way communication through a network socket--> Server
 
 <!-- livebook:{"break_markdown":true} -->
 
-LiveViews are processes implemented with `GenServer`. For every client, the server spawns a LiveView process which maintains state and can send and receive messages. The LiveView stores the state in a [socket assigns](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Socket.html) struct.
+LiveViews are processes implemented with [GenServer](https://hexdocs.pm/elixir/GenServer.html). For every client, the server spawns a LiveView process which maintains state and can send and receive messages. The LiveView stores the state in a [socket assigns](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Socket.html) struct.
 
-Phoenix starts each LiveView Process under the application's `Superisor`. The `Supervisor` restarts the LiveView in the event of a crash.
+Phoenix starts each LiveView Process under the application's `Superisor`. The [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) restarts the LiveView in the event of a crash.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -146,7 +146,7 @@ The [Phoenix.Router](https://hexdocs.pm/phoenix/Phoenix.Router.html) uses the [P
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Start The Server
+### Start the Server
 
 We can start the server normally.
 
@@ -210,7 +210,7 @@ Visit http://localhost:4000 and you will see the following page.
 
 The [mount/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:mount/3) callback accepts public parameters from `params`, and private data stored in the `session`.
 
-if you `IO.inspect/2` the `session`, it includes a `_csrf_token`.
+if you [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) the `session`, it includes a `_csrf_token`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -302,7 +302,7 @@ end
 
 If you try to visit http://localhost:4000 and click the button, you'll see the following error in your terminal. The most important part is `function CounterWeb.CounterLive.handle_event/3 is undefined or private`, which means we need to implement a [handle_event/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:handle_event/3) handler for the click event.
 
-Also, you might not have noticed, but our page is crashing. It's hard to notice because the application's `Supervisor` quickly restarts the page after it crashes.
+Also, you might not have noticed, but our page is crashing. It's hard to notice because the application's [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) quickly restarts the page after it crashes.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -364,7 +364,7 @@ We've seen the `phx-click` event which we can trigger on any valid html element 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Form phx-submit Event
+### Form Phx-submit Event
 
 To change the increment by value, we'll create a form with a number input. There are many ways to define a form in Phoenix, see [Phoenix.LiveView.Helpers.form/1](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Helpers.html#form/1) for more information.
 
@@ -416,7 +416,7 @@ State: %{components: {%{}, %{}, 1}, join_ref: "4", serializer: Phoenix.Socket.V2
 
 The message `(ArithmeticError) bad argument in arithmetic expression :erlang.+(0, "2")` tells us we're attempting to add an integer and a string. That's because the `increment_by` is a string, not an integer.
 
-We need to convert the input into an integer in the event handle to add it to the current count. Since the input could be empty, we'll use `Integer.parse/2` to handle invalid input and have a default increment value of `1`.
+We need to convert the input into an integer in the event handle to add it to the current count. Since the input could be empty, we'll use [Integer.parse/2](https://hexdocs.pm/elixir/Integer.html#parse/2) to handle invalid input and have a default increment value of `1`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -483,7 +483,7 @@ You can visit http://localhost:4000, enter a number in the input, and the count 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Form phx-change Event
+### Form Phx-change Event
 
 Notice the form input clears after every form submission. That's because we re-render the page when the counter state changes.
 
