@@ -193,17 +193,17 @@ defmodule Assertion do
 
             #{inspect(error)}
 
-            When it received: #{inspect(message)} #{message_type}
+            When it recieved: #{inspect(message)} #{message_type}
 
             Likely you need to define the corresponding handler for #{inspect(message)}.
 
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
+            Ensure you defined a handle_call/3, handle_info/2, or handle_cast/2 or appropriate handler function.
 
               def handle_call(:message, _from, state) do
                 ...
               end
 
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
+            Also ensure you call GenServer.call/2, GenServer.cast/2, or otherwise send the message correctly.
 
               GenServer.call(pid, :message)
         """)
@@ -218,7 +218,7 @@ defmodule Assertion do
       # all warnings and errors are printed to the previous Kino Frame
       # to avoid cluttering the test results display.
       Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
+      Kino.render(Kino.Markdown.new("### Test Results 
 <hr/>"))
     end
   end
