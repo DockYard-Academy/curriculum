@@ -80,7 +80,7 @@ defmodule UtilsTest do
              """
              #{file_name}: Needs to be formatted.
 
-             Run mix format_notebooks to format all notebooks.
+             Run mix bc.format_notebooks to format all notebooks.
              Sometimes bullet points * can cause formatting issues.
              """
     end)
@@ -120,7 +120,7 @@ defmodule UtilsTest do
           flunk("""
           #{file_name}:#{line_number} #{module} should use a documentation link [module](url) instead of backticks.
 
-          run mix update_documentation_links to resolve this issue.
+          run mix bc.update_documentation_links to resolve this issue.
           """)
         end
       end)
@@ -202,7 +202,7 @@ defmodule UtilsTest do
              Expected: #{expected}
              Received: #{heading}
 
-             Manually resolve the issue or run mix format_headings.
+             Manually resolve the issue or run mix bc.format_headings.
              """
     end)
   end
