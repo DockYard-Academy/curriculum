@@ -23,7 +23,7 @@ The recommended installation methods for this course are from the Elixir languag
 
 2. Install Elixir
    - `brew install elixir`
-   
+
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
    - `mix escript.install hex livebook`
    - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
@@ -37,16 +37,16 @@ The recommended installation methods for this course are from the Elixir languag
    - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
 
 2. Install Elixir
-   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings. 
+   - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings.
    - NOTE: You need to type `iex.bat` instead of `iex` when starting the interactive REPL.
    - Run `iex.bat --sname test` to trigger a firewall prompt that needs to be accepted to run Livebook.
    - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
    - `mix escript install hex livebook`
-   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line. 
+   - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line.
    - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
-   
+
 4. Start the Livebook server and open the navigation page where you can find the course reading material and associated exercises
    - `livebook server start.livemd`
 
@@ -104,7 +104,7 @@ If using [asdf](https://asdf-vm.com/guide/getting-started.html#_1-install-depend
 ```sh
 asdf reshim
 ```
-   
+
 ### Livebook: Command Not Found
 
 After installing livebook `mix escript.install github livebook-dev/livebook` you may see the following message:
@@ -233,7 +233,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 
 1. UX/UI Design + Accessibility
 2. Phoenix LiveView
-3. JavaScript & JS Interoptability & AlpineJS
+3. Phoenix Forms
 4. PubSub & Channels
 5. GraphQL & Absinthe (+ Testing Patterns)
 
@@ -251,17 +251,17 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 3. Advanced Livebook (Graphs, Tables, Connecting Projects)
 4. Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
-5.
+5. Group Project Start
 
 ## Week 10
 
-1. Emailing & Swoosh
-2. Stripe
+1. Group Project Presentation
+2. Emailing & Swoosh
+3. Oban
 3. Designing Elixir Systems
 4. Advanced Livebook
-5. Group Project Presentation
 
-## Week 11: Scaling Elixir Applications
+## Week 11: Elixir Applications in Production
 
 1. Umbrella Projects
 2. Genserver Bottlenecks

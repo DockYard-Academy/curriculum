@@ -1,5 +1,7 @@
-defmodule Mix.Tasks.AddNavigation do
-  @moduledoc "Add Previous and Next Navigation. Run: mix add_navigation"
+defmodule Mix.Tasks.Bc.AddNavigation do
+  @moduledoc "Add Previous/Next navigation link to reading pages."
+  @shortdoc @moduledoc
+
   use Mix.Task
 
   @impl Mix.Task

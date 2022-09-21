@@ -1,5 +1,6 @@
-defmodule Mix.Tasks.AddGitSection do
-  @moduledoc "The add git section mix task: `mix help add_git_section`"
+defmodule Mix.Tasks.Bc.AddGitSection do
+  @moduledoc "Add Git section to selected pages."
+  @shortdoc @moduledoc
 
   use Mix.Task
 

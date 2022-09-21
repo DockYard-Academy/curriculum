@@ -1,8 +1,15 @@
-defmodule Mix.Tasks.UpdateDocumentationLinks do
-  @moduledoc "Replace backtick links such as `Enum.map/2` with links to documentation such as: [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2)"
-  alias Utils.Notebooks
+defmodule Mix.Tasks.Bc.Autolink do
+  @moduledoc """
+  Autolink backtick function like `Enum.map/2` to HexDocs, like
+  [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2).
+  """
+
+  @shortdoc "Autolink Elixir functions to HexDocs."
 
   use Mix.Task
+
+  alias Utils.Notebooks
+
   @libraries ["Kino", "ExUnit", "Benchee", "IEx", "Mix", "Poison", "HTTPoison"]
 
   @impl Mix.Task

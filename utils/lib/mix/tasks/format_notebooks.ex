@@ -1,8 +1,10 @@
-defmodule Mix.Tasks.FormatNotebooks do
-  @moduledoc "Formats Live Markdown Headings. Run: MIX_ENV=test mix format_notebooks"
-  alias Utils.Notebooks
+defmodule Mix.Tasks.Bc.FormatNotebooks do
+  @moduledoc "Format Livebook notebooks."
+  @shortdoc @moduledoc
 
   use Mix.Task
+
+  alias Utils.Notebooks
 
   @impl Mix.Task
   def run(_) do
