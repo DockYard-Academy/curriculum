@@ -4,8 +4,6 @@ defmodule Utils do
   """
   alias Kino.ValidatedForm
 
-  defdelegate visual(visual_name, params), to: Utils.Visual
-
   def form(form_name), do: ValidatedForm.new(apply(Utils.Form, form_name, []))
   def constants(constant), do: apply(Utils.Constants, constant, [])
   def graph(graph_name), do: apply(Utils.Graph, graph_name, [])

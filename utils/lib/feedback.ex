@@ -17,28 +17,6 @@ defmodule Utils.Feedback do
   """
   use Utils.Feedback.Assertion
 
-  feedback :string_concatenation do
-    answer = get_answers()
-    assert is_binary(answer), "the answer should be a string."
-    assert "Hi, " <> _name = answer, "the answer should be in the format: Hi, name."
-    assert Regex.match?(~r/Hi, \w+\./, answer), "the answer should end in a period."
-  end
-
-  feedback :string_interpolation do
-    answer = get_answers()
-    assert is_binary(answer), "the answer should be a string."
-
-    assert Regex.match?(~r/I have/, answer),
-           "the answer should be in the format: I have 10 classmates"
-
-    assert Regex.match?(~r/I have \d+/, answer),
-           "the answer should contain an integer for classmates."
-
-    assert Regex.match?(~r/I have \d+ classmates\./, answer) ||
-             answer === "I have 1 classmate.",
-           "the answer should end in a period."
-  end
-
   feedback :rock_paper_scissors_pattern_matching do
     rock_paper_scissors = get_answers()
 
@@ -239,26 +217,6 @@ defmodule Utils.Feedback do
 
     assert updated_map.example_key !== "value",
            "Ensure you update the :example_key with a changed value."
-  end
-
-  feedback :remainder do
-    remainder = get_answers()
-    assert remainder == rem(10, 3)
-  end
-
-  feedback :exponents do
-    result = get_answers()
-    assert result == 10 ** 214
-  end
-
-  feedback :bedmas do
-    answer = get_answers()
-    assert answer == (20 + 20) * 20
-  end
-
-  feedback :gcd do
-    gcd = get_answers()
-    assert gcd == Integer.gcd(10, 15)
   end
 
   feedback :string_at do
