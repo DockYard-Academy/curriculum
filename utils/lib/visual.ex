@@ -1,10 +1,10 @@
 defmodule Utils.Visual do
   def visual(:loading_bar, percentage) do
-    Kino.Markdown.new(~s(
-<div style=\"height: 20px; width: 100%; background-color: grey\">
-  <div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
-</div>
-    ))
+  Kino.Markdown.new(~s(
+    <div style=\"height: 20px; width: 100%; background-color: grey\">
+    <div style=\"height: 20px; width: #{percentage}%; background-color: green\"></div>
+    </div>
+  ))
   end
 
   def visual(:light_control, power) do
