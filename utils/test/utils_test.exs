@@ -120,7 +120,7 @@ defmodule UtilsTest do
           flunk("""
           #{file_name}:#{line_number} #{module} should use a documentation link [module](url) instead of backticks.
 
-          run mix bc.update_documentation_links to resolve this issue.
+          run mix bc.autolink to resolve this issue.
           """)
         end
       end)
