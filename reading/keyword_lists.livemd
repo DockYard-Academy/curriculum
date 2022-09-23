@@ -75,21 +75,36 @@ the keyword list as a list of tuples.
 [{}, key: "value"]
 ```
 
+The keyword list syntax must come at the end of a list, or we'll cause a `SyntaxError`.
+
+```elixir
+[key: "value", ""]
+```
+
 List order is guaranteed, so the same is true for keyword lists.
 
 ### Your Turn
 
-In the Elixir cell below, create a keyword list of your favourite super hero. Include their `:name` and `:secret_identity`. Replace `nil` with your answer.
+In the Elixir cell below, create a keyword list of your favourite super hero. Include their `:name` and `:secret_identity`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-hero = nil
+[name: "Spiderman", secret_identity: "Peter Parker"]
+```
 
-Utils.feedback(:keyword_list_hero, hero)
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Keyword List Operators
 
-You can also use `--` and `++` with keyword lists.
+We can also use `--` and `++` list operators with keyword lists.
 
 ```elixir
 [one: 1, two: 2] -- [one: 1]
@@ -115,6 +130,76 @@ Remove `[two: 2]` from `[one: 1, two: 2]` to make `[one: 1]`.
 ```elixir
 
 ```
+
+## Pattern Matching
+
+Much like with lists, we can use pattern matching to bind values in a keyword list to variables.
+
+```elixir
+[hello: my_variable] = [hello: "world"]
+
+my_variable
+```
+
+Much like a list, we must match on the entire keyword list, otherwise we'll cause a `MatchError`.
+
+```elixir
+[one: one] = [one: 1, two: 2]
+```
+
+So long as we have a match for every element in the keyword list, we can use pattern matching.
+
+```elixir
+[one: one, two: two] = [one: 1, two: 2]
+```
+
+We can use the `[head | tail]` syntax to pattern match on the tail of the keyword list to avoid this issue.
+
+```elixir
+[head | _tail] = [one: 1, two: 2]
+
+head
+```
+
+If we want to pattern match on the keys in the list, we need to use the tuple syntax on the left hand side of the `=` match operator.
+
+```elixir
+[{key, value}] = [key: "value"]
+```
+
+```elixir
+key
+```
+
+```elixir
+value
+```
+
+### Your Turn
+
+Bind `1` in the following keyword list to a variable `one`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+[{_, one} | _tail] = [one: 1, two: 2, three: 3, four: 4]
+```
+</details>
+
+Enter your solution below.
+
+```elixir
+[{_, one} | _tail] = [one: 1, two: 2, three: 3, four: 4]
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Lang: Keyword Lists](https://elixir-lang.org/getting-started/keywords-and-maps.html#keyword-lists)
+* [Elixir Schools: Keyword Lists](https://elixirschool.com/en/lessons/basics/collections#keyword-lists-5)
+* [HexDocs: Keyword](https://hexdocs.pm/elixir/Keyword.html)
 
 ## Commit Your Progress
 

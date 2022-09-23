@@ -70,42 +70,12 @@ though, not a colon `:`. `=>` is an equals sign `=` and a greater than symbol `>
 %{1 => "value"}
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-In the Elixir cell below, create a map with string keys and any value. Replace `nil` with your answer.
-
-```elixir
-map = nil
-
-Utils.feedback(:string_key_map, map)
-```
-
-Create a map with atom keys and any value. Replace `nil` with your answer.
-
-```elixir
-map = nil
-
-Utils.feedback(:atom_key_map, map)
-```
-
-Create a map with a non-string or atom key and any value. Replace `nil` with your answer.
-
-```elixir
-map = nil
-
-Utils.feedback(:non_standard_key_map, map)
-```
-
-## Manipulating Maps
+## Accessing Map Values
 
 Unlike the other data types, there aren't specific map operators. To manipulate maps we
 use a different tool called the [Map](https://hexdocs.pm/elixir/Map.html) module, which you will learn more about in a future lesson.
 
 For now, it's enough to know that you can access values in an atom-key map using a few different methods.
-
-### Accessing Map Values
 
 You can retrieve values in a map using **map.key** notation like so. This only works for maps with
 atom keys.
@@ -114,7 +84,7 @@ atom keys.
 %{key: "value"}.key
 ```
 
-Alternatively, you can access the map value using square bracket notation `[key]`.
+Alternatively, you can access the map value using square bracket notation **map[key]**.
 
 ```elixir
 %{key: "value"}[:key]
@@ -174,16 +144,29 @@ map[:key]
 
 ### Your Turn
 
-In the Elixir cell below, access the `:hello` key in `map`.
-Retrieve the value using both **map[key]** and **map.key** notation.
-Replace `nil` with your answer.
+In the Elixir cell below, access the `:hello` key in `map`. Retrieve the value using both **map[key]** and **map.key** notation.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+**map.key** notation.
 
 ```elixir
 map = %{hello: "world"}
+map.hello
+```
 
-value = nil
+**map[]** notation.
 
-Utils.feedback(:access_map, value)
+```elixir
+map = %{hello: "world"}
+map[:hello]
+```
+
+</details>
+
+```elixir
+map = %{hello: "world"}
 ```
 
 ### Updating Maps
@@ -226,16 +209,114 @@ initial = %{}
 
 ### Your Turn
 
-Update the `example_key` in the `initial_map` below. Replace `nil` with your answer.
-Change `"value"` to any other value.
+Use a map to represent a todo item The todo map should have `:title` and `:completed` keys.
+
+* title: "finish maps exercises", completed: false
+
+Bind your map to a `todo` variable, and update the value so `completed` is `true`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-initial_map = %{example_key: "value"}
+todo = %{title: "finish maps exercise", completed: false}
 
-updated_map = nil
-
-Utils.feedback(:update_map, updated_map)
+%{todo | completed: true}
 ```
+
+</details>
+
+```elixir
+
+```
+
+## Pattern Matching
+
+We can pattern match on values inside the map.
+
+```elixir
+%{hello: my_variable} = %{hello: "world"}
+my_variable
+```
+
+Unlike with keyword lists, we don't have to match on every key/value pair when pattern matching with maps.
+
+```elixir
+%{one: one} = %{one: 1, two: 2}
+one
+```
+
+This also works with non-atom key maps.
+
+```elixir
+%{"hello" => world} = %{"hello" => "world"}
+```
+
+We can only pattern match on the value in the map, not the key. Keys in maps must be **literals** such as atoms, strings, tuples, etc.
+
+```elixir
+%{hello => world} = %{"hello" => "world"}
+```
+
+### Pin Operator
+
+You'll notice that we can rebind variables using pattern matching.
+
+```elixir
+name = "Jon"
+
+%{name: name} = %{name: "Bill"}
+
+name
+```
+
+If instead of re-binding the variable, we want to use the literal value of the variable, we can use the pin operator `^`.
+
+```elixir
+name = "Jon"
+
+%{name: ^name} = %{name: "Bill"}
+
+name
+```
+
+The above causes a `MatchError` because the left side and right side do not match. It's the same as if we had written the following.
+
+```elixir
+%{name: "Jon"} = %{name: "Bill"}
+```
+
+We might use this to confirm our map matches some shape.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Bind `2` and `4` in the following map to variables `two` and `four`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+%{two: two, four: four} = %{one: 1, two: 2, three: 3, four: 4}
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+%{one: 1, two: 2, three: 3, four: 4}
+```
+
+## Futher Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Maps](https://elixirschool.com/en/lessons/basics/collections#maps-6)
+* [Exercise: Maps](https://exercism.org/tracks/elixir/concepts/maps)
+* [Elixir Lang: Pattern Matching](https://elixir-lang.org/getting-started/pattern-matching.html)
+* [Elixir Lang: Maps](https://elixir-lang.org/getting-started/keywords-and-maps.html#maps)
 
 ## Commit Your Progress
 
