@@ -2,7 +2,6 @@ defmodule Utils do
   @moduledoc """
   Documentation for `Utils`.
   """
-  alias Kino.ValidatedForm
 
   def feedback(description, answers) do
     Utils.Feedback.feedback(description, answers)
