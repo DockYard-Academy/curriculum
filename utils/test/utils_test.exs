@@ -19,11 +19,6 @@ defmodule UtilsTest do
     end)
   end
 
-  test "random" do
-    assert Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
-    assert Utils.random(1..9) in 1..9
-  end
-
   test "feedback/2" do
     Enum.each(Utils.Feedback.test_names(), fn each ->
       exists = Keyword.has_key?(Solutions.__info__(:functions), each)

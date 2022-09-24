@@ -6,9 +6,6 @@ defmodule Utils do
 
   def graph(graph_name), do: apply(Utils.Graph, graph_name, [])
 
-  def random(:rock_paper_scissors), do: Enum.random([:rock, :paper, :scissors])
-  defdelegate random(range), to: Enum
-
   def slide(slide_name), do: apply(Utils.Slide, slide_name, [])
 
   def table(:users_and_photos) do
