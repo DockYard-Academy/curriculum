@@ -12,13 +12,6 @@ defmodule UtilsTest do
     end)
   end
 
-  test "graph/1" do
-    Utils.Graph.__info__(:functions)
-    |> Enum.each(fn {graph_name, _arity} ->
-      assert %Kino.JS.Live{} = Utils.graph(graph_name)
-    end)
-  end
-
   test "feedback/2" do
     Enum.each(Utils.Feedback.test_names(), fn each ->
       exists = Keyword.has_key?(Solutions.__info__(:functions), each)

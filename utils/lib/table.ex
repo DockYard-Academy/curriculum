@@ -78,17 +78,6 @@ defmodule Utils.Table do
     ]
   end
 
-  def n2 do
-    Enum.map(1..1000, fn each ->
-      %{
-        "# of elements": each,
-        result: each ** 2,
-        notation: "#{each}**2",
-        equation: "#{each} * #{each}"
-      }
-    end)
-  end
-
   def n3 do
     Enum.map(1..1000, fn each ->
       %{
@@ -110,15 +99,15 @@ defmodule Utils.Table do
   end
 
   def measurements do
-[
-  [unit: :millimeter, value: 1, centimeter: 0.1],
-  [unit: :meter, value: 1, centimeter: 100],
-  [unit: :kilometer, value: 1, centimeter: 100_000],
-  [unit: :inch, value: 1, centimeter: 2.54],
-  [unit: :feet, value: 1, centimeter: 30],
-  [unit: :yard, value: 1, centimeter: 91],
-  [unit: :mile, value: 1, centimeter: 160_000]
-]
+    [
+      [unit: :millimeter, value: 1, centimeter: 0.1],
+      [unit: :meter, value: 1, centimeter: 100],
+      [unit: :kilometer, value: 1, centimeter: 100_000],
+      [unit: :inch, value: 1, centimeter: 2.54],
+      [unit: :feet, value: 1, centimeter: 30],
+      [unit: :yard, value: 1, centimeter: 91],
+      [unit: :mile, value: 1, centimeter: 160_000]
+    ]
   end
 
   def code_points do
