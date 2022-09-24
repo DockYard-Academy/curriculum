@@ -101,8 +101,16 @@ If you are curious, the full list of representable characters is called the [The
 See this table for alphabetical characters and their code point values.
 You do not need to memorize these values! You only need to be aware that each character has a corresponding codepoint.
 
+<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend)\n|> Kino.DataTable.new()","title":"Unicode Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:unicode)
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+|> String.codepoints()
+|> Enum.map(fn char ->
+  <<code_point::utf8>> = char
+  %{character: char, code_point: code_point}
+end)
+|> Kino.DataTable.new()
 ```
 
 #### [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1)

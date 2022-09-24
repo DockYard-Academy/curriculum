@@ -182,8 +182,18 @@ end)
 
 In other words, it creates $n^2$ elements. We can see how this grows in the following table.
 
+<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 2,\n    notation: \"#{each}**2\",\n    equation: \"#{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>2</sup> Complexity"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:n2)
+Enum.map(1..1000, fn each ->
+  %{
+    "# of elements": each,
+    result: each ** 2,
+    notation: "#{each}**2",
+    equation: "#{each} * #{each}"
+  }
+end)
+|> Kino.DataTable.new()
 ```
 
 If you nest a third enumeration it becomes $n^3$.
@@ -313,15 +323,48 @@ end)
 
 We can see how $n^3$ grows in the following table.
 
+<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 3,\n    notation: \"#{each}**3\",\n    equation: \"#{each} * #{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>3</sup> Complexity"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:n3)
+Enum.map(1..1000, fn each ->
+  %{
+    "# of elements": each,
+    result: each ** 3,
+    notation: "#{each}**3",
+    equation: "#{each} * #{each} * #{each}"
+  }
+end)
+|> Kino.DataTable.new()
 ```
 
 Plotted onto a graph, we can see that polynomial complexity results in an upward curve, and
 the size of the power significantly increases the growth.
 
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Polonomial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 5\n\nn2 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 2, type: \"n^2\"}\nn3 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 3, type: \"n^3\"}\nn4 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 4, type: \"n^4\"}\n\nKino.VegaLite.push_many(widget, n2)\nKino.VegaLite.push_many(widget, n3)\nKino.VegaLite.push_many(widget, n4)\nwidget","title":"Polynomial Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.graph(:polynomial_complexity)
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "number of elements", type: :quantitative)
+  |> VegaLite.encode_field(:y, "time", type: :quantitative)
+  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+  |> VegaLite.encode_field(:color, "type", title: "Polonomial Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+
+init = 1
+max = 5
+
+n2 = for n <- init..max, do: %{"number of elements": n, time: n ** 2, type: "n^2"}
+n3 = for n <- init..max, do: %{"number of elements": n, time: n ** 3, type: "n^3"}
+n4 = for n <- init..max, do: %{"number of elements": n, time: n ** 4, type: "n^4"}
+
+Kino.VegaLite.push_many(widget, n2)
+Kino.VegaLite.push_many(widget, n3)
+Kino.VegaLite.push_many(widget, n4)
+widget
 ```
 
 ## Exponential Complexity
@@ -350,12 +393,40 @@ In other words, it executes $$10^n$$ attempts. Now often you'll see exponential 
 represented as $2^n$  or $C^n$ where `2` or `C` represents some constant value. In the case of a password cracker, it would
 be `10`.
 
-```elixir
-Utils.table(:exponential_growth)
-```
+<!-- livebook:{"attrs":{"source":"Enum.map(1..100, fn each ->\n  %{\n    \"# of elements\": each,\n    result: 10 ** each,\n    equation: \"100 ** #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"Exponential Growth Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-Utils.graph(:exponential_complexity)
+Enum.map(1..100, fn each ->
+  %{
+    "# of elements": each,
+    result: 10 ** each,
+    equation: "100 ** #{each}"
+  }
+end)
+|> Kino.DataTable.new()
+```
+
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Exponential Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 10\n\nexponential = for n <- init..max, do: %{x: n, y: 10 ** n, type: \"2^n\"}\n\nKino.VegaLite.push_many(widget, exponential)\nwidget","title":"Exponential Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+size = 600
+
+widget =
+  VegaLite.new(width: size, height: size)
+  |> VegaLite.mark(:line)
+  |> VegaLite.encode_field(:x, "x", type: :quantitative)
+  |> VegaLite.encode_field(:y, "y", type: :quantitative)
+  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
+  |> VegaLite.encode_field(:color, "type", title: "Exponential Growth", type: :nominal)
+  |> Kino.VegaLite.new()
+
+init = 1
+max = 10
+
+exponential = for n <- init..max, do: %{x: n, y: 10 ** n, type: "2^n"}
+
+Kino.VegaLite.push_many(widget, exponential)
+widget
 ```
 
 ## Factorial Complexity
@@ -441,8 +512,19 @@ Kino.VegaLite.push_many(widget, factorial)
 widget
 ```
 
+<!-- livebook:{"attrs":{"source":"Enum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: each ** each, equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:factorial_complexity)
+Enum.map(1..10, fn each ->
+  equation =
+    Enum.map_join(each..1, fn
+      ^each -> "#{each}"
+      n -> " * #{n}"
+    end)
+
+  %{"# of elements": each, result: each ** each, equation: equation}
+end)
+|> Kino.DataTable.new()
 ```
 
 ## Commit Your Progress

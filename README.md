@@ -185,7 +185,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 
 1. Course Tools
 2. Basics
-3. Complex Types
+3. Data Structures and Intro to Pattern Matching
 4. Modules, Functions, Structs, Control Flow
 5. Enumeration
 
