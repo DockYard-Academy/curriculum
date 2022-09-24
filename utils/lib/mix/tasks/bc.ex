@@ -18,8 +18,10 @@ defmodule Mix.Tasks.Bc do
       end)
 
     for {task, shortdoc} <- tasks do
+
       msg = "mix #{String.pad_trailing(task, max)} # #{shortdoc}"
       Mix.shell().info(msg)
+      Mix.Task.run(task)
     end
   end
 
