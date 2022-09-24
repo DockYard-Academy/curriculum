@@ -18,11 +18,15 @@ defmodule Mix.Tasks.Bc do
       end)
 
     for {task, shortdoc} <- tasks do
-
       msg = "mix #{String.pad_trailing(task, max)} # #{shortdoc}"
       Mix.shell().info(msg)
       Mix.Task.run(task)
     end
+
+    # Spelling Check
+    System.cmd("codespell", ["--skip=./utils/deps/*,./.git/*,./utils/lib/assets/*", "-w"],
+      cd: "../"
+    )
   end
 
   defp task?({name, _, _}) do
