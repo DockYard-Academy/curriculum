@@ -673,54 +673,6 @@ defmodule Utils.Feedback do
     assert money.multiply(money.new(100, :CAD), 1.1) == money.new(110, :CAD)
   end
 
-  feedback :metric_measurements do
-    measurement = get_answers()
-
-    conversion = [
-      millimeter: 0.1,
-      centimeter: 1,
-      meter: 100,
-      kilometer: 100_000,
-      inch: 2.54,
-      feet: 30,
-      yard: 91,
-      mile: 160_000
-    ]
-
-    assert measurement.convert({:millimeter, 1}, :centimeter),
-           "Ensure you implement the `convert/2` function."
-
-    assert measurement.convert({:millimeter, 1}, :centimeter) == {:centimeter, 0.1}
-    assert measurement.convert({:centimeter, 1}, :centimeter) == {:centimeter, 1}
-    assert measurement.convert({:meter, 1}, :centimeter) == {:centimeter, 100}
-    assert measurement.convert({:kilometer, 1}, :centimeter) == {:centimeter, 100_000}
-    assert measurement.convert({:inch, 1}, :centimeter) == {:centimeter, 2.54}
-    assert measurement.convert({:feet, 1}, :centimeter) == {:centimeter, 30}
-    assert measurement.convert({:yard, 1}, :centimeter) == {:centimeter, 91}
-    assert measurement.convert({:mile, 1}, :centimeter) == {:centimeter, 160_000}
-
-    assert measurement.convert({:meter, 1}, :millimeter) == {:millimeter, 1000}
-    assert measurement.convert({:meter, 1}, :centimeter) == {:centimeter, 100}
-    assert measurement.convert({:meter, 1}, :meter) == {:meter, 1}
-    assert measurement.convert({:meter, 1}, :kilometer) == {:kilometer, 0.001}
-
-    Enum.each(conversion, fn {measure, amount} ->
-      measurement.convert({:centimeter, 1}, measure) == {measure, 1 / amount}
-    end)
-
-    # to centimeter
-    Enum.each(conversion, fn {measure, amount} ->
-      assert measurement.convert({measure, 1}, :centimeter) == {:centimeter, amount}
-    end)
-
-    # from anything to anything
-    Enum.each(conversion, fn {measure1, amount1} ->
-      Enum.each(conversion, fn {measure2, amount2} ->
-        assert measurement.convert({measure1, 1}, measure2) == {measure2, amount1 / amount2}
-      end)
-    end)
-  end
-
   feedback :cypher do
     cypher = get_answers()
 

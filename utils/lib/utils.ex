@@ -6,8 +6,6 @@ defmodule Utils do
 
   def graph(graph_name), do: apply(Utils.Graph, graph_name, [])
 
-  def slide(slide_name), do: apply(Utils.Slide, slide_name, [])
-
   def table(:users_and_photos) do
     Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg"]], name: "Photos") |> Kino.render()
     Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
