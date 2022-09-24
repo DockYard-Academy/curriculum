@@ -26,13 +26,6 @@ defmodule UtilsTest do
     end)
   end
 
-  test "form/1" do
-    Utils.Form.__info__(:functions)
-    |> Enum.each(fn {form_name, _arity} ->
-      assert %Kino.JS{} = Utils.form(form_name)
-    end)
-  end
-
   test "random" do
     assert Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
     assert Utils.random(1..9) in 1..9
