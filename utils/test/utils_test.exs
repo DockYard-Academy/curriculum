@@ -5,13 +5,6 @@ defmodule UtilsTest do
   alias Utils.Notebooks
   alias Utils.Solutions
 
-  test "table/1" do
-    Utils.Table.__info__(:functions)
-    |> Enum.each(fn {table_name, _arity} ->
-      assert %Kino.JS.Live{} = Utils.table(table_name)
-    end)
-  end
-
   test "feedback/2" do
     Enum.each(Utils.Feedback.test_names(), fn each ->
       exists = Keyword.has_key?(Solutions.__info__(:functions), each)

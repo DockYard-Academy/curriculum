@@ -62,8 +62,14 @@ the left when it reaches `10` in base 10 or `2` in base 2.
 
 Here's a table of binary numbers and their corresponding integer values.
 
+<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:base_2_10_comparison)
+Enum.map(1..300, fn integer ->
+  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
+  %{base10: integer, base2: binary}
+end)
+|> Kino.DataTable.new()
 ```
 
 Each byte stores a binary number. Integers between `1` and `255` can be represented in a single byte.
@@ -92,8 +98,16 @@ You can find the code point of a character using `?` in Elixir. For example the 
 Here we can see a table of alphabetical characters and their code points. Notice that capital letters and
 lowercase letters have different code points.
 
+<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend) |> Kino.DataTable.new()","title":"Code Points"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:code_points)
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+|> String.codepoints()
+|> Enum.map(fn char ->
+  <<code_point::utf8>> = char
+  %{character: char, code_point: code_point}
+end)
+|> Kino.DataTable.new()
 ```
 
 To represent strings as binaries, each byte in the binary represents a code point.
@@ -207,13 +221,23 @@ human friendly representation of binary values.
 Hexadecimal is a base 16 counting system.
 
 If base 10 uses ten symbols (0-9) and base 2 uses two symbols (0, 1), then Hexadecimal uses
-sixteen symbols.
+sixteen symbols (0-9 a-f).
 
-Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the letters `a` to `f` as
-you can see in the following table.
+Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the letters `a` to `f` as you can see in the following table.
+
+<!-- livebook:{"attrs":{"source":"\"0,1,2,3,4,5,6,7,8,9,10,a,b,c,d,e,f\"\n|> String.split(\",\")\n|> Enum.with_index()\n|> Enum.map(fn {symbol, index} -> %{integer: \"#{index}\", hexadecimal: symbol} end)\n|> Enum.take(-10)\n|> Kino.DataTable.new()","title":"Hexadecimal"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-Utils.table(:hexadecimal)
+"0,1,2,3,4,5,6,7,8,9,10,a,b,c,d,e,f"
+|> String.split(",")
+|> Enum.with_index()
+|> Enum.map(fn {symbol, index} -> %{integer: "#{index}", hexadecimal: symbol} end)
+|> Enum.take(-10)
+|> Kino.DataTable.new()
+```
+
+```elixir
+
 ```
 
 As the rightmost placeholder grows, it shifts to the left when it reaches `16`.

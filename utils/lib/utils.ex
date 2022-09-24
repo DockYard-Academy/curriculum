@@ -4,20 +4,6 @@ defmodule Utils do
   """
   alias Kino.ValidatedForm
 
-  def table(:users_and_photos) do
-    Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg"]], name: "Photos") |> Kino.render()
-    Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
-  end
-
-  def table(:user_photo_foreign_key) do
-    Kino.DataTable.new([[id: 1, image: "daily-bugel-photo.jpg", user_id: 2]], name: "Photos")
-    |> Kino.render()
-
-    Kino.DataTable.new([[id: 2, name: "Peter Parker"]], name: "Users")
-  end
-
-  def table(table_name), do: Kino.DataTable.new(apply(Utils.Table, table_name, []))
-
   def feedback(description, answers) do
     Utils.Feedback.feedback(description, answers)
   rescue

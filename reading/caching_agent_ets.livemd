@@ -1,4 +1,4 @@
-# Caching: ETS and Agent
+# Caching: Agent and ETS
 
 ```elixir
 Mix.install([
@@ -87,8 +87,25 @@ cache = %{
 That cache retrieves inputs up to `150` for fib and speeds things up a lot!
 You can think of this cache as a table of inputs and outputs.
 
+<!-- livebook:{"attrs":{"source":"defmodule Fib do\n  def get(n) do\n    sequence =\n      Stream.unfold({1, 1}, fn {a, b} ->\n        {a, {b, a + b}}\n      end)\n      |> Enum.take(n)\n\n    [0 | sequence]\n  end\nend\n\nFib.get(150)\n|> Enum.with_index()\n|> Enum.map(fn {value, index} -> %{input: index, output: value} end)\n|> Kino.DataTable.new()","title":"Fib Cache"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:fib_cache)
+defmodule Fib do
+  def get(n) do
+    sequence =
+      Stream.unfold({1, 1}, fn {a, b} ->
+        {a, {b, a + b}}
+      end)
+      |> Enum.take(n)
+
+    [0 | sequence]
+  end
+end
+
+Fib.get(150)
+|> Enum.with_index()
+|> Enum.map(fn {value, index} -> %{input: index, output: value} end)
+|> Kino.DataTable.new()
 ```
 
 However, be aware that caching should be well considered. The cache permanently takes up memory in
