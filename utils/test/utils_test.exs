@@ -19,13 +19,6 @@ defmodule UtilsTest do
     end)
   end
 
-  test "constants/1" do
-    Utils.Constants.__info__(:functions)
-    |> Enum.each(fn {constant_name, _arity} ->
-      assert Utils.constants(constant_name)
-    end)
-  end
-
   test "random" do
     assert Utils.random(:rock_paper_scissors) in [:rock, :paper, :scissors]
     assert Utils.random(1..9) in 1..9
