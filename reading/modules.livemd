@@ -20,23 +20,21 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Modules
 
-As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions".
+As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions". We use them to organize and group related functions together.
 
-Here's what an empty module looks like.
+We use the `defmodule` keyword to define a module like so.
 
 ```elixir
-defmodule Greeter do
+defmodule MyModule do
 end
 ```
 
-Again, don't worry about the somewhat strange-looking return value.
-`{:module, Greeter, <<70, 79, 82, 49, 0, 0, 4, ...>>, nil}` That's how Elixir represents
-modules internally.
+Don't worry about the output `{:module, MyModule, <<70, 79, 82, 49, 0, 0, 4, ...>>, nil}`. That's just how Elixir represents modules internally, and it's not important for our understanding.
 
-Let's break down what this all means.
+Let's break down the code above.
 
 1. `defmodule` a keyword that means "define module".
-2. `Greeter` is the name of this module. It can be any valid name, and should be **CapitalCase** which is often called **PascalCase**.
+2. `MyModule` is the name of this module. It can be any valid name, and should be **CapitalCase** which is often called **PascalCase**.
    you'll often hear the name of the module referred to as the **namespace** that functions are organized under.
 3. `do` a keyword that separates the module name and its internal implementation.
 4. `end` a keyword that finishes the module definition.
@@ -47,7 +45,7 @@ You can define functions inside a module using the following syntax.
 ```elixir
 defmodule Greeter do
   def hello do
-    "hello world"
+    "Hello"
   end
 end
 ```
@@ -76,11 +74,11 @@ Here's a new `hi/1` function that says hi to a person.
 ```elixir
 defmodule Greeter do
   def hello do
-    "hello world"
+    "Hello"
   end
 
   def hi(name) do
-    "hi #{name}"
+    "Hi #{name}"
   end
 end
 ```
@@ -93,8 +91,20 @@ Greeter.hi("Peter Parker")
 
 ### Your Turn
 
-In the Elixir cell below, create a `Math` module with a function `add` that adds two integers
-together.
+Create a `Math` module with an `add/2` function that adds two numbers together.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Math do
+  def add(int1, int2) do
+    int1 + int2
+  end
+end
+```
+
+</details>
 
 ```elixir
 
@@ -118,7 +128,7 @@ end
 InspectorGadget.necktie()
 ```
 
-However, you can omit the module name. notice `gogo` instead of `InspectorGadget.gogo`
+The module can omit the module name when calling an internal function. Below, we call `gogo/1` instead of `InspectorGadget.gogo/1`
 
 ```elixir
 defmodule InspectorGadget do
@@ -134,18 +144,38 @@ end
 InspectorGadget.necktie()
 ```
 
+However, we must include the module name when using the module's function outside of the module. For example, the following will raise an error.
+
+```elixir
+gogo("necktie")
+```
+
 ### Your Turn
 
-In the Elixir cell below, add an `arms/0` function to the `InspectorGadget` module
-that calls `gogo("arms")`
+Add an `arms/0` function to the `InspectorGadget` module above that calls `gogo("arms")`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
 defmodule InspectorGadget do
   def gogo(gadget) do
     "Go go gadget #{gadget}!"
   end
+
+  def necktie do
+    gogo("necktie")
+  end
+
+  def arms do
+    gogo("arms")
+  end
 end
+
+InspectorGadget.arms()
 ```
+
+</details>
 
 ## Private Functions
 
@@ -167,12 +197,10 @@ end
 Listener.listen()
 ```
 
-However, sometimes a module must keep a function private for internal use only. Why?
-It may be for security reasons or because you don't think the function should be used anywhere but internally.
+However, sometimes a module must keep a function private for internal use only. It may be for security reasons or because you don't think the function should be used anywhere but internally.
 Often it communicates to other developers how to use your module.
 
-You can create a private module function with `defp` instead of `def`. You'll notice that below the
-`Speaker.think/0` function is undefined to the outside world.
+You can create a private module function with `defp` instead of `def`. You'll notice that below the `Speaker.think/0` function is undefined to the outside world.
 
 ```elixir
 defmodule Speaker do
@@ -198,6 +226,38 @@ defmodule Speaker do
 end
 
 Speaker.speak()
+```
+
+## Callback Functions
+
+Similar to anonymous functions, we can pass named functions as callback functions, however we have to explicitly provide the functions arity using the capture operator `&`.
+
+```elixir
+defmodule HigherOrder do
+  def higher_order_function(callback) do
+    callback.()
+  end
+end
+
+defmodule Callback do
+  def callback_function do
+    "I was called!"
+  end
+end
+
+HigherOrder.higher_order_function(&Callback.callback_function/0)
+```
+
+Notice we cannot simply pass `Callback.callback_function` as an argument.
+
+```elixir
+HigherOrder.higher_order_function(Callback.callback_function())
+```
+
+Alternatively, we can wrap the callback function in an anonymous function.
+
+```elixir
+HigherOrder.higher_order_function(fn -> Callback.callback_function() end)
 ```
 
 ## Namespaces
@@ -235,9 +295,9 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-However, sometimes you need to further split the functions in a module.
-This can be because the module is too large, or because the module has multiple
-separate responsibilities and it's more clear to separate them.
+### SubModules
+
+Sometimes you need to further split the functions in a module. This can be because the module is too large, or because the module has multiple separate responsibilities and it's more clear to separate them.
 
 ```mermaid
 flowchart
@@ -247,34 +307,120 @@ flowchart
   SubModule --> c[Function]
 ```
 
-To do this you can nest modules with a period `.`.
+To create submodules, you can separate module names with a period `.`.
 
 ```elixir
-defmodule MyModule.SubModule do
-  def my_function do
-    "my return value"
+defmodule Languages.English do
+  def greeting do
+    "Hello"
   end
 end
 
-MyModule.SubModule.my_function()
+Languages.English.greeting()
 ```
 
 ### Your Turn
 
-In the Elixir cell below, create two submodules under as single namespace.
+Create a submodule under the `Languages` module with a `greeting/0` function that returns a greeting in another language. You may choose the language and the name of the submodule.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Languages.Spanish do
+  def greeting do
+    "Hola"
+  end
+end
+```
+
+</details>
+
+Enter your solution below.
 
 ```elixir
 
 ```
 
+### Nested Modules
+
+It's also possible, though not very common, to define a module inside another module. This will automatically nest the namespaces.
+
+```elixir
+defmodule Languages do
+  defmodule English do
+    def greeting do
+      "Hello"
+    end
+  end
+
+  defmodule Spanish do
+    def greeting do
+      "Hola"
+    end
+  end
+end
+```
+
+```elixir
+Languages.English.greeting()
+```
+
+```elixir
+Languages.Spanish.greeting()
+```
+
 ## Module Attributes
 
-What if you have many functions in a module that all use the same value? You've already learned
-that repeating the same hard-coded value over and over again isn't very reusable, and you've
-used variables to pass the same value around in your code. However, that's not possible in a module.
+While modules are mostly used to group functions, we can also include **compile-time** data inside the module that our functions can all use.
+
+We use the `@` symbol to define a compile-time module attribute.
+
+```elixir
+defmodule Hero do
+  @name "Spider-Man"
+  @nemesis "Green Goblin"
+
+  def introduce do
+    "Hello, my name is #{@name}!"
+  end
+
+  def catchphrase do
+    "I'm your friendly neighborhood #{@name}!"
+  end
+
+  def defeat do
+    "I #{@name} will defeat you #{@nemesis}!"
+  end
+end
+```
+
+```elixir
+Hero.introduce()
+```
+
+```elixir
+Hero.catchphrase()
+```
+
+```elixir
+Hero.defeat()
+```
+
+We can use module attributes to avoid significant code repitition where many functions all need to use the same value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Change the module attributes for the `Hero` module above to match your favourite super hero. Re-evaluate the `Hero` functions to see the output change.
+
+You will have to re-evaluate the `Hero` module after changing it, to ensure it compiles with the latest version.
+
+## Module Scope
 
 Modules and functions close themselves to the outside world. We call this `scope`.
-Modules, functions, and many other similar constructs in Elixir are `lexically scoped`.
+Modules, functions, and many other similar constructs in Elixir are [lexically scoped](https://en.wikipedia.org/wiki/Scope_(computer_science)).
 
 That means that variables defined in one scope cannot be accessed in another scope.
 
@@ -316,96 +462,24 @@ defmodule MyModule do
 end
 ```
 
-To get around this, Elixir allows you to store constant values as module attributes
-using the `@module_attribute value` syntax. You can then access the `@module_attribute` value in
-any module function.
-
-```mermaid
-flowchart
-  direction TB
-  subgraph A[Top Level Scope]
-    a[Top Level Variable] --- b
-    direction TB
-    subgraph B[Module Level Scope]
-      b[Define Module Attribute] --- c
-      subgraph C[Function Level Scope]
-        c[Access Module Attribute]
-      end
-    end
-  end
-```
-
-Notice that we can use a module attribute inside of the module's function now.
+We've already seen we can share a value between functions in a module using module attributes. We can also use module attributes to provide access to outside variables. This isn't very common, and should not be overused, but it's a useful trick to be aware of.
 
 ```elixir
-defmodule MyModule do
-  @my_attribute "any valid data type"
-  def my_function do
-    @my_attribute
+name = "Jon"
+
+defmodule Greeter do
+  @name name
+  def hello do
+    "Hello #{@name}!"
   end
 end
 
-MyModule.my_function()
-```
-
-We can also access a variable in the top-level scope as long as we set a module attribute.
-
-```elixir
-top_level_variable = 1
-
-defmodule MyModule do
-  @my_attribute top_level_variable
-  def my_function do
-    @my_attribute
-  end
-end
-
-MyModule.my_function()
-```
-
-Now we can easily share constant values between multiple module functions.
-
-```elixir
-defmodule Hero do
-  @name "Batman"
-  @nemesis "Joker"
-
-  def catchphrase do
-    "I am #{@name}."
-  end
-
-  def victory do
-    "I #{@name} will defeat you #{@nemesis}!"
-  end
-end
-
-Hero.victory()
-```
-
-If the module attribute value changes, you only need to change the module attribute.
-
-```elixir
-defmodule Hero do
-  @name "Iron Man"
-  @nemesis "Iron Monger"
-
-  def catchphrase do
-    "I am #{@name}."
-  end
-
-  def victory do
-    "I #{@name} will defeat you #{@nemesis}!"
-  end
-end
-
-Hero.victory()
+Greeter.hello()
 ```
 
 ## Multiple Function Clauses
 
 Elixir allows us to define multiple functions with the same name but that expect different parameters.
-This means the function has multiple function clauses.
-For example, we can take our `hi` function and create a new version that says hi to two people.
 
 ```elixir
 defmodule Greeter do
@@ -421,11 +495,9 @@ end
 Greeter.hi("Peter Parker", "Mary Jane")
 ```
 
-In the example above, each function has a different **arity**. You can treat each function with
-a different arity as a different function. We often refer to each function by its arity
-as `function/arity`.
+Each function clause has a different **arity**. We can treat each function with a different arity as a completely separate function.
 
-So the `Greeter` module has a  `hi/1` (hi one) function and `hi/2` (hi two) function.
+So above we have a `Greeter.hi/1` function, and a `Greeter.hi/2` function.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -433,6 +505,30 @@ So the `Greeter` module has a  `hi/1` (hi one) function and `hi/2` (hi two) func
 
 Create a `Math` module with `add/2` and `add/3` functions. Each should add all of its parameters
 together.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Math.add(2, 5) # 7
+Math.add(1, 2, 3) # 6
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Math do
+  def add(int1, int2, int3) do
+    int1 + int2 + int3
+  end
+
+  def add(int1, int2) do
+    int1 + int2
+  end
+end
+```
+
+</details>
 
 ```elixir
 
@@ -477,7 +573,7 @@ end
 Greeter.greet()
 ```
 
-However, you can even have a default for the first of multiple parameters. Elixir
+You can even have a default for the first of multiple parameters. Elixir
 is smart enough to handle that!
 
 ```elixir
@@ -489,6 +585,10 @@ end
 
 Greeter.greet("HI")
 ```
+
+This sometimes results in some confusion with the function's arity, and the number of arguments passed into the function. For example, the `Greeter.greet/2` function above has an arity of `2`, despite only being called with fewer than two arguments.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
