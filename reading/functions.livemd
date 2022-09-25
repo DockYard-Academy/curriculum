@@ -257,22 +257,28 @@ multiline_function.()
 
 ### Your Turn
 
-:walnuts
-In the Elixir cell below, create a function `is_even?` that checks if an integer is even or not.
-The function should return `true` if the integer is even and `false` if the integer is odd.
+Create a function `is_even?/1` that accepts an integer, and returns `true` if the integer is even, or `false` if the integer is odd.
 
-Replace `nil` with your anonymous function.
-
-<details>
-<summary>Hint</summary>
-
-You can use <code>rem</code> to determine if an integer is even with <code>rem(integer, 2) == 0</code>.
-</details>
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-is_even? = nil
+is_even?(2) # true
+is_even?(1) # false
+```
 
-Utils.feedback(:is_even?, is_even?)
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+is_even? = fn int -> rem(int, 2) == 0 end 
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Multi-Parameter Functions
@@ -316,15 +322,29 @@ is called `add_two/2`.
 
 ### Your Turn
 
-Create a multi-parameter `calculate_force/2` function.
-`calculate_force/2` should accept `mass` and `acceleration` and return `mass * acceleration`.
+Create a function `calculate_force/2` that accepts a `mass` and `acceleration` parameters.
+The `calculate_force/2` function should return `mass * acceleration`.
 
-Replace `nil` with your anonymous function.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-calculate_force = nil
+calculate_force(10, 10) # 100
+calculate_force(2, 4) # 8
+```
 
-Utils.feedback(:calculate_force, calculate_force)
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+calculate_force = fn mass, acceleration -> mass * acceleration end
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Shorthand Syntax
@@ -352,14 +372,54 @@ add_two.(2, 3)
 
 ### Your Turn
 
-Using shorthand syntax, create a `calculate_force` function which multiplies `mass` and `acceleration`.
+Using shorthand syntax, create a `subtract/2` function which subtracts two numbers.
 
-Replace `nil` with your answer.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-calculate_force = nil
+subtract(1, 1) # 0
+subtract(20, 25) # -5
+```
 
-Utils.feedback(:calculate_force, calculate_force)
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+subtract = &(&1 - &2)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+### Your Turn
+
+Using shorthand syntax, create a `multiply_three/3` function which multiplies three numbers together.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+multiply_three(2, 2, 2) # 8
+multiply_three(2, 5, 3) # 30
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+multiply_three = &(&1 * &2 * &3)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## First-class Functions
@@ -368,44 +428,86 @@ Functions in Elixir are [first-class citizens](https://en.wikipedia.org/wiki/Fir
 
 For our purposes, this means we can bind functions to variables, store them in other data types, pass them as arguments to other functions.
 
+We'll see something like `#Function<42.3316493/1 in :erl_eval.expr/6>` if we try to view a function as data. This is the internal representation of the function in Elixir. We can only view a function this way, we cannot use this syntax in our code.
+
+```elixir
+[fn int -> int * 2 end, 2, 3, 4]
+```
+
+Functions are just data as far as our programs are concerned. We can work with them like we would work with any data structure.
+
+```elixir
+[my_function | _tail] = [fn int -> int * 2 end, 2, 3, 4]
+
+my_function.(10)
+```
+
 If a function takes in another function as a parameter, it's called a **higher-order function**.
+The function passed in is called a **callback function**.
 
-For example, we could make a function named `call_twice`, which calls a function on a value twice.
-
-```elixir
-call_twice = fn function, parameter -> function.(function.(parameter)) end
-```
-
-We'll use our `double` function and create a quadruple result.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-double = fn number -> number * 2 end
+callback_function = fn -> end
 
-call_twice.(double, 3)
+higher_order_function.(callback_function)
 ```
 
-We don't need to bind the passed function to a variable first. We can pass
-in the anonymous function directly.
+For example, we can create a `call_with_2/1` higher order function, that accepts a callback function, and calls it with the integer `2`.
 
 ```elixir
-call_twice.(fn number -> number * 2 end, 5)
+call_with_2 = fn callback -> callback.(2) end
 ```
 
-Whenever you pass a function into a higher-order function with the
-expectation that the higher-order function is going to call it, the passed function is
-referred to as a **callback function**.
+We can then use the `call_with_2/1` higher order function with an `add_three/1` callback function. This calls `add_three/1` with `2` to return `5`.
+
+```elixir
+add_three = fn int -> int + 3 end
+
+call_with_2.(add_three)
+```
+
+Instead of binding the callback function to a variable, we can pass in the anonymous function directly.
+
+```elixir
+call_with_2.(fn int -> int + 3 end)
+```
+
+Callback functions are useful for creating re-usable behavior with slight alterations. For example, in Elixir we have a built-in function `Enum.map/2` which we will cover in later lessons.
+
+`Enum` is a module. We'll cover modules in the next [Modules](./modules.livemd) reading material.
+
+`Enum.map/2` can accept a list as the first argument, and a callback function as the second argument. The callback function is applied to every element in the list to create a new list.
+
+```elixir
+Enum.map([1, 2, 3], fn element -> element * 2 end)
+```
 
 ### Your Turn
 
-Create a `call_with_20` function. the `call_with_20` function should accept a function as it's
-argument and call that function with the integer `20`.
+Create a `call_with_10_and_20/1` function. the `call_with_10_and_20/1` function should accept a call back function, and call the function with `10` as the first argument, and `20` as the second argument.
 
-Replace `nil` with your anonymous function.
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+add = fn int1, int2 -> end
+
+call_with_10_and_20.(add) # 30
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+call_with_10_and_20 = fn callback -> callback.(10, 20) end
+```
+
+</details>
+
+Enter your solution below.
 
 ```elixir
 call_with_20 = nil
-
-Utils.feedback(:call_with_20, call_with_20)
 ```
 
 ## Pipe Operator
@@ -413,8 +515,8 @@ Utils.feedback(:call_with_20, call_with_20)
 To create more complex behavior, you'll often compose smaller functions together. Composing functions together reflects
 nature of problem-solving where we take large problems and break them down into smaller ones.
 
-To help compose functions together, Elixir provides the pipe `|>` operator.
-That's the `|` symbol likely above your enter key, and the greater than `>` symbol side by side to make `|>`.
+To help compose functions together, Elixir provides the pipe <span style="background-color: rgb(225 232 240); padding: 0.1rem 0.5rem; border-radius: 0.5rem;">|></span> operator.
+That's the `|` symbol likely above your enter key, and the greater than `>` symbol side by side to make <span style="background-color: rgb(225 232 240); padding: 0.1rem 0.5rem; border-radius: 0.5rem;">|></span>.
 
 The pipe operator allows you to take the output of one function and pass it in as an argument
 for the input of another function.
@@ -466,14 +568,16 @@ two(1, 2) # how to call two/2 by itself.
 one.() |> two.(2)
 ```
 
-You can also pass in a value to a pipe. It's generally non-idiomatic to use the
-pipe operator for a single value and function.
+You can also pass in a value to a pipe. It's generally non-idiomatic (not following the standards of the community) to use the pipe operator for a single value and function.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 # non-idiomatic
 1 |> two.()
+
+# idiomatic
+two.(1)
 
 # idiomatic
 1 |> two.() |> three()
@@ -488,24 +592,35 @@ exists as syntax sugar to improve the clarity of your code.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use the `add/2`, `subtract/2`, and `multiply/2` functions provided.
-Use the pipe operator to:
+Create three functions `add/2`, `subtract/2`, and `multiply/2` which add, subtract, or multiply two numbers.
+
+Use these functions with the pipe operator <span style="background-color: rgb(225 232 240); padding: 0.1rem 0.5rem; border-radius: 0.5rem;">|></span> to:
 
 1. start with `10`.
 2. add `2`.
 3. multiply by `5`.
 4. subtract by `4`.
 
-Replace `nil` with your answer.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
 add = fn int1, int2 -> int1 + int2 end
-multiply = fn int1, int2 -> int1 * int2 end
 subtract = fn int1, int2 -> int1 - int2 end
+multiply = fn int1, int2 -> int1 * int2 end
 
-answer = nil
+10
+|> add.(2)
+|> multiply.(2)
+|> subtract.(4)
+```
 
-Utils.feedback(:pipe_operator, answer)
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Commit Your Progress
