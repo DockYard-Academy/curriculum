@@ -105,51 +105,56 @@ end
 %Person{}
 ```
 
+## Enforce Keys
+
 It's common to validate data in a struct. For example, you can use the `@enforce_keys`
-module attribute to enforce that certain keys are set, other wise the struct will throw an error
-`the following keys must also be given when building struct Person: [:name]`.
+module attribute to enforce that certain keys are set.
 
 ```elixir
-defmodule Person do
+defmodule EnforcedNamePerson do
   @enforce_keys [:name]
   defstruct [:name]
 end
-
-%Person{}
 ```
 
-Right now, we can create a Person struct who has a name of 25. That doesn't really make much sense.
+Without the key, the struct instance will raise an error.
 
 ```elixir
-defmodule Person do
-  defstruct [:name]
-end
-
-%Person{name: 25}
+%EnforcedNamePerson{}
 ```
 
-So you can imagine it's useful to validate the data in a struct upon creation.
-It's a common pattern to create a `new` function in the struct that handles creation and validation.
-
-Here's how we could use the `is_binary/1` guard from earlier to ensure that name is only ever a string.
-You'll notice we return a tuple with `:ok` and the struct. This is part of a common pattern to
-communicate with code that the `Person` was created successfully.
-
-Now, our code will give us an error if we misuse the `Person` struct! Excellent.
+To avoid repetion, we can use the `@enforce_keys` module attribute in the `defstruct` definition, and add any non-enforced keys using `++`.
 
 ```elixir
-defmodule Person do
-  defstruct [:name]
-
-  def new(name) when is_binary(name) do
-    {:ok, %Person{name: name}}
-  end
+defmodule EnforcedNamePersonWithAge do
+  @enforce_keys [:name]
+  defstruct @enforce_keys ++ [:age]
 end
-
-Person.new(25)
 ```
 
-### Module Functions
+### Your Turn
+
+Define a `Coordinate` struct which must have `:x` and `:y` keys.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Coordinate do
+  @enforce_keys [:x, :y]
+  defstruct @enforce_keys
+end
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Module Functions
 
 A module that defines a struct can contain functions just like a normal module.
 
@@ -157,16 +162,14 @@ A module that defines a struct can contain functions just like a normal module.
 defmodule Person do
   defstruct [:name]
 
-  def new(name) when is_binary(name) do
-    {:ok, %Person{name: name}}
-  end
-
   def greet(person) do
     "Hello, #{person.name}."
   end
 end
+```
 
-{:ok, person} = Person.new("Peter")
+```elixir
+person = %Person{name: "Peter"}
 
 Person.greet(person)
 ```
@@ -174,53 +177,77 @@ Person.greet(person)
 ### Your Turn
 
 * Define a new struct `Hero`.
+* A `Hero` will have a `:name` and `:secret_identity`.
 
-* A `Hero` will have a `:name`, `:catchphrase`, and `:secret_identity`
+<!-- livebook:{"force_markdown":true} -->
 
-* Create a `reveal/1` function which takes in an instance of a hero and returns
+```elixir
+hero = %Hero{
+  name: "Spider-Man",
+  secret_identity: "Peter Parker"
+}
+```
 
-  `"I am secretly #{hero.secret_identity}"`
+* Create a `Hero.greeting/1` function which uses the `hero` struct instance and return a greeting.
 
-* Create an `introduce/2` function which takes in an instance of a hero and a greeting
-  and returns
+<!-- livebook:{"force_markdown":true} -->
 
-  `"#{greeting} I am #{hero.name}"`
+```elixir
+Hero.greeting(hero) # "I am Spider-Man."
+```
+
+* Create a `Hero.reveal/1` function which accepts the `hero` struct instance and reveals the hero's secret identity.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Hero.reveal(hero) # "I am Peter Parker."
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Hero do
+  defstruct [:name, :secret_identity]
+
+  def greeting(hero) do
+    "I am #{hero.name}."
+  end
+
+  def reveal(hero) do
+    "I am #{hero.secret_identity}."
+  end
+end
+```
+
+</details>
+
+Enter your solution below.
 
 ```elixir
 
 ```
 
-### Your Turn
-
-In the Elixir below, create an instance of a Hero with the following data and bind it
-to the variable `spider_man`.
-
-```mermaid
-classDiagram
-  class Hero {
-    name: Spider Man
-    catchphrase: Friendly neighborhood Spiderman!
-    secret_identity: Peter Parker
-  }
-```
+When finished create bind a variable `hero` to an instance of your `Hero` struct.
 
 ```elixir
 
 ```
 
-Use the `Hero.introduce/2` function on `spider_man`.
+Use the `Hero.greeting/1` function on `hero` to ensure it works correctly.
 
 ```elixir
 
 ```
 
-Use the `Hero.reveal/1` function on `spider_man`.
+Use the `Hero.reveal/1` function on `hero` to ensure it works correctly.
 
 ```elixir
 
 ```
 
-### Updating A Struct
+## Updating Structs
 
 Structs are an extension of maps under the hood, so you can use the same map update syntax.
 
@@ -237,10 +264,11 @@ updated = %{initial | key: "new value"}
 
 ## Further Reading
 
-For more on structs, you can read
+Consider the following resource(s) to deepen your understanding of the topic.
 
-* [The Elixir Documentation](https://elixir-lang.org/getting-started/structs.html)
-* [Elixir School](https://elixirschool.com/en/lessons/basics/modules#structs-2)
+* [The Elixir Documentation: Structs](https://elixir-lang.org/getting-started/structs.html)
+* [Elixir School: Structs](https://elixirschool.com/en/lessons/basics/modules#structs-2)
+* [Exercism: Structs](https://exercism.org/tracks/elixir/concepts/structs)
 
 ## Commit Your Progress
 
