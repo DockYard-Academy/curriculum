@@ -14,24 +14,17 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Exercise
+## Rock Paper Scissors Lizard Spock
 
-In the Elixir cell below, you're going to create a `RockPaperScissorsLizardSpock`
-module with a `RockPaperScissorsLizardSpock.play/2` function.
+You're going to create a Rock Paper Scissors Lizard Spock game. Rock Paper Scissors Lizard Spock is a more complex adaptation of Rock Paper Scissors.
 
-The `play/2` function will accept input from two players.
-The input will be either `:rock`, `:paper`, `:scissors`, `:lizard`, or `:spock`.
-
-The `play/2` function should return `"____ beats ____."` depending on who wins.
-If it's a draw, then return `"Tie game!"`
-
-The rules to rock paper scissors lizard spock start normal:
+The rules start the same as normal rock paper scissors.
 
 * Rock beats Scissors.
 * Paper beats Rock.
 * Scissors beats Paper.
 
-Then add the following extra rules
+Then we add the following extra rules
 
 * Rock beats Lizard.
 * Lizard beats Spock.
@@ -41,78 +34,65 @@ Then add the following extra rules
 * Paper beats Spock.
 * Spock beats Rock.
 
-For example,
+We'll represent these choices as atoms `:rock, :paper, :scissors, :lizard, :spock`.
 
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
+You're going to create a `RockPaperScissorsLizardSpock` module. Implement the functions as documented.
 
 ```elixir
-RockPaperScissorsLizardSpock.play(:lizard, :spock)
-":lizard beats :spock"
-```
-
-<!-- livebook:{"attrs":{"assertions":"assert Keyword.has_key?(RockPaperScissorsLizardSpock.__info__(:functions), :play),\n        \"Ensure you define the `play/2` function\"\n\ngame_permutations =\n  for player1 <- [:rock, :paper, :scissors, :lizard, :spock],\n      player2 <- [:rock, :paper, :scissors, :lizard, :spock] do\n    {player1, player2}\n  end\n\nbeats? = fn player1, player2 ->\n  {player1, player2} in [\n    {:rock, :scissors},\n    {:paper, :rock},\n    {:scissors, :paper},\n    {:rock, :lizard},\n    {:lizard, :spock},\n    {:scissors, :lizard},\n    {:lizard, :paper},\n    {:paper, :spock},\n    {:spock, :scissors},\n    {:spock, :rock}\n  ]\nend\n\nEnum.each(game_permutations, fn {p1, p2} ->\n  expected_result =\n    cond do\n      beats?.(p1, p2) -> \"#{p1} beats #{p2}.\"\n      beats?.(p2, p1) -> \"#{p2} beats #{p1}.\"\n      true -> \"Tie game!\"\n    end\n\n  actual = RockPaperScissorsLizardSpock.play(p1, p2)\n\n  assert actual == expected_result,\n          \"\"\"\n          Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).\n          expected: #{inspect(expected_result)}\n          received: #{inspect(actual)}\n          \"\"\"\nend)","code":"defmodule RockPaperScissorsLizardSpock do\r\nend","solution":"defmodule RockPaperScissorsLizardSpock do\n  def play(a, b) do\n    cond do\n      beats?(a, b) -> \"#{a} beats #{b}.\"\n      beats?(b, a) -> \"#{b} beats #{a}.\"\n      true -> \"Tie game!\"\n    end\n  end\n\n  defp beats?(a, b) do\n    {a, b} in [\n      {:rock, :scissors},\n      {:paper, :rock},\n      {:scissors, :paper},\n      {:rock, :lizard},\n      {:lizard, :spock},\n      {:spock, :scissors},\n      {:scissors, :lizard},\n      {:lizard, :paper},\n      {:paper, :spock},\n      {:spock, :rock}\n    ]\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    defmodule RockPaperScissorsLizardSpock do
-    end
-
-    assert Keyword.has_key?(RockPaperScissorsLizardSpock.__info__(:functions), :play),
-           "Ensure you define the `play/2` function"
-
-    game_permutations =
-      for player1 <- [:rock, :paper, :scissors, :lizard, :spock],
-          player2 <- [:rock, :paper, :scissors, :lizard, :spock] do
-        {player1, player2}
-      end
-
-    beats? = fn player1, player2 ->
-      {player1, player2} in [
-        {:rock, :scissors},
-        {:paper, :rock},
-        {:scissors, :paper},
-        {:rock, :lizard},
-        {:lizard, :spock},
-        {:scissors, :lizard},
-        {:lizard, :paper},
-        {:paper, :spock},
-        {:spock, :scissors},
-        {:spock, :rock}
-      ]
-    end
-
-    Enum.each(game_permutations, fn {p1, p2} ->
-      expected_result =
-        cond do
-          beats?.(p1, p2) -> "#{p1} beats #{p2}."
-          beats?.(p2, p1) -> "#{p2} beats #{p1}."
-          true -> "Tie game!"
-        end
-
-      actual = RockPaperScissorsLizardSpock.play(p1, p2)
-
-      assert actual == expected_result,
-             """
-             Failed on RockPaperScissorsLizardSpock.play(:#{p1}, :#{p2}).
-             expected: #{inspect(expected_result)}
-             received: #{inspect(actual)}
-             """
-    end)
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
 defmodule RockPaperScissorsLizardSpock do
+  @moduledoc """
+  Rock Paper Scissors Lizard Spock Game
+  """
+
+  @doc """
+  Returns `true` if the first guess beats the second, and `false` otherwise.
+  
+  ## Winning Examples
+  
+    iex> RockPaperScissorsLizardSpock.beats?(:rock, :lizard)
+    true
+    iex> RockPaperScissorsLizardSpock.beats?(:spock, :scissors)
+    true
+    iex> RockPaperScissorsLizardSpock.beats?(:scissors, :lizard)
+    true
+    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :paper)
+    true
+    iex> RockPaperScissorsLizardSpock.beats?(:paper, :spock)
+    true
+    iex> RockPaperScissorsLizardSpock.beats?(:spock, :rock)
+    true
+  
+  ## Losing Examples
+  
+    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
+    false
+    iex> RockPaperScissorsLizardSpock.beats?(:scissors, :spock)
+    false
+    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :scissors)
+    false
+    iex> RockPaperScissorsLizardSpock.beats?(:paper, :lizard)
+    false
+    iex> RockPaperScissorsLizardSpock.beats?(:spock, :paper)
+    false
+    iex> RockPaperScissorsLizardSpock.beats?(:rock, :spock)
+    false
+  """
+  def beats?(guess1, guess2) do
+  end
+
+  @doc """
+  Return "Player 1 Wins!", "Player 2 Wins!", or "Draw" depending on which player guess won.
+  
+  ## Examples
+  
+    iex> RockPaperScissorsLizardSpock.play(:lizard, :rock)
+    "Player 2 Wins!"
+  
+    iex> RockPaperScissorsLizardSpock.play(:rock, :lizard)
+    "Player 1 Wins!"
+  """
+  def play(player1, player2) do
+  end
 end
 ```
 

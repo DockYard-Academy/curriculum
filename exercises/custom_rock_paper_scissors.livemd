@@ -48,47 +48,92 @@ ExUnit.start(auto_run: false)
 defmodule Assertion do
   use ExUnit.Case
 
-  test "" do
-    defmodule CustomGame do
-    end
+  test "Exercise" do
+    try do
+      Process.flag(:trap_exit, true)
 
-    assert 3 == Keyword.get(CustomGame.__info__(:functions), :new),
-           "Ensure you define the `new/3` function"
+      defmodule CustomGame do
+      end
 
-    assert Keyword.get(CustomGame.__info__(:functions), :__struct__),
-           "Ensure you use `defstruct`."
+      assert 3 == Keyword.get(CustomGame.__info__(:functions), :new),
+             "Ensure you define the `new/3` function"
 
-    assert match?(%{rock: _, paper: _, scissors: _}, struct(CustomGame)),
-           "Ensure you use `defstruct` with :rock, :paper, and :scissors."
+      assert Keyword.get(CustomGame.__info__(:functions), :__struct__),
+             "Ensure you use `defstruct`."
 
-    assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
-             CustomGame.new(:custom_rock, :custom_paper, :custom_scissors)
+      assert match?(%{rock: _, paper: _, scissors: _}, struct(CustomGame)),
+             "Ensure you use `defstruct` with :rock, :paper, and :scissors."
 
-    assert 3 == Keyword.get(CustomGame.__info__(:functions), :play),
-           "Ensure you define the `play/3` function"
+      assert %{rock: :custom_rock, paper: :custom_paper, scissors: :custom_scissors} =
+               CustomGame.new(:custom_rock, :custom_paper, :custom_scissors)
 
-    game = CustomGame.new(:custom_rock, :custom_paper, :custom_scissors)
+      assert 3 == Keyword.get(CustomGame.__info__(:functions), :play),
+             "Ensure you define the `play/3` function"
 
-    beats? = fn p1, p2 ->
-      {p1, p2} in [
-        {:custom_rock, :custom_scissors},
-        {:custom_paper, :custom_rock},
-        {:custom_scissors, :custom_paper}
-      ]
-    end
+      game = CustomGame.new(:custom_rock, :custom_paper, :custom_scissors)
 
-    for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
-        player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
-      result = CustomGame.play(game, player1, player2)
+      beats? = fn p1, p2 ->
+        {p1, p2} in [
+          {:custom_rock, :custom_scissors},
+          {:custom_paper, :custom_rock},
+          {:custom_scissors, :custom_paper}
+        ]
+      end
 
-      expected_result =
-        cond do
-          beats?.(player1, player2) -> "#{player1} beats #{player2}"
-          beats?.(player2, player1) -> "#{player2} beats #{player1}"
-          true -> "draw"
-        end
+      for player1 <- [:custom_rock, :custom_paper, :custom_scissors],
+          player2 <- [:custom_rock, :custom_paper, :custom_scissors] do
+        result = CustomGame.play(game, player1, player2)
 
-      assert result == expected_result
+        expected_result =
+          cond do
+            beats?.(player1, player2) -> "#{player1} beats #{player2}"
+            beats?.(player2, player1) -> "#{player2} beats #{player1}"
+            true -> "draw"
+          end
+
+        assert result == expected_result
+      end
+    catch
+      error ->
+        flunk("""
+          Your solution threw the following error:
+
+          #{inspect(error)}
+        """)
+
+      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
+        flunk("""
+            GenServer crashed with the following error:
+
+            #{inspect(error)}
+
+            When it recieved: #{inspect(message)} #{message_type}
+
+            Likely you need to define the corresponding handler for #{inspect(message)}.
+
+            Ensure you defined a handle_call/3, handle_info/2, or handle_cast/2 or appropriate handler function.
+
+              def handle_call(:message, _from, state) do
+                ...
+              end
+
+            Also ensure you call GenServer.call/2, GenServer.cast/2, or otherwise send the message correctly.
+
+              GenServer.call(pid, :message)
+        """)
+
+      :exit, error ->
+        flunk("""
+          Unhandled exit with the following error:
+
+          #{inspect(error)}
+        """)
+    after
+      # all warnings and errors are printed to the previous Kino Frame
+      # to avoid cluttering the test results display.
+      Process.sleep(10)
+      Kino.render(Kino.Markdown.new("### Test Results 
+<hr/>"))
     end
   end
 end
@@ -97,6 +142,7 @@ ExUnit.run()
 
 # Make variables and modules defined in the test available.
 # Also allows for exploration using the output of the cell.
+# Unfortunately, this results in duplication of warnings.
 defmodule CustomGame do
 end
 ```

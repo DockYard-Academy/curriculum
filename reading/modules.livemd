@@ -598,6 +598,82 @@ In the Elixir cell below, define a module with a function that uses a default ar
 
 ```
 
+## Documentation
+
+We can document modules using `@doc` and `@moduledoc` module attributes with a multiline string.
+
+`@moduledoc` should describe the module at a high level. `@doc` should document a single function in the module.
+
+```elixir
+defmodule Greeter do
+  @moduledoc """
+  Greeter
+  
+  Return common greetings.
+  """
+
+  @doc """
+  Returns a personalized greeting for one person.
+  """
+  def greet(name) do
+    "Hello #{name}!"
+  end
+
+  @doc """
+  Returns a personalized greeting for two people.
+  """
+  def greet(name1, name2) do
+    "Hello #{name1}! Hello #{name2}!"
+  end
+end
+```
+
+Sometimes documentation will include examples of how the code should behave. This is usually kept in an examples section.
+
+We use `iex>` to declare that the code example should be executable. This represents the [IEx Shell](./iex.livemd) which we will learn more about in a future lesson.
+
+```elixir
+defmodule Greeter do
+  @moduledoc """
+  Greeter
+  
+  Return common greetings.
+  """
+
+  @doc """
+  Returns a personalized greeting for one person.
+  
+  ## Examples
+  
+    iex> Greeter.greet("Bill")
+    "Hello Bill!"
+  """
+  def greet(name) do
+    "Hello #{name}!"
+  end
+
+  @doc """
+  Returns a personalized greeting for two people.
+  
+    ## Examples
+  
+    iex> Greeter.greet("Bill", "Jon")
+    "Hello Bill! Hello Jon!"
+  """
+  def greet(name1, name2) do
+    "Hello #{name1}! Hello #{name2}!"
+  end
+end
+```
+
+Livebook automatically executes these examples to ensure they work as documented. You will start to see these used in course exercises.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Use `@doc` and `@moduledoc` to document the `Math` module you previously created in this lesson.
+
 ## Commit Your Progress
 
 Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
