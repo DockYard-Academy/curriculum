@@ -34,6 +34,35 @@ We've created a map that represents the following maze. Each cardinal direction 
 
 ![](images/atom_key_maze.png)
 
+<!-- livebook:{"break_markdown":true} -->
+
+Use **map.key** notation to navigate the maze and retrieve the `"Exit!"` string.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+maze = %{
+  south: %{
+    west: %{
+      south: %{
+        east: %{
+          south: %{
+            east: %{
+              south: "Exit!"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+maze.south.west.south.east.south.east.south
+```
+
+</details>
+
 ```elixir
 maze = %{
   south: %{
@@ -52,48 +81,21 @@ maze = %{
 }
 ```
 
-Use **map.key** notation to navigate the maze and retrieve the `"Exit!"` string.
-
-<!-- livebook:{"break_markdown":true} -->
-
-In the Elixir cell below, use **map.key** notation to navigate the following maze. The maze is
-in an `atom_maze` variable.
-
-<!-- livebook:{"break_markdown":true} -->
-
-Replace `nil` with your answer.
-
-```elixir
-atom_maze = %{
-  south: %{
-    west: %{
-      south: %{
-        east: %{
-          south: %{
-            east: %{
-              south: "Exit!"
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-path = nil
-```
-
 ## The String Maze
 
-In the Elixir cell below, use **map[key]** notation to get to the end of the following maze.
-The maze is in a `string_maze` variable. Replace `nil` with your answer.
+Use use **map[key]** notation to navigate the maze and retrieve the `"Exit!"` string.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/string_maze_small.png)
 
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
 ```elixir
-string_maze = %{
+maze = %{
   "south" => %{
     "east" => %{
       "south" => %{
@@ -102,7 +104,6 @@ string_maze = %{
             "west" => %{
               "south" => %{
                 "east" => %{
-                  # using string_maze[key] syntax, access this deeply nested value.
                   "south" => "Exit!"
                 }
               }
@@ -114,116 +115,186 @@ string_maze = %{
   }
 }
 
-path = nil
-
-Utils.feedback(:string_maze, [string_maze, path])
+maze["south"]["east"]["south"]["west"]["south"]["west"]["south"]["east"]["south"]
 ```
 
-## Create Your Own Maze
+</details>
+
+```elixir
+maze = %{
+  "south" => %{
+    "east" => %{
+      "south" => %{
+        "west" => %{
+          "south" => %{
+            "west" => %{
+              "south" => %{
+                "east" => %{
+                  "south" => "Exit!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Bonus: Treasure Map
+
+You have been given a treasure map (pun intended). That will lead you to `"gold"`.
+
+Use **map[key]** and/or **map.key** notation to retrieve the `"gold"` value in the `treasure_map`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+
+treasure_map["south ten paces"][10][:"east three paces"][[1, 2, 3]][{"turn", "right"}][:dig]
+```
+
+</details>
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### (Extra Bonus) Update the Treasure Map
+
+Update the `treasure_map` such that the `"gold"` is now `"taken"`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+We can update the treasure map using map update syntax `%{old_map | updated_key}`.
+
+```elixir
+%{
+  treasure_map
+  | "south ten paces" => %{
+      10 => %{
+        :"east three paces" => %{
+          [1, 2, 3] => %{
+            {"turn", "right"} => %{:dig => "taken"}
+          }
+        }
+      }
+    }
+}
+```
+
+You might also have found the [Kernel.put_in](https://hexdocs.pm/elixir/1.12/Kernel.html#put_in/3) function for updating a deeply nested map.
+
+```elixir
+put_in(
+  treasure_map,
+  ["south ten paces", 10, :"east three paces", [1, 2, 3], {"turn", "right"}, :dig],
+  "taken"
+)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+treasure_map = %{
+  "south ten paces" => %{
+    10 => %{
+      :"east three paces" => %{
+        [1, 2, 3] => %{
+          {"turn", "right"} => %{
+            :dig => "gold"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Bonus: Pattern Matching
+
+Use pattern matching to bind the `"Exit!"` string to an `exit` variable.
+
+```elixir
+maze = %{
+  "south" => %{
+    "east" => %{
+      "south" => %{
+        "west" => %{
+          "south" => %{
+            "west" => %{
+              "south" => %{
+                "east" => %{
+                  "south" => "Exit!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## BONUS: Create Your Own Maze
 
 Generate a maze using the [Online Maze Generator](https://www.mazegenerator.net/). It should be
 at least a 5 * 5 in width and height.
 
 * Create a deeply nested map to represent your `custom_maze`. It should have an `"Exit!"` value at the end.
-* Use either **map[key]** notation
-  or **map.key** notation to show how to navigate your maze `path`.
-* BONUS: Use both atom keys and string keys in your `custom_maze`.
+* Have a partner navigate your maze using either **map[key]** notationor **map.key** notation to retrieve the `"Exit!"` value.
 
-Replace `nil` with your answers below.
+Enter your solution below.
 
 ```elixir
-custom_maze = nil
 
-path = nil
-
-Utils.feedback(:custom_maze, [custom_maze, nil])
-```
-
-## Treasure Map
-
-You have been given a treasure map (pun intended). That will lead you to `"gold"`.
-
-Use **map[key]** and/or **map.key** to access the `"gold"` value in the `treasure_map`.
-
-Here's a simple example of how to take the gold:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-treasure_map = %{
-  "ten paces south" => %{
-    10 => "gold"
-  }
-}
-
-path = treasure_map["ten paces south"][10]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Replace `nil` with your answer below.
-
-```elixir
-treasure_map = %{
-  "south ten paces" => %{
-    10 => %{
-      :"east three paces" => %{
-        [1, 2, 3] => %{
-          {"turn", "right"} => %{
-            :dig => "gold"
-          }
-        }
-      }
-    }
-  }
-}
-
-path = nil
-
-Utils.feedback(:treasure_map, [treasure_map, path])
-```
-
-### (Bonus) Update the Treasure Map
-
-Use map update syntax `%{map | key => "new value"}` or `%{map | key: "new value"}` and update the `treasure_map`
-to show the `"gold"` has been `"taken"`.
-
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-treasure_map = %{
-  "ten paces south" => %{
-    10 => "gold"
-  }
-}
-
-updated_map = %{treasure_map | "ten paces south" => %{10 => "taken"}}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Replace `nil` with your answer below.
-
-```elixir
-treasure_map = %{
-  "south ten paces" => %{
-    10 => %{
-      :"east three paces" => %{
-        [1, 2, 3] => %{
-          {"turn", "right"} => %{
-            :dig => "gold"
-          }
-        }
-      }
-    }
-  }
-}
-
-updated_map = %{}
-
-Utils.feedback(:update_treasure_map, [treasure_map, updated_map])
 ```
 
 ## Commit Your Progress
@@ -237,6 +308,6 @@ $ git commit -m "finish mazes exercise"
 
 ## Up Next
 
-| Previous                                       | Next                                     |
-| ---------------------------------------------- | ---------------------------------------: |
-| [Family Tree](../exercises/family_tree.livemd) | [Functions](../reading/functions.livemd) |
+| Previous                                       | Next                                                           |
+| ---------------------------------------------- | -------------------------------------------------------------: |
+| [Family Tree](../exercises/family_tree.livemd) | [Rock Paper Scissors](../exercises/rock_paper_scissors.livemd) |

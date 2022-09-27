@@ -27,12 +27,15 @@ flowchart LR
 scissors --beats--> paper --beats--> rock --beats--> scissors
 ```
 
-The player will enter a `player_choice` of `:rock`, `:paper`, or `:scissors`. Then the AI program will return the answwer that beats the player choice.
+Generate a random player choice of `:rock` ,`:paper`, or `:scissors` or manually enter `:rock`, `:paper`, and `:scissors` to determine your program works correctly.
 
-So if the player chooses `:rock`, the program should return `:paper`.
+<!-- livebook:{"force_markdown":true} -->
 
-Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determining the winning
-`ai_choice`.
+```elixir
+player_choice = Enum.random([:rock, :paper, :scissors])
+```
+
+Then, return the winning choice of either `:rock`, `:paper`, or `:scissors` that beats the player's choice.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Hint</summary>
@@ -66,6 +69,7 @@ Given a `player_choice` of either `:rock`, `:paper`, or `:scissors` determining 
 
   ```elixir
   player_choice = :scissors
+  
 (player_choice == :rock && :paper) || (player_choice == :paper && :scissors) ||
   (player_choice == :scissors && :rock)
   ```
@@ -94,7 +98,11 @@ Enter your solution below.
 
 Now that you know how to create a rock paper scissors AI, you're going to create a two player game of rock paper scissors.
 
-Given `player1` and `player2` select either `:rock`, `:paper`, or `:scissors`, return `"Player1"`, `"Player2"`, or `"Draw"`.
+Bind a `player1_choice` and `player2_choice` variable to `:rock`, `:paper`, or `:scissors`.
+
+* If `player1_choice` beats `player2_choice`, return `"Player 1 wins!"`.
+* If `player2_choice` beats `player1_choice`, return `"Player 2 wins!"`.
+* If both players have the same choice, then return `"Draw"`.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Hint</summary>
@@ -111,7 +119,7 @@ Given `player1` and `player2` select either `:rock`, `:paper`, or `:scissors`, r
 
   draw = player1 == player2
 
-  winner_message = if player1_won, do: "Player1", else: "Player2"
+  winner_message = if player1_won, do: "Player 1 Wins!", else: "Player 2 Wins!"
   winner_message = if draw, do: "Draw", else: winner_message
   ```
 
@@ -122,12 +130,12 @@ Given `player1` and `player2` select either `:rock`, `:paper`, or `:scissors`, r
   player2 = :scissors
 
   case {player1, player2} do
-    {:rock, :scissors} -> "Player1"
-    {:paper, :rock} -> "Player1"
-    {:scissors, :paper} -> "Player1"
-    {:rock, :paper} -> "Player2"
-    {:paper, :scissors} -> "Player2"
-    {:scissors, :rock} -> "Player2"
+    {:rock, :scissors} -> "Player 1 Wins!"
+    {:paper, :rock} -> "Player 1 Wins!"
+    {:scissors, :paper} -> "Player 1 Wins!"
+    {:rock, :paper} -> "Player 2 Wins!"
+    {:paper, :scissors} -> "Player 2 Wins!"
+    {:scissors, :rock} -> "Player 2 Wins!"
     {_same, _same} -> "Draw"
   end
   ```
@@ -168,6 +176,6 @@ $ git commit -m "finish rock paper scissors exercise"
 
 ## Up Next
 
-| Previous                                             | Next                             |
-| ---------------------------------------------------- | -------------------------------: |
-| [Guessing Games](../exercises/guessing_games.livemd) | [Atoms](../reading/atoms.livemd) |
+| Previous                           | Next                                     |
+| ---------------------------------- | ---------------------------------------: |
+| [Mazes](../exercises/mazes.livemd) | [Functions](../reading/functions.livemd) |

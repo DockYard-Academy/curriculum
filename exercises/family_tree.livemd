@@ -14,7 +14,7 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Lesson
+## Family Tree
 
 Maps allow you to create tree like structures using keys and values. Thus it's possible to make a family tree.
 In the Elixir cell below, create a family tree that is a `map`.
@@ -100,31 +100,63 @@ classDiagram
     Uther --> Leia
 ```
 
-<!-- livebook:{"attrs":{"assertions":"assert is_map(family_tree), \"Ensure `family_tree` is a map.\"\nassert %{name: \"Arthur\"} = family_tree, \"Ensure `family_tree` starts with Arthur.\"\n\nassert %{name: \"Arthur\", parents: parents} = family_tree,\n  \"Ensure Arthur in `family_tree` has a list of parents.\"\n\nassert length(parents) == 2, \"Ensure both parents are included.\"","code":"family_tree = %{}","solution":"han = %{name: \"Han\", status: :grand_parent, age: 81}\nleia = %{name: \"Leia\", status: :grand_parent, age: 82}\nbob = %{name: \"Bob\", status: :grand_parent, age: 68}\nbridget = %{name: \"Bridget\", status: :grand_parent, age: 70}\n\nuther = %{name: \"Uther\", status: :parent, age: 56, parents: [han, leia]}\nygraine = %{name: \"Ygraine\", status: :parent, age: 68, parents: [bob, bridget]}\n\narthur = %{name: \"Arthur\", status: :child, age: 22, parents: [uther, ygraine]}\n\nfamily_tree = arthur"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+This is an example of **nested data**.
 
 ```elixir
-ExUnit.start(auto_run: false)
+%{
+  name: "Arthur",
+  status: :child,
+  age: 22,
+  parents: [
+    %{
+      name: "Uther",
+      status: :parent,
+      age: 56,
+      parents: [
+        %{name: "Han", status: :grand_parent, age: 81},
+        %{name: "Leia", status: :grand_parent, age: 82}
+      ]
+    },
+    %{
+      name: "Ygraine",
+      status: :parent,
+      age: 68,
+      parents: [
+        %{name: "Bob", status: :grand_parent, age: 68},
+        %{name: "Bridget", status: :grand_parent, age: 70}
+      ]
+    }
+  ]
+}
+```
 
-defmodule Assertion do
-  use ExUnit.Case
+You might also consider extracting each family member as its own variable.
 
-  test "" do
-    family_tree = %{}
-    assert is_map(family_tree), "Ensure `family_tree` is a map."
-    assert %{name: "Arthur"} = family_tree, "Ensure `family_tree` starts with Arthur."
+```elixir
+han = %{name: "Han", status: :grand_parent, age: 81}
+leia = %{name: "Leia", status: :grand_parent, age: 82}
+bob = %{name: "Bob", status: :grand_parent, age: 68}
+bridget = %{name: "Bridget", status: :grand_parent, age: 70}
 
-    assert %{name: "Arthur", parents: parents} = family_tree,
-           "Ensure Arthur in `family_tree` has a list of parents."
+uther = %{name: "Uther", status: :parent, age: 56, parents: [han, leia]}
+ygraine = %{name: "Ygraine", status: :parent, age: 68, parents: [bob, bridget]}
 
-    assert length(parents) == 2, "Ensure both parents are included."
-  end
-end
+arthur = %{name: "Arthur", status: :child, age: 22, parents: [uther, ygraine]}
 
-ExUnit.run()
+family_tree = arthur
+```
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-family_tree = %{}
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Commit Your Progress

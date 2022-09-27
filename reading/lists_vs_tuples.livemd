@@ -550,10 +550,21 @@ are still stored contiguously.
 
 ## Conclusion
 
-Operations and lists will have the following Big $O$ notation.
+Operations with tuples and lists will have the following Big $O$ notation.
+
+<!-- livebook:{"attrs":{"source":"[\n  [operation: \"length\", tuple: \"O(1)\", list: \"O(n)\"],\n  [operation: \"prepend\", tuple: \"O(n)\", list: \"O(1)\"],\n  [operation: \"insert\", tuple: \"O(n)\", list: \"O(n*)\"],\n  [operation: \"access\", tuple: \"O(1)\", list: \"O(n*)\"],\n  [operation: \"update/replace\", tuple: \"O(n)\", list: \"O(n*)\"],\n  [operation: \"delete\", tuple: \"O(n)\", list: \"O(n*)\"],\n  [operation: \"concatenation\", tuple: \"O(n1 + n2)\", list: \"O(n1)\"]\n]\n|> Kino.DataTable.new()","title":"Lists and Tuples"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-Utils.table(:lists_vs_tuples)
+[
+  [operation: "length", tuple: "O(1)", list: "O(n)"],
+  [operation: "prepend", tuple: "O(n)", list: "O(1)"],
+  [operation: "insert", tuple: "O(n)", list: "O(n*)"],
+  [operation: "access", tuple: "O(1)", list: "O(n*)"],
+  [operation: "update/replace", tuple: "O(n)", list: "O(n*)"],
+  [operation: "delete", tuple: "O(n)", list: "O(n*)"],
+  [operation: "concatenation", tuple: "O(n1 + n2)", list: "O(n1)"]
+]
+|> Kino.DataTable.new()
 ```
 
 > n* will be the index of the operation, instead of the number of elements in the list.
@@ -569,16 +580,6 @@ Utils.table(:lists_vs_tuples)
 * Lists should be used for **dynamic-size containers**.
 * Functional languages do not allow mutation, they instead rely on **shallow-copying** elements
   to avoid unnecessary memory consumption.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Select the Big $O$ notation that matches the operation. To challenge yourself, try not to refer to the table above.
-
-```elixir
-Utils.form(:lists_vs_tuples)
-```
 
 ## Commit Your Progress
 

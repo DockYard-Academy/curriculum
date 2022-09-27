@@ -33,110 +33,94 @@ flowchart
   Condition --- 2[Instruction]
 ```
 
-The flow of our program through these branches, and how we control it is called **control flow**.
-We have a variety of tools to control the flow of our program.
+The flow of our program through these branches, and how we control it is called **control flow**. We have a variety of tools to control the flow of our program including `if`, `cond`, and `case` statements.
 
-Let's say you're building a rock paper scissors game.
-You're familiar with the rules.
+## If Statements
 
-* Rock beats Scissors
-* Paper beats Rock
-* Scissors beats Paper
+We've already seen `if` statements, which are a useful when we have one or two branching paths in our code.
 
-Player1 will input `"Rock"`, `"Paper"`, or `"Scissors"`. Then player2 will do the same.
-then the program will return either `"player1"` or `"player2"` depending on who won.
+For example, we might build a weather app that provides recommendations of what to wear.
+
+We'll have some condition like **if it is cold** then provide a recommendation to **wear a coat**. If it is not cold, then we'll provide a recommendation to wear a coat.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
-  Rock --> Function
-  Paper --> Function
-  Scissors --> Function
-  Function --> Player1
-  Function --> Draw
-  Function --> Player2
+weather --> hot --> t-shirt 
+weather --> cold --> coat
 ```
 
-The branching arrows represent a different flow
-that our program might take. Depending on the input the player
-will either win, lose, or draw.
+<!-- livebook:{"break_markdown":true} -->
 
-So how would you implement a game like this? Well, you might try to use operators. We'll start by
-assuming player2 always chooses rock.
+Here's how we can translate that into a program.
 
 ```elixir
-defmodule RockPaperScissors do
-  def play(player1_choice) do
-    (player1_choice === "Rock" && "Draw") ||
-      (player1_choice === "Paper" && "Player1") ||
-      (player1_choice === "Scissors" && "Player2")
-  end
+weather = :cold
+
+if weather == :cold do
+  "coat"
+else
+  "t-shirt"
 end
-
-RockPaperScissors.play("Scissors")
 ```
 
-That worked, but what about when we try to accept input from player 2?
+`if` statements are only effective for up to two paths. We'll likely have to write overly verbose solutions that involve re-binding a variable if we try to use them for multiple conditions.
 
-```elixir
-defmodule RockPaperScissors do
-  def play(player1_choice, player2_choice) do
-    (player1_choice === "Rock" && player2_choice === "Rock" && "Draw") ||
-      (player1_choice === "Rock" && player2_choice === "Paper" && "Player2") ||
-      (player1_choice === "Rock" && player2_choice === "Scissors" && "Player1") ||
-      (player1_choice === "Paper" && player2_choice === "Rock" && "Player2") ||
-      (player1_choice === "Paper" && player2_choice === "Paper" && "Draw") ||
-      (player1_choice === "Paper" && player2_choice === "Scissors" && "Player2") ||
-      (player1_choice === "Scissors" && player2_choice === "Rock" && "Player2") ||
-      (player1_choice === "Scissors" && player2_choice === "Paper" && "Player1") ||
-      (player1_choice === "Scissors" && player2_choice === "Scissors" && "Draw")
-  end
-end
-
-RockPaperScissors.play("Rock", "Rock")
-```
-
-Woah. Ok, that's a bit overwhelming and unclear. For example. I've purposely left
-a bug in the code above. Can you find it?
-
-### Your Turn
-
-Find the bug in the code above and call the module function with the input that will trigger it.
-
-<details>
-<summary>Spoiler</summary>
-It's "Paper" and "Rock". player1 should win, but instead player2 wins.
-</details>
-
-```elixir
-
-```
-
-### Clear Control Flow
-
-Through the example above, you've learned that clear control flow is important. It's not enough
-to have a program work, it should also be clear to understand.
-
-So, control flow is the branching flow of decisions in our program.
-In the rock paper scissors game above it's the following.
+This is not recommended. For example, let's expand our weather application to handle many conditions, instead of only hot and cold.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart
-  A[Rock] --> 1[Rock] --> a[Draw]
-  A[Rock] --> 2[Paper] --> b[Lose]
-  A[Rock] --> 3[Scissors]  --> c[Win]
-  B[Paper] --> 4[Rock] --> d[Win]
-  B[Paper] --> 5[Paper] --> e[Draw]
-  B[Paper] --> 6[Scissors]  --> f[Lose]
-  C[Scissors] --> 7[Rock] --> g[Lose]
-  C[Scissors] --> 8[Paper] --> h[Win]
-  C[Scissors] --> 9[Scissors] --> i[Draw]
+weather --> sunny --> r1[t-shirt]
+weather --> snowing --> r2[thick coat]
+weather --> rainy --> r3[rain coat]
+weather --> foggy --> r4[something bright]
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+```elixir
+# Change :sunny to :snowing, :raining, and :foggy to see a different result.
+weather = :sunny
 
-Often the complexity of a program is determined by the number of branching decisions it needs to make.
+recommendation = "t-shirt"
+recommendation = if weather == :snowing, do: "thick coat", else: recommendation
+recommendation = if weather == :raining, do: "raincoat", else: recommendation
+recommendation = if weather == :foggy, do: "something bright", else: recommendation
+
+recommendation
+```
+
+### Your Turn
+
+Create a thermometer program that determines if the temperature is `:hot`, or `:cold`. Bind a variable `temperature` to a number between `0` and `20`. If the temperature is above `10`, then return `:hot`, otherwise return `:cold`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+temperature = 10
+
+if temperature > 10 do
+  :hot
+else
+  :cold
+end
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
+```
+
+## Clear Control Flow
+
+Control flow impacts the complexity of a program. The more branching paths we have in our program, the more complex it is.
+
+Some complexity is necessary, but overly complex programs are often the result of improper use of control flow.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -159,173 +143,275 @@ flowchart
 
 <!-- livebook:{"break_markdown":true} -->
 
-You can reduce the complexity of a program by reducing the number of branching decisions.
-For example, what if we reduced Rock Paper Scissors to the following?
+We can simplify our programs by reducing the number of branching decisions and leveraging different control flow structures.
+
+## Case
+
+Case is a control flow structure that allows you to define a series of cases, and handle them separately.
+
+Case is best used when you have many branching conditions, that all work well with pattern matching.
+
+We'll use this to improve our weather application that handles many different conditions.
 
 <!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-  a[choice1] --> b[beats?] --> c[choice2] --> d[Player1]
-  c --> or --> 1[choice2] --> 2[beats?] --> 3[choice1] --> 4[Player2]
-  3 --> 5[or] --> Draw
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Then `beats?` could be its own piece of control flow that returns a boolean.
 
 ```mermaid
 flowchart
-  Input --> A[Rock, Scissors] --> true
-  Input --> B[Paper, Rock] --> true
-  Input --> C[Scissors, Paper] --> true
-  Input --> D[Other] --> false
+weather --> sunny --> r1[t-shirt]
+weather --> snowing --> r2[thick coat]
+weather --> rainy --> r3[rain coat]
+weather --> foggy --> r4[something bright]
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-Converting that into code, we would get the following. Readability is sometimes subjective, but
-we can probably agree that this is easier to understand, though it's still not great.
+We can break this control flow down into several cases.
+
+* Case 1: It's sunny so wear a t-shirt.
+* Case 4: It's snowing so wear a thick coat.
+* Case 2: It's raining so wear a raincoat.
+* Case 3: It's foggy so wear a something bright.
+
+Here's how we translate that into code. This is significantly more straightforward than our solution using `if`.
 
 ```elixir
-defmodule RockPaperScissors do
-  def play(player1_choice, player2_choice) do
-    (beats?(player1_choice, player2_choice) && "Player1") ||
-      (beats?(player2_choice, player1_choice) && "Player2") ||
-      "Draw"
-  end
+# Change :sunny to :snowing, :raining, and :foggy to see a different result.
+weather = :sunny
 
-  def beats?(choice1, choice2) do
-    (choice1 === "Rock" && choice2 === "Scissors") ||
-      (choice1 === "Paper" && choice2 === "Rock") ||
-      (choice1 === "Scissors" && choice2 === "Paper")
-  end
-end
-
-RockPaperScissors.play("Paper", "Scissors")
-```
-
-To further handle the complexity of control flow,
-Elixir provides a number of control flow structures that make our job easier.
-
-In this lesson, we'll cover:
-
-* Using `if` and `unless` to handle control flow with two paths.
-* Using `case` to create many branching flows depending on a single input.
-* Using `cond` to create many branching flows depending on many inputs.
-
-## If
-
-In the real world, you use **if** all the time.
-
-* If it is rainy then I will stay inside
-* If it is sunny then I will go outdoors
-
-`if` means exactly what it says. It checks for some condition, then executes some
-action.
-
-In Elixir, we provide if a boolean or a truthy value, and then execute the block of code inside of it.
-
-```elixir
-if true do
-  "Hello!"
+case weather do
+  :sunny -> "t-shirt"
+  :snowing -> "thick coat"
+  :raining -> "raincoat"
+  :foggy -> "something bright"
 end
 ```
 
-However, if we pass `if` `nil` or `false`, then it will not execute the code inside.
+### Case Breakdown
+
+Let's break down the case statement above. To use a case statement start with the `case` keyword.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-if false do
-  "Hello"
+case
+```
+
+Then enter a value that will match one of the cases. This can be a variable, or any elixir term. We'll use "sunny" from above.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny
+```
+
+Now write the `do` keyword to start defining the series of potential cases.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny do
+```
+
+Defining the "sunny" case. We'll trigger the case that matches the value between `case` and `do`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny do
+  :sunny
+```
+
+We separate the pattern to match on with the code to run if it matches using the `->`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny do
+  :sunny ->
+```
+
+We then provide the code to run when the case hits. In this case, `"t-shirt"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny do
+  :sunny -> "t-shirt"
+```
+
+Then we `end` the case statement.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case :sunny do
+  :sunny -> "t-shirt"
 end
 ```
 
-Passing if a literal `true` or `false` value isn't useful. Anytime you do that you know
-you've probably made a mistake in your code.
+We can provide any number of cases. Cases use pattern matching to decide which result to run.
 
-<details>
-<summary>Why?</summary>
-Because, you already you wanted to execute the code inside the <code>if</code> or not, so you should omit
-the <code>if</code> statement.
+## Pattern Matching With Case
+
+`case` uses pattern matching to determine which case to run. For now, we'll only use exact matching where the value is exactly equal.
+
+```elixir
+case {:exactly, :equal} do
+  {:exactly, :equal} -> "I hit this case"
+end
+```
+
+In the future, we'll cover more complex use cases such as how to pattern match on the value to hit cases.
+
+```elixir
+case {:exactly, :equal} do
+  {_mostly, :equal} -> "matching case"
+  {:exactly, :equal} -> "exactly equal case"
+end
+```
+
+`case` statements will raise a **CaseClauseError** if the value provided doesn't match any case.
+
+```elixir
+case "no match" do
+  :sunny -> "t-shirt"
+end
+```
+
+To provide a default case for the `case` statement, you can use an underscore `_`.
+
+```elixir
+case "no match" do
+  "sunnny" -> "wear a t-shirt"
+  _ -> "wear clothing"
+end
+```
+
+## Cond
+
+`cond` stands for **condition**. `cond` is best used for control flow with many branching paths that does not work well with pattern matching.
+
+For example, if we expand our weather application to handle conditions that depend on a range of temperatures.
+
+* If the temperature is below `5` degrees: wear a thick coat.
+* If the temperature is `5-10` degrees: wear a coat.
+* If the temperature is `11-15` degrees: wear a light coat.
+* If the temperature is `16-20` degrees: wear a heavy shirt.
+* If the temperature is `21+` degrees: wear a t-shirt.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+temperature --> t1[0<] --> r1[thick coat]
+temperature --> t2[5-10] --> r2[coat]
+temperature --> t3[11-15] --> r3[light coat]
+temperature --> t4[16-20] --> r4[heavy shirt]
+temperature --> t5[21+] --> r5[t-shirt]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here's how we can translate this into a program using `cond`.
+
+```elixir
+# Change temperature to change the condition triggered.
+temperature = 0
+
+cond do
+  temperature >= 21 -> "t-shirt"
+  16 <= temperature and temperature <= 20 -> "heavy shirt"
+  11 <= temperature and temperature <= 15 -> "light coat"
+  5 <= temperature and temperature <= 10 -> "coat"
+  5 >= temperature -> "thick coat"
+end
+```
+
+`cond` accepts a truthy value on the left-hand side of the arrow `->` and returns the expression on the right-hand side of the arrow for whichever condition returns `true` first.
+
+This means that order does matter. Here, even though the integer is above `5`, it will never trigger the second condition, because the first condition is always true.
+
+```elixir
+value = 10
+
+cond do
+  is_integer(value) -> "value is an integer"
+  value > 5 -> "value is above 5"
+end
+```
+
+Generally, we want more specific conditions to be higher in priority than less specific conditions.
+
+```elixir
+value = 10
+
+cond do
+  value > 5 -> "value is above 5"
+  is_integer(value) -> "value is an integer"
+end
+```
+
+Like `case` statements, conditions will raise an error if we don't trigger any condition.
+
+```elixir
+cond do
+  false -> ""
+end
+```
+
+We can provide a default condition using `true`.
+
+```elixir
+cond do
+  false -> ""
+  true -> "default condition"
+end
+```
+
+### Your Turn
+
+In the Elixir cell below:
+
+* Create a variable called `grade` which will be a number grade from 1 to 100.
+* Create a condition that returns `"A"`, `"B"`, `"C"`, or `"D"` depending on the value of `grade`.
+
+The conditions for `grade` should be:
+
+* 85-100 is an A
+* 70-84 is a B
+* 55-59 is a C
+* 1-54 is a D
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+We can solve this problem being very explicit about each condition.
+
+```elixir
+grade = 0
+
+cond do
+  85 <= grade and grade <= 100 -> "A"
+  70 <= grade and grade <= 84 -> "B"
+  55 <= grade and grade <= 59 -> "C"
+  1 <= grade and grade <= 54 -> "D"
+end
+```
+
+Or we can make use of order to make the code more concise.
+However, this wouldn't reveal if `grade` were an invalid value
+such as `-5`, `110`, or `"hello"`.
+
+```elixir
+cond do
+  grade >= 85 -> "A"
+  grade >= 70 -> "B"
+  grade >= 55 -> "C"
+  true -> "D"
+end
+```
+
 </details>
-
-Instead, it's more useful to check if some condition is true.
-
-### Your Turn
-
-Here's a little program that checks the current hour of the day and displays either `"Good morning!"`
-or `"Good afternoon!"`.
-
-Replace `8` with a time in the afternoon using 24 hour format. See that it now runs `"Good afternoon!"`
-
-```elixir
-current_hour = 8
-
-if current_hour < 12 do
-  "Good morning!"
-end
-
-if current_hour >= 12 do
-  "Good Afternoon!"
-end
-```
-
-### Else
-
-We can also use `else` with if to create two branching paths.
-The code inside of the `else` will execute if the condition in the `if` statement is `false` or `nil`.
-
-Keep in mind that else allows for every other condition, so it can sometimes create unexpected
-results.
-
-```elixir
-current_hour = 13
-
-if current_hour >= 12 do
-  "Good Afternoon!"
-else
-  "Good Morning!"
-end
-```
-
-If statements are really good at splitting the control flow in two, but they aren't very good
-at splitting it further.
-
-In some programming languages there is an `else if` construct which allows you to create many
-conditions. However Elixir relies on other constructs which you will learn about further on in this
-lesson.
-
-It's usually unclear to nest if statements and a sign that you can improve your code.
-
-```elixir
-condition1 = true
-condition2 = true
-
-if condition1 do
-  if condition2 do
-    {true, true}
-  end
-end
-```
-
-Instead, you can often group conditions together, or rely on a different construct than `if`.
-
-```elixir
-if condition1 and condition2 do
-  {true, true}
-end
-```
-
-### Your Turn
-
-Let's create a thermometer program. This thermometer program will take a temperature in and return
-`"hot"` or `"cold"`.
-
-To avoid debate and confusion over Celsius and Fahrenheit. Any number greater than or equal
-to `20` will be hot.
-
-Enter your answer in the Elixir cell below.
 
 ```elixir
 
@@ -380,448 +466,6 @@ In the Elixir cell below
 
 * Create an variable named `tired` which is `true` or `false`.
 * Create an `unless` statement. which returns `"awake"` unless `tired`.
-
-```elixir
-
-```
-
-## Case
-
-Case is often sometimes called `switch case` in other languages.
-It's a control flow structure that allows you to define a series of cases.
-
-For example:
-
-* Case 1: It's sunny so wear a t-shirt.
-* Case 2: It's rainy so wear a rain jacket.
-* Case 3: It's cold so wear a sweater.
-* Case 4: It's snowing so wear a thick coat.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart
-  case --> 1
-  case --> 2
-  case --> 3
-  case --> 4
-  1[sunny] --> A[wear a t-shirt]
-  2[rainy] --> B[wear a rain jacket]
-  3[cold] --> C[wear a sweater]
-  4[snowing] --> D[wear a thick coat]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-To use a case statement start with the `case` keyword.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case
-```
-
-Then enter a value that will match one of the cases. We'll use "sunny" from above.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny"
-```
-
-Now write the `do` keyword to start defining the series of potential cases.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny" do
-
-```
-
-Start defining the "sunny" case
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny" do
-  "sunny"
-```
-
-Separate the "sunny" case and what will happen with the value is "sunny" using `->`
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny" do
-  "sunny" ->
-```
-
-Enter what will happen when it's the `"sunny"` case. `"wear a t-shirt"`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny" do
-  "sunny" -> "wear a t-shirt"
-```
-
-`end` the case statement.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-case "sunny" do
-  "sunny" -> "wear a t-shirt"
-end
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-That gives us the following case statement.
-
-```elixir
-case "sunny" do
-  "sunny" -> "wear a t-shirt"
-end
-```
-
-You can create more cases as well. Let's fill in the rest of the examples from above. It's
-still going to return the `"sunny"` case though.
-
-```elixir
-case "sunny" do
-  "sunny" -> "wear a t-shirt"
-  "rainy" -> "wear a rain jacket"
-  "cold" -> "wear a sweater"
-  "snowy" -> "wear a thick coat"
-end
-```
-
-### Your Turn
-
-If the value between `case` and `do` changes, it will hit a different case.
-try changing the `weather` variable by binding it to `"rainy"` and re-evaluate the
-Elixir cell. Try that again with `"cold"`, and `"snowy"`.
-
-```elixir
-weather = "sunny"
-
-case weather do
-  "sunny" -> "wear a t-shirt"
-  "rainy" -> "wear a rain jacket"
-  "cold" -> "wear a sweater"
-  "snowy" -> "wear a thick coat"
-end
-```
-
-### Case Visualization
-
-Under the hood, Elixir is checking the value given to the case statement, and then checking
-if it matches any of the cases. It then executes the first case that matches.
-
-<!-- livebook:{"attrs":{"source":"frames = [\n      \"\new create a case statement.\n```elixir\ncase \\\"snowy\\\" do\n  \\\"sunny\\\" -> \\\"wear a t-shirt\\\"\n  \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nCheck if snowy equals sunny.\n```elixir\ncase \\\"snowy\\\" do\n  \\\"snowy\\\" === \\\"sunny\\\" -> \\\"wear a t-shirt\\\"\n  \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals rainy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  \\\"snowy\\\" === \\\"rainy\\\" -> \\\"wear a rain jacket\\\"\n  \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals cold.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  \\\"snowy\\\" === \\\"cold\\\" -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nIt's false, so check if snowy equals snowy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  false -> \\\"wear a sweater\\\"\n  \\\"snowy\\\" === \\\"snowy\\\" -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nsnowy equals snowy.\n```elixir\ncase \\\"snowy\\\" do\n  false -> \\\"wear a t-shirt\\\"\n  false -> \\\"wear a rain jacket\\\"\n  false -> \\\"wear a sweater\\\"\n  true -> \\\"wear a thick coat\\\"\nend\n```\n  \",\n      \"\nReturn wear a thick coat.\n```elixir\n\n\n\n\n          \\\"wear a thick coat\\\"\n \n```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Case Visualization"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-````elixir
-frames = [
-  "
-We create a case statement.
-```elixir
-case \"snowy\" do
-  \"sunny\" -> \"wear a t-shirt\"
-  \"rainy\" -> \"wear a rain jacket\"
-  \"cold\" -> \"wear a sweater\"
-  \"snowy\" -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-Check if snowy equals sunny.
-```elixir
-case \"snowy\" do
-  \"snowy\" === \"sunny\" -> \"wear a t-shirt\"
-  \"rainy\" -> \"wear a rain jacket\"
-  \"cold\" -> \"wear a sweater\"
-  \"snowy\" -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-It's false, so check if snowy equals rainy.
-```elixir
-case \"snowy\" do
-  false -> \"wear a t-shirt\"
-  \"snowy\" === \"rainy\" -> \"wear a rain jacket\"
-  \"cold\" -> \"wear a sweater\"
-  \"snowy\" -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-It's false, so check if snowy equals cold.
-```elixir
-case \"snowy\" do
-  false -> \"wear a t-shirt\"
-  false -> \"wear a rain jacket\"
-  \"snowy\" === \"cold\" -> \"wear a sweater\"
-  \"snowy\" -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-It's false, so check if snowy equals snowy.
-```elixir
-case \"snowy\" do
-  false -> \"wear a t-shirt\"
-  false -> \"wear a rain jacket\"
-  false -> \"wear a sweater\"
-  \"snowy\" === \"snowy\" -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-snowy equals snowy.
-```elixir
-case \"snowy\" do
-  false -> \"wear a t-shirt\"
-  false -> \"wear a rain jacket\"
-  false -> \"wear a sweater\"
-  true -> \"wear a thick coat\"
-end
-```
-  ",
-  "
-Return wear a thick coat.
-```elixir
-
-
-
-
-          \"wear a thick coat\"
- 
-```
-  "
-]
-
-SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
-  Enum.at(frames, i) |> Kino.Markdown.new()
-end)
-````
-
-Now, you may notice that if you give the `case` statement a value that doesn't match any case,
-the program crashes with a **CaseClauseError** error. In general, it's wise to have a default
-case that handles any value.
-
-```elixir
-case "no match" do
-  "sunny" -> "wear a t-shirt"
-end
-```
-
-To provide a default case for the `case` statement, you use an underscore `_`.
-
-```elixir
-case "no match" do
-  "sunnny" -> "wear a t-shirt"
-  _ -> "wear clothing"
-end
-```
-
-## Cond
-
-`cond` stands for **condition**. It allows you to have many different conditions and branches.
-
-It's unlike case in that instead of checking a single value, it can compare many, and check
-for more complex conditions.
-
-For example:
-
-* Condition 1: the plant wilting and it's dark -> use a UV light.
-* Condition 2: the plant is wilting and it's sunny -> put the plant in sunlight.
-* Condition 3: It's been 2 weeks since you watered the plant -> water the plant.
-* Condition 4: the plant is dead -> get a new plant.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart
-  cond --> 1
-  cond --> 2
-  cond --> 3
-  cond --> 4
-  1[the plant wilting and it's dark] --> A[use a UV light]
-  2[the plant is wilting and it's sunny] --> B[ put the plant in sunlight]
-  3[It's been 2 weeks since you watered the plant] --> C[water the plant]
-  4[the plant is dead] --> D[get a new plant]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Notice that instead of cases based on a single value, we have conditions based on multiple values
-such as the state of the plant, time, and weather.
-
-The syntax for `cond` looks faily similar to case, except there's no value. Instead you give
-`cond` a truthy or falsy value on the left of the `->`.
-
-```elixir
-cond do
-  true -> "good morning!"
-end
-```
-
-`true` is the default condition in `cond`. You can use operators on the left-hand side
-of the `->` and whichever condition returns `true` first will execute.
-
-Let's convert the example above for plants into code.
-
-```elixir
-daylight = true
-days_since_watered = 14
-plant = "wilting"
-
-cond do
-  plant === "wilting" && !daylight -> "use a UV light"
-  plant === "wilting" && daylight -> "put the plant in sunlight"
-  days_since_watered >= 14 -> "water the plant"
-  plant === "dead" -> "get a new plant"
-end
-```
-
-`cond` will execute the instructions for the first condition that returns true. You often have to
-be careful of order. For example, there's a bug in the above condition.
-
-Right now, if it's been 14 days since we watered the plant, we'll always water it. But if the
-plant is dead that doesn't really make sense. Instead, we should move the `plant === "dead"` check
-to be the highest in priority.
-
-```elixir
-daylight = true
-days_since_watered = 14
-plant = "dead"
-
-cond do
-  plant === "dead" -> "get a new plant"
-  plant === "wilting" && !daylight -> "use a UV light"
-  plant === "wilting" && daylight -> "put the plant in sunlight"
-  days_since_watered >= 14 -> "water the plant"
-end
-```
-
-Let's follow the flow of execution to try to make this more clear.
-
-<!-- livebook:{"attrs":{"source":"frames = [\n      \"\nCheck if plant is dead.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  plant === \\\"dead\\\" -> \\\"get a new plant\\\"\n  plant === \\\"wilting\\\" && !daylight -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if plant is wilting and it's dark.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  plant === \\\"wilting\\\" && !daylight -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if plant is wilting and it's sunny.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  plant === \\\"wilting\\\" && daylight -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`false`, so check if days_since_watered is >= 14.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  false -> \\\"put the plant in sunlight\\\"\n  days_since_watered >= 14 -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\n`true`! days_since_watered is >= 14.\n```elixir\ndaylight = true\ndays_since_watered = 14\nplant = \\\"healthy\\\"\n\ncond do\n  false -> \\\"get a new plant\\\"\n  false -> \\\"use a UV light\\\"\n  false -> \\\"put the plant in sunlight\\\"\n  true -> \\\"water the plant\\\"\nend\n```\n \",\n      \"\nWater the plant.\n```elixir\n\n\n\n\n\n\n\n\n          \\\"water the plant\\\"\n \n```\n \"\n    ]\n\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Cond Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-````elixir
-frames = [
-  "
-Check if plant is dead.
-```elixir
-daylight = true
-days_since_watered = 14
-plant = \"healthy\"
-
-cond do
-  plant === \"dead\" -> \"get a new plant\"
-  plant === \"wilting\" && !daylight -> \"use a UV light\"
-  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
-  days_since_watered >= 14 -> \"water the plant\"
-end
-```
- ",
-  "
-`false`, so check if plant is wilting and it's dark.
-```elixir
-daylight = true
-days_since_watered = 14
-plant = \"healthy\"
-
-cond do
-  false -> \"get a new plant\"
-  plant === \"wilting\" && !daylight -> \"use a UV light\"
-  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
-  days_since_watered >= 14 -> \"water the plant\"
-end
-```
- ",
-  "
-`false`, so check if plant is wilting and it's sunny.
-```elixir
-daylight = true
-days_since_watered = 14
-plant = \"healthy\"
-
-cond do
-  false -> \"get a new plant\"
-  false -> \"use a UV light\"
-  plant === \"wilting\" && daylight -> \"put the plant in sunlight\"
-  days_since_watered >= 14 -> \"water the plant\"
-end
-```
- ",
-  "
-`false`, so check if days_since_watered is >= 14.
-```elixir
-daylight = true
-days_since_watered = 14
-plant = \"healthy\"
-
-cond do
-  false -> \"get a new plant\"
-  false -> \"use a UV light\"
-  false -> \"put the plant in sunlight\"
-  days_since_watered >= 14 -> \"water the plant\"
-end
-```
- ",
-  "
-`true`! days_since_watered is >= 14.
-```elixir
-daylight = true
-days_since_watered = 14
-plant = \"healthy\"
-
-cond do
-  false -> \"get a new plant\"
-  false -> \"use a UV light\"
-  false -> \"put the plant in sunlight\"
-  true -> \"water the plant\"
-end
-```
- ",
-  "
-Water the plant.
-```elixir
-
-
-
-
-
-
-
-
-          \"water the plant\"
- 
-```
- "
-]
-
-SmartAnimation.new(0..(Enum.count(frames) - 1), fn i ->
-  Enum.at(frames, i) |> Kino.Markdown.new()
-end)
-````
-
-### Your Turn
-
-In the Elixir cell below:
-
-* Create a variable called `grade` which will be a number grade from 1 to 100.
-* Create a condition that returns `"A"`, `"B"`, `"C"`, or `"D"` depending on the value of `grade`.
-
-The conditions for `grade` should be:
-
-* 85-100 is an A
-* 70-84 is a B
-* 55-59 is a C
-* 1-54 is a D
 
 ```elixir
 

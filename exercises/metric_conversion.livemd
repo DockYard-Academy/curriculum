@@ -18,8 +18,19 @@ Mix.install([
 
 You are building an app to help people handle converting measurements according to the following chart.
 
+<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, centimeter: 0.1],\n  [unit: :meter, value: 1, centimeter: 100],\n  [unit: :kilometer, value: 1, centimeter: 100_000],\n  [unit: :inch, value: 1, centimeter: 2.54],\n  [unit: :feet, value: 1, centimeter: 30],\n  [unit: :yard, value: 1, centimeter: 91],\n  [unit: :mile, value: 1, centimeter: 160_000]\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-Utils.table(:measurements)
+[
+  [unit: :millimeter, value: 1, centimeter: 0.1],
+  [unit: :meter, value: 1, centimeter: 100],
+  [unit: :kilometer, value: 1, centimeter: 100_000],
+  [unit: :inch, value: 1, centimeter: 2.54],
+  [unit: :feet, value: 1, centimeter: 30],
+  [unit: :yard, value: 1, centimeter: 91],
+  [unit: :mile, value: 1, centimeter: 160_000]
+]
+|> Kino.DataTable.new()
 ```
 
 Users may provide any measurement and a value in a tuple `{measurement, value}`, and convert
@@ -47,11 +58,50 @@ Enter your solution below.
 
 ```elixir
 defmodule Measurement do
+  @doc """
+  Convert one measurement to another.
+
+  ## Examples
+
+    iex> Measurement.convert({millimeter, 1}, :centimeter)
+    {:centimeter, 0.1}
+
+    iex> Measurement.convert({centimeter, 1}, :centimeter)
+    {:centimeter, 1}
+
+    iex> Measurement.convert({meter, 1}, :centimeter)
+    {:centimeter, 100}
+
+    iex> Measurement.convert({:kilometer, 1}, :centimeter)
+    {:centimeter, 100_000}
+
+    iex> Measurement.convert({:inch, 1}, :centimeter)
+    {:centimeter, 2.54}
+
+    iex> Measurement.convert({:feet, 1}, :centimeter)
+    {:centimeter, 30}
+
+    iex> Measurement.convert({:yard, 1}, :centimeter)
+    {:centimeter, 91}
+
+    iex> Measurement.convert({:mile, 1}, :centimeter)
+    {:centimeter, 160_000}
+
+    iex> Measurement.convert({:meter, 1}, :millimeter)
+    {:millimeter, 1000}
+
+    iex> Measurement.convert({:meter, 1}, :centimeter)
+    {:centimeter, 100}
+
+    iex> Measurement.convert({:meter, 1}, :meter)
+    {:meter, 1}
+
+    iex> Measurement.convert({:meter, 1}, :kilometer)
+    {:meter, 0.001}
+  """
   def convert(from, to) do
   end
 end
-
-Utils.feedback(:metric_measurements, Measurement)
 ```
 
 ## Commit Your Progress
