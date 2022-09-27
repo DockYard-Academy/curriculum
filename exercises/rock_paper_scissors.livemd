@@ -40,43 +40,6 @@ Then, return the winning choice of either `:rock`, `:paper`, or `:scissors` that
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Hint</summary>
 
-  Remember you can conditionally return values using boolean operators.
-  For example, you can use this to return `:paper` if the `player_choice` is `:rock`.
-
-  ```elixir
-  player_choice = :rock
-
-  player_choice == :rock && :paper
-  ```
-
-  Alternatively you can use `if` statements.
-
-  ```elixir
-  if player_choice == :rock, do: :paper
-  ```
-
-  You can use this in combination with re-binding the variable to
-  return the winning choice.
-
-  ```elixir
-  player_choice = :scissors
-  ai_choice = if player_choice == :rock, do: :paper
-  ai_choice = if player_choice == :paper, do: :scissors, else: ai_choice
-  if player_choice == :scissors, do: :rock, else: ai_choice
-  ```
-
-  Or you could chain a series of conditions without re-binding `player_choice`.
-
-  ```elixir
-  player_choice = :scissors
-  
-(player_choice == :rock && :paper) || (player_choice == :paper && :scissors) ||
-  (player_choice == :scissors && :rock)
-  ```
-
-  There are also cleaner solutions using language features we have not yet covered
-  such as the `case` statement.
-
   ```elixir
   player_choice = :scissors
   
@@ -106,24 +69,6 @@ Bind a `player1_choice` and `player2_choice` variable to `:rock`, `:paper`, or `
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Hint</summary>
-  
-  We can use boolean operators and/or `if` statements to create a sequence of conditions to determine the winner message.
-
-  ```elixir
-  player1 = :rock
-  player2 = :scissors
-
-  player1_won =
-    (player1 == :rock and player2 == :scissors) or (player1 == :paper and player2 == :rock) or
-      (player1 == :scissors and player2 == :paper)
-
-  draw = player1 == player2
-
-  winner_message = if player1_won, do: "Player 1 Wins!", else: "Player 2 Wins!"
-  winner_message = if draw, do: "Draw", else: winner_message
-  ```
-
-  There are cleaner solutions using language features we have not covered yet such as `case`.
 
   ```elixir
   player1 = :rock
@@ -140,7 +85,7 @@ Bind a `player1_choice` and `player2_choice` variable to `:rock`, `:paper`, or `
   end
   ```
 
-  You can also reduce code repetition using functions, which we have also not yet covered.
+  You can also reduce code repetition using functions and the `in` keyword to check if the value exists in a list.
 
   ```elixir
   player1 = :rock
@@ -176,6 +121,6 @@ $ git commit -m "finish rock paper scissors exercise"
 
 ## Up Next
 
-| Previous                           | Next                                     |
-| ---------------------------------- | ---------------------------------------: |
-| [Mazes](../exercises/mazes.livemd) | [Functions](../reading/functions.livemd) |
+| Previous                                             | Next                                 |
+| ---------------------------------------------------- | -----------------------------------: |
+| [Naming Numbers](../exercises/naming_numbers.livemd) | [Modules](../reading/modules.livemd) |

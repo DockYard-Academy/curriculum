@@ -93,41 +93,35 @@ However, we can bind other values inside of a container data type, so the left a
 {one, two, three} = {1, 2, 3}
 ```
 
-But you can also use pattern matching to bind values within a data type.
+Now we can use these bound variables `one`, `two`, and `three` in our program.
 
 ```elixir
-
+one
 ```
-
-So long as the expression on the left side of match operator `=` matches the pattern of the right side,
-you can bind variables to values.
-
-Here's the same concept with a list
 
 ```elixir
-[hero, secret_identity] = ["Spider Man", "Peter Parker"]
-
-hero
+two
 ```
-
-This binds a new variable. If you aren't concerned about a value then you can use underscore `_`
-to ignore it.
 
 ```elixir
-[_, secret_identity] = ["Spider Man", "Peter Parker"]
-
-secret_identity
+three
 ```
 
-However, if the left hand side doesn't match the right hand side, then the code will crash with
-a **MatchError**.
+So long as the expression on the left side of match operator `=` matches the pattern of the right side, you can bind variables to values.
+
+The tuple with variables bound on the left side must have the same number of elements as the tuple on the right side, otherwise we'll cause a [MatchError](https://hexdocs.pm/elixir/MatchError.html).
 
 ```elixir
-# The following crashes because a list with 1 element does not match a list with two elements.
-[name] = ["Spider Man", "Peter Parker"]
+{one, two} = {1, 2, 3}
 ```
 
-You can pattern match with any kind of data. So long as the left side matches the right side.
+If we want to bind some of the variables in a tuple, and ignore others, we can use an `_` to ignore any variables.
+
+```elixir
+{one, _two, three} = {1, 2, 3}
+```
+
+You can pattern match with any kind of data. So long as the left side matches the right side. We'll cover pattern matching with other data structures in later reading material.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -140,13 +134,14 @@ Replace `jewel` with your answer.
 <summary>Hint</summary>
 
 ```elixir
-[_, _, jewel] = [1, 2, "jewel"]
+{_gold, _treasure, jewel} = {"gold", "treasure", "jewel"}
+jewel
 ```
 
 </details>
 
 ```elixir
-jewel = [1, 2, "jewel"]
+{"gold", "treasure", "jewel"}
 ```
 
 ## Further Reading
