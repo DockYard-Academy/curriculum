@@ -18,237 +18,151 @@ Mix.install([
 
 You're going to create a pokemon battle game. If you're not familiar with pokemon, it's a game where elemental creatures battle.
 
-You're going to represent pokemon using a `Pokemon` struct with the keys `:name`, `:type`, `health`, `:attack`, and `:speed`.
+You're going to represent pokemon using a `Pokemon` struct with the keys `:name`, `:type`, `health`, `:attack`, and `:speed`. Enforce that all keys must exist.
 
-* `:name` will be a string.
+* `:name` is a string.
 * `:type` will be an atom of either `:grass`, `:water`, or `:fire`
 * `:health` will be an integer with a default value of `20`
 * `:attack` will be an integer with a default value of `5`
 * `:speed` will be an integer
 
-Then, implement the `Pokemon` module functions according to the documented examples.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-
+%Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
 ```
 
-## Define A Pokemon Struct
+Then implement the `Pokemon.attack/2` function according to the documented examples.
 
-In the Elixir cell below, define a `Pokemon` struct with the keys `:name`, `:type`, `health`, `:attack`, and `:speed`.
+<!-- livebook:{"force_markdown":true} -->
 
-* `:name` will be a string.
-* `:type` will be an atom of either `:grass`, `:water`, or `:fire`
-* `:health` will be an integer with a default value of `20`
-* `:attack` will be an integer with a default value of `5`
-* `:speed` will be an integer
+```elixir
+attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+
+Pokemon.attack(attacker, defender)
+# output: subtract attack from health to return an updated pokemon struct
+%Pokemon{name: "Bulbasaur", type: :grass, health: 15, attack: 5, speed: 20}
+```
+
+`Pokemon.attack/2` should apply double damage if the pokemon has a type advantage, and half damage if the pokemon has a type disadvantage.
+
+The advantages are:
+
+* `:fire` is strong against `:grass`
+* `:grass` is strong against `:water`
+* `:water` is strong against `:fire`
+* `:fire` is weak against `:water`
+* `:grass` is weak against `:fire`
+* `:water` is weak against `:grass`
+* the same type should deal normal damage.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+
+Pokemon.attack(attacker, defender)
+# output: subtract attack (doubled) from health to return an updated pokemon struct
+%Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
+```
+
+```elixir
+defmodule Pokemon do
+  @moduledoc """
+  Pokemon
+  
+  ## Examples
+  
+    iex> %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  
+    iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
+    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  """
+
+  @doc """
+  subtract the attack damage of an attacker from the defender's health.
+  return an updated pokemon struct, and take type advantage into consideration.
+  
+  ## Examples
+  
+    Same Type
+  
+    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Charmander", type: :fire, health: 15, attack: 5, speed: 20}
+  
+    Type Disadvantage
+  
+    iex> attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5, speed: 20}
+  
+    Type Advantage
+  
+    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+    iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+    iex> Pokemon.attack(attacker, defender)
+    %Pokemon{name: "Charmander", type: :fire, health: 10, attack: 5, speed: 20}
+  """
+  def attack(attacker, defender) do
+  end
+end
+```
+
+### Pokemon Instances
+
+Bind three variables `charmander`, `bulbasaur`, and `squirtle` to an instance of a `Pokemon` struct with the following information.
+
+```mermaid
+classDiagram
+  class charmander {
+    name: "Charmander"
+    type: :fire
+    health: 20
+    attack: 5
+    speed: 20
+  }
+  class bulbasaur {
+    name: "Bulbasar"
+    type: :grass
+    health: 20
+    attack: 5
+    speed: 20
+  }
+  class squirtle {
+    name: "Squirtle"
+    type: :water
+    health: 20
+    attack: 5
+    speed: 20
+  }
+```
+
+Use may these three structs to test your `Pokemon.attack/2` function.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Hint</summary>
 
 ```elixir
+charmander = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+bulbasaur = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+squirtle = %Pokemon{name: "Squirtle", type: :water, health: 20, attack: 5, speed: 20}
 
+# Testing Example
+Pokemon.attack(charmander, bulbasaur)
 ```
 
 </details>
 
-```elixir
-
-```
-
-## Create 3 Pokemon
-
-In the Elixir cell below, create 3 variables `charmander`, `bulbasaur`, and `squirtle`.
-Bind each variable to a `Pokemon` struct with the following stats.
-
-```mermaid
-classDiagram
-    class Charmander {
-        type: :fire
-        speed: 20
-    }
-    class Bulbasaur {
-        type: :grass
-        speed: 15
-    }
-    class Squirtle {
-        type: :water
-        speed: 10
-    }
-```
-
-Replace `nil` with your solution.
-
-<!-- livebook:{"attrs":{"assertions":"assert is_struct(charmander), \"Ensure `charmander` is a struct.\"\nassert is_struct(squirtle), \"Ensure `squirtle` is a struct.\"\nassert is_struct(bulbasaur), \"Ensure `bulbasaur` is a struct.\"\n\nassert %Pokemon{name: \"Charmander\", type: :fire, attack: 5, health: 20, speed: 20} = charmander\nassert %Pokemon{name: \"Bulbasaur\", type: :grass, attack: 5, health: 20, speed: 15} = bulbasaur\nassert %Pokemon{name: \"Squirtle\", type: :water, attack: 5, health: 20, speed: 10} = squirtle","code":"charmander = nil\r\nbulbasaur = nil\r\nsquirtle = nil","solution":"charmander = %Pokemon{name: \"Charmander\", type: :fire, speed: 20}\nbulbasaur = %Pokemon{name: \"Bulbasaur\", type: :grass, speed: 15}\nsquirtle = %Pokemon{name: \"Squirtle\", type: :water, speed: 10}"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+Enter your solution below.
 
 ```elixir
-ExUnit.start(auto_run: false)
 
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    charmander = nil
-    bulbasaur = nil
-    squirtle = nil
-    assert is_struct(charmander), "Ensure `charmander` is a struct."
-    assert is_struct(squirtle), "Ensure `squirtle` is a struct."
-    assert is_struct(bulbasaur), "Ensure `bulbasaur` is a struct."
-
-    assert %Pokemon{name: "Charmander", type: :fire, attack: 5, health: 20, speed: 20} =
-             charmander
-
-    assert %Pokemon{name: "Bulbasaur", type: :grass, attack: 5, health: 20, speed: 15} = bulbasaur
-    assert %Pokemon{name: "Squirtle", type: :water, attack: 5, health: 20, speed: 10} = squirtle
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-charmander = nil
-bulbasaur = nil
-squirtle = nil
-```
-
-## Pokemon Battle
-
-Create a `PokemonBattle` module with the following functions:
-
-### attack/2
-
-Create an `attack/2` function which:
-
-* accepts two pokemon structs as parameters.
-* return an updated version of the second pokemon struct.
-* subtract the first pokemon's attack from the second pokemon's health.
-* double the damage dealt if the pokemon has a type advantage.
-* half the damage dealt if the pokemon has a type weakness.
-
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-squirtle = %Pokemon{name: "Squirtle", type: :water, attack: 10}
-charmander = %Pokemon{name: "Charmander", type: :fire, health: 20}
-
-PokemonBattle.attack(squirtle, charmander)
-%Pokemon{name: "Charmander", type: :fire, health: 0, speed: nil, attack: 5}
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Use the following type advantages to determine half or double damage.
-
-* `:fire` beats `:grass`
-* `:grass` beats `:water`
-* `:water` beats `:fire`
-
-<!-- livebook:{"break_markdown":true} -->
-
-### battle/2
-
-Create a `battle/2` function which:
-
-* accepts two pokemon structs as parameters.
-* `attack/2` with the pokemon that has the higher speed. If their speed is the same attack the second pokemon first.
-* if the attacked pokemon is still above 0 health, attack with the second pokemon.
-* returns two updated pokemon structs in a tuple.
-
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-charmander = %Pokemon{name: "Charmander", type: :fire, speed: 20}
-squirtle = %Pokemon{name: "Squirtle", type: :water, speed: 10}
-
-PokemonBattle.battle(charmander, squirtle)
-{
-    %Pokemon{name: "Charmander", type: :fire, health: 10, speed: 20, attack: 5},
-    %Pokemon{name: "Squirtle", type: :water, health: 17.5, speed: 10, attack: 5}
-}
-
-charizard = %Pokemon{name: "Charizard", type: :fire, speed: 20, attack: 20}
-blastoise = %Pokemon{name: "Blastoise", type: :water, speed: 10, health: 10}
-
-# the faster pokemon will not receive damage if the slower pokemon's health is 0.
-PokemonBattle.battle(charizard, blastoise)
-{
-    %Pokemon{name: "Charizard", type: :fire, health: 20, speed: 20, attack: 20},
-    %Pokemon{name: "Blastoise", type: :water, health: 0, speed: 10, attack: 5}
-}
-```
-
-<!-- livebook:{"attrs":{"assertions":"assert Keyword.get(Pokemon.__info__(:functions), :__struct__),\n        \"Ensure you complete the `Pokemon` module above first.\"\n\nassert match?(\n          %{name: nil, type: nil, speed: nil, health: 20, attack: 5},\n          struct(Pokemon)\n        ),\n        \"Ensure you complete the `Pokemon` module above first.\"\n\npokemon_types =\n  for speed <- 10..30//5,\n      type <- [:water, :fire, :grass],\n      attack <- 5..40//5,\n      health <- 5..20//5 do\n    struct(Pokemon, %{\n      name: \"#{Atom.to_string(type)} pokemon\",\n      speed: speed,\n      attack: attack,\n      health: health,\n      type: type\n    })\n  end\n\npokemon_types\n|> Enum.shuffle()\n|> Enum.take(2)\n|> Enum.chunk_every(2)\n|> Enum.each(fn [pokemon1, pokemon2] ->\n  attacked_pokemon = PokemonBattle.attack(pokemon1, pokemon2)\n\n  multiplier = Utils.Solutions.PokemonBattle.multiplier(pokemon1, pokemon2)\n\n  assert attacked_pokemon == %Pokemon{\n            pokemon2\n            | health: pokemon2.health - pokemon1.attack * multiplier\n          }\n\n  PokemonBattle.battle(pokemon1, pokemon2)\n\n  assert {battled_pokemon1, battled_pokemon2} =\n            PokemonBattle.battle(pokemon1, pokemon2)\n\n  {expected_battled_pokemon1, expected_battled_pokemon2} =\n    Utils.Solutions.PokemonBattle.battle(pokemon1, pokemon2)\n\n  assert battled_pokemon1 == expected_battled_pokemon1\n  assert battled_pokemon2 == expected_battled_pokemon2\nend)","code":"defmodule PokemonBattle do\r\nend","solution":"defmodule PokemonBattle do\n  def attack(emetter, receiver) do\n    damage = emetter.attack * calc_advantage(emetter.type, receiver.type)\n\n    %Pokemon{receiver | health: receiver.health - damage}\n  end\n\n  def battle(pokemon1, pokemon2) do\n    if pokemon1.speed >= pokemon2.speed do\n      pokemon2 = attack(pokemon1, pokemon2)\n      pokemon1 = if pokemon2.health > 0, do: attack(pokemon2, pokemon1), else: pokemon1\n\n      {pokemon1, pokemon2}\n    else\n      pokemon1 = attack(pokemon2, pokemon1)\n      pokemon2 = if pokemon1.health > 0, do: attack(pokemon1, pokemon2), else: pokemon2\n\n      {pokemon1, pokemon2}\n    end\n  end\n\n  defp calc_advantage(emetter_type, receiver_type) do\n    case {emetter_type, receiver_type} do\n      {:water, :fire} -> 2\n      {:fire, :grass} -> 2\n      {:grass, :water} -> 2\n      {emetter_type, emetter_type} -> 1\n      _ -> 0.5\n    end\n  end\nend"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "" do
-    defmodule PokemonBattle do
-    end
-
-    assert Keyword.get(Pokemon.__info__(:functions), :__struct__),
-           "Ensure you complete the `Pokemon` module above first."
-
-    assert match?(
-             %{name: nil, type: nil, speed: nil, health: 20, attack: 5},
-             struct(Pokemon)
-           ),
-           "Ensure you complete the `Pokemon` module above first."
-
-    pokemon_types =
-      for speed <- 10..30//5,
-          type <- [:water, :fire, :grass],
-          attack <- 5..40//5,
-          health <- 5..20//5 do
-        struct(Pokemon, %{
-          name: "#{Atom.to_string(type)} pokemon",
-          speed: speed,
-          attack: attack,
-          health: health,
-          type: type
-        })
-      end
-
-    pokemon_types
-    |> Enum.shuffle()
-    |> Enum.take(2)
-    |> Enum.chunk_every(2)
-    |> Enum.each(fn [pokemon1, pokemon2] ->
-      attacked_pokemon = PokemonBattle.attack(pokemon1, pokemon2)
-
-      multiplier = Utils.Solutions.PokemonBattle.multiplier(pokemon1, pokemon2)
-
-      assert attacked_pokemon == %Pokemon{
-               pokemon2
-               | health: pokemon2.health - pokemon1.attack * multiplier
-             }
-
-      PokemonBattle.battle(pokemon1, pokemon2)
-
-      assert {battled_pokemon1, battled_pokemon2} = PokemonBattle.battle(pokemon1, pokemon2)
-
-      {expected_battled_pokemon1, expected_battled_pokemon2} =
-        Utils.Solutions.PokemonBattle.battle(pokemon1, pokemon2)
-
-      assert battled_pokemon1 == expected_battled_pokemon1
-      assert battled_pokemon2 == expected_battled_pokemon2
-    end)
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-defmodule PokemonBattle do
-end
 ```
 
 ## Commit Your Progress
