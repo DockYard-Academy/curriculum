@@ -251,9 +251,30 @@ end
 
 We can provide any number of cases. Cases use pattern matching to decide which result to run.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Return each value from `1` to `5` by changing the `condition` variable below.
+
+```elixir
+condition = nil
+
+case condition do
+  :red -> 1
+  "blue" -> 2
+  %{key: "value"} -> 3
+  123 -> 4
+  [1, 2, 3] -> 5
+  _ -> "default"
+end
+```
+
 ## Pattern Matching With Case
 
-`case` uses pattern matching to determine which case to run. For now, we'll only use exact matching where the value is exactly equal.
+`case` uses pattern matching to determine which case to run. If the left side of the `->` operator would match with the provided value, then the `case` statement returns the right side of the `->` operator.
+
+Exact values always match.
 
 ```elixir
 case {:exactly, :equal} do
@@ -261,7 +282,34 @@ case {:exactly, :equal} do
 end
 ```
 
-In the future, we'll cover more complex use cases such as how to pattern match on the value to hit cases.
+Under the hood, Elixir checks if the condition, and the left side of the `->` symbol would match.
+
+```elixir
+{:exactly, :equal} = {:exactly, :equal}
+```
+
+If the values would throw a `MatchError` with the match operator `=`, then they do not match.
+
+```elixir
+{:not_exactly, :equal} = {:exactly, :equal}
+```
+
+That's why the following case statement does not trigger the `"non-matching case"`.
+
+```elixir
+case {:exactly, :equal} do
+  {:not_exactly, :equal} -> "non-matching case"
+  {:exactly, :equal} -> "matching case"
+end
+```
+
+We can use pattern matching the same way we already have with the match operator `=`.
+
+```elixir
+{_mostly, :equal} = {:exactly, :equal}
+```
+
+So now, by matching on `:exactly` using a variable, we can trigger the first case below.
 
 ```elixir
 case {:exactly, :equal} do
@@ -278,12 +326,47 @@ case "no match" do
 end
 ```
 
-To provide a default case for the `case` statement, you can use an underscore `_`.
+To provide a default case for the `case` statement, you can use a variable, which pattern matches with any Elixir value.
+
+```elixir
+case "no match" do
+  "sunnny" -> "wear a t-shirt"
+  anything -> "wear clothing"
+end
+```
+
+We're not using this variable, so we should preface it with an `_`.
+
+```elixir
+case "no match" do
+  "sunnny" -> "wear a t-shirt"
+  _anything -> "wear clothing"
+end
+```
+
+It's common to simply use an `_` rather than naming the variable.
 
 ```elixir
 case "no match" do
   "sunnny" -> "wear a t-shirt"
   _ -> "wear clothing"
+end
+```
+
+### Your Turn
+
+Return each result from `1` to `5` by changing the `condition` variable below.
+
+```elixir
+condition = nil
+
+case condition do
+  [1, 2, 3] -> 1
+  [_head | _tail] -> 2
+  {_, _} -> 3
+  %{key1: _, key2: "value"} -> 4
+  {1, _, %{key: [1, _, _]}} -> 5
+  _ -> "default"
 end
 ```
 
