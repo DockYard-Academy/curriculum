@@ -28,55 +28,55 @@ to do something many many times.
 For example, let's say you're creating a shopping application.
 In this application, customers create a shopping list.
 
-You're responsible for displaying the cost of each item to the user
-after taxes.
-
-Given a list of costs in pennies, how might you do that
-with what you've learned so far?
-
-<!-- livebook:{"force_markdown":true} -->
+We'll represent this shopping cart as a list of item costs in pennies.
 
 ```elixir
-[100, 200, 150, 200]
+shopping_cart = [100, 200, 150, 200]
 ```
 
-With only four items, That would still be a fairly difficult task.
-You would have to extract out each value with pattern matching, and
-then apply some `calculate_tax/1` function to each value, then rebuild
-a new list with the new values
-
-<!-- livebook:{"force_markdown":true} -->
+We can create a function that will calculate the after tax cost of an item called `calculate_tax/1`. Lets say that the tax is `5%` so we can multiply our cost by `1.05`.
 
 ```elixir
-[one, two, three, four] = [100, 200, 150, 200]
+calculate_tax = fn cost -> cost * 1.05 end
+```
+
+With four items in our shopping list, it's a bit tedius to call the `calculate_tax/1` function on each item. We'd need to bind each item to a variable and call the `calculate_tax/1` function on each item individually to determine the after tax cost of each item.
+
+```elixir
+[one, two, three, four] = shopping_cart
 
 [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three), calculate_tax.(four)]
 ```
 
-However the above would only work for four items, you would need
-to create different cases for every size of list you want to support.
-
-<!-- livebook:{"force_markdown":true} -->
+This only works when there are exactly four items. If we want to handle when there is one, two, three, or four items our code gets much more verbose. As you can imagine, this solution is not scalable.
 
 ```elixir
-list = [100, 200, 150, 200]
+shopping_cart = [100, 200, 150]
 
-case list do
-  [] -> []
-  [one] -> [calculate_tax.(one)]
-  [one, two] -> [calculate_tax.(one), calculate_tax.(two)]
-  [one, two, three] -> [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three)]
-  [one, two, three, four] -> [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three), calculate_tax.(four)]
+case shopping_cart do
+  [] ->
+    []
+
+  [one] ->
+    [calculate_tax.(one)]
+
+  [one, two] ->
+    [calculate_tax.(one), calculate_tax.(two)]
+
+  [one, two, three] ->
+    [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three)]
+
+  [one, two, three, four] ->
+    [calculate_tax.(one), calculate_tax.(two), calculate_tax.(three), calculate_tax.(four)]
 end
 ```
 
-Now imagine if you had to support a hundred items. Or if you
-have enterprise customers who buy thousands of items! This simply doesn't
-scale.
+To solve this problem, we need to apply the `calculate_tax/1` function on every element in the list. Any time we need to repeat a similar action over and over again we can use **enumeration**.
 
-To handle scenarios where we need to repeat an action over and over
-again, we can use **enumeration**. Enumeration is the act of looping through a collection and reading
+Enumeration is the act of looping through a collection and reading
 its elements for the sake of returning some output.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
@@ -84,36 +84,71 @@ flowchart LR
   Enumeration --> Output
 ```
 
-With enumeration, we can `calculate_tax/1` on any number of items with a single line.
+<!-- livebook:{"break_markdown":true} -->
 
-<!-- livebook:{"force_markdown":true} -->
+With enumeration, we can `calculate_tax/1` on any number of items with a single call to `Enum.map/2`.
 
 ```elixir
-Enum.map(list, fn item -> calculate_tax(item) end)
+shopping_cart = [100, 200, 150]
+
+Enum.map(shopping_cart, fn item -> calculate_tax.(item) end)
 ```
 
-This lesson will cover tools and techniques to accomplish enumeration.
-In total we will cover:
+## The Enum Module
 
-* **Enumerable** **Collections** that support enumeration.
-* How to use the **Enum** module's built-in functionality with **Collections**.
+Elixir provides the [Enum](https://hexdocs.pm/elixir/Enum.html) to accomplish enumeration. The `Enum` module contains a large amount of useful functions that all work on collection data types such as lists, ranges, maps, and keyword lists.
 
-First, it's useful to know what we can enumerate on.
-
-## Enum
-
-We use the [Enum](https://hexdocs.pm/elixir/Enum.html) module to accomplish enumeration. The Enum module contains
-a large amount of useful functions that all work on enumerable data types.
-
-Certain [Collections](https://elixirschool.com/en/lessons/basics/collections) implement the [Enumerable](https://hexdocs.pm/elixir/Enumerable.html) protocol, which allows us to use [Enum](https://hexdocs.pm/elixir/1.12/Enum.html) functions with them.
-
-We are already familiar with most enumberable collections, such as **lists**, **keyword lists**, and **maps**.
-
-We'll focus on common [Enum](https://hexdocs.pm/elixir/Enum.html) functions you'll use frequently.
+Most enumeration problems can be solved with the folling `Enum` functions.
 
 * [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) enumerate over every element and create a new collection with a new value.
 * [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) and [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3). Enumerate over every element into an accumulated value.
 * [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) filter out elements from a collection.
+
+<!-- livebook:{"break_markdown":true} -->
+
+`Enum.map/2` applies the callback function on every element in a collection to build a new list.
+
+Each element in the new list will be the return value of the provided callback function.
+
+```elixir
+Enum.map(1..10, fn element -> element * 2 end)
+```
+
+`Enum.filter/2` applies the callback funtion to every element in the collection and keeps an element when the callback function returns `true`.
+
+```elixir
+Enum.filter(1..10, fn element -> rem(element, 2) == 0 end)
+```
+
+`Enum.reduce/2` and `Enum.reduce/3` applies the callback function to every element in the collection and builds an accumulated value stored between each function call.
+
+When complete, it returns the result of the last function call, which is typically the accumulated value
+
+```elixir
+# 0 is the initial accumulator value
+Enum.reduce(1..3, 0, fn element, accumulator ->
+  element + accumulator
+end)
+```
+
+`Enum.reduce/2` uses the first value in the collection as the initial accumulator. Generally (but not always) `Enum.reduce/3` is preferable for the sake of clarity, and we will prefer it for most use cases.
+
+```elixir
+Enum.reduce(1..3, 5, fn element, accumulator ->
+  element + accumulator
+end)
+```
+
+```elixir
+Enum.reduce(1..3, fn element, accumulator ->
+  element + accumulator
+end)
+```
+
+### Other Handy Functions
+
+The `Enum` module also provides other useful functions. Here are a handful of the most used.
+
 * [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) check if all elements in a collection match some condition.
 * [Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) check if any elements in a collection match some condition.
 * [Enum.count/2](https://hexdocs.pm/elixir/Enum.html#count/2) return the number of elements in a collection collection.
@@ -181,185 +216,27 @@ Enum.map([one: 1, two: 2], fn {key, _value} -> key end)
 
 ### Your Turn
 
-Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) to convert every number in the following `list` to a string.
+Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) to convert a list of integers from `1` to `10` to strings.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# Expected Output
 ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 ```
 
-Bind `string_list` to your answer.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Example Solution</summary>
 
-<!-- livebook:{"attrs":{"assertions":"","attempts":1,"code":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\r\n\r\nstring_list = nil","solution":"","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+  ```elixir
+  Enum.map(1..10, fn integer -> "#{integer}" end)
+  ```
+</details>
 
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Exercise" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-      string_list = nil
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-string_list = nil
-```
-
-### Your Turn
-
-Use [Enum.map/2](https://hexdocs.pm/elixir/1.12/Enum.html#map/2) with `list` to convert a list such as `[1, 2]` into `[{:one, 1}, {:two, 2}]`. bind `keyword_list` to your answer. You only need to handle integers from `1` to `9`.
-
-Next, try changing `list` to `[1, 2, 3, 4, 5, 6, 7, 8, 9]` and ensure your solution returns the following:
-
-<!-- livebook:{"force_markdown":true} -->
+Enter your solution below.
 
 ```elixir
-[one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9]
-```
 
-<!-- livebook:{"attrs":{"assertions":"case list do\n    [1, 2] -> \n         assert keyword_list == [one: 1, two: 2]\n    [1, 2, 3, 4, 5, 6, 7, 8, 9] ->\n        assert keyword_list == [one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9]\n    _ -> flunk(\"`list` should be either [1, 2] or [1, 2, 3, 4, 5, 6, 7, 8, 9]\")\nend","attempts":1,"code":"list = [1, 2]\r\n\r\nkeyword_list = nil","solution":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nkeyword_list = Enum.map(list, fn integer ->\n  key = case integer do\n    1 -> :one\n    2 -> :two\n    3 -> :three\n    4 -> :four\n    5 -> :five\n    6 -> :six\n    7 -> :seven\n    8 -> :eight\n    9 -> :nine\n  end\n\n  {key, integer}\nend)","title":"Create A Keyword List"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Create A Keyword List" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2]
-
-      keyword_list = nil
-
-      case list do
-        [1, 2] ->
-          assert keyword_list == [one: 1, two: 2]
-
-        [1, 2, 3, 4, 5, 6, 7, 8, 9] ->
-          assert keyword_list == [
-                   one: 1,
-                   two: 2,
-                   three: 3,
-                   four: 4,
-                   five: 5,
-                   six: 6,
-                   seven: 7,
-                   eight: 8,
-                   nine: 9
-                 ]
-
-        _ ->
-          flunk("`list` should be either [1, 2] or [1, 2, 3, 4, 5, 6, 7, 8, 9]")
-      end
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-list = [1, 2]
-
-keyword_list = nil
 ```
 
 ## Enum.reduce/2 and Enum.reduce/3
@@ -455,80 +332,32 @@ Enum.reduce([1, 2, 3], 10, fn integer, accumulator -> integer + accumulator end)
 
 ### Your Turn
 
-Use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) or [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) to sum all of the even numbers in the `list`.
+Use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) or [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) to sum all of the even numbers from `1` to `10`. It should return `30`.
 
-<!-- livebook:{"attrs":{"assertions":"assert list == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], \"The `list` should be [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\"\nassert sum == 2 + 4 + 6  + 8 + 10","attempts":1,"code":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\r\n\r\nsum = nil","solution":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\nEnum.reduce(list, 0, fn int, acc ->\n  if rem(int, 2) == 0 do\n    acc + int\n  else\n    acc\n  end\nend)","title":"Sum Even Numbers"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-ExUnit.start(auto_run: false)
+2 + 4 + 6 + 8 + 10 = 30
+```
 
-defmodule Assertion do
-  use ExUnit.Case
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Hint</summary>
 
-  test "Sum Even Numbers" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-      sum = nil
-
-      assert list == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-             "The `list` should be [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-
-      assert sum == 2 + 4 + 6 + 8 + 10
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
+  ```elixir
+  Enum.reduce(1..10, fn int, acc -> 
+    if rem(int, 2) == 0 do
+      acc + int
+      else
+      acc
     end
-  end
-end
+  end)
+  ```
+</details>
 
-ExUnit.run()
+Enter your solution below.
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```elixir
 
-sum = nil
 ```
 
 ## Enum.filter
@@ -551,82 +380,22 @@ Enum.filter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], fn integer -> integer <= 5 end)
 
 ### Your Turn
 
-use [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) to create a list of `odd_numbers` and a list of `even_numbers` using the following `list`.
+use [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) to create a list of odd numbers from `1` to `10` and a list of even numbers from `1` to `10`.
 
-<!-- livebook:{"attrs":{"assertions":"assert list == [1, 2, 3, 4, 5, 6, 7, 8, 9], \"`list` should be [1, 2, 3, 4, 5, 6, 7, 8, 9].\"\nassert odd_numbers == [1, 3, 5, 7, 9]\nassert even_numbers == [2, 4, 6, 8]","attempts":1,"code":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\r\n\r\nodd_numbers = nil\r\n\r\neven_numbers = nil","solution":"list = [1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nodd_numbers = Enum.filter(list, fn int -> rem(int, 2) == 1 end)\n\neven_numbers = Enum.filter(list, fn int -> rem(int, 2) == 0 end)","title":"Filter Even Numbers"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-ExUnit.start(auto_run: false)
+even_numbers = Enum.filter(1..10, fn integer -> rem(integer, 2) == 0 end)
+odd_numbers = Enum.filter(1..10, fn integer -> rem(integer, 2) != 0 end)
+```
 
-defmodule Assertion do
-  use ExUnit.Case
+</details>
 
-  test "Filter Even Numbers" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+Enter your solution below.
 
-      odd_numbers = nil
+```elixir
 
-      even_numbers = nil
-      assert list == [1, 2, 3, 4, 5, 6, 7, 8, 9], "`list` should be [1, 2, 3, 4, 5, 6, 7, 8, 9]."
-      assert odd_numbers == [1, 3, 5, 7, 9]
-      assert even_numbers == [2, 4, 6, 8]
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-odd_numbers = nil
-
-even_numbers = nil
 ```
 
 ## Enum.all?/2 and Enum.any?/2
@@ -687,6 +456,22 @@ to_find = 1
 Enum.all?(1..10_000_000, fn int -> int < to_find end)
 ```
 
+### Your Turn
+
+Determine if all of the `colors` are `:green`. You may change the value of `colors` to experiment with `Enum.all/2`.
+
+```elixir
+colors = [:green, :green, :red]
+```
+
+### Your Turn
+
+Determine if any of the `colors` are `:red`. You may change the value of `colors` to experiment with `Enum.any/2`.
+
+```elixir
+colors = [:green, :green, :red]
+```
+
 ## Enum.count/1
 
 [Enum.count/1](https://hexdocs.pm/elixir/Enum.html#count/1) returns the number of items in a collection.
@@ -736,77 +521,10 @@ Enum.find(["h", "e", "l", "l", "o"], 10, fn each -> is_integer(each) end)
 
 ### Your Turn
 
-In the Elixir cell below, use [Enum.find/2](https://hexdocs.pm/elixir/Enum.html#find/2) to find the first even number in this list. Replace `nil` with your answer.
-
-<!-- livebook:{"attrs":{"assertions":"assert list == [1, 2, 3, 4, 5], \"`list` should be [1, 2, 3, 4, 5]\"\nassert found == 2","attempts":1,"code":"list = [1, 2, 3, 4, 5]\r\n\r\nfound = nil","solution":"Enum.find(list, fn int -> rem(int, 2) == 0 end)","title":"Find The Even Number"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
+Use `Enum.find/2` to find the first even integer in this list.
 
 ```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Find The Even Number" do
-    try do
-      Process.flag(:trap_exit, true)
-      list = [1, 2, 3, 4, 5]
-
-      found = nil
-      assert list == [1, 2, 3, 4, 5], "`list` should be [1, 2, 3, 4, 5]"
-      assert found == 2
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-list = [1, 2, 3, 4, 5]
-
-found = nil
+[1, "2", "three", 4, "five", 6]
 ```
 
 ## Enum.random/1
@@ -819,10 +537,21 @@ Enum.random(1..10)
 
 ### Your Turn
 
-In the Elixir cell below, use [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to retrieve a random element from the `collection`.
+Generate a list with ten random integers from `0` to `9`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
 ```elixir
-collection = ["one", 3, {}]
+Enum.map(1..10, fn _ -> Enum.random(0..9) end)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Capture Operator and Module Functions
@@ -847,6 +576,12 @@ defmodule NonAnonymous do
 end
 
 Enum.map(1..10, &NonAnonymous.function/1)
+```
+
+This can be used with any of Elixir's built-in functions as well, as long as their arity matches the callback function.
+
+```elixir
+Enum.map(1..10, &is_integer/1)
 ```
 
 We can also use the capture operator alone to create an anonymous function. However, we generally don't recommend this as it typically reduces readability. `&1` is the first argument to the function.
