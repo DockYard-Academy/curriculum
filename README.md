@@ -180,15 +180,13 @@ throughout their career. Students will be capable of delivering high-quality, we
 The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full weekly and daily breakdown.
 
 <!-- course-outline-start -->
-
-## Week 1: Core Syntax
-
-1. Course Tools
-2. Basics
-3. Data Structures and Intro to Pattern Matching
+Course Tools
+Basics
+Data Structures and Intro to Pattern Matching
 Control Flow and Abstraction
-4. Modules and Structs
-5. Enumeration
+Modules and Structs
+Enumeration 1
+Enumeration 2
 
 ## Week 2: Built-In Tools
 

@@ -34,9 +34,24 @@ FizzBuzz.run(1..15)
 [1, 2, "fizz", 4, "buzz", "fizz", 7, 8, "fizz", "buzz", 11, "fizz", 13, 14, "fizzbuzz"]
 ```
 
-```elixir
-Enum.map(1..10, fn integer -> integer * 2 end)
-```
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+  <summary>Example Solution</summary>
+
+  ```elixir
+  defmodule FizzBuzz do
+    def run(range) do
+      Enum.map(range, fn int ->
+        cond do
+          rem(int, 3) == 0 and rem(int, 5) == 0 -> "fizz"
+          rem(int, 3) == 0 -> "fizz"
+          rem(int, 5) == 0 -> "fizz"
+          true -> int
+        end
+      end)
+    end
+  end
+  ```
+</details>
 
 ```elixir
 defmodule FizzBuzz do
@@ -67,6 +82,6 @@ $ git commit -m "finish fizzbuzz exercise"
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Comprehensions](../reading/comprehensions.livemd) | [Counting Votes](../exercises/counting_votes.livemd) |
+| Previous                       | Next                                                         |
+| ------------------------------ | -----------------------------------------------------------: |
+| [Enum](../reading/enum.livemd) | [Named Number Lists](../exercises/named_number_lists.livemd) |

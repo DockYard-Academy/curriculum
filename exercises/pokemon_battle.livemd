@@ -72,12 +72,12 @@ Pokemon.attack(attacker, defender)
 defmodule Pokemon do
   @moduledoc """
   Pokemon
-  
+
   ## Examples
-  
+
     iex> %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
     %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-  
+
     iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
     %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
   """
@@ -85,25 +85,25 @@ defmodule Pokemon do
   @doc """
   subtract the attack damage of an attacker from the defender's health.
   return an updated pokemon struct, and take type advantage into consideration.
-  
+
   ## Examples
-  
+
     Same Type
-  
+
     iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
     iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
     iex> Pokemon.attack(attacker, defender)
     %Pokemon{name: "Charmander", type: :fire, health: 15, attack: 5, speed: 20}
-  
+
     Type Disadvantage
-  
+
     iex> attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
     iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
     iex> Pokemon.attack(attacker, defender)
     %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5, speed: 20}
-  
+
     Type Advantage
-  
+
     iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
     iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
     iex> Pokemon.attack(attacker, defender)
