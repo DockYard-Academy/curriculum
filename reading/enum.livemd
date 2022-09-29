@@ -398,78 +398,102 @@ Enter your solution below.
 
 ```
 
-## Enum.all?/2 and Enum.any?/2
+## Enum.all?/2
 
-We use [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) and [Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) to check elements in a collection for some condition and return either `false` or `true` depending on if the function called on each element returned `true` or `false`.
+[Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) checks that all elements in a collection match some condition.
 
-[Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) returns `true` if **all** elements in the collection returned `true`, and `false` if **one** element in the collection returned `false`.
-
-[Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) returns `true` if **any** elements in the collection returned `true` and `false` if **all** elements in the collection returned `false`.
+[Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) executes the callback function provided on each element. If every element returns truthy, then [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) returns `true`.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
-Collection --> E[Enum.all?/2 or Enum.any?/2]
+Collection --> E[Enum.all?/2]
 E --> Function
-Function -- boolean --> E
+Function -- truthy --> E
 E --> Boolean
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-For example, this function below checks if all of the elements in a list are below `10`. There is one element above `10` (`20`) so it returns `false`.
-
 ```elixir
-Enum.all?([1, 2, 20], fn integer -> integer < 10 end)
+Enum.all?([1, 2, 3], fn integer -> is_integer(integer) end)
 ```
 
-The same collection and function with [Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) returns true because one or more elements are below `10`.
+If a single element returns a falsy value, then [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) returns `false`.
 
 ```elixir
-Enum.any?([1, 2, 20], fn integer -> integer < 10 end)
+Enum.all?([1, 2, 3, "4"], fn element -> is_integer(element) end)
 ```
 
-[Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) will stop the moment an element called with the function returns `false`. [Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) will end the moment any element returns `true`.
+For performance reasons, [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) will complete as soon as it finds a single element that returns a falsey value when called with the function.
 
-This means both can be performant with large lists, so long as they exit early.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Evaluate the cell below, notice that it completes instantly. Then change `to_find` to `10000000`. Notice it takes significantly longer, because [Enum.any?/2](https://hexdocs.pm/elixir/Enum.html#any?/2) must check every element before it finally finds the last element that passes the condition.
+Notice the code below should finish very quickly because the very first element fails the condition.
 
 ```elixir
-to_find = 1
+to_find = 0
 
-Enum.any?(1..10_000_000, fn int -> int == to_find end)
+Enum.all?(1..10_000_000, fn integer -> is_bitstring(integer) end)
 ```
 
-### Your Turn
+If [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) must traverse the entire collection if all elements pass the condition, or if a failing element is towards the end of the list.
 
-Evaluate the cell below, notice that it completes instantly, then change `to_find` to `10000000`. Notice it takes significantly longer, because [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) must check every element before it finally finds the last element that fails the condition.
+Notice the code below should take awhile to finish running because every element passes the condition.
 
 ```elixir
-to_find = 1
+to_find = 0
 
-Enum.all?(1..10_000_000, fn int -> int < to_find end)
+Enum.all?(1..10_000_000, fn integer -> is_integer(integer) end)
 ```
 
 ### Your Turn
 
-Determine if all of the `colors` are `:green`. You may change the value of `colors` to experiment with [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2).
+Use [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) to determine if all of the `colors` in this list of colors are `:green`. You may change the value of `colors` to experiment with [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2).
 
 ```elixir
 colors = [:green, :green, :red]
 ```
 
-### Your Turn
+## Enum.any/2
 
-Determine if any of the `colors` are `:red`. You may change the value of `colors` to experiment with [Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2).
+[Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2) checks if any elements in a collection pass some condition. If a single element returns a truthy value when called with the callback function, then [Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2) returns `true`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+Collection --> E[Enum.any?/2]
+E --> Function
+Function -- truthy --> E
+E --> Boolean
+```
 
 ```elixir
-colors = [:green, :green, :red]
+Enum.any?([1, "2", "3"], fn element -> is_integer(element) end)
+```
+
+[Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2) returns as soon as an element in the collection returns a truthy value.
+
+Notice the code below finishes very quickly, because the first element in the collection passes the condition.
+
+```elixir
+to_find = 0
+
+Enum.any?(1..10_000_000, fn integer -> is_integer(integer) end)
+```
+
+However, the following takes awhile to run because all elements in the collection fail the condition.
+
+```elixir
+to_find = 0
+
+Enum.any?(1..10_000_000, fn integer -> is_bitstring(integer) end)
+```
+
+### Your Turn
+
+Use [Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2) to determine if any the `animals` in this list of animals are `:dogs`. You may change the list of `animals` to experiment with [Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2).
+
+```elixir
+[:cats, :dogs, :bears, :lions, :penguins]
 ```
 
 ## Enum.count/1
