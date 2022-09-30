@@ -1,0 +1,211 @@
+# SafeRange
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## A Safe Range Function
+
+In the lesson on creating a range of numbers using the `..`
+operator:
+
+```elixir
+iex> Enum.to_list(1..5)
+[1, 2, 3, 4, 5]
+```
+
+You also learned that it can optionally take a
+*step* value:
+
+```elixir
+iex> Enum.to_list(1..5//2)
+[1, 3, 5]
+```
+
+In this way, the programmer may create a
+sequence of integers starting at the *first* number and
+returning increments by `step` until the *last* number
+is reached or exceeded.
+
+But, what happens when the *step* attempts to create a
+sequence that is not incrementing towards the *last*
+number, such as:
+
+```elixir
+iex> Enum.to_list(1..5//-1)
+```
+
+In this case, an empty list (`[]`) is returned as there
+are no numbers between `1` and `5` starting at `1` and
+incrementing by `-1`.
+
+As was brought up<sup>*</sup> in a Beta release of this course,
+why would Elixir allow such code? Does it compile? Does
+it evaluate?
+
+In this bonus exercise, you will be recreating the
+range function AND creating a *safe* version.
+
+In Elixir, there is already a standard on providing *safe* versions
+of functions: When you want Elixir to throw an exception instead
+of returning a reasonable or error value, the name of the function
+will end with `!`.
+
+Two examples from the standard library may be referred to:
+
+`Enum.fetch` & `Enum.fetch!`
+
+https://hexdocs.pm/elixir/1.14.0/Enum.html
+
+The `Enum` module provides two functions to retreive an element
+from a list (`[]`) at a given index. The difference is in how
+they behave when the index is invalid; ex:
+
+```elixir
+iex> list = [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+iex> Enum.fetch(list, 10)
+:error
+iex> Enum.fetch!(list, 10)
+** (Enum.OutOfBoundsError) out of bounds error
+    (elixir 1.14.0) lib/enum.ex:1072: Enum.fetch!/2
+    iex:27: (file)
+```
+
+`Map.fetch` & `Map.fetch!`
+
+https://hexdocs.pm/elixir/1.14.0/Map.html
+
+When accessing a Map (`%{}`) with a *key*, the `Map` module
+provides these two functions. The difference is in how they
+behave when the *key* is **not** present in the map; ex:
+
+```elixir
+iex> map = %{a: 1, b: 2}
+%{a: 1, b: 2}
+iex> Map.fetch(map, :c)
+:error
+iex> Map.fetch!(map, :c)
+** (KeyError) key :c not found in: %{a: 1, b: 2}
+    (stdlib 4.0.1) :maps.get(:c, %{a: 1, b: 2})
+    iex:29: (file)
+```
+
+Your assignment is to implement the `SafeRange` module with 2
+functions called `range` and `range!` where:
+
+  * `SafeRange.range` behaves as the existing `..//STEP` function
+  
+  * `SafeRange.range!` verifies that the given *step* "makes
+    sense" with the given *first* and *last* values, and if not
+    a `RuntimeError` exception is thrown.
+
+In Elixir exceptions may be thrown using the `raise` function,
+for example here is how to throw a `RuntimeError` exception:
+
+```elixir
+iex> raise "Houston, we have a problem."
+** (RuntimeError) Houston, we have a problem.
+```
+    
+```elixir
+defmodule SafeRange do
+
+  @doc """
+  Generate a sequences of integers from 'first' to 'last' with an
+  option 'step' value.
+
+  If incrementing by 'step' will not end at or beyond 'last',
+  just return an empty list ([]).
+
+  ## Examples
+
+    iex> SafeRange.range(1, 5)
+    [1, 2, 3, 4, 5]
+
+    iex> SafeRange.range(1, 5, 2)
+    [1, 3, 5]
+
+    iex> SafeRange.range(1, 5, -1)
+    []
+
+    iex> SafeRange.range(5, 1, 1)
+    []
+  """
+  def range(first, last, step \\ DEFAULT) do
+  end
+
+  @doc """
+  Generate a sequences of integers from 'first' to 'last' with an
+  option 'step' value.
+
+  If incrementing by 'step' will not end at or beyond 'last',
+  a "RuntimeError" will be thrown.
+
+  ## Examples
+
+    iex> SafeRange.range!(1, 5)
+    [1, 2, 3, 4, 5]
+
+    iex> SafeRange.range!(1, 5, 2)
+    [1, 3, 5]
+
+    iex> SafeRange.range!(1, 5, -1)
+    ** (RuntimeError) Invalid step value of: -1
+        iex: SafeRange.range!/3
+
+    iex> SafeRange.range!(5, 1, 1)
+    ** (RuntimeError) Invalid step value of: 1
+        iex: SafeRange.range!/3
+  """
+  def range!(first, last, step \\ DEFAULT) do
+  end
+
+end
+```
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule SafeRange do
+  def range(first, last, step \\ 1) do
+    start..finish//step
+  end
+
+  def range!(first, last, step \\ 1) do
+    cond do
+      step < 0 and first < last ->
+        raise "Invalid step value of: #{step}"
+      last < first ->
+        raise "Invalid step value of: #{step}"
+      true -> first..last//step
+    end       
+  end
+end
+```
+</details>
+
+* - Thanks to Jeff Helman for asking the question and pursuing a
+    good answer!
+    
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish measurements exercise"
+```
+
+## Up Next
