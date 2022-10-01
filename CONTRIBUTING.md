@@ -143,8 +143,9 @@ mix bc
 
 If there are any changed files, ensure you include them when you create your Pull Request.
 
-## Add and Commit Changes
-Now, make your desired changes to the project, adding and committing changes as you make them.
+## Stage, Commit, and Push Changes
+
+Now, make your desired changes to the project. add and commit changes as you make them.
 You may choose to use the command line, or perhaps the **Source Control** tab in Visual Studio Code or your preferred code editor.
 
 The `git add` command stages changes that you want to include in your next commit. `git add .` stages all changes in the current folder.
@@ -162,11 +163,10 @@ git commit -m "fix typo"
 Once finished with your changes, you need to push your changes to your remote repository.
 
 ```mermaid
-flowchart
-L[Local Repository]
-R[Remote Repository]
-
-L --push changes--> R
+sequenceDiagram
+    Local Repository->>Local Repository: Stage Changes `git add`
+    Local Repository->>Local Repository: Commit Changes `git commit -m "message"`
+    Local Repository->>Remote Forked Repository: Push Changes `git push`
 ```
 
 In order to push changes from your local branch to your remote forked repository, you must connect them. The branch on the forked repository is called the **upstream**.
@@ -189,6 +189,27 @@ To push the current branch and set the remote as upstream, use
 
     git push --set-upstream origin example-branch
 ```
+
+## Create a Pull Request
+
+Once you have pushed your local changes to your remote forked repository, you need to create a pull request from your forked repository to the original DockYard Academy repository.
+
+```mermaid
+sequenceDiagram
+    Remote Forked Repository->>DockYard Academy Repository: Make Pull Request
+```
+
+To make a pull request, go the the **Pull Requests** tab on your remote repository and click **Create Pull Request**.
+
+![Create Pull Request Tab](./images/pull_request_tab.png)
+
+Ensure that you are creating a pull request from your forked repository branch to the `main` branch of DockYard Academy.
+
+![Open Pull Request](./images/open_a_pull_request.png)
+
+Click **Create Pull Request**. Fill in a title and description for the pull request and click **Create Pull Request**. This should create a Pull Request that is ready for review by a maintainer.
+
+We have no strict guidelines on titles or descriptions. Simply do your best to capture what the PR accomplishes in simple language. Include screenshots where applicable.
 
 ## Ensure Remote CI Passes
 
