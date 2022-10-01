@@ -23,7 +23,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 Data types that do not contain multiple elements are not enumerable.
 However, it's still sometimes useful to enumerate over non-enumerable data types.
 
-Even though you can't enumerate over them directly, the trick is to convert
+Even though we can't enumerate over them directly, the trick is to convert
 non-enumerable data into an enumerable data type, then convert them back if necessary.
 
 ## Integers
@@ -74,75 +74,27 @@ List.to_tuple([1, 2, 3])
 
 ## Strings
 
-Strings are not enumerable, however there are several methods to convert strings to lists.
-
-Strings can be converted into lists with either [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1), [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1), or [String.split/3](https://hexdocs.pm/elixir/String.html#split/3).
-
-Under the hood, strings are represented with a **codepoint**. A codepoint is an integer that represents
-the character. Each character such as `"a"` has a corresponding codepoint. That's why the
-function is called [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
+Strings are not enumerable.
 
 ```elixir
-String.codepoints("abcdefghijklmnopqrstuvwxyz")
+Enum.map("abc", fn char -> char end)
 ```
 
-For example, the code point for the letter `a` is `97`. Lowercase and uppercase letters have
-different codepoints.
+### `String.split/3`
 
-You can find the code point of any character by using `?` in Elixir. Evaluate the Elixir cell below
-to see how `?a` returns `97`.
+<!-- livebook:{"break_markdown":true} -->
 
-```elixir
-?a
-```
+However, strings can be converted into lists using [String.split/3](https://hexdocs.pm/elixir/String.html#split/3).
 
-If you are curious, the full list of representable characters is called the [The Unicode Standard](https://unicode.org/standard/standard.html).
+[String.split/3](https://hexdocs.pm/elixir/String.html#split/3) splits a string based on some value.
 
-See this table for alphabetical characters and their code point values.
-You do not need to memorize these values! You only need to be aware that each character has a corresponding codepoint.
-
-<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend)\n|> Kino.DataTable.new()","title":"Unicode Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-```elixir
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-|> String.codepoints()
-|> Enum.map(fn char ->
-  <<code_point::utf8>> = char
-  %{character: char, code_point: code_point}
-end)
-|> Kino.DataTable.new()
-```
-
-#### [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1)
-
-Some special characters are actually multiple characters combined.
-
-You'll notice that é is actually 2 characters if you use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1).
-Each character has its own codepoint.
-
-```elixir
-String.codepoints("é")
-```
-
-We use **grapheme** to refer to special characters that may contain multiple codepoints.
-Therefore, use `String.graphemes` when you want to convert the string to a list without separating special characters
-formed from multiple codepoints.
-
-```elixir
-String.graphemes("é")
-```
-
-### String.split/3
-
-Alternatively, you can use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split a string based on some value.
 For example, we can split a string by every comma like so:
 
 ```elixir
 String.split("a,b,c,d", ",")
 ```
 
-You can use this to accomplish a similar behavior as [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) by passing a string as the second argument.
-However this leaves whitespace from the start and end of the string in.
+We can split a string into a list of characters by splitting on every empty space `""` This does create an empty string becaused of the start and the end of the list.
 
 ```elixir
 String.split("abcde", "")
@@ -154,7 +106,15 @@ You can trim whitespace using the `[trim: true]` option.
 String.split("abcde", "", trim: true)
 ```
 
+By default, `String.split/1` will split the string on every space.
+
+```elixir
+String.split("hello world")
+```
+
 Now your string is an enumerable list of characters.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
@@ -178,10 +138,60 @@ The default joiner is a string, so you can omit the second argument.
 Enum.join(["a", "b", "c"])
 ```
 
-Alternatively you can join the strings by some joining character.
+Alternatively we can join the strings by some joining character.
 
 ```elixir
 Enum.join(["a", "b", "c"], "_")
+```
+
+We can use `String.split/3` and `Enum.join/2` in combination with eachother to split strings, enumerate over them applying some transformation, and then rejoining them.
+
+Here's a simple example of replacing all characters other than spaces with `"X"`.
+
+```elixir
+split_string = String.split("secret information", "")
+
+transformed_list =
+  Enum.map(split_string, fn char ->
+    case char do
+      " " -> " "
+      _ -> "X"
+    end
+  end)
+
+joined_string = Enum.join(transformed_list)
+```
+
+### Your Turn
+
+Start with a string such as `"hello"`. Use enumeration to double every character in the string so the `"hello"` would become `"hheelllloo"`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Possible Solution</summary>
+
+```elixir
+split_string = String.split("hello", "")
+
+doubled_string = Enum.map(split_string, fn char -> char <> char end)
+
+Enum.join(doubled_string)
+```
+
+You might also use the pipe operator.
+
+```elixir
+"hello"
+|> String.split("")
+|> Enum.map(fn char -> char <> char end)
+|> Enum.join()
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Commit Your Progress
