@@ -2,9 +2,22 @@
 
 DockYard Academy aspires to create a supportive and inclusive environment. We welcome pull requests from everyone and from all experience levels. If you encounter any issues please [Raise An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) and describe your problem to get help.
 
+## Set Up A Code Editor (Recommended)
+
+We recommend you install Visual Studio Code as your primary code editor for this course:
+https://code.visualstudio.com/
+
+While this is not mandatory, we highly recommend using Visual Studio Code for it's ability to use LiveShare for collaborative code editing.
+
+## Install Livebook
+
+DockYard Academy is built using [Livebook](https://livebook.dev/), which allows you to run Elixir Notebooks.
+
+Follow the [Livebook Installation Guide](https://livebook.dev/#install) to install Livebook Desktop or Livebook using escripts if you prefer using the command line or are a Linux user.
+
 ## Fork the Repository
 
-In order to contribute to this project, you need to create a version of the project that you control. This version is called a **fork** or **forked repository**.
+To contribute to this project, you need to create a version of the project that you control. This version is called a **fork** or **forked repository**.
 
 ```mermaid
 flowchart LR
@@ -62,7 +75,7 @@ m --> b3
 
 ## Update Main
 
-If we make significant projects to `main` you may want to update your fork before submitting a Pull Request. To update `main`, click the **Sync Fork** button from your forked repository on GitHub.
+If we make significant changes to `main` you may want to update your fork before submitting a Pull Request. To update `main`, click the **Sync Fork** button from your forked repository on GitHub.
 
 ![Sync DockYard Academy Fork](./images/sync_fork.png)
 
@@ -76,7 +89,13 @@ L[Local Repository]
 R --pull changes--> L
 ```
 
-Run the following command from your command line in the `beta_curriculum` folder to pull the latest changes.
+Changes must be pulled to your `main` branch on your local repository, so ensure you are on this branch by running the following from your command line in the `beta_curriculum` folder.
+
+```
+git checkout main
+```
+
+Then run the following command from your command line in the `beta_curriculum` folder to pull the latest changes.
 
 ```
 git pull
@@ -226,3 +245,31 @@ First, find your Pull Request in the [DockYard Academy Pull Requests](https://gi
 ## Receive a Pull Request Review
 
 A maintainer will review your pull request as soon as possible and provide feedback for changes where needed.
+
+## Writing Contribution Guide
+If you fix DockYard Academy Content or submit new content, please keep the following writing tips in mind.
+- Code keywords such as `defimpl`, `defprotocol`, and `end` should use backticks (``).
+- New concepts should be in **bold** the first time you introduce them, and should be explained.
+- Use title case without a period in headers. i.e `"### Title"`. We have a task that automatically enforces this so don't worry about it too much.
+- Code should be in an executable elixir cell unless it is pseudocode or reduces the lesson's clarity.
+- Text should be run through [grammarly](https://app.grammarly.com/) or an alternative grammar checking program to ensure correctness. The free Grammarly features should be sufficient.
+- Lessons should have a hidden setup section at the top of the Livebook for any necessary dependencies.
+- Each major concept should have a new section. In addition, each section should try to provide at least one student interaction portion, typically using the **Your Turn** heading.
+- **Hints** and **Possible Solutions** should be provided using the details component (these styles look nicer in Livebook):
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+Have you tried turning it off and on again?
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Possible Solution</summary>
+
+```elixir
+initial_count = 0
+initial_count + high
+```
+
+</details>
