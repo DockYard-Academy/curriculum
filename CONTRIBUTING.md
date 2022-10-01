@@ -1,0 +1,207 @@
+# Contributing
+
+DockYard Academy aspires to create a supportive and inclusive environment. We welcome pull requests from everyone and from all experience levels. If you encounter any issues please [Raise An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) and describe your problem to get help.
+
+## Fork the Repository
+
+In order to contribute to this project, you need to create a version of the project that you control. This version is called a **fork** or **forked repository**.
+
+```mermaid
+flowchart LR
+DY[DockYard Academy Repository]
+F[Forked Repository]
+
+DY --fork--> F
+```
+
+You can create a fork by pressing the fork button in the top right corner of the GitHub repository or [click this link to create a fork]([fork](https://github.com/DockYard-Academy/beta_curriculum/fork))
+
+## Clone the Repository
+
+The forked repository is stored remotely on GitHub, so you need to download the codebase onto your local computer. We call this process **cloning** because we're downloading a copy (a clone) of the remote repository onto our local computer.
+
+```mermaid
+flowchart
+R[Remote Repository]
+L[Local Repository]
+
+R --clone--> L
+```
+
+To do this, press the green **CODE** button on your forked repository and copy the URL provided.
+
+![GitHub Clone URL](./images//fork_curriculum_clone.png)
+
+Then run the following command in the command line from the folder you want to create your `beta_curriculum` folder in.
+<div style="background-color: lightcoral; font-weight: bold; padding: 1rem; color: black; margin: 1rem 0;">Ensure you replace URL with the copied URL</div>
+
+```
+git clone URL
+```
+
+This should create a local copy of the project on your computer.
+
+## Keep `main` Branch Unchanged
+
+Git repositories use multiple branches to keep track of changes you make to the codebase.
+Branches typically branch off of the `main` branch, which holds the main version of the codebase.
+
+In general, you want to avoid creating changes directly on the `main` branch and instead create new branches to make your changes on.
+
+```mermaid
+flowchart BT
+m[main]
+b1[branch]
+b2[branch]
+b3[branch]
+
+m --> b1
+m --> b2
+m --> b3
+```
+
+## Update Main
+
+If we make significant projects to `main` you may want to update your fork before submitting a Pull Request. To update `main`, click the **Sync Fork** button from your forked repository on GitHub.
+
+![Sync DockYard Academy Fork](./images/sync_fork.png)
+
+Once you have the latest changes on your remote repository, you need to download them to your local repository. We call this process **pulling**.
+
+```mermaid
+flowchart TB
+R[Remote Repository]
+L[Local Repository]
+
+R --pull changes--> L
+```
+
+Run the following command from your command line in the `beta_curriculum` folder to pull the latest changes.
+
+```
+git pull
+```
+
+We recommend doing this regularly as we make significant changes daily.
+
+If you are running the project with Livebook, make sure you completely stop the Livebook project either by stopping it from the command line, or closing the Desktop Application.
+
+<div style="background-color: lightcoral; font-weight: bold; padding: 1rem; color: black; margin: 1rem 0;">It is not enough to close the browser, you must stop the application otherwise you may retain an old version of opened files.</div>
+
+## Create A Solutions Branch
+
+If you are interested in completing DockYard Academy content, create a solutions branch.
+To create a new solutions branch, run the following from the `beta_curriculum` folder in your command line. You may replace `2022-10-1` with any branch name.
+
+```
+git checkout -B 2022-10-1
+```
+
+If you update your `main` branch, and wish to have the latest changes, we generally recommend creating a new solutions branch rather than trying to merge the latest changes with your existing solutions branch to avoid any potential merge conflicts.
+
+## Create a Feature Branch
+
+If you are contributing to the project, create a new branch for the specific contribution you would like to make. We have no strict name structure, however we recommend you pick a branch name related to the problem you are trying to solve such as:
+
+- `fix-typo-in-enum-reading`
+- `issue-769`
+- `content-review`
+
+Ensure you create your feature branch while on the `main` branch, otherwise you may accidentally include solutions to exercises in your Pull Request.
+
+First, checkout into the `main` branch if you are not already on the `main` branch.
+
+```
+git checkout main
+```
+
+Follow the steps for updating main, then create your new feature branch. Replace `feature-branch-name` with your desired branch name.
+
+```
+git checkout -b feature-branch-name
+```
+
+## Run Tests
+
+From the `beta_curriculum/utils` folder, run the following command to run all tests.
+
+```
+mix test
+```
+
+Ensure all tests pass before submitting any Pull Request. Tests should provide you with a hint if there is any issue.
+
+## Run Tasks
+
+We have several [Mix Tasks](https://elixirschool.com/en/lessons/intermediate/mix_tasks) which handle automated tasks such as adding navigation, formatting lessons, and spellchecking.
+
+Before submitting any Pull Request, run the following command from the `beta_curriculum/utils` folder.
+
+```
+mix bc
+```
+
+If there are any changed files, ensure you include them when you create your Pull Request.
+
+## Add and Commit Changes
+Now, make your desired changes to the project, adding and committing changes as you make them.
+You may choose to use the command line, or perhaps the **Source Control** tab in Visual Studio Code or your preferred code editor.
+
+The `git add` command stages changes that you want to include in your next commit. `git add .` stages all changes in the current folder.
+
+```
+git add .
+```
+
+Once you have staged the changes you want in your next commit, you may commit them using the following command. Put a description of your work between the two quotes `""`. Consider making small, frequent commits to regularly save your work.
+
+```
+git commit -m "fix typo"
+```
+
+Once finished with your changes, you need to push your changes to your remote repository.
+
+```mermaid
+flowchart
+L[Local Repository]
+R[Remote Repository]
+
+L --push changes--> R
+```
+
+In order to push changes from your local branch to your remote forked repository, you must connect them. The branch on the forked repository is called the **upstream**.
+
+Run the following command to create a remote upstream branch, then push your local changes to the remote upstream branch. Replace `branch-name` with the name of your branch.
+
+```
+git push --set-upstream origin branch-name
+```
+
+Alternatively you can just run `git push` and let the warning message tell you what command to run.
+
+<div style="background-color: lightcoral; font-weight: bold; padding: 1rem; color: black; margin: 1rem 0;">The following code is meant for example purposes only, do not run it in your command line.</div>
+
+```
+$ git checkout -b example-branch
+$ git push
+fatal: The current branch example-branch has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin example-branch
+```
+
+## Ensure Remote CI Passes
+
+We run [GitHub Actions](https://github.com/features/actions) for spell checking and tests on every Pull Request. If it is your first Pull Request on the project these will have to be approved by a Maintainer. Otherwise, the GitHub Actions should run automatically.
+
+Ensure that all GitHub Actions Pass after submitting your Pull Request.
+
+## Review Your Changes
+
+We recommend reading through your code changes after submitting your Pull Request.
+
+First, find your Pull Request in the [DockYard Academy Pull Requests](https://github.com/DockYard-Academy/beta_curriculum/pulls) tab. Then click on the **Files Changed** tab to view your changed files. Ensure there are no issues and that you are happy with your changes.
+
+## Receive a Pull Request Review
+
+A maintainer will review your pull request as soon as possible and provide feedback for changes where needed.
