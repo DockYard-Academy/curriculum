@@ -36,10 +36,54 @@ WeightedVoting.tally([cats: 10, dogs: 20, dogs: 20])
 [cats: 10, dogs: 40]
 ```
 
-Ensure the keyword list is sorted in alphabetical order. You can do this with [Enum.sort/1](https://hexdocs.pm/elixir/Enum.html#sort/1).
+<summary>
+Example Solution
+</summary>
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Enum.sort(c: "c", b: "b", a: "a")
+
+```
+
+```elixir
+defmodule WeightedVoting do
+  @doc """
+  Count the total number of votes for some key in a keyword list.
+  
+  ## Examples
+  
+    iex> WeightedVoting.count([dogs: 20, dogs: 10], :dogs)
+    30
+    iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 30], :dogs)
+    50
+    iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
+    40
+  """
+  def count(votes, vote_to_count) do
+    Enum.reduce(votes, %{}, fn {key, value}, acc ->
+      Map.update()
+    end)
+  end
+
+  @doc """
+  Tally the total number of votes in a keyword list, and return
+  the results as a keyword list.
+  
+  The keyword list should be sorted in alphabetical order.
+  
+  ## Examples
+  
+    iex> WeightedVoting.tally([dogs: 20, dogs: 10])
+    [dogs: 30]
+    iex> WeightedVoting.tally([cats: 10, dogs: 20, dogs: 10])
+    [cats: 10, dogs: 30]
+    iex> WeightedVoting.tally([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
+    [birds: 20, cats: 30, dogs: 30]
+  """
+  def tally(votes) do
+  end
+end
 ```
 
 ```elixir
