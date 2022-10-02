@@ -398,8 +398,10 @@ defmodule Utils.Feedback do
 
     now = DateTime.utc_now()
     assert tomorrow.year == now.year
-    assert tomorrow.month == now.month
-    assert tomorrow.day == now.day + 1
+
+    assert (tomorrow.month == now.month && tomorrow.day == now.day + 1) ||
+             (tomorrow.month == now.month + 1 && tomorrow.day == 1)
+
     assert tomorrow.hour == now.hour
     # Allowing 2 second adjustment for possible time delay
     assert DateTime.diff(DateTime.add(now, 60 * 60 * 24, :second), tomorrow) < 2
