@@ -191,10 +191,8 @@ Control Flow and Abstraction
 Modules and Structs
 Enumeration 1
 Enumeration 2
-
-## Week 2: Built-In Tools
-
-1. Built-In Modules
+Built-in Modules
+Reduce
 2. Dates and Time
 3. Guards, Pattern Matching
 4. String Manipulation
