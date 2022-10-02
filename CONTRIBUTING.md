@@ -265,7 +265,7 @@ Have you tried turning it off and on again?
 </details>
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Possible Solution</summary>
+<summary>Example Solution</summary>
 
 ```elixir
 initial_count = 0
