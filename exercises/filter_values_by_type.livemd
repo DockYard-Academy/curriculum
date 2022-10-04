@@ -83,9 +83,6 @@ defmodule Filter do
     [1, 2]
   """
   def integers(list) do
-    Enum.filter(list, fn item ->
-      is_integer(item)
-    end)
   end
 
   @doc """
@@ -97,9 +94,6 @@ defmodule Filter do
     [1.2, 3.2]
   """
   def floats(list) do
-    Enum.filter(list, fn item ->
-      is_float(item)
-    end)
   end
 
   @doc """
@@ -111,9 +105,6 @@ defmodule Filter do
     [1, 2, 1.2, 3.2]
   """
   def numbers(list) do
-    Enum.filter(list, fn item ->
-      is_number(item)
-    end)
   end
 
   @doc """
@@ -125,7 +116,6 @@ defmodule Filter do
     [:first_atom, :second_atom]
   """
   def atoms(list) do
-    Enum.filter(list, fn item -> is_atom(item) end)
   end
 
   @doc """
@@ -137,7 +127,6 @@ defmodule Filter do
     [[1, 2], [4, 5, 6]]
   """
   def lists(list) do
-    Enum.filter(list, fn item -> is_list(item) end)
   end
 
   @doc """
@@ -145,11 +134,10 @@ defmodule Filter do
 
   ## Examples
 
-    iex> Filter.maps([1, 2, %{}, {}, [], 1.2, 3.2, :atom. %{key: "value"}])
+    iex> Filter.maps([1, 2, %{}, {}, [], 1.2, 3.2, :atom, %{key: "value"}])
     [%{}, %{key: "value"}]
   """
   def maps(list) do
-    Enum.filter(list, fn item -> is_map(item) end)
   end
 
   @doc """
@@ -157,26 +145,12 @@ defmodule Filter do
 
   ## Examples
 
-    iex> Filter.maps([1, 2, %{}, {}, [], 1.2, 3.2, :atom. %{key: "value"}, [key: "value"]])
+    iex> Filter.keyword_lists([1, 2, %{}, {}, [], 1.2, 3.2, :atom, %{key: "value"}, [key: "value"]])
     [[], [key: "value"]]
   """
   def keyword_lists(list) do
-    Enum.filter(list, fn item -> Keyword.keyword?(item) end)
   end
 end
-```
-
-```elixir
-# Validation. Pipe each function to IO.inspect so we can view them all
-Filter.integers([1, 2, %{}, {}, []]) |> IO.inspect()
-Filter.floats([1, 2, %{}, {}, [], 1.2, 3.2]) |> IO.inspect()
-Filter.numbers([1, 2, %{}, {}, [], 1.2, 3.2]) |> IO.inspect()
-Filter.atoms([1, 2, %{}, {}, [], :first_atom, 1.2, 3.2, :second_atom]) |> IO.inspect()
-Filter.lists([1, 2, %{}, {}, [], 1.2, 3.2, :atom, [1, 2], [4, 5, 6]]) |> IO.inspect()
-Filter.maps([1, 2, %{}, {}, [], 1.2, 3.2, :atom, %{key: "value"}]) |> IO.inspect()
-
-Filter.keyword_lists([1, 2, %{}, {}, [], 1.2, 3.2, :atom, %{key: "value"}, [key: "value"]])
-|> IO.inspect()
 ```
 
 ## Commit Your Progress
