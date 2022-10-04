@@ -38,7 +38,7 @@ YouTube.new("https://www.youtube.com/watch?v=OQrfedclHfk")
 
 ## Input -> Output
 
-As we've seen, other `Enum` functions such as `Enum.map/2` or `Enum.filter/2` take in a collection as input and produce a list as output.
+As we've seen, other [Enum](https://hexdocs.pm/elixir/Enum.html) functions such as [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) or [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) take in a collection as input and produce a list as output.
 
 ```mermaid
 flowchart LR
@@ -53,11 +53,11 @@ flowchart LR
 C1[Collection] --> Enum.reduce/3 --> ANYTHING!!!
 ```
 
-Anytime you have a collection, and want to produce a non-list output, `Enum.reduce/3` might be the right tool for the job.
+Anytime you have a collection, and want to produce a non-list output, [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) might be the right tool for the job.
 
 ## Building the Accumulator
 
-`Enum.reduce/3` works by enumerating over the collection and building up an accumulator. Instead of applying a change to each element in the collection, we transform the accumulator by applying a callback function on every element.
+[Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) works by enumerating over the collection and building up an accumulator. Instead of applying a change to each element in the collection, we transform the accumulator by applying a callback function on every element.
 
 For example, we can simply return `0` in the body of the callback function to return this value as the accumulator.
 
@@ -65,7 +65,7 @@ For example, we can simply return `0` in the body of the callback function to re
 Enum.reduce(1..3, 0, fn _integer, _acc -> 0 end)
 ```
 
-With each step in `Enum.reduce/3` we create a new acculumator of `0`.
+With each step in [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) we create a new acculumator of `0`.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -98,7 +98,7 @@ For example, to determine if `"state"` and `"taste"` are anagrams of each other,
 %{"s" => 1, "t" => 2, "a" => 1, "e" => 1} == %{"t" => 2, "a" => 1, "s" => 1, "e" => 1}
 ```
 
-We can use `Enum.reduce/3` to convert a string into a map of character counts. For each character in the string, we'll build a new map with an updated key.
+We can use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) to convert a string into a map of character counts. For each character in the string, we'll build a new map with an updated key.
 
 Here's how we would build the accumulator for the string `"aba"`.
 
@@ -122,7 +122,7 @@ flowchart TB
 
 <!-- livebook:{"break_markdown":true} -->
 
-We can initialize or update a value in a map using `Map.update/4`. If there is no existing key, it initializes the map key with the default value provided.
+We can initialize or update a value in a map using [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4). If there is no existing key, it initializes the map key with the default value provided.
 
 ```elixir
 updated_map = Map.update(%{}, :key, "default value", fn current -> "updated: #{current}" end)
@@ -134,7 +134,7 @@ If there is an existing key, then it can update the map key using the existing v
 Map.update(updated_map, :key, "default value", fn current -> "updated: #{current}" end)
 ```
 
-When converting a string to a map of character counts, If there is no key, the value will be `1`. If there is an existing key in the map, the value will be the current value incremented by `1`. Here are the steps we want to accomplish for our `Enum.reduce/3` function.
+When converting a string to a map of character counts, If there is no key, the value will be `1`. If there is an existing key in the map, the value will be the current value incremented by `1`. Here are the steps we want to accomplish for our [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) function.
 
 ```elixir
 initial_accumulator = %{}
@@ -152,7 +152,7 @@ step2 = Map.update(step1, "b", 1, fn current_value -> current_value + 1 end)
 step3 = Map.update(step2, "a", 1, fn current_value -> current_value + 1 end)
 ```
 
-Putting this all together, here's the `Enum.reduce/3` function that let's us convert a string into a map with character counts. Note that we have to split the string into a list of characters first to make it enumerable.
+Putting this all together, here's the [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) function that let's us convert a string into a map with character counts. Note that we have to split the string into a list of characters first to make it enumerable.
 
 ```elixir
 split_string = String.split("aba", "", trim: true)
@@ -164,7 +164,7 @@ end)
 
 ### Your Turn
 
-Use `Enum.reduce/3` to convert the integer `1234321` into a map of digit counts.
+Use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) to convert the integer `1234321` into a map of digit counts.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -177,8 +177,8 @@ Use `Enum.reduce/3` to convert the integer `1234321` into a map of digit counts.
 Consider the following resource(s) to deepen your understanding of the topic.
 
 * [Elixir Schools: Reduce](https://elixirschool.com/en/lessons/basics/enum#reduce-9)
-* `Enum.reduce/2`
-* `Enum.reduce/3`
+* [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2)
+* [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3)
 
 ## Commit Your Progress
 
@@ -191,6 +191,6 @@ $ git commit -m "finish enum section"
 
 ## Up Next
 
-| Previous                           | Next                                     |
-| ---------------------------------- | ---------------------------------------: |
-| [Ranges](../reading/ranges.livemd) | [Fizzbuzz](../exercises/fizzbuzz.livemd) |
+| Previous                                                           | Next                                               |
+| ------------------------------------------------------------------ | -------------------------------------------------: |
+| [Filter Values By Type](../exercises/filter_values_by_type.livemd) | [Number Finder](../exercises/number_finder.livemd) |
