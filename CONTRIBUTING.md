@@ -273,3 +273,14 @@ initial_count + high
 ```
 
 </details>
+
+- Add Further Reading sections at the bottom of every lesson before the Commit Your Progress section when applicable. For example:
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Maps](https://elixirschool.com/en/lessons/basics/collections#maps-6)
+* [Exercise: Maps](https://exercism.org/tracks/elixir/concepts/maps)
+* [Elixir Lang: Pattern Matching](https://elixir-lang.org/getting-started/pattern-matching.html)
+* [Elixir Lang: Maps](https://elixir-lang.org/getting-started/keywords-and-maps.html#maps)
