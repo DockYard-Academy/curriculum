@@ -1,0 +1,196 @@
+# Reduce
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:smart_animation, github: "brooklinjazz/smart_animation"},
+  {:visual, github: "brooklinjazz/visual"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+Reduce is an incredibly powerful tool you can leverage in a wide variety of circumstances.
+
+> Reduce (sometimes called fold) is a basic building block in functional programming. Almost all of the functions in the Enum module can be implemented on top of reduce. Those functions often rely on other operations, such as Enum.reverse/1, which are optimized by the runtime.
+> 
+> * [HexDocs](https://hexdocs.pm/elixir/1.12/Enum.html#reduce/3)
+
+If you'd like to learn more about reduce, there's an [excellent video](https://github.com/paulfioravanti/presentations/tree/master/everything_is_reduce) by Paul Fioravanti.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=OQrfedclHfk\")","title":"Everything Is Reduce"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=OQrfedclHfk")
+```
+
+## Input -> Output
+
+As we've seen, other [Enum](https://hexdocs.pm/elixir/Enum.html) functions such as [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) or [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) take in a collection as input and produce a list as output.
+
+```mermaid
+flowchart LR
+C1[Collection] --> Enum.map/2 --> L1[List]
+C2[Collection] --> Enum.filter/2 --> L2[List]
+```
+
+Reduce allows you to take any collection and produce **any** output. That's powerful.
+
+```mermaid
+flowchart LR
+C1[Collection] --> Enum.reduce/3 --> ANYTHING!!!
+```
+
+Anytime you have a collection, and want to produce a non-list output, [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) might be the right tool for the job.
+
+## Building the Accumulator
+
+[Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) works by enumerating over the collection and building up an accumulator. Instead of applying a change to each element in the collection, we transform the accumulator by applying a callback function on every element.
+
+For example, we can simply return `0` in the body of the callback function to return this value as the accumulator.
+
+```elixir
+Enum.reduce(1..3, 0, fn _integer, _acc -> 0 end)
+```
+
+With each step in [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) we create a new acculumator of `0`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart TB
+  subgraph Accumulator
+  direction TB
+    A1 --> A2 --> A3
+  end
+  subgraph Element
+    direction TB
+    1 --> 2 --> 3
+  end
+  A1[0]
+  A2[0]
+  A3[0]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Anagrams](../exercises/anagram.livemd)
+
+Let's look at a more practical example of taking a collection, and returning a non-list output.
+
+In the [Anagram](../exercises/anagram.livemd) exercise you previously completed, you built an `Anagram.anagram?2` function to determine if two strings are anagrams. One solution to the problem is to build a map storing the character counts of two strings.
+
+For example, to determine if `"state"` and `"taste"` are anagrams of each other, we can convert them into the following maps with a count of each character, and check if they are equal. Remember that order in maps does not matter.
+
+```elixir
+%{"s" => 1, "t" => 2, "a" => 1, "e" => 1} == %{"t" => 2, "a" => 1, "s" => 1, "e" => 1}
+```
+
+We can use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) to convert a string into a map of character counts. For each character in the string, we'll build a new map with an updated key.
+
+Here's how we would build the accumulator for the string `"aba"`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart TB
+  A1["%{''a'' => 1}"]
+  A2["%{''a'' => 1, ''b'' => 1}"]
+  A3["%{''a'' => 2, ''b'' => 1}"]
+
+  subgraph Accumulator
+    direction TB
+    A1 --> A2 --> A3
+  end
+  subgraph Element
+    direction TB
+    a1[a] --> b --> a2[a]
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We can initialize or update a value in a map using [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4). If there is no existing key, it initializes the map key with the default value provided.
+
+```elixir
+updated_map = Map.update(%{}, :key, "default value", fn current -> "updated: #{current}" end)
+```
+
+If there is an existing key, then it can update the map key using the existing value.
+
+```elixir
+Map.update(updated_map, :key, "default value", fn current -> "updated: #{current}" end)
+```
+
+When converting a string to a map of character counts, If there is no key, the value will be `1`. If there is an existing key in the map, the value will be the current value incremented by `1`. Here are the steps we want to accomplish for our [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) function.
+
+```elixir
+initial_accumulator = %{}
+```
+
+```elixir
+step1 = Map.update(initial_accumulator, "a", 1, fn current_value -> current_value + 1 end)
+```
+
+```elixir
+step2 = Map.update(step1, "b", 1, fn current_value -> current_value + 1 end)
+```
+
+```elixir
+step3 = Map.update(step2, "a", 1, fn current_value -> current_value + 1 end)
+```
+
+Putting this all together, here's the [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) function that let's us convert a string into a map with character counts. Note that we have to split the string into a list of characters first to make it enumerable.
+
+```elixir
+split_string = String.split("aba", "", trim: true)
+
+Enum.reduce(split_string, %{}, fn char, map_accumulator ->
+  Map.update(map_accumulator, char, 1, fn current -> current + 1 end)
+end)
+```
+
+### Your Turn
+
+Use [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) to convert the integer `1234321` into a map of digit counts.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{1 => 2, 2 => 2, 3 => 2, 4 => 1}
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Reduce](https://elixirschool.com/en/lessons/basics/enum#reduce-9)
+* [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2)
+* [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3)
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish enum section"
+```
+
+## Up Next
+
+| Previous                                                           | Next                                               |
+| ------------------------------------------------------------------ | -------------------------------------------------: |
+| [Filter Values By Type](../exercises/filter_values_by_type.livemd) | [Number Finder](../exercises/number_finder.livemd) |

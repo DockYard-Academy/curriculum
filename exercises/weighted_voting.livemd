@@ -27,64 +27,43 @@ WeightedVoting.count([cats: 10, dogs: 20, dogs: 20], :dogs)
 40
 ```
 
-You're also going to create a `WeightedVoting.tally/1` function that will count the votes provided in a keyword list, and return the results as a keyword list.
+You're also going to create a `WeightedVoting.tally/1` function that will count the votes provided in a keyword list, and return the results as a map.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 WeightedVoting.tally([cats: 10, dogs: 20, dogs: 20])
-[cats: 10, dogs: 40]
+%{cats: 10, dogs: 40}
 ```
 
-<summary>
-Example Solution
-</summary>
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-
-```
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule WeightedVoting do
-  @doc """
-  Count the total number of votes for some key in a keyword list.
-  
-  ## Examples
-  
-    iex> WeightedVoting.count([dogs: 20, dogs: 10], :dogs)
-    30
-    iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 30], :dogs)
-    50
-    iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
-    40
-  """
   def count(votes, vote_to_count) do
-    Enum.reduce(votes, %{}, fn {key, value}, acc ->
-      Map.update()
+    Enum.reduce(votes, 0, fn {key, value}, acc ->
+      if key == vote_to_count do
+        acc + value
+      else
+        acc
+      end
     end)
   end
 
-  @doc """
-  Tally the total number of votes in a keyword list, and return
-  the results as a keyword list.
-  
-  The keyword list should be sorted in alphabetical order.
-  
-  ## Examples
-  
-    iex> WeightedVoting.tally([dogs: 20, dogs: 10])
-    [dogs: 30]
-    iex> WeightedVoting.tally([cats: 10, dogs: 20, dogs: 10])
-    [cats: 10, dogs: 30]
-    iex> WeightedVoting.tally([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
-    [birds: 20, cats: 30, dogs: 30]
-  """
   def tally(votes) do
+    Enum.reduce(votes, %{}, fn {key, vote_count}, acc ->
+      Map.update(acc, key, vote_count, fn existing_value ->
+        existing_value + vote_count
+      end)
+    end)
   end
 end
 ```
+
+</details>
+
+Implement the `WeightedVoting.tally/1` function as documented below.
 
 ```elixir
 defmodule WeightedVoting do
