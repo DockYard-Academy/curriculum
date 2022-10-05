@@ -103,7 +103,6 @@ Therefore, if `y` is `0`, then we want to access the row list at index `2`.
 
 ```elixir
 defmodule TicTacToe do
-  
   def at(board, coordinate) do
     {x, y} = coordinate
 
@@ -164,13 +163,13 @@ defmodule TicTacToe do
 
   Filling an empty board.
 
-  iex> board = [[nil, nil, nil], [nil, nil, nil],[nil, nil, nil]]
+  iex> board = [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]]
   iex> TicTacToe.fill(board, {0, 0}, "X")
-  [[nil, nil, nil], [nil, nil, nil],[nil, nil, "X"]]
+  [[nil, nil, nil], [nil, nil, nil], [nil, nil, "X"]]
   iex> TicTacToe.fill(board, {1, 1}, "O")
-  [[nil, nil, nil], [nil, "O", nil],[nil, nil, nil]]
+  [[nil, nil, nil], [nil, "O", nil], [nil, nil, nil]]
   iex> TicTacToe.fill(board, {2, 2}, "X")
-  [[nil, nil, "X"], [nil, nil, nil],[nil, nil, nil]]
+  [[nil, nil, "X"], [nil, nil, nil], [nil, nil, nil]]
 
   Filling an existing board
 
@@ -179,6 +178,142 @@ defmodule TicTacToe do
   """
   def fill(board, coordinate, symbol) do
   end
+end
+```
+
+### Bonus: Winner
+
+Create a `TicTacToe.winner/1` function which accepts a board and determines if there is a winner. A player wins if they have three symbols in a row, three symbols in a column, or three symbols diagonally.
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+board = [
+  ["X", "O", "O"]
+  ["X", "O", nil]
+  ["X", nil, nil]
+]
+
+TicTacToe.winner(board) # returns "X".
+"X"
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule TicTacToe do
+  def winner(board) do
+    cond do
+      winner?(board, "X") -> "X"
+      winner?(board, "O") -> "O"
+      true -> nil
+    end
+  end
+
+  def winner?(board, symbol) do
+    row_winner =
+      Enum.any?(board, fn row ->
+        Enum.all?(row, fn element -> element == symbol end)
+      end)
+
+    column_winner =
+      Enum.any?(0..2, fn index ->
+        Enum.all?(board, fn row ->
+          Enum.at(row, index) == symbol
+        end)
+      end)
+
+    diagonal_winner =
+      Enum.all?(0..2, fn index ->
+        board
+        |> Enum.at(index)
+        |> Enum.at(index) == symbol
+      end) or
+        Enum.all?(0..2, fn index ->
+          board
+          |> Enum.at(index)
+          |> Enum.at(2 - index) == symbol
+        end)
+
+    row_winner or column_winner or diagonal_winner
+  end
+end
+```
+
+Note it's also possible to use pattern matching to solve this problem.
+
+```elixir
+defmodule TicTacToe do
+  def winner(board) do
+    cond do
+      winner?(board, "X") -> "X"
+      winner?(board, "O") -> "O"
+      true -> nil
+    end
+  end
+
+  def winner?(board, x) do
+    match?([[^x, ^x, ^x], [_, _, _], [_, _, _]], board) or
+      match?([[_, _, _], [^x, ^x, ^x], [_, _, _]], board) or
+      match?([[_, _, _], [_, _, _], [_, _, _]], board) or
+      match?([[^x, _, _], [^x, _, _], [^x, _, _]], board) or
+      match?([[_, ^x, _], [_, ^x, _], [_, ^x, _]], board) or
+      match?([[_, _, ^x], [_, _, ^x], [_, _, ^x]], board) or
+      match?([[^x, _, _], [_, ^x, _], [_, _, ^x]], board) or
+      match?([[_, _, ^x], [_, ^x, _], [^x, _, _]], board)
+  end
+end
+```
+
+</details>
+
+To get started, copy the code below into the `TicTacToe` module above.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@doc """
+Determine if a player has won the game.
+
+## Examples
+
+  Row Wins:
+
+  iex> TicTacToe.winner([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+  "X"
+
+  Column Wins:
+
+  iex> TicTacToe.winner([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+  "X"
+
+  Diagonal Wins
+
+  iex> TicTacToe.winner([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+  "X"
+
+  No Winner
+
+  iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+  nil
+  iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, nil, nil]])
+  nil
+
+"""
+def winner(board) do
 end
 ```
 
