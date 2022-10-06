@@ -87,7 +87,18 @@ defmodule WeightedVoting do
     iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
     40
   """
+
+  # OUTPUT: an integer which is the sum of the votes of the chosen animal 
+  # Reduce will take the keyword and add the votes to the acc
+
   def count(votes, vote_to_count) do
+    Enum.reduce(votes, 0, fn {animal, vote}, acc ->
+      if vote_to_count == animal do
+        acc + vote
+      else
+        acc
+      end
+    end)
   end
 
   @doc """
@@ -105,9 +116,57 @@ defmodule WeightedVoting do
     iex> WeightedVoting.tally([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
     [birds: 20, cats: 30, dogs: 30]
   """
+
+  # OUTPUT: Keyword list
+  # 
+
   def tally(votes) do
   end
 end
+
+WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
+```
+
+```elixir
+[step1 | tail] = [cats: 10, dogs: 10, cats: 10]
+IO.inspect(step1)
+[step2 | tail] = tail
+IO.inspect(step2)
+[step3 | tail] = tail
+IO.inspect(step3)
+
+accumulator = []
+# First Step: Acc: []
+# First Step: Input: {:cats, 10}
+# First Step: Output: [cats: 10]
+{key, value} = step1
+
+# update(keywords, key, initial, fun)
+
+accumulator = Keyword.update(accumulator, key, value, fn x -> x end)
+
+# Second Step: Acc: [cats: 10]
+# Second Step: Input: {:dogs, 10}
+# Second Step: Output: [cats: 10, dogs: 10]
+{key, value} = step2
+
+accumulator = Keyword.update(accumulator, key, value, fn x -> x end)
+
+# Third Step: Acc: [cats: 10, dogs: 10]
+# Third Step: Input: {:cats, 10}
+# Third Step: Output: [cats: 20, dogs: 10] 
+{key, value} = step3
+
+accumulator =
+  Keyword.update(accumulator, key, value, fn current_value -> current_value + value end)
+
+# Final Step (drumroll)
+votes = [cats: 10, dogs: 10, cats: 10]
+
+Enum.reduce(votes, [], fn each, acc ->
+  {key, value} = each
+  Keyword.update(acc, key, value, fn current_value -> current_value + value end)
+end)
 ```
 
 ### Bonus: Tally Map
