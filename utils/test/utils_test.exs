@@ -62,7 +62,8 @@ defmodule UtilsTest do
       "IEx",
       "Mix",
       "Poison",
-      "HTTPoison"
+      "HTTPoison",
+      "Timex"
     ]
 
     Notebooks.all_livebooks()
@@ -102,6 +103,7 @@ defmodule UtilsTest do
       {":smart_animation", "SmartAnimation."},
       {":hidden_cell", "HiddenCell."},
       {":benchee", "Benchee."},
+      {":timex", "Timex."},
       {":httpoison", "HTTPoison."},
       {":kino_db", "Elixir.KinoDB."},
       {":postgrex", "Kino.start_child({Postgrex}"}
