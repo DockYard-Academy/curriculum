@@ -2,6 +2,7 @@
 
 ```elixir
 Mix.install([
+  {:timex, "~> 3.0"},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
@@ -25,6 +26,8 @@ deeply into that complexity.
 
 This reading is intended as a primer to working with dates, times, and timezones. You will
 need to consult the documentation and do you own research to go deeper.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=-5wpm-gesOY\")","title":"Time and Timezones"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=-5wpm-gesOY")
@@ -122,7 +125,7 @@ Under the hood, this is still the same [DateTime](https://hexdocs.pm/elixir/Date
 Map.from_struct(datetime)
 ```
 
-And like any struct, you can access all of these properties directly.
+Like any struct or map, you can access all of these properties directly using dot notation.
 
 ```elixir
 datetime.year
@@ -181,56 +184,110 @@ are only concerned about the calendar date.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use [DateTime.new!/4](https://hexdocs.pm/elixir/DateTime.html#new!/4) to create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for April 18, 1938 at noon.
-Replace `nil` with your answer.
+Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for April 19, 1938 at noon (12pm).
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Using sigils.
 
 ```elixir
-date = nil
-
-Utils.feedback(:datetime_new, date)
+~U[1938-04-19 12:00:00Z]
 ```
 
-Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for today at the current time.
-Replace `nil` with your answer.
+Using functions.
 
 ```elixir
-today = nil
-
-Utils.feedback(:datetime_today, today)
+DateTime.new!(Date.new!(2022, 4, 19), Time.new!(12, 0, 0))
 ```
 
-Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for tomorrow at the current time. You may wish to use [DateTime.add/4](https://hexdocs.pm/elixir/DateTime.html#add/4).
+</details>
+
+Enter your solution below.
 
 ```elixir
-tomorrow = nil
 
-Utils.feedback(:datetime_tomorrow, tomorrow)
 ```
 
-Use [DateTime.compare/2](https://hexdocs.pm/elixir/DateTime.html#compare/2) to check if the current time is greater than the `datetime` below. `comparison` should be either `:lt` or `:gt`.
+If you solved the challenge above using sigils, complete it again using functions. If you solved the challenge using functions, then complete it again using sigils.
 
-Replace `nil` with your answer.
+Enter your new solution below.
 
 ```elixir
-date = DateTime.new!(~D[1938-04-18], ~T[12:00:00])
-
-comparison = nil
-
-Utils.feedback(:datetime_compare, comparison)
+DateTime.new!(~D[1938-04-18])
 ```
 
-Use [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) to find the time difference from the first date to the second date. Your answer should
-be a positive integer. Keep in mind that [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) subtracts the first argument by the second argument.
+Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for today at the current time in universal time.
 
-Replace `nil` with your answer.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-date1 = DateTime.new!(~D[2000-01-01], ~T[12:00:00])
-date2 = DateTime.new!(~D[2010-02-02], ~T[12:00:00])
+DateTime.utc_now()
+```
 
-difference = nil
+</details>
 
-Utils.feedback(:datetime_diff, difference)
+Enter your solution below.
+
+```elixir
+
+```
+
+Use [DateTime.add/4](https://hexdocs.pm/elixir/DateTime.html#add/4) to add one day to the current [DateTime](https://hexdocs.pm/elixir/DateTime.html). This creates a new [DateTime](https://hexdocs.pm/elixir/DateTime.html) for tomorrow at the current time.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+day_in_seconds = 60 * 60 * 24
+DateTime.add(DateTime.utc_now(), day_in_seconds)
+```
+
+</details>
+
+Enter your solution below
+
+```elixir
+
+```
+
+Use [DateTime.compare/2](https://hexdocs.pm/elixir/DateTime.html#compare/2) to compare the [DateTime](https://hexdocs.pm/elixir/DateTime.html) below with the current [DateTime](https://hexdocs.pm/elixir/DateTime.html). The `date` below should be `:lt` (less than) the current [DateTime](https://hexdocs.pm/elixir/DateTime.html).
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+date = DateTime.new!(~D[2020-01-01], ~T[12:00:00])
+DateTime.compare(date, DateTime.utc_now())
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+date = DateTime.new!(~D[2020-01-01], ~T[12:00:00])
+```
+
+Use [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) to determine how many seconds are between `2000-01-01` and `2010-01-01`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+start = DateTime.new!(~D[2000-01-01], ~T[12:00:00])
+finish = DateTime.new!(~D[2010-01-01], ~T[12:00:00])
+
+DateTime.diff(finish, start)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+
 ```
 
 ## Timex
@@ -238,12 +295,12 @@ Utils.feedback(:datetime_diff, difference)
 The [Timex](https://hexdocs.pm/timex/Timex.html) external library provides a number of useful features
 for working with dates in Elixir. It is not built-in to Elixir and needs to be installed in a project.
 
-`Timex` is not currently within the scope of this course, however we have installed `Timex` specifically
-in this livebook file only. You will not normally have access to `Timex` as the purpose of this section is to build familiarity
+[Timex](https://hexdocs.pm/timex/Timex.html) is not currently within the scope of this course, however we have installed [Timex](https://hexdocs.pm/timex/Timex.html) specifically
+in this livebook file only. You will not normally have access to [Timex](https://hexdocs.pm/timex/Timex.html) as the purpose of this section is to build familiarity
 with [DateTime](https://hexdocs.pm/elixir/DateTime.html).
 
-`Timex` uses the [tzdata](https://github.com/lau/tzdata) timezone database for Elixir.
-You can create a timezone aware [DateTime](https://hexdocs.pm/elixir/DateTime.html) using `Timex.now/1` and the name of a timezone.
+[Timex](https://hexdocs.pm/timex/Timex.html) uses the [tzdata](https://github.com/lau/tzdata) timezone database for Elixir.
+You can create a timezone aware [DateTime](https://hexdocs.pm/elixir/DateTime.html) using [Timex.now/1](https://hexdocs.pm/timex/Timex.html#now/1) and the name of a timezone.
 
 ```elixir
 Timex.now("Asia/Kabul")
@@ -261,7 +318,7 @@ Many websites host the full list of timezones such as [timezonedb.com](https://t
 
 ### Your Turn
 
-Use `Timex.now/1` to create a datetime for your current timezone. Compare it with your local time
+Use [Timex.now/1](https://hexdocs.pm/timex/Timex.html#now/1) to create a datetime for your current timezone. Compare it with your local time
 to ensure it is correct.
 
 ```elixir
@@ -279,6 +336,6 @@ $ git commit -m "finish datetime section"
 
 ## Up Next
 
-| Previous                                                               | Next                                       |
-| ---------------------------------------------------------------------- | -----------------------------------------: |
-| [Custom Enum With Reduce](../exercises/custom_enum_with_reduce.livemd) | [Itinerary](../exercises/itinerary.livemd) |
+| Previous                                                               | Next                                                   |
+| ---------------------------------------------------------------------- | -----------------------------------------------------: |
+| [Custom Enum With Reduce](../exercises/custom_enum_with_reduce.livemd) | [Time Converting](../exercises/time_converting.livemd) |

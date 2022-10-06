@@ -16,47 +16,50 @@ Mix.install([
 
 ## Itinerary
 
-You are building a day planning application. Users will provide a list of expected
-times for activities and you will determine if they have enough time in the day to fit those activities.
+You are building a day planning application. Users will provide the time it takes to complete an activity in minutes and you will determine if there is enough time to fit the activity between two [DateTime](https://hexdocs.pm/elixir/DateTime.html)s.
 
-Activities are provided as a keyword lists of times using only `:minutes`, and `:hours`.
-
-Given a start time and and end time, your `Itinerary` should determine if they have enough time
-to complete all of their activities.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-activities = [hours: 2, minutes: 30, hours: 4.5, minutes: 10] # ~430 minutes of activities
-start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
-finish = DateTime.new!(~D[2022-04-24], ~T[20:00:00]) # 8 hours or 480 minutes of time
-
-Itinerary.has_time?(start, finish, activities)
-true
-```
-
-`has_time?/3` should be inclusive, so one hour of activities should fit into one hour of time.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-activities = [hours: 1]
-start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
-finish = DateTime.new!(~D[2022-04-24], ~T[13:00:00])
-
-Itinerary.has_time?(start, finish, activities)
-true
-```
-
-Enter your solution below.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Itinerary do
-  def has_time?(start, finish, activities) do
+  def has_time?(start, finish, minutes) do
+    DateTime.diff(finish, start) >= minutes * 60
   end
 end
+```
 
-Utils.feedback(:itinerary, Itinerary)
+</details>
+
+Implement the `Itinerary` module as documented.
+
+```elixir
+defmodule Itinerary do
+  @doc """
+  Given a number of minutes, determine if there is enough time 
+  between two `DateTimes` to fit all activities.
+
+  ## Examples
+
+    iex> Itinerary.has_time?(~U[2020-01-01 12:00:00Z], ~U[2020-01-01 12:01:00Z], 1)
+    true
+    
+    iex> Itinerary.has_time?(~U[2020-01-01 12:00:00Z], ~U[2020-01-01 12:10:00Z], 10)
+    true
+
+    iex> Itinerary.has_time?(~U[2020-01-01 07:00:00Z], ~U[2020-01-01 08:00:00Z], 60)
+    true
+
+    iex> Itinerary.has_time?(~U[2020-01-01 12:00:00Z], ~U[2020-01-01 12:30:00Z], 31)
+    false
+
+    iex> Itinerary.has_time?(~U[2020-01-01 07:00:00Z], ~U[2020-01-01 08:00:00Z], 61)
+    false
+
+  """
+  def has_time?(start, finish, minutes) do
+  end
+end
 ```
 
 ## Commit Your Progress
@@ -70,6 +73,6 @@ $ git commit -m "finish itinerary exercise"
 
 ## Up Next
 
-| Previous                               | Next                                     |
-| -------------------------------------- | ---------------------------------------: |
-| [Datetime](../reading/datetime.livemd) | [Timeline](../exercises/timeline.livemd) |
+| Previous                                               | Next                                     |
+| ------------------------------------------------------ | ---------------------------------------: |
+| [Time Converting](../exercises/time_converting.livemd) | [Timeline](../exercises/timeline.livemd) |

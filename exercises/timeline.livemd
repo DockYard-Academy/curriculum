@@ -16,30 +16,119 @@ Mix.install([
 
 ## Timeline
 
-You are building an application which builds a timeline of events.
-
-Users provide you a list of dates in the format `"YYYY-MM-DD"`. Users will always provide 2 or more dates in chronological order.
-
-You will provide the number of days between each date.
+You are building an application which creates a timeline of events.
+Users provide you with a list of [Date](https://hexdocs.pm/elixir/Date.html)s. You will provide the number of days between each date.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-dates = ["2020-05-23", "2020-05-25", "2021-06-10"]
+dates = [~D[2020-01-01], ~D[2020-01-02], ~D[2020-01-22]]
 
-Timeline.generate(dates)
-[2, 381]
+Timeline.from_dates(dates)
+[1, 20]
 ```
+
+**BONUS**: `Timeline.from_strings/1`.
+
+As a bonus, implement the `Timeline.from_strings/1` function which accepts a list of strings instead of a list of [Date](https://hexdocs.pm/elixir/Date.html)s.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+date_strings = ["2020-01-01", "2020-01-02", "2020-01-22"]
+
+Timeline.from_strings(date_strings)
+[1, 20]
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Timeline do
+  
+  def from_dates(dates) do
+    Enum.chunk_every(dates, 2, 1, :discard)
+    |> Enum.map(fn chunk ->
+      [start, finish] = chunk
+      Date.diff(finish, start)
+    end)
+  end
+
+  def from_strings(date_strings) do
+    date_strings
+    |> Enum.map(&string_to_date/1)
+    |> from_dates()
+  end
+
+  defp string_to_date(date_string) do
+    [year, month, day] = String.split(date_string, "-")
+    Date.new!(String.to_integer(year), String.to_integer(month), String.to_integer(day))
+  end
+end
+```
+
+</details>
 
 Enter your solution below.
 
 ```elixir
 defmodule Timeline do
-  def generate(dates) do
+  @moduledoc """
+  Documentation for `Timeline`
+  """
+
+  @doc """
+  Given a list of [Date](https://hexdocs.pm/elixir/Date.html)s return a timeline of days between each date.
+
+  ## Examples
+
+    iex> Timeline.from_dates([~D[2020-01-01]])
+    []
+
+    iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-02]])
+    [1]
+
+    iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-02], ~D[2020-01-22]])
+    [1, 20]
+    
+    iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]])
+    [9, 12, 2]
+  """
+  def from_dates(dates) do
+    Enum.chunk_every(dates, 2, 1, :discard)
+    |> Enum.map(fn chunk ->
+      [start, finish] = chunk
+      Date.diff(finish, start)
+    end)
+  end
+
+  @doc """
+  Given a list of "YYYY-MM-DD" strings return a timeline of days between each date.
+  Assume you will always be given two or more strings.
+
+  ## Examples
+
+    iex> Timeline.from_strings(["2020-01-01", "2020-01-02")
+    [1]
+
+    iex> Timeline.from_strings(["2020-01-01", "2020-01-02", "2020-01-22"])
+    [1, 20]
+    
+    iex> Timeline.from_strings(["2020-01-01", "2020-01-10", "2020-01-22", "2020-01-24"])
+    [9, 12, 2]
+  """
+  def from_strings(date_strings) do
+    date_strings
+    |> Enum.map(&string_to_date/1)
+    |> from_dates()
+  end
+
+  defp string_to_date(date_string) do
+    [year, month, day] = String.split(date_string, "-")
+    Date.new!(String.to_integer(year), String.to_integer(month), String.to_integer(day))
   end
 end
-
-Utils.feedback(:timeline, Timeline)
 ```
 
 ## Commit Your Progress
@@ -53,6 +142,6 @@ $ git commit -m "finish timeline exercise"
 
 ## Up Next
 
-| Previous                                   | Next                                               |
-| ------------------------------------------ | -------------------------------------------------: |
-| [Itinerary](../exercises/itinerary.livemd) | [School Grades](../exercises/school_grades.livemd) |
+| Previous                                   | Next                                           |
+| ------------------------------------------ | ---------------------------------------------: |
+| [Itinerary](../exercises/itinerary.livemd) | [Polymorphism](../reading/polymorphism.livemd) |
