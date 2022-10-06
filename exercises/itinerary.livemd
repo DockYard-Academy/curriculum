@@ -53,10 +53,69 @@ Enter your solution below.
 ```elixir
 defmodule Itinerary do
   def has_time?(start, finish, activities) do
+    available_mins = DateTime.diff(finish, start, :minute)
+
+    activities_mins =
+      Enum.reduce(activities, 0, fn {unit, amount}, acc ->
+        case unit do
+          :hours -> amount * 60 + acc
+          :minutes -> amount + acc
+        end
+      end)
+
+    available_mins >= activities_mins
   end
 end
 
+activities = [hours: 1]
+start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
+finish = DateTime.new!(~D[2022-04-24], ~T[13:00:00])
+
+Itinerary.has_time?(start, finish, activities)
+
 Utils.feedback(:itinerary, Itinerary)
+```
+
+```elixir
+# INPUTS = Keyword list, Start Time, End Time
+# OUTPUT = True or False
+
+# Problem = Is the time between Start and End enough to fit all of the activities?
+# I need to know:
+# 1 Amount of minutes between Start and End (inclusive)
+# 2 Amount of minutes of activities
+# 3 Difference between the two
+
+# 1 INPUT: Two times
+# 1 OUTPUT: Minutes
+# Subtract the end time to the start time (diff/3?)
+
+start = DateTime.new!(~D[2022-04-24], ~T[12:00:00])
+finish = DateTime.new!(~D[2022-04-24], ~T[13:00:00])
+available_mins = DateTime.diff(finish, start, :minute)
+
+# 2 INPUT: Keyword List
+# 2 OUTPUT: Minutes
+# Problem / Solution
+# Go through the keyword list, convert all activities to minutes, add them all up.
+
+activities = [hours: 2, minutes: 30, hours: 4.5, minutes: 10]
+
+activities_mins =
+  Enum.reduce(activities, 0, fn {unit, amount}, acc ->
+    case unit do
+      :hours -> amount * 60 + acc
+      :minutes -> amount + acc
+    end
+  end)
+
+# 3 INPUT minutes available & minutes of activities
+# 3 OUTPUT true or false
+# Problem / Solution
+# If minutes available > minutes of activities, then true. Else false.
+IO.inspect(available_mins)
+IO.inspect(activities_mins)
+available_mins > activities_mins
 ```
 
 ## Commit Your Progress
