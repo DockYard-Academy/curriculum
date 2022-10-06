@@ -1,0 +1,116 @@
+# Time Converting
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Time Converting
+
+Often we have to convert seconds, minutes, hours, and days. You're going to create a `TimeConverter` module which can handle all of this for us.
+
+We'll use the atoms `:days`, `:hours`, `:minutes`, or `:seconds` to represent days, hours, minutes, and seconds.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule TimeConverter do
+  def to_seconds(amount, unit) do
+    case unit do
+      :seconds -> amount
+      :minutes -> amount * 60
+      :hours -> amount * 60 * 60
+      :days -> amount * 60 * 60 * 24
+    end
+  end
+
+  def from_seconds(amount, unit) do
+    case unit do
+      :seconds -> amount
+      :minutes -> amount / 60
+      :hours -> amount / 60 / 60
+      :days -> amount / 60 / 60 / 24
+    end
+  end
+end
+```
+
+</details>
+
+Implement the `TimeConverter.to_seconds/2` and `TimeConverter.from_seconds/2` functions as documented.
+
+```elixir
+defmodule TimeConverter do
+  @moduledoc """
+  Documentation for `TimeConverter`
+  """
+
+  @doc """
+  Convert a unit of time to a number of seconds.
+
+  ## Examples
+
+    iex> TimeConverter.to_seconds(1, :seconds)
+    1
+
+    iex> TimeConverter.to_seconds(1, :minutes)
+    60
+    
+    iex> TimeConverter.to_seconds(1, :hours)
+    3600
+
+    iex> TimeConverter.to_seconds(1, :days)
+    86400
+
+  """
+  def to_seconds(amount, unit) do
+  end
+
+  @doc """
+  Convert a number of seconds to a unit of time.
+  Return a float, as these values will require division using `/`.
+
+  ## Examples
+
+    iex> TimeConverter.from_seconds(1, :seconds)
+    1.0
+
+    iex> TimeConverter.from_seconds(60, :minutes)
+    1.0
+    
+    iex> TimeConverter.from_seconds(3600, :hours)
+    1.0
+
+    iex> TimeConverter.from_seconds(86400, :days)
+    1.0
+
+  """
+  def from_seconds(amount, unit) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish itinerary exercise"
+```
+
+## Up Next
+
+| Previous                               | Next                                       |
+| -------------------------------------- | -----------------------------------------: |
+| [Datetime](../reading/datetime.livemd) | [Itinerary](../exercises/itinerary.livemd) |
