@@ -868,11 +868,11 @@ Now we can implement the `get/0` and `increment/1` functions in the `Count` modu
 ```elixir
 defmodule Counter.Count do
   def get do
-    GenServer.call(__MODULE__, :get)
+    GenServer.call(Counter.Count.CounterServer, :get)
   end
 
   def increment(increment_by \\ 1) do
-    GenServer.call(__MODULE__, {:increment, increment_by})
+    GenServer.call(Counter.Count.CounterServer, {:increment, increment_by})
   end
 end
 ```
