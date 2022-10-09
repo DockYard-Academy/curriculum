@@ -255,9 +255,9 @@ If you fix DockYard Academy Content or submit new content, please keep the follo
 - Text should be run through [grammarly](https://app.grammarly.com/) or an alternative grammar checking program to ensure correctness. The free Grammarly features should be sufficient.
 - Lessons should have a hidden setup section at the top of the Livebook for any necessary dependencies.
 - Each major concept should have a new section. In addition, each section should try to provide at least one student interaction portion, typically using the **Your Turn** heading.
-- **Hints** and **Possible Solutions** should be provided using the details component (these styles look nicer in Livebook):
+- **Hints** and **Example Solutions** should be provided using the details component (these styles look nicer in Livebook):
 
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
 <summary>Hint</summary>
 
 Have you tried turning it off and on again?
