@@ -65,14 +65,9 @@ So, why not just use a map? We could easily define a similar map and it looks ex
 %{name: "Peter Parker"}
 ```
 
-There are a ton of reasons to use a struct vs a map. It's not possible in this section to cover
-all of them.
+Unlike maps, Structs provide structure to our data. We can ensure specific keys exist.
 
-One main reason, is to validate our data and ensure keys and values exist with the expected data.
-
-For example, using a struct guarantees that certain keys exist, even if the value is `nil`. So it's
-always safe to use `.` syntax. Notice how `map.name` results in an error, but `struct.name` simply 
-returns `nil`.
+For example, using a struct guarantees that certain keys exist, even if the value is `nil`. So it's always safe to use `.` syntax. Notice how `map.name` results in an error, but `struct.name` simply returns `nil`.
 
 ```elixir
 map = %{}
@@ -88,21 +83,63 @@ We also guarantee that other keys don't exist. For example, if we don't define `
 it can't be set. This helps ensure we use the data structure as intended.
 
 ```elixir
-defmodule Person do
-  defstruct [:name]
-end
-
 %Person{age: 20}
 ```
 
-We also get some very handy features such as default values using a keyword list.
+### Multiple Keys
+
+We define the keys for our struct in a list of atoms.
 
 ```elixir
-defmodule Person do
-  defstruct name: "Peter Parker"
+defmodule Character do
+  defstruct [:name, :age]
 end
+```
 
-%Person{}
+```elixir
+%Character{name: "Peter Parker", age: 24}
+```
+
+## Default Values
+
+By providing struct keys as a keyword list, we can define default values for the key.
+
+```elixir
+defmodule DefaultKeys do
+  defstruct key1: "default1", key2: "default2"
+end
+```
+
+The key will have the default value if we don't provide it to the instance of our struct.
+
+```elixir
+%DefaultKeys{}
+```
+
+Or we can override the default value like so.
+
+```elixir
+%DefaultKeys{key1: "OVERRIDE!"}
+```
+
+Structs can have keys with and without a default value.
+
+```elixir
+defmodule SomeDefaults do
+  defstruct [:key2, key1: "default"]
+end
+```
+
+```elixir
+%SomeDefaults{}
+```
+
+Default keys must come last in the list of struct keys otherwise Elixir will raise a `SyntaxError`.
+
+```elixir
+defmodule BadDefaults do
+  defstruct [key1: "default", :key2]
+end
 ```
 
 ## Enforce Keys
