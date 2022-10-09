@@ -14,33 +14,157 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Create Rock Paper Scissors Using Pattern Matching
+## Rock Paper Scissors Using Pattern Matching
 
 You're going to recreate your rock paper scissors game using pattern matching.
-
-In the Elixir cell below,
-
-* Create a module `RockPaperScissors`
-* Create a `play/2` function that expects `:rock`, `:paper`, or `:scissors` for each parameter.
-* `play/2` should return `"#{guess} beats #{guess}!"` or `"draw!"` depending on the outcome.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 RockPaperScissors.play(:rock, :paper)
-":paper beats :rock!"
+"paper beats rock!"
 
 RockPaperScissors.play(:rock, :rock)
 "draw!"
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
 ```elixir
-defmodule RockPaperScissors do
+defmodule RockPaperScissorsPatternMatching do
+  def play(guess1, guess2) do
+    case {guess1, guess2} do
+      {:rock, :scissors} -> "rock beats scissors!"
+      {:paper, :rock} -> "paper beats rock!"
+      {:scissors, :paper} -> "scissors beats paper!"
+      {:rock, :paper} -> "paper beats rock!"
+      {:paper, :scissors} -> "scissors beats paper!"
+      {:scissors, :rock} -> "rock beats scissors!"
+      {_same, _same} -> "draw!"
+    end
+  end
+end
+```
+
+</details>
+
+Implement the `RockPaperScissorsPatternMatching` module as documented below.
+
+```elixir
+defmodule RockPaperScissorsPatternMatching do
+  @moduledoc """
+  Documentation for `RockPaperScissorsPatternMatching`
+  """
+
+  @doc """
+  Play rock paper scissors. Returns a string to describe who won the game.
+
+  ## Examples
+
+    iex> RockPaperScissorsPatternMatching.play(:rock, :scissors)
+    "rock beats scissors!"
+
+    iex> RockPaperScissorsPatternMatching.play(:paper, :rock)
+    "paper beats rock!"
+
+    iex> RockPaperScissorsPatternMatching.play(:scissors, :paper)
+    "scissors beats paper!"
+
+    iex> RockPaperScissorsPatternMatching.play(:rock, :paper)
+    "paper beats rock!"
+
+    iex> RockPaperScissorsPatternMatching.play(:paper, :rock)
+    "rock beats paper!"
+
+    iex> RockPaperScissorsPatternMatching.play(:scissors, :rock)
+    "rock beats scissors!"
+
+    iex> RockPaperScissorsPatternMatching.play(:rock, :rock)
+    "draw!"
+
+    iex> RockPaperScissorsPatternMatching.play(:paper, :paper)
+    "draw!"
+
+    iex> RockPaperScissorsPatternMatching.play(:scissors, :scissors)
+    "draw!"
+  """
   def play(guess1, guess2) do
   end
 end
+```
 
-Utils.feedback(:rock_paper_scissors_pattern_matching, RockPaperScissors)
+## Rock Paper Scissors Using Guards
+
+Now, implement the `RockPaperScissorsGuards` module which achieves the same behavior as the module above. This time, use guards for your solution.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule RockPaperScissorsGuards do
+  defguard is_winner(guess1, guess2)
+           when {guess1, guess2} in [{:rock, :scissors}, {:paper, :rock}, {:scissors, :paper}]
+
+  def play(guess1, guess2) when is_winner(guess1, guess2) do
+    "#{guess1} beats #{guess2}!"
+  end
+
+  def play(guess1, guess2) when is_winner(guess2, guess1) do
+    "#{guess2} beats #{guess1}!"
+  end
+
+  def play(guess1, guess2) when guess1 == guess2 do
+    "draw!"
+  end
+end
+```
+
+</details>
+
+Implement `RockPaperScissorsGuards` as documented below.
+
+```elixir
+defmodule RockPaperScissorsGuards do
+  @moduledoc """
+  Documentation for `RockPaperScissorsGuards`
+  """
+
+  @doc """
+  Play rock paper scissors. Returns a string to describe who won the game.
+
+  ## Examples
+
+    iex> RockPaperScissorsGuards.play(:rock, :scissors)
+    "rock beats scissors!"
+
+    iex> RockPaperScissorsGuards.play(:paper, :rock)
+    "paper beats rock!"
+
+    iex> RockPaperScissorsGuards.play(:scissors, :paper)
+    "scissors beats paper!"
+
+    iex> RockPaperScissorsGuards.play(:rock, :paper)
+    "paper beats rock!"
+
+    iex> RockPaperScissorsGuards.play(:paper, :rock)
+    "rock beats paper!"
+
+    iex> RockPaperScissorsGuards.play(:scissors, :rock)
+    "rock beats scissors!"
+
+    iex> RockPaperScissorsGuards.play(:rock, :rock)
+    "draw!"
+
+    iex> RockPaperScissorsGuards.play(:paper, :paper)
+    "draw!"
+
+    iex> RockPaperScissorsGuards.play(:scissors, :scissors)
+    "draw!"
+  """
+  def play(guess1, guess2) do
+  end
+end
 ```
 
 ## Commit Your Progress

@@ -1,0 +1,94 @@
+# Palindrome
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Palindrome
+
+A word or sentence that reads the same way forwards and backwards is a palindrome.
+For example **kayak** and **racecar** are palindromes.
+
+You're going to create a `Palindrome` module which can determine if a string is a palindrome.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Palindrome.palindrome?("kayak")
+true
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Palindrome do
+  def palindrome?(string) do
+    string
+    |> String.split("")
+    |> Enum.reverse()
+    |> Enum.join() == string
+  end
+end
+```
+
+</details>
+
+Implement the `Palindrome` module as documented below.
+
+```elixir
+defmodule Palindrome do
+  @moduledoc """
+  Documentation for `Palindrome`.
+  """
+
+  @doc """
+  Determine if two strings are anagrams.
+
+  ## Examples
+
+    iex> Palindrome.palindrome?("baab")
+    true
+
+    iex> Palindrome.palindrome?("racecar")
+    true
+
+    iex> Palindrome.palindrome?("kayak")
+    true
+
+    iex> Palindrome.palindrome?("apples")
+    false
+  """
+  def palindrome?(string) do
+    string
+    |> String.split("")
+    |> Enum.reverse()
+    |> Enum.join() == string
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish palindrome exercise"
+```
+
+## Up Next
+
+| Previous                                           | Next                                   |
+| -------------------------------------------------- | -------------------------------------: |
+| [Comprehensions](../reading/comprehensions.livemd) | [Anagram](../exercises/anagram.livemd) |

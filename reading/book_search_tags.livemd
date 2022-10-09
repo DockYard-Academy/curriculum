@@ -48,12 +48,12 @@ To model many-to-many relationships in a Database we use a **join** table to ass
 
 ### Book_tags Table (join Table)
 
-| id | book_id | tag_id |
-| -- | ------- | ------ |
-| 1  | 123     | 456    |
-| 2  | 124     | 456    |
-| 3  | 123     | 457    |
-| 14 | 124     | 457    |
+| id  | book_id | tag_id |
+| --- | ------- | ------ |
+| 1   | 123     | 456    |
+| 2   | 124     | 456    |
+| 3   | 123     | 457    |
+| 14  | 124     | 457    |
 
 This way, tags can have many books, and books can have many tags.
 
@@ -430,7 +430,7 @@ def create_book(attrs \\ %{}) do
 end
 ```
 
-To let `Ecto` handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
+To let [Ecto](https://hexdocs.pm/ecto/Ecto.html) handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
 
 <!-- livebook:{"force_markdown":true} -->
 

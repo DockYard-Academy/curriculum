@@ -16,88 +16,85 @@ Mix.install([
 
 ## Metric Conversion
 
-You are building an app to help people handle converting measurements according to the following chart.
+You're going to build an app to convert metric measurements such as **millimeters**, **centimeters**, **meters**, and **kilometers** according to the following table.
 
-<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, centimeter: 0.1],\n  [unit: :meter, value: 1, centimeter: 100],\n  [unit: :kilometer, value: 1, centimeter: 100_000],\n  [unit: :inch, value: 1, centimeter: 2.54],\n  [unit: :feet, value: 1, centimeter: 30],\n  [unit: :yard, value: 1, centimeter: 91],\n  [unit: :mile, value: 1, centimeter: 160_000]\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, meter: 0.001],\n  [unit: :centimeter, value: 1, meter: 0.01],\n  [unit: :meter, value: 1, meter: 1],\n  [unit: :kilometer, value: 1, meter: 1000],\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 [
-  [unit: :millimeter, value: 1, centimeter: 0.1],
-  [unit: :meter, value: 1, centimeter: 100],
-  [unit: :kilometer, value: 1, centimeter: 100_000],
-  [unit: :inch, value: 1, centimeter: 2.54],
-  [unit: :feet, value: 1, centimeter: 30],
-  [unit: :yard, value: 1, centimeter: 91],
-  [unit: :mile, value: 1, centimeter: 160_000]
+  [unit: :millimeter, value: 1, meter: 0.001],
+  [unit: :centimeter, value: 1, meter: 0.01],
+  [unit: :meter, value: 1, meter: 1],
+  [unit: :kilometer, value: 1, meter: 1000]
 ]
 |> Kino.DataTable.new()
 ```
 
-Users may provide any measurement and a value in a tuple `{measurement, value}`, and convert
-it to any other measurement like so.
+```elixir
+1000 * 0.01 / 1000
+```
+
+Users provide values using `{from_unit, value}` tuples, and the desired unit to convert to.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Measurement.convert({:meter, 1}, :centimeter)
-{:centimeter, 100}
+Metric.convert({:centimeter, 100}, :meter)
+1.0
 ```
 
-Use the measurements provided by the table to convert values, even when this would deviate from
-how these measurements are typically converted. For example, 12 inches is typically 1 foot, however
-according to this table it would be `1.016` feet.
-
-<!-- livebook:{"force_markdown":true} -->
+The unit to convert from, and the unit to convert to can be either `:millimeter`, `:centimeter`, `:meter`, or `:kilometer`. The output should always be a **float**.
 
 ```elixir
-Measurement.convert({:inch, 12}, :feet)
-{1.016, :feet}
-```
+defmodule Metric do
+  @moduledoc """
+  Documentation for `Metric`
+  """
 
-Enter your solution below.
-
-```elixir
-defmodule Measurement do
   @doc """
   Convert one measurement to another.
+  We've used math values in the result
 
   ## Examples
 
-    iex> Measurement.convert({millimeter, 1}, :centimeter)
-    {:centimeter, 0.1}
+    Convert unit to meters.
 
-    iex> Measurement.convert({centimeter, 1}, :centimeter)
-    {:centimeter, 1}
+    iex> Metric.convert({:millimeter, 1}, :meter)
+    0.001
 
-    iex> Measurement.convert({meter, 1}, :centimeter)
-    {:centimeter, 100}
+    iex> Metric.convert({:centimeter, 1}, :meter)
+    0.01
 
-    iex> Measurement.convert({:kilometer, 1}, :centimeter)
-    {:centimeter, 100_000}
+    iex> Metric.convert({:meter, 1}, :meter)
+    1.0
 
-    iex> Measurement.convert({:inch, 1}, :centimeter)
-    {:centimeter, 2.54}
+    iex> Metric.convert({:kilometer, 1}, :meter)
+    1000
 
-    iex> Measurement.convert({:feet, 1}, :centimeter)
-    {:centimeter, 30}
+    Convert meters to unit.
 
-    iex> Measurement.convert({:yard, 1}, :centimeter)
-    {:centimeter, 91}
+    iex> Metric.convert({:meter, 1}, :millimeter)
+    1000.0
 
-    iex> Measurement.convert({:mile, 1}, :centimeter)
-    {:centimeter, 160_000}
+    iex> Metric.convert({:meter, 1}, :centimeter)
+    100.0
 
-    iex> Measurement.convert({:meter, 1}, :millimeter)
-    {:millimeter, 1000}
+    iex> Metric.convert({:meter, 1}, :meter)
+    1.0
 
-    iex> Measurement.convert({:meter, 1}, :centimeter)
-    {:centimeter, 100}
+    iex> Metric.convert({:meter, 1}, :kilometer)
+    0.001
 
-    iex> Measurement.convert({:meter, 1}, :meter)
-    {:meter, 1}
+    Convert unit to unit.
 
-    iex> Measurement.convert({:meter, 1}, :kilometer)
-    {:meter, 0.001}
+    iex> Metric.convert({:centimeter, 1000}, :kilometer)
+    0.01
+
+    iex> Metric.convert({:millimeter, 10}, :centimeter)
+    1
+
+    iex> Metric.convert({:kilometer, 10}, :centimeter)
+    1000000
   """
   def convert(from, to) do
   end
@@ -115,6 +112,6 @@ $ git commit -m "finish metric conversion exercise"
 
 ## Up Next
 
-| Previous                                                         | Next                                                           |
-| ---------------------------------------------------------------- | -------------------------------------------------------------: |
-| [Rps Pattern Matching](../exercises/rps_pattern_matching.livemd) | [Currency Conversion](../exercises/currency_conversion.livemd) |
+| Previous                                                         | Next                                       |
+| ---------------------------------------------------------------- | -----------------------------------------: |
+| [Rps Pattern Matching](../exercises/rps_pattern_matching.livemd) | [Bitstrings](../reading/bitstrings.livemd) |

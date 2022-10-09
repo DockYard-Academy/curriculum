@@ -43,13 +43,13 @@ defmodule UtilsTest do
       # to avoid changing the file every time a student opens a .livemd file.
       expected = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n"
 
-      assert file == expected,
-             """
-             #{file_name}: Needs to be formatted.
+      assert file == expected
+      #  """
+      #  #{file_name}: Needs to be formatted.
 
-             Run mix bc.format_notebooks to format all notebooks.
-             Sometimes bullet points * can cause formatting issues.
-             """
+      #  Run mix bc.format_notebooks to format all notebooks.
+      #  Sometimes bullet points * can cause formatting issues.
+      #  """
     end)
   end
 
