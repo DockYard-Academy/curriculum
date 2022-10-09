@@ -56,13 +56,10 @@ end
 Trigger the `"A"` case. Replace `nil` with your answer.
 
 ```elixir
-case_match =
-  case nil do
-    [_, _, 3] -> "A"
-    _ -> "default"
-  end
-
-Utils.feedback(:case_match, case_match)
+case nil do
+  [_, _, 3] -> "A"
+  _ -> "default"
+end
 ```
 
 ## Pattern Matching Multi-Clause Functions
@@ -102,23 +99,27 @@ Greeter.greet(%{name: "Batman", identity: "Bruce Wayne"})
 ### Your Turn
 
 Use pattern matching to create a `Hello.everyone/1` function which only accepts a list with three or more elements.
-Remember that you can use the `[head | tail]` syntax with a list.
 
-Replace `nil` with your pattern match statement.
-
-<details>
-<summary>Hint</summary>
-<code>[one, two, three | tail] = list</code>
-</details>
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Hello do
-  def everyone(nil) do
+  def everyone([_, _, _ | _tail]) do
     "Hello, everyone!"
   end
 end
+```
 
-Utils.feedback(:hello_match, Hello)
+</details>
+
+Enter your solution below.
+
+```elixir
+defmodule Hello do
+  def everyone(list) do
+  end
+end
 ```
 
 ## Pattern Matching in Anonymous Functions
@@ -161,6 +162,32 @@ Enum.reduce(list, 0, fn
   %{add: int}, acc -> acc + int
   int, acc -> acc + int
 end)
+```
+
+### Your Turn
+
+Use `Enum.map/2` with pattern matching and multi-clause functions to double `{:double, integer}` tuples and half `{:halve, integer}` tuples in the following list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[{:double, 2}, {:halve, 10}, {:double, 4}] -> [4, 5, 8]
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+Enum.map([{:double, 2}, {:halve, 10}, {:double, 4}], fn
+  {:double, integer} -> integer * 2
+  {:halve, integer} -> div(integer, 2)
+end)
+```
+
+</details>
+
+```elixir
+[{:double, 2}, {:halve, 10}, {:double, 4}]
 ```
 
 ## Pattern Matching Vs. If
@@ -214,15 +241,25 @@ defmodule Message do
   end
 
   def send(%{is_admin: true}, message) do
-    message
+    {:ok, message}
   end
 
   def send(%{is_admin: false}, _) do
     {:error, :not_authorized}
   end
 end
+```
 
+```elixir
 Message.send(%{is_admin: true}, "")
+```
+
+```elixir
+Message.send(%{is_admin: false}, "Error!")
+```
+
+```elixir
+Message.send(%{is_admin: true}, "Successful!")
 ```
 
 Pattern matching can help reduce the complexity of our control flow.
@@ -266,257 +303,6 @@ By showing you alternative solutions, we hope to bring your attention to the opt
 
 We do not hope to tell you that one solution is always better than another.
 Context matters!
-
-## With
-
-`with` is often used with pattern matching to create "happy path" code.
-It's useful whenever you have a series of cases or values that rely on each other.
-
-You can use `with` to check some preconditions before executing instructions.
-
-```mermaid
-flowchart LR
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-```
-
-If any of the preconditions fail, the with statement will stop and return the value
-of the failed precondition.
-
-```mermaid
-flowchart LR
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1 --> 5[failed pre-condition]
-  2 --> 5
-  3 --> 5
-```
-
-Alternatively, you can use `else` to handle the result of a failed precondition.
-
-```mermaid
-flowchart LR
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1 --> 5[failed pre-condition]
-  2 --> 5
-  3 --> 5
-  5 --> 6[else]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Here's a minimal example with a single precondition. `is_admin` must be true to delete a user. We're using pseudo-code and simply returning the `"delete user"` string.
-
-```elixir
-is_admin = true
-
-with true <- is_admin do
-  "delete user"
-end
-```
-
-The `with` statement checks `is_admin`. If `true`, it returns `"delete_user"`.
-If any other value, it returns the value of variable `is_admin`.
-
-```mermaid
-flowchart LR
-  with --> is_admin --> 3["delete user"]
-  is_admin --> 4[is_admin]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-`with` uses pattern matching to check if the left side of the `<-` matches the right side.
-The example above is probably better served using a simple `if` statement, so let's make it
-more realistic and store `is_admin` in a boolean on a user map.
-
-```elixir
-user = %{is_admin: true}
-
-with true <- user do
-  "delete user"
-end
-```
-
-Because `%{is_admin: true}` does not match `true`, the with statement returns `%{is_admin: true}`.
-Let's correct that.
-
-```elixir
-user = %{is_admin: true}
-
-with %{is_admin: true} <- user do
-  "delete user"
-end
-```
-
-Great! That's working. But this is still probably better handled by an `if` or `case` statement.
-
-```elixir
-user = %{is_admin: true}
-
-if user.is_admin do
-  "delete user"
-end
-```
-
-`with` is ideal for checking a series of preconditions.
-
-Let's change our example to sending an email. To send an email, we need to ensure:
-
-* The sending user is an admin.
-* The receiving user has an email.
-* The email has a title and a body.
-
-We also need the `name` of the sender and receiver and their emails.
-Here's how we can handle this with `case`. Arguably the
-nested `case` statements reduce the clarity of the code.
-
-```elixir
-sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-case sending_user do
-  %{is_admin: true, name: sender_name, email: sender_email} ->
-    case receiving_user do
-      %{name: receiver_name, email: receiver_email} ->
-        case email do
-          %{title: title, body: body} ->
-            "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-        end
-    end
-end
-```
-
-`with` replaces the need for nested case statements.
-
-Here's the same code using `with`. There's still some natural complexity, but `with` improved the code clarity.
-
-```elixir
-sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-end
-```
-
-Right now, if a value doesn't match the precondition, it returns the value. For example,
-if the sender is `nil`, we return `nil`.
-
-```elixir
-sending_user = nil
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-end
-```
-
-Sometimes we want to return the value. Other times we want to handle the error in an `else` block.
-
-```elixir
-sending_user = "batman"
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-else
-  error -> "Email not sent because #{error} did not match expected format"
-end
-```
-
-You can match multiple cases to handle different errors.
-
-```elixir
-sending_user = %{name: "Joker", email: "joker@jokesonyou.haha"}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "HAHA!", body: "HAHAHAHAHA"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-else
-  %{name: "Joker"} -> "Get out of here Joker!"
-  error -> "Email not sent because #{error} did not match expected format"
-end
-```
-
-`with` statements can use values from previous conditions in future conditions.
-
-```elixir
-triangle = [3, 3, 3]
-
-with [side1, side2, side3] <- triangle, true <- side1 == side2 && side2 == side3 do
-  "all sides are equal!"
-end
-```
-
-### Your Turn
-
-Use `with` to check that `scores`:
-
-* Has two elements
-* Each element is an integer.
-* Each element is ten or above.
-
-If so, sum the two scores together. If not, return `{:error, :invalid}`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Points.tally([10, 20])
-30
-
-Points.tally(10)
-{:error, :invalid}
-
-
-Points.tally([1, 10])
-{:error, :invalid}
-
-
-Points.tally([10, 20, 30])
-{:error, :invalid}
-```
-
-```elixir
-defmodule Points do
-  def tally(scores) do
-  end
-end
-
-Utils.feedback(:with_points, Points)
-```
 
 ## Pin Operator
 
@@ -571,7 +357,19 @@ actual = [1, 2, 3]
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use the pin operator to make the following code crash with a [MatchError](https://hexdocs.pm/elixir/MatchError.html).
+Use the pin operator to make the following code crash with a [MatchError](https://hexdocs.pm/elixir/MatchError.html) because `expected` does not match `actual`, rather than rebinding `expected` as it is currently doing.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+expected = {"hello"}
+actual = {"hello", "hi"}
+
+^expected = actual
+```
+
+</details>
 
 ```elixir
 expected = {"hello"}
@@ -579,6 +377,15 @@ actual = {"hello", "hi"}
 
 expected = actual
 ```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Pattern Matching](https://elixirschool.com/en/lessons/basics/pattern_matching)
+* [Exercism.io: Pattern Matching](https://exercism.org/tracks/elixir/concepts/pattern-matching)
+* [elixir-lang.org: Pattern Matching](https://elixir-lang.org/getting-started/pattern-matching.html)
+* [HexDocs: Patterns and Guards](https://hexdocs.pm/elixir/master/patterns-and-guards.html)
 
 ## Commit Your Progress
 

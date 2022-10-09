@@ -95,10 +95,10 @@ valid guesses.
 We could create a `is_guess/1` guard which checks that the guess is valid.
 
 ```elixir
-defmodule RPS do
+defmodule RockPaperScissors do
   defguard is_guess(guess) when guess in [:rock, :paper, :scissors]
 
-  def play(guess) when is_guess(guess) do
+  def winner(guess) when is_guess(guess) do
     case guess do
       :rock -> :paper
       :scissors -> :rock
@@ -107,13 +107,13 @@ defmodule RPS do
   end
 end
 
-RPS.play(:rock)
+RockPaperScissors.winner(:rock)
 ```
 
 Invalid guesses will now raise a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
 
 ```elixir
-RPS.play("rock")
+RockPaperScissors.winner("rock")
 ```
 
 ## Polymorphic Functions With Guards
@@ -150,7 +150,7 @@ Multiplier.double("example")
 There are many guards available in Elixir. If you ever need a specific guard, you can refer to the
 [Guards](https://hexdocs.pm/elixir/Kernel.html#guards) documentation.
 
-Function order matters. The first function who's function head matches the input executes.
+**Function order matters**. The first function who's function head matches the input executes.
 
 For example. if you remove
 the `is_number/1` guard. Now the first function expects any type of input, so it will always
@@ -177,7 +177,7 @@ so the second will never execute.
 > **this clause for double/1 cannot match because a previous clause at line 2 always matches**.
 
 If you move the more generic function lower, then strings will match the
-`is_binary/1` version first.
+`is_binary/1` version first and our `Multiplier.double/1` function works as expected.
 
 ```elixir
 defmodule Multiplier do
@@ -212,14 +212,27 @@ Say.hello("Brian")
 "Hello, Brian."
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Say do
+  def hello(name) when is_bitstring(name) do
+    "Hello, #{name}."
+  end
+end
+```
+
+</details>
+
 ```elixir
 defmodule Say do
   def hello(name) do
   end
 end
-
-Utils.feedback(:say_guards, Say)
 ```
+
+### Your Turn
 
 Create a `Percent.display/1` function which accepts a number and returns a string with a percent.
 Use guards to ensure the percent is between 0 (exclusive) and 100 (inclusive)
@@ -241,14 +254,36 @@ Percent.display(101)
 ** (FunctionClauseError) no function clause matching in Percent.display/1
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Percent do
+  def display(percent) when 0 <= percent and percent <= 100 do
+    "#{percent}%"
+  end
+end
+```
+
+</details>
+
+Enter your solution below.
+
 ```elixir
 defmodule Percent do
   def display(percent) do
   end
 end
-
-Utils.feedback(:percent, Percent)
 ```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: Guards](https://hexdocs.pm/elixir/guards.html)
+* [HexDocs: Where to use Guards](https://hexdocs.pm/elixir/guards.html#where-guards-can-be-used)
+* [Elixir Schools: Guards](https://elixirschool.com/en/lessons/basics/functions/#guards-6)
+* [Exercism.io: Guards](https://exercism.org/tracks/elixir/concepts/guards)
 
 ## Commit Your Progress
 

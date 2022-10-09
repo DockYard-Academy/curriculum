@@ -22,7 +22,7 @@ defmodule Utils.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:livebook, "~> 0.6.3", only: [:test], runtime: false},
+      {:livebook, "~> 0.7", only: [:test], runtime: false},
       # poison needed for livebook
       {:poison, "~> 5.0.0", only: [:test]},
       {:earmark_parser, "~> 1.4", only: [:dev, :test]},
