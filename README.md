@@ -195,7 +195,7 @@ Built-in Modules
 Reduce
 Dates and Time
 Pattern Matching
-Guards, Pattern Matching
+Guards
 4. String Manipulation
 5. Protocols, and Behaviors.
 
