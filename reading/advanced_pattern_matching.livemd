@@ -102,17 +102,14 @@ Use pattern matching to create a `Hello.everyone/1` function which only accepts 
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
-<code>[one, two, three | tail] = list</code>
-</details>
-
-```elixir
+<code>
 defmodule Hello do
   def everyone([_, _, _ | _tail]) do
     "Hello, everyone!"
   end
 end
-```
-
+</code>
+</details>
 
 
 Enter your solution below.
@@ -266,10 +263,7 @@ Message.send(%{is_admin: true}, "Successful!")
 
 Pattern matching can help reduce the complexity of our control flow.
 
-This implementation uses function clauses, but let's dive deep into the
-options we have for how to write this same code.
-
-We could also use a `case` statement with pattern matching.
+Anytime that we can use multiple function clauses, we can also use a `case` statement.
 
 ```elixir
 defmodule Message do
@@ -282,29 +276,6 @@ defmodule Message do
   end
 end
 ```
-
-We could even implement a solution with guards.
-
-```elixir
-defmodule Guards do
-  def send(user, message) when user.is_admin and message == "" do
-    {:error, :empty_message}
-  end
-
-  def send(user, message) when user.is_admin do
-    message
-  end
-
-  def send(user) do
-    {:error, :not_authorized}
-  end
-end
-```
-
-By showing you alternative solutions, we hope to bring your attention to the options you have so that you can make informed decisions about improving code clarity.
-
-We do not hope to tell you that one solution is always better than another.
-Context matters!
 
 ## Pin Operator
 
@@ -400,6 +371,6 @@ $ git commit -m "finish pattern matching section"
 
 ## Up Next
 
-| Previous                           | Next                                                       |
-| ---------------------------------- | ---------------------------------------------------------: |
-| [Guards](../reading/guards.livemd) | [Treasure Matching](../exercises/treasure_matching.livemd) |
+| Previous                                       | Next                                                       |
+| ---------------------------------------------- | ---------------------------------------------------------: |
+| [Polymorphism](../reading/polymorphism.livemd) | [Treasure Matching](../exercises/treasure_matching.livemd) |

@@ -325,28 +325,21 @@ end)
 
 ### Your Turn
 
-Create an `obfuscate/1` function that expects a string with one or more phone numbers in the format `999-999-9999`.
+Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) to obfuscate (hide important information) in a phone number. Replace all but the first three digits with `X` so `999-999-9999` becomes `999-XXX-XXXX`.
 
-Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) and capture groups to obfuscate the phone number from `999-999-9999` into `XXX-999-XXXX`.
-
-<!-- livebook:{"force_markdown":true} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-obfuscate.("123-123-1234")
-"XXX-123-XXXX"
-
-obfuscate.("123-123-1234 456-456-4567")
-"XXX-123-XXXX XXX-456-XXXX"
+Regex.replace(~r/(\d{3}-)\d{3}-\d{4}/, "999-999-9999", fn _match, group1 ->
+  group1 <> "XXX-" <> "XXXX"
+end)
 ```
 
-Replace `nil` with your answer.
+</details>
 
 ```elixir
-obfuscate = fn string ->
-  nil
-end
 
-Utils.feedback(:obfuscate_phone, obfuscate)
 ```
 
 ## Lookaround
@@ -412,27 +405,21 @@ Regex.scan(~r/(?<=\d\. )\w+/, text)
 
 ### Your Turn
 
-Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) to convert all phone numbers preceded by the `#` symbol in the format `1231231234`
-into the format `123-123-1234`.
+Use [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3) to convert a phone number in the format `#9999999999` into the format `999-999-9999`.
 
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-convert.("#1231231234")
-"#123-123-1234"
-
-convert.("#1231231234 1231231234")
-"#123-123-1234 1231231234"
+Regex.replace(~r/\#(\d{3})(\d{3})(\d{4})/, "#9999999999", fn _full, group1, group2, group3 -> 
+  "#{group1}-#{group2}-#{group3}"
+end)
 ```
 
-```elixir
-convert = fn string ->
-  nil
-end
+</details>
 
-Utils.feedback(:convert_phone, convert)
+```elixir
+
 ```
 
 ## Further Reading
@@ -460,6 +447,6 @@ $ git commit -m "finish regex section"
 
 ## Up Next
 
-| Previous                                   | Next                                                     |
-| ------------------------------------------ | -------------------------------------------------------: |
-| [Bitstrings](../reading/bitstrings.livemd) | [Email Validation](../exercises/email_validation.livemd) |
+| Previous                                                       | Next                                                     |
+| -------------------------------------------------------------- | -------------------------------------------------------: |
+| [Strings And Binaries](../reading/strings_and_binaries.livemd) | [Email Validation](../exercises/email_validation.livemd) |

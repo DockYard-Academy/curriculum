@@ -193,8 +193,9 @@ Enumeration 1
 Enumeration 2
 Built-in Modules
 Reduce
-2. Dates and Time
-3. Guards, Pattern Matching
+Dates and Time
+Pattern Matching
+Guards, Pattern Matching
 4. String Manipulation
 5. Protocols, and Behaviors.
 
