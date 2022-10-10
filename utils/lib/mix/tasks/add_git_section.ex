@@ -35,7 +35,7 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     %{reading: reading_files, exercise: exercise_files}
   end
 
-  defp commit_snippet(commit_message) do
+  defp commit_snippet(exercise_name, commit_message) do
     """
 
     ## Commit Your Progress
@@ -43,8 +43,11 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
 
     ```
+    $ git checkout main
+    $ git checkout -b exercise-#{exercise_name}
     $ git add .
     $ git commit -m "#{commit_message}"
+    $ git push origin exercise-#{exercise_name}
     ```
     """
   end
@@ -58,14 +61,22 @@ defmodule Mix.Tasks.Bc.AddGitSection do
 
     if String.contains?(file, "## Commit Your") do
       new_file =
-        Regex.replace(~r/\n\#\# Commit Your(.|\n)+/, file, commit_snippet(commit_message))
+        Regex.replace(
+          ~r/\n\#\# Commit Your(.|\n)+/,
+          file,
+          commit_snippet(exercise_name(path), commit_message)
+        )
 
       File.write(path, new_file)
     else
-      File.write!(path, commit_snippet(commit_message), [:append])
+      File.write!(exercise_name(path), commit_snippet(path, commit_message), [:append])
     end
 
     File.close(file)
+  end
+
+  defp exercise_name(path) do
+    Path.basename(path) |> String.slice(0..-8)
   end
 
   defp spaced_filename(path) do
