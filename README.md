@@ -195,9 +195,9 @@ Built-in Modules
 Reduce
 Dates and Time
 Pattern Matching
-Guards, Pattern Matching
-4. String Manipulation
-5. Protocols, and Behaviors.
+Guards
+String Manipulation
+Protocols
 
 ## Week 3: Performance, Persistence, and Processes
 

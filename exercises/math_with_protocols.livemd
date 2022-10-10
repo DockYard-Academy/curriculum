@@ -1,0 +1,170 @@
+# Math With Protocols
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Math With Protocols
+
+In this exercise, you're going to create a `Math` protocol that handles adding and subtracting different data types.
+
+Create a `Math` protocol implementation for **integers**, **strings**, and **lists**. You do not need to handling adding or subtracting different data types.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Math.add(1, 2)
+3
+
+Math.add("Hello, ", "World!")
+"Hello, World!"
+
+Math.add([1, 2], [3, 4])
+[1, 2, 3, 4]
+
+Math.subtract(10, 2)
+8
+
+Math.subtract("hello there", "hello ")
+"there"
+
+Math.subtract([1, 2, 3, 4], [1, 3])
+[2, 4]
+```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint: Subtracting Strings</summary>
+
+Consider converting your strings to a list, then subtract the two lists together then join your result back into a string.
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defprotocol Math do
+  def add(value1, value2)
+  def subtract(value1, value2)
+end
+
+defimpl Math, for: Integer do
+  def add(integer1, integer2) do
+    integer1 + integer2
+  end
+
+  def subtract(integer1, integer2) do
+    integer1 - integer2
+  end
+end
+
+defimpl Math, for: BitString do
+  def add(string1, string2) do
+    string1 <> string2
+  end
+
+  def subtract(string1, string2) do
+    (String.split(string1, "") -- String.split(string2, ""))
+    |> Enum.join()
+  end
+end
+
+defimpl Math, for: List do
+  def add(list1, list2) do
+    list1 ++ list2
+  end
+
+  def subtract(list1, list2) do
+    list1 -- list2
+  end
+end
+```
+
+</details>
+
+Define implementations for the `Math` protocol as documented below.
+
+```elixir
+defprotocol Math do
+  @doc """
+  Add two integers, lists, or strings.
+
+  ## Examples
+
+    iex> Math.add(2, 2)
+    4
+    iex> Math.add(4, 4)
+    8
+
+    Math.add([1, 2], [3, 4])
+    [1, 2, 3, 4]
+    Math.add([1, 2, 3], [4, 5, 6])
+    [1, 2, 3, 4, 5, 6]
+
+    iex> Math.add("abc", "def")
+    "abcdef"
+    iex> Math.add("123", "456")
+    "123456"
+
+    iex> Math.add(%{}, %{})
+    ** (Protocol.UndefinedError) protocol Math not implemented for %{} of type Map
+
+    iex> Math.add({}, {})
+    ** (Protocol.UndefinedError) protocol Math not implemented for {} of type Tuple
+  """
+  def add(value1, value2)
+
+  @doc """
+  Subtract two integers, lists, or strings.
+
+  ## Examples
+    iex> Math.subtract(10, 2)
+    8
+    iex> Math.subtract(20, 2)
+    18
+
+    iex> Math.subtract([1, 2], [1])
+    [1]
+    iex> Math.subtract([1, 2, 3, 4], [1, 3])
+    [2, 4]
+
+    iex> Math.subtract("abcd", "abc")
+    "d"
+    iex> Math.subtract("cbad", "abc")
+    "d"
+    iex> Math.subtract("abc", "xyz")
+    "abc"
+    iex> Math.subtract("abc", "xyza")
+    "bc"
+
+    iex> Math.subtract(1.0, 2.0)
+    ** (Protocol.UndefinedError) protocol Math not implemented for 1.0 of type Float
+  """
+  def subtract(value1, value2)
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish math exercise"
+```
+
+## Up Next
+
+| Previous                                 | Next                                                       |
+| ---------------------------------------- | ---------------------------------------------------------: |
+| [Protocols](../reading/protocols.livemd) | [Pokemon Protocols](../exercises/pokemon_protocols.livemd) |
