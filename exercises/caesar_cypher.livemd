@@ -16,20 +16,24 @@ Mix.install([
 
 ## Caesar Cypher
 
-A cypher alters characters in order to make secret messages.
-The Caesar cypher is a substitution cypher named after the Roman emperor Julius Caesar.
+You're going to create a Caesar Cypher. A cypher alters characters in order to make secret messages. The Caesar cypher is a substitution cypher named after the Roman emperor Julius Caesar.
 
-Typically caesar cyphers use a `key` to shift letters. For example,
-a caesar cypher with a key of `1` would shift each letter by one.
+A Caesar cypher shifts characters by some key. For example, if the key is `1` then each character shifts over by one, so `"a"` becomes `"b"`, `"b"` becomes `"c"` and so on.
+
+Create a `CaesarCypher.encode/1` function which shifts each letter in a string by a key. The default key should be `1`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 1)
+CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz")
 "bcdefghijklmnopqrstuvwyxza"
 ```
 
-A key of `2` would shift each letter by two.
+You only need to handle **lowercase letters**.
+
+### Bonus: Any Key
+
+Create a `CaesarCypher.encode/2` function which encodes the string by a provided key. For example, if the key is `2` then each letter shifts over by two, so `"a"` becomes `"c"`, `"b"` becomes `"d"` and so on.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -38,135 +42,73 @@ CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 2)
 "cdefghijklmnopqrstuvwyxzab"
 ```
 
-Ensure you handle keys between `1` and `25`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 25)
-"zabcdefghijklmnopqrstuvwyx"
-```
-
-CaesarCypher should also be able to decode messages given the key.
-
-<!-- livebook:{"force_markdown":true} -->
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-CaesarCypher.decode("cdefghijklmnopqrstuvwyxzab", 2)
-"abcdefghijklmnopqrstuvwyxz"
-```
+defmodule CaesarCypher do
+ def encode(string) do
+    String.to_charlist(string)
+    |> Enum.map(fn
+      ?z -> ?a
+      char -> char + 1
+    end)
+    |> List.to_string()
+  end
 
-The cypher should only handle lowercase letters and ignore non-alphabetical characters.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-CaesarCypher.encode("et tu, brute?", 2)
-"gv vw, dtwvg?"
-```
-
-Enter your solution below.
-
-<!-- livebook:{"attrs":{"assertions":"assert CaesarCypher.encode(\"\", 1), \"Ensure you implement the `encode/2` function.\"\nassert CaesarCypher.encode(\"\", 1) == \"\"\nassert CaesarCypher.encode(\"a\", 1) == \"b\"\nassert CaesarCypher.encode(\"a\", 14) == \"o\"\nassert CaesarCypher.encode(\"a\", 25) == \"z\"\nassert CaesarCypher.encode(\"z\", 1) == \"a\"\nassert CaesarCypher.encode(\"z\", 14) == \"n\"\nassert CaesarCypher.encode(\"z\", 25) == \"y\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 1) == \"bcdefghijklmnopqrstuvwxyza\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 14) == \"opqrstuvwxyzabcdefghijklmn\"\nassert CaesarCypher.encode(\"abcdefghijklmnopqrstuvwxyz\", 25) == \"zabcdefghijklmnopqrstuvwxy\"\nassert CaesarCypher.encode(\"et tu, brute?\", 2) == \"gv vw, dtwvg?\"\n\nassert CaesarCypher.decode(\"\", 1), \"Ensure you implement the `decode/2` function.\"\nassert CaesarCypher.decode(\"\", 1) == \"\"\nassert CaesarCypher.decode(\"b\", 1) == \"a\"\nassert CaesarCypher.decode(\"o\", 14) == \"a\"\nassert CaesarCypher.decode(\"z\", 25) == \"a\"\nassert CaesarCypher.decode(\"a\", 1) == \"z\"\nassert CaesarCypher.decode(\"n\", 14) == \"z\"\nassert CaesarCypher.decode(\"y\", 25) == \"z\"\nassert CaesarCypher.decode(\"bcdefghijklmnopqrstuvwxyza\", 1) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"opqrstuvwxyzabcdefghijklmn\", 14) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"zabcdefghijklmnopqrstuvwxy\", 25) == \"abcdefghijklmnopqrstuvwxyz\"\nassert CaesarCypher.decode(\"gv vw, dtwvg?\", 2) == \"et tu, brute?\"","attempts":7,"code":"defmodule CaesarCypher do\r\n  def encode(string, key) do\r\n  end\r\n\r\n  def decode(string, key) do\r\n  end\r\nend","solution":"defmodule CaesarCypher do\n  def decode(string, key) do\n    String.to_charlist(string)\n    |> Enum.map(fn char ->\n      cond do\n        char < ?a or ?z < char ->\n          char\n\n        char - key < ?a ->\n          ?z - (?a - (char - key)) + 1\n\n        true ->\n          char - key\n      end\n    end)\n    |> List.to_string()\n  end\n\n  def encode(string, key) do\n    String.to_charlist(string)\n    |> Enum.map(fn char ->\n      cond do\n        char < ?a or ?z < char ->\n          char\n\n        char + key > ?z ->\n          ?a + (char + key - ?z) - 1\n\n        true ->\n          char + key\n      end\n    end)\n    |> List.to_string()\n  end\nend","title":"Caesar Cypher Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Caesar Cypher Exercise" do
-    try do
-      Process.flag(:trap_exit, true)
-
-      defmodule CaesarCypher do
-        def encode(string, key) do
-        end
-
-        def decode(string, key) do
-        end
+  def encode(string, key) do
+    String.to_charlist(string)
+    |> Enum.map(fn char ->
+      overflow = char + key > ?z
+      if overflow do
+        rem(char + key, ?z) + ?a
+      else
+        char + key
       end
-
-      assert CaesarCypher.encode("", 1), "Ensure you implement the `encode/2` function."
-      assert CaesarCypher.encode("", 1) == ""
-      assert CaesarCypher.encode("a", 1) == "b"
-      assert CaesarCypher.encode("a", 14) == "o"
-      assert CaesarCypher.encode("a", 25) == "z"
-      assert CaesarCypher.encode("z", 1) == "a"
-      assert CaesarCypher.encode("z", 14) == "n"
-      assert CaesarCypher.encode("z", 25) == "y"
-      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1) == "bcdefghijklmnopqrstuvwxyza"
-      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14) == "opqrstuvwxyzabcdefghijklmn"
-      assert CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 25) == "zabcdefghijklmnopqrstuvwxy"
-      assert CaesarCypher.encode("et tu, brute?", 2) == "gv vw, dtwvg?"
-
-      assert CaesarCypher.decode("", 1), "Ensure you implement the `decode/2` function."
-      assert CaesarCypher.decode("", 1) == ""
-      assert CaesarCypher.decode("b", 1) == "a"
-      assert CaesarCypher.decode("o", 14) == "a"
-      assert CaesarCypher.decode("z", 25) == "a"
-      assert CaesarCypher.decode("a", 1) == "z"
-      assert CaesarCypher.decode("n", 14) == "z"
-      assert CaesarCypher.decode("y", 25) == "z"
-      assert CaesarCypher.decode("bcdefghijklmnopqrstuvwxyza", 1) == "abcdefghijklmnopqrstuvwxyz"
-      assert CaesarCypher.decode("opqrstuvwxyzabcdefghijklmn", 14) == "abcdefghijklmnopqrstuvwxyz"
-      assert CaesarCypher.decode("zabcdefghijklmnopqrstuvwxy", 25) == "abcdefghijklmnopqrstuvwxyz"
-      assert CaesarCypher.decode("gv vw, dtwvg?", 2) == "et tu, brute?"
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a `handle_call/3`, `handle_info/2`, or `handle_cast/2` or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Then ensure you call [GenServer.call/2](https://hexdocs.pm/elixir/GenServer.html#call/2), [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2), or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
+    end)
+    |> List.to_string()
   end
 end
+```
 
-ExUnit.run()
+</details>
 
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
+Implement the `CaesarCypher` module as documented.
+
+```elixir
 defmodule CaesarCypher do
-  def encode(string, key) do
+  @moduledoc """
+  Documentation for `CaesarCypher`
+  """
+
+  @doc """
+  Encode a string using the caesar cypher.
+  Shift every letter over by one.
+
+  ## Examples
+
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz")
+    "bcdefghijklmnopqrstuvwyxza"
+  """
+  def encode(string) do
   end
 
-  def decode(string, key) do
+  @doc """
+  Encode a string using the caesar cypher and a provided key.
+  Shift every letter over by the provided key.
+
+  ## Examples
+
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 1)
+    "bcdefghijklmnopqrstuvwyxza"
+
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 2)
+    "cdefghijklmnopqrstuvwyxzab"
+    
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 14)
+    "opqrstuvwxyzabcdefghijklmn"
+  """
+  def encode(string, key) do
   end
 end
 ```
@@ -182,6 +124,6 @@ $ git commit -m "finish caesar cypher exercise"
 
 ## Up Next
 
-| Previous                                     | Next                                                             |
-| -------------------------------------------- | ---------------------------------------------------------------: |
-| [Classified](../exercises/classified.livemd) | [Rollable Expressions](../exercises/rollable_expressions.livemd) |
+| Previous                                                 | Next                                                             |
+| -------------------------------------------------------- | ---------------------------------------------------------------: |
+| [Email Validation](../exercises/email_validation.livemd) | [Rollable Expressions](../exercises/rollable_expressions.livemd) |

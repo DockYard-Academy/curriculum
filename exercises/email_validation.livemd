@@ -22,49 +22,76 @@ Generally, we validate this input to ensure that users enter a valid email.
 
 You are going to build an `Email.validate/1` function which checks if an email address is valid or not.
 
-```elixir
-Email.validate("mail@mail.com")
-true
-```
-
-Emails are generally in the format:
-
-`"recipientname@domainname.topleveldomain"`
-
-For the sake of simplicity,
-we're going to allow any string for the recipient name, domain name, and top level domain.
-
-So, `"string@string.string"`
-
-Here's a few examples.
-
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-true = Email.validate("peter.parker@spider.web")
-true = Email.validate("bruce@wayne.tech")
-true = Email.validate("123@456.789")
+Email.valid?("mail@mail.com")
+true
 
-# This would normally not be a valid email, but will pass our simple validation
-true = Email.validate("!#$@*&().&&&")
+Email.valid?("mail.com")
+false
 ```
 
-Enter your solution below
+For the sake of this exercise, an email is valid if it is in the format `string@string.string`. Be aware, this is not sufficient for true email validation where not all characters are allowed.
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+Consider using [Regex.replace/4](https://hexdocs.pm/elixir/Regex.html#replace/4).
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Email do
-  def validate(email) do
+  def valid?(email) do
+    Regex.match?(~r/\w+\@\w+\.\w+/, email)
   end
 end
-
-Utils.feedback(:email_validation, Email)
 ```
 
-This simple validation works for many use cases, however there are more comprehensive rules for email
-validation.
+</details>
 
-Generally applications send users a verification email to further ensure that the email address
-exists and belongs to them.
+Implement the `Email` module as documented.
+
+```elixir
+defmodule Email do
+  @moduledoc """
+  Documentation for `Email`
+  """
+
+  @doc """
+  Checks if an email is valid.
+
+  ## Examples
+
+    iex> Email.valid?("mail@mail.com")
+    true
+
+    iex> Email.valid?("string@string.string")
+    true
+
+    iex> Email.valid?("string")
+    false
+
+    iex> Email.valid?(".string")
+    false
+
+    iex> Email.valid?("string.string")
+    false
+
+    iex> Email.valid?("string@string")
+    false
+
+    iex> Email.valid?("string@string.")
+    false
+  """
+  def valid?(email) do
+  end
+end
+```
 
 ## Commit Your Progress
 
@@ -77,6 +104,6 @@ $ git commit -m "finish email validation exercise"
 
 ## Up Next
 
-| Previous                         | Next                                                             |
-| -------------------------------- | ---------------------------------------------------------------: |
-| [Regex](../reading/regex.livemd) | [Phone Number Parsing](../exercises/phone_number_parsing.livemd) |
+| Previous                         | Next                                               |
+| -------------------------------- | -------------------------------------------------: |
+| [Regex](../reading/regex.livemd) | [Caesar Cypher](../exercises/caesar_cypher.livemd) |

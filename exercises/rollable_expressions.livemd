@@ -21,60 +21,147 @@ You will build a program which makes it easier for players to automatically roll
 
 Dice expressions are in the form `1d6` which means [roll one six-sided die](https://www.google.com/search?q=roll+1d6).
 
+There can be any **number of dice** on the left hand side of the `d` and any number of sides on the dice on the right hand side of the `d`.
+
+For example, `20d12` would roll twenty dice with twelve sides. [20d12](https://www.google.com/search?q=roll+20d12).
+
 Provided a text with a dice expression, replace the expression with a clickable link.
 
 In markdown, a clickable link is in the format `[link name](url)`.
 
 Google allows you to roll multi sided dice by searching `roll 1d6`.
-The url for this is `https://www.google.com/search?q=roll+1d6`.
-
-### Example
-
-> Fireball: deal 8d6 fire damage.
-
-Becomes
-
-> Fireball: deal [8d6](https://www.google.com/search?q=roll+8d6) fire damage.
-
-Replace any rollable expressions like so:
+The url for this is https://www.google.com/search?q=roll+1d6.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-RollableExpression.clickable("8d6")
+Rollable.replace("8d6")
 "[8d6](https://www.google.com/search?q=roll+8d6)"
 ```
 
 Ensure you handle `4`, `6`, `8`, `12`, and `20` sided dice and
-be able to roll between `1` and `99` dice.
-
-For example,
+handle rolling between `1` and `99` dice.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 Rollable.replace("Fireball: deal 8d6 fire damage.")
 "Fireball: deal [8d6](https://www.google.com/search?q=roll+8d6) fire damage."
-
-Rollable.replace("Ice Shard: deal 12d4 ice damage.")
-"Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
-
-Rollable.replace("99d20")
-"[99d20](https://www.google.com/search?q=roll+99d20)"
-
-Rollable.replace("1d4")
-"[1d4](https://www.google.com/search?q=roll+1d4)"
 ```
 
-Enter your solution below.
+### Bonus
+
+Implement a `Rollable.roll/1` function which finds rollable expressions and generates a random number based on the expression. For example, `1d6` would roll a single die returning a result from `1` to `6`. `2d12` would generate two random numbers between `1` and `12` and add them together.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Rollable.roll("2d12")
+"20"
+
+Rollable.roll("2d12")
+"24"
+
+Rollable.roll("2d12")
+"5"
+
+Rollable.roll("Fireball: deal 8d6 fire damage.")
+"Fireball: deal 20 fire damage."
+```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+You can use [Regex.replace/4](https://hexdocs.pm/elixir/Regex.html#replace/4) to replace expressions in a string, and `\d+` to match on one or more digits.
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Rollable
+  def replace(string) do
+    Regex.replace(~r/(\d+)d(\d+)/, string, fn full, dice, sides ->
+      "[#{full}](https://www.google.com/search?q=roll+#{dice}d#{sides})"
+    end)
+  end
+
+  def roll(string) do
+    Regex.replace(~r/(\d+)d(\d)+/, string, fn full, dice, sides ->
+      dice_integer = String.to_integer(dice)
+      sides_integer = String.to_integer(sides)
+
+      value =
+        1..dice_integer
+        |> Enum.map(fn _ -> Enum.random(1..sides_integer) end)
+        |> Enum.sum()
+        |> Integer.to_string()
+    end)
+  end
+end
+```
+
+</details>
+
+Implement the `Rollable` module as documented below.
 
 ```elixir
 defmodule Rollable do
+  @moduledoc """
+  Documentation for `Rollable`
+  """
+
+  @doc """
+  Replace dice expressions with clickable links.
+
+  ## Examples
+
+    iex> Rollable.replace("1d4")
+    "[1d4](https://www.google.com/search?q=roll+1d4)"
+
+    iex> Rollable.replace("1d6")
+    "[1d4](https://www.google.com/search?q=roll+1d6)"
+
+    iex> Rollable.replace("1d8")
+    "[1d4](https://www.google.com/search?q=roll+1d8)"
+
+    iex> Rollable.replace("1d12")
+    "[1d4](https://www.google.com/search?q=roll+1d12)"
+
+    iex> Rollable.replace("1d20")
+    "[1d4](https://www.google.com/search?q=roll+1d20)"
+
+    iex> Rollable.replace("8d6")
+    "[8d6](https://www.google.com/search?q=roll+8d6)"
+
+    iex> Rollable.replace("99d20")
+    "[99d20](https://www.google.com/search?q=roll+99d20)"
+    
+    iex> Rollable.replace("Ice Shard: deal 12d4 ice damage.")
+    "Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
+  """
   def replace(string) do
+    Regex.replace(~r/(\d+)d(\d+)/, string, fn full, dice, sides ->
+      "[#{full}](https://www.google.com/search?q=roll+#{dice}d#{sides})"
+    end)
+  end
+
+  def roll(string) do
+    Regex.replace(~r/(\d+)d(\d)+/, string, fn full, dice, sides ->
+      dice_integer = String.to_integer(dice)
+      sides_integer = String.to_integer(sides)
+
+      value =
+        1..dice_integer
+        |> Enum.map(fn _ -> Enum.random(1..sides_integer) end)
+        |> Enum.sum()
+        |> Integer.to_string()
+    end)
   end
 end
 
-Utils.feedback(:rollable_expressions, Rollable)
+Rollable.roll("10d6")
 ```
 
 ## Commit Your Progress
