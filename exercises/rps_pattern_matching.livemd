@@ -75,7 +75,7 @@ defmodule RockPaperScissorsPatternMatching do
     "paper beats rock!"
 
     iex> RockPaperScissorsPatternMatching.play(:paper, :rock)
-    "rock beats paper!"
+    "paper beats rock!"
 
     iex> RockPaperScissorsPatternMatching.play(:scissors, :rock)
     "rock beats scissors!"
@@ -89,9 +89,40 @@ defmodule RockPaperScissorsPatternMatching do
     iex> RockPaperScissorsPatternMatching.play(:scissors, :scissors)
     "draw!"
   """
+
+  # INPUT: 2 guesses (in atom form)
+  # OUTPUT: A string that declares the outcome of the play
+
+  # 5 ideas
+  # Case / Cond
+  # Use With
+
   def play(guess1, guess2) do
+    with true <- guess1 == guess2 do
+      "draw!"
+    end
+
+    with true <-
+           {:rock, :scissors} == {guess1, guess2} ||
+             {:rock, :scissors} == {guess2, guess1} do
+      "Rock beats scissors"
+    end
+
+    with true <-
+           {:rock, :paper} == {guess1, guess2} ||
+             {:rock, :paper} == {guess2, guess1} do
+      "Paper beats rock"
+    end
+
+    with true <-
+           {:scissors, :paper} == {guess1, guess2} ||
+             {:scissors, :paper} == {guess2, guess1} do
+      "Scissors beats paper"
+    end
   end
 end
+
+RockPaperScissorsPatternMatching.play(:rock, :rock)
 ```
 
 ## Rock Paper Scissors Using Guards
