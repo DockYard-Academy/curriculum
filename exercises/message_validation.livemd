@@ -1,0 +1,150 @@
+# Message Validation
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Message Validation
+
+You're creating a messaging application where users can send each other messages as a string.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Message.send("hello!")
+"hello!"
+```
+
+Use guards to ensure `Message.send/1` does not allow invalid data types.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Message.send(123)
+** (FunctionClauseError) no function clause matching in Message.send/1    
+    
+    The following arguments were given to Message.send/1:
+    
+        # 1
+        123
+```
+
+Users can also send each other messages as a `Message` struct which has a `:body` key.
+Make sure you define a message struct, and use guards to create a `Message.send/1` clause which can handle `Message` structs. `Message.send/1` should return the `:body` field of the message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Message.send(%Message{body: "hello!})
+
+```
+
+Only allow messages that have a string in their `:body` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Message.send(%Message{body: 123})
+** (FunctionClauseError) no function clause matching in Message.send/1    
+    
+    The following arguments were given to Message.send/1:
+    
+        # 1
+        %Message{body: 123}
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Message do
+  defstruct [:body]
+  def send(message) when is_bitstring(message) do
+    message
+  end
+
+  def send(message) when is_bitstring(message.body) do
+    message.body
+  end
+end
+```
+
+</details>
+
+Implement the `Message` module as documented below.
+
+```elixir
+defmodule Message do
+  @moduledoc """
+  Documentation for `Message`
+
+    ## Examples
+
+      iex> %Message{}
+      %Message{body: nil}
+  """
+
+  @doc """
+  Send messages between users.
+  Returns a string of the message if provided valid input.
+
+  ## Examples
+
+    iex> Message.send("hello!")
+    "hello!"
+
+    iex> Message.send("hi!")
+    "hi!"
+
+    iex> Message.send(%Message{body: "hello!"})
+    "hello!"
+
+    iex> Message.send(%Message{body: "hi!"})
+    "hi!"
+
+    iex> Message.send(123)
+    ** (FunctionClauseError) no function clause matching in Message.send/1
+
+    iex> Message.send(%{})
+    ** (FunctionClauseError) no function clause matching in Message.send/1
+
+    iex> Message.send(%{})
+    ** (FunctionClauseError) no function clause matching in Message.send/1
+
+    iex> Message.send(%Message{body: nil})
+    ** (FunctionClauseError) no function clause matching in Message.send/1
+  """
+  def send(message) when is_bitstring(message) do
+    message
+  end
+
+  def send(message) when is_bitstring(message.body) do
+    message.body
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish math exercise"
+```
+
+## Up Next
+
+| Previous                           | Next                                                     |
+| ---------------------------------- | -------------------------------------------------------: |
+| [Guards](../reading/guards.livemd) | [Math With Guards](../exercises/math_with_guards.livemd) |

@@ -1,4 +1,4 @@
-# Bitstrings
+# Strings and Binaries
 
 ```elixir
 Mix.install([
@@ -33,7 +33,7 @@ A binary is a sequence of bytes. bytes are a grouping of eight bits.
 
 A bit is a single value represented as `0` or `1`. `0` and `1` correspond to on and off for an electrical signal.
 
-Here we see a visual of a byte in memory.
+Here we see a visual representation of a byte in memory.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -72,16 +72,16 @@ end)
 |> Kino.DataTable.new()
 ```
 
-Each byte stores a binary number. Integers between `1` and `255` can be represented in a single byte.
-
-### Your Turn
-
-In the Elixir cell below, enter an integer for the binary representation of `150`. Replace `nil` with your answer.
+Each byte stores an integer between `1` and `255` in binary. These integers are used to represent characters. For example, the number `65` represents the `"A"` character. This number is called the **codepoint**. We can find the codepoint of any character using the `?` symbol.
 
 ```elixir
-binary = nil
+?A
+```
 
-Utils.feedback(:binary_150, binary)
+We can also see that a string is actually a series of binary bytes representing a codepoint using [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) with the `binaries: :as_binaries` option.
+
+```elixir
+IO.inspect("ABCDEFG", binaries: :as_binaries)
 ```
 
 ## Unicode Code Points
@@ -89,7 +89,7 @@ Utils.feedback(:binary_150, binary)
 To represent strings, each character is given a unique numerical index called a code point.
 The [Unicode Standard](https://unicode.org/standard/standard.html) contains the complete registry of all possible characters and their numerical index.
 
-You can find the code point of a character using `?` in Elixir. For example the code point of `h` is `104`.
+We've already seen we can find the code point of a character using `?` in Elixir. For example the code point of `h` is `104`.
 
 ```elixir
 ?h
@@ -155,6 +155,18 @@ IO.inspect("hello", binaries: :as_binaries)
 ?o = 111
 ```
 
+Using the codepoints for these characters, we can create a charlist to see the relationship between charlists and binaries.
+
+```elixir
+[104, 101, 108, 108, 111]
+```
+
+We can also create a binary using `<<>>`. Don't worry about using this syntax. It's uncommon for most real-world applications.
+
+```elixir
+<<104, 101, 108, 108, 111>>
+```
+
 ### UTF-8
 
 [Unicode version 14.0](https://www.unicode.org/versions/Unicode14.0.0/) has a total of 144,697 characters with code points. Since a single byte can only store an integer up to `255` some characters must use multiple bytes.
@@ -196,21 +208,16 @@ String.graphemes("é")
 
 ### Your Turn
 
-Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the string `"hello"` to a list of graphemes.
-Replace `nil` with your answer.
+Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the [woman fire fighter](https://emojipedia.org/woman-firefighter/) emoji 👩‍🚒 to a list of graphemes.
 
 ```elixir
-graphemes = nil
 
-Utils.feedback(:graphemes, graphemes)
 ```
 
-Find the codepoint for the letter `z` using `?`.
+Use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1) to convert the emoji 👩‍🚒 into a list of codepoints. You'll notice it's actually a combination of the 👩 and 🚒 emojis.
 
 ```elixir
-z = nil
-
-Utils.feedback(:codepoint_z, z)
+String.codepoints("👩‍🚒")
 ```
 
 ## Hexadecimal
@@ -290,20 +297,19 @@ Which is why `"\u0065"` is the character `"e"`.
 
 ### Your Turn
 
-Use hexadecimal `0x` syntax to represent the number `4096`.
+Use hexadecimal `0x` syntax to represent the number `15`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-hexadecimal = nil
-
-Utils.feedback(:hexadecimal_4096, hexadecimal)
+0xf
 ```
 
-Use hexadecimal `\u` syntax to represent the character `a`.
+</details>
 
 ```elixir
-hexadecimal = nil
 
-Utils.feedback(:hexadecimal_a, hexadecimal)
 ```
 
 ## Bitstrings
@@ -340,7 +346,7 @@ are all valid code points. If any integer in a list is not a valid codepoint, th
 not be interpreted as a charlist.
 
 ```elixir
-# a   b   c  _
+# a   b   c  invalid
 [97, 98, 99, 1]
 ```
 
@@ -375,32 +381,35 @@ Or convert a string into a charlist with [String.to_charlist/1](https://hexdocs.
 String.to_charlist("hello")
 ```
 
-Like bitstrings, you will likely not need to use charlists frequently, however they can be useful
-for certain string manipulation or when working with certain libraries.
+Like bitstrings, you will likely not need to use charlists frequently, however they can be useful for certain string manipulation or when working with certain libraries.
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Create a `Cypher` which will shift all of the values in the alphabet by one letter.
-You will only need to handle lowercase values.
-
-For example,
-
-<!-- livebook:{"force_markdown":true} -->
+If we want to inspect a list that contains codepoints, we can use [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) with the `charlists: :as_lists` option.
 
 ```elixir
-Cypher.shift("abcdefghijklmnopqrstuvwxyz")
-"bcdefghijklmnopqrstuvwxyza"
+IO.inspect([65, 66, 67])
 ```
 
 ```elixir
-defmodule Cypher do
-  def shift(string) do
-  end
-end
+IO.inspect([65, 66, 67], charlists: :as_lists)
+```
 
-Utils.feedback(:cypher, Cypher)
+### Your Turn
+
+Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect it to see the codepoints for each letter.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+"abcdefghijklmnopqrstuvwxyz"
+|> String.to_charlist()
+|> IO.inspect(charlists: :as_lists)
+```
+
+</details>
+
+```elixir
+
 ```
 
 ## Commit Your Progress
@@ -414,6 +423,6 @@ $ git commit -m "finish bitstrings section"
 
 ## Up Next
 
-| Previous                                                   | Next                             |
-| ---------------------------------------------------------- | -------------------------------: |
-| [Metric Conversion](../exercises/metric_conversion.livemd) | [Regex](../reading/regex.livemd) |
+| Previous                                     | Next                             |
+| -------------------------------------------- | -------------------------------: |
+| [Rps Guards](../exercises/rps_guards.livemd) | [Regex](../reading/regex.livemd) |
