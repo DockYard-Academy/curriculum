@@ -1,4 +1,4 @@
-# Games Project
+# Games: Rock Paper Scissors
 
 ```elixir
 Mix.install([
@@ -14,17 +14,9 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Create A New Mix Project
+## Games: Rock Paper Scissors
 
-Using the command line, create a new project in the `projects` folder called `games`.
-
-```
-mix new games
-```
-
-## Create A Rock Paper Scissors Game
-
-You're going to create a rock paper scissors game where players will play against an AI which randomly chooses
+In your existing [Games](./games_setup.livemd) project, you're going to create a rock paper scissors game where players will play against an AI which randomly chooses
 rock, paper, or scissors.
 
 You should be able to start your project by running the following from the `game` folder in
@@ -34,40 +26,33 @@ the command line.
 iex -S mix
 ```
 
-Then you can play the game in a `Games.RockPaperScissors` module.
-Each time the player plays the game, it should generate a random choice for the opponent, and
-display a custom message of your choosing to let the player know they won or lost.
+Then you can start the rock paper scissors game with a `Games.RockPaperScissors` module.
+The game should prompt the user for a choice of `"rock"`, `"paper"`, or `"scissors"`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# randomly generated :scissors for the opponent
-iex> Games.RockPaperScissors.play(:rock)
-"You win! :rock beats :scissors."
+iex> Games.RockPaperScissors.start()
+(rock/paper/scissors): scissors
+```
 
-# randomly generated :paper for the opponent
-iex> Games.RockPaperScissors.play(:rock)
-"You lose! :paper beats :rock."
+The game should generate a random AI choice of `"rock"` , `"paper"`, or `"scissors"`, then prompt the user with feedback if they win, lose, or draw.
 
-# randomly generated :rock for the opponent
-iex> Games.RockPaperScissors.play(:rock)
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# randomly generated paper for the opponent
+(rock/paper/scissors): scissors
+"You win! scissors beats paper."
+
+# randomly generated scissors for the opponent
+(rock/paper/scissors): paper
+"You lose! scissors beats paper."
+
+# randomly generated rock for the opponent
+(rock/paper/scissors): rock
 "It's a tie!"
 ```
-
-## (Bonus) Save Score
-
-Ever time you play, you should save a running total of your wins, loses, and draws.
-You should be able to retrieve the current tally like so:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Game.RockPaperScissors.score()
-%{wins: 1, loses: 1, draws: 0}
-```
-
-You may choose to persist the score between sessions (using the file system),
-or keep a running tally in memory (using a process).
 
 ## Commit Your Progress
 
@@ -80,6 +65,6 @@ $ git commit -m "finish games rock paper scissors exercise"
 
 ## Up Next
 
-| Previous                                       | Next                               |
-| ---------------------------------------------- | ---------------------------------: |
-| [Journal Cli](../exercises/journal_cli.livemd) | [Exunit](../reading/exunit.livemd) |
+| Previous                                                       | Next                               |
+| -------------------------------------------------------------- | ---------------------------------: |
+| [Games Guessing Game](../exercises/games_guessing_game.livemd) | [Exunit](../reading/exunit.livemd) |
