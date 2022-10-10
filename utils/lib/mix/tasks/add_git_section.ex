@@ -23,13 +23,13 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     reading_files =
       Path.wildcard(base_path <> "/reading/*.livemd")
       |> Enum.filter(fn path ->
-        Path.basename(path) not in @ignore_reading_files && !commit_snippet_present?(path)
+        Path.basename(path) not in @ignore_reading_files && !deprecated_file?(path)
       end)
 
     exercise_files =
       Path.wildcard(base_path <> "/exercises/*.livemd")
       |> Enum.filter(fn path ->
-        Path.basename(path) not in @ignore_exercise_files && !commit_snippet_present?(path)
+        Path.basename(path) not in @ignore_exercise_files && !deprecated_file?(path)
       end)
 
     %{reading: reading_files, exercise: exercise_files}
@@ -49,13 +49,22 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     """
   end
 
-  defp commit_snippet_present?(path) do
-    File.read!(path) |> String.contains?("## Commit Your Progress")
+  defp deprecated_file?(path) do
+    String.contains?(path, "DEPRECATED")
   end
 
   defp add_git_section_to_file(path, commit_message) do
-    file = File.open!(path, [:append])
-    IO.binwrite(file, commit_snippet(commit_message))
+    file = File.read!(path)
+
+    if String.contains?(file, "## Commit Your") do
+      new_file =
+        Regex.replace(~r/\n\#\# Commit Your(.|\n)+/, file, commit_snippet(commit_message))
+
+      File.write(path, new_file)
+    else
+      File.write!(path, commit_snippet(commit_message), [:append])
+    end
+
     File.close(file)
   end
 
