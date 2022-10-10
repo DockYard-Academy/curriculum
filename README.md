@@ -196,8 +196,8 @@ Reduce
 Dates and Time
 Pattern Matching
 Guards
-4. String Manipulation
-5. Protocols, and Behaviors.
+String Manipulation
+Protocols
 
 ## Week 3: Performance, Persistence, and Processes
 
