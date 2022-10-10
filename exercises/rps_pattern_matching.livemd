@@ -31,6 +31,8 @@ RockPaperScissors.play(:rock, :rock)
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
+Using `case`.
+
 ```elixir
 defmodule RockPaperScissorsPatternMatching do
   def play(guess1, guess2) do
@@ -44,6 +46,20 @@ defmodule RockPaperScissorsPatternMatching do
       {_same, _same} -> "draw!"
     end
   end
+end
+```
+
+Using multiple function clauses.
+
+```elixir
+defmodule RockPaperScissorsPatternMatching do
+  def play(:rock, :scissors), do: "rock beats scissors!"
+  def play(:paper, :rock), do: "paper beats rock!"
+  def play(:scissors, :paper), do: "scissors beats paper!"
+  def play(:rock, :paper), do: "paper beats rock!"
+  def play(:paper, :scissors), do: "scissors beats paper!"
+  def play(:scissors, :rock), do: "rock beats scissors!"
+  def play(_same, _same), do: "draw!"
 end
 ```
 
@@ -74,8 +90,8 @@ defmodule RockPaperScissorsPatternMatching do
     iex> RockPaperScissorsPatternMatching.play(:rock, :paper)
     "paper beats rock!"
 
-    iex> RockPaperScissorsPatternMatching.play(:paper, :rock)
-    "rock beats paper!"
+    iex> RockPaperScissorsPatternMatching.play(:paper, :scissors)
+    "scissors beats paper!"
 
     iex> RockPaperScissorsPatternMatching.play(:scissors, :rock)
     "rock beats scissors!"
@@ -87,79 +103,6 @@ defmodule RockPaperScissorsPatternMatching do
     "draw!"
 
     iex> RockPaperScissorsPatternMatching.play(:scissors, :scissors)
-    "draw!"
-  """
-  def play(guess1, guess2) do
-  end
-end
-```
-
-## Rock Paper Scissors Using Guards
-
-Now, implement the `RockPaperScissorsGuards` module which achieves the same behavior as the module above. This time, use guards for your solution.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
-
-```elixir
-defmodule RockPaperScissorsGuards do
-  defguard is_winner(guess1, guess2)
-           when {guess1, guess2} in [{:rock, :scissors}, {:paper, :rock}, {:scissors, :paper}]
-
-  def play(guess1, guess2) when is_winner(guess1, guess2) do
-    "#{guess1} beats #{guess2}!"
-  end
-
-  def play(guess1, guess2) when is_winner(guess2, guess1) do
-    "#{guess2} beats #{guess1}!"
-  end
-
-  def play(guess1, guess2) when guess1 == guess2 do
-    "draw!"
-  end
-end
-```
-
-</details>
-
-Implement `RockPaperScissorsGuards` as documented below.
-
-```elixir
-defmodule RockPaperScissorsGuards do
-  @moduledoc """
-  Documentation for `RockPaperScissorsGuards`
-  """
-
-  @doc """
-  Play rock paper scissors. Returns a string to describe who won the game.
-
-  ## Examples
-
-    iex> RockPaperScissorsGuards.play(:rock, :scissors)
-    "rock beats scissors!"
-
-    iex> RockPaperScissorsGuards.play(:paper, :rock)
-    "paper beats rock!"
-
-    iex> RockPaperScissorsGuards.play(:scissors, :paper)
-    "scissors beats paper!"
-
-    iex> RockPaperScissorsGuards.play(:rock, :paper)
-    "paper beats rock!"
-
-    iex> RockPaperScissorsGuards.play(:paper, :rock)
-    "rock beats paper!"
-
-    iex> RockPaperScissorsGuards.play(:scissors, :rock)
-    "rock beats scissors!"
-
-    iex> RockPaperScissorsGuards.play(:rock, :rock)
-    "draw!"
-
-    iex> RockPaperScissorsGuards.play(:paper, :paper)
-    "draw!"
-
-    iex> RockPaperScissorsGuards.play(:scissors, :scissors)
     "draw!"
   """
   def play(guess1, guess2) do
