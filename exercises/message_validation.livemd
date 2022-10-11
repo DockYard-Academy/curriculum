@@ -45,7 +45,7 @@ Make sure you define a message struct, and use guards to create a `Message.send/
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Message.send(%Message{body: "hello!})
+Message.send(%Message{body: "hello!"})
 
 ```
 
@@ -118,10 +118,13 @@ defmodule Message do
     iex> Message.send(%{})
     ** (FunctionClauseError) no function clause matching in Message.send/1
 
-    iex> Message.send(%{})
+    iex> Message.send({})
     ** (FunctionClauseError) no function clause matching in Message.send/1
 
     iex> Message.send(%Message{body: nil})
+    ** (FunctionClauseError) no function clause matching in Message.send/1
+        
+    iex> Message.send(%Message{body: {}})
     ** (FunctionClauseError) no function clause matching in Message.send/1
   """
   def send(message) do

@@ -34,34 +34,87 @@ You need to convert them into the format `123-123-1234`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-text = "
+text = """
 1231231234
 123 123 1234
 (123)-123-1234
 (123) 123 1234
 (123)123-1234
-"
+"""
 PhoneNumber.parse(text)
-"
+"""
 123-123-1234
 123-123-1234
 123-123-1234
 123-123-1234
 123-123-1234
-"
+"""
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
 
-Enter your answer below.
+Consider using regular expressions with digits and capture groups to replace
+phone number expressions in the string.
+
+You can replace expressions one at a time, rather than all at once.
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule PhoneNumber
+  def parse(string) do
+    replacement = "\\1-\\2-\\3"
+
+    string
+    |> String.replace(~r/(\d{3})(\d{3})(\d{4})/, replacement)
+    |> String.replace(~r/(\d{3}) (\d{3}) (\d{4})/, replacement)
+    |> String.replace(~r/\((\d{3})\)-(\d{3})-(\d{4})/, replacement)
+    |> String.replace(~r/\((\d{3})\) (\d{3}) (\d{4})/, replacement)
+    |> String.replace(~r/\((\d{3})\)(\d{3})-(\d{4})/, replacement)
+  end
+end
+```
+
+</details>
+
+Implement the `PhoneNumber` module as documented below.
 
 ```elixir
 defmodule PhoneNumber do
+  @moduledoc """
+  Documentation for `PhoneNumber`
+  """
+
+  @doc """
+  Parse phone numbers and convert them to XXX-XXX-XXXX format.
+
+  ## Examples
+
+    iex> PhoneNumber.parse("1231231234")
+    "123-123-1234"
+
+    iex> PhoneNumber.parse("123 123 1234")
+    "123-123-1234"
+
+    iex> PhoneNumber.parse("(123)-123-1234")
+    "123-123-1234"
+
+    iex> PhoneNumber.parse("(123) 123 1234")
+    "123-123-1234"
+
+    iex> PhoneNumber.parse("(123)123-1234")
+    "123-123-1234"
+
+    iex> PhoneNumber.parse("1231231234 4564564567")
+    "123-123-1234 456-456-4567"
+  """
   def parse(string) do
   end
 end
-
-Utils.feedback(:phone_number_parsing, PhoneNumber)
 ```
 
 ## Commit Your Progress
