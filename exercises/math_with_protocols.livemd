@@ -18,7 +18,7 @@ Mix.install([
 
 In this exercise, you're going to create a `Math` protocol that handles adding and subtracting different data types.
 
-Create a `Math` protocol implementation for **integers**, **strings**, and **lists**. You do not need to handle adding or subtracting different data types.
+Create a `Math` protocol implementation for **integers**, **strings**, and **lists**. You do not need to handling adding or subtracting different data types.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -96,62 +96,88 @@ Define implementations for the `Math` protocol as documented below.
 
 ```elixir
 defprotocol Math do
-  @doc """
-  Add two integers, lists, or strings.
-
-  ## Examples
-
-    iex> Math.add(2, 2)
-    4
-    iex> Math.add(4, 4)
-    8
-
-    Math.add([1, 2], [3, 4])
-    [1, 2, 3, 4]
-    Math.add([1, 2, 3], [4, 5, 6])
-    [1, 2, 3, 4, 5, 6]
-
-    iex> Math.add("abc", "def")
-    "abcdef"
-    iex> Math.add("123", "456")
-    "123456"
-
-    iex> Math.add(%{}, %{})
-    ** (Protocol.UndefinedError) protocol Math not implemented for %{} of type Map
-
-    iex> Math.add({}, {})
-    ** (Protocol.UndefinedError) protocol Math not implemented for {} of type Tuple
-  """
   def add(value1, value2)
-
-  @doc """
-  Subtract two integers, lists, or strings.
-
-  ## Examples
-    iex> Math.subtract(10, 2)
-    8
-    iex> Math.subtract(20, 2)
-    18
-
-    iex> Math.subtract([1, 2], [1])
-    [1]
-    iex> Math.subtract([1, 2, 3, 4], [1, 3])
-    [2, 4]
-
-    iex> Math.subtract("abcd", "abc")
-    "d"
-    iex> Math.subtract("cbad", "abc")
-    "d"
-    iex> Math.subtract("abc", "xyz")
-    "abc"
-    iex> Math.subtract("abc", "xyza")
-    "bc"
-
-    iex> Math.subtract(1.0, 2.0)
-    ** (Protocol.UndefinedError) protocol Math not implemented for 1.0 of type Float
-  """
-  def subtract(value1, value2)
 end
+
+@doc """
+Add two integers, lists, or strings.
+
+## Examples
+
+  iex> Math.add(2, 2)
+  4
+  iex> Math.add(4, 4)
+  8
+
+  Math.add([1, 2], [3, 4])
+  [1, 2, 3, 4]
+  Math.add([1, 2, 3], [4, 5, 6])
+  [1, 2, 3, 4, 5, 6]
+
+  iex> Math.add("abc", "def")
+  "abcdef"
+  iex> Math.add("123", "456")
+  "123456"
+
+  iex> Math.add(%{}, %{})
+  ** (Protocol.UndefinedError) protocol Math not implemented for %{} of type Map
+
+  iex> Math.add({}, {})
+  ** (Protocol.UndefinedError) protocol Math not implemented for {} of type Tuple
+"""
+
+defimpl Math, for: Integer do
+  def add(value1, value2) do
+    value1 + value2
+  end
+end
+
+# end
+
+@doc """
+Subtract two integers, lists, or strings.
+
+## Examples
+  iex> Math.subtract(10, 2)
+  8
+  iex> Math.subtract(20, 2)
+  18
+
+  iex> Math.subtract([1, 2], [1])
+  [1]
+  iex> Math.subtract([1, 2, 3, 4], [1, 3])
+  [2, 4]
+
+  iex> Math.subtract("abcd", "abc")
+  "d"
+  iex> Math.subtract("cbad", "abc")
+  "d"
+  iex> Math.subtract("abc", "xyz")
+  "abc"
+  iex> Math.subtract("abc", "xyza")
+  "bc"
+
+  iex> Math.subtract(1.0, 2.0)
+  ** (Protocol.UndefinedError) protocol Math not implemented for 1.0 of type Float
+"""
+
+# def subtract(value1, value2)
+
+Math.add(2, 2)
+```
+
+```elixir
+defprotocol Math do
+  def add(value1, value2)
+end
+
+defimpl Math, for: Integer do
+  def add(value1, value2) do
+    value1 + value2
+  end
+end
+
+Math.add(2, 2)
 ```
 
 ## Commit Your Progress
