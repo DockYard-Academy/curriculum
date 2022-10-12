@@ -1,0 +1,165 @@
+# Drill: Replace `nil`s in a List with Elements from a 2nd List
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Purpose
+
+This is a *drill* exercise:
+
+> *Drill* exercises are meant to provide practise of Elixir's
+> syntax and important language modules so developers can
+> type them out as fast as possible.
+> The problem should not be conceptually difficult to
+> facilitate this goal.
+> 
+> Developers need to commit both Elixir's syntax and core
+> modules/functions to (working) memory so that when writing
+> their code the developer is not slowed down having to
+> remember the syntax or which module function to use. This
+> is analogous to knowing how to spell and the grammer of
+> your (human) language.
+
+In this particular interation of this problem, the goal is
+to practise writing/using functions with pattern matching
+in the functions' heads.
+
+## Replace `nil`s in a List with Elements from a 2nd List
+
+Now that you know how to iterate over a list, your assignment
+is to write a function which takes a list of numbers and
+returns a list of the same numbers.
+
+That seems pretty boring so, lets say that there may be
+`nil`s in the input list. When there is a `nil` in the
+input list your function should use an element from a
+2nd input list instead of the `nil` value from the
+main/first input list.
+
+This means your function takes 2 input lists and returns
+a list:
+
+```elixir
+@spec replace([any()], [any()]) :: [any()]
+```
+
+Data View:
+
+```text
+Input 1 list:   [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
+Input 2 list:   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Expected list:  [1, 2, 3, :d, :e, 6, 7, :h, 9, 10]
+```
+
+You can assume the lists are of the same length.
+
+## Your Turn
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    nil
+  end
+end
+```
+
+#### Testcases
+
+```text
+Testcase 1:
+  Input1:   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Expected: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 2:
+  Input1:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Input2:   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  Expected: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 3:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 4:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 5:
+  [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+```
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 1</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace([i1|input1], [i2|input2]) do
+    if input1 == [] do
+      if i1 == nil, do: [i2], else: [i1]
+    else
+      [if i1 == nil, do: [i2], else: [i1]] ++ replace(input1, input2)
+    end
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 2</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace([a|as], [b|bs]) do
+    case as do
+      [] -> [a || b]
+      _  -> [a || b] ++ replace(as, bs)
+    end
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 3</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(as, bs, acc \\ [])
+
+  def replace([], [], acc), do: Enum.reverse(acc)
+  def replace([nil|as], [b|bs], acc), do: replace(as, bs, [b|acc])
+  def replace([a|as], [_b|bs], acc), do: replace(as, bs, [a|acc])
+end
+```
+
+</details>
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish saferange exercise"
+```
+
+## Up Next
+
+| Previous                                 | Next                           |
+| ---------------------------------------- | -----------------------------: |
+| [PREVIOUS](../exercises/PREVIOUS.livemd) | [NEXT](../reading/NEXT.livemd) |
