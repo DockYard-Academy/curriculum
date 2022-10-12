@@ -51,7 +51,35 @@ defmodule Mix.Tasks.Bc.AddNavigation do
     [name, _extension] = String.split(file_name, ".")
 
     String.split(name, "_")
-    |> Enum.map(&String.capitalize/1)
+    |> Enum.map(&capitalize/1)
     |> Enum.join(" ")
+  end
+
+  @custom_capitalizations %{
+    "api" => "API",
+    "apis" => "APIs",
+    "cli" => "CLI",
+    "css" => "CSS",
+    "datetime" => "DateTime",
+    "ets" => "ETS",
+    "exunit" => "ExUnit",
+    "fizzbuzz" => "FizzBuzz",
+    "genserver" => "GenServer",
+    "genservers" => "GenServers",
+    "html" => "HTML",
+    "iex" => "IEx",
+    "io" => "IO",
+    "liveview" => "LiveView",
+    "mapset" => "MapSet",
+    "mapsets" => "MapSets",
+    "rdbms" => "RDBMS",
+    "rpg" => "RPG",
+    "rps" => "RPS",
+    "saferange" => "SafeRange"
+  }
+
+  defp capitalize(word) do
+    @custom_capitalizations
+    |> Map.get(String.downcase(word), String.capitalize(word))
   end
 end

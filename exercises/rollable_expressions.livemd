@@ -121,16 +121,16 @@ defmodule Rollable do
     "[1d4](https://www.google.com/search?q=roll+1d4)"
 
     iex> Rollable.replace("1d6")
-    "[1d4](https://www.google.com/search?q=roll+1d6)"
+    "[1d6](https://www.google.com/search?q=roll+1d6)"
 
     iex> Rollable.replace("1d8")
-    "[1d4](https://www.google.com/search?q=roll+1d8)"
+    "[1d8](https://www.google.com/search?q=roll+1d8)"
 
     iex> Rollable.replace("1d12")
-    "[1d4](https://www.google.com/search?q=roll+1d12)"
+    "[1d12](https://www.google.com/search?q=roll+1d12)"
 
     iex> Rollable.replace("1d20")
-    "[1d4](https://www.google.com/search?q=roll+1d20)"
+    "[1d20](https://www.google.com/search?q=roll+1d20)"
 
     iex> Rollable.replace("8d6")
     "[8d6](https://www.google.com/search?q=roll+8d6)"
@@ -142,26 +142,11 @@ defmodule Rollable do
     "Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
   """
   def replace(string) do
-    Regex.replace(~r/(\d+)d(\d+)/, string, fn full, dice, sides ->
-      "[#{full}](https://www.google.com/search?q=roll+#{dice}d#{sides})"
-    end)
   end
 
   def roll(string) do
-    Regex.replace(~r/(\d+)d(\d)+/, string, fn full, dice, sides ->
-      dice_integer = String.to_integer(dice)
-      sides_integer = String.to_integer(sides)
-
-      value =
-        1..dice_integer
-        |> Enum.map(fn _ -> Enum.random(1..sides_integer) end)
-        |> Enum.sum()
-        |> Integer.to_string()
-    end)
   end
 end
-
-Rollable.roll("10d6")
 ```
 
 ## Commit Your Progress
