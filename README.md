@@ -194,7 +194,7 @@ Enumeration 2
 Built-in Modules
 Reduce
 Dates and Time
-Pattern Matching
+Advanced Pattern Matching
 Guards
 String Manipulation
 Protocols
