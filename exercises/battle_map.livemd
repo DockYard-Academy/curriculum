@@ -81,10 +81,10 @@ true
 
 ![](images/wizard_attack.png)
 
-Enter your solution between the comments below. You may consider making `Character` a protocol or a module.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-# Enter your solution below
 defprotocol Character do
   def can_attack?(character, origin, target)
 end
@@ -94,7 +94,7 @@ defimpl Character, for: Wizard do
     x_diff = init_x - x
     y_diff = init_y - y
 
-    init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
+    abs(x_diff) == abs(y_diff)
   end
 end
 
@@ -106,9 +106,69 @@ defimpl Character, for: Barbarian do
     abs(x_diff) <= 2 && abs(y_diff) <= 2
   end
 end
+```
 
-# Enter your solution above
-Utils.feedback(:battle_map, [Character, Barbarian, Wizard])
+</details>
+
+Create implementations for the `Character` protocol as documented below.
+
+```elixir
+defprotocol Character do
+  @doc """
+
+  Determine if a character type can attack based on it's
+  current position and target position on a grid.
+  ## Examples
+
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {6, 6})
+    true
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {2, 2})
+    true
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {2, 6})
+    true
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {6, 2})
+    true
+
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {1, 1})
+    false
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {7, 7})
+    false
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {7, 1})
+    false
+    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {1, 7})
+    false
+
+    iex> Character.can_attack?(%Barbarian{}, {3, 3}, {5, 5})
+    true
+    iex> Character.can_attack?(%Barbarian{}, {3, 3}, {6, 6})
+    false
+
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {7, 7})
+    true
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {1, 1})
+    true
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {1, 7})
+    true
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {7, 1})
+    true
+
+    iex> Character.can_attack?(%Wizard{}, {3, 3}, {4, 4})
+    true
+    iex> Character.can_attack?(%Wizard{}, {3, 3}, {4, 2})
+    true
+
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {5, 4})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 5})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {3, 4})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 3})
+    false
+
+  """
+  def can_attack?(character, origin, target)
+end
 ```
 
 ## Custom Character (BONUS)
@@ -127,7 +187,11 @@ Character.can_attack?(%Archer{}, {4, 4}, {7, 7})
 true
 ```
 
-Modify the existing solution above to add your custom character.
+Implement your custom character below.
+
+```elixir
+
+```
 
 ## Commit Your Progress
 
@@ -140,6 +204,6 @@ $ git commit -m "finish battle map exercise"
 
 ## Up Next
 
-| Previous                                     | Next                                                       |
-| -------------------------------------------- | ---------------------------------------------------------: |
-| [Classified](../exercises/classified.livemd) | [Pokemon Protocols](../exercises/pokemon_protocols.livemd) |
+| Previous                                                       | Next                                 |
+| -------------------------------------------------------------- | -----------------------------------: |
+| [Consumable Protocol](../exercises/consumable_protocol.livemd) | [Scripts](../reading/scripts.livemd) |
