@@ -212,48 +212,46 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Files and Data Validation
 * Processes
 * Agent, Task, and ETS
-## Week 5: Web Servers and Phoenix
+## Web Servers and Phoenix
 * HTML & CSS
 * APIs & Parsing JSON
-* Relational Database Management Systems and Ecto
 * Phoenix
+## Databases With Ecto
+* Relational Database Management Systems and Ecto
 * Phoenix and Ecto
 * Phoenix Authentication
-## Week 6: Ecto Associations
 * Testing Phoenix
 * Phoenix and Ecto One-to-Many Relationships
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
 * Tailwind
-## Week 7: LiveView
+## LiveView
 * UX/UI Design + Accessibility
 * Phoenix LiveView
 * Phoenix Forms
 * PubSub & Channels
 * GraphQL & Absinthe (+ Testing Patterns)
-## Week 8: Quality Assurance
+## Quality Assurance
 * TDD Techniques (Red Green Refactor)
 * Metrics, Telemetry, Live Dashboard
 * Factories & Mocks
 * Property Based Testing (Stream Data) + E2E Testing (Wallaby)
 * CI/CD, Code Coverage, GitHub Actions & Hooks
-## Week 9 (Group Project)
+## Architecture
 * Software & Product Management (Agile, StandUps, Kanban)
 * Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
 * Advanced Livebook (Graphs, Tables, Connecting Projects)
 * Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
 * Group Project Start
-## Week 10
-* Group Project Presentation
+* Designing Elixir Systems With OTP
+## External Libraries
 * Emailing & Swoosh
 * Oban
-* Designing Elixir Systems
 * Advanced Livebook
-## Week 11: Elixir Applications in Production
+## Elixir Applications in Production
 * Umbrella Projects
 * Genserver Bottlenecks
 * Worker Pools
-* Nodes & Clustering
 * Deployment
-## Week 12: (Final Project)
+## (Final Project)
 <!-- course-outline-end -->
