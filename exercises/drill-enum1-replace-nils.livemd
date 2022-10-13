@@ -31,50 +31,23 @@ This is a *drill* exercise:
 > is analogous to knowing how to spell and the grammar of
 > your (human) language.
 
-In this particular iteration of this problem, the goal is
-to practise writing/using functions from the `Enum` module;
-some important ones being:
+To develop familiarity with the Enum module, you will replace
+`nil` values in a list with values from a second list at the
+same index.
 
-* Iteration: `map`, `filter`, `reduce`, `zip`
-* Ordering: `reverse`, `sort`, `with_index`, `shuffle`
-* Grouping: `chunk*`, `take*`, `drop*`, `frequencies`, `group_by`
-* Conditionals: `member?`, `any?`, `all?`, `find*`
-
-The `Enum` module is probably the main Elixir module and
-you should definitely work to commit as much as possible
-to memory.
-
-## Replace `nil`s in a List with Elements from a 2nd List
-
-Now that you know how to iterate over a list, your assignment
-is to write a function which takes a list of numbers and
-returns a list of the same numbers.
-
-That seems pretty boring so, lets say that there may be
-`nil`s in the input list. When there is a `nil` in the
-input list your function should use an element from a
-2nd input list instead of the `nil` value from the
-main/first input list.
-
-This means your function takes 2 input lists and returns
-a list:
+For example:
 
 ```elixir
-@spec replace([any()], [any()]) :: [any()]
-```
+list1 = [0, nil, 2, 3, nil]
+list2 = [:a, :b, :c, :d, :e]
 
-Data View:
-
-```text
-Input 1 list:   [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
-Input 2 list:   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
-
-Expected list:  [1, 2, 3, :d, :e, 6, 7, :h, 9, 10]
+ReplaceNils.replace(list1, list2)
+[0, :b, 2, 3, :e]
 ```
 
 You can assume the lists are of the same length.
 
-## Your Turn
+Implement the `ReplaceNils` module as below:
 
 ```elixir
 defmodule ReplaceNils do
@@ -84,7 +57,7 @@ defmodule ReplaceNils do
 end
 ```
 
-#### Testcases
+Here are some additional test data to think about:
 
 ```text
 Testcase 1:
@@ -109,6 +82,8 @@ Testcase 5:
   [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
 ```
+
+Here are some example solutions:
 
 <details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
 <summary>Example Solution 1</summary>
