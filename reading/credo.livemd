@@ -1,0 +1,102 @@
+# Credo
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Credo
+
+Credo is another static analysis tool which focuses on teaching and code consistency.
+It scans a project's code for anti-patterns and provides suggestions to improve it's quality and readability.
+
+### Your Turn
+
+Install Credo in your math project by adding it to your dependencies in `mix.exs`.
+You can find the latest Credo version on [hex.pm](https://hex.pm/packages/credo).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp deps do
+  [
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+  ]
+end
+```
+
+Ensure you install the new dependency.
+
+```
+$ mix deps.get
+```
+
+Then run the following command to see credo warnings.
+
+```
+$ mix credo
+...
+Analysis took 0.01 seconds (0.01s to load, 0.00s running 52 checks on 3 files)
+3 mods/funs, found no issues.
+```
+
+Credo provides code suggestions that help you write idiomatic Elixir.
+
+For example, Credo will warn you if you leave an [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) in your project as you probably don't want to leave calls to [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) in your codebase.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Previously you converted a `Math` module into a mix project in the [ExUnit with Mix](./exunit_with_mix.livemd) section.
+
+Add credo as a dependency to the project and leave an [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) call somewhere in your codebase.
+
+Run `mix credo` and you should see a warning similar to the following.
+
+```
+$ mix credo
+  Warnings - please take a look
+┃
+┃ [W] ↗ There should be no calls to IO.inspect/1.
+┃       lib/math.ex:20:5 #(Math.test)
+
+Please report incorrect results: https://github.com/rrrene/credo/issues
+
+Analysis took 0.09 seconds (0.05s to load, 0.04s running 52 checks on 3 files)
+4 mods/funs, found 1 warning.
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: Credo](https://hexdocs.pm/credo/overview.html)
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish credo section"
+```
+
+## Up Next
+
+| Previous                         | Next                                         |
+| -------------------------------- | -------------------------------------------: |
+| [Exdoc](../reading/exdoc.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |

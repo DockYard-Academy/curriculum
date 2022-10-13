@@ -9,51 +9,35 @@ defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
   @course_outline_path Path.join([@root_path, "start.livemd"])
   @outline_start_comment "<!-- course-outline-start -->"
   @outline_end_comment "<!-- course-outline-end -->"
-  @h2_regex ~r/^##\s/
-  @h3_regex ~r/^###\s/
-
-  def split_readme do
-    content =
-      @readme_path
-      |> File.read!()
-
-    beginning_content =
-      content
-      |> String.split(@outline_start_comment, trim: true)
-      |> List.first()
-
-    ending_content =
-      content
-      |> String.split(@outline_end_comment, trim: true)
-      |> List.last()
-
-    %{
-      beginning: beginning_content <> @outline_start_comment <> "\n",
-      ending: "\n" <> @outline_end_comment <> ending_content
-    }
-  end
-
-  def get_course_outline do
-    @course_outline_path
-    |> File.read!()
-    |> String.split("\n")
-    |> Enum.filter(fn line ->
-      (Regex.match?(@h2_regex, line) && String.contains?(String.downcase(line), "week")) ||
-        Regex.match?(@h3_regex, line)
-    end)
-    |> Enum.map_join("\n", fn line ->
-      if Regex.match?(@h2_regex, line) do
-        "\n" <> line <> "\n"
-      else
-        Regex.replace(@h3_regex, line, "")
-      end
-    end)
-  end
 
   def run(_args) do
-    %{beginning: beginning, ending: ending} = split_readme()
-    course_outline = get_course_outline()
-    updated_readme = beginning <> course_outline <> ending
-    File.write!(@readme_path, updated_readme)
+    course_outline = File.read!(@course_outline_path)
+    readme = File.read!(@readme_path)
+    [start, _outline, finish] = split_on_outline(readme)
+    simplified_outline = sections(course_outline)
+
+    File.write!(
+      @readme_path,
+      start <>
+        @outline_start_comment <> "\n" <> simplified_outline <> @outline_end_comment <> finish
+    )
+  end
+
+  @spec split_on_outline(String.t()) :: [String.t()]
+  def split_on_outline(content) do
+    String.split(content, ~r/(<!-- course-outline-start -->)|(<!-- course-outline-end -->)/,
+      trim: true
+    )
+  end
+
+  @spec sections(String.t()) :: String.t()
+  def sections(outline) do
+    Regex.scan(~r/(\#{2,3})(.+)/, outline)
+    |> Enum.reject(fn [full, _, _] -> full =~ "Overview" end)
+    |> Enum.map(fn
+      [full, "##", _heading] -> full <> "\n"
+      [_, "###", subheading] -> "*#{subheading}\n"
+    end)
+    |> Enum.join()
   end
 end

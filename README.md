@@ -181,93 +181,77 @@ They will also have the researching and problem-solving skills necessary to expa
 throughout their career. Students will be capable of delivering high-quality, well-tested features to a production complexity codebase.
 
 ## Curriculum Outline
-The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full weekly and daily breakdown.
+The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full breakdown.
 
 <!-- course-outline-start -->
-Course Tools
-Basics
-Data Structures and Intro to Pattern Matching
-Control Flow and Abstraction
-Modules and Structs
-Enumeration 1
-Enumeration 2
-Built-in Modules
-Reduce
-Dates and Time
-Advanced Pattern Matching
-Guards
-String Manipulation
-Protocols
-1. Elixir Build Tooling
-2. ExUnit & Testing
-3. Supervisor Basics and Fault Tolerance
-4. Relational Database Management Systems and Ecto
-5. Group Project
-
-## Week 3: Performance, Persistence, and Processes
-
-1. Recursion
-2. Performance Optimization
-3. Files and Data Validation
-4. Processes
-5. Agent, Task, and ETS
-
-## Week 5: Web Servers and Phoenix
-
-1. HTML & CSS
-2. APIs & Parsing JSON
-3. Phoenix
-4. Phoenix and Ecto
-5. Phoenix Authentication
-
-## Week 6: Ecto Associations
-
-1. Testing Phoenix
-2. Phoenix and Ecto One-to-Many Relationships
-3. Phoenix and Ecto Many-to-Many Relationships
-4. Phoenix and Ecto One-to-One Relationships
-5. Tailwind
-
-## Week 7: LiveView
-
-1. UX/UI Design + Accessibility
-2. Phoenix LiveView
-3. Phoenix Forms
-4. PubSub & Channels
-5. GraphQL & Absinthe (+ Testing Patterns)
-
-## Week 8: Quality Assurance
-
-1. TDD Techniques (Red Green Refactor)
-2. Metrics, Telemetry, Live Dashboard
-3. Factories & Mocks
-4. Property Based Testing (Stream Data) + E2E Testing (Wallaby)
-5. CI/CD, Code Coverage, GitHub Actions & Hooks
-
-## Week 9 (Group Project)
-
-1. Software & Product Management (Agile, StandUps, Kanban)
-2. Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
-3. Advanced Livebook (Graphs, Tables, Connecting Projects)
-4. Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
-5. Group Project Start
-
-## Week 10
-
-1. Group Project Presentation
-2. Emailing & Swoosh
-3. Oban
-3. Designing Elixir Systems
-4. Advanced Livebook
-
-## Week 11: Elixir Applications in Production
-
-1. Umbrella Projects
-2. Genserver Bottlenecks
-3. Worker Pools
-4. Nodes & Clustering
-5. Deployment
-
-## Week 12: (Final Project)
-
+## Core Syntax
+* Course Tools
+* Basics
+* Data Structures and Intro to Pattern Matching
+* Control Flow and Abstraction
+* Modules and Structs
+* Enumeration
+* Comprehensions and Non-Enumerable Data Types
+* Built-in Modules
+* Reduce
+* Dates and Time
+* Advanced Pattern Matching
+* Guards
+* String Manipulation
+## Mix Projects
+* Elixir Build Tooling
+* Testing With ExUnit
+* ExUnit With Mix Projects
+* Documentation and Static Analysis
+* Group Project
+## OTP and Advanced Syntax
+* Protocols
+* Supervisor Basics and Fault Tolerance
+* Recursion
+* Performance Optimization
+* Files and Data Validation
+* Processes
+* Agent, Task, and ETS
+## Web Servers and Phoenix
+* HTML & CSS
+* APIs & Parsing JSON
+* Phoenix
+## Databases With Ecto
+* Relational Database Management Systems and Ecto
+* Phoenix and Ecto
+* Phoenix Authentication
+* Testing Phoenix
+* Phoenix and Ecto One-to-Many Relationships
+* Phoenix and Ecto Many-to-Many Relationships
+* Phoenix and Ecto One-to-One Relationships
+* Tailwind
+## LiveView
+* UX/UI Design + Accessibility
+* Phoenix LiveView
+* Phoenix Forms
+* PubSub & Channels
+* GraphQL & Absinthe (+ Testing Patterns)
+## Quality Assurance
+* TDD Techniques (Red Green Refactor)
+* Metrics, Telemetry, Live Dashboard
+* Factories & Mocks
+* Property Based Testing (Stream Data) + E2E Testing (Wallaby)
+* CI/CD, Code Coverage, GitHub Actions & Hooks
+## Architecture
+* Software & Product Management (Agile, StandUps, Kanban)
+* Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
+* Advanced Livebook (Graphs, Tables, Connecting Projects)
+* Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
+* Group Project Start
+* Designing Elixir Systems With OTP
+## External Libraries
+* Emailing & Swoosh
+* Oban
+* Advanced Livebook
+## Elixir Applications in Production
+* Umbrella Projects
+* Genserver Bottlenecks
+* Worker Pools
+* Deployment
+## (Final Project)
 <!-- course-outline-end -->

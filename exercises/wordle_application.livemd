@@ -14,83 +14,64 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Create A New Mix Project
-
-Using the command line, create a new project in the `projects` folder called `wordle`.
-
-```
-mix new wordle
-```
-
 ## Wordle
 
-In this exercise, you will build a Wordle application. Wordle is a game where users guess a five letter word.
-They have 6 guesses and are provided hints based on their previous guesses.
+In your existing [Games](./games_setup.livemd) project, you're going to create a Wordle game.
 
-If a letter is in the correct position in the guess, it will highlight green.
+Wordle is a popular game where players get six attempts to guess a word.
+They are given feedback clues to guess the word.
 
-If a letter is in the word, but in the incorrect position, it will highlight yellow.
+* **Green** if the letter is in the word and in the correct spot.
+* **Yellow** if the letter is in the word but in the incorrect spot.
+* **Gray** if the letter is not in the word.
 
-You should be able to start the application using `iex -S mix`
+For example for the word "TOAST" the guess "TARTS" would be
+
+```mermaid
+flowchart LR
+style 1 fill:green
+style 2 fill:gray
+style 3 fill:gray
+style 4 fill:yellow
+style 5 fill:yellow
+
+1[T] --- 2[A] --- 3[R] --- 4[T] --- 5[S]
+```
+
+You should be able to start your project by running the following from the `game` folder in
+the command line.
 
 ```
 iex -S mix
 ```
 
-Then start playing a Wordle game with `Wordle.play()`.
+Given an answer and a guess, your `Games.Wordle` module will provide feedback as a list of color atoms `:green`, `:yellow`, and `:grey`.
 
-the Wordle game will randomly generate a word and store the state of the player's game.
-Likely, you will rely on a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
+<!-- livebook:{"force_markdown":true} -->
 
-```
-iex> game = Wordle.play()
-```
+```elixir
+                    #answer   #guess
+iex> Games.World.feedback("aaaaaa", "aaaaaa")
+[:green, :green, :green, :green, :green, :green]
 
-The player can type in their guess. it should be a five letter string such as `hello`.
+iex> Games.World.feedback("aaaaaa", "aaaaab")
+[:green, :green, :green, :green, :green, :grey]
 
-The game should then give them feedback on their answer. `G` will mean green, so the letter
-is in the correct spot, and `Y` will mean yellow, so the letter is in the word but in the wrong spot.
-Incorrect letters will be marked with an underscore `_`.
+iex> Games.World.feedback("abcdef", "fedcba")
+[:yellow, :yellow, :yellow, :yellow, :yellow, :yellow]
 
-```
-iex> Wordle.guess(game, "hello")
-H E L L 0
-_ _ _ G Y
-```
+# If there are duplicate characters in the guess prioritize exact matches.
+iex> Games.World.feedback("abcdef", "axxxxa")
+[:green, :grey, :grey, :grey, :grey, :grey]
 
-When the player enters the correct guess, end the game.
-
-```
-iex> Wordle.guess(game, "world")
-W O R L D
-G G G G G
-
-iex> Process.alive?(game)
-false
-
-iex> Wordle.guess(game, "")
-{:error, :game_not_found}
+# If there are duplicate characters, the first in the guess should provide `:yellow` feedback if applicable
+iex> Games.World.feedback("abcdef", "xxxxaa")
+[:grey, :grey, :grey, :grey, :yellow, :grey]
+iex> Games.World.feedback("aacdef", "xxxaaa")
+[:grey, :grey, :grey, :yellow, :yellow, :grey]
 ```
 
-If a player guesses more than 6 times, the game should end with them losing.
-
-## Test Cases
-
-Cover the following test cases and ensure your code passes the tests.
-
-* A player guesses the correct word
-* A player guesses a completely incorrect word
-* A player guesses a partially correct word
-* A player guesses 6 times and loses
-
-## (BONUS) Edge Cases
-
-Wordle has a number of edge cases with words that will make providing feedback more difficult.
-Add the following additional test cases and ensure you code passes.
-
-* A player guesses a word with similar letters and one is in the correct position (i.e "HELLO" vs "WORLD")
-* A player guesses a word with similar letters and both are not in the correct position (i.e "HELLO" vs "LEGAL")
-* A player guesses a word with similar letters and only one should be yellow  (i.e "HELLO" vs "GLOBE")
+Test and implement a `Games.World` module in your [Games](./games_setup.livemd) project.
 
 ## Commit Your Progress
 
@@ -103,6 +84,6 @@ $ git commit -m "finish wordle application exercise"
 
 ## Up Next
 
-| Previous                                               | Next                                         |
-| ------------------------------------------------------ | -------------------------------------------: |
-| [Product Filters](../exercises/product_filters.livemd) | [Supervisors](../reading/supervisors.livemd) |
+| Previous                                             | Next                                   |
+| ---------------------------------------------------- | -------------------------------------: |
+| [ExUnit With Mix](../reading/exunit_with_mix.livemd) | [Doctests](../reading/doctests.livemd) |

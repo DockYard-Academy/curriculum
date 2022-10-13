@@ -76,6 +76,70 @@ end
 Implement the `CaesarCypher` module as documented.
 
 ```elixir
+# list -> list (same length)
+
+# Brute Force
+
+key = 2
+
+String.split("abcdefghijklmnopqrstuvwxyz", "", trim: true)
+|> Enum.map(fn char ->
+  nil
+end)
+
+## Five Ideas
+### Treat the Characters As Integers.
+### Use the Alphabet As An Index
+["a", "b", "c"]
+0
+1
+# new char
+"b"
+
+"c"
+2
+3
+nil
+
+list_of_chars = "abc" |> String.split("", trim: true)
+
+"abc"
+|> String.split("", trim: true)
+|> Enum.map(fn char ->
+  incremented_index =
+    Enum.find_index(list_of_chars, fn alphabet_char ->
+      char == alphabet_char
+    end) + 1
+
+  # circle back
+  if incremented_index == length(list_of_chars) do
+    IO.inspect(char)
+  else
+    Enum.at(list_of_chars, incremented_index)
+  end
+end)
+```
+
+```elixir
+
+```
+
+```elixir
+?x
+```
+
+```elixir
+# list of numbers
+[97, 98, 99]
+# list of char codes
+[97, 98, 99]
+```
+
+```elixir
+[97, 98, 99, 126]
+```
+
+```elixir
 defmodule CaesarCypher do
   @moduledoc """
   Documentation for `CaesarCypher`
@@ -90,7 +154,9 @@ defmodule CaesarCypher do
     iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz")
     "bcdefghijklmnopqrstuvwyxza"
   """
+  @spec encode(String.t()) :: String.t()
   def encode(string) do
+    2
   end
 
   @doc """

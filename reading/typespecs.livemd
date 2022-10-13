@@ -1,0 +1,209 @@
+# Typespecs
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Typespecs
+
+Elixir comes with a notation for declaring types and specifications.
+
+We can use the `@spec` module attribute to define the signature of a function.
+
+For example, we could add a `@spec` for the `math` module's `add/2` function.
+
+`@spec` defines the function name, then the types for each argument, then the return value type separated
+by the `::` symbol.
+
+```elixir
+defmodule Number do
+  @spec double(integer()) :: integer()
+  def double(number) do
+    number * 2
+  end
+end
+```
+
+### Basic Types
+
+`number()` is a built-in type. Here are a few other common types you may find useful.
+
+```
+any()
+atom()
+map()
+tuple()
+list()
+list(type) # a list where the elements are particular type
+float()
+integer()
+number() # both integers and floats
+String.t() # the string type
+```
+
+For a full list of built in types you can see the [Basic Types](https://hexdocs.pm/elixir/typespecs.html#basic-types)
+section of the Elixir Typespecs documentation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the `Math` module below, create an `@spec` for integers with the `add/2` function.
+
+```elixir
+defmodule Math do
+  def add(integer1, integer2) do
+    integer1 + integer2
+  end
+end
+```
+
+### Combing Types
+
+The `|` symbol allows us to combine multiple types. For example we can combine `integer()` and `float()` in our `Number` module
+
+```elixir
+defmodule Number do
+  @spec double(integer() | float()) :: integer() | float()
+  def double(number) do
+    number * 2
+  end
+end
+```
+
+### Custom Types
+
+We can use `@type` to define custom types. We give our custom type a name then define it's value after the `::` symbol.
+
+```elixir
+defmodule Number do
+  @type my_number() :: integer() | float()
+
+  @spec double(my_number()) :: my_number()
+  def double(number) do
+    number * 2
+  end
+end
+```
+
+We can use types defined in modules outside of that module. This way we don't have to repeatedly define the same types over and over.
+
+```elixir
+defmodule Math do
+  @spec add(Number.my_number(), Number.my_number()) :: Number.my_number()
+  def add(number, number) do
+    number + number
+  end
+end
+```
+
+We've defined a custom `my_number()` type for the sake of example. However, in the real-world we should use the built-in `number()` type instead.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the `Math` module below, define a custom `@type` `input()` that can be a list, integer, or string.
+
+```elixir
+defmodule Math do
+end
+```
+
+## Dialyzer
+
+Dialyzer is a static analysis tool used to provide warnings about your code, such as mismatched types,
+unreachable code, and other common issues.
+
+To use Dialyzer, we install [Dialyxir](https://github.com/jeremyjh/dialyxir), which provides conveniences for working with Dialyzer in an Elixir project.
+
+We can add `:dialyxir` as a dependency in the `mix.exs` file in any mix project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ defp deps do
+    [
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+    ]
+  end
+```
+
+We can then run Dialyzer by running the following in the command line.
+
+```
+$ mix dialyzer
+...
+Total errors: 0, Skipped: 0, Unnecessary Skips: 0
+done in 0m0.82s
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Previously you converted a `Math` module into a mix project in the [ExUnit with Mix](./exunit_with_mix.livemd) section.
+
+Add dialyxir as a dependency to your mix.exs file in the math project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp deps do
+  [
+    {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+  ]
+end
+```
+
+Add typespecs for `Math.add/2` and `Math.subtract/2` for lists, strings, and integers.
+Once complete, if you include a failing example in your `Math` module like so, you should see a warning in the Visual Studio Code editor.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Math do
+  @moduledoc """
+  Documentation for `Math`.
+  """
+
+  def fail_example do
+    Math.add(%{}, %{})
+  end
+end
+```
+
+Run dialyzer and you should see some errors because the typespec catches that `%{}` is an invalid input.
+
+```
+$ mix dialyzer
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish typespecs section"
+```
+
+## Up Next
+
+| Previous                               | Next                             |
+| -------------------------------------- | -------------------------------: |
+| [Doctests](../reading/doctests.livemd) | [Exdoc](../reading/exdoc.livemd) |

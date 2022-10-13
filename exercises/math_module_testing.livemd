@@ -1,0 +1,125 @@
+# Math Module Testing
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Math Module Testing
+
+Generally, we can split up our test suite into test cases. Each test case may require many assertions.
+
+For this exercises, we're going to test a `Math` module that abstracts the operators for adding different data types together, like so.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Math.add(4, 4) # 
+Math.add("a", "b") # "ab"
+Math.add([1], [2]) # [1, 2]
+```
+
+Our **Happy-path** test cases (where our code is used as expected) could be the following.
+
+`Math.add/2`
+
+* add two integers
+* add two strings
+* add two lists
+
+`Math.subtract/1`
+
+* subtract two integers
+* subtract two strings
+* subtract two lists
+
+We also want to consider **edge-case** test cases, also called **sad-path** or **unhappy path** when things go wrong, or the code is misused. For example, we might consider the following cases.
+
+`Math.add/2`
+
+* add a valid data type (integer, string, list) and an invalid data type.
+* add two invalid data types.
+* add two empty lists.
+* add two empty strings.
+* add a string by an empty string.
+* add a list by an empty list.
+
+`Math.subtract/2`
+
+* subtract a valid data type (integer, string, list) and an invalid data type.
+* subtract two invalid data types.
+* subtract two empty lists.
+* subtract two empty strings.
+* subtract a string by an empty string.
+* subtract a list by an empty list.
+
+There can be a deceptive number of edge cases to consider. For example, we could build a growing list of edge-case permutations for each data type we want the `Math` module to handle.
+
+Here, we've colored happy path tests green and edge-case tests yellow.
+
+![](images/test%20cases.png)
+
+By planning test cases, we can anticipate possible edge cases and ensure we understand the desired behavior of the feature.
+
+Test and implement a `Math` module. Include at least two assertions for the happy path cases (**strings**, **lists**, and **integers**.)
+
+```elixir
+defmodule Math do
+end
+```
+
+### Bonus: Edge Cases
+
+Decide how to handle calling the `Math.add/2` and `Math.subtract/2` functions with invalid data.
+For example, you might raise a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html) using guards.
+
+Note that if you expect to raise an error, it's usually idiomatic to name our functions using a bang `!` symbol, so `Math.add/2` and `Math.subtract/2` should be renamed to `Math.add!/2` and `Math.subtract!/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Math.add!(1, 1)
+2
+
+Math.add!(%{}, %{})
+** (FunctionClauseError) no function clause matching in Math.add/2  
+```
+
+Alternatively or in addition, you might choose to change the return value to an `{:ok, value}` tuple or `{:error, error}` tuple.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Math.add(%{}, %{})
+{:error, :invalid_data}
+```
+
+Test and implement these edge cases on your `Math` module above.
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish math module testing exercise"
+```
+
+## Up Next
+
+| Previous                           | Next                                                   |
+| ---------------------------------- | -----------------------------------------------------: |
+| [ExUnit](../reading/exunit.livemd) | [Product Filters](../exercises/product_filters.livemd) |

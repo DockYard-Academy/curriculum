@@ -16,8 +16,10 @@ Mix.install([
 
 ## Product Filters
 
+You're going to build an application where users search for products based on certain filters.
+
 We have an application where users search for products based on certain filters.
-Products have a `:name`, `:category`, and `:price` (in cents).
+Each product is a map with a `:name`, `:category`, and `:price` (in cents).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -31,8 +33,15 @@ products = [
 ```
 
 Test and implement a `Products.filter/2` function which accepts a list of items
-and a filter. It should be able to filter by a partial case-insensitive name, by an exact category, and by
-an inclusive minimum and maximum price.
+and a keyword list of filters.
+
+You should be able to filter be:
+
+1. a partial case-insensitive `:name` field.
+2. a `:min` and `:max` price.
+3. an exact `:category` field as an atom.
+
+For example:
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -84,7 +93,7 @@ end
 
 ExUnit.start(auto_run: false)
 
-defmodule ProductTests do
+defmodule ProductsTest do
   use ExUnit.Case
 end
 
@@ -102,6 +111,6 @@ $ git commit -m "finish product filters exercise"
 
 ## Up Next
 
-| Previous                           | Next                                                         |
-| ---------------------------------- | -----------------------------------------------------------: |
-| [Stack](../exercises/stack.livemd) | [Wordle Application](../exercises/wordle_application.livemd) |
+| Previous                                                       | Next                                                 |
+| -------------------------------------------------------------- | ---------------------------------------------------: |
+| [Math Module Testing](../exercises/math_module_testing.livemd) | [ExUnit With Mix](../reading/exunit_with_mix.livemd) |
