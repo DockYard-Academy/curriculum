@@ -1026,11 +1026,11 @@ defmodule Utils.Solutions do
     defstruct []
   end
 
-  defprotocol BattleCharacter do
+  defprotocol Character do
     def can_attack?(character, origin, target)
   end
 
-  defimpl BattleCharacter, for: Wizard do
+  defimpl Character, for: Wizard do
     def can_attack?(_character, {init_x, init_y}, {x, y}) do
       x_diff = init_x - x
       y_diff = init_y - y
@@ -1039,7 +1039,7 @@ defmodule Utils.Solutions do
     end
   end
 
-  defimpl BattleCharacter, for: Barbarian do
+  defimpl Character, for: Barbarian do
     def can_attack?(_character, {init_x, init_y}, {x, y}) do
       x_diff = init_x - x
       y_diff = init_y - y
@@ -1048,5 +1048,5 @@ defmodule Utils.Solutions do
     end
   end
 
-  def battle_map, do: [BattleCharacter, Barbarian, Wizard]
+  def battle_map, do: [Character, Barbarian, Wizard]
 end
