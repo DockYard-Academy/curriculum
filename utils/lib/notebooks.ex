@@ -32,7 +32,7 @@ defmodule Utils.Notebooks do
 
   def exercises do
     fetch_livebooks("../exercises/")
-    |> Enum.reject(&Path.basename(&1) in exercises_exceptions())
+    |> Enum.reject(&(Path.basename(&1) in exercises_exceptions()))
   end
 
   def exercises_exceptions do
