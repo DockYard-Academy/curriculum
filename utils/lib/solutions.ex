@@ -1027,6 +1027,12 @@ defmodule Utils.Solutions do
   end
 
   defprotocol Character do
+    @moduledoc File.read!(Path.expand("../exercises/battle_map.livemd"))
+      |> String.split(~s(@doc """))
+      |> Enum.at(1)
+      |> String.split(~s("""))
+      |> Enum.at(1)
+
     def can_attack?(character, origin, target)
   end
 
