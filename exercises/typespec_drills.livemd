@@ -1,0 +1,249 @@
+# Typespec Drills
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Typespec Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Typespecs](../reading/typespecs.livemd) follow the instructions for each drill and complete them as quickly as you can.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Review
+
+You can define a function spec using the `@spec` module attribute. Each `@spec` includes the
+function parameter types, and the return value type.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@spec add(integer(), integer()) :: integer()
+def add(int1, int2) do
+  int1 + int2
+end
+```
+
+You can define custom types using the `@type` module attribute. These custom types can be used inside and outside of the current module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@type user :: %{
+  name: string(),
+  age: integer()
+}
+```
+
+You can include multiple types using the `|` operator. This works for functions using `@spec` and in custom types.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@spec double(integer() | nil)
+```
+
+## Function Specs
+
+Add function `@spec`s based on the function parameter names and return value.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule FunctionSpecs do
+  @spec do_nothing :: nil
+  def do_nothing do
+    nil
+  end
+
+  @spec accept_and_return_anything(any()) :: any()
+  def accept_and_return_anything(anything) do
+    anything
+  end
+
+  @spec double(float()) :: float()
+  def double(float) when is_float(float) do
+    float * 2.0
+  end
+
+  @spec double(integer()) :: integer()
+  def double(integer) when is_integer(integer) do
+    integer * 2
+  end
+
+  @spec double(number()) :: number()
+  def double(number) do
+    number * 2
+  end
+
+  @spec add(integer(), integer()) :: integer()
+  def add(integer1, integer2) do
+    integer1 + integer2
+  end
+
+  @spec multiply(integer(), integer()) :: integer()
+  def multiply(integer1, integer2) do
+    integer1 * integer2
+  end
+
+  @spec divide(integer(), integer()) :: float()
+  def divide(integer1, integer2) do
+    integer1 / integer2
+  end
+
+  @spec rounded_divide(integer(), integer()) :: integer()
+  def rounded_divide(integer1, integer2) do
+    div(integer1, integer2)
+  end
+
+  @spec concat(String.t(), String.t()) :: String.t()
+  def concat(string1, string2) do
+    string1 <> string2
+  end
+
+  @spec to_string(integer()) :: String.t()
+  def to_string(integer) do
+    Integer.to_string(integer)
+  end
+
+  @spec merge(map(), map()) :: map()
+  def merge(map1, map2) do
+    Map.merge(map1, map2)
+  end
+
+  @spec get_or_empty(Keyword.t(), atom()) :: any()
+  def get_or_empty(keyword_list, atom_key) do
+    Keyword.get(keyword_list, atom_key, "")
+  end
+
+  @spec one_to_two(1) :: 2
+  def one_to_two(1) do
+    2
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule FunctionSpecs do
+  def do_nothing do
+    nil
+  end
+
+  def accept_and_return_anything(anything) do
+    anything
+  end
+
+  def double(float) when is_float(float) do
+    float * 2.0
+  end
+
+  def double(integer) when is_integer(integer) do
+    integer * 2
+  end
+
+  def double(number) do
+    number * 2
+  end
+
+  def add(integer1, integer2) do
+    integer1 + integer2
+  end
+
+  def multiply(integer1, integer2) do
+    integer1 * integer2
+  end
+
+  def divide(integer1, integer2) do
+    integer1 / integer2
+  end
+
+  def rounded_divide(integer1, integer2) do
+    div(integer1, integer2)
+  end
+
+  def concat(string1, string2) do
+    string1 <> string2
+  end
+
+  def to_string(integer) do
+    Integer.to_string(integer)
+  end
+
+  def merge(map1, map2) do
+    Map.merge(map1, map2)
+  end
+
+  def get_or_empty(keyword_list, atom_key) do
+    Keyword.get(keyword_list, atom_key, "")
+  end
+
+  def one_to_two(1) do
+    2
+  end
+end
+```
+
+## Custom Types
+
+Implement the following custom `@type`s in the module below based on the comment describing them.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule CustomTypes do
+  # a string or number
+  @type unparsed_number :: string() | number()
+  # a list of strings
+  @type strings :: [string()]
+  # a map with :title (string) and :content (string) keys. 
+  @type book :: %{title: string(), content: string()}
+  # A map with :name (string) and `:books` (a list of books) keys.
+  @type author :: %{name: string(), books: [book()]}
+end
+```
+
+</details>
+
+```elixir
+defmodule CustomTypes do
+  # a string or number
+  @type unparsed_number
+  # a list of strings
+  @type strings
+  # a map with :title (string) and :content (string) keys. 
+  @type book
+  # A map with :name (string) and `:books` (a list of books) keys.
+  @type author
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish typespec drills exercise"
+```
+
+## Up Next
+
+| Previous                                                                                               | Next                                         |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------: |
+| [Games Documentation And Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |
