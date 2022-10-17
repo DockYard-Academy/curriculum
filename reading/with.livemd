@@ -251,10 +251,8 @@ Points.tally([10, 20])
 Points.tally(10)
 {:error, :invalid}
 
-
 Points.tally([1, 10])
 {:error, :invalid}
-
 
 Points.tally([10, 20, 30])
 {:error, :invalid}
@@ -266,12 +264,14 @@ Points.tally([10, 20, 30])
 ```elixir
 defmodule Points do
   def tally(scores) do
-    with [score1, score2] <- scores, true <- is_integer(score1), true <- is_integer(score2) do
-      score1 + score2
+    with [score1, score2] <- scores,
+        true <- is_integer(score1) and is_integer(score2),
+        true <- score1 >= 10 and score2 >= 10 do
+      {:ok, score1 + score2}
     else
       _ -> {:error, :invalid}
-    end
-  end
+    end 
+  end 
 end
 ```
 

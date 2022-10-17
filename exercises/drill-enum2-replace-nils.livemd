@@ -1,0 +1,149 @@
+# Drill: Replace `nil`s in A List With Elements From A 2nd List
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Purpose
+
+This is a *drill* exercise:
+
+> *Drill* exercises are meant to provide practise of Elixir's
+> syntax and important language modules so developers can
+> type them out as fast as possible.
+> The problem should not be conceptually difficult to
+> facilitate this goal.
+> 
+> Developers need to commit both Elixir's syntax and core
+> modules/functions to (working) memory so that when writing
+> their code the developer is not slowed down having to
+> remember the syntax or which module function to use. This
+> is analogous to knowing how to spell and the grammar of
+> your (human) language.
+
+To develop familiarity with comprehensions, you will replace
+`nil` values in a list with values from a second list at the
+same index.
+
+For example:
+
+```elixir
+list1 = [0, nil, 2, 3, nil]
+list2 = [:a, :b, :c, :d, :e]
+
+ReplaceNils.replace(list1, list2)
+[0, :b, 2, 3, :e]
+```
+
+You can assume the lists are of the same length.
+
+Implement the `ReplaceNils` module as below:
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    nil
+  end
+end
+```
+
+Here are some additional test data to think about:
+
+```text
+Testcase 1:
+  Input1:   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Expected: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 2:
+  Input1:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Input2:   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  Expected: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 3:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 4:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 5:
+  [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+```
+
+Here are some example solutions:
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 1</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    for index <- 0..length(input1)-1 do
+      if Enum.at(input1, index) == nil do
+        Enum.at(input2, index)
+      else
+        Enum.at(input1, index)
+      end
+    end
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 2</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    for {element, index} <- Enum.with_index(input1) do
+      element || Enum.at(input2, index)
+    end
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 3</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(as, bs) do
+    for {a, b} <- Enum.zip(as, bs) do
+      a || b
+    end
+  end
+end
+```
+</details>
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish saferange exercise"
+```
+
+## Up Next
+
+| Previous                                 | Next                           |
+| ---------------------------------------- | -----------------------------: |
+| [Book Search](../exercises/book_search.livemd) | [Built-In Modules](../reading/built-in_modules.livemd) |
