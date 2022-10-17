@@ -30,7 +30,7 @@ For example for the word "TOAST" the guess "TARTS" would be
 ```mermaid
 flowchart LR
 style 1 fill:green
-style 2 fill:gray
+style 2 fill:yellow
 style 3 fill:gray
 style 4 fill:yellow
 style 5 fill:yellow
@@ -50,25 +50,19 @@ Given an answer and a guess, your `Games.Wordle` module will provide feedback as
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-                    #answer   #guess
-iex> Games.Wordle.feedback("aaaaaa", "aaaaaa")
-[:green, :green, :green, :green, :green, :green]
+                         #answer   #guess
+iex> Games.World.feedback("aaaaa", "aaaaa")
+[:green, :green, :green, :green, :green]
 
-iex> Games.Wordle.feedback("aaaaaa", "aaaaab")
-[:green, :green, :green, :green, :green, :grey]
+iex> Games.World.feedback("aaaaa", "aaaab")
+[:green, :green, :green, :green, :grey]
 
-iex> Games.Wordle.feedback("abcdef", "fedcba")
-[:yellow, :yellow, :yellow, :yellow, :yellow, :yellow]
+iex> Games.World.feedback("abcde", "edcba")
+[:yellow, :yellow, :yellow, :yellow, :yellow]
 
 # If there are duplicate characters in the guess prioritize exact matches.
-iex> Games.Wordle.feedback("abcdef", "axxxxa")
-[:green, :grey, :grey, :grey, :grey, :grey]
-
-# If there are duplicate characters, the first in the guess should provide `:yellow` feedback if applicable
-iex> Games.Wordle.feedback("abcdef", "xxxxaa")
-[:grey, :grey, :grey, :grey, :yellow, :grey]
-iex> Games.Wordle.feedback("aacdef", "xxxaaa")
-[:grey, :grey, :grey, :yellow, :yellow, :grey]
+iex> Games.World.feedback("aaaxx", "xaaaa")
+[:grey, :green, :green, :yellow, :grey]
 ```
 
 Test and implement a `Games.Wordle` module in your [Games](./games_setup.livemd) project.
