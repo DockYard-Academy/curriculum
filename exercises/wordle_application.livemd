@@ -51,21 +51,46 @@ Given an answer and a guess, your `Games.Wordle` module will provide feedback as
 
 ```elixir
                          #answer   #guess
-iex> Games.World.feedback("aaaaa", "aaaaa")
+iex> Games.Wordle.feedback("aaaaa", "aaaaa")
 [:green, :green, :green, :green, :green]
 
-iex> Games.World.feedback("aaaaa", "aaaab")
+iex> Games.Wordle.feedback("aaaaa", "aaaab")
 [:green, :green, :green, :green, :grey]
 
-iex> Games.World.feedback("abcde", "edcba")
+iex> Games.Wordle.feedback("abdce", "edcba")
 [:yellow, :yellow, :yellow, :yellow, :yellow]
 
 # If there are duplicate characters in the guess prioritize exact matches.
-iex> Games.World.feedback("aaaxx", "xaaaa")
+iex> Games.Wordle.feedback("aaabb", "xaaaa")
 [:grey, :green, :green, :yellow, :grey]
 ```
 
 Test and implement a `Games.Wordle` module in your [Games](./games_setup.livemd) project.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Random Word
+
+Use the IEx shell to start a game of Wordle.
+
+```
+iex> Games.Wordle.start()
+Enter a five letter word:  
+```
+
+Randomly generate a word for the wordle game. Retrieve user input and provide feedback based
+on their guess. For example, this would be the output if the word `toast` were randomly generated.
+
+```
+Enter a give letter word: tarts
+[:green, :yellow, :grey, :yellow, :yellow]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Six Guesses
+
+After six guesses, the player should lose the game if they do not get the correct answer.
 
 ## Commit Your Progress
 
