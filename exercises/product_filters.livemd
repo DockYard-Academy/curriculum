@@ -40,6 +40,8 @@ You should be able to filter by:
 2. an inclusive `:min` and `:max` price.
 3. an exact `:category` field as an atom.
 
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Test Cases</summary>
 
@@ -138,6 +140,8 @@ ExUnit.run()
 
 </details>
 
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution 1</summary>
 
@@ -167,40 +171,34 @@ end
 
 </details>
 
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution 2</summary>
 
 In this example, we solve the problem by enumerating over every filter.
 
 ```elixir
-defmodule Products do
-  def filter(products, filters \\ []) do
-    Enum.filter(products, &matches_filters?(&1, filters))
-  end
+defmodule Product do
+  def check?({:min, min}, product), do: min <= product.price
+  def check?({:max, max}, product), do: product.price <= max
 
-  defp matches_filters?(product, filters) do
-    Enum.all?(filters, &apply_filter?(&1, product))
-  end
+  def check?({:name, name}, product),
+    do: String.contains?(String.downcase(product.name), String.downcase(name))
 
-  defp apply_filter?({:category, category}, product) do
-    product.category == category
-  end
+  def check?({:category, category}, product), do: category == product.category
 
-  defp apply_filter?({:min, min}, product) do
-    min <= product.price
-  end
-
-  defp apply_filter?({:max, max}, product) do
-    product.price <= max
-  end
-
-  defp apply_filter?({:name, name}, product) do
-    String.contains?(String.downcase(product.name), String.downcase(name))
+  def filter(products, filters) do
+    Enum.filter(products, fn product ->
+      Enum.all?(filters, fn filter -> check?(filter, product) end)
+    end)
   end
 end
 ```
 
 </details>
+
+<!-- livebook:{"break_markdown":true} -->
 
 Implement and test the `Products` module based on the provided test cases and documentation.
 
@@ -214,6 +212,11 @@ defmodule Products do
   Filter products by name, category, and price.
 
   ## Examples
+
+  No filters returs all products.
+
+  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+  [%{name: "Laptop", category: :tech, price: 100}]
 
   Filter by name
 
