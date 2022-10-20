@@ -12,3 +12,15 @@ Removed to be sorted
 * [Currency Conversion](exercises/currency_conversion.livemd)
 * [Classified](exercises/classified.livemd)
 * [Pokemon Protocols](exercises/pokemon_protocols.livemd)
+* [Public Chat API](exercises/public_chat_api.livemd)
+* [Portfolio: Mock](exercises/portfolio_mock.livemd)
+* [Portfolio: Blog Live Search](exercises/portfolio_blog_live_search.livemd)
+
+### Property Based Testing (Stream Data) + E2E Testing (Wallaby)
+
+* Reading
+  * Property Based Testing With Stream Data
+  * End-To-End Testing With Wallaby
+* Exercises
+  * Test Music Filters
+  * E2E Test Rock Paper Scissors App
