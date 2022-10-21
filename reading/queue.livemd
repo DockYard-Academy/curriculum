@@ -1,0 +1,226 @@
+# Queues
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Queues
+
+Queues are an abstract data structure based on the common human
+experience of waiting in lines. In human lines, people arrive at
+the end of the line and are served from the front of the line.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  subgraph Queue
+    direction LR
+    Last[Last/Newest] --> NextN[NextN] -- ... --> Next[Next] --> First[First/Oldest]
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+In programming we have defined a Queue as:
+
+* The first item in the queue is called the **front**.
+* The **front** of the queue is gotten and removed when we
+  **dequeue** the queue.
+* The last item in the queue is called the **back**.
+* Items are added to the **back** of the queue when we
+  **enqueue** a new item.
+
+```mermaid
+flowchart
+  subgraph Queue-Actions
+    direction LR
+    New[NewLast/NewNewest] -- "(enqueue)" --> Last[Last/Newest]
+    subgraph Queue
+      direction LR
+      Last[Last/Newest] --> NextN[NextN] -- ... --> Next[Next] --> First[First/Oldest]
+    end
+    First[First/Oldest] -- "(dequeue)" --> Out["."]
+  end
+```
+
+So, you might be wonder: *Great! So what is the syntax for Elixir's
+`Queue` data structure?* There is no built-in Queue data strucuture;
+and this is why a Queue is called an "abstract data structure": You
+must implement the concept yourself.
+
+The most common implementation of a Queue is to base it on a List.
+
+### Your Turn
+
+How would you create a new empty Queue?
+
+```elixir
+defmodule Queue do
+  def new() do
+    :your_code_here
+  end
+end
+```
+
+Continuing, how would you **enqueue** an item -- let's say `:bob` --
+to an empty Queue?
+
+```elixir
+defmodule Queue do
+  def new() do
+    :your_code_here
+  end
+
+  def enqueue(queue, item) do
+    :your_code_here
+  end
+end
+```
+
+Continuing, how would you **dequeue** an item from our non-empty
+Queue? The **dequeue**d item's value should be `:bob`. Dont forget
+to return the new queue (without `:bob`) also!
+
+```elixir
+defmodule Queue do
+  def new() do
+    []
+  end
+
+  def enqueue(queue, item) do
+    queue ++ [item]
+  end
+
+  def dequeue(queue) do
+    [item | queue] = queue
+  end
+end
+```
+
+### Your Turn
+
+Imagine people forming a line, arriving and leaving from it.
+
+Using your Queue module above, create the queue where the following people
+arrived in this order:
+
+* Soren
+* Ram
+* Cindy
+* Sam
+
+```mermaid
+flowchart
+  subgraph Waiting
+    direction LR
+    Sam[Sam] --> Cindy[Cindy] --> Ram[Ram] --> Soren[Soren]
+  end
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example solution</summary>
+
+```elixir
+defmodule Line do
+  def arrivals(people) do
+    queue = Queue.new()
+
+    Enum.reduce(people, queue, fn arrival, queue ->
+      Queue.enqueue(queue, arrival)
+    end)
+  end
+end
+
+people = ["Soren", "Ram", "Cindy", "Sam"]
+queue = Line.arrivals(people)
+IO.inspect(queue)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+defmodule Line do
+  def arrivals(people) do
+    :your_code_here
+  end
+end
+
+people = ???
+queue = Line.arrivals(people)
+IO.inspect(queue)
+```
+
+Bind `1` in the following list to a variable `a` using pattern matching.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example solution</summary>
+
+```elixir
+[a | _tail] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+```
+
+Bind `1` and `2`, and `3` in the following list to variables `a`, `b`, and `c` using pattern matching.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example solution</summary>
+
+```elixir
+[a, b, c | _tail] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Lists](https://elixirschool.com/en/lessons/basics/collections#lists-0)
+* [Exercism: Lists](https://exercism.org/tracks/elixir/concepts/lists)
+* [Elixir Lang: Lists](https://elixir-lang.org/getting-started/basic-types.html#linked-lists)
+* [HexDocs: List](https://hexdocs.pm/elixir/List.html)
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish lists section"
+```
+
+## Up Next
+
+| Previous                           | Next                                             |
+| ---------------------------------- | -----------------------------------------------: |
+| [Tuples](../reading/tuples.livemd) | [Keyword Lists](../reading/keyword_lists.livemd) |
