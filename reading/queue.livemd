@@ -116,7 +116,7 @@ end
 
 Imagine people forming a line, arriving and leaving from it.
 
-Using your Queue module above, create the queue where the following people
+Using your Queue module above, create a queue where the following people
 arrived in this order:
 
 * Soren
@@ -138,9 +138,7 @@ flowchart
 ```elixir
 defmodule Line do
   def arrivals(people) do
-    queue = Queue.new()
-
-    Enum.reduce(people, queue, fn arrival, queue ->
+    Enum.reduce(people, Queue.new(), fn arrival, queue ->
       Queue.enqueue(queue, arrival)
     end)
   end
