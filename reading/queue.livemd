@@ -38,12 +38,12 @@ flowchart
 
 In programming we have defined a Queue as:
 
-* The first item in the queue is called the **front**.
-* The **front** of the queue is gotten and removed when we
-  **dequeue** the queue.
-* The last item in the queue is called the **back**.
-* Items are added to the **back** of the queue when we
-  **enqueue** a new item.
+* The first item in the queue is called the *front* or *first*.
+* The *front* of the queue is gotten and removed when we
+  *dequeue* the queue.
+* The last item in the queue is called the *back* or *last*.
+* Items are added to the *back* of the queue when we
+  *enqueue* a new item.
 
 ```mermaid
 flowchart
@@ -77,7 +77,7 @@ defmodule Queue do
 end
 ```
 
-Continuing, how would you **enqueue** an item -- let's say `:bob` --
+Continuing, how would you *enqueue* an item -- let's say `:bob` --
 to an empty Queue?
 
 ```elixir
@@ -92,8 +92,8 @@ defmodule Queue do
 end
 ```
 
-Continuing, how would you **dequeue** an item from our non-empty
-Queue? The **dequeue**d item's value should be `:bob`. Dont forget
+Continuing, how would you *dequeue* an item from our non-empty
+Queue? The *dequeue*d item's value should be `:bob`. Dont forget
 to return the new queue (without `:bob`) also!
 
 ```elixir
@@ -145,7 +145,7 @@ defmodule Line do
 end
 
 people = ["Soren", "Ram", "Cindy", "Sam"]
-Line.arrivals(people)
+queue = Line.arrivals(people)
 ```
 
 </details>
@@ -163,13 +163,15 @@ people = ???
 Line.arrivals(people)
 ```
 
-Bind `1` in the following list to a variable `a` using pattern matching.
+Continuing, the first 2 people are served from the queue, who are
+they and who remains in the queue?
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
 
 ```elixir
-[a | _tail] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+{first, queue} = Queue.dequeue(queue)
+{next, queue} = Queue.dequeue(queue)
 ```
 
 </details>
@@ -177,31 +179,14 @@ Bind `1` in the following list to a variable `a` using pattern matching.
 Enter your solution below.
 
 ```elixir
-[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-```
-
-Bind `1` and `2`, and `3` in the following list to variables `a`, `b`, and `c` using pattern matching.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example solution</summary>
-
-```elixir
-[a, b, c | _tail] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-```
-
-</details>
-
-Enter your solution below.
-
-```elixir
-[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+:your_code_here
 ```
 
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
 
-* [Elixir Schools: Lists](https://elixirschool.com/en/lessons/basics/collections#lists-0)
+* [Wikipedia: Queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type))
 * [Exercism: Lists](https://exercism.org/tracks/elixir/concepts/lists)
 * [Elixir Lang: Lists](https://elixir-lang.org/getting-started/basic-types.html#linked-lists)
 * [HexDocs: List](https://hexdocs.pm/elixir/List.html)
