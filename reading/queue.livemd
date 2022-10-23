@@ -85,14 +85,13 @@ defmodule Queue do
     :your_code_here
   end
 
-  def empty?() do
+  def empty?(queue) do
     :your_code_here
   end
 end
 ```
 
-Continuing, how would you *enqueue* an item -- let's say `:bob` --
-to an empty Queue?
+Continuing, how would you *enqueue* an item -- let's say `:bob` -- to an empty Queue?
 
 ```elixir
 defmodule Queue do
@@ -100,7 +99,7 @@ defmodule Queue do
     :your_code_here
   end
 
-  def empty?() do
+  def empty?(queue) do
     :your_code_here
   end
 
@@ -109,6 +108,29 @@ defmodule Queue do
   end
 end
 ```
+
+Continuing, it might be nice to know how many items are in the Queue.
+
+```elixir
+defmodule Queue do
+  def new() do
+    :your_code_here
+  end
+
+  def empty?(queue) do
+    :your_code_here
+  end
+
+  def enqueue(queue, item) do
+    :your_code_here
+  end
+
+  def size(queue) do
+    :your_code_here
+  end
+end
+```
+
 
 Continuing, how would you *dequeue* an item from our non-empty
 Queue? The *dequeue*d item's value should be `:bob`. Dont forget
@@ -120,11 +142,15 @@ defmodule Queue do
     :your_code_here
   end
 
-  def empty?() do
+  def empty?(queue) do
     :your_code_here
   end
 
   def enqueue(queue, item) do
+    :your_code_here
+  end
+
+  def size(queue) do
     :your_code_here
   end
 
@@ -186,17 +212,32 @@ people = []
 line = Line.arrivals(people)
 ```
 
-Continuing, the first 2 people are served from the queue, who are
-they and who remains in the queue?
+Continuing, update your Line so that it can serve some number of people
+from the line. Have it serve the first 2 people from the line:
+
+  * Who gets served?
+  * Who remains in the line?
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
 
 ```elixir
-{first, line} = Queue.dequeue(line)
-IO.inspect(first, label: "At the head of the line was")
-{next, line} = Queue.dequeue(line)
-IO.inspect(next, label: "After that was")
+defmodule Line do
+  def arrivals(people) do
+    :your_code_here
+  end
+
+  def serve(line, number) do
+    case number do
+      0 -> line
+      _ ->
+        {first, line} = Queue.dequeue(line)
+        IO.inspect(first, label: "Just served")
+        serve(line, number-1)
+  end
+end
+
+line = Line.serve(line, 2)
 IO.inspect(line, label: "Remaining in line is")
 ```
 
@@ -209,21 +250,30 @@ Enter your solution below.
 ```
 
 Continuing, remove and display all the remaining people from
-the queue, until the queue is empty. Who was removed and in
+the line, until the line is empty. Who was removed and in
 what order?
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
 
 ```elixir
-line = (fn
-  line when Line.empty?(line) -> line
-  line ->
-    {first, line} = Queue.dequeue(line)
-    IO.inspect(first, label: "At the head of the line was")
-    line
-end).(line)
-IO.inspect(line, label: "The line is now empty")
+defmodule Line do
+  def arrivals(people) do
+    :your_code_here
+  end
+
+  def serve(line, number) do
+    case number do
+      0 -> line
+      :all -> serve(line, Queue.size(line))
+      _ ->
+        {first, line} = Queue.dequeue(line)
+        IO.inspect(first, label: "Just served")
+        serve(line, number-1)
+  end
+end
+
+line = Line.serve(line, :all)
 ```
 
 </details>
