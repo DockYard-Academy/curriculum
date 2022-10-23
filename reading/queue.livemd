@@ -145,7 +145,8 @@ defmodule Line do
 end
 
 people = ["Soren", "Ram", "Cindy", "Sam"]
-queue = Line.arrivals(people)
+line = Line.arrivals(people)
+IO.inspect(line, label: "In line is")
 ```
 
 </details>
@@ -171,7 +172,10 @@ they and who remains in the queue?
 
 ```elixir
 {first, line} = Queue.dequeue(line)
+IO.inspect(first, label: "At the head of the line was")
 {next, line} = Queue.dequeue(line)
+IO.inspect(next, label: "After that was")
+IO.inspect(line, label: "Remaining in line is")
 ```
 
 </details>
@@ -190,15 +194,14 @@ what order?
 <summary>Example solution</summary>
 
 ```elixir
-# Assumes the Queue is bound to 'line'
-
 line = (fn
   line when Line.empty?(line) -> line
   line ->
     {first, line} = Queue.dequeue(line)
-    IO.inspect(first, label: "Item from queue is")
+    IO.inspect(first, label: "At the head of the line was")
     line
-end).(queue)
+end).(line)
+IO.inspect(line, label: "The line is now empty")
 ```
 
 </details>
