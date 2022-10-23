@@ -224,7 +224,9 @@ from the line. Have it serve the first 2 people from the line:
 ```elixir
 defmodule Line do
   def arrivals(people) do
-    :your_code_here
+    Enum.reduce(people, Queue.new(), fn arrival, queue ->
+      Queue.enqueue(queue, arrival)
+    end)
   end
 
   def serve(line, number) do
@@ -234,6 +236,7 @@ defmodule Line do
         {first, line} = Queue.dequeue(line)
         IO.inspect(first, label: "Just served")
         serve(line, number-1)
+    end
   end
 end
 
@@ -259,7 +262,9 @@ what order?
 ```elixir
 defmodule Line do
   def arrivals(people) do
-    :your_code_here
+    Enum.reduce(people, Queue.new(), fn arrival, queue ->
+      Queue.enqueue(queue, arrival)
+    end)
   end
 
   def serve(line, number) do
@@ -270,6 +275,7 @@ defmodule Line do
         {first, line} = Queue.dequeue(line)
         IO.inspect(first, label: "Just served")
         serve(line, number-1)
+    end
   end
 end
 
