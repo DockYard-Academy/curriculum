@@ -159,8 +159,8 @@ defmodule Line do
   end
 end
 
-people = ???
-Line.arrivals(people)
+people = []
+line = Line.arrivals(people)
 ```
 
 Continuing, the first 2 people are served from the queue, who are
@@ -170,8 +170,35 @@ they and who remains in the queue?
 <summary>Example solution</summary>
 
 ```elixir
-{first, queue} = Queue.dequeue(queue)
-{next, queue} = Queue.dequeue(queue)
+{first, line} = Queue.dequeue(line)
+{next, line} = Queue.dequeue(line)
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+:your_code_here
+```
+
+Continuing, remove and display all the remaining people from
+the queue, until the queue is empty. Who was removed and in
+what order?
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example solution</summary>
+
+```elixir
+# Assumes the Queue is bound to 'line'
+
+line = (fn
+  line when Line.empty?(line) -> line
+  line ->
+    {first, line} = Queue.dequeue(line)
+    IO.inspect(first, label: "Item from queue is")
+    line
+end).(queue)
 ```
 
 </details>
