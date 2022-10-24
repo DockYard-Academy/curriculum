@@ -36,7 +36,7 @@ memory during execution.
 Each [Enum](https://hexdocs.pm/elixir/Enum.html) function stores a copy of the the enumerable it creates and executes sequentially as
 seen in this slide.
 
-<!-- livebook:{"attrs":{"source":"defmodule Boxes do\n  def space, do: box(\"\", %{background: \"none\", border: \"none\"})\n  def spaces(0), do: []\n  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)\n  def green_box(text), do: box(text, %{background: \"#D5E8D4\", border: \"#82B366\"})\n  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)\n  def grey_box(text), do: box(text, %{background: \"#F5F5F5\", border: \"#666666\"})\n  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)\n\n  def box(text, style) do\n    \"<div style=\\\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\\\">#{text}</div>\"\n  end\n\n  def row(title, items) do\n    \"<div style=\\\"height: 80px; display: flex; width: 100%; align-items: center;\\\">\n    <p style=\\\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\\\">#{title}</p>\n    <div style=\\\"display: flex; width: 90%;\\\">#{items}</div>\n  </div>\"\n  end\n\n  def sequence do\n    [\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", [])}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}\n  \"\n    ]\n  end\nend\n\nKino.animate(2000, 0, fn i ->\n  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))\n  {:cont, md, rem(i + 1, length(Boxes.sequence()))}\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"defmodule Boxes do\n  def space, do: box(\"\", %{background: \"none\", border: \"none\"})\n  def spaces(0), do: []\n  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)\n  def green_box(text), do: box(text, %{background: \"#D5E8D4\", border: \"#82B366\"})\n  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)\n  def grey_box(text), do: box(text, %{background: \"#F5F5F5\", border: \"#666666\"})\n  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)\n\n  def box(text, style) do\n    \"<div style=\\\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\\\">#{text}</div>\"\n  end\n\n  def row(title, items) do\n    \"<div style=\\\"height: 80px; display: flex; width: 100%; align-items: center;\\\">\n    <p style=\\\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\\\">#{title}</p>\n    <div style=\\\"display: flex; width: 90%;\\\">#{items}</div>\n  </div>\"\n  end\n\n  def sequence do\n    [\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", [])}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}\n  \"\n    ]\n  end\nend\n\nKino.animate(2000, 0, fn i ->\n  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))\n  {:cont, md, rem(i + 1, length(Boxes.sequence()))}\nend)","title":"Eager Evaluation Animation"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 defmodule Boxes do
@@ -95,14 +95,11 @@ Kino.animate(2000, 0, fn i ->
 end)
 ```
 
-While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by
-the end of the execution the [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2) function only needs two elements.
+While the operation above is a bit contrived for the sake of simplifying the example, you may notice that by the end of the execution the [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2) function only needs four elements.
 
-It seems like a waste of resources to execute every operation on every element, and it is.
-As the list grows, this becomes a massive waste of computation. It would be far more performant if we
-could instead build up a series of functions and run them one by one only when needed.
+It's a waste of resources to execute every operation on every element. It would be far more performant if we could instead build up a series of functions and run them one by one only when needed.
 
-<!-- livebook:{"attrs":{"source":"Kino.animate(500, {0, 0}, fn {current_row, current_column} ->\n  current_element = current_column + 1\n  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)\n\n  maybe_display = fn expected_row, display ->\n    if current_row === expected_row, do: display, else: []\n  end\n\n  indent = Boxes.spaces(current_column)\n\n  md =\n    Kino.Markdown.new(\"\"\"\n    #{Boxes.row(\"1..10\", range)}\n    #{Boxes.row(\"map\", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"filter\", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"take\", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}\n    \"\"\")\n\n  next_row = rem(current_row + 1, 4)\n  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)\n  {:cont, md, {next_row, next_column}}\nend)","title":"Animation Source (Hidden: Teachers Only)"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Kino.animate(500, {0, 0}, fn {current_row, current_column} ->\n  current_element = current_column + 1\n  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)\n\n  maybe_display = fn expected_row, display ->\n    if current_row === expected_row, do: display, else: []\n  end\n\n  indent = Boxes.spaces(current_column)\n\n  md =\n    Kino.Markdown.new(\"\"\"\n    #{Boxes.row(\"1..10\", range)}\n    #{Boxes.row(\"map\", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"filter\", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"take\", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}\n    \"\"\")\n\n  next_row = rem(current_row + 1, 4)\n  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)\n  {:cont, md, {next_row, next_column}}\nend)","title":"Lazy Evaluation Animation"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Kino.animate(500, {0, 0}, fn {current_row, current_column} ->
@@ -134,8 +131,7 @@ We can't accomplish this with the [Enum](https://hexdocs.pm/elixir/Enum.html) mo
 **Lazy** means they execute on each element in the stream one by one. **Composable**
 means that we build up functions to execute on each element in the stream.
 
-Notice that the following does not execute, it instead builds up future work to execute and returns
-a [Stream](https://hexdocs.pm/elixir/Stream.html) data structure.
+Notice that the following does not execute, it instead builds up future work to execute and returns a [Stream](https://hexdocs.pm/elixir/Stream.html) data structure with a list of functions to apply.
 
 ```elixir
 1..10
@@ -152,6 +148,26 @@ when it's called with any eager function from the [Enum](https://hexdocs.pm/elix
 |> Stream.map(fn each -> each * 2 end)
 |> Stream.filter(fn each -> each <= 10 end)
 |> Stream.take(4)
+|> Enum.to_list()
+```
+
+We can see this more clearly if we use [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) to trigger a side effect. Notice we're not printing anything.
+
+```elixir
+Stream.each(1..10, &IO.puts/1)
+```
+
+[IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) is only called when we run the stream with [Stream.run/1](https://hexdocs.pm/elixir/Stream.html#run/1) or when we use an [Enum](https://hexdocs.pm/elixir/Enum.html) function.
+
+```elixir
+1..10
+|> Stream.each(&IO.puts/1)
+|> Stream.run()
+```
+
+```elixir
+1..10
+|> Stream.each(&IO.puts/1)
 |> Enum.to_list()
 ```
 
@@ -187,18 +203,21 @@ While the exact results may vary, you should notice that the stream runs faster 
 
 ```
 Name             ips        average  deviation         median         99th %
-stream       69.84 K       14.32 μs   ±126.27%       11.30 μs       59.40 μs
-enum          8.77 K      114.02 μs    ±75.94%      106.10 μs      227.45 μs
+stream      172.86 K        5.79 μs   ±418.69%           4 μs       18.50 μs
+enum          9.64 K      103.76 μs    ±21.83%       98.70 μs      190.13 μs
 
-Comparison:
-stream       69.84 K
-enum          8.77 K - 7.96x slower +99.70 μs
+Comparison: 
+stream      172.86 K
+enum          9.64 K - 17.94x slower +97.97 μs
 
 Memory usage statistics:
 
 Name      Memory usage
-stream        31.25 KB
-enum         191.88 KB - 6.14x memory usage +160.63 KB
+stream         8.54 KB
+enum         181.20 KB - 21.22x memory usage +172.66 KB
+
+**All measurements for memory usage were the same**
+
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -255,8 +274,7 @@ enum_fn = fn -> 1..1000 |> Enum.map(&(&1 * 2)) |> Enum.map(&(&1 * 2)) |> Enum.ma
 %{stream_time: stream_time, enum_time: enum_time}
 ```
 
-In terms of improving performance, Streams will generally provide the greatest benefits when operations
-reduce the number of elements in the enumerable.
+In terms of improving performance, Streams will generally provide the greatest benefits when operations reduce the number of elements in the enumerable. Whenever optimizing, use benchmarks to verify your assumptions rather than relying on theoretical performance gains.
 
 ## Stream
 
@@ -313,15 +331,14 @@ Stream.cycle([1, 2, 3])
 |> Enum.take(10)
 ```
 
-We've been using Streams for a while now! Did you know that ranges are Streams? Each element
-in the range is only created as necessary. For example, we can create an incredibly massive range in a
-single moment.
+### Lazy Evaluation
 
-But when we use that massive range with an [Enum](https://hexdocs.pm/elixir/Enum.html) operation, then we pay the computational price!
+We've been using lazy evaluation for a while now! Ranges only create each element in the list when necessary, so we can create a massive range without any noticeable performance impact.
+
+When we use that massive range with an [Enum](https://hexdocs.pm/elixir/Enum.html) operation, then we pay the computational price!
 
 ```elixir
-{creation_time, _result} = :timer.tc(fn -> 1..10_000_000_000_000_000_000_000_000_000 end)
-# The below range is smaller to avoid crashing your computer!
+{creation_time, _result} = :timer.tc(fn -> 1..10_000_000 end)
 {execution_time, _result} = :timer.tc(fn -> Enum.to_list(1..10_000_000) end)
 
 %{creation_time: creation_time, execution_time: execution_time}
@@ -381,8 +398,6 @@ integer --> odd
   4 --> 2 --> 1
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 For example, let's take the number `5` to see how it quickly repeats `4, 2, 1`
 
 ```mermaid
@@ -391,19 +406,46 @@ flowchart LR
   -- 1 * 3 + 1--> a[4] --4 / 2--> b[2] --2 / 2--> c[1]
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
-In the Elixir cell below, try changing `starting_integer` and see how it always
-eventually repeats `4, 2, 1`.
+Use `Stream.iterate` to implement the collatz conjecture given a `starting_integer` such as `20` as the initial accumulator.
 
-We're limited to how many elements we can display, so if the integer is
-too large you might not see the end of the list.
+1. If the number is odd, multiply the number by three and add 1
+2. If the number is even, divide by two.
+
+Use [Enum.take_while/2](https://hexdocs.pm/elixir/Enum.html#take_while/2) to generate elements from the stream until it returns `4` to prove it eventually repeats `4`, `2`, `1`, forever. Try changing your `starting_integer` to provide this for larger numbers.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 starting_integer = 20
 
-Stream.iterate(starting_integer, fn n -> if rem(n, 2) === 0, do: div(n, 2), else: 3 * n + 1 end)
-|> Enum.take(100)
+Stream.iterate(starting_integer, fn int ->
+  if rem(int, 2) == 0 do
+    div(int, 2)
+  else
+    int * 3 + 1
+  end
+end)
+|> Enum.take_while(fn integer -> integer != 4 end)
+```
+
+</details>
+
+```elixir
+starting_integer = 20
+
+Stream.iterate(starting_integer, fn int ->
+  if rem(int, 2) == 0 do
+    div(int, 2)
+  else
+    int * 3 + 1
+  end
+end)
+|> Enum.take_while(fn integer -> integer != 4 end)
 ```
 
 ### Stream.unfold/2
@@ -432,8 +474,8 @@ Otherwise, the stream would be infinite and run forever. To specify when the str
 You could do this with a separate function head, or some other control flow.
 
 ```elixir
-Stream.unfold(5, fn
-  0 ->
+Stream.unfold(0, fn
+  10 ->
     nil
 
   accumulator ->
@@ -441,36 +483,27 @@ Stream.unfold(5, fn
     next_accumulator = accumulator + 1
     {value, next_accumulator}
 end)
-|> Enum.take(5)
-```
-
-For example, we could use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) to improve the **Collatz Conjecture** function from above
-to simply stop when the element reaches `4`. That way if it ever stops, it must have
-reached `4` and we've proven the conjecture.
-
-```elixir
-starting_number = 100
-
-Stream.unfold(starting_number, fn
-  4 ->
-    nil
-
-  accumulator ->
-    next_accumulator =
-      if rem(accumulator, 2) === 0, do: div(accumulator, 2), else: 3 * accumulator + 1
-
-    {accumulator, next_accumulator}
-end)
 |> Enum.to_list()
 ```
 
 ### Your Turn
 
-In the Elixir cell below, use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) to generate a list of cubed numbers. Use [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2)
-to evaluate the first `100` numbers. You need to reverse the generated stream before you evaluate the first
-`100` numbers
+Use [Stream.unfold/2](https://hexdocs.pm/elixir/Stream.html#unfold/2) to generate a list of cubed numbers. Use [Enum.take/2](https://hexdocs.pm/elixir/Enum.html#take/2) to take the first `20` cubed numbers.
 
 I.e. $1^3, 2^3, 3^3, 4^3, ...$ which would be `[1, 8, 27 , 64]` and so on.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+1
+|> Stream.unfold(fn int ->
+  {int ** 3, int + 1}
+end)
+|> Enum.take(20)
+```
+
+</details>
 
 ```elixir
 
@@ -487,6 +520,6 @@ $ git commit -m "finish streams section"
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Big O Notation](../reading/big_o_notation.livemd) | [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) |
+| Previous                                                     | Next                                               |
+| ------------------------------------------------------------ | -------------------------------------------------: |
+| [Games Benchmarking](../exercises/games_benchmarking.livemd) | [Stream Drills](../exercises/stream_drills.livemd) |

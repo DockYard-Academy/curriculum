@@ -5,7 +5,8 @@ Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:utils, path: "#{__DIR__}/../utils"},
+  {:benchee, "~> 1.1"}
 ])
 ```
 
@@ -16,17 +17,17 @@ Mix.install([
 
 ## Custom Enum With Recursion
 
-We're going to use `Recursion` to re-implement several of the [Enum](https://hexdocs.pm/elixir/Enum.html) module's functions. For this exercise
+We're going to use recursion to re-implement several of the [Enum](https://hexdocs.pm/elixir/Enum.html) module's functions. For this exercise
 you are not allowed to use the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
 
 Implement the following [Enum](https://hexdocs.pm/elixir/Enum.html) functions in this `CustomEnum` function. Each should use recursion
 to accomplish the same functionality as the [Enum](https://hexdocs.pm/elixir/Enum.html) module does.
 
-* `reverse/2`
-* `each/2`
-* `map/2`
-* `filter/2`
-* `sum/2`
+* [Enum.reverse/2](https://hexdocs.pm/elixir/Enum.html#reverse/2)
+* [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2)
+* [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2)
+* [Enum.sum/2](https://hexdocs.pm/elixir/Enum.html#sum/2)
+* [Enum.join/1](https://hexdocs.pm/elixir/Enum.html#join/1)
 
 Keep in mind you may need to delegate to another function if an accumulator is required.
 
@@ -48,26 +49,92 @@ You only need to handle lists, not all collections.
 
 ```elixir
 defmodule CustomEnum do
-  def map(list, function) do
-  end
+  @moduledoc """
+  Documentation for `CustomEnum`.
+  Re-implement common [Enum](https://hexdocs.pm/elixir/Enum.html) functions using recursion.
+  """
 
+  @doc """
+  Reverse a list
+
+  ## Examples
+
+    iex> CustomEnum.reverse([1, 2, 3])
+    [3, 2, 1]
+
+    iex> CustomEnum.reverse([4, 5, 6, 7])
+    [7, 6, 5, 4]
+  """
   def reverse(list) do
   end
 
-  def reduce(list, acc, fun) do
+  @doc """
+  Map over a list
+
+  ## Examples
+
+    iex> CustomEnum.map([1, 2, 3], fn integer -> integer * 2 end)
+    [2, 4, 6]
+
+    iex> CustomEnum.map([5, 4, 3], fn integer -> is_integer(integer) end)
+    [true, true, true]
+  """
+  def map(list, callback_function) do
   end
 
-  def each(list, function) do
+  @doc """
+  Filter elements in a list. Keep elements that return `true` when called with the
+  provided callback function.
+
+  ## Examples
+
+    iex> CustomEnum.filter([1, 2, "3"], fn int -> is_integer(int) end)
+    [1, 2]
+
+    iex> CustomEnum.filter([1, "2", "3"], fn char -> is_bitstring(char) end)
+    ["2", "3"]
+  """
+  def filter(list, callback_function) do
   end
 
-  def filter(list, function) do
+  @doc """
+  Sum a list of integers.
+
+  ## Examples
+
+    iex> CustomEnum.sum([1, 2, 3])
+    6
+
+    iex> CustomEnum.sum([1, 1, 1])
+    3
+  """
+  def sum(list_of_integers) do
   end
 
-  def sum(list, function) do
+  @doc """
+  Join a list of strings together.
+
+  ## Examples
+
+    iex> CustomEnum.join(["A", "B", "C"])
+    "ABC"
+
+    iex> CustomEnum.join(["Hello", ",", " ", "World", "!"])
+    "Hello, World!"
+  """
+  def join(list_of_strings) do
   end
 end
+```
 
-Utils.feedback(:enum_recursion, CustomEnum)
+## Benchmarking
+
+We've installed the [Benchee](https://github.com/bencheeorg/benchee) project in this livebook.
+
+Benchmark your solution against the existing [Enum](https://hexdocs.pm/elixir/Enum.html) module. Is yours faster or slower? Keep in mind that the [Enum](https://hexdocs.pm/elixir/Enum.html) module contains implementations for all enumerables, not just lists.
+
+```elixir
+
 ```
 
 ## Commit Your Progress
@@ -81,6 +148,6 @@ $ git commit -m "finish custom enum with recursion exercise"
 
 ## Up Next
 
-| Previous                                 | Next                                               |
-| ---------------------------------------- | -------------------------------------------------: |
-| [Recursion](../reading/recursion.livemd) | [Lucas Numbers](../exercises/lucas_numbers.livemd) |
+| Previous                                           | Next                                                         |
+| -------------------------------------------------- | -----------------------------------------------------------: |
+| [Big O Notation](../reading/big_o_notation.livemd) | [Games Benchmarking](../exercises/games_benchmarking.livemd) |

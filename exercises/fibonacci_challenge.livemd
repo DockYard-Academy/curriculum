@@ -1,0 +1,96 @@
+# Fibonacci Sequence
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:benchee, "~> 1.1"},
+  {:utils, path: "#{__DIR__}/../utils"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Fibonacci Sequence
+
+The Fibonacci sequence is a series of the following numbers.
+
+```mermaid
+flowchart LR
+a[0] --> b[1] --> c[1] --> d[2] --> e[3] --> f[5] --> g[8] --> h[13] --> i[21] --> k[34] --> ...
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+It's created by taking the sum of the previous to numbers to get the next number.
+
+So $fib(n) = fib(n-1) + fib(n - 2)$
+
+Implement the `Fibonacci.sequence/1` function below. Do not worry about performance for this solution.
+
+```elixir
+defmodule Fibonacci do
+  @doc """
+  Generate the fibonacci sequence of a given length.
+
+  ## Examples
+
+    iex> 
+  """
+  def sequence(length) do
+  end
+end
+```
+
+## Competition: Benchmark
+
+In the Elixir cell below, create a `FastFib` module. The `FastFib` module should be the most performant version of the Fibonacci Sequence that you can create.
+
+```elixir
+defmodule FastFib do
+  def sequence(n) do
+  end
+end
+```
+
+Use [Benchee](https://hexdocs.pm/benchee/Benchee.html) to benchmark the performance of `FastFib.sequence/1` function. The student in the class with the fastest `FastFib` time wins.
+
+```elixir
+Benchee.run(
+  %{
+    fast_fib: fn n -> FastFib.sequence(n) end
+  },
+  inputs: %{
+    "1: small" => 10,
+    "2: medium" => 30
+    # Uncomment the following if your solution can handle it!
+    # "3: large" => 100
+    # "4: xl" => 1000
+    # "6: 2xl" => 10000
+    # "7: 3xl" => 100000
+  }
+)
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish fibonacci challenge exercise"
+```
+
+## Up Next
+
+| Previous                                                                   | Next                                     |
+| -------------------------------------------------------------------------- | ---------------------------------------: |
+| [Maps MapSets Keyword Lists](../reading/maps_mapsets_keyword_lists.livemd) | [Processes](../reading/processes.livemd) |

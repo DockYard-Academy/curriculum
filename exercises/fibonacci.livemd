@@ -34,55 +34,64 @@ It's created by taking the sum of the previous to numbers to get the next number
 
 So $fib(n) = fib(n-1) + fib(n - 2)$
 
-You'll notice that this is a recursive function.
+You'll notice that this is a recursive function. You're going to create a `Fibonacci` module that can generate the $nth$ fibonacci number.
 
-In the Elixir cell below, implement the `Fibonacci.sequence/1` function which should return a Fibonacci Sequence up to the $nth$ element.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Fibonacci.sequence(0)
-[0]
-
-Fibonacci.sequence(4)
-[0, 1, 1, 2, 3]
-```
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Fibonacci do
-  def sequence(n) do
+  def of(1), do: 0
+  def of(2), do: 1
+
+  def of(n) do
+    of(n - 1) + of(n - 2)
   end
 end
 ```
 
-## Competition
+</details>
 
-In the Elixir cell below, create a `FastFib` module. The `FastFib` module should be the most performant version of the Fibonacci Sequence that you can create.
+Implement the `Fibonacci` module as documented.
 
 ```elixir
-defmodule FastFib do
-  def sequence(n) do
+defmodule Fibonacci do
+  @moduledoc """
+  Documentation for the `Fibonacci` module.
+  """
+
+  @doc """
+  Generate the nth fibonacci number.
+
+  ## Examples
+
+    iex> Fibonacci.of(1)
+    0
+
+    iex> Fibonacci.of(2)
+    1
+
+    iex> Fibonacci.of(3)
+    1
+
+    iex> Fibonacci.of(4)
+    2
+
+    iex> Fibonacci.of(5)
+    3
+
+    iex> Fibonacci.of(6)
+    5
+
+    iex> Fibonacci.of(7)
+    8
+
+    iex> FIbonacci.of(20)
+    4181
+  """
+  def of(n) do
   end
 end
-```
-
-Use Benchee to benchmark the performance of `FastFib` compared to `Fibonacci`. The student in the class with the fastest `FastFib` time wins.
-
-```elixir
-Benchee.run(
-  %{
-    fast_fib: fn n -> FastFib.sequence(n) end
-  },
-  inputs: %{
-    "1: small" => 10,
-    "2: medium" => 30
-    # Uncomment the following if your solution can handle it!
-    # "3: large" => 100
-    # "4: xl" => 1000
-    # "6: 2xl" => 10000
-    # "7: 3xl" => 100000
-  }
-)
 ```
 
 ## Commit Your Progress
@@ -96,6 +105,6 @@ $ git commit -m "finish fibonacci exercise"
 
 ## Up Next
 
-| Previous                                                                   | Next                                                     |
-| -------------------------------------------------------------------------- | -------------------------------------------------------: |
-| [Maps MapSets Keyword Lists](../reading/maps_mapsets_keyword_lists.livemd) | [Pascals Triangle](../exercises/pascals_triangle.livemd) |
+| Previous                                 | Next                                               |
+| ---------------------------------------- | -------------------------------------------------: |
+| [Recursion](../reading/recursion.livemd) | [Lucas Numbers](../exercises/lucas_numbers.livemd) |

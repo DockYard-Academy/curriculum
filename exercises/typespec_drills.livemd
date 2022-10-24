@@ -129,6 +129,23 @@ defmodule FunctionSpecs do
     Keyword.get(keyword_list, atom_key, "")
   end
 
+  @spec split_and_lowercase(String.t()) :: [String.t()]
+  def split_and_lowercase(string) do
+    string
+    |> String.downcase()
+    |> String.split("", trim: true)
+  end
+
+  @spec string_to_int(String.t()) :: integer()
+  def string_to_int(string) do
+    String.to_integer(string)
+  end
+
+  @spec integers_to_strings([integer()]) :: [String.t()]
+  def integers_to_strings(integers) do
+    Enum.map(integers, fn int -> Integer.to_string(int) end)
+  end
+  
   @spec one_to_two(1) :: 2
   def one_to_two(1) do
     2
@@ -192,6 +209,20 @@ defmodule FunctionSpecs do
     Keyword.get(keyword_list, atom_key, "")
   end
 
+  def split_and_lowercase(string) do
+    string
+    |> String.downcase()
+    |> String.split("", trim: true)
+  end
+
+  def string_to_int(string) do
+    String.to_integer(string)
+  end
+
+  def integers_to_strings(integers) do
+    Enum.map(integers, fn int -> Integer.to_string(int) end)
+  end
+
   def one_to_two(1) do
     2
   end
@@ -244,6 +275,6 @@ $ git commit -m "finish typespec drills exercise"
 
 ## Up Next
 
-| Previous                                                                                               | Next                                         |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------: |
-| [Games Documentation And Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |
+| Previous                         | Next                                                                                                   |
+| -------------------------------- | -----------------------------------------------------------------------------------------------------: |
+| [Credo](../reading/credo.livemd) | [Games Documentation And Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) |

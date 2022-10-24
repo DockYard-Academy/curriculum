@@ -259,6 +259,8 @@ Walking through the function we bind `list` to `[1, 2, 3]` and accumulator to 0.
 
 <!-- livebook:{"break_markdown":true} -->
 
+### Base Cases
+
 Rather than using case statements, it's common to use different function clauses
 to handle the base case. The base case is when the function returns a value instead of making a recursive call.
 
@@ -277,23 +279,104 @@ Recursion.sum([1, 2, 3], 0)
 
 ### Your Turn
 
-In the Elixir cell below, implement a `CustomEnum.map/2` function for lists using recursion.
-Do not use the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
+Create a `CountDown` module which uses recursion to print all of the values between the provided integer and `0`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-CustomEnum.map([1, 2, 3], fn each -> each * 2 end)
-[2, 4, 6]
+CountDown.count(5)
 ```
 
+The above would print:
+
+```
+5
+4
+3
+2
+1
+0
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
 ```elixir
-defmodule CustomEnum do
-  def map(list, function) do
+defmodule CountDown do
+  def count(0), do: IO.puts(0)
+  def count(n) do
+    IO.puts(n)
+    count(n - 1)
   end
 end
+```
 
-Utils.feedback(:custom_enum_map, CustomEnum)
+</details>
+
+```elixir
+
+```
+
+### Your Turn
+
+Create a `CountBetween` module which counts up between a starting integer and a finish integer.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+CountBetween.count(2, 5)
+```
+
+The above would print:
+
+```
+2
+3
+4
+5
+```
+
+The `CountBetween` module should handle when the start is greater than the finish.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+CountBetween.count(10, 5)
+```
+
+The above would print:
+
+```
+10
+9
+8
+7
+6
+5
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule CountBetween do
+  def count(finish, finish), do: IO.puts(finish)
+  def count(start, finish) when start < finish do
+    IO.puts(start)
+    count(start + 1, finish)
+  end
+
+    def count(start, finish) when start > finish do
+    IO.puts(start)
+    count(start - 1, finish)
+  end
+end
+```
+
+</details>
+
+```elixir
+
 ```
 
 ## Commit Your Progress
@@ -307,6 +390,6 @@ $ git commit -m "finish recursion section"
 
 ## Up Next
 
-| Previous                                       | Next                                                                         |
-| ---------------------------------------------- | ---------------------------------------------------------------------------: |
-| [Benchmarking](../reading/benchmarking.livemd) | [Custom Enum With Recursion](../exercises/custom_enum_with_recursion.livemd) |
+| Previous                                     | Next                                       |
+| -------------------------------------------- | -----------------------------------------: |
+| [Battle Map](../exercises/battle_map.livemd) | [Fibonacci](../exercises/fibonacci.livemd) |

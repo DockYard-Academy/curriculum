@@ -21,6 +21,8 @@ This exercise was inspired by [Exercism.io](https://exercism.org/tracks/elixir/e
 Lucas numbers are much like the fibonacci sequence where $fib(n) = fib(n - 1) + fib(n - 2)$
 Numberphile has a great video that explains them in further detail,
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=PeUbRXnbmms\")","title":"Lucas Numbers"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=PeUbRXnbmms")
 ```
@@ -34,34 +36,105 @@ flowchart LR
   2 --> 1 --> 3 --> 4 --> 7 --> 11 --> 18 --> 29 --> ...
 ```
 
-In the Elixir cell below, implement the `LucasNumbers.generate/1` function that will generate
-a Lucas number sequence starting with `2, 1`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-LucasNumbers.generate(1)
-[1]
-
-LucasNumbers.generate(2)
-[2, 1]
-
-LucasNumbers.generate(3)
-[2, 1, 3]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
 Other than starting with two different numbers, the formula for a lucas number is still
 $L(n)=L(n-1)+L(n - 2)$.
 
+In addition to generating the $nth$ lucas number, you're also going to generate a sequence of lucas numbers.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
 ```elixir
-defmodule LucasNumbers do
-  def generate(n) do
+defmodule Lucas do
+
+  def number(1), do: 2
+  def number(2), do: 1
+
+  def number(n) do
+    number(n - 1) + number(n - 2)
+  end
+
+  def sequence(length) do
+    Enum.map(1..length, &number/1)
   end
 end
 
-Utils.feedback(:lucas_numbers, LucasNumbers)
+Lucas.sequence(10)
+```
+
+To avoid recomputing lucas numbers over and over, we can implement `sequence/1` using [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) instead.
+
+```elixir
+def sequence(length) do
+  {_, _, list} =
+    Enum.reduce(2..length, {2, 1, [1, 2]}, fn each, {prev2, prev1, list} ->
+      current = prev2 + prev1
+      {prev1, current, [current | list]}
+    end)
+
+  Enum.reverse(list)
+end
+```
+
+</details>
+
+Implement the `Lucas` module as documented.
+
+```elixir
+defmodule Lucas do
+  @doc """
+  return the nth lucas number.
+
+  ## Examples
+
+    iex> Lucas.number(1)
+    2
+
+    iex> Lucas.number(2)
+    1
+
+    iex> Lucas.number(3)
+    3
+
+    iex> Lucas.number(4)
+    4
+    
+    iex> Lucas.number(5)
+    7
+
+    iex> Lucas.number(6)
+    11
+
+    iex> Lucas.number(20)
+    9349
+  """
+  def number(n) do
+  end
+
+  @doc """
+  Generate a list of lucas numbers with the given length.
+
+  ## Examples
+
+    iex> Lucas.sequence(1)
+    [2]
+
+    iex> Lucas.sequence(2)
+    [2, 1]
+
+    iex> Lucas.sequence(3)
+    [2, 1, 3]
+
+    iex> Lucas.sequence(4)
+    [2, 1, 3, 4]
+
+    iex> Lucas.sequence(10)
+    [2, 1, 3, 4, 7, 11, 18, 29, 47, 76]
+  """
+
+  def sequence(length) do
+  end
+end
 ```
 
 ## Commit Your Progress
@@ -75,6 +148,6 @@ $ git commit -m "finish lucas numbers exercise"
 
 ## Up Next
 
-| Previous                                                                     | Next                                       |
-| ---------------------------------------------------------------------------- | -----------------------------------------: |
-| [Custom Enum With Recursion](../exercises/custom_enum_with_recursion.livemd) | [Factorial](../exercises/factorial.livemd) |
+| Previous                                   | Next                                       |
+| ------------------------------------------ | -----------------------------------------: |
+| [Fibonacci](../exercises/fibonacci.livemd) | [Factorial](../exercises/factorial.livemd) |

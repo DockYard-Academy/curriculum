@@ -1,0 +1,341 @@
+# MapSet Product Filters
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:tested_cell, github: "brooklinjazz/tested_cell"},
+  {:utils, path: "#{__DIR__}/../utils"},
+  {:benchee, "~> 1.1"},
+  {:faker, "~> 0.17.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## MapSet Product Filters
+
+Previously in the [Product Filters](./product_filters.livemd) exercise, you built an application where users search for products based on certain filters.
+
+Each product is a map with a `:name`, `:category`, and `:price` (in cents).
+
+Instead of using a list of products, you're going to re-implement the product search using a [MapSet](https://hexdocs.pm/elixir/MapSet.html) of products.
+
+```elixir
+products =
+  MapSet.new([
+    %{name: "Laptop", category: :tech, price: 100_000},
+    %{name: "Phone", category: :tech, price: 50000},
+    %{name: "Chocolate", category: :snacks, price: 200},
+    %{name: "Shampoo", category: :health, price: 1000}
+  ])
+```
+
+You're going to refactor and re-implement your existing `Products.filter/2` function and test cases using MapSets.
+
+You should be able to filter by:
+
+1. a partial case-insensitive `:name` field.
+2. an inclusive `:min` and `:max` price.
+3. an exact `:category` field as an atom.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Test Cases</summary>
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule ProductsTest do
+  use ExUnit.Case
+
+  test "filter/2 empty filters" do
+    found = create_product(name: "Laptop")
+    assert Products.filter([found], []) == [found]
+  end
+
+  test "filter/2 by exact matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert Products.filter(products, name: "Laptop") == [found]
+  end
+
+  test "filter/2 by partial matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert Products.filter(products, name: "apt") == [found]
+  end
+
+  test "filter/2 by mixed case partial matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert Products.filter(products, name: "aPt") == [found]
+  end
+
+  test "filter/2 by category" do
+    found = create_product(category: :tech)
+    not_found = create_product(category: :snacks)
+    products = [found, not_found]
+    assert Products.filter(products, category: :tech) == [found]
+  end
+
+  test "filter/2 by min price" do
+    found1 = create_product(price: 101)
+    found2 = create_product(price: 100)
+    not_found = create_product(price: 99)
+    products = [found1, found2, not_found]
+    assert Products.filter(products, min: 100) == [found1, found2]
+  end
+
+  test "filter/2 by max price" do
+    found1 = create_product(price: 99)
+    found2 = create_product(price: 100)
+    not_found = create_product(price: 101)
+    products = [found1, found2, not_found]
+    assert Products.filter(products, max: 100) == [found1, found2]
+  end
+
+  test "filter/2 by max and min price" do
+    found1 = create_product(price: 100)
+    found2 = create_product(price: 150)
+    found3 = create_product(price: 200)
+    not_found1 = create_product(price: 99)
+    not_found2 = create_product(price: 201)
+    products = [found1, found2, found3, not_found1, not_found2]
+    assert Products.filter(products, min: 100, max: 200) == [found1, found2, found3]
+  end
+
+  test "filter/2 all filters" do
+    found = create_product(price: 150, name: "Laptop", category: :tech)
+    wrong_category = create_product(price: 150, name: "Laptop", category: :wrong)
+    wrong_name = create_product(price: 150, name: "Wrong", category: :wrong)
+    too_low_price = create_product(price: 99, name: "Laptop", category: :wrong)
+    too_high_price = create_product(price: 201, name: "Laptop", category: :wrong)
+
+    products = [found, wrong_category, wrong_name, too_low_price, too_high_price]
+
+    assert Products.filter(products, min: 100, max: 200, name: "Laptop", category: :tech) == [
+             found
+           ]
+  end
+
+  # simplifies creation of product test data
+  defp create_product(attrs \\ %{}) do
+    attrs
+    |> Enum.into(%{
+      name: Enum.random(["Laptop", "Shampoo", "Phone"]),
+      category: Enum.random([:tech, :snacks, :health]),
+      price: Enum.random(1..1000)
+    })
+  end
+end
+
+ExUnit.run()
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+In this example, we solve the problem by enumerating over products and checking each filter.
+
+```elixir
+defmodule Products do
+  def filter(products, filters) do
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
+
+    products
+    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> Stream.reject(fn %{category: category} ->
+      category_filter && category_filter != category
+    end)
+    |> Enum.to_list()
+  end
+end
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the `StreamProducts` module using Streams instead of the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
+
+```elixir
+defmodule MapSetProducts do
+  @moduledoc """
+  Documentation for `Products`
+  """
+
+  @doc """
+  Filter products by name, category, and price.
+
+  ## Examples
+
+    No filters returns all products.
+
+    iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), [])
+    MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
+
+    Filter by name
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
+    []
+
+    Filter by category
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
+    []
+
+    Filter by min price.
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
+    []
+
+    Filter by max price.
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
+    []
+
+    Multiple filters.
+
+    Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+  """
+  def filter(products, filters) do
+    products
+  end
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule MapSetProductsTest do
+  use ExUnit.Case
+
+  test "filter/2 empty filters" do
+    products = MapSet.new([make_product()])
+    assert MapSetProducts.filter(products, []) == products
+  end
+
+  test "filter/2 by exact matching name" do
+    found = make_product(name: "AAA")
+    not_found = make_product(name: "B")
+    products = MapSet.new([found, not_found])
+    assert MapSetProducts.filter(name: "AAAA") == MapSet.new()
+  end
+
+  test "filter/2 by partial matching name"
+
+  test "filter/2 by mixed case partial matching name"
+
+  test "filter/2 by category"
+
+  test "filter/2 by min price"
+
+  test "filter/2 by max price"
+
+  test "filter/2 by max and min price"
+
+  test "filter/2 all filters"
+
+  defp make_product(attrs \\ %{}) do
+    %{
+      name: Enum.random(["A", "B", "C"]),
+      category: Enum.random([:tech, :toys, :candy]),
+      price: Enum.random(1..100)
+    }
+    |> Enum.into(attrs)
+  end
+end
+
+ExUnit.run()
+```
+
+## Bonus: Benchmark
+
+Did using [MapSet](https://hexdocs.pm/elixir/MapSet.html) improve the performance of you solution? Use [Benchee](https://hexdocs.pm/benchee/Benchee.html) to find out. Ensure you benchmark your solution with a large and varied data set. We've included the [Faker](https://hexdocs.pm/faker/readme.html) project to make this easier.
+
+```elixir
+Faker.Food.dish()
+```
+
+Consider adding the `:memory_time` option to your benchmark to see which solution is more memory efficient.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
+categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
+
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
+
+filters = [name: "1", category: :tech, min: 25, max: 50]
+
+mapset_products = MapSet.new(products)
+
+Benchee.run(
+  %{
+    "Enum" => fn -> EnumProducts.filter(products, filters) end,
+    "Stream" => fn -> MapSetProducts.filter(mapset_products, filters) end
+  },
+  memory_time: 2
+)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+
+```
+$ git add .
+$ git commit -m "finish mapset product filters exercise"
+```

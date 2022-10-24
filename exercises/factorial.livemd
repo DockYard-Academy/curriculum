@@ -27,43 +27,51 @@ Meaning the factorial of `5` is `5 * 4 * 3 * 2 * 1` which equals `120`.
 
 So $factorial(n) = n * factorial(n - 1)$
 
-In the Elixir cell below, implement the `Factorial.of/1` function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Factorial.of(1)
-1
-
-Factorial.of(2)
-2
-
-Factorial.of(5)
-120
-
-Factorial.of(10)
-3628800
-```
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Factorial do
+  def of(1), do: 1
   def of(n) do
+    n * of(n - 1)
   end
 end
 ```
 
-### Validate Your Solution
+</details>
 
-To test your solution, ensure the following code does not crash with a **MatchError**.
+Our factorial function only needs to handle inputs above `1`.
+Implement the `Factorial` module as documented below.
 
 ```elixir
-1 = Factorial.of(1)
+defmodule Factorial do
+  @doc """
+  Find the factorial of an integer.
 
-2 = Factorial.of(2)
+  ## Examples
 
-120 = Factorial.of(5)
+    iex> Factorial.of(1)
+    1
 
-3_628_800 = Factorial.of(10)
+    iex> Factorial.of(2)
+    2
+
+    iex> Factorial.of(3)
+    6
+
+    iex> Factorial.of(4)
+    24
+    
+    iex> Factorial.of(5)
+    120
+
+    iex> Factorial.of(10)
+    3628800
+  """
+  def of(n) do
+  end
+end
 ```
 
 ## Commit Your Progress
@@ -77,6 +85,6 @@ $ git commit -m "finish factorial exercise"
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Lucas Numbers](../exercises/lucas_numbers.livemd) | [Anagram Solver](../exercises/anagram_solver.livemd) |
+| Previous                                           | Next                                                     |
+| -------------------------------------------------- | -------------------------------------------------------: |
+| [Lucas Numbers](../exercises/lucas_numbers.livemd) | [Pascals Triangle](../exercises/pascals_triangle.livemd) |

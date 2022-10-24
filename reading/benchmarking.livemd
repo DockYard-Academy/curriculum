@@ -62,26 +62,71 @@ IO.inspect(seconds, label: "seconds")
 ### Your Turn
 
 In the Elixir cell below, use `:timer.tc/1` to measure the following `slow_function`.
-Replace `nil` with your answer.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Using anonymous function.
+
+```elixir
+:timer.tc(fn -> slow_function.() end)
+```
+
+Passing the function directly.
+
+```elixir
+:timer.tc(slow_function)
+```
+
+</details>
 
 ```elixir
 slow_function = fn -> Process.sleep(1000) end
-
-result = nil
-
-Utils.feedback(:timer_tc, result)
 ```
 
-### Benchee
+### Your Turn
+
+In the Elixir cell below, use `:timer.tc/1` to measure the following named function.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Using anonymous function.
+
+```elixir
+:timer.tc(fn -> MyModule.slow_function() end)
+```
+
+Using capture operator.
+
+```elixir
+:timer.tc(&MyModule.slow_function/0)
+```
+
+</details>
+
+```elixir
+defmodule MyModule do
+  def slow_function do
+    Process.sleep(1000)
+  end
+end
+```
+
+## Benchee
 
 [Benchee](https://github.com/bencheeorg/benchee)
 is a popular library for measuring performance and memory consumption.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Installing Benchee
 
 External libraries need to be installed to use them.
 
 We use [Mix](https://hexdocs.pm/mix/1.13/Mix.html) to install Benchee.
 
-Mix is a build tool that provides tasks for creating, compiling, and testing Elixir projects, managing its dependencies, and more.
+Mix is a build tool that provides tasks for creating, compiling, testing, and managing dependencies for Elixir projects.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -98,11 +143,36 @@ D --> Benchee
 
 <!-- livebook:{"break_markdown":true} -->
 
-You'll learn more about Mix in future lessons. For now, it's enough to be aware that you won't be able
-to use the Benchee library unless it's installed.
-
 We've installed Benchee for you for this lesson, but be aware if you try to use Benchee in
 other projects it likely isn't installed.
+
+If you want [Benchee](https://hexdocs.pm/benchee/Benchee.html) in any Livebook, you have to add it to the setup section at the top of the Livebook if it is not already available. Include [Benchee](https://hexdocs.pm/benchee/Benchee.html) in the existing [Mix.install/2](https://hexdocs.pm/mix/Mix.html#install/2) call or add one. There should only ever be a single call to [Mix.install/2](https://hexdocs.pm/mix/Mix.html#install/2).
+
+Make sure to replace `1.1` with the latest version. You can find the latest version of Benchee on [Hex](https://hex.pm/packages/benchee).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Mix.install([
+  {:benchee, "~> 1.1"},
+])
+```
+
+In a mix project, you'll add the latest [Benchee](https://hexdocs.pm/benchee/Benchee.html) in the existing `deps/0` function in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp deps do
+  [
+    {:benchee, "~> 1.1"}
+  ]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Usage
 
 We can use the [Benchee.run/2](https://hexdocs.pm/benchee/Benchee.html#run/2) function to measure the performance and memory consumption of some function.
 
@@ -173,7 +243,7 @@ list       0.0324 M - 33.58x slower +29.97 μs
 ### Your Turn
 
 Use Benchee to compare accessing the **first** element instead of the last element as we already did above.
-You should notice the list is faster this time, or at least about the same speed. You'll learn why in a future lesson.
+You should notice the list is faster this time, or at least close to the same speed. You'll learn why in a future lesson.
 
 ```elixir
 Benchee.run(%{
@@ -181,6 +251,56 @@ Benchee.run(%{
   "access first element in tuple" => fn -> nil end
 })
 ```
+
+### Multiple Inputs
+
+We can use the `:inputs` option in [Benchee.run/2](https://hexdocs.pm/benchee/Benchee.html#run/2) to benchmark multiple inputs.
+
+```elixir
+Benchee.run(
+  %{
+    "Enum.count/1" => fn input -> Enum.count(input) end,
+    "Kernel.length/1" => fn input -> Kernel.length(input) end
+  },
+  inputs: [small: [1, 2, 3], medium: Enum.to_list(1..1000), large: Enum.to_list(1..100_000)]
+)
+```
+
+You should see a benchmark for each input.
+
+```
+##### With Input Small #####
+Name                      ips        average  deviation         median         99th %
+Kernel.length/1        1.34 M      745.94 ns  ±3912.97%         500 ns        1600 ns
+Enum.count/1           1.28 M      781.60 ns  ±3327.02%         500 ns        2000 ns
+
+Comparison: 
+Kernel.length/1        1.34 M
+Enum.count/1           1.28 M - 1.05x slower +35.66 ns
+
+##### With Input Medium #####
+Name                      ips        average  deviation         median         99th %
+Kernel.length/1      274.56 K        3.64 μs   ±627.53%        3.40 μs        6.30 μs
+Enum.count/1         265.48 K        3.77 μs  ±1277.99%        3.50 μs        8.20 μs
+
+Comparison: 
+Kernel.length/1      274.56 K
+Enum.count/1         265.48 K - 1.03x slower +0.124 μs
+
+##### With Input Large #####
+Name                      ips        average  deviation         median         99th %
+Kernel.length/1        5.30 K      188.70 μs    ±63.77%      157.70 μs      897.38 μs
+Enum.count/1           4.97 K      201.40 μs    ±75.41%      159.50 μs     1096.38 μs
+
+Comparison: 
+Kernel.length/1        5.30 K
+Enum.count/1           4.97 K - 1.07x slower +12.70 μs
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+This is especially useful for benchmarking how larger data affects our system. It's also useful for creating different situations (i.e. worst case and best case scenarios) that may cause our system to behave differently than expected.
 
 ## Commit Your Progress
 
@@ -193,6 +313,6 @@ $ git commit -m "finish benchmarking section"
 
 ## Up Next
 
-| Previous                                                 | Next                                     |
-| -------------------------------------------------------- | ---------------------------------------: |
-| [Computer Hardware](../reading/computer_hardware.livemd) | [Recursion](../reading/recursion.livemd) |
+| Previous                                                 | Next                                               |
+| -------------------------------------------------------- | -------------------------------------------------: |
+| [Computer Hardware](../reading/computer_hardware.livemd) | [Big O Notation](../reading/big_o_notation.livemd) |
