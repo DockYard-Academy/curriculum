@@ -1,11 +1,13 @@
-# Product Filters
+# Lazy Product Filters
 
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:utils, path: "#{__DIR__}/../utils"},
+  {:benchee, "~> 1.1"},
+  {:faker, "~> 0.17.0"}
 ])
 ```
 
@@ -14,9 +16,9 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Product Filters
+## Lazy Product Filters
 
-You're going to build an application where users search for products based on certain filters.
+Previously in the [Product Filters](./product_filters.livemd) exercise, you built an application where users search for products based on certain filters.
 
 Each product is a map with a `:name`, `:category`, and `:price` (in cents).
 
@@ -31,9 +33,9 @@ products = [
 ]
 ```
 
-Test and implement a `Products.filter/2` function which accepts a list of items
-and a keyword list of filters. Each filter is optional, and every item must have all of the included filters. This is called an **exclusive** search rather than an **inclusive** search.
+You're going to refactor and re-implement your existing `Products.filter/2` function using Streams.
 
+Ensure the refactored version passes your existing test suite.
 You should be able to filter by:
 
 1. a partial case-insensitive `:name` field.
@@ -143,28 +145,26 @@ ExUnit.run()
 <!-- livebook:{"break_markdown":true} -->
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution 1</summary>
+<summary>Example Solution</summary>
 
 In this example, we solve the problem by enumerating over products and checking each filter.
 
 ```elixir
 defmodule Products do
   def filter(products, filters) do
-    name_filter = Keyword.get(filters, :name, "")
-    category_filter = Keyword.get(filters, :category)
-    min_filter = Keyword.get(filters, :min)
-    max_filter = Keyword.get(filters, :max)
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
 
     products
-    |> Enum.filter(fn product ->
-      matches_name =
-        !name_filter or String.contains?(String.downcase(product.name), String.downcase(name))
-
-      matches_category = !category_filter or product.category == category_filter
-      above_min_price = !min_filter or min_filter <= product.price
-      below_max_price = !max_filter or product.price <= max_filter
-      matches_name and matches_category and above_min_price and below_max_price
+    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> Stream.reject(fn %{category: category} ->
+      category_filter && category_filter != category
     end)
+    |> Enum.to_list()
   end
 end
 ```
@@ -173,37 +173,10 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution 2</summary>
-
-In this example, we solve the problem by enumerating over every filter.
+Implement the `StreamProducts` module using Streams instead of the `Enum` module.
 
 ```elixir
-defmodule Products do
-  def check?({:min, min}, product), do: min <= product.price
-  def check?({:max, max}, product), do: product.price <= max
-
-  def check?({:name, name}, product),
-    do: String.contains?(String.downcase(product.name), String.downcase(name))
-
-  def check?({:category, category}, product), do: category == product.category
-
-  def filter(products, filters) do
-    Enum.filter(products, fn product ->
-      Enum.all?(filters, fn filter -> check?(filter, product) end)
-    end)
-  end
-end
-```
-
-</details>
-
-<!-- livebook:{"break_markdown":true} -->
-
-Implement and test the `Products` module based on the provided test cases and documentation.
-
-```elixir
-defmodule Products do
+defmodule StreamProducts do
   @moduledoc """
   Documentation for `Products`
   """
@@ -213,88 +186,103 @@ defmodule Products do
 
   ## Examples
 
-  No filters returs all products.
+    No filters returs all products.
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  Filter by name
+    Filter by name
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
-  []
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
+    []
 
-  Filter by category
+    Filter by category
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
-  []
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
+    []
 
-  Filter by min price.
+    Filter by min price.
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
-  []
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
+    []
 
-  Filter by max price.
+    Filter by max price.
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
-  [%{name: "Laptop", category: :tech, price: 100}]
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
+    [%{name: "Laptop", category: :tech, price: 100}]
 
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
-  []
+    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
+    []
 
-  Multiple filters.
+    Multiple filters.
 
-  Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+    Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
   """
   def filter(products, filters) do
   end
 end
+```
 
-ExUnit.start(auto_run: false)
+## Bonus: Benchmark
 
-defmodule ProductsTest do
-  use ExUnit.Case
+Did using `Stream` improve the performance of you solution? Use `Benchee` to find out. Ensure you benchmark your solution with a large and varied data set. We've included the [Faker](https://hexdocs.pm/faker/readme.html) project to make this easier.
 
-  test "filter/2 empty filters"
+```elixir
+Faker.Food.dish()
+```
 
-  test "filter/2 by exact matching name"
+Consider adding the `:memory_time` option to your benchmark to see which solution is more memory efficient.
 
-  test "filter/2 by partial matching name"
+<!-- livebook:{"break_markdown":true} -->
 
-  test "filter/2 by mixed case partial matching name"
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
-  test "filter/2 by category"
+```elixir
+names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
+categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
 
-  test "filter/2 by min price"
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
 
-  test "filter/2 by max price"
+filters = [name: "1", category: :tech, min: 25, max: 50]
 
-  test "filter/2 by max and min price"
+Benchee.run(
+  %{
+    "Enum" => fn -> EnumProducts.filter(products, filters) end,
+    "Stream" => fn -> StreamProducts.filter(products, filters) end
+  },
+  memory_time: 2
+)
+```
 
-  test "filter/2 all filters"
-end
+</details>
 
-ExUnit.run()
+```elixir
+
 ```
 
 ## Commit Your Progress
@@ -303,7 +291,7 @@ Run the following in your command line from the beta_curriculum folder to track 
 
 ```
 $ git add .
-$ git commit -m "finish product filters exercise"
+$ git commit -m "finish lazy product filters exercise"
 ```
 
 ## Up Next

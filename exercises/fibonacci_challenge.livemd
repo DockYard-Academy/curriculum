@@ -21,7 +21,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Fibonacci Sequence
 
-The Fibonacci Sequence is a series of the following numbers.
+The Fibonacci sequence is a series of the following numbers.
 
 ```mermaid
 flowchart LR
@@ -34,64 +34,50 @@ It's created by taking the sum of the previous to numbers to get the next number
 
 So $fib(n) = fib(n-1) + fib(n - 2)$
 
-You'll notice that this is a recursive function. You're going to create a `Fibonacci` module that can generate the $nth$ fibonacci number.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
+Implement the `Fibonacci.sequence/1` function below. Do not worry about performance for this solution.
 
 ```elixir
 defmodule Fibonacci do
-  def of(1), do: 0
-  def of(2), do: 1
+  @doc """
+  Generate the fibonacci sequence of a given length.
 
-  def of(n) do
-    of(n - 1) + of(n - 2)
+  ## Examples
+
+    iex> 
+  """
+  def sequence(length) do
   end
 end
 ```
 
-</details>
+## Competition: Benchmark
 
-Implement the `Fibonacci` module as documented.
+In the Elixir cell below, create a `FastFib` module. The `FastFib` module should be the most performant version of the Fibonacci Sequence that you can create.
 
 ```elixir
-defmodule Fibonacci do
-  @moduledoc """
-  Documentation for the `Fibonacci` module.
-  """
-
-  @doc """
-  Generate the nth fibonacci number.
-
-  ## Examples
-
-    iex> Fibonacci.of(1)
-    0
-
-    iex> Fibonacci.of(2)
-    1
-
-    iex> Fibonacci.of(3)
-    1
-
-    iex> Fibonacci.of(4)
-    2
-
-    iex> Fibonacci.of(5)
-    3
-
-    iex> Fibonacci.of(6)
-    5
-
-    iex> Fibonacci.of(7)
-    8
-
-    iex> FIbonacci.of(20)
-    4181
-  """
-  def of(n) do
+defmodule FastFib do
+  def sequence(n) do
   end
 end
+```
+
+Use `Benchee` to benchmark the performance of `FastFib.sequence/1` function. The student in the class with the fastest `FastFib` time wins.
+
+```elixir
+Benchee.run(
+  %{
+    fast_fib: fn n -> FastFib.sequence(n) end
+  },
+  inputs: %{
+    "1: small" => 10,
+    "2: medium" => 30
+    # Uncomment the following if your solution can handle it!
+    # "3: large" => 100
+    # "4: xl" => 1000
+    # "6: 2xl" => 10000
+    # "7: 3xl" => 100000
+  }
+)
 ```
 
 ## Commit Your Progress
