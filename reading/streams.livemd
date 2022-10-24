@@ -151,13 +151,13 @@ when it's called with any eager function from the [Enum](https://hexdocs.pm/elix
 |> Enum.to_list()
 ```
 
-We can see this more clearly if we use `IO.puts/1` to trigger a side effect. Notice we're not printing anything.
+We can see this more clearly if we use [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) to trigger a side effect. Notice we're not printing anything.
 
 ```elixir
 Stream.each(1..10, &IO.puts/1)
 ```
 
-`IO.puts/1` is only called when we run the stream with `Stream.run/1` or when we use an `Enum` function.
+[IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) is only called when we run the stream with [Stream.run/1](https://hexdocs.pm/elixir/Stream.html#run/1) or when we use an [Enum](https://hexdocs.pm/elixir/Enum.html) function.
 
 ```elixir
 1..10
@@ -333,7 +333,7 @@ Stream.cycle([1, 2, 3])
 
 ### Lazy Evaluation
 
-We've been using lazy evaluation for a while now! Ranges only create each element in the list when necessary, so we can create a massive range without any noticable performance impact.
+We've been using lazy evaluation for a while now! Ranges only create each element in the list when necessary, so we can create a massive range without any noticeable performance impact.
 
 When we use that massive range with an [Enum](https://hexdocs.pm/elixir/Enum.html) operation, then we pay the computational price!
 
@@ -415,7 +415,7 @@ Use `Stream.iterate` to implement the collatz conjecture given a `starting_integ
 1. If the number is odd, multiply the number by three and add 1
 2. If the number is even, divide by two.
 
-Use `Enum.take_while/2` to generate elements from the stream until it returns `4` to prove it eventually repeats `4`, `2`, `1`, forever. Try changing your `starting_integer` to provide this for larger numbers.
+Use [Enum.take_while/2](https://hexdocs.pm/elixir/Enum.html#take_while/2) to generate elements from the stream until it returns `4` to prove it eventually repeats `4`, `2`, `1`, forever. Try changing your `starting_integer` to provide this for larger numbers.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -520,6 +520,6 @@ $ git commit -m "finish streams section"
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Big O Notation](../reading/big_o_notation.livemd) | [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) |
+| Previous                                                     | Next                                               |
+| ------------------------------------------------------------ | -------------------------------------------------: |
+| [Games Benchmarking](../exercises/games_benchmarking.livemd) | [Stream Drills](../exercises/stream_drills.livemd) |

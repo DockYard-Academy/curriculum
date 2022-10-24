@@ -203,17 +203,20 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Testing With ExUnit
 * ExUnit With Mix Projects
 * Documentation and Static Analysis
-* Group Project
 ## OTP and Advanced Syntax
 * Protocols
-* Supervisor Basics and Fault Tolerance
 * Recursion
+* Benchmarking and Performance
+* Streams
 * Performance Optimization
-* Files and Data Validation
 * Processes
-* Agent, Task, and ETS
+* Supervisor Basics and Fault Tolerance
+* Concurrency With Tasks
+* State Management With Agents
+* In Memory State With Agents and ETS.
+* Files and Data Validation
 ## Web Servers and Phoenix
-* HTML & CSS
+* HTML and CSS
 * APIs & Parsing JSON
 * Phoenix
 ## Databases With Ecto
@@ -226,24 +229,21 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix and Ecto One-to-One Relationships
 * Tailwind
 ## LiveView
-* UX/UI Design + Accessibility
-* Phoenix LiveView
+* LiveView
+* Testing LiveView
 * Phoenix Forms
-* PubSub & Channels
-* GraphQL & Absinthe (+ Testing Patterns)
+* PubSub and Channels
+* GraphQL and Absinthe
+## Capstone Project Preparation
+* Capstone Project
+* UX/UI Design + Accessibility
 ## Quality Assurance
-* TDD Techniques (Red Green Refactor)
-* Metrics, Telemetry, Live Dashboard
+* Observability
 * Factories & Mocks
-* Property Based Testing (Stream Data) + E2E Testing (Wallaby)
 * CI/CD, Code Coverage, GitHub Actions & Hooks
-## Architecture
-* Software & Product Management (Agile, StandUps, Kanban)
-* Architecture Design & Patterns (Diagrams, UML, CQRS/ES, Contexts, MVC)
-* Advanced Livebook (Graphs, Tables, Connecting Projects)
-* Open Source Patterns & Advanced GitHub (PRs, Forking, Cloning, Issues, Rebasing)
-* Group Project Start
-* Designing Elixir Systems With OTP
+## Group Project
+* Project Management
+* Group Project
 ## External Libraries
 * Emailing & Swoosh
 * Oban
@@ -253,5 +253,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Genserver Bottlenecks
 * Worker Pools
 * Deployment
-## (Final Project)
+## Final Project
+* Demo Day
 <!-- course-outline-end -->
