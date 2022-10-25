@@ -28,3 +28,14 @@ Removed to be sorted
   * Test Music Filters
   * E2E Test Rock Paper Scissors App
 
+
+
+### Others not in the curriculum
+
+* [Bomb Defusal](exercises/bomb_defusal.livemd)
+* [Character Generator](exercises/character_generator.livemd)
+* [DEPRECATED School Grades](exercises/DEPRECATED_school_grades.livemd)
+* [Journal](exercises/journal.livemd)
+* [Mining Simulator](exercises/mining_simulator.livemd)
+* [Mix Math](exercises/mix_math.livemd)
+* [Todo List](exercises/todo_list.livemd)
