@@ -94,7 +94,7 @@ defimpl Character, for: Wizard do
     x_diff = init_x - x
     y_diff = init_y - y
 
-    abs(x_diff) == abs(y_diff)
+    init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
   end
 end
 
@@ -158,14 +158,22 @@ defprotocol Character do
     true
 
     iex> Character.can_attack?(%Wizard{}, {4, 4}, {5, 4})
-    false
+    true
     iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 5})
-    false
+    true
     iex> Character.can_attack?(%Wizard{}, {4, 4}, {3, 4})
-    false
+    true
     iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 3})
-    false
+    true
 
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {6, 5})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {2, 5})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {3, 2})
+    false
+    iex> Character.can_attack?(%Wizard{}, {4, 4}, {6, 3})
+    false
   """
   def can_attack?(character, origin, target)
 end

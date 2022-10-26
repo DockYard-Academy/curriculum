@@ -1017,36 +1017,4 @@ defmodule Utils.Solutions do
   end
 
   def evolvable, do: [Evolvable, Charmander, Charmeleon, Charizard]
-
-  defmodule Barbarian do
-    defstruct []
-  end
-
-  defmodule Wizard do
-    defstruct []
-  end
-
-  defprotocol BattleCharacter do
-    def can_attack?(character, origin, target)
-  end
-
-  defimpl BattleCharacter, for: Wizard do
-    def can_attack?(_character, {init_x, init_y}, {x, y}) do
-      x_diff = init_x - x
-      y_diff = init_y - y
-
-      init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
-    end
-  end
-
-  defimpl BattleCharacter, for: Barbarian do
-    def can_attack?(_character, {init_x, init_y}, {x, y}) do
-      x_diff = init_x - x
-      y_diff = init_y - y
-
-      abs(x_diff) <= 2 && abs(y_diff) <= 2
-    end
-  end
-
-  def battle_map, do: [BattleCharacter, Barbarian, Wizard]
 end
