@@ -79,16 +79,16 @@ GenericServer.start(CallbackModule)
 
 <!-- livebook:{"break_markdown":true} -->
 
-The `GenericServer` should be able to recieve a message and return a response.
+The `GenericServer` should be able to receive a message and return a response.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 sequenceDiagram
     Process ->> Generic Server: send
-    Generic Server ->> Generic Server: recieve
+    Generic Server ->> Generic Server: receive
     Generic Server ->> Process: send
-    Process->> Process: recieve
+    Process->> Process: receive
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -118,11 +118,11 @@ a message.
 
 ```mermaid
 sequenceDiagram
-    Generic Server->> Generic Server: recieve
+    Generic Server->> Generic Server: receive
     Generic Server ->> Generic Server: handle_call(request, state)
     Generic Server ->> Generic Server: new state
     Generic Server ->> Process: send
-    Process->> Process: recieve
+    Process->> Process: receive
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -187,14 +187,14 @@ sequenceDiagram
     Caller Process ->> Generic Server: spawn
     Generic Server ->> Callback Module: init
     Callback Module ->> Generic Server: init
-    Generic Server ->> Generic Server: loop recieve
+    Generic Server ->> Generic Server: loop receive
 
     Caller Process ->> Generic Server: send
     Generic Server ->> Callback Module: handle_call
     Callback Module ->> Generic Server: new state, response
     Generic Server ->> Generic Server: update state
     Generic Server ->> Caller Process: send
-    Caller Process ->> Caller Process: recieve
+    Caller Process ->> Caller Process: receive
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -379,7 +379,7 @@ that the count increments.
 GenServer.call(pid, :increment)
 ```
 
-`GenServer.call/3` executes the `handle_call/3` function in the internal code of [GenServer](https://hexdocs.pm/elixir/GenServer.html), just like our
+[GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) executes the `handle_call/3` function in the internal code of [GenServer](https://hexdocs.pm/elixir/GenServer.html), just like our
 `GenericServer`. The parent process then receives a response.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -453,7 +453,7 @@ end
 
 ## Fire and Forget
 
-So far, we've seen only synchronous message sending, where every message blocks the calling process. To demonstrate, here's an example that simulates a `GenServer` with a slower operation.
+So far, we've seen only synchronous message sending, where every message blocks the calling process. To demonstrate, here's an example that simulates a [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a slower operation.
 
 ```elixir
 defmodule SlowServer do
@@ -481,12 +481,12 @@ The caller process only continues when the slow server finishes the `handle_call
 ```elixir
 IO.puts("Caller starting")
 response = GenServer.call(pid, :sleep)
-IO.puts("Caller recieved: #{response}")
+IO.puts("Caller received: #{response}")
 ```
 
-Most of the time, we want this behavior. This makes our code predictable, especially when we want to recieve a response from the `GenServer`. However, sometimes we want to **fire-and-forget**, meaning we send the `GenServer` a message so it can handle some work for us or update it's state without blocking the caller process.
+Most of the time, we want this behavior. This makes our code predictable, especially when we want to receive a response from the [GenServer](https://hexdocs.pm/elixir/GenServer.html). However, sometimes we want to **fire-and-forget**, meaning we send the [GenServer](https://hexdocs.pm/elixir/GenServer.html) a message so it can handle some work for us or update it's state without blocking the caller process.
 
-For example, we can modify our `CounterServer` to use `handle_cast/2` to increment the count, then `handle_call/3` to return the updated count. We'll use `Process.sleep/1` to increment the count after one second.
+For example, we can modify our `CounterServer` to use `handle_cast/2` to increment the count, then `handle_call/3` to return the updated count. We'll use [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to increment the count after one second.
 
 `handle_cast/2` does not need to know the parent process, because it doesn't return a response. It returns `{:noreply, state}`.
 
@@ -527,7 +527,7 @@ IO.puts("not blocked!")
 
 ### Your Turn
 
-Create a new version of your `Journal` `GenServer` that uses `handle_call/3` to retrieve journal entries, and `handle_cast/2` to add journal entries.
+Create a new version of your `Journal` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that uses `handle_call/3` to retrieve journal entries, and `handle_cast/2` to add journal entries.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -562,9 +562,9 @@ end
 ## Client / Server APIs
 
 Often we organize GenServers into client functions and server callbacks.
-Rather than use the `GenServer` module directly, we'll create functions that abstract that implementation detail away.
+Rather than use the [GenServer](https://hexdocs.pm/elixir/GenServer.html) module directly, we'll create functions that abstract that implementation detail away.
 
-Commonly, the `GenServer` module will define a `start_link/1` function for starting the GenServer, and a function for each message we can send to the `GenServer`.
+Commonly, the [GenServer](https://hexdocs.pm/elixir/GenServer.html) module will define a `start_link/1` function for starting the GenServer, and a function for each message we can send to the [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 Here's our `Counter` server with an `increment/1` client API function.
 
@@ -601,7 +601,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Whenever refering to the current module, instead of using the full module name `CounterClientAndServer`, we can use the special syntax `__MODULE__` which automatically returns the name of the current module. This is useful if we ever change the module name to avoid refactoring.
+Whenever referring to the current module, instead of using the full module name `CounterClientAndServer`, we can use the special syntax `__MODULE__` which automatically returns the name of the current module. This is useful if we ever change the module name to avoid refactoring.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -625,9 +625,9 @@ See [Client / Server APIs](https://hexdocs.pm/elixir/1.12/GenServer.html#module-
 
 ## Name Registration
 
-Sometimes we want to name our processes so there is only ever a single named process rather than refering to many processes by their PID. These are sometimes called **singletons**.
+Sometimes we want to name our processes so there is only ever a single named process rather than referring to many processes by their PID. These are sometimes called **singletons**.
 
-Here, we have a simplified `NamedCounter` `GenServer` that will server as our singleton example.
+Here, we have a simplified `NamedCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that will server as our singleton example.
 
 ```elixir
 defmodule NamedCounter do
@@ -645,7 +645,7 @@ defmodule NamedCounter do
 end
 ```
 
-We can spawn a process as a named process singleton when we call `GenServer.start_link/3` by passing in a `:name` option. The name can be any atom we choose.
+We can spawn a process as a named process singleton when we call [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) by passing in a `:name` option. The name can be any atom we choose.
 
 ```elixir
 GenServer.start_link(NamedCounter, [], name: :my_counter)
@@ -657,7 +657,7 @@ You'll notice if we try to start this named process twice we get an error, becau
 GenServer.start_link(NamedCounter, [], name: :my_counter)
 ```
 
-Now, rather than refering to the process by it's PID, we can use the process name.
+Now, rather than referring to the process by it's PID, we can use the process name.
 
 ```elixir
 GenServer.call(:my_counter, :increment)
@@ -701,10 +701,10 @@ GenServer.call(CounterSingleton, :increment)
 
 ## Thought Provoking Questions
 
-* When would we want to use a `GenServer`?
-* When might you want to use `GenServer.call/3` vs `GenServer.cast/2`?
-* What happens if a `GenServer` takes a long time to respond? see [Timeouts](https://hexdocs.pm/elixir/1.12/GenServer.html#module-timeouts).
-* What happens when we send a `GenServer` too many messages? How might that bottleneck our program?
+* When would we want to use a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
+* When might you want to use [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) vs [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2)?
+* What happens if a [GenServer](https://hexdocs.pm/elixir/GenServer.html) takes a long time to respond? see [Timeouts](https://hexdocs.pm/elixir/1.12/GenServer.html#module-timeouts).
+* What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? How might that bottleneck our program?
 
 ## Further Reading
 
