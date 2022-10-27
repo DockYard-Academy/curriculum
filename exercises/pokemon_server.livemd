@@ -69,6 +69,22 @@ Pokemon.attack(attacker, defender)
 %Pokemon{name: "Bulbasaur1", type: :grass, health: 15, attack: 20} = :sys.get_state(defender)
 ```
 
+### Type Advantages and Weaknesses
+
+Multiply the damage dealt by an attack by `2` if the attacker has a type advantage. Multiply the damage applied by `0.5` if the attacker has a type weakness.
+
+Type Advantages are:
+
+* fire -> grass
+* grass -> water
+* water -> fire
+
+Type weaknesses are:
+
+* fire -> water
+* grass -> fire
+* water -> grass
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Example Solution</summary>
 
@@ -161,52 +177,44 @@ defmodule Pokemon do
   ## Examples
 
     With default values.
-    iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass})
-    iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass})
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 15, attack: 5}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 10, attack: 5}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 5, attack: 5}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
+      iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass})
+      iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass})
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 15, attack: 5}
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 10, attack: 5}
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 5, attack: 5}
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 0, attack: 5}
+
+    With type advantage
+
+      iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Charmander", type: :fire})
+      iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur", type: :grass})
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5}
+
+    With type weakness
+
+      iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur", type: :grass})
+      iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Charmander", type: :fire})
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5}
 
     Ensure you use the attacking pokemon's attack number to apply damage to the defending pokemon's health.
 
-    iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass, attack: 20})
-    iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass, health: 45})
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur2", type: :grass, health: 25, attack: 5}
+      iex> {:ok, attacker} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass, attack: 20})
+      iex> {:ok, defender} = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass, health: 45})
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur2", type: :grass, health: 25, attack: 5}
   """
   def attack(attacker, defender) do
   end
 end
 ```
-
-```elixir
-
-```
-
-### Bonus: Type Advantages and Weaknesses
-
-Multiply the damage dealt by an attack by `2` if the attacker has a type advantage. Multiply the damage applied by `0.5` if the attacker has a type weakness.
-
-Type Advantages are:
-
-* fire -> grass
-* grass -> water
-* water -> fire
-
-Type weaknesses are:
-
-* fire -> water
-* grass -> fire
-* water -> grass
-
-Modify your solution above to complete this bonus section.
 
 ## Commit Your Progress
 
@@ -224,6 +232,6 @@ Then create a pull request to your `main` branch and notify your teacher by incl
 
 ## Up Next
 
-| Previous                                                                           | Next                                         |
-| ---------------------------------------------------------------------------------- | -------------------------------------------: |
-| [Rock Paper Scissors GenServer](../exercises/rock_paper_scissors_genserver.livemd) | [Supervisors](../reading/supervisors.livemd) |
+| Previous                                                         | Next                                         |
+| ---------------------------------------------------------------- | -------------------------------------------: |
+| [Traffic Light Server](../exercises/traffic_light_server.livemd) | [Supervisors](../reading/supervisors.livemd) |
