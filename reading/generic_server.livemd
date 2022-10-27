@@ -32,13 +32,13 @@ processes sending messages to the generic server.
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-  subgraph GenericServer
-    State --> h
-    h[handle message]
-    h --new state--> State
-  end
-  Process --message--> GenericServer
+sequenceDiagram
+    Process-->> Generic Server: send message
+    activate Generic Server
+    Generic Server->>Generic Server: handle message
+    Generic Server->>Generic Server: new state
+    Generic Server-->> Process: send response
+    deactivate Generic Server
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -47,8 +47,11 @@ Typically the callback module defines an `init` function to define the initial s
 the `GenericServer` process.
 
 ```mermaid
-flowchart LR
-  CallbackModule --> init --> state --> GenericServer
+sequenceDiagram
+    Generic Server ->> Generic Server: spawns
+    Generic Server ->> Callback Module: init callback
+    Callback Module ->> Generic Server: init value
+    Generic Server ->> Generic Server: initializes state
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -76,19 +79,16 @@ GenericServer.start(CallbackModule)
 
 <!-- livebook:{"break_markdown":true} -->
 
-The `GenericServer` should be able to send a message and receive a response.
+The `GenericServer` should be able to recieve a message and return a response.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-  GS2[Genserver 1]
-  GS1[Genserver 2]
-  c[call]
-
-  GS1 --> c --request--> GS2
-  GS2 --response--> c
-
+sequenceDiagram
+    Process ->> Generic Server: send
+    Generic Server ->> Generic Server: recieve
+    Generic Server ->> Process: send
+    Process->> Process: recieve
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -117,10 +117,12 @@ a message.
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart LR
-  GenericServer --> receive
-  receive --request, state--> CallbackModule --> h["handle_call(request, state)"]
-  --request, new_state --> receive
+sequenceDiagram
+    Generic Server->> Generic Server: recieve
+    Generic Server ->> Generic Server: handle_call(request, state)
+    Generic Server ->> Generic Server: new state
+    Generic Server ->> Process: send
+    Process->> Process: recieve
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -181,29 +183,23 @@ Putting all of that together, we get the full flow of our `GenericServer` and `C
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-  GenericServer --> loop --state--> receive --new state--> loop
-  Caller --> c[call] --request--> receive --response--> c
-  receive --request, state--> CallbackModule --> h["handle_call(request, state)"]
-  --request, new_state --> receive
+sequenceDiagram
+    Caller Process ->> Generic Server: spawn
+    Generic Server ->> Callback Module: init
+    Callback Module ->> Generic Server: init
+    Generic Server ->> Generic Server: loop recieve
 
-  style GenericServer fill:orange,stroke:#333,stroke-width:2px
-  style Caller fill:yellow,stroke:#333,stroke-width:2px
-  style CallbackModule fill:#f9f,stroke:#333,stroke-width:2px
-
-  style receive fill:orange
-  style loop fill:orange
-
-  style c fill:yellow
-
-  style h fill:#f9f
-
-
+    Caller Process ->> Generic Server: send
+    Generic Server ->> Callback Module: handle_call
+    Callback Module ->> Generic Server: new state, response
+    Generic Server ->> Generic Server: update state
+    Generic Server ->> Caller Process: send
+    Caller Process ->> Caller Process: recieve
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
-We have a full `GenericServer` module.
+Here's the fully functional `GenericServer` module.
 
 ```elixir
 defmodule GenericServer do
@@ -344,7 +340,7 @@ defmodule Counter do
 end
 ```
 
-We use [GenServer.start_link/2](https://hexdocs.pm/elixir/GenServer.html#start_link/2) to start the new `Counter` process with the new counter process.
+We use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start the new `Counter` process with the new counter process.
 There are no options, so the second parameter is an empty list.
 
 ```elixir
@@ -383,15 +379,22 @@ that the count increments.
 GenServer.call(pid, :increment)
 ```
 
-`call` executes the `handle_call/3` function in the internal code of [GenServer](https://hexdocs.pm/elixir/GenServer.html), just like our
+`GenServer.call/3` executes the `handle_call/3` function in the internal code of [GenServer](https://hexdocs.pm/elixir/GenServer.html), just like our
 `GenericServer`. The parent process then receives a response.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
-flowchart
-  P[Parent Process] --> GenServer --> c[call] --> h[handle_call/3] --response--> P
-  h --new_state--> GenServer
+sequenceDiagram
+    Caller Process ->> GenServer: start_link
+    GenServer ->> Callback Module: init
+    Callback Module ->> GenServer: init
+    GenServer ->> Caller Process: pid
+
+    Caller Process ->> GenServer: GenServer.call/2
+    GenServer ->> Callback Module: handle_call/3
+    Callback Module ->> GenServer: new state, response
+    GenServer ->> Caller Process: response
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -414,17 +417,302 @@ All journal entries should be stored in state and returned as a `list` for the r
 ```elixir
 {:ok, journal_pid} = GenServer.start_link(Journal, [])
 
-GenServer.call(:add_entry, "first entry")
+GenServer.call(journal_pid, {:add_entry, "first entry"})
 ["first entry"]
 
-GenServer.call(:add_entry, "second entry")
-["first entry", "second entry"]
+GenServer.call(journal_pid, {:add_entry, "second entry"})
+["second entry", "first entry"]
 ```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Journal do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, []}
+  end
+
+  @impl true
+  def handle_call({:add_entry, message}, _from, entries) do
+    new_entries = [message | entries]
+    {:reply, new_entries, new_entries}
+  end
+end
+
+```
+
+</details>
+
+```elixir
+
+```
+
+## Fire and Forget
+
+So far, we've seen only synchronous message sending, where every message blocks the calling process. To demonstrate, here's an example that simulates a `GenServer` with a slower operation.
+
+```elixir
+defmodule SlowServer do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, nil}
+  end
+
+  @impl true
+  def handle_call(:sleep, _from, state) do
+    IO.puts("Starting sleep")
+    Process.sleep(1000)
+    IO.puts("Ending sleep")
+    {:reply, "response!", state}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(SlowServer, 0)
+```
+
+The caller process only continues when the slow server finishes the `handle_call/3` function.
+
+```elixir
+IO.puts("Caller starting")
+response = GenServer.call(pid, :sleep)
+IO.puts("Caller recieved: #{response}")
+```
+
+Most of the time, we want this behavior. This makes our code predictable, especially when we want to recieve a response from the `GenServer`. However, sometimes we want to **fire-and-forget**, meaning we send the `GenServer` a message so it can handle some work for us or update it's state without blocking the caller process.
+
+For example, we can modify our `CounterServer` to use `handle_cast/2` to increment the count, then `handle_call/3` to return the updated count. We'll use `Process.sleep/1` to increment the count after one second.
+
+`handle_cast/2` does not need to know the parent process, because it doesn't return a response. It returns `{:noreply, state}`.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:get_count, _from, state) do
+    {:reply, state, state}
+  end
+
+  @impl true
+  def handle_cast(:increment, state) do
+    IO.puts("count: #{state + 1}")
+    Process.sleep(1000)
+    {:noreply, state + 1}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Counter, 0)
+```
+
+Now, even though it takes a second to increment the count, the caller process will be able to continue.
+
+```elixir
+GenServer.cast(pid, :increment)
+GenServer.cast(pid, :increment)
+GenServer.cast(pid, :increment)
+
+IO.puts("not blocked!")
+```
+
+### Your Turn
+
+Create a new version of your `Journal` `GenServer` that uses `handle_call/3` to retrieve journal entries, and `handle_cast/2` to add journal entries.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Journal do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, []}
+  end
+
+  @impl true
+  def handle_cast({:add_entry, message}, entries) do
+    {:no_reply, [message | entries]}
+  end
+
+  @impl true
+  def handle_call(:get_entries, _from, entries) do
+    {:reply, entries, entries}
+  end
 end
 ```
+
+</details>
+
+```elixir
+
+```
+
+## Client / Server APIs
+
+Often we organize GenServers into client functions and server callbacks.
+Rather than use the `GenServer` module directly, we'll create functions that abstract that implementation detail away.
+
+Commonly, the `GenServer` module will define a `start_link/1` function for starting the GenServer, and a function for each message we can send to the `GenServer`.
+
+Here's our `Counter` server with an `increment/1` client API function.
+
+```elixir
+defmodule CounterClientAndServer do
+  use GenServer
+
+  # Client API
+
+  def start_link(_opts) do
+    GenServer.start_link(CounterClientAndServer, [])
+  end
+
+  def increment(counter_pid) do
+    GenServer.call(counter_pid, :increment)
+  end
+
+  # Server callbacks
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    next_count = state + 1
+    {:reply, next_count, next_count}
+  end
+end
+```
+
+### `__MODULE__`
+
+<!-- livebook:{"break_markdown":true} -->
+
+Whenever refering to the current module, instead of using the full module name `CounterClientAndServer`, we can use the special syntax `__MODULE__` which automatically returns the name of the current module. This is useful if we ever change the module name to avoid refactoring.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterClientAndServer do
+  use GenServer
+
+  # Client API
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
+  end
+  
+  ...
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+See [Client / Server APIs](https://hexdocs.pm/elixir/1.12/GenServer.html#module-client-server-apis) for more.
+
+## Name Registration
+
+Sometimes we want to name our processes so there is only ever a single named process rather than refering to many processes by their PID. These are sometimes called **singletons**.
+
+Here, we have a simplified `NamedCounter` `GenServer` that will server as our singleton example.
+
+```elixir
+defmodule NamedCounter do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    {:reply, state + 1, state + 1}
+  end
+end
+```
+
+We can spawn a process as a named process singleton when we call `GenServer.start_link/3` by passing in a `:name` option. The name can be any atom we choose.
+
+```elixir
+GenServer.start_link(NamedCounter, [], name: :my_counter)
+```
+
+You'll notice if we try to start this named process twice we get an error, because the process has already started.
+
+```elixir
+GenServer.start_link(NamedCounter, [], name: :my_counter)
+```
+
+Now, rather than refering to the process by it's PID, we can use the process name.
+
+```elixir
+GenServer.call(:my_counter, :increment)
+```
+
+It's common to name the process after the module that defines it. We usually include this configuration in a `start_link/1` function inside of the named module.
+
+Here's a `CounterSingleton` module which demonstrates how to configure the module as a named process.
+
+```elixir
+defmodule CounterSingleton do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    {:reply, state + 1, state + 1}
+  end
+end
+```
+
+Now we can start the named process using `CounterSingleton.start_link/1`.
+
+```elixir
+CounterSingleton.start_link([])
+```
+
+Now we can send the named process messages using the module name.
+
+```elixir
+GenServer.call(CounterSingleton, :increment)
+```
+
+## Thought Provoking Questions
+
+* When would we want to use a `GenServer`?
+* When might you want to use `GenServer.call/3` vs `GenServer.cast/2`?
+* What happens if a `GenServer` takes a long time to respond? see [Timeouts](https://hexdocs.pm/elixir/1.12/GenServer.html#module-timeouts).
+* What happens when we send a `GenServer` too many messages? How might that bottleneck our program?
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html#call/3)
+* [ElixirLang: GenServer](https://elixir-lang.org/getting-started/mix-otp/genserver.html)
+* [Exercism: GenServer](https://exercism.org/tracks/elixir/concepts/genserver)
 
 ## Commit Your Progress
 

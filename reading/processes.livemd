@@ -56,8 +56,7 @@ flowchart
   end
 ```
 
-You've been using processes for some time now. Each Elixir cell in livebook is a process.
-It even has a **pid** (personal identifier) that we can see with `self()`.
+Perhaps without realizing it, you've been using processes for some time now. Each Elixir cell in livebook is a process. It even has a **pid** (personal identifier) that we can see with `self()`.
 
 ```elixir
 self()
@@ -107,7 +106,7 @@ spawn --> Process --> Alive --> cn[Callback Function] --> Dead
 ```
 
 We can use the [Process](https://hexdocs.pm/elixir/Process.html) module for functionality
-related to processes. We'll use the `alive?/1` function to show that the process is alive before executing its callback function.
+related to processes. We'll use the `alive?/1` function to show that the process is alive before executing its callback function. `Process.sleep/1` pauses the execution of the process that it is called in.
 
 ```elixir
 pid = spawn(fn -> IO.puts("I was called") end)
@@ -151,17 +150,23 @@ spawn(fn -> raise "oops" end)
 If this is not desirable behavior, we can link processes together so that if one dies, the other will
 crash.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ```mermaid
-flowchart LR
-subgraph Child
-  CP[Child Process] --> raise --dies--> CP
-end
-subgraph Parent
-  PA[Parent Process]
-end
-PA --spawns_link--> Link --> CP
-  raise --crash--> PA
+sequenceDiagram
+    Parent Process->>Child Process: spawns link
+    activate Child Process
+    Child Process-->>Parent Process: pid
+    Child Process->>Child Process: raise
+    activate Child Process
+    Child Process->>Parent Process: raise
+    deactivate Child Process
+    Child Process->>Child Process: dies
+    Parent Process->>Parent Process: raise
+    deactivate Child Process
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 We can either `spawn_link/1`.
 

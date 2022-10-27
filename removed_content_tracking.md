@@ -18,6 +18,7 @@ Removed to be sorted
 * [Rubix Cube](exercises/rubix_cube.livemd)
 * Bonus: [Sublist](exercises/sublist.livemd)
 * [Anagram Solver](exercises/anagram_solver.livemd)
+* [Rock Paper Scissors GenServer](exercises/rock_paper_scissors_genserver.livemd)
 
 ### Property Based Testing (Stream Data) + E2E Testing (Wallaby)
 
