@@ -1166,39 +1166,6 @@ defmodule Utils.Feedback do
     assert evolvable.evolve(struct(charmeleon)) == struct(charizard)
   end
 
-  feedback :battle_map do
-    [character, barbarian, wizard] = get_answers()
-
-    wizard = struct(wizard)
-    barbarian = struct(barbarian)
-
-    for init_x <- 1..7, init_y <- 1..7, x <- 1..7, y <- 1..7 do
-      x_diff = init_x - x
-      y_diff = init_y - y
-
-      can_attack = init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
-
-      assert character.can_attack?(wizard, {init_x, init_y}, {x, y}) == can_attack, """
-      Called with: Character.can_attack(%Wizard{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
-      Expected: #{can_attack}
-      Received: #{character.can_attack?(wizard, {init_x, init_y}, {x, y})}
-      """
-    end
-
-    for init_x <- 1..7, init_y <- 1..7, x <- 1..7, y <- 1..7 do
-      x_diff = init_x - x
-      y_diff = init_y - y
-
-      can_attack = abs(x_diff) <= 2 && abs(y_diff) <= 2
-
-      assert character.can_attack?(barbarian, {init_x, init_y}, {x, y}) == can_attack, """
-      Called with: Character.can_attack(%Barbarian{}, #{inspect({init_x, init_y})}, #{inspect({x, y})})
-      Expected: #{can_attack}
-      Received: #{character.can_attack?(barbarian, {init_x, init_y}, {x, y})}
-      """
-    end
-  end
-
   feedback :number_wordle do
     number_wordle = get_answers()
 
