@@ -4,8 +4,7 @@
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:tested_cell, github: "brooklinjazz/tested_cell"}
 ])
 ```
 
@@ -79,6 +78,24 @@ classDiagram
   }
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Charmander do
+  defstruct hp: 39, attack: 52, defense: 43
+end
+
+defmodule Charmeleon do
+  defstruct hp: 58, attack: 64, defense: 58
+end
+
+defmodule Charizard do
+  defstruct hp: 78, attack: 84, defense: 78
+end
+```
+</details>
+
 ```elixir
 defmodule Charmander do
 end
@@ -88,8 +105,6 @@ end
 
 defmodule Charizard do
 end
-
-Utils.feedback(:pokemon_evolution_structs, [Charmander, Charmeleon, Charizard])
 ```
 
 ## Evolvable Protocol
@@ -114,11 +129,27 @@ Evolvable.evolve(%Charmeleon{})
 %Charizard{hp: 78, attack: 84: defense: 78}
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defprotocol Evolvable do
+  def evolve(pokemon)
+end
+
+defimpl Evolvable, for: Charmander do
+  def evolve(_charmander), do: %Charmeleon{}
+end
+
+defimpl Evolvable, for: Charmeleon do
+  def evolve(_charmeleon), do: %Charizard{}
+end
+```
+</details>
+
 ```elixir
 defprotocol Evolvable do
 end
-
-Utils.feedback(:evolvable, [Evolvable, Charmander, Charmeleon, Charizard])
 ```
 
 ## Commit Your Progress
