@@ -77,17 +77,17 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     if String.contains?(file, "## Commit Your") do
       new_file =
         Regex.replace(
+          # Commit Your Progress are always at the end for now.
+          # If this changed, we could use a negative lookahead instead.
           ~r/\n\#\# Commit Your(.|\n)+/,
           file,
           commit_snippet(exercise_name(path), commit_message)
         )
 
-      File.write(path, new_file)
+      File.write!(path, new_file)
     else
-      File.write!(exercise_name(path), commit_snippet(path, commit_message), [:append])
+      File.write!(path, commit_snippet(path, commit_message), [:append])
     end
-
-    File.close(file)
   end
 
   defp exercise_name(path) do
