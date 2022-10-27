@@ -17,6 +17,19 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     "livebook_recovery.livemd"
   ]
 
+  @impl Mix.Task
+  def run(_) do
+    %{reading: reading, exercise: exercise} = get_paths()
+
+    Enum.each(reading, fn path ->
+      add_git_section_to_file(path, "finish #{spaced_filename(path)} section")
+    end)
+
+    Enum.each(exercise, fn path ->
+      add_git_section_to_file(path, "finish #{spaced_filename(path)} exercise")
+    end)
+  end
+
   defp get_paths do
     base_path = Path.expand("../")
 
@@ -35,7 +48,7 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     %{reading: reading_files, exercise: exercise_files}
   end
 
-  defp commit_snippet(commit_message) do
+  defp commit_snippet(exercise_name, commit_message) do
     """
 
     ## Commit Your Progress
@@ -43,9 +56,14 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
 
     ```
+    $ git checkout main
+    $ git checkout -b exercise-#{exercise_name}
     $ git add .
     $ git commit -m "#{commit_message}"
+    $ git push origin exercise-#{exercise_name}
     ```
+
+    Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
     """
   end
 
@@ -58,30 +76,25 @@ defmodule Mix.Tasks.Bc.AddGitSection do
 
     if String.contains?(file, "## Commit Your") do
       new_file =
-        Regex.replace(~r/\n\#\# Commit Your(.|\n)+/, file, commit_snippet(commit_message))
+        Regex.replace(
+          # Commit Your Progress are always at the end for now.
+          # If this changed, we could use a negative lookahead instead.
+          ~r/\n\#\# Commit Your(.|\n)+/,
+          file,
+          commit_snippet(exercise_name(path), commit_message)
+        )
 
-      File.write(path, new_file)
+      File.write!(path, new_file)
     else
-      File.write!(path, commit_snippet(commit_message), [:append])
+      File.write!(path, commit_snippet(path, commit_message), [:append])
     end
+  end
 
-    File.close(file)
+  defp exercise_name(path) do
+    Path.basename(path) |> String.slice(0..-8)
   end
 
   defp spaced_filename(path) do
     Path.basename(path) |> String.slice(0..-8) |> String.replace("_", " ")
-  end
-
-  @impl Mix.Task
-  def run(_) do
-    %{reading: reading, exercise: exercise} = get_paths()
-
-    Enum.map(reading, fn path ->
-      add_git_section_to_file(path, "finish #{spaced_filename(path)} section")
-    end)
-
-    Enum.map(exercise, fn path ->
-      add_git_section_to_file(path, "finish #{spaced_filename(path)} exercise")
-    end)
   end
 end
