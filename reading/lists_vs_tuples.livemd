@@ -118,7 +118,7 @@ Tuples however, are stored contiguously in memory, so in order to make any chang
 be copied. Since we need to enumerate through the tuple and copy each value, prepending
 and element to a tuple is $O(n)$ complexity.
 
-Let's prepend `0` to `{1, 2, 3}` as an example.
+Let's prepend `0` to `{1, 2, 3}` as an example. To prepend a value we can use either `Tuple.insert_at/3`.
 
 ```elixir
 Tuple.insert_at({1, 2, 3}, 0, 0)
@@ -132,7 +132,7 @@ Let's compare the time it takes to prepend an element to an equal sized list and
 
 ```elixir
 {tuple_time, _result} = :timer.tc(fn -> Tuple.insert_at(large_tuple, 0, 0) end)
-{list_time, _result} = :timer.tc(fn -> [0 | large_list] end)
+{list_time, _result} = :timer.tc(fn -> List.insert_at(large_list, 0, 0) end)
 
 %{tuple: tuple_time, list: list_time}
 ```
@@ -143,8 +143,44 @@ Once again, as expected prepending the list is nearly instant, where as prependi
 
 ### Your Turn
 
-In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend `100` to a list with
-`50000` elements. Then do the same for tuples.
+In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend a value to a **list** with `50000` elements.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We can prepend a list using `[head | tail]` syntax
+
+```elixir
+list = Enum.to_list(1..50000)
+:timer.tc(fn -> ["my value" | list] end)
+```
+
+Alternatively we can use `List.insert_at/3`.
+
+```elixir
+list = Enum.to_list(1..50000)
+:timer.tc(fn -> List.insert_at(list, 0, "my value") end)
+```
+
+Generally, `[head | tail]` is more idiomatic.
+
+</details>
+
+```elixir
+
+```
+
+In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend a value to a **tuple** with `50000` elements.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+tuple = Enum.to_list(1..50000) |> List.to_tuple()
+:timer.tc(fn -> Tuple.insert_at(tuple, 0, 0) end)
+```
+
+</details>
 
 ```elixir
 
@@ -310,7 +346,7 @@ put_elem(tuple, 2, 7)
 Let's compare the time it takes to update the first element of a list and tuple of equal size.
 
 ```elixir
-{tuple_time, _result} = :timer.tc(fn -> :erlang.setelement(1, large_tuple, 7) end)
+{tuple_time, _result} = :timer.tc(fn -> put_elem(large_tuple, 0, 7) end)
 {list_time, _result} = :timer.tc(fn -> List.replace_at(large_list, 0, 7) end)
 
 %{tuple: tuple_time, list: list_time}
@@ -320,7 +356,7 @@ As expected, the list is fast and the tuple is slow. Now let's compare the time 
 the last element of a list and tuple of equal size.
 
 ```elixir
-{tuple_time, _result} = :timer.tc(fn -> :erlang.setelement(10_000_000, large_tuple, 7) end)
+{tuple_time, _result} = :timer.tc(fn -> put_elem(large_tuple, 9_999_999, 7) end)
 {list_time, _result} = :timer.tc(fn -> List.replace_at(large_list, 9_999_999, 7) end)
 
 %{tuple: tuple_time, list: list_time}
@@ -534,18 +570,28 @@ In memory, that might look like the following.
 
 ![](images/copying_abc_tuple.png)
 
-<!-- livebook:{"break_markdown":true} -->
+## Garbage Collection
 
-This frees up `b` and `{4, 5, 6}` for garbage collection, because they are no longer accessible.
+Elixir handles garbage collection for us, so we often don't need to concern ourselves with this implementation detail.
+
+Whenever a variable is no longer referenced, it is free to be garbage collected.
+For example, if we have the variables `a`, `b`, and `c`, if we rebind `b`, we no longer have to store the underlying data and it will be garbage collected.
+
+```elixir
+a = {1, 2, 3}
+b = {4, 5, 6}
+c = {7, 8, 9}
+
+# {4, 5, 6} is now free to be garbage collected because it is no longer referenced by any variable.
+b = {10, 11, 12}
+```
+
+This frees up the tuple `{4, 5, 6}` for garbage collection, because it is no longer accessible.
+Below we use `b` and `b2` to represent rebinding the `b` variable.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/abc_tuple_garbage_collection.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Keep in mind that for the above diagram, we've separated the tuple for spacing reasons. The tuples
-are still stored contiguously.
 
 ## Conclusion
 
@@ -579,6 +625,14 @@ Operations with tuples and lists will have the following Big $O$ notation.
 * Lists should be used for **dynamic-size containers**.
 * Functional languages do not allow mutation, they instead rely on **shallow-copying** elements
   to avoid unnecessary memory consumption.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixirlang: Tuples or Lists?](https://elixir-lang.org/getting-started/basic-types.html#lists-or-tuples)
+* [Exercism: Tuples](https://exercism.org/tracks/elixir/concepts/tuples)
+* [Exercism: Lists](https://exercism.org/tracks/elixir/concepts/lists)
 
 ## Commit Your Progress
 
