@@ -229,9 +229,9 @@ In the Elixir cell below, try refactoring this code using the [Stream](https://h
 
 ```elixir
 1..100
-|> Enum.map(fn each -> div(each, 2))
-|> Enum.map(fn each -> each * 3)
-|> Enum.filter(fn each -> rem(each, 2) === 0)
+|> Enum.map(fn each -> div(each, 2) end)
+|> Enum.map(fn each -> each * 3 end)
+|> Enum.filter(fn each -> rem(each, 2) === 0 end)
 ```
 
 ```elixir
@@ -435,16 +435,7 @@ end)
 </details>
 
 ```elixir
-starting_integer = 20
 
-Stream.iterate(starting_integer, fn int ->
-  if rem(int, 2) == 0 do
-    div(int, 2)
-  else
-    int * 3 + 1
-  end
-end)
-|> Enum.take_while(fn integer -> integer != 4 end)
 ```
 
 ### Stream.unfold/2

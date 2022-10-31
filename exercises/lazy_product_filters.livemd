@@ -49,40 +49,40 @@ You should be able to filter by:
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule ProductsTest do
+defmodule StreamProductsTest do
   use ExUnit.Case
 
   test "filter/2 empty filters" do
     found = create_product(name: "Laptop")
-    assert Products.filter([found], []) == [found]
+    assert StreamProducts.filter([found], []) == [found]
   end
 
   test "filter/2 by exact matching name" do
     found = create_product(name: "Laptop")
     not_found = create_product(name: "Shampoo")
     products = [found, not_found]
-    assert Products.filter(products, name: "Laptop") == [found]
+    assert StreamProducts.filter(products, name: "Laptop") == [found]
   end
 
   test "filter/2 by partial matching name" do
     found = create_product(name: "Laptop")
     not_found = create_product(name: "Shampoo")
     products = [found, not_found]
-    assert Products.filter(products, name: "apt") == [found]
+    assert StreamProducts.filter(products, name: "apt") == [found]
   end
 
   test "filter/2 by mixed case partial matching name" do
     found = create_product(name: "Laptop")
     not_found = create_product(name: "Shampoo")
     products = [found, not_found]
-    assert Products.filter(products, name: "aPt") == [found]
+    assert StreamProducts.filter(products, name: "aPt") == [found]
   end
 
   test "filter/2 by category" do
     found = create_product(category: :tech)
     not_found = create_product(category: :snacks)
     products = [found, not_found]
-    assert Products.filter(products, category: :tech) == [found]
+    assert StreamProducts.filter(products, category: :tech) == [found]
   end
 
   test "filter/2 by min price" do
@@ -90,7 +90,7 @@ defmodule ProductsTest do
     found2 = create_product(price: 100)
     not_found = create_product(price: 99)
     products = [found1, found2, not_found]
-    assert Products.filter(products, min: 100) == [found1, found2]
+    assert StreamProducts.filter(products, min: 100) == [found1, found2]
   end
 
   test "filter/2 by max price" do
@@ -98,7 +98,7 @@ defmodule ProductsTest do
     found2 = create_product(price: 100)
     not_found = create_product(price: 101)
     products = [found1, found2, not_found]
-    assert Products.filter(products, max: 100) == [found1, found2]
+    assert StreamProducts.filter(products, max: 100) == [found1, found2]
   end
 
   test "filter/2 by max and min price" do
@@ -108,7 +108,7 @@ defmodule ProductsTest do
     not_found1 = create_product(price: 99)
     not_found2 = create_product(price: 201)
     products = [found1, found2, found3, not_found1, not_found2]
-    assert Products.filter(products, min: 100, max: 200) == [found1, found2, found3]
+    assert StreamProducts.filter(products, min: 100, max: 200) == [found1, found2, found3]
   end
 
   test "filter/2 all filters" do
@@ -120,7 +120,7 @@ defmodule ProductsTest do
 
     products = [found, wrong_category, wrong_name, too_low_price, too_high_price]
 
-    assert Products.filter(products, min: 100, max: 200, name: "Laptop", category: :tech) == [
+    assert StreamProducts.filter(products, min: 100, max: 200, name: "Laptop", category: :tech) == [
              found
            ]
   end
@@ -149,7 +149,7 @@ ExUnit.run()
 In this example, we solve the problem by enumerating over products and checking each filter.
 
 ```elixir
-defmodule Products do
+defmodule StreamProducts do
   def filter(products, filters) do
     name_filter = filters[:name] || ""
     min_filter = filters[:min]
@@ -187,56 +187,57 @@ defmodule StreamProducts do
 
     No filters returns all products.
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], [])
     [%{name: "Laptop", category: :tech, price: 100}]
 
     Filter by name
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
     []
 
     Filter by category
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
     []
 
     Filter by min price.
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
     []
 
     Filter by max price.
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
     [%{name: "Laptop", category: :tech, price: 100}]
 
-    iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
     []
 
     Multiple filters.
 
-    Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+    [%{name: "Laptop", category: :tech, price: 100}]
   """
   def filter(products, filters) do
   end

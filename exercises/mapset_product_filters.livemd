@@ -168,7 +168,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Implement the `StreamProducts` module using Streams instead of the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
+Implement the `MapSetProducts` module using [MapSet](https://hexdocs.pm/elixir/MapSet.html) instead of the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
 
 ```elixir
 defmodule MapSetProducts do
@@ -183,48 +183,35 @@ defmodule MapSetProducts do
 
     No filters returns all products.
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), [])
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), [])
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
 
     Filter by name (case insensitive and partial matching)
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), name: "l")
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), name: "l")
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
 
     Filter by category.
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), category: :tech)
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), category: :tech)
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
 
     Filter by min price (inclusive).
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), min: 100)
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), min: 100)
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
 
     Filter by max price (inclusive).
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), max: 100)
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), max: 100)
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
 
     Multiple Filters
 
-      iex> Products.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), min: 50, max: 200, name: "Laptop", category: :tech)
+      iex> MapSetProducts.filter(MapSet.new([%{name: "Laptop", category: :tech, price: 100}]), min: 50, max: 200, name: "Laptop", category: :tech)
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
   """
   def filter(products, filters \\ []) do
-    name_filter = filters[:name]
-    category_filter = filters[:category]
-    min_filter = filters[:min]
-    max_filter = filters[:max]
-
-    MapSet.filter(products, fn product ->
-      matches_name = !name_filter || Regex.match?(~r/#{name_filter}/i, product.name)
-      matches_category = !category_filter || product.category == category_filter
-      matches_min = !min_filter || min_filter <= product.price
-      matches_max = !max_filter || product.price <= max_filter
-
-      matches_name and matches_category and matches_min and matches_max
-    end)
   end
 end
 
