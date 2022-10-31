@@ -41,7 +41,7 @@ Pokemon can attack each other. An attack should update the `Pokemon`'s health in
 
 ## Create Pokemon Server
 
-Create a `Pokemon` module which will be a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and a struct definition. It should store the following in values in state.
+Create a `Pokemon` module which will be a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and a struct definition. It should store the following in values in state. You do not need to validate these values, you can assume each will be the following:
 
 * `:name` will be a string.
 * `:type` will be an atom of either `:grass`, `:water`, or `:fire`
@@ -65,8 +65,7 @@ attacker = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur1", type: :grass
 defender = Pokemon.start_link(pokemon: %Pokemon{name: "Bulbasaur2", type: :grass})
 
 Pokemon.attack(attacker, defender)
-
-%Pokemon{name: "Bulbasaur1", type: :grass, health: 15, attack: 20} = :sys.get_state(defender)
+%Pokemon{name: "Bulbasaur1", type: :grass, health: 15, attack: 20}
 ```
 
 ### Type Advantages and Weaknesses
@@ -141,7 +140,7 @@ end
 
 </details>
 
-Enter your solution below.
+Implement the `Pokemon` GenServer and struct definition as documented below.
 
 ```elixir
 defmodule Pokemon do
@@ -164,11 +163,6 @@ defmodule Pokemon do
       iex> {:ok, pokemon} = Pokemon.start_link([pokemon: %Pokemon{name: "Charmander", type: :fire}])
   """
   def start_link(opts \\ []) do
-  end
-
-  @impl true
-  def init(state) do
-    {:ok, state}
   end
 
   @doc """
