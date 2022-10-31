@@ -169,12 +169,41 @@ end
 
 </details>
 
-<!-- livebook:{"break_markdown":true} -->
+```elixir
+defmodule Sponger do
+  def filter(products, filters) do
+    name_filter = filters[:name] || ""
+    IO.inspect(name_filter, label: "name_filter")
+    min_filter = filters[:min]
+    IO.inspect(min_filter, label: "min_filter")
+    max_filter = filters[:max]
+    IO.inspect(max_filter, label: "max_filter")
+    category_filter = filters[:category]
+    IO.inspect(category_filter, label: "category_filter")
+  end
+end
+
+# min_filter = 200 
+# if min_filter, do: "truthy", else: "falsey"
+# String.contains?(String.upcase(product.name), String.upcase(filters[:name] || ""))
+products = [
+  %{name: "Laptop", category: :tech, price: 100_000},
+  %{name: "Phone", category: :tech, price: 50000},
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Shampoo", category: :health, price: 1000}
+]
+
+# Sponger.filter(products, min: 50, max: 200, name: "Laptop", category: :tech)
+name = "Laptop"
+filters = [name: "APT"]
+filters[:name]
+String.contains?(String.upcase(name), String.upcase(filters[:name] || ""))
+```
 
 Implement the `StreamProducts` module using Streams instead of the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
 
 ```elixir
-defmodule StreamProducts do
+defmodule Products do
   @moduledoc """
   Documentation for `Products`
   """
@@ -238,9 +267,205 @@ defmodule StreamProducts do
     iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
     [%{name: "Laptop", category: :tech, price: 100}]
   """
+
+  # def filter(products, []), do: products
+
   def filter(products, filters) do
+    IO.inspect(products, label: "Products")
+    IO.inspect(filters, label: "Filters")
+
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
+
+    Stream.filter(products, fn %{name: name} ->
+      IO.inspect(name, label: "Analyzing product.name")
+      String.contains?(String.upcase(name), String.upcase(name_filter))
+    end)
+    |> Stream.reject(fn %{category: category} ->
+      IO.inspect(category, label: "Analyzing product.category")
+      category_filter && category != category_filter
+    end)
+    |> Stream.reject(fn %{price: price} ->
+      IO.inspect(price, label: "Analyzing product.price")
+      min_filter && price < min_filter
+    end)
+    |> Stream.reject(fn %{price: price} ->
+      IO.inspect(price, label: "Analyzing product.price")
+      max_filter && price > max_filter
+    end)
+    |> Enum.to_list()
   end
 end
+
+Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+Products.filter(products, min: 50, max: 120_000, name: "Laptop", category: :tech)
+```
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule ProductsTest do
+  use ExUnit.Case
+
+  @products [
+    %{name: "Laptop", category: :tech, price: 100_000},
+    %{name: "Phone", category: :tech, price: 50000},
+    %{name: "Chocolate", category: :snacks, price: 200},
+    %{name: "Shampoo", category: :health, price: 1000}
+  ]
+
+  test "filter/2 empty filters" do
+    # INPUT product list & no filters
+    # OUTPUT the same product list
+    assert Products.filter(@products, []) == @products
+  end
+
+  test "filter/2 by exact matching name" do
+    assert Products.filter(@products, name: "Laptop") ==
+             [%{name: "Laptop", category: :tech, price: 100_000}]
+
+    assert Products.filter(@products, name: "Phone") ==
+             [%{name: "Phone", category: :tech, price: 50000}]
+  end
+
+  test "filter/2 by partial matching name" do
+    assert Products.filter(@products, name: "apt") ==
+             [%{name: "Laptop", category: :tech, price: 100_000}]
+
+    assert Products.filter(@products, name: "ho") ==
+             [
+               %{name: "Phone", category: :tech, price: 50000},
+               %{name: "Chocolate", category: :snacks, price: 200}
+             ]
+  end
+
+  test "filter/2 by mixed case partial matching name" do
+    assert Products.filter(@products, name: "L") ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Chocolate", category: :snacks, price: 200}
+             ]
+
+    assert Products.filter(@products, name: "p") ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000},
+               %{name: "Shampoo", category: :health, price: 1000}
+             ]
+  end
+
+  test "filter/2 by category" do
+    assert Products.filter(@products, category: :tech) ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ]
+
+    assert Products.filter(@products, category: :snacks) ==
+             [
+               %{name: "Chocolate", category: :snacks, price: 200}
+             ]
+  end
+
+  test "filter/2 by min price" do
+    assert Products.filter(@products, min: 5000) == [
+             %{name: "Laptop", category: :tech, price: 100_000},
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
+
+    assert Products.filter(@products, min: 200) == [
+             %{name: "Laptop", category: :tech, price: 100_000},
+             %{name: "Phone", category: :tech, price: 50000},
+             %{name: "Chocolate", category: :snacks, price: 200},
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
+
+  # @tag :skip
+  test "filter/2 by max price" do
+    assert Enum.sort(Products.filter(@products, max: 50000), :asc) ==
+             Enum.sort(
+               [
+                 %{name: "Chocolate", category: :snacks, price: 200},
+                 %{name: "Phone", category: :tech, price: 50000},
+                 %{name: "Shampoo", category: :health, price: 1000}
+               ],
+               :asc
+             )
+
+    assert Enum.sort(Products.filter(@products, max: 1000), :asc) ==
+             Enum.sort(
+               [
+                 %{name: "Chocolate", category: :snacks, price: 200},
+                 %{name: "Shampoo", category: :health, price: 1000}
+               ],
+               :asc
+             )
+  end
+
+  # @tag :skip
+  test "filter/2 by max and min price" do
+    assert Enum.sort(Products.filter(@products, min: 199, max: 51000), :asc) ==
+             Enum.sort(
+               [
+                 %{name: "Chocolate", category: :snacks, price: 200},
+                 %{name: "Phone", category: :tech, price: 50000},
+                 %{name: "Shampoo", category: :health, price: 1000}
+               ],
+               :asc
+             )
+  end
+
+  # test "filter/2 all filters"
+end
+
+ExUnit.run()
+```
+
+```elixir
+products = [
+  %{name: "Laptop", category: :tech, price: 100_000},
+  %{name: "Phone", category: :tech, price: 50000},
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Shampoo", category: :health, price: 1000}
+]
+
+defmodule Spong do
+  def filter(products, filters) do
+    IO.inspect(filters, label: "Filters")
+    IO.inspect(products, label: "Products")
+
+    Stream.filter(products, fn product ->
+      IO.inspect(product.name, label: "Analyzing product.name")
+      String.contains?(String.upcase(product.name), String.upcase(filters[:name] || ""))
+    end)
+    |> Stream.filter(fn product ->
+      IO.inspect(product.category, label: "Analyzing product.category")
+      product.category == filters[:category] || nil
+    end)
+    |> Stream.filter(fn product ->
+      IO.inspect(product.price, label: "Analyzing product.price")
+      product.price >= filters[:min] || nil
+    end)
+    |> Enum.to_list()
+  end
+
+  # Icia brilliance/WAY over Jeff's head
+  # def filter(products, [h_filter | t_filters]) do
+  #   IO.inspect(h_filter, label: "h_filter")
+  #   IO.inspect(t_filters, label: "t_filters")
+  #   filter(products, h_filter) |> filter(t_filters)
+  # end
+end
+
+# Spong.filter(products, name: "Laptop")
+# Spong.filter(products, category: :snacks)
+# Spong.filter(products, min: 50, max: 200, name: "Laptop", category: :tech)
+# Spong.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+Spong.filter(products, max: 200, name: "Laptop", category: :tech)
+Spong.filter(products, min: 50, max: 200, name: "Laptop", category: :tech)
 ```
 
 ## Bonus: Benchmark
