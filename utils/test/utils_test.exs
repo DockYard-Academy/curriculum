@@ -1,7 +1,6 @@
 defmodule UtilsTest do
   use ExUnit.Case
   doctest Utils
-  alias Utils.Factory
   alias Utils.Notebooks
 
   @tag :skip_ci
