@@ -22,15 +22,10 @@ defmodule Utils.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:kino, "~> 0.6.2"},
-      {:vega_lite, "~> 0.1.6"},
-      {:kino_vega_lite, "~> 0.1.3"},
-      {:faker, "~> 0.17.0"},
-      {:earmark_parser, "~> 1.4", only: [:dev, :test]},
       {:credo, "~> 1.6", runtime: false, only: [:dev, :test]},
       {:livebook, "~> 0.7", runtime: false, only: [:dev, :test]},
-      {:poison, "~> 5.0", only: [:dev, :test]}
       # poison needed for livebook
+      {:poison, "~> 5.0", only: [:dev, :test]}
     ]
   end
 end
