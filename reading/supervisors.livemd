@@ -56,7 +56,7 @@ When a linked process crashes, it will also crashed the process that spawned it.
 # spawn_link(fn -> raise "error" end)
 ```
 
-That means if we start a `GenServer` (or other process) **unsupervised** it will raise an error if it crashes.
+That means if we start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) (or other process) **unsupervised** it will raise an error if it crashes.
 
 ```elixir
 defmodule UnsupervisedWorker do
@@ -79,7 +79,7 @@ Uncomment and run the following code to see it crashes the current Livebook proc
 # Process.send(pid, :crash, [])
 ```
 
-The same is true if we manually exit a process using `Process.exit/2` with the `:exit` reason. Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
+The same is true if we manually exit a process using [Process.exit/2](https://hexdocs.pm/elixir/Process.html#exit/2) with the `:exit` reason. Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
 
 ```elixir
 # {:ok, pid} = GenServer.start_link(UnsupervisedWorker, [])
@@ -168,7 +168,7 @@ When we kill one of the processes under the supervision tree, it will be restart
 pid = :c.pid(0, 727, 0)
 ```
 
-Then, kill the proccess using [Process.exit/2](https://hexdocs.pm/elixir/1.12/Process.html#exit/2).
+Then, kill the process using [Process.exit/2](https://hexdocs.pm/elixir/1.12/Process.html#exit/2).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -455,6 +455,7 @@ Uncomment the following code to see the crash timeline, then re-comment it.
 ## Commit Your Progress
 
 Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
 $ git checkout main

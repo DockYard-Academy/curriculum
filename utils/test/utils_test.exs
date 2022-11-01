@@ -68,7 +68,6 @@ defmodule UtilsTest do
     # dependency install name, and usage indicator
     possible_deps = [
       {":youtube", "YouTube."},
-      {":kino", "Kino."},
       {":smart_animation", "SmartAnimation."},
       {":hidden_cell", "HiddenCell."},
       {":benchee", "Benchee."},
