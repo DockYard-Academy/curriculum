@@ -191,7 +191,8 @@ Spawn a linked process and crash this Elixir cell below.
 Comment out your solution when complete to avoid continuously crashing the livebook!
 
 ```elixir
-
+# crash_pid = spawn_link(fn -> raise "Crashing with a capture operator!" end)
+"The Crash should stop this running"
 ```
 
 ## Message Passing
@@ -237,7 +238,18 @@ In the Elixir cell below, spawn a new process and send it a message `{:hello, "w
 `IO.puts` the message's payload where `"world"` is the payload.
 
 ```elixir
+hello_pid =
+  spawn(fn ->
+    receive do
+      {:hello, message} -> IO.puts(message)
+    end
+  end)
+```
 
+```elixir
+# Testing a thing
+send(hello_pid, {:error, "OOPS"})
+send(hello_pid, {:hello, "world"})
 ```
 
 ## State
@@ -283,6 +295,8 @@ We've used [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1) to show
 
 ```elixir
 send(server_process, "message")
+
+for _ <- 1..5, do: send(server_process, "message")
 ```
 
 With a slight modification of the `ServerProcess`, we can store state!
@@ -354,8 +368,26 @@ send(todo_list_process, {:remove, "new todo list item"})
 ```elixir
 defmodule TodoListProcess do
   def loop(state \\ []) do
+    IO.inspect(state, label: "TODO")
+
+    receive do
+      {:add, item} -> loop([item | state])
+      {:remove, item} -> loop(state -- [item])
+      {:remove_all} -> loop()
+    end
   end
 end
+
+todo_list_process = spawn(fn -> TodoListProcess.loop() end)
+```
+
+Added a `:remove_all` "command" to clear state on the process, otherwise I have to recompile or restart the process.
+
+```elixir
+send(todo_list_process, {:remove_all})
+for i <- 1..10, do: send(todo_list_process, {:add, "new todo list item #{i}"})
+
+send(todo_list_process, {:remove, "new todo list item 6"})
 ```
 
 ## Commit Your Progress
