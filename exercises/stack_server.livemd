@@ -1,0 +1,126 @@
+# Stack Server
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Stack
+
+A [stack](https://en.wikipedia.org/wiki/Stack_(abstract_data_type)) is a data structure which can push elements onto the top of the stack and pop them off of the top of the stack.
+We're going to create a `Stack` process which stores a stack as a list of elements in it's state. We should be able to send a `{:push, element}` message and a `:pop` message
+to add and remove elements from the beginning of the list.
+
+The `{:push, element}` message should add an element onto the stack, and return the current state.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, stack_pid} = GenServer.start_link(Stack, [])
+
+GenServer.call(stack_pid, {:push, 1})
+[1]
+
+GenServer.call(stack_pid, {:push, 2})
+[2, 1]
+```
+
+The `:pop` message should remove an element from the stack and return the removed element.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+2 = GenServer.call(stack_pid, :pop)
+
+[1] = :sys.get_state(stack_pid)
+
+1 = GenServer.call(stack_pid, :pop)
+
+[] = :sys.get_state(stack_pid)
+```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+```elixir
+defmodule Stack do
+  use GenServer
+
+  @impl true
+  def init(state) do
+  end
+
+  @impl true
+  def handle_call(:pop, _from, state) do
+  end
+
+  @impl true
+  def handle_call({:push, element}, _from, state) do
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Stack do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_call(:pop, _from, state) do
+    [head | tail] = state
+    {:reply, head, tail}
+  end
+
+  @impl true
+  def handle_call({:push, element}, _from, state) do
+    new_state = [element | state]
+    {:reply, new_state, new_state}
+  end
+end
+```
+
+</details>
+
+Implement the `Stack` module below. You do not need to handle `:pop`-ing an element from an empty stack.
+
+```elixir
+defmodule Stack do
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-stack_server
+$ git add .
+$ git commit -m "finish stack server exercise"
+$ git push origin exercise-stack_server
+```
+
+Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Up Next
+
+| Previous                                           | Next                                                             |
+| -------------------------------------------------- | ---------------------------------------------------------------: |
+| [Generic Server](../reading/generic_server.livemd) | [Traffic Light Server](../exercises/traffic_light_server.livemd) |

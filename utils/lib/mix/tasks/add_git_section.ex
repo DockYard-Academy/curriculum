@@ -54,6 +54,7 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     ## Commit Your Progress
 
     Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+    Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
     ```
     $ git checkout main

@@ -4,7 +4,6 @@
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
   {:benchee, "~> 1.1"},
   {:faker, "~> 0.17.0"}
 ])
@@ -268,7 +267,7 @@ products =
       category <- categories,
       do: %{name: name, category: category, price: Enum.random(1..100)}
 
-filters = [name: "1", category: :tech, min: 25, max: 50]
+filters = [name: "A", category: :tech, min: 25, max: 50]
 
 Benchee.run(
   %{
@@ -282,12 +281,108 @@ Benchee.run(
 </details>
 
 ```elixir
+defmodule StreamProducts do
+  def filter(products, filters) do
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
 
+    products
+    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> Stream.reject(fn %{category: category} ->
+      category_filter && category_filter != category
+    end)
+    |> Enum.to_list()
+  end
+end
+```
+
+```elixir
+defmodule EnumProducts do
+  def check?({:min, min}, product), do: min <= product.price
+  def check?({:max, max}, product), do: product.price <= max
+
+  def check?({:name, name}, product),
+    do: String.contains?(String.downcase(product.name), String.downcase(name))
+
+  def check?({:category, category}, product), do: category == product.category
+
+  def filter(products, filters) do
+    Enum.filter(products, fn product ->
+      Enum.all?(filters, fn filter -> check?(filter, product) end)
+    end)
+  end
+end
+```
+
+```elixir
+defmodule Fibonacci do
+  def fib(0), do: 0
+  def fib(1), do: 1
+  def fib(n), do: fib(n - 1) + fib(n - 2)
+end
+
+Enum.map(1..40, fn int ->
+  {time, _result} = :timer.tc(fn -> Fibonacci.fib(int) end)
+  time
+end)
+|> IO.inspect(label: "ACTUAL")
+
+# O(n)
+Enum.map(1..40, fn n -> n end) |> IO.inspect(label: "O(n)")
+# O(n)**2
+Enum.map(1..40, fn n -> n ** 2 end) |> IO.inspect(label: "O(n)**2")
+# O(n)**n
+Enum.map(1..40, fn n -> n ** n end) |> IO.inspect(label: "O(n)**n")
+
+defmodule Factorial do
+  def of(0), do: 1
+
+  def of(n) when n > 0 do
+    Enum.reduce(1..n, &*/2)
+  end
+end
+
+Enum.map(1..40, fn n -> Factorial.of(n) end) |> IO.inspect(label: "O(n!)")
+```
+
+```elixir
+Enum.map(1..10, fn time -> time ** 2 end)
+```
+
+1. 25 seconds
+2. 5 seconds
+3. 30 seconds
+
+total = 2 mins
+
+```elixir
+names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
+categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
+
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
+
+filters = [name: "A", category: :tech, min: 25, max: 50]
+
+Benchee.run(
+  %{
+    "Enum" => fn -> EnumProducts.filter(products, filters) end,
+    "Stream" => fn -> StreamProducts.filter(products, filters) end
+  },
+  memory_time: 2
+)
 ```
 
 ## Commit Your Progress
 
 Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
 $ git checkout main

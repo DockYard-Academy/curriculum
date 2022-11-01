@@ -1,0 +1,153 @@
+# Asynchronous Messages
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Fire and Forget
+
+So far, we've seen only synchronous message sending, where every message blocks the calling process. To demonstrate, here's an example that simulates a [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a slower operation.
+
+```elixir
+defmodule SlowServer do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, nil}
+  end
+
+  @impl true
+  def handle_call(:sleep, _from, state) do
+    IO.puts("Starting sleep")
+    Process.sleep(1000)
+    IO.puts("Ending sleep")
+    {:reply, "response!", state}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(SlowServer, 0)
+```
+
+The caller process only continues when the slow server finishes the `handle_call/3` function.
+
+```elixir
+IO.puts("Caller starting")
+response = GenServer.call(pid, :sleep)
+IO.puts("Caller received: #{response}")
+```
+
+Most of the time, we want this behavior. This makes our code predictable, especially when we want to receive a response from the [GenServer](https://hexdocs.pm/elixir/GenServer.html). However, sometimes we want to **fire-and-forget**, meaning we send the [GenServer](https://hexdocs.pm/elixir/GenServer.html) a message so it can handle some work for us or update it's state without blocking the caller process.
+
+For example, we can modify our `CounterServer` to use `handle_cast/2` to increment the count, then `handle_call/3` to return the updated count. We'll use [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to increment the count after one second.
+
+`handle_cast/2` does not need to know the parent process, because it doesn't return a response. It returns `{:noreply, state}`.
+
+```elixir
+defmodule Counter do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:get_count, _from, state) do
+    {:reply, state, state}
+  end
+
+  @impl true
+  def handle_cast(:increment, state) do
+    IO.puts("count: #{state + 1}")
+    Process.sleep(1000)
+    {:noreply, state + 1}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Counter, 0)
+```
+
+Now, even though it takes a second to increment the count, the caller process will be able to continue.
+
+```elixir
+GenServer.cast(pid, :increment)
+GenServer.cast(pid, :increment)
+GenServer.cast(pid, :increment)
+
+IO.puts("not blocked!")
+```
+
+### Your Turn
+
+Create a new version of your `Journal` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that uses `handle_call/3` to retrieve journal entries, and `handle_cast/2` to add journal entries.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Journal do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, []}
+  end
+
+  @impl true
+  def handle_cast({:add_entry, message}, entries) do
+    {:no_reply, [message | entries]}
+  end
+
+  @impl true
+  def handle_call(:get_entries, _from, entries) do
+    {:reply, entries, entries}
+  end
+end
+```
+
+</details>
+
+```elixir
+
+```
+
+## Thought Provoking Questions
+
+* When might you want to use [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) vs [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2)?
+* What happens if a [GenServer](https://hexdocs.pm/elixir/GenServer.html) takes a long time to respond? see [Timeouts](https://hexdocs.pm/elixir/1.12/GenServer.html#module-timeouts).
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html#call/3)
+* [ElixirLang: GenServer](https://elixir-lang.org/getting-started/mix-otp/genserver.html)
+* [Exercism: GenServer](https://exercism.org/tracks/elixir/concepts/genserver)
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-async_messages
+$ git add .
+$ git commit -m "finish async messages section"
+$ git push origin exercise-async_messages
+```
+
+Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.

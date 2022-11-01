@@ -3,8 +3,7 @@
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -15,69 +14,109 @@ Mix.install([
 
 ## Supervised Stack
 
-We've created a Stack process.
+Previously we created a [Stack](./stack_server.livemd) [GenServer](https://hexdocs.pm/elixir/GenServer.html) process.
+
+We've made a slight modification to the `Stack` process by adding a `start_link/1` function so this named `Stack` can be started under a [Supervisor](https://hexdocs.pm/elixir/Supervisor.html).
 
 ```elixir
 defmodule Stack do
   use GenServer
 
-  def start_link(state, opts) do
-    server_name = Keyword.get(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, state, name: server_name)
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def init(stack) do
-    {:ok, stack}
+  @impl true
+  def init(state) do
+    {:ok, state}
   end
 
-  def push(pid, item) do
-    GenServer.cast(pid, {:push, item})
-  end
-
-  def pop(pid) do
-    GenServer.call(pid, :pop)
-  end
-
-  def handle_call(:pop, _from, [head | tail]) do
+  @impl true
+  def handle_call(:pop, _from, state) do
+    [head | tail] = state
     {:reply, head, tail}
   end
 
-  def handle_cast({:push, item}, stack) do
-    {:noreply, [item | stack]}
+  @impl true
+  def handle_call({:push, element}, _from, state) do
+    new_state = [element | state]
+    {:reply, new_state, new_state}
   end
 end
 ```
 
-The Stack process can store a list and `push/2`/`pop/1` elements onto and off of the stack.
+We're able to push and pop elements off of the stack.
 
 ```elixir
-{:ok, pid} = Stack.start_link([], name: :example)
-Stack.push(pid, 1)
-Stack.push(pid, 2)
-2 = Stack.pop(pid)
-1 = Stack.pop(pid)
+{:ok, stack_pid} = GenServer.start_link(Stack, [])
+
+GenServer.call(stack_pid, {:push, 1}) |> IO.inspect(label: "push")
+GenServer.call(stack_pid, {:push, 2}) |> IO.inspect(label: "push")
+GenServer.call(stack_pid, {:push, 3}) |> IO.inspect(label: "push")
+
+GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
+GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
+GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
+
+# the final state is empty.
+:sys.get_state(stack_pid)
 ```
 
 However, there's a bug. If we try to `pop/1` an item off of an empty stack, the process
 will crash due to a function clause error because the `handle_call/2` function expects a list with one or more elements.
 
-Here we use [GenServer.start/2](https://hexdocs.pm/elixir/GenServer.html#start/2) to avoid crashing the livebook.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = GenServer.start(Stack, [])
-Stack.pop(pid)
+{:ok, pid} = GenServer.start_link(Stack, [])
+GenServer.call(stack_pid, :pop)
 ```
 
-In the Elixir cell below,
-start the `Stack` process under a supervisor so that it will restart with an empty stack when it crashes.
+Normally, we could handle this by using control flow. For example, we could make another `handle_call/3` function clause for when the stack is empty.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# return `nil` when the stack is empty.
+@impl true
+def handle_call(:pop, _from, []) do
+  {:reply, nil, []}
+end
+```
+
+Instead, you're going to start the Stack process under a supervisor so that it will be restarted instead. In the Elixir cell below, start the `Stack` process under a supervisor so that it will restart with an empty stack when it crashes.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  {Stack, []}
+]
+
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+Keep in mind, if you have already started a supervisor with the `Stack` process, your livebook may crash. You can resolve this issue by simply re-running the cell below to start the supervisor again.
 
 ```elixir
 
+```
+
+You should be able to send a `:pop` message to the `Stack` process and the [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) will restart the `Stack` process.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GenServer.call(Stack, :pop)
 ```
 
 ## Commit Your Progress
 
 Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
 $ git checkout main
