@@ -66,7 +66,7 @@ We can `send/2` and `receive/1` messages between processes by using their **pid*
 send(self(), "message")
 
 receive do
-  "message" -> "received"
+  "message" -> "Waaaat's UUUUUUUUUP!?!??!!!!"
 end
 ```
 
@@ -77,7 +77,7 @@ It's much like a `case` statement.
 send(self(), {:hello, "world"})
 
 receive do
-  {:hello, payload} -> payload
+  {:hello, payload} -> {payload, :hello}
 end
 ```
 
@@ -92,7 +92,7 @@ sequenceDiagram
 ```
 
 ```elixir
-spawn(fn -> nil end)
+spawn(fn -> :timer.sleep(50000) end)
 ```
 
 A process accepts a callback function and ends when that callback function completes.
@@ -116,7 +116,7 @@ We can use [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to 
 after it is called.
 
 ```elixir
-pid = spawn(fn -> IO.puts("I was called") end)
+pid = spawn(fn -> IO.puts("I am PID #{Kernel.inspect(pid)}, and I was called") end)
 
 Process.sleep(100)
 
@@ -191,7 +191,9 @@ Spawn a linked process and crash this Elixir cell below.
 Comment out your solution when complete to avoid continuously crashing the livebook!
 
 ```elixir
-
+# pid1 = spawn(fn -> raise "oops" end)
+# Process.link(pid1)
+# "I will not run, because the above crashes"
 ```
 
 ## Message Passing
@@ -216,6 +218,7 @@ pid1 =
   spawn(fn ->
     receive do
       "message" -> IO.puts("received!")
+      _ -> IO.puts("That does NOT compute!")
     end
   end)
 ```
@@ -237,7 +240,14 @@ In the Elixir cell below, spawn a new process and send it a message `{:hello, "w
 `IO.puts` the message's payload where `"world"` is the payload.
 
 ```elixir
+my_pid =
+  spawn(fn ->
+    receive do
+      {:hello, payload} -> IO.puts(payload)
+    end
+  end)
 
+send(my_pid, {:hello, "world"})
 ```
 
 ## State
@@ -341,18 +351,18 @@ defmodule Counter do
     IO.inspect(state, label: "counter")
 
     receive do
-      :increment -> loop(state + 1)
+      :decrement -> loop(state - 1)
     end
   end
 end
 
-counter_process = spawn(fn -> CounterProcess.loop() end)
+counter_process = spawn(fn -> Counter.loop() end)
 ```
 
 You should be able to send a `:decrement` message to a spawned `Counter`. Uncomment and evaluate the code below to test your solution.
 
 ```elixir
-# send(counter_process, :decrement)
+send(counter_process, :decrement)
 ```
 
 ## Commit Your Progress
