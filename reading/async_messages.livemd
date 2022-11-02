@@ -92,7 +92,17 @@ IO.puts("not blocked!")
 
 ### Your Turn
 
-Create a new version of your `Journal` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that uses `handle_call/3` to retrieve journal entries, and `handle_cast/2` to add journal entries.
+Create a `Journal` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that uses `handle_cast/2` to add journal entries. You can ensure this updates the `Journal` process's state using [:sys.get_state/1](https://www.erlang.org/doc/man/sys.html#get_state-1).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, journal_pid} = GenServer.start_link(Journal, [])
+
+GenServer.cast(journal_pid, {:add_entry, "first entry"})
+
+["first entry"] = :sys.get_state(journal_pid)
+```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -108,14 +118,168 @@ defmodule Journal do
 
   @impl true
   def handle_cast({:add_entry, message}, entries) do
-    {:no_reply, [message | entries]}
-  end
-
-  @impl true
-  def handle_call(:get_entries, _from, entries) do
-    {:reply, entries, entries}
+    {:noreply, [message | entries]}
   end
 end
+```
+
+</details>
+
+```elixir
+
+```
+
+## Process
+
+We've seen we can use some [Kernel](https://hexdocs.pm/elixir/Kernel.html) functions for working with processes.
+
+```elixir
+pid =
+  spawn(fn ->
+    receive do
+      :message -> IO.puts("I received a message")
+    end
+  end)
+
+send(pid, :message)
+```
+
+Generally speaking, we won't use these functions directly and will use the [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3)
+and [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) functions for sending messages.
+
+We'll also use the [Process](https://hexdocs.pm/elixir/Process.html) which provides some generic functions for working with processes and sending messages.
+
+For example, we can send messages using [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) the same way we can with [Kernel.send/2](https://hexdocs.pm/elixir/Kernel.html#send/2).
+
+```elixir
+Process.send(self(), :message, [])
+
+receive do
+  :message -> "I received a message"
+end
+```
+
+We also have a [Process.send_after/3](https://hexdocs.pm/elixir/Process.html#send_after/3) function for sending processes after a certain number of milliseconds.
+
+```elixir
+Process.send_after(self(), :message, 2000)
+
+receive do
+  :message -> "I received a message after 2 seconds"
+end
+```
+
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) process can receive generic messages from other processes. It handles them using a `handle_info/2` callback function.
+
+```elixir
+defmodule Receiver do
+  use GenServer
+
+  def init(_opts) do
+    {:ok, []}
+  end
+
+  def handle_info(:message, state) do
+    IO.puts("Received a message!")
+    {:noreply, state}
+  end
+end
+```
+
+Any messages sent using the [Process](https://hexdocs.pm/elixir/Process.html) module or generic [Kernel](https://hexdocs.pm/elixir/Kernel.html) functions can be handled using the generic `handle_info/2` function.
+
+```elixir
+{:ok, pid} = GenServer.start_link(Receiver, [])
+
+Process.send(pid, :message, [])
+```
+
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) should not call it's own callback functions, as this can cause it to misbehave.
+
+```elixir
+defmodule MisbehavingGenServer do
+  use GenServer
+
+  def init(_opts) do
+    {:ok, []}
+  end
+
+  def handle_call(:message, _from, state) do
+    GenServer.call(self(), :talking_to_myself)
+    IO.puts("Received a message!")
+    {:reply, state}
+  end
+
+  def handle_call(:talking_to_myself, _from, state) do
+    IO.puts("Sent a message to myself")
+    {:reply, state}
+  end
+end
+```
+
+Uncomment and evaluate the code below, and you'll see the `MisbehavingGenServer` crashes, because it tries to send itself a message. Re-comment it when finished.
+
+```elixir
+# {:ok, pid} = GenServer.start_link(MisbehavingGenServer, [])
+
+# GenServer.call(pid, :message)
+```
+
+Instead of sending itself a message using [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) or [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3), a GenServer can send itself generic messages using [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) or [Process.send_after/4](https://hexdocs.pm/elixir/Process.html#send_after/4).
+
+Often we'll use this to schedule some kind of recurring work. Here we have an example of a counter that automatically increments every second.
+
+```elixir
+defmodule IncrementingCounter do
+  def init(_opts) do
+    schedule_increment()
+    {:ok, 0}
+  end
+
+  def handle_info(:increment, state) do
+    schedule_increment()
+    {:noreply, state + 1}
+  end
+
+  defp schedule_increment do
+    Process.send_after(self(), :increment, 1000)
+  end
+end
+
+{:ok, counter_pid} = GenServer.start_link(IncrementingCounter, [])
+```
+
+Re-evaluate the cell to see that the counter is constantly incrementing.
+
+```elixir
+:sys.get_state(counter_pid)
+```
+
+### Your Turn
+
+Create a `DecrementingCounter` module which stores a counter in its state and decrements it every `500` milliseconds.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule DecrementingCounter do
+  def init(_opts) do
+    schedule_increment()
+    {:ok, 0}
+  end
+
+  def handle_info(:decrement, state) do
+    schedule_increment()
+    {:noreply, state - 1}
+  end
+
+  defp schedule_increment do
+    Process.send_after(self(), :decrement, 500)
+  end
+end
+
+{:ok, counter_pid} = GenServer.start_link(DecrementingCounter, [])
 ```
 
 </details>
@@ -133,6 +297,7 @@ end
 
 Consider the following resource(s) to deepen your understanding of the topic.
 
+* [HexDocs: Receiving "Regular" Messages](https://hexdocs.pm/elixir/1.14.1/GenServer.html#module-receiving-regular-messages)
 * [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html#call/3)
 * [ElixirLang: GenServer](https://elixir-lang.org/getting-started/mix-otp/genserver.html)
 * [Exercism: GenServer](https://exercism.org/tracks/elixir/concepts/genserver)
@@ -151,3 +316,9 @@ $ git push origin exercise-async_messages
 ```
 
 Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Up Next
+
+| Previous                                             | Next                                               |
+| ---------------------------------------------------- | -------------------------------------------------: |
+| [Pokemon Server](../exercises/pokemon_server.livemd) | [Score Tracker](../exercises/score_tracker.livemd) |

@@ -1,0 +1,97 @@
+# Process Mailbox
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Process Mailbox
+
+You're going to create a `Mailbox` using a process which loops and receives messages.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+mailbox_process = spawn(fn -> Mailbox.loop() end)
+```
+
+You should be able to send the `Mailbox` a message to add a virtual letter to the mailbox.
+Print the current list of letters during every loop to prove your spawned process is storing every message in its state.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+send(mailbox_process, {:mail, "You've Got Mail!"})
+# ["You've Got Mail!"]
+
+send(mailbox_process, {:mail, "You've Got Mail..Again!"})
+# ["You've Got Mail..Again!", "You've Got Mail!"]
+```
+
+We won't typically work directly with processes like this. Instead we'll rely on abstractions such as [GenServer](https://hexdocs.pm/elixir/GenServer.html) which we will learn about in a future lesson.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Mailbox do
+  def loop(state \\ []) do
+    IO.inspect(state)
+    receive do
+      {:mail, letter} -> loop([letter | state])
+    end
+  end
+end
+```
+
+</details>
+
+Implement the `Mailbox` module below.
+
+```elixir
+defmodule Mailbox do
+  @moduledoc """
+  Documentation for `Mailbox`
+  """
+
+  @doc """
+  Recursively loop and receive messages.
+
+  ## Examples
+
+      iex> counter_process = spawn(fn -> Mailbox.loop() end)
+      iex> send(counter_process, {:mail, "Hello!"})
+      :ok
+  """
+  def loop(state \\ []) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-process_mailbox
+$ git add .
+$ git commit -m "finish process mailbox exercise"
+$ git push origin exercise-process_mailbox
+```
+
+Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Up Next
+
+| Previous                                             | Next                                               |
+| ---------------------------------------------------- | -------------------------------------------------: |
+| [Process Drills](../exercises/process_drills.livemd) | [Generic Server](../reading/generic_server.livemd) |

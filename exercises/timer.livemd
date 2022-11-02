@@ -1,0 +1,154 @@
+# Timer
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Timer
+
+You're going to create a `Timer` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which when spawned, will send itself a message every second to increment an internal count.
+
+You should be able to retrieve the number of seconds that have passed since the `Timer` was spawned using a `Timer.seconds/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, pid} = Timer.start_link([])
+Timer.seconds(pid)
+0
+Process.sleep(1000)
+Timer.seconds(pid)
+2
+```
+
+Keep in mind, we cannot guarantee perfect timing when sending messages on an interval, and that is not the purpose of this exercise.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Timer do
+  use GenServer
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def seconds(timer_pid) do
+    GenServer.call(timer_pid, :seconds)
+  end
+
+  @impl true
+  def init(_opts) do
+    schedule_timer()
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_info(:increment, state) do
+    schedule_timer()
+    {:noreply, state + 1}
+  end
+
+  @impl true
+  def handle_call(:seconds, _from, state) do
+    {:reply, state, state}
+  end
+
+  defp schedule_timer do
+    Process.send_after(self(), :increment, 1000)
+  end
+end
+```
+
+</details>
+
+Implement the `Timer` module as documented below. You will also have to implement the necessary [GenServer](https://hexdocs.pm/elixir/GenServer.html) callback functions such as [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1), [GenServer.handle_info/2](https://hexdocs.pm/elixir/GenServer.html#handle_info/2), and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
+
+```elixir
+defmodule Timer do
+  @moduledoc """
+  Documentation for `Timer`
+  """
+  use GenServer
+
+  @doc """
+  Start the `Timer` process.
+
+  ## Examples
+
+      iex> {:ok, pid} = Timer.start_link([])
+  """
+  def start_link(_opts) do
+  end
+
+  @doc """
+  Get the number of seconds that have elapsed since the `Timer` was started.
+
+  ## Examples
+
+    iex> {:ok, pid} = Timer.start_link([])
+    iex> Timer.seconds(pid)
+    0
+    iex> Process.sleep(1200)
+    iex> Timer.seconds(pid)
+    1
+  """
+  def seconds(timer_pid) do
+  end
+end
+```
+
+## Bonus :timer
+
+Re-implement your `Timer` module using the erlang [:timer](https://www.erlang.org/doc/man/timer.html) library. If wrote your solution using the [:timer](https://www.erlang.org/doc/man/timer.html) library library, then re-implement it using [Process.send_after/4](https://hexdocs.pm/elixir/Process.html#send_after/4).
+
+```elixir
+defmodule Timer do
+  @moduledoc """
+  Documentation for `Timer`
+  """
+  use GenServer
+
+  @doc """
+  Start the `Timer` process.
+  """
+  def start_link(_opts) do
+  end
+
+  @doc """
+  Get the number of seconds that have elapsed since the `Timer` was started.
+  """
+  def seconds(timer_pid) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-timer
+$ git add .
+$ git commit -m "finish timer exercise"
+$ git push origin exercise-timer
+```
+
+Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Up Next
+
+| Previous                                           | Next                                         |
+| -------------------------------------------------- | -------------------------------------------: |
+| [Score Tracker](../exercises/score_tracker.livemd) | [Supervisors](../reading/supervisors.livemd) |
