@@ -131,48 +131,48 @@ end
 
 ## Process
 
-We've seen we can use some `Kernel` functions for working with processes.
+We've seen we can use some [Kernel](https://hexdocs.pm/elixir/Kernel.html) functions for working with processes.
 
 ```elixir
 pid =
   spawn(fn ->
     receive do
-      :message -> IO.puts("I recieved a message")
+      :message -> IO.puts("I received a message")
     end
   end)
 
 send(pid, :message)
 ```
 
-Generally speaking, we won't use these functions directly and will use the `GenServer.call/3`
-and `GenServer.cast/2` functions for sending messages.
+Generally speaking, we won't use these functions directly and will use the [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3)
+and [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) functions for sending messages.
 
 We'll also use the [Process](https://hexdocs.pm/elixir/Process.html) which provides some generic functions for working with processes and sending messages.
 
-For example, we can send messages using `Process.send/3` the same way we can with `Kernel.send/2`.
+For example, we can send messages using [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) the same way we can with [Kernel.send/2](https://hexdocs.pm/elixir/Kernel.html#send/2).
 
 ```elixir
 Process.send(self(), :message, [])
 
 receive do
-  :message -> "I recieved a message"
+  :message -> "I received a message"
 end
 ```
 
-We also have a `Process.send_after/3` function for sending processes after a certain number of milliseconds.
+We also have a [Process.send_after/3](https://hexdocs.pm/elixir/Process.html#send_after/3) function for sending processes after a certain number of milliseconds.
 
 ```elixir
 Process.send_after(self(), :message, 2000)
 
 receive do
-  :message -> "I recieved a message after 2 seconds"
+  :message -> "I received a message after 2 seconds"
 end
 ```
 
-A `GenServer` process can recieve generic messages from other processes. It handles them using a `handle_info/2` callback function.
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) process can receive generic messages from other processes. It handles them using a `handle_info/2` callback function.
 
 ```elixir
-defmodule Reciever do
+defmodule Receiver do
   use GenServer
 
   def init(_opts) do
@@ -180,21 +180,21 @@ defmodule Reciever do
   end
 
   def handle_info(:message, state) do
-    IO.puts("Recieved a message!")
+    IO.puts("Received a message!")
     {:noreply, state}
   end
 end
 ```
 
-Any messages sent using the `Process` module or generic `Kernel` functions can be handled using the generic `handle_info/2` function.
+Any messages sent using the [Process](https://hexdocs.pm/elixir/Process.html) module or generic [Kernel](https://hexdocs.pm/elixir/Kernel.html) functions can be handled using the generic `handle_info/2` function.
 
 ```elixir
-{:ok, pid} = GenServer.start_link(Reciever, [])
+{:ok, pid} = GenServer.start_link(Receiver, [])
 
 Process.send(pid, :message, [])
 ```
 
-A `GenServer` should not call it's own callback functions, as this can cause it to misbehave.
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) should not call it's own callback functions, as this can cause it to misbehave.
 
 ```elixir
 defmodule MisbehavingGenServer do
@@ -206,7 +206,7 @@ defmodule MisbehavingGenServer do
 
   def handle_call(:message, _from, state) do
     GenServer.call(self(), :talking_to_myself)
-    IO.puts("Recieved a message!")
+    IO.puts("Received a message!")
     {:reply, state}
   end
 
@@ -225,7 +225,7 @@ Uncomment and evaluate the code below, and you'll see the `MisbehavingGenServer`
 # GenServer.call(pid, :message)
 ```
 
-Instead of sending itself a message using `GenServer.cast/2` or `GenServer.call/3`, a GenServer can send itself generic messages using `Process.send/3` or `Process.send_after/4`.
+Instead of sending itself a message using [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) or [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3), a GenServer can send itself generic messages using [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) or [Process.send_after/4](https://hexdocs.pm/elixir/Process.html#send_after/4).
 
 Often we'll use this to schedule some kind of recurring work. Here we have an example of a counter that automatically increments every second.
 
@@ -316,3 +316,9 @@ $ git push origin exercise-async_messages
 ```
 
 Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Up Next
+
+| Previous                                             | Next                                         |
+| ---------------------------------------------------- | -------------------------------------------: |
+| [Pokemon Server](../exercises/pokemon_server.livemd) | [Supervisors](../reading/supervisors.livemd) |

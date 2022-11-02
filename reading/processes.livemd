@@ -311,7 +311,7 @@ defmodule CounterProcess do
     IO.inspect(state, label: "counter")
 
     receive do
-      "increment" -> loop(state + 1)
+      :increment -> loop(state + 1)
     end
   end
 end
@@ -323,7 +323,7 @@ Try evaluating the cell below over and over again. Notice that the counter value
 We now have stateful processes!
 
 ```elixir
-send(counter_process, "increment")
+send(counter_process, :increment)
 ```
 
 Stateful processes are short-term in-memory persistence. We can create a stateful process
@@ -333,29 +333,26 @@ to store some value for the duration of the program.
 
 ### Your Turn
 
-Create a `TodoListProcess` which can receive messages in a loop.
-
-<!-- livebook:{"force_markdown":true} -->
+Modify the `Counter` module below so it can recieve a `:decrement` message to decrement the current count.
 
 ```elixir
-todo_list_process = spawn(fn -> TodoListProcess.loop() end)
-```
+defmodule Counter do
+  def loop(state \\ 0) do
+    IO.inspect(state, label: "counter")
 
-It should store a `list` of strings in the state. You should be able to send messages to the `TodoListProcess` to
-`add` and `remove` items from the list in the state.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-send(todo_list_process, {:add, "new todo list item"})
-send(todo_list_process, {:remove, "new todo list item"})
-```
-
-```elixir
-defmodule TodoListProcess do
-  def loop(state \\ []) do
+    receive do
+      :increment -> loop(state + 1)
+    end
   end
 end
+
+counter_process = spawn(fn -> CounterProcess.loop() end)
+```
+
+You should be able to send a `:decrement` message to a spawned `Counter`. Uncomment and evaluate the code below to test your solution.
+
+```elixir
+# send(counter_process, :decrement)
 ```
 
 ## Commit Your Progress
@@ -372,6 +369,14 @@ $ git push origin exercise-processes
 ```
 
 Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: Process](https://hexdocs.pm/elixir/Process.html)
+* [Elixirlang: Processes](https://elixir-lang.org/getting-started/processes.html)
+* [Exercism: Processes](https://exercism.org/tracks/elixir/concepts/processes)
 
 ## Up Next
 
