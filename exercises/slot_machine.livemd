@@ -5,29 +5,17 @@
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## The House Inc
-
-You have been hired at The House Inc.
-
-The House Inc is a casino right in the middle of Generic City. You aren't sure why a casino needs a programmer but you were desperate and applied anyway.
-
-Somehow, you actually made it past the other applicants and got the job... Or maybe that was because you were the only applicant.
-
-Your first assignment was to write the code for a slot machine. You looked at the specification and you were alarmed at how unfair this slot machine is. The House Inc isn't known for being a good place to work but you decide to talk to your boss about it anyway.
-
-So you went to your boss's office to voice your opinions on the topic and after you give a passionate speech on the value of ethics and morals. Your boss interrupts you in the middle of your ~~tantrum~~ speech and asks what ethics means.
-
-At that very moment you knew that there was no way these guys would listen because the only ethics they believe in are profit maximization.
-
 ## Slot Machine Specs
 
-The slot machine is a [GenServer](https://hexdocs.pm/elixir/GenServer.html) that has the state of `balance` within it. Balance is how much money the machine has.
+Create a `SlotMachine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that keeps track of its `balance`. Balance is the amount of money the machine has. It should not give out more rewards than its balance.
 
-* Slot machine reward sizes are random but must not exceed `balance`.
-* When a slot machine gives out a reward. Subtract `balance` by the amount of the reward.
-* The machine should only give rewards 30% of the time.
+When a user calls `SlotMachine.roll/1` the `SlotMachine` should reward the player 1/3rd of the time.
 
-This exercise will need you to use if statements. You will also need to figure out a way to generate random numbers and convert those into chances.
+* When a slot machine gives the user a reward. Subtract `balance` by the amount of the reward.
+* If the reward is greater than the current `balance`, set the reward to the remaining balance and subtract that amount from the `SlotMachine`'s state.
+* use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
+
+You need to use if statements and the `:rand` erlang module to complete this exercise.
 
 ```elixir
 defmodule SlotMachine do
@@ -39,12 +27,6 @@ defmodule SlotMachine do
 
   def init(:ok) do
     {:ok, %{balance: 7000}}
-  end
-
-  @doc """
-  Use this function for debugging. You need to make sure that your slot machine works properly.
-  """
-  def get_balance(pid) do
   end
 
   @doc """
@@ -73,7 +55,7 @@ end
 
 ## Bonuses
 
-* This machine is boring. Make numbers spin on screen with `IO.write` to make the slot machine feel like a slot machine.
+* Make numbers spin on screen with `IO.write` to make the slot machine more interesting.
 * Create another [GenServer](https://hexdocs.pm/elixir/GenServer.html) that represents a person in the casino and make that person have to pay money in order to use the slot machine. A person can no longer play if he runs out of money.
 
 ## Commit Your Progress
@@ -83,10 +65,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-/home/smartix/beta_curriculum/exercises/slot_machine.livemd
+$ git checkout -b exercise-slot_machine
 $ git add .
 $ git commit -m "finish slot machine exercise"
-$ git push origin exercise-/home/smartix/beta_curriculum/exercises/slot_machine.livemd
+$ git push origin exercise-slot_machine
 ```
 
 Then create a pull request to your `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
