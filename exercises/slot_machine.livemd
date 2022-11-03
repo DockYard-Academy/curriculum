@@ -7,13 +7,13 @@
 
 ## Slot Machine Specs
 
-Create a `SlotMachine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that keeps track of its `balance`. Balance is the amount of money the machine has. It should not give out more rewards than its balance.
+Create a `SlotMachine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that represents a slot machine game. It should keep track of its `balance`. Balance is the amount of money the machine has. It should not give out more rewards than its balance. The starting balance of a slot machine is `7000` pennies.
 
-When a user calls `SlotMachine.roll/1` the `SlotMachine` should reward the player 1/3rd of the time.
+When the `SlotMachine.roll/1` function is called the user should have a one in three chance of getting a reward.
 
-* When a slot machine gives the user a reward. Subtract `balance` by the amount of the reward.
-* If the reward is greater than the current `balance`, set the reward to the remaining balance and subtract that amount from the `SlotMachine`'s state.
-* use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
+The should be between `1` and the remaning balance of the machine.
+
+- use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
 
 You need to use if statements and the `:rand` erlang module to complete this exercise.
 
@@ -21,8 +21,8 @@ You need to use if statements and the `:rand` erlang module to complete this exe
 defmodule SlotMachine do
   use GenServer
 
-  def start() do
-    GenServer.start(__MODULE__, :ok)
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, :ok)
   end
 
   def init(:ok) do
@@ -55,8 +55,8 @@ end
 
 ## Bonuses
 
-* Make numbers spin on screen with `IO.write` to make the slot machine more interesting.
-* Create another [GenServer](https://hexdocs.pm/elixir/GenServer.html) that represents a person in the casino and make that person have to pay money in order to use the slot machine. A person can no longer play if he runs out of money.
+- Make numbers spin on screen with `IO.write` to make the slot machine more interesting.
+- Create another [GenServer](https://hexdocs.pm/elixir/GenServer.html) that represents a person in the casino and make that person have to pay money in order to use the slot machine. A person can no longer play if he runs out of money.
 
 ## Commit Your Progress
 
@@ -75,6 +75,6 @@ Then create a pull request to your `main` branch and notify your teacher by incl
 
 ## Up Next
 
-| Previous                                                         | Next                                                 |
+| Previous                                                         |                                                 Next |
 | ---------------------------------------------------------------- | ---------------------------------------------------: |
 | [Traffic Light Server](../exercises/traffic_light_server.livemd) | [Pokemon Server](../exercises/pokemon_server.livemd) |
