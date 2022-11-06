@@ -4,8 +4,7 @@
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:kino, "~> 0.7.0"}
 ])
 ```
 
@@ -51,12 +50,45 @@ Process.sleep(100)
 "I still run."
 ```
 
+When a linked process crashes, it will also crashed the process that spawned it. Uncomment the code below, and you'll see it crashes the current Livebook process. Re-comment the code when finished.
+
+```elixir
+# spawn_link(fn -> raise "error" end)
+```
+
+That means if we start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) (or other process) **unsupervised** it will raise an error if it crashes.
+
+```elixir
+defmodule UnsupervisedWorker do
+  use GenServer
+
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_info(:crash, _state) do
+    raise "crash!"
+  end
+end
+```
+
+Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
+
+```elixir
+# {:ok, pid} = GenServer.start_link(UnsupervisedWorker, [])
+# Process.send(pid, :crash, [])
+```
+
+The same is true if we manually exit a process using [Process.exit/2](https://hexdocs.pm/elixir/Process.html#exit/2) with the `:exit` reason. Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
+
+```elixir
+# {:ok, pid} = GenServer.start_link(UnsupervisedWorker, [])
+# Process.exit(pid, :exit)
+```
+
 ## Supervisors
 
-We've seen that unlinked processes can crash and die without affecting the parent process.
-
-Instead of crashing the process and leaving it dead, we can use `Supervisors` to monitor
-processes and attempt to restart them.
+Instead of crashing the parent process, we can use `Supervisors` to monitor processes and restart them when they die.
 
 The term restart is a bit misleading. To be clear, we cannot restart a process. Restart in this case means that we kill the process and start a new one in its place. However, it's conceptually easier to think of it as restarting.
 
@@ -81,47 +113,82 @@ S --> W3
 
 <!-- livebook:{"break_markdown":true} -->
 
-We'll create a `Bomb` process that crashes after two seconds to demonstrate how to supervise a process.
+Here, we define a simple `Worker` process which we'll start under a supervisor.
 
 ```elixir
-defmodule Bomb do
+defmodule Worker do
   use GenServer
 
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [], [])
   end
 
   def init(state) do
-    Process.send_after(self(), :explode, 2000)
     {:ok, state}
-  end
-
-  def handle_info(:explode, _state) do
-    raise "Bomb Exploded!"
   end
 end
 ```
 
-The [Supervisor.start_link/2](https://hexdocs.pm/elixir/Supervisor.html#start_link/2) function accepts a list of child processes. Each child must define a
-`start_link/1` function, which `Bomb` already does.
-
-By default, a Supervisor limits the number of
-times a child worker can crash to three times in five seconds. So we kill the supervisor process after five seconds to avoid crashing this livebook.
+Every supervisor is also a process. The [Supervisor.start_link/2](https://hexdocs.pm/elixir/Supervisor.html#start_link/2) function accepts a list of child processes and starts the supervisor process. We provide each child as a map with an `:id` and a `:start` signature.
 
 ```elixir
 children = [
-  {Bomb, []}
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, [1]}
+  },
+  %{
+    id: :worker2,
+    start: {Worker, :start_link, [2]}
+  },
+  %{
+    id: :worker3,
+    start: {Worker, :start_link, [3]}
+  }
 ]
 
 {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
+```
 
-Process.sleep(5000)
-Process.exit(supervisor_pid, :normal)
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here, we've used the livebook-exclusive [Kino.Process.sup_tree/2](https://hexdocs.pm/kino/Kino.Process.html#sup_tree/2) function to create a visualization of the above supervision tree.
+
+```elixir
+Kino.Process.sup_tree(supervisor_pid)
+```
+
+When we kill one of the processes under the supervision tree, it will be restarted. For demonstration purposes only, you can use the [:c.pid/3](https://www.erlang.org/doc/man/c.html#pid-3) function from erlang to manually create the `pid` from the diagram above where `727` should be a pid from the diagram above.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+pid = :c.pid(0, 727, 0)
+```
+
+Then, kill the process using [Process.exit/2](https://hexdocs.pm/elixir/1.12/Process.html#exit/2).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Process.exit(pid, :exit)
+```
+
+Re-evaluate the diagram above and you should see a new `Worker` process started with a different pid. Repeat this process to kill each process under the supervisor and see them restarted.
+
+```elixir
+
 ```
 
 ## Restart Strategies
 
-Supervisors have different strategies for when one of their workers crashes.
+Supervisors can have different restart strategies that change the behavior of how we handle restarting child processes when one of them dies.
+
+We've seen the above `:one_for_one` strategy. This is the most common strategy, where we restart the child process that died under the supervisor.
+
+However, sometimes we want different restart strategies such as `:one_for_all` and `:rest_for_all`.
 
 ### One-to-One
 
@@ -194,100 +261,82 @@ flowchart TD
 
 P2 crashed, the child processes after it in the start order are terminated, then P2 and the other terminated child processes are are restarted.
 
----
+## Restart Strategy Examples
 
-To better understand how we can use a supervisor with different restart strategies, we're going to
-supervise multiple bomb processes.
+To better understand how we can use a supervisor with different restart strategies, we're going to supervise multiple `Bomb` processes that will crash after a specified amount of time.
+
+Here, we've created a `Bomb` process that will send itself a message to cause it to crash after a specified `:bomb_time`.
+
+```elixir
+defmodule Bomb do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
+  end
+
+  @impl true
+  def init(opts) do
+    bomb_time = Keyword.get(opts, :bomb_time, 2000)
+    name = Keyword.get(opts, :name, 2000)
+
+    Process.send_after(self(), :explode, bomb_time)
+    {:ok, name}
+  end
+
+  @impl true
+  def handle_info(:explode, name) do
+    raise "#{name} Exploded!"
+  end
+end
+```
 
 Each `Bomb` will exist for a specified time and then crash (explode).
 
-* `Bomb1` will explode after 2 seconds.
-* `Bomb2` will explode after 3 seconds.
-* `Bomb3` will explode after 5 seconds.
+* `Bomb 1` will explode after 2 seconds.
+* `Bomb 2` will explode after 3 seconds.
+* `Bomb 3` will explode after 5 seconds.
+
+We'll reuse these same children in all of our examples.
 
 ```elixir
-defmodule Bomb1 do
-  use GenServer
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state)
-  end
-
-  def init(state) do
-    Process.send_after(self(), :explode, 2000)
-    {:ok, state}
-  end
-
-  def handle_info(:explode, _state) do
-    raise "Bomb 1 Exploded!"
-  end
-end
-
-defmodule Bomb2 do
-  use GenServer
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state)
-  end
-
-  def init(state) do
-    Process.send_after(self(), :explode, 3000)
-    {:ok, state}
-  end
-
-  def handle_info(:explode, _state) do
-    raise "Bomb 2 Exploded!"
-  end
-end
-
-defmodule Bomb3 do
-  use GenServer
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state)
-  end
-
-  def init(state) do
-    Process.send_after(self(), :explode, 5000)
-    {:ok, state}
-  end
-
-  def handle_info(:explode, _state) do
-    raise "Bomb 3 Exploded!"
-  end
-end
+children = [
+  %{
+    id: :bomb1,
+    start: {Bomb, :start_link, [[name: "Bomb 1", bomb_time: 2000]]}
+  },
+  %{
+    id: :bomb2,
+    start: {Bomb, :start_link, [[name: "Bomb 2", bomb_time: 3000]]}
+  },
+  %{
+    id: :bomb3,
+    start: {Bomb, :start_link, [[name: "Bomb 3", bomb_time: 5000]]}
+  }
+]
 ```
 
 ### One For One
 
 We'll start the three bombs using the `:one_for_one` strategy.
 
-Each bomb restarts individually without affecting the others,
-so the timeline of crashes should be:
-
-* 2 seconds: `Bomb1` crashes.
-* 3 seconds: `Bomb2` crashes.
-* 4 seconds: `Bomb1` crashes.
-* 5 seconds: `Bomb3` crashes.
-
-We've increased
-`:max_restarts` to increase the limit of three crashes per five seconds to five crashes per five seconds.
+For the sake of example, we've increased `:max_restarts` to increase the limit of three crashes per five seconds to five crashes per five seconds.
 
 You can go to [Supervisor Options](https://hexdocs.pm/elixir/Supervisor.html#init/2-options)
  on HexDocs for a full list of configuration options.
 
+Each bomb restarts individually without affecting the others,
+so the timeline of crashes should be:
+
+* 2 seconds: `Bomb 1` crashes.
+* 3 seconds: `Bomb 2` crashes.
+* 4 seconds: `Bomb 1` crashes.
+* 5 seconds: `Bomb 3` crashes.
+
+Uncomment and run the cell below to see the timeline of crashes, then re-comment it.
+
 ```elixir
-children = [
-  {Bomb1, []},
-  {Bomb2, []},
-  {Bomb3, []}
-]
-
-{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_one, max_restarts: 5)
-
-# allow time for crashes and kill the supervisor to clean up the process.
-Process.sleep(5100)
-Process.exit(supervisor, :normal)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one, max_restarts: 5)
 ```
 
 ### One For All
@@ -297,27 +346,23 @@ terminated and restarted when a single process crashes.
 
 So the timeline of crashes will be:
 
-* 2 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
-* 4 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
-* 6 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 2 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 4 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 6 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 8 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 10 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
 
 Notice that `Bomb2` and `Bomb3` will never explode because their timers restart.
 
+Uncomment the line below to observe the timeline of crashes, then re-comment it.
+
 ```elixir
-children = [
-  {Bomb1, []},
-  {Bomb2, []},
-  {Bomb3, []}
-]
-
-{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_all)
-
-# allow time for crashes and kill the supervisor to clean up the process.
-Process.sleep(6100)
-Process.exit(supervisor, :normal)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_all, max_restarts: 5)
 ```
 
 ### Rest For One
+
+Rest for one works like a row of dominoes, where only children defined after the crashed process will be restarted.
 
 If we change the restart strategy to `:rest_for_one`, the processes will restart any
 processes ordered after them in the supervisor.
@@ -325,26 +370,37 @@ processes ordered after them in the supervisor.
 At first, we won't notice any change from the `:one_for_all` strategy. The
 timeline will still be:
 
-* 2 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
-* 4 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
-* 6 seconds: `Bomb1` crashes (`Bomb2` and `Bomb3` restarted)
+* 2 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 4 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 6 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 8 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+* 10 seconds: `Bomb 1` crashes (`Bomb 2` and `Bomb 3` restarted)
+
+Uncomment the line below to observe the timeline of crashes, then re-comment it.
 
 ```elixir
-children = [
-  {Bomb1, []},
-  {Bomb2, []},
-  {Bomb3, []}
-]
-
-{:ok, supervisor} = Supervisor.start_link(children, strategy: :rest_for_one)
-
-# allow time for crashes and kill the supervisor to clean up the process.
-Process.sleep(6100)
-Process.exit(supervisor, :normal)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
 ```
 
 However, if we change the order of children in the supervisor, only children after the crashed
-process (`Bomb1`) will restart.
+process will restart.
+
+```elixir
+children = [
+  %{
+    id: :bomb3,
+    start: {Bomb, :start_link, [[name: "Bomb 3", bomb_time: 5000]]}
+  },
+  %{
+    id: :bomb1,
+    start: {Bomb, :start_link, [[name: "Bomb 1", bomb_time: 2000]]}
+  },
+  %{
+    id: :bomb2,
+    start: {Bomb, :start_link, [[name: "Bomb 2", bomb_time: 3000]]}
+  }
+]
+```
 
 So the timeline of crashes would be:
 
@@ -352,38 +408,41 @@ So the timeline of crashes would be:
 * 4 seconds: `Bomb1` crashes (`Bomb2` restarted)
 * 5 seconds: `Bomb3` crashes (`Bomb1` and `Bomb2` restarted)
 * 7 seconds: `Bomb1` crashes (`Bomb2` restarted)
-
-We've increased `max_restarts` because there would normally be three crashes in five seconds.
+* 9 seconds: `Bomb1` crashes (`Bomb2` restarted)
 
 ```elixir
-children = [
-  {Bomb3, []},
-  {Bomb1, []},
-  {Bomb2, []}
-]
-
-{:ok, supervisor} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
-
-# allow time for crashes and kill the supervisor to cleanup the process.
-Process.sleep(7100)
-Process.exit(supervisor, :normal)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
 ```
 
 ### Your Turn
 
-Start `Bomb1`, `Bomb2`, and `Bomb3` under a new supervisor.
-
-Change the order to:
-
-* first: `Bomb2`
-* second: `Bomb3`
-* third: `Bomb1`
-
-Predict the crash timeline, Then evaluate your code. Did the result match your prediction?
+Start **four** `Bomb` processes under a supervisor with different bomb times. Try each restart strategy `:one_for_one`, `one_for_all`, and `:rest_for_one`. Predict the crash timeline then evaluate your code. Did the result match your prediction?
 
 ```elixir
 
 ```
+
+## Syntax Sugar
+
+Instead of providing a map with the `:id` and `:start` keys, we can instead provide the child as a tuple. The name of the module will also be the `:id`, and the second value will be the argument passed to `start_link/1`.
+
+```elixir
+children = [
+  {Bomb, [name: "Syntax Sugar Bomb", bomb_time: 1000]}
+]
+```
+
+Uncomment the following code to see the crash timeline, then re-comment it.
+
+```elixir
+# Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+## Thought Provoking Questions
+
+* Why do supervisors make our application fault-tolerant?
+* What kinds of errors to supervisors catch?
+* Why might we use each restart strategy?
 
 ## Further Reading
 
@@ -393,15 +452,25 @@ Predict the crash timeline, Then evaluate your code. Did the result match your p
 
 ## Commit Your Progress
 
-Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
+$ git checkout main
+$ git checkout -b exercise-supervisors
 $ git add .
 $ git commit -m "finish supervisors section"
+$ git push origin exercise-supervisors
 ```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                     | Next                                                               |
-| -------------------------------------------- | -----------------------------------------------------------------: |
-| [Battle Map](../exercises/battle_map.livemd) | [Supervised Mix Project](../reading/supervised_mix_project.livemd) |
+| Previous                           | Next                                                     |
+| ---------------------------------- | -------------------------------------------------------: |
+| [Timer](../exercises/timer.livemd) | [Supervised Stack](../exercises/supervised_stack.livemd) |

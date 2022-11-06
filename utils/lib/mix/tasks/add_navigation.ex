@@ -51,8 +51,7 @@ defmodule Mix.Tasks.Bc.AddNavigation do
     [name, _extension] = String.split(file_name, ".")
 
     String.split(name, "_")
-    |> Enum.map(&capitalize/1)
-    |> Enum.join(" ")
+    |> Enum.map_join(" ", &capitalize/1)
   end
 
   @custom_capitalizations %{

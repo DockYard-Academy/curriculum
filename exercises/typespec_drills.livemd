@@ -3,9 +3,7 @@
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -129,6 +127,23 @@ defmodule FunctionSpecs do
     Keyword.get(keyword_list, atom_key, "")
   end
 
+  @spec split_and_lowercase(String.t()) :: [String.t()]
+  def split_and_lowercase(string) do
+    string
+    |> String.downcase()
+    |> String.split("", trim: true)
+  end
+
+  @spec string_to_int(String.t()) :: integer()
+  def string_to_int(string) do
+    String.to_integer(string)
+  end
+
+  @spec integers_to_strings([integer()]) :: [String.t()]
+  def integers_to_strings(integers) do
+    Enum.map(integers, fn int -> Integer.to_string(int) end)
+  end
+  
   @spec one_to_two(1) :: 2
   def one_to_two(1) do
     2
@@ -192,6 +207,20 @@ defmodule FunctionSpecs do
     Keyword.get(keyword_list, atom_key, "")
   end
 
+  def split_and_lowercase(string) do
+    string
+    |> String.downcase()
+    |> String.split("", trim: true)
+  end
+
+  def string_to_int(string) do
+    String.to_integer(string)
+  end
+
+  def integers_to_strings(integers) do
+    Enum.map(integers, fn int -> Integer.to_string(int) end)
+  end
+
   def one_to_two(1) do
     2
   end
@@ -208,13 +237,13 @@ Implement the following custom `@type`s in the module below based on the comment
 ```elixir
 defmodule CustomTypes do
   # a string or number
-  @type unparsed_number :: string() | number()
+  @type unparsed_number :: String.t() | number()
   # a list of strings
-  @type strings :: [string()]
+  @type strings :: [String.t()]
   # a map with :title (string) and :content (string) keys. 
-  @type book :: %{title: string(), content: string()}
+  @type book :: %{title: String.t(), content: String.t()}
   # A map with :name (string) and `:books` (a list of books) keys.
-  @type author :: %{name: string(), books: [book()]}
+  @type author :: %{name: String.t(), books: [book()]}
 end
 ```
 
@@ -235,15 +264,25 @@ end
 
 ## Commit Your Progress
 
-Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
+$ git checkout main
+$ git checkout -b exercise-typespec_drills
 $ git add .
 $ git commit -m "finish typespec drills exercise"
+$ git push origin exercise-typespec_drills
 ```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                                                               | Next                                         |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------: |
-| [Games Documentation And Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |
+| Previous                         | Next                                                                                                   |
+| -------------------------------- | -----------------------------------------------------------------------------------------------------: |
+| [Credo](../reading/credo.livemd) | [Games Documentation And Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) |

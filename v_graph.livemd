@@ -2,188 +2,179 @@
 
 ```elixir
 Mix.install([
-  {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:kino, "~> 0.7.0"},
+  {:vega_lite, "~> 0.1.6"},
+  {:kino_vega_lite, "~> 0.1.4"}
 ])
 ```
 
-## 2022-04-04 graph
-
-Week Goals
-
-* Day 1 and Day 2 of Week 4
-* [Stretch Goal] All of Week 4
-* [Maintenance] Week 1 Content Updates
-* [Maintenance] Automated Testing System
-* [Maintenance] Add Licence
-
-General Feedback
-
-* Seems like a lot of content, what can we remove?
-* Remove the custom deployment of self-made server, add deployment later in the course.
-  What deployment should we use? (Recommendations made to partner with Fly)
-* Potential order changes: Some Week 9 topics could be sooenr
-* adding stretch goals or extra credit sections
-* add a survey of students
+## Class Helpers
 
 ```elixir
-weeks = 12
+defmodule Class do
+  @today Date.utc_today()
+  @launch_deadline ~D[2023-01-31]
+  @beta_deadline ~D[2022-12-20]
+  @initial_class_date ~D[2022-10-20]
+  @initial_class_day 17
+  @completed_content_days 19
+  @actual_class_day 17
+  def beta_class_days_remaining(date \\ @today, count \\ 0)
+  def beta_class_days_remaining(@beta_deadline, count), do: count
 
-start = Date.new!(2022, 1, 15)
-current = Date.utc_today()
+  def beta_class_days_remaining(current, count) do
+    beta_class_days_remaining(Date.add(current, 1), (has_lesson?(current) && count + 1) || count)
+  end
 
-finish = Date.new!(2022, 7, 1)
-past_days = Date.diff(current, start)
-days_until_finish = Date.diff(finish, current)
+  def beta_target_days_completed(target) do
+    total_days_of_content() - beta_class_days_remaining(target)
+  end
 
-content_completed_in_days = 15
-remaining_content_in_days = 35
+  def beta_expected_end_date(current \\ @today, count \\ beta_days_of_content_remaining())
+  def beta_expected_end_date(end_date, 0), do: end_date
 
-necessary_pace = remaining_content_in_days / days_until_finish
-current_pace = content_completed_in_days / past_days
-size = 600
+  def beta_expected_end_date(current, count) do
+    beta_expected_end_date(Date.add(current, 1), (has_lesson?(current) && count - 1) || count)
+  end
 
-widget =
-  VegaLite.new(width: size, height: size)
-  |> VegaLite.mark(:line)
-  |> VegaLite.encode_field(:x, "x", type: :quantitative)
-  |> VegaLite.encode_field(:y, "y", type: :quantitative)
-  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
-  |> VegaLite.encode_field(:color, "type", title: "V Graph", type: :nominal)
-  |> Kino.VegaLite.new()
+  def beta_days_of_content_remaining, do: total_days_of_content() - @actual_class_day
 
-IO.inspect(Float.round(necessary_pace * 5), label: "days of content I must finish per week")
+  def beta_actual_days_completed, do: @actual_class_day
+  def completed_content_days, do: @completed_content_days
 
-current_pace =
-  Enum.map(0..days_until_finish, &%{x: &1, y: &1 * current_pace + 15, type: "current pace"})
+  def days_in_cohort, do: 5 * 4 * 3
 
-baseline =
-  Enum.map(0..days_until_finish, &%{x: &1, y: content_completed_in_days, type: "baseline"})
+  def days_completed_balanced_target(target) do
+    days_since_starting = Date.diff(target, @initial_class_date)
 
-goal_pace =
-  Enum.map(0..days_until_finish, &%{x: &1, y: &1 * necessary_pace + 15, type: "goal pace"})
+    Float.ceil(days_since_starting * days_unfinished() / total_days_remaining_until_deadline()) +
+      @initial_class_day
+  end
 
-Kino.VegaLite.push_many(widget, goal_pace)
-Kino.VegaLite.push_many(widget, current_pace)
-Kino.VegaLite.push_many(widget, baseline)
+  def days_ahead_or_behind_in_beta, do: total_days_of_content() - beta_class_days_remaining()
 
-widget
+  def total_days_remaining_until_deadline, do: Date.diff(@launch_deadline, @today)
+
+  def total_days_of_content do
+    outline = File.read!(__DIR__ <> "/start.livemd")
+    Regex.scan(~r/(\#{3})(.+)/, outline) |> Enum.count()
+  end
+
+  def days_needing_content_review,
+    do: total_days_of_content() - @completed_content_days - days_needing_content()
+
+  def days_needing_content do
+    outline = File.read!(__DIR__ <> "/start.livemd")
+
+    Regex.scan(~r/\#{3}[^\#]+/, outline)
+    |> Enum.filter(fn [section] ->
+      Regex.scan(~r/\*.+/, section)
+      |> Enum.reject(fn [bullet] ->
+        bullet in ["* Reading", "* Exercises"] or
+          Regex.match?(~r/\[.+(?=\])/, bullet)
+      end)
+      |> Enum.any?()
+    end)
+    |> Enum.count()
+  end
+
+  def days_unfinished, do: days_needing_content_review() + days_needing_content()
+
+  defp has_lesson?(date) do
+    Calendar.strftime(date, "%A") in ["Monday", "Tuesday", "Wednesday", "Thursday", "Sunday"]
+  end
+end
 ```
 
-## Questions
+## Content Tracking
 
-What can we effectively remove?
-
-## Takeaway
-
-Will add restrictions to README when licence found.
-
-## 2022-04-11
-
-### Review
-
-* [X] [Maintenance] Week 1 Content Updates & Tests
-* [X] [Maintenance] Automated Testing System
-* [ ] Day 1 and Day 2 of Week 4 (exercises complete, missing reading material)
-* [X] (holding off) [Maintenance] Add Licence
-
-Additionally
-
-* Added new Setup Section
-
-### Goals
-
-* [ ] [Maintenance] Week 2 Content Updates & Tests
-* [ ] Day 3 and Day 4 of Week 4
-* [ ] Week 4 Day 1 & 2 Reading material
-* [ ]
+### General Information
 
 ```elixir
-weeks = 12
-
-start = Date.new!(2022, 4, 4)
-current = Date.utc_today()
-
-finish = Date.new!(2022, 7, 1)
-# past_days = Date.diff(current, start)
-days_until_finish = Date.diff(finish, start)
-# days_until_finish = Date.diff(finish, current)
-weeks_until_finish = div(days_until_finish, 7)
-
-content_days = 11 * 5
-
-week1 = 15
-week2 = 17
-
-weekly_pace = week2 - week1
-
-necessary_pace = (content_days - week1) / weeks_until_finish
-
-size = 600
-# 2022-04-04
-week1 = %{x: 0, y: 15, type: "actual_pace"}
-# 2022-04-11
-week2 = %{x: 1, y: 17, type: "actual_pace"}
-
-velocity =
-  for week <- 1..weeks_until_finish, do: %{x: week, y: week * weekly_pace + 15, type: "velocity"}
-
-widget =
-  VegaLite.new(width: size, height: size)
-  |> VegaLite.mark(:line)
-  |> VegaLite.encode_field(:x, "x", type: :quantitative)
-  |> VegaLite.encode_field(:y, "y", type: :quantitative)
-  |> VegaLite.transform(groupby: ["color"], extent: [2500, 6500])
-  |> VegaLite.encode_field(:color, "type", title: "V Graph", type: :nominal)
-  |> Kino.VegaLite.new()
-
-goal_pace =
-  Enum.map(0..weeks_until_finish, &%{x: &1, y: &1 * necessary_pace + 15, type: "goal pace"})
-
-Kino.VegaLite.push_many(widget, goal_pace)
-Kino.VegaLite.push_many(widget, velocity)
-Kino.VegaLite.push_many(widget, [week1, week2])
-
-widget
+Class.days_in_cohort()
 ```
 
-### Questions/Update
+```elixir
+# days needing content + days needing content review
+Class.days_unfinished()
+```
 
-* Week 1 done (needs very small update)
-* Week 2 estimated done this week.
-* Week 3 needs exercises and test feedback
-* Week 4 needs reading material
-* I estimate I am 25%-30% complete with the course.
-* We are past 50% of the deadline.
-* We're not on linear pace for July 4.
-  * Are there ways we can save time on the course? (reading material compromises or alternative approach?)
-* Assuming linear pace, my estimate for completion is
+```elixir
+Class.days_needing_content()
+```
 
-## 2022-04-18
+```elixir
+Class.days_needing_content_review()
+```
 
-### Goals
+```elixir
+Class.total_days_remaining_until_deadline()
+```
 
-* Week 2 Maintenance (Content Updates and Tests)
-* Week 3 Maintenance (Content Updates and Tests)
-* List of beta testing feedback and small revisions
-* Week 4 RND using Smart Cells to teach SQL.
+### Targets
 
-## 2022-04-25
+```elixir
+# October
+Class.days_completed_balanced_target(~D[2022-10-31])
+```
 
-Unfortunately Last week I was ill. Minimal progress was made and my goals are the same as last week.
+```elixir
+# November
+Class.days_completed_balanced_target(~D[2022-11-30])
+```
 
-## 2022-04-28
+```elixir
+# December
+Class.days_completed_balanced_target(~D[2022-12-31])
+```
 
-* Week 2 Content updates almost done
-* Added pattern matching to early content
-* Added Date Time lessons
-* Greatly expanded Built in module section with exercises in reading.
-* Expanded added pattern matching and Date lessons
-* Added piper operator to functions lesson
+```elixir
+# January
+Class.days_completed_balanced_target(~D[2023-01-31])
+```
 
-## 2022-05-02
+## Beta Tracking
 
-* Week 2 String Section
-* Week 3 Filling in Content & Exercises
+### General Information
+
+```elixir
+Class.beta_class_days_remaining()
+```
+
+```elixir
+Class.beta_days_of_content_remaining()
+```
+
+```elixir
+Class.beta_actual_days_completed()
+```
+
+### Targets
+
+```elixir
+# Current
+Class.beta_target_days_completed(Date.utc_today())
+```
+
+```elixir
+Class.beta_target_days_completed(~D[2022-10-24])
+```
+
+```elixir
+# October
+Class.beta_target_days_completed(~D[2022-10-31])
+```
+
+```elixir
+# October
+Class.beta_target_days_completed(~D[2022-11-30])
+```
+
+```elixir
+# October
+Class.beta_target_days_completed(~D[2022-12-20])
+```
+
+```elixir
+Class.beta_expected_end_date()
+```

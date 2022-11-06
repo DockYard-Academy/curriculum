@@ -3,9 +3,7 @@
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -56,8 +54,7 @@ flowchart
   end
 ```
 
-You've been using processes for some time now. Each Elixir cell in livebook is a process.
-It even has a **pid** (personal identifier) that we can see with `self()`.
+Perhaps without realizing it, you've been using processes for some time now. Each Elixir cell in livebook is a process. It even has a **pid** (personal identifier) that we can see with `self()`.
 
 ```elixir
 self()
@@ -107,7 +104,7 @@ spawn --> Process --> Alive --> cn[Callback Function] --> Dead
 ```
 
 We can use the [Process](https://hexdocs.pm/elixir/Process.html) module for functionality
-related to processes. We'll use the `alive?/1` function to show that the process is alive before executing its callback function.
+related to processes. We'll use the `alive?/1` function to show that the process is alive before executing its callback function. [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) pauses the execution of the process that it is called in.
 
 ```elixir
 pid = spawn(fn -> IO.puts("I was called") end)
@@ -151,17 +148,23 @@ spawn(fn -> raise "oops" end)
 If this is not desirable behavior, we can link processes together so that if one dies, the other will
 crash.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ```mermaid
-flowchart LR
-subgraph Child
-  CP[Child Process] --> raise --dies--> CP
-end
-subgraph Parent
-  PA[Parent Process]
-end
-PA --spawns_link--> Link --> CP
-  raise --crash--> PA
+sequenceDiagram
+    Parent Process->>Child Process: spawns link
+    activate Child Process
+    Child Process-->>Parent Process: pid
+    Child Process->>Child Process: raise
+    activate Child Process
+    Child Process->>Parent Process: raise
+    deactivate Child Process
+    Child Process->>Child Process: dies
+    Parent Process->>Parent Process: raise
+    deactivate Child Process
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 We can either `spawn_link/1`.
 
@@ -178,7 +181,7 @@ Or manually link a process with [Process.link/1](https://hexdocs.pm/elixir/Proce
 
 ```elixir
 pid1 = spawn(fn -> raise "oops" end)
-Process.link(pid)
+Process.link(pid1)
 "I will not run, because the above crashes"
 ```
 
@@ -218,7 +221,7 @@ pid1 =
 ```
 
 Evaluate the cell above to create a process waiting to receive a message, then evaluate
-the cell below to send that message a process. You'll notice the [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) logs in the cell below.
+the cell below to send that process a message. You'll notice the [IO.puts/1](https://hexdocs.pm/elixir/IO.html#puts/1) logs in the cell below.
 
 As soon as the spawned process receives a message, it dies. You'll notice you can only send
 and receive a single message. You can re-evaluate the cell above and the cell below to
@@ -308,7 +311,7 @@ defmodule CounterProcess do
     IO.inspect(state, label: "counter")
 
     receive do
-      "increment" -> loop(state + 1)
+      :increment -> loop(state + 1)
     end
   end
 end
@@ -320,7 +323,7 @@ Try evaluating the cell below over and over again. Notice that the counter value
 We now have stateful processes!
 
 ```elixir
-send(counter_process, "increment")
+send(counter_process, :increment)
 ```
 
 Stateful processes are short-term in-memory persistence. We can create a stateful process
@@ -330,42 +333,49 @@ to store some value for the duration of the program.
 
 ### Your Turn
 
-Create a `TodoListProcess` which can receive messages in a loop.
-
-<!-- livebook:{"force_markdown":true} -->
+Modify the `Counter` module below so it can receive a `:decrement` message to decrement the current count.
 
 ```elixir
-todo_list_process = spawn(fn -> TodoListProcess.loop() end)
-```
+defmodule Counter do
+  def loop(state \\ 0) do
+    IO.inspect(state, label: "counter")
 
-It should store a `list` of strings in the state. You should be able to send messages to the `TodoListProcess` to
-`add` and `remove` items from the list in the state.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-send(todo_list_process, {:add, "new todo list item"})
-send(todo_list_process, {:remove, "new todo list item"})
-```
-
-```elixir
-defmodule TodoListProcess do
-  def loop(state \\ []) do
+    receive do
+      :increment -> loop(state + 1)
+    end
   end
 end
+
+counter_process = spawn(fn -> Counter.loop() end)
+```
+
+You should be able to send a `:decrement` message to a spawned `Counter`. Uncomment and evaluate the code below to test your solution.
+
+```elixir
+# send(counter_process, :decrement)
 ```
 
 ## Commit Your Progress
 
-Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
+$ git checkout main
+$ git checkout -b exercise-processes
 $ git add .
 $ git commit -m "finish processes section"
+$ git push origin exercise-processes
 ```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                         | Next                                               |
-| ------------------------------------------------ | -------------------------------------------------: |
-| [Sign Up Form](../exercises/sign_up_form.livemd) | [Generic Server](../reading/generic_server.livemd) |
+| Previous                                                       | Next                                                 |
+| -------------------------------------------------------------- | ---------------------------------------------------: |
+| [Fibonacci Challenge](../exercises/fibonacci_challenge.livemd) | [Process Drills](../exercises/process_drills.livemd) |

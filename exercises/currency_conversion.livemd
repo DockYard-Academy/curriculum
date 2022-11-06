@@ -3,9 +3,7 @@
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -23,7 +21,7 @@ You are tasked with the assignment of converting one currency to another accordi
 following conversion rates.
 
 * Canadian Dollar (`:CAD`): $1.00
-* US Dollar (`:US`): $1.29
+* US Dollar (`:USD`): $1.29
 * European Euro (`:EUR`): $1.39
 
 While not a perfect solution, you may round currency conversions using `round/1`.
@@ -75,32 +73,88 @@ Enter your solution below.
 defmodule Money do
   defstruct []
 
+  @doc ~S"""
+  Create a new `Money` struct with the given `amount` and `currency`.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD)
+      %Money{amount: 500, currency: :CAD}
+
+  """
   def new(amount, currency) do
   end
 
+  @doc ~S"""
+  Converts a `Money` struct from its current currency to the given `currency`.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD) |> Money.convert(:EUR)
+      %Money{amount: 360, currency: :EUR}
+
+  """
   def convert(money, currency) do
   end
 
+  @doc ~S"""
+  Adds two `Money` structs of the same currency to one another.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD) |> Money.add(Money.new(500, :CAD))
+      %Money{amount: 1000, currency: :CAD}
+
+  """
   def add(money1, money2) do
   end
 
-  def multiply(money1, money2) do
+  @doc ~S"""
+  Multiplies a `Money` struct by the given `multiplier`.
+
+  ## Examples
+
+      iex> Money.new(100, :CAD) |> Money.multiply(10)
+      %Money{amount: 1000, currency: :CAD}
+
+      iex> Money.new(100, :CAD) |> Money.multiply(1.1)
+      %Money{amount: 110, currency: :CAD}
+
+  """
+  def multiply(money, multiplier) do
   end
 
+  @doc ~S"""
+  Subtracts `money2` from `money1` given they are `Money` structs with the same currency.
+
+  ## Examples
+
+      iex> Money.new(10_000, :USD) |> Money.subtract(Money.new(100, :USD)
+      %Money{amount: 9900, currency: :USD}
+
+  """
   def subtract(money1, money2) do
   end
 end
-
-Utils.feedback(:money, Money)
 ```
 
 This exercise is inspired by the Elixir [Money](https://github.com/elixirmoney/money) library.
 
 ## Commit Your Progress
 
-Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
+$ git checkout main
+$ git checkout -b exercise-currency_conversion
 $ git add .
 $ git commit -m "finish currency conversion exercise"
+$ git push origin exercise-currency_conversion
 ```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

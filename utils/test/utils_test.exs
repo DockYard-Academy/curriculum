@@ -1,38 +1,7 @@
 defmodule UtilsTest do
   use ExUnit.Case
   doctest Utils
-  alias Utils.Factory
   alias Utils.Notebooks
-  alias Utils.Solutions
-
-  test "feedback/2" do
-    Enum.each(Utils.Feedback.test_names(), fn each ->
-      exists = Keyword.has_key?(Solutions.__info__(:functions), each)
-
-      if !exists do
-        raise "define a Solutions.#{Atom.to_string(each)} function."
-      end
-    end)
-
-    execute_tests_until_failure(Utils.Feedback.test_names())
-  end
-
-  test "feedback/2 with invalid atom" do
-    atom = String.to_atom(Factory.string())
-
-    assert Utils.feedback(atom, "non-nil answer") ==
-             "Something went wrong, feedback does not exist for #{atom}. Please speak to your teacher and/or reset the exercise."
-  end
-
-  defp execute_tests_until_failure([]), do: nil
-
-  defp execute_tests_until_failure([test | tail]) do
-    test_failed = Utils.feedback(test, apply(Solutions, test, [])).failures > 0
-
-    unless test_failed do
-      execute_tests_until_failure(tail)
-    end
-  end
 
   @tag :skip_ci
   test "Ensure all .livemd files are formatted." do
@@ -43,13 +12,13 @@ defmodule UtilsTest do
       # to avoid changing the file every time a student opens a .livemd file.
       expected = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n"
 
-      assert file == expected
-      #  """
-      #  #{file_name}: Needs to be formatted.
+      assert file == expected,
+             """
+             #{file_name}: Needs to be formatted.
 
-      #  Run mix bc.format_notebooks to format all notebooks.
-      #  Sometimes bullet points * can cause formatting issues.
-      #  """
+             Run mix bc.format_notebooks to format all notebooks.
+             Sometimes bullet points * can cause formatting issues.
+             """
     end)
   end
 
@@ -99,7 +68,6 @@ defmodule UtilsTest do
     # dependency install name, and usage indicator
     possible_deps = [
       {":youtube", "YouTube."},
-      {":tested_cell", "TestedCell."},
       {":smart_animation", "SmartAnimation."},
       {":hidden_cell", "HiddenCell."},
       {":benchee", "Benchee."},
@@ -140,12 +108,6 @@ defmodule UtilsTest do
           assert File.exists?(base_path <> path)
         end
       end)
-    end)
-  end
-
-  test "Teacher-only editors are hidden" do
-    Notebooks.stream_lines(Notebooks.all_livebooks(), fn line ->
-      refute Regex.match?(~r/TestedCell\./, line)
     end)
   end
 

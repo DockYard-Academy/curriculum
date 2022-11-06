@@ -3,9 +3,7 @@
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:tested_cell, github: "brooklinjazz/tested_cell"},
-  {:utils, path: "#{__DIR__}/../utils"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -18,7 +16,7 @@ Mix.install([
 
 You have been hired to hide confidential information in certain documents.
 
-confidential information should be replaced with `REDACTED`.
+Confidential information should be replaced with `REDACTED`.
 
 Confidential information includes:
 
@@ -55,18 +53,44 @@ Enter your solution below.
 
 ```elixir
 defmodule Classified do
+  @doc ~S"""
+  Replaces confidential information with REDACTED in the given `string`.
+
+  ## Examples
+
+      iex> Classified.redact("Spiderman is Peter Parker.")
+      "Spiderman is REDACTED."
+
+      iex> Classified.redact("Call 555-555-5555 for the secret info.")
+      "Call REDACTED for the secret info."
+
+      iex> Classified.redact("Email super@secret.ssh for the private data.")
+      "Email REDACTED for the private data."
+
+      iex> Classified.redact("The password is 4525.")
+      "The password is REDACTED."
+
+  """
   def redact(string) do
   end
 end
-
-Utils.feedback(:classified, Classified)
 ```
 
 ## Commit Your Progress
 
-Run the following in your command line from the beta_curriculum folder to track and save your progress in a Git commit.
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
+$ git checkout main
+$ git checkout -b exercise-classified
 $ git add .
 $ git commit -m "finish classified exercise"
+$ git push origin exercise-classified
 ```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

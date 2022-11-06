@@ -1,0 +1,405 @@
+# Lazy Product Filters
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:benchee, "~> 1.1"},
+  {:faker, "~> 0.17.0"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Lazy Product Filters
+
+Previously in the [Product Filters](./product_filters.livemd) exercise, you built an application where users search for products based on certain filters.
+
+Each product is a map with a `:name`, `:category`, and `:price` (in cents).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+products = [
+  %{name: "Laptop", category: :tech, price: 100000},
+  %{name: "Phone", category: :tech, price: 50000},
+  %{name: "Chocolate", category: :snacks, price: 200},
+  %{name: "Shampoo", category: :health, price: 1000}
+]
+```
+
+You're going to refactor and re-implement your existing `Products.filter/2` function using Streams.
+
+Ensure the refactored version passes your existing test suite.
+You should be able to filter by:
+
+1. a partial case-insensitive `:name` field.
+2. an inclusive `:min` and `:max` price.
+3. an exact `:category` field as an atom.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Test Cases</summary>
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule StreamProductsTest do
+  use ExUnit.Case
+
+  test "filter/2 empty filters" do
+    found = create_product(name: "Laptop")
+    assert StreamProducts.filter([found], []) == [found]
+  end
+
+  test "filter/2 by exact matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert StreamProducts.filter(products, name: "Laptop") == [found]
+  end
+
+  test "filter/2 by partial matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert StreamProducts.filter(products, name: "apt") == [found]
+  end
+
+  test "filter/2 by mixed case partial matching name" do
+    found = create_product(name: "Laptop")
+    not_found = create_product(name: "Shampoo")
+    products = [found, not_found]
+    assert StreamProducts.filter(products, name: "aPt") == [found]
+  end
+
+  test "filter/2 by category" do
+    found = create_product(category: :tech)
+    not_found = create_product(category: :snacks)
+    products = [found, not_found]
+    assert StreamProducts.filter(products, category: :tech) == [found]
+  end
+
+  test "filter/2 by min price" do
+    found1 = create_product(price: 101)
+    found2 = create_product(price: 100)
+    not_found = create_product(price: 99)
+    products = [found1, found2, not_found]
+    assert StreamProducts.filter(products, min: 100) == [found1, found2]
+  end
+
+  test "filter/2 by max price" do
+    found1 = create_product(price: 99)
+    found2 = create_product(price: 100)
+    not_found = create_product(price: 101)
+    products = [found1, found2, not_found]
+    assert StreamProducts.filter(products, max: 100) == [found1, found2]
+  end
+
+  test "filter/2 by max and min price" do
+    found1 = create_product(price: 100)
+    found2 = create_product(price: 150)
+    found3 = create_product(price: 200)
+    not_found1 = create_product(price: 99)
+    not_found2 = create_product(price: 201)
+    products = [found1, found2, found3, not_found1, not_found2]
+    assert StreamProducts.filter(products, min: 100, max: 200) == [found1, found2, found3]
+  end
+
+  test "filter/2 all filters" do
+    found = create_product(price: 150, name: "Laptop", category: :tech)
+    wrong_category = create_product(price: 150, name: "Laptop", category: :wrong)
+    wrong_name = create_product(price: 150, name: "Wrong", category: :wrong)
+    too_low_price = create_product(price: 99, name: "Laptop", category: :wrong)
+    too_high_price = create_product(price: 201, name: "Laptop", category: :wrong)
+
+    products = [found, wrong_category, wrong_name, too_low_price, too_high_price]
+
+    assert StreamProducts.filter(products, min: 100, max: 200, name: "Laptop", category: :tech) == [
+             found
+           ]
+  end
+
+  # simplifies creation of product test data
+  defp create_product(attrs \\ %{}) do
+    attrs
+    |> Enum.into(%{
+      name: Enum.random(["Laptop", "Shampoo", "Phone"]),
+      category: Enum.random([:tech, :snacks, :health]),
+      price: Enum.random(1..1000)
+    })
+  end
+end
+
+ExUnit.run()
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+In this example, we solve the problem by enumerating over products and checking each filter.
+
+```elixir
+defmodule StreamProducts do
+  def filter(products, filters) do
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
+
+    products
+    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> Stream.reject(fn %{category: category} ->
+      category_filter && category_filter != category
+    end)
+    |> Enum.to_list()
+  end
+end
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the `StreamProducts` module using Streams instead of the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
+
+```elixir
+defmodule StreamProducts do
+  @moduledoc """
+  Documentation for `Products`
+  """
+
+  @doc """
+  Filter products by name, category, and price.
+
+  ## Examples
+
+    No filters returns all products.
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    Filter by name
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
+    []
+
+    Filter by category
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
+    []
+
+    Filter by min price.
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
+    []
+
+    Filter by max price.
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
+    [%{name: "Laptop", category: :tech, price: 100}]
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
+    []
+
+    Multiple filters.
+
+    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+    [%{name: "Laptop", category: :tech, price: 100}]
+  """
+  def filter(products, filters) do
+  end
+end
+```
+
+## Bonus: Benchmark
+
+Did using [Stream](https://hexdocs.pm/elixir/Stream.html) improve the performance of your solution? Use [Benchee](https://hexdocs.pm/benchee/Benchee.html) to find out. Ensure you benchmark your solution with a large and varied data set. We've included the [Faker](https://hexdocs.pm/faker/readme.html) project to make this easier.
+
+```elixir
+Faker.Food.dish()
+```
+
+Consider adding the `:memory_time` option to your benchmark to see which solution is more memory efficient.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
+categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
+
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
+
+filters = [name: "A", category: :tech, min: 25, max: 50]
+
+Benchee.run(
+  %{
+    "Enum" => fn -> EnumProducts.filter(products, filters) end,
+    "Stream" => fn -> StreamProducts.filter(products, filters) end
+  },
+  memory_time: 2
+)
+```
+
+</details>
+
+```elixir
+defmodule StreamProducts do
+  def filter(products, filters) do
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    category_filter = filters[:category]
+
+    products
+    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> Stream.reject(fn %{category: category} ->
+      category_filter && category_filter != category
+    end)
+    |> Enum.to_list()
+  end
+end
+```
+
+```elixir
+defmodule EnumProducts do
+  def check?({:min, min}, product), do: min <= product.price
+  def check?({:max, max}, product), do: product.price <= max
+
+  def check?({:name, name}, product),
+    do: String.contains?(String.downcase(product.name), String.downcase(name))
+
+  def check?({:category, category}, product), do: category == product.category
+
+  def filter(products, filters) do
+    Enum.filter(products, fn product ->
+      Enum.all?(filters, fn filter -> check?(filter, product) end)
+    end)
+  end
+end
+```
+
+```elixir
+defmodule Fibonacci do
+  def fib(0), do: 0
+  def fib(1), do: 1
+  def fib(n), do: fib(n - 1) + fib(n - 2)
+end
+
+Enum.map(1..40, fn int ->
+  {time, _result} = :timer.tc(fn -> Fibonacci.fib(int) end)
+  time
+end)
+|> IO.inspect(label: "ACTUAL")
+
+# O(n)
+Enum.map(1..40, fn n -> n end) |> IO.inspect(label: "O(n)")
+# O(n)**2
+Enum.map(1..40, fn n -> n ** 2 end) |> IO.inspect(label: "O(n)**2")
+# O(n)**n
+Enum.map(1..40, fn n -> n ** n end) |> IO.inspect(label: "O(n)**n")
+
+defmodule Factorial do
+  def of(0), do: 1
+
+  def of(n) when n > 0 do
+    Enum.reduce(1..n, &*/2)
+  end
+end
+
+Enum.map(1..40, fn n -> Factorial.of(n) end) |> IO.inspect(label: "O(n!)")
+```
+
+```elixir
+Enum.map(1..10, fn time -> time ** 2 end)
+```
+
+1. 25 seconds
+2. 5 seconds
+3. 30 seconds
+
+total = 2 mins
+
+```elixir
+names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
+categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
+
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
+
+filters = [name: "A", category: :tech, min: 25, max: 50]
+
+Benchee.run(
+  %{
+    "Enum" => fn -> EnumProducts.filter(products, filters) end,
+    "Stream" => fn -> StreamProducts.filter(products, filters) end
+  },
+  memory_time: 2
+)
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-lazy_product_filters
+$ git add .
+$ git commit -m "finish lazy product filters exercise"
+$ git push origin exercise-lazy_product_filters
+```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                                 |
+| -------------------------------------------------- | ---------------------------------------------------: |
+| [Stream Drills](../exercises/stream_drills.livemd) | [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) |
