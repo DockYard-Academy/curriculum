@@ -17,8 +17,6 @@ Mix.install([
 Earlier you created a [Process Mailbox](./process_mailbox.livemd) using purely processes.
 Now you're going to create a similar mailbox using [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
-You should be able to asynchronously send mail to a `Mailbox` [GenServer](https://hexdocs.pm/elixir/GenServer.html) process which will store the mail in a list in its state. Each mail will be a map with have a `:title`, and `:content` fields.
-
 To test your solution, you can use [:sys.get_state/1](https://www.erlang.org/doc/man/sys.html#get_state-1) to get the current state of your mailbox. This should **only** be used for debugging purposes, not for retrieving values from state in a real-world application.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -40,9 +38,26 @@ GenServer.cast(mailbox_pid, {:mail, %{title: "Title 2", content: "Content 2"}})
 defmodule Mailbox do
   use GenServer
 
+  def start_link(state \\ []) do
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def send(mailbox_pid) do
+    GenServer.call(mailbox_pid, {:mail, mail})
+  end
+
+  def all_messages(mailbox_pid) do
+    GenServer.call(mailbox_pid, :all_messages)
+  end
+
   @impl true
   def init(state) do
-    {:ok, []}
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_call(:all_messages, state) do
+    {:noreply, state, state}
   end
 
   @impl true
@@ -50,7 +65,6 @@ defmodule Mailbox do
     {:noreply, [mail | state]}
   end
 
-  @impl true
   def handle_info({:mail, mail}, state) do
     {:noreply, [mail | state]}
   end
@@ -59,39 +73,107 @@ end
 
 </details>
 
-### Bonus: Receive "regular" Messages.
-
-Add a [GenServer.handle_info/2](https://hexdocs.pm/elixir/GenServer.html#handle_info/2) callback function so that your `Mailbox` [GenServer](https://hexdocs.pm/elixir/GenServer.html) can receive generic messages from [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3).
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, mailbox_pid} = GenServer.start_link(Mailbox, [])
-Process.send(mailbox_pid, {:mail, %{title: "Title", content: "Content"}}, [])
-
-:sys.get_state(mailbox_pid)
-[%{title: "Title", content: "Content"}]
-```
-
-Implement your `Mailbox` below.
+Implement the `Mailbox` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as documented below.
 
 ```elixir
 defmodule Mailbox do
   use GenServer
 
+  @doc """
+  Start a mailbox server.
+
+  ## Examples
+
+      iex> {:ok, pid} = Mailbox.start_link([])
+      iex> :sys.get_state(pid)
+      []
+
+      Allow the mailbox to start with a default list of messages.
+
+      iex> {:ok, pid} = Mailbox.start_link(["Welcome to your mailbox!"])
+      iex> :sys.get_state(pid)
+      ["Welcome to your mailbox!"]
+  """
+  def start_link(_opts) do
+  end
+
+  @doc """
+  Asynchronously Send a message to a mailbox server.
+
+  ## Examples
+
+      iex> {:ok, pid} = Mailbox.start_link([])
+      iex> Mailbox.send(pid, "Message 1")
+      iex> Mailbox.send(pid, "Message 2")
+      iex> :sys.get_state(pid)
+      ["Message 2", "Message 1"]
+  """
+  def send(mailbox_pid) do
+  end
+
+  @doc """
+  Synchonously retrieve all messages in a mailbox server.
+
+  ## Examples
+
+      iex> {:ok, pid} = Mailbox.start_link([])
+      iex> Mailbox.all_messages(pid)
+      []
+  """
+  def all_messages(mailbox_pid) do
+  end
+
+  @doc """
+  Required callback to start a GenServer.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Mailbox, [])
+  """
   @impl true
   def init(state) do
-    {:ok, []}
   end
 
+  @doc """
+  Callback to synchronously retrieve a `Mailbox`'s state.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Mailbox, ["Welcome"])
+      iex> GenServer.call(pid, :all_messages)
+      ["Welcome"]
+  """
+  @impl true
+  def handle_call(:all_messages, state) do
+  end
+
+  @doc """
+  Callback for receiving a `cast` message and storing it in the `Mailbox`'s state.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Mailbox, [])
+      iex> GenServer.cast(pid, {:mail, "Message 1"})
+      iex> GenServer.cast(pid, {:mail, "Message 2"})
+      iex> :sys.get_state(pid)
+      ["Message 2", "Message 1"]
+  """
   @impl true
   def handle_cast({:mail, mail}, state) do
-    {:noreply, [mail | state]}
   end
 
-  @impl true
+  @doc """
+  Callback for receiving "regular" messages and storing them in the `Mailbox`'s state.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Mailbox, [])
+      iex> Process.send(pid, {:mail, "Message 1"}, [])
+      iex> Process.send(pid, {:mail, "Message 2"}, [])
+      iex> :sys.get_state(pid)
+      ["Message 2", "Message 1"]
+  """
   def handle_info({:mail, mail}, state) do
-    {:noreply, [mail | state]}
   end
 end
 ```

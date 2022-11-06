@@ -12,55 +12,106 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Dominoes
+## Dominoe
 
 [Dominoes](https://en.wikipedia.org/wiki/Dominoes) are square tiles often placed near each other to make satisfying effects when it falls and knocks each other over.
 
-You're going to make three `Domino` processes under a [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) (`Domino1`, `Domino2`, and `Domino3`), then
-have them terminate and restart sequentially.
-
-```mermaid
-flowchart
-S[Supervisor]
-S --> Domino1
-S --> Domino2
-S --> Domino3
-```
-
-You should be able to cause each `Domino` process to crash by sending it a `:fall` message.
-
-We've created the `Domino1` server for sake of example.
+We've created a named `Domino` process that can receive a generic `:fall` message to cause it to crash. It will also print a message every time it's started with the name of the process.
 
 ```elixir
-defmodule Domino1 do
+defmodule Domino do
   use GenServer
 
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  def start_link(opts) do
+    IO.inspect(opts, label: "STARTED DOMINO")
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
-  def init(state) do
-    {:ok, state}
+  @impl true
+  def init(opts) do
+    {:ok, opts}
   end
 
+  @impl true
   def handle_info(:fall, _state) do
-    raise "Domino1 falls"
+    raise "error"
   end
 end
 ```
 
-Create the `Domino2` and `Domino3` modules. Then configure them with a supervisor such that
-each `Domino` process terminates (and restarts) one after the other.
+You're going to start three `Domino` processes under a supervisor. When one crashes, they should restart sequentially in the order they are defined.
 
-For example:
+<!-- livebook:{"break_markdown":true} -->
 
-* `Domino1` receives the `:fall` message. `Domino1` crashes. `Domino2` then `Domino3` are terminated by the supervisor.
-* `Domino2` receives the `:fall` message. `Domino2` crashes. `Domino3` is terminated by the supervisor.
+```mermaid
+flowchart TD 
+    Supervisor
+    Supervisor --> Domino1
+    Supervisor --> Domino2
+    Supervisor --> Domino3
+
+    classDef crashed fill:#fe8888;
+    classDef terminated fill:#fbab04;
+    classDef restarted stroke:#0cac08,stroke-width:4px
+
+    class Domino2 crashed
+    class Domino3 terminated
+    class Domino2,Domino3 restarted
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+For example, if `Domino2` crashes, then `Domino3` should also be restarted. If `Domino3` crashes, no other processes are affected.
 
 <details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
 <summary>Hint</summary>
 Use the <code>:rest_for_one</code> strategy for your supervisor.
 </details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :domino1,
+    start: {Domino, :start_link, [[name: :domino1]]}
+  },
+  %{
+    id: :domino2,
+    start: {Domino, :start_link, [[name: :domino2]]}
+  },
+  %{
+    id: :domino3,
+    start: {Domino, :start_link, [[name: :domino3]]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :rest_for_one)
+```
+
+</details>
+
+Keep in mind, if you have already started a named process, the supervisor might crash when you attempt to start it again. Re-evaluate the cell after the livebook crashes to resolve this issue.
+
+```elixir
+
+```
+
+Send your dominos messages to ensure they are crashing in the correct order. They will log a message that demonstrates the `Domino.start_link/1` function was called again.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Replace `:domino_name` with the name of a domino process you started in the supervisor above.
+
+```elixir
+Process.send(:domino_name, :fall, [])
+```
+
+</details>
+
+Test sending each `Domino` process a message individually.
 
 ```elixir
 

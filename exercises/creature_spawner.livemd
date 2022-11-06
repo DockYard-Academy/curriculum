@@ -1,9 +1,10 @@
-# Creature Spawner
+# Monster Spawner
 
 ```elixir
 Mix.install([
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:kino, "~> 0.7.0"}
 ])
 ```
 
@@ -16,62 +17,336 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-## Creature Spawner
+## Overview
 
-Many video games contain **Spawners** which spawn enemy creatures.
+Many video games contain **Spawners** which spawn enemy monsters.
 
 Typically, the spawner has a limit for how many enemy creatures it spawns. If
-a creature dies, the spawner then re-spawns that creature.
+a monster dies, the spawner then re-spawns that monster.
 
 Sound familiar? We can leverage supervisors to create this effect.
 
-Create three `Creature` processes. A creature process should store
-it's health in state, and you should be able to send a message to damage the creature like so.
+<!-- livebook:{"break_markdown":true} -->
 
-<!-- livebook:{"force_markdown":true} -->
+```mermaid
+flowchart TD 
+    Supervisor
+    Supervisor --> Monster1
+    Supervisor --> Monster2
+    Supervisor --> Monster3
 
-```elixir
-{:ok, creature} = Creature1.start_link([])
-%{health: 100} = :sys.get_state(creature)
-Creature1.damage(creature, 10)
-%{health: 90} = :sys.get_state(creature)
+    classDef crashed fill:#fe8888;
+    classDef terminated fill:#fbab04;
+    classDef restarted stroke:#0cac08,stroke-width:4px
+
+    class Monster1 crashed
+    class Monster1 restarted
 ```
 
-When the creature's health reaches `0`, it should die (crash).
-When it crashes, the supervisor should restart the creature process.
+## Monster
+
+First, you're going to create a `Monster` [GenServer](https://hexdocs.pm/elixir/GenServer.html) process that represents a `Monster` you would fight in a video game.
+
+A monster should start with `100` health. Store health in a map with the `:health` key.
+
+You should be able to send the `Monster` process a message to apply damage to the monster. The `Monster` process should crash and raise `"dying!"` when its health is `0` or lower.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Monster do
+  use GenServer
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def attack(monster_pid, amount) do
+    GenServer.cast(monster_pid, {:attack, amount})
+  end
+
+  def health(monster_pid) do
+    GenServer.call(monster_pid, :health)
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, %{health: 100}}
+  end
+
+  @impl true
+  def handle_cast({:attack, damage}, state) do
+    new_health = state.health - damage
+
+    if new_health <= 0 do
+      raise "dying!"
+    else
+      {:noreply, %{state | health: new_health}}
+    end
+  end
+
+  @impl true
+  def handle_call(:health, _from, state) do
+    {:reply, state.health, state}
+  end
+end
+```
+
+</details>
+
+Implement the `Monster` process as documented below.
+
+```elixir
+defmodule Monster do
+  use GenServer
+
+  @doc """
+  Start the `Monster` process.
+
+  ## Examples
+
+      iex> {:ok, pid} = Monster.start_link([])
+  """
+  def start_link(_opts) do
+  end
+
+  @doc """
+  Attack a `Monster` process and apply damage.
+
+  ## Examples
+
+      iex> {:ok, pid} = Monster.start_link([])
+      iex> :sys.get_state(pid)
+      %{health: 100}
+      iex> Monster.attack(pid, 30)
+      iex> :sys.get_state(pid)
+      %{health: 70}
+  """
+  def attack(monster_pid, amount) do
+  end
+
+  @doc """
+  Retrieve the `Monster` health.
+
+  ## Examples
+
+      iex> {:ok, pid} = Monster.start_link([])
+      iex> Monster.health(pid)
+      100
+  """
+  def health(monster_pid) do
+  end
+
+  @doc """
+  Callback function to start the `Monster` process. 
+  Monsters should start with a `:health` value in a map.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Monster, [])
+      iex> :sys.get_state(pid)
+      %{health: 100}
+  """
+  @impl true
+  def init(_opts) do
+  end
+
+  @doc """
+  Callback function to damage the `Monster`.
+
+  When a `Monster`'s health reaches zero it should crash and raise "dying!".
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Monster, [])
+      iex> :sys.get_state(pid)
+      %{health: 100}
+      iex> GenServer.cast(pid, {:attack, 20})
+      iex> :sys.get_state(pid)
+      %{health: 80}
+      iex> GenServer.cast(pid, {:attack, 80})
+      ** (RuntimeError) dying!
+  """
+  @impl true
+  def handle_cast({:attack, damage}, state) do
+  end
+
+  @doc """
+  Callback function to retrieve the current health of a monster.
+
+  ## Examples
+
+      iex> {:ok, pid} = GenServer.start_link(Monster, [])
+      iex> GenServer.call(pid, :health)
+      100
+  """
+  @impl true
+  def handle_call(:health, _from, state) do
+  end
+end
+```
+
+## Supervisor
+
+Create three `Monster` processes under a single supervisor. When one `Monster` process dies after its health reaches zero, another should be restarted in it's place.
 
 ```mermaid
 flowchart
-  S[Spawner]
-  C1[Creature1]
-  C2[Creature2]
-  C3[Creature3]
+  S[Supervisor]
+  M1[Monster 1]
+  M2[Monster 2]
+  M3[Monster 3]
 
-  S --> C1
-  S --> C2
-  S --> C3
+  S --> M1
+  S --> M2
+  S --> M3
+
+  classDef crashed fill:#fe8888;
+  classDef restarted stroke:#0cac08,stroke-width:4px
+
+  class M1 crashed
+  class M1 restarted
 ```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :monster1,
+    start: {Monster, :start_link, [[]]}
+  },
+  %{
+    id: :monster2,
+    start: {Monster, :start_link, [[]]}
+  },
+  %{
+    id: :monster3,
+    start: {Monster, :start_link, [[]]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
 
 Enter your solution below.
 
 ```elixir
-defmodule Creature1 do
-end
 
-defmodule Creature2 do
-end
-
-defmodule Creature3 do
-end
-
-# start the creatures under a supervisor below:
 ```
 
-### Bonus: Hero
+## Bonus: Hero
 
-You may add a `Hero` process supervised by the supervisor above.
-The `Hero` process should automatically damage the three `Creature` processes on
-an interval (i.e. 5 seconds)
+Create a named `Hero` process. The Hero process will automatically apply a random amount of damage between `1` and `10` to each monster in the named supervisor every second.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Hero do
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], opts)
+  end
+
+  def init(_opts) do
+    schedule_attack()
+    {:ok, []}
+  end
+
+  defp schedule_attack() do
+    Process.send_after(self(), :attack_monsters, 1000)
+  end
+
+  def handle_info(:attack_monsters, state) do
+    Supervisor.which_children(:rpg_supervisor)
+    |> Enum.each(fn
+      {_name, pid, :worker, [Monster]} -> Monster.attack(pid, Enum.random(1..10))
+      _ -> :ok
+    end)
+
+    schedule_attack()
+    {:noreply, state}
+  end
+end
+```
+
+</details>
+
+```elixir
+
+```
+
+Start the `Hero` process with three other `Monster` processes in the same supervisor. Make the supervisor a named supervisor so you can find all of its child processes with [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1).
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :monster1,
+    start: {Monster, :start_link, [[]]}
+  },
+  %{
+    id: :monster2,
+    start: {Monster, :start_link, [[]]}
+  },
+  %{
+    id: :monster3,
+    start: {Monster, :start_link, [[]]}
+  },
+  %{
+    id: :hero1,
+    start: {Hero, :start_link, [[name: :arthur]]}
+  }
+]
+
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_one, name: :spawner)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Kino.Process.sup_tree/2](https://hexdocs.pm/kino/Kino.Process.html#sup_tree/2) to visualize the processes under your named supervisor.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+Kino.Process.sup_tree(supervisor)
+```
+
+</details>
+
+```elixir
+
+```
+
+For improved observability, create a function that will print the health value for each `Monster` process under the named supervisor.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+Supervisor.which_children(supervisor)
+|> Enum.each(fn
+  {_name, pid, :worker, [Monster]} -> IO.puts(Monster.health(pid))
+  _ -> :ok
+end)
+```
+
+</details>
+
+```elixir
+
+```
 
 ## Commit Your Progress
 
@@ -94,6 +369,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                 | Next                                           |
-| ---------------------------------------- | ---------------------------------------------: |
-| [Dominoes](../exercises/dominoes.livemd) | [Typing Game](../exercises/typing_game.livemd) |
+| Previous                                 | Next                                                               |
+| ---------------------------------------- | -----------------------------------------------------------------: |
+| [Dominoes](../exercises/dominoes.livemd) | [Supervised Mix Project](../reading/supervised_mix_project.livemd) |
