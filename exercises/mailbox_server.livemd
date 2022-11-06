@@ -1,0 +1,122 @@
+# Mailbox Server
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Mailbox Server
+
+Earlier you created a [Process Mailbox](./process_mailbox.livemd) using purely processes.
+Now you're going to create a similar mailbox using [GenServer](https://hexdocs.pm/elixir/GenServer.html).
+
+You should be able to asynchronously send mail to a `Mailbox` [GenServer](https://hexdocs.pm/elixir/GenServer.html) process which will store the mail in a list in its state. Each mail will be a map with have a `:title`, and `:content` fields.
+
+To test your solution, you can use [:sys.get_state/1](https://www.erlang.org/doc/man/sys.html#get_state-1) to get the current state of your mailbox. This should **only** be used for debugging purposes, not for retrieving values from state in a real-world application.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, mailbox_pid} = GenServer.start_link(Mailbox, [])
+
+GenServer.cast(mailbox_pid, {:mail, %{title: "Title 1", content: "Content 1"}})
+GenServer.cast(mailbox_pid, {:mail, %{title: "Title 2", content: "Content 2"}})
+
+:sys.get_state(mailbox_pid)
+[%{title: "Title 2", content: "Content 2"}, %{title: "Title 1", content: "Content 1"}]
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Mailbox do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, []}
+  end
+
+  @impl true
+  def handle_cast({:mail, mail}, state) do
+    {:noreply, [mail | state]}
+  end
+
+  @impl true
+  def handle_info({:mail, mail}, state) do
+    {:noreply, [mail | state]}
+  end
+end
+```
+
+</details>
+
+### Bonus: Receive "regular" Messages.
+
+Add a [GenServer.handle_info/2](https://hexdocs.pm/elixir/GenServer.html#handle_info/2) callback function so that your `Mailbox` [GenServer](https://hexdocs.pm/elixir/GenServer.html) can receive generic messages from [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, mailbox_pid} = GenServer.start_link(Mailbox, [])
+Process.send(mailbox_pid, {:mail, %{title: "Title", content: "Content"}}, [])
+
+:sys.get_state(mailbox_pid)
+[%{title: "Title", content: "Content"}]
+```
+
+Implement your `Mailbox` below.
+
+```elixir
+defmodule Mailbox do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, []}
+  end
+
+  @impl true
+  def handle_cast({:mail, mail}, state) do
+    {:noreply, [mail | state]}
+  end
+
+  @impl true
+  def handle_info({:mail, mail}, state) do
+    {:noreply, [mail | state]}
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-mailbox_server
+$ git add .
+$ git commit -m "finish mailbox server exercise"
+$ git push origin exercise-mailbox_server
+```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                               |
+| -------------------------------------------------- | -------------------------------------------------: |
+| [Async Messages](../reading/async_messages.livemd) | [Score Tracker](../exercises/score_tracker.livemd) |
