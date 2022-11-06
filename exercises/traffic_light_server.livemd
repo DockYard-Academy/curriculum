@@ -59,7 +59,7 @@ The `TrafficLightServer` should define some [Client API](https://hexdocs.pm/elix
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = TrafficLight.start_link()
+{:ok, pid} = TrafficLight.start_link([])
 
 :green = TrafficLight.current_light(pid)
 :yellow = TrafficLight.transition(pid)
@@ -125,7 +125,7 @@ defmodule TrafficLightServer do
 
   ## Examples
 
-      iex> TrafficLightServer.start_link()
+      iex> TrafficLightServer.start_link([])
       {:ok, pid}
   """
   def start_link(opts) do
@@ -136,7 +136,7 @@ defmodule TrafficLightServer do
 
   ## Examples
 
-      iex> {:ok, pid} = TrafficLightServer.start_link()
+      iex> {:ok, pid} = TrafficLightServer.start_link([])
       iex> TrafficLightServer.transition(pid)
       :yellow
       iex> TrafficLightServer.transition(pid)
@@ -152,7 +152,7 @@ defmodule TrafficLightServer do
 
   ## Examples
 
-      iex> {:ok, pid} = TrafficLightServer.start_link()
+      iex> {:ok, pid} = TrafficLightServer.start_link([])
       iex> TrafficLightServer.current_light(pid)
       :green
   """
