@@ -65,11 +65,11 @@ GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 However, there's a bug. If we try to `pop/1` an item off of an empty stack, the process
 will crash due to a function clause error because the `handle_call/2` function expects a list with one or more elements.
 
-<!-- livebook:{"force_markdown":true} -->
+Uncomment the following code to watch the `Stack` crash.
 
 ```elixir
-{:ok, pid} = GenServer.start_link(Stack, [])
-GenServer.call(stack_pid, :pop)
+# {:ok, pid} = GenServer.start_link(Stack, [])
+# GenServer.call(stack_pid, :pop)
 ```
 
 Normally, we could handle this by using control flow. For example, we could make another `handle_call/3` function clause for when the stack is empty.
@@ -84,7 +84,7 @@ def handle_call(:pop, _from, []) do
 end
 ```
 
-Instead, you're going to start the Stack process under a supervisor so that it will be restarted instead. In the Elixir cell below, start the `Stack` process under a supervisor so that it will restart with an empty stack when it crashes.
+Instead, you're going to start the Stack process under a supervisor so that it will be restarted when it crashes. In the Elixir cell below, start the `Stack` process under a supervisor so that it will restart with an empty stack when it crashes.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -107,10 +107,10 @@ Keep in mind, if you have already started a supervisor with the `Stack` process,
 
 You should be able to send a `:pop` message to the `Stack` process and the [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) will restart the `Stack` process.
 
-<!-- livebook:{"force_markdown":true} -->
+Uncomment and evaluate the code below to test your supervisor.
 
 ```elixir
-GenServer.call(Stack, :pop)
+# GenServer.call(Stack, :pop)
 ```
 
 ## Commit Your Progress

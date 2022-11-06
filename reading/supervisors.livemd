@@ -316,16 +316,14 @@ children = [
 ]
 ```
 
+### One For One
+
+We'll start the three bombs using the `:one_for_one` strategy.
+
 For the sake of example, we've increased `:max_restarts` to increase the limit of three crashes per five seconds to five crashes per five seconds.
 
 You can go to [Supervisor Options](https://hexdocs.pm/elixir/Supervisor.html#init/2-options)
  on HexDocs for a full list of configuration options.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### One For One
-
-We'll start the three bombs using the `:one_for_one` strategy.
 
 Each bomb restarts individually without affecting the others,
 so the timeline of crashes should be:
@@ -430,7 +428,7 @@ Instead of providing a map with the `:id` and `:start` keys, we can instead prov
 
 ```elixir
 children = [
-  {Bomb, [bomb_time: 1000]}
+  {Bomb, [name: "Syntax Sugar Bomb", bomb_time: 1000]}
 ]
 ```
 
