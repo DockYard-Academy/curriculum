@@ -114,7 +114,7 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "Counter.increment/1" do
+  test "increment/1" do
     {:ok, pid} = Counter.start_link([])
     Counter.increment(pid)
     assert Counter.get_count(pid) == 1
@@ -172,7 +172,7 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "Counter.increment/1" do
+  test "increment/1" do
     {:ok, pid} = Counter.start_link([])
     Counter.increment(pid)
     assert Counter.get_count(pid) == 1
@@ -202,28 +202,76 @@ ExUnit.run()
 
 For more on testing [GenServer](https://hexdocs.pm/elixir/GenServer.html)s, there is an excellent talk by Tyler Young.
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=EZFLPG7V7RM\")","title":"Testing GenServers"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=EZFLPG7V7RM")
 ```
 
 ### Your Turn
 
-Create a `counter` mix project in your projects folder.
-
-```
-$ mix new counter
-```
-
-Implement your own `Counter` server with `increment/1`, `decrement/1` and `get_count/1` functions. Ensure each function has at least one test.
-
-<!-- livebook:{"force_markdown":true} -->
+Implement and test a `decrement/1` function on the `Counter` module.
 
 ```elixir
-{:ok, pid} = Counter.start_link([])
-Counter.increment(pid)
-1 = Counter.get_count(pid)
-Counter.decrement(pid)
-0 = Counter.get_count(pid)
+defmodule Counter do
+  use GenServer
+
+  # Client
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, %{count: 0})
+  end
+
+  def increment(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+
+  def decrement(pid) do
+    # Implementation
+  end
+
+  # Server
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_call(:get_count, _from, state) do
+    {:reply, state.count, state}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    {:reply, state.count + 1, %{state | count: state.count + 1}}
+  end
+
+  @impl true
+  def handle_call(:decrement, _from, state) do
+    # Implementation
+  end
+end
+
+ExUnit.start(auto_run: false)
+
+defmodule CounterTest do
+  use ExUnit.Case
+
+  test "increment/1" do
+    {:ok, pid} = Counter.start_link([])
+    Counter.increment(pid)
+    assert Counter.get_count(pid) == 1
+  end
+
+  test "decrement/1"
+end
+
+ExUnit.run()
 ```
 
 ## Commit Your Progress
@@ -247,6 +295,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                           | Next                               |
-| ------------------------------------------------------------------ | ---------------------------------: |
-| [Supervised Mix Project](../reading/supervised_mix_project.livemd) | [Stack](../exercises/stack.livemd) |
+| Previous                                                 | Next                               |
+| -------------------------------------------------------- | ---------------------------------: |
+| [Creature Spawner](../exercises/creature_spawner.livemd) | [Stack](../exercises/stack.livemd) |

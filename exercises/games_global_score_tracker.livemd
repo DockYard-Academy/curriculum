@@ -1,0 +1,113 @@
+# Games: Global Score Tracker
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Games: Global Score Tracker
+
+You're going to create a named process `Games.GlobalScoreTracker` which will track player score history across multiple different games. `Games.GlobalScoreTracker` should automatically start as part of the `Games` [Supervisor](https://hexdocs.pm/elixir/Supervisor.html).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Test Cases
+
+Create a full suite of test cases for all of the features described below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Score
+
+The `Games.GlobalScoreTracker` should be able to add a certain number of points given a player name and a game name.
+A game should start with `0` points be default.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Games.GlobalScoreTracker.add(:ping_pong, :player1, 10)
+Games.GlobalScoreTracker.add(:ping_pong, :player1, 10)
+```
+
+It should also be able to retrieve the total number of points for the current game when provided the name of the game and the player.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = Games.GlobalScoreTracker.get(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### New Game
+
+When a game is finished, `Games.GlobalScoreTracker` should be able to start a `new/2` game with a default score of `0`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Games.GlobalScoreTracker.new(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### History
+
+Retrieve a history of scores for a player and a game as a list of point totals.
+The most recent game should be at the start of the list.
+
+Each value should be the total number of points accumulated before calling `Games.GlobalScoreTracker.new/2` to start a new game.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[0, 20] = Games.GlobalScoreTracker.history(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### High Score
+
+Find the highest score from the players history.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = Games.GlobalScoreTracker.high_score(:player1, :ping_pong)
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-games_global_score_tracker
+$ git add .
+$ git commit -m "finish games global score tracker exercise"
+$ git push origin exercise-games_global_score_tracker
+```
+
+**DockYard Academy Students Only:**
+
+Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                       | Next                                                               |
+| -------------------------------------------------------------- | -----------------------------------------------------------------: |
+| [Games Score Tracker](../exercises/games_score_tracker.livemd) | [Supervised Mix Project](../reading/supervised_mix_project.livemd) |

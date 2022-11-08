@@ -42,7 +42,7 @@ The `TrafficLightServer` should also be able to receive a `:current_light` messa
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = GenServer.start_link(TrafficLight, [])
+{:ok, pid} = GenServer.start_link(TrafficLightServer, [])
 
 :green = GenServer.call(pid, :current_light)
 :yellow = GenServer.call(pid, :transition)
@@ -59,12 +59,12 @@ The `TrafficLightServer` should define some [Client API](https://hexdocs.pm/elix
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = TrafficLight.start_link([])
+{:ok, pid} = TrafficLightServer.start_link([])
 
-:green = TrafficLight.current_light(pid)
-:yellow = TrafficLight.transition(pid)
-:red = TrafficLight.transition(pid)
-:green = TrafficLight.transition(pid)
+:green = TrafficLightServer.current_light(pid)
+:yellow = TrafficLightServer.transition(pid)
+:red = TrafficLightServer.transition(pid)
+:green = TrafficLightServer.transition(pid)
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -119,6 +119,7 @@ defmodule TrafficLightServer do
   @moduledoc """
   Documentation for `TrafficLightServer`
   """
+  use GenServer
 
   @doc """
   Start a TrafficLightServer linked to the current caller process.
