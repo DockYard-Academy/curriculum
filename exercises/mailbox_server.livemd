@@ -42,7 +42,7 @@ defmodule Mailbox do
     GenServer.start_link(__MODULE__, state)
   end
 
-  def send(mailbox_pid) do
+  def send(mailbox_pid, mail) do
     GenServer.call(mailbox_pid, {:mail, mail})
   end
 
@@ -56,7 +56,7 @@ defmodule Mailbox do
   end
 
   @impl true
-  def handle_call(:all_messages, state) do
+  def handle_call(:all_messages, _from, state) do
     {:noreply, state, state}
   end
 
@@ -108,7 +108,7 @@ defmodule Mailbox do
       iex> :sys.get_state(pid)
       ["Message 2", "Message 1"]
   """
-  def send(mailbox_pid) do
+  def send(mailbox_pid, message) do
   end
 
   @doc """
@@ -144,7 +144,7 @@ defmodule Mailbox do
       ["Welcome"]
   """
   @impl true
-  def handle_call(:all_messages, state) do
+  def handle_call(:all_messages, _from, state) do
   end
 
   @doc """
@@ -173,10 +173,19 @@ defmodule Mailbox do
       iex> :sys.get_state(pid)
       ["Message 2", "Message 1"]
   """
+  @impl true
   def handle_info({:mail, mail}, state) do
   end
 end
 ```
+
+## `handle_info` Vs `handle_cast`/`handle_call`
+
+The main difference between these functions is how you call them.
+
+You call `handle_cast` with `GenServer.cast` and `handle_call` with `GenServer.call`. `handle_info` is called with `Process.send`.
+
+It is useful for situations where you don't have access to `GenServer.call` or when you need to send a message to many different [GenServer](https://hexdocs.pm/elixir/GenServer.html)s without calling a bunch of different functions to do it.
 
 ## Commit Your Progress
 

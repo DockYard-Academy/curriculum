@@ -1,4 +1,4 @@
-# Stack
+# Tested Stack
 
 ```elixir
 Mix.install([
@@ -12,12 +12,11 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Stack
+## Tested Stack
 
-Test and implement a `Stack` process.
+Previously you created a [Stack](./stack_server.livemd) [GenServer](https://hexdocs.pm/elixir/GenServer.html). Now you're going to re-create the `Stack` [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a full test suite.
 
-The `Stack` process should store a list as state and `push/2` elements onto the stack, and `pop/2` elements
-off of the stack like so.
+The `Stack` process should store a list as state and `push/2` elements onto the stack, and `pop/2` elements off of the stack like so.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -31,18 +30,73 @@ off of the stack like so.
 nil = Stack.pop(pid)
 ```
 
-Implement and test the `Stack` module. Ensure you have at least one test each for the `push/2` function
-and the `pop/1` function.
+<!-- livebook:{"break_markdown":true} -->
+
+### Pair Testing
+
+This will be a **pair testing** exercise. One student will be the **tester** and the other will be the **implementer**. The **tester** will write the test, and the **implementer** will implement the code for the test.
+
+As the **implementer** you may challenge your **tester** to improve their tests by writing only the code necessary to make the test pass (within reason) even if it is a false-positive. This will encourage your **tester** to write more comprehensive tests.
+
+Swap roles for each new test.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create A Mix Project
+
+Create a new mix project and use LiveShare to make it simpler to collaborate with your pair partner.
+
+```
+mix new stack
+```
+
+Copy the code below into your `Stack` module.
 
 ```elixir
 defmodule Stack do
   use GenServer
-end
 
-defmodule StackTests do
-  use ExUnit.Case
+  def start_link(_opts) do
+  end
+
+  def push(pid, element) do
+  end
+
+  def pop(pid) do
+  end
 end
 ```
+
+Then copy the following code into the associated test file for the `Stack` module.
+
+```elixir
+defmodule StackTest do
+  use ExUnit.Case
+
+  describe "start_link/1" do
+    test "with no configuration"
+    test "with a default state"
+  end
+
+  describe "push/2" do
+    test "an element onto an empty stack"
+    test "an element onto a stack with one element"
+    test "an element onto a stack with multiple elements"
+  end
+
+  describe "pop/1" do
+    test "an empty stack"
+    test "a stack with one element"
+    test "a stack with multiple elements"
+  end
+end
+```
+
+## Bonus: GitHub Repository
+
+Upload your stack project to GitHub. You may add your partner as a collaborator, or they can fork the project so that you both own a copy.
+
+Create a README that describes the purpose of the project and what you learned.
 
 ## Commit Your Progress
 
@@ -65,6 +119,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                   | Next                                           |
-| ---------------------------------------------------------- | ---------------------------------------------: |
-| [Testing GenServers](../reading/testing_genservers.livemd) | [Typing Game](../exercises/typing_game.livemd) |
+| Previous                                                   | Next                                                           |
+| ---------------------------------------------------------- | -------------------------------------------------------------: |
+| [Testing GenServers](../reading/testing_genservers.livemd) | [Games Score Tracker](../exercises/games_score_tracker.livemd) |

@@ -51,6 +51,8 @@ A monster should start with `100` health. Store health in a map with the `:healt
 
 You should be able to send the `Monster` process a message to apply damage to the monster. The `Monster` process should crash and raise `"dying!"` when its health is `0` or lower.
 
+You should also be able to start the `Monster` process as a **named process** by passing a `:name` option.
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
@@ -58,8 +60,8 @@ You should be able to send the `Monster` process a message to apply damage to th
 defmodule Monster do
   use GenServer
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [])
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], name: opts[:name])
   end
 
   def attack(monster_pid, amount) do
@@ -108,7 +110,9 @@ defmodule Monster do
 
       iex> {:ok, pid} = Monster.start_link([])
   """
-  def start_link(_opts) do
+  def start_link(opts) do
+    # IO.inspect/2 to observe when a `Monster` process starts.
+    IO.inspect(opts, label: "Monster Started")
   end
 
   @doc """
@@ -189,7 +193,7 @@ end
 
 ## Supervisor
 
-Create three `Monster` processes under a single supervisor. When one `Monster` process dies after its health reaches zero, another should be restarted in it's place.
+Create three named `Monster` processes under a single supervisor. When one `Monster` process dies after its health reaches zero, another should be restarted in it's place.
 
 ```mermaid
 flowchart
@@ -216,15 +220,15 @@ flowchart
 children = [
   %{
     id: :monster1,
-    start: {Monster, :start_link, [[]]}
+    start: {Monster, :start_link, [[name: :monster1]]}
   },
   %{
     id: :monster2,
-    start: {Monster, :start_link, [[]]}
+    start: {Monster, :start_link, [[name: :monster2]]}
   },
   %{
     id: :monster3,
-    start: {Monster, :start_link, [[]]}
+    start: {Monster, :start_link, [[name: :monster3]]}
   }
 ]
 
@@ -234,6 +238,22 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 Enter your solution below.
+
+```elixir
+
+```
+
+Call `Monster.attack/1` on your monster processes to ensure they are restarted.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+Monster.attack(:monster1, 110)
+# logs: "Monster Started: [name: :monster1]"
+```
+
+</details>
 
 ```elixir
 
@@ -369,6 +389,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                 | Next                                                               |
-| ---------------------------------------- | -----------------------------------------------------------------: |
-| [Dominoes](../exercises/dominoes.livemd) | [Supervised Mix Project](../reading/supervised_mix_project.livemd) |
+| Previous                                 | Next                                                       |
+| ---------------------------------------- | ---------------------------------------------------------: |
+| [Dominoes](../exercises/dominoes.livemd) | [Testing GenServers](../reading/testing_genservers.livemd) |

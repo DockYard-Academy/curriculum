@@ -146,19 +146,21 @@ iex(1)> Supervisor.count_children(RockPaperScissors.Supervisor)
 
 ## Starting Child Workers
 
-We're going to create a `RockPaperScissors` [GenServer](https://hexdocs.pm/elixir/GenServer.html) in the `lib/rock_paper_scissors.ex` file which handles the logic for playing our game.
+We're going to create a `RockPaperScissors` worker in the `lib/rock_paper_scissors.ex` file which handles the logic for playing our game.
+We've seen that a [GenServer](https://hexdocs.pm/elixir/GenServer.html) can be a worker. However, we're not limited to `GenServers`.
+Let's change things up and use an [Agent](https://hexdocs.pm/elixir/Agent.html) instead.
 
-We'll create a very basic named [GenServer](https://hexdocs.pm/elixir/GenServer.html) for now and an [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) message to ensure it starts correctly.
+We'll create a very basic named [Agent](https://hexdocs.pm/elixir/Agent.html) for now and an [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) message to ensure it starts correctly.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule RockPaperScissors do
-  use GenServer
+  use Agent
 
-  def start_link(opts) do
+  def start_link(state) do
     IO.puts("RockPaperScissors started")
-    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+    Agent.start_link(fn -> state end, name: RockPaperScissors)
   end
 
   def init(state) do
@@ -168,8 +170,6 @@ end
 ```
 
 We then have to put the `RockPaperScissors` as one of the `children` for our supervisor in `application.ex`.
-
-<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 def start(_type, args) do
@@ -207,14 +207,36 @@ iex(1)> Supervisor.which_children(RockPaperScissors.Supervisor)
 [{RockPaperScissors, PID<0.163.0>, :worker, [RockPaperScissors]}]
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 ### RockPaperScissors Game
 
 Now that we have the `RockPaperScissors` worker started and supervised, we can create the logic
 for the game.
 
 The RockPaperScissors game will prompt the player to enter either `rock`, `paper`, or `scissors` as a string.
+
+```
+$ iex -S mix
+iex>
+```
+
+This is going to require message passing, so let's change the `RockPaperScissors` module into a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule RockPaperScissors do
+  use GenServer
+
+  def start_link(state) do
+    IO.puts("RockPaperScissors started")
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+```
 
 We want to repeatedly prompt the user to enter a choice for rock, paper, or scissors.
 So we'll send the `RockPaperScissors` module a `:prompt` message over and over again.
@@ -355,7 +377,8 @@ State: []
 Please enter rock, paper, or scissors.
 ```
 
-Notice that even though our game crashes, the supervisor restarts the `RockPaperScissors` process so we can keep playing. That's fault-tolerance in action!
+Notice that even though our game crashes, the supervisor restarts the `RockPaperScissors` process
+so we can keep playing. That's the definition of fault-tolerance!
 
 ## Commit Your Progress
 
@@ -364,10 +387,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-supervised_mix_project
+$ git checkout -b exercise-deprecated_supervised_mix_project
 $ git add .
-$ git commit -m "finish supervised mix project section"
-$ git push origin exercise-supervised_mix_project
+$ git commit -m "finish deprecated supervised mix project section"
+$ git push origin exercise-deprecated_supervised_mix_project
 ```
 
 **DockYard Academy Students Only:**
@@ -375,9 +398,3 @@ $ git push origin exercise-supervised_mix_project
 Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
-
-## Up Next
-
-| Previous                                                                     | Next                                                                 |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------: |
-| [Games Global Score Tracker](../exercises/games_global_score_tracker.livemd) | [Games Supervisor Setup](../exercises/games_supervisor_setup.livemd) |
