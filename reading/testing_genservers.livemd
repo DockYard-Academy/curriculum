@@ -231,7 +231,7 @@ defmodule Counter do
   end
 
   def decrement(pid) do
-    # Implementation
+    GenServer.call(pid, :decrement)
   end
 
   # Server
@@ -253,7 +253,7 @@ defmodule Counter do
 
   @impl true
   def handle_call(:decrement, _from, state) do
-    # Implementation
+    {:reply, state.count - 1, %{state | count: state.count - 1}}
   end
 end
 
@@ -268,7 +268,11 @@ defmodule CounterTest do
     assert Counter.get_count(pid) == 1
   end
 
-  test "decrement/1"
+  test "decrement/1" do
+    {:ok, pid} = Counter.start_link([])
+    Counter.decrement(pid)
+    assert Counter.get_count(pid) == -1
+  end
 end
 
 ExUnit.run()
