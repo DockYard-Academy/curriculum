@@ -64,9 +64,11 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     $ git push origin exercise-#{exercise_name}
     ```
 
+    Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
     **DockYard Academy Students Only:**
 
-    Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+    Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
     If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
     """
