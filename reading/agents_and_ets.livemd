@@ -18,13 +18,13 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## State
 
-State allows us to persist a value during the runtime of our application. We've seen how we can start a `GenServer` process which stores and manipulates its internal state.
+State allows us to persist a value during the runtime of our application. We've seen how we can start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) process which stores and manipulates its internal state.
 
-Now we're going to learn about managing state using `Agent`s and [ETS (Erlang Term Storage)](https://elixir-lang.org/getting-started/mix-otp/ets.html)
+Now we're going to learn about managing state using [Agent](https://hexdocs.pm/elixir/Agent.html)s and [ETS (Erlang Term Storage)](https://elixir-lang.org/getting-started/mix-otp/ets.html)
 
 ## Agents
 
-`Agent`s are a wrapper around state. They are less fully-featured and simpler than a `GenServer`. Unlike `GenServer`s, they do not send and receive messages. Instead, the `Agent` module provides functions such as `Agent.get/3` and `Agent.update/3` to get and update the `Agent` process's state.
+[Agent](https://hexdocs.pm/elixir/Agent.html)s are a wrapper around state. They are less fully-featured and simpler than a [GenServer](https://hexdocs.pm/elixir/GenServer.html). Unlike [GenServer](https://hexdocs.pm/elixir/GenServer.html)s, they do not send and receive messages. Instead, the [Agent](https://hexdocs.pm/elixir/Agent.html) module provides functions such as [Agent.get/3](https://hexdocs.pm/elixir/Agent.html#get/3) and [Agent.update/3](https://hexdocs.pm/elixir/Agent.html#update/3) to get and update the [Agent](https://hexdocs.pm/elixir/Agent.html) process's state.
 
 ```elixir
 {:ok, counter_pid} = Agent.start_link(fn -> 0 end)
@@ -64,7 +64,7 @@ end
 2 = Counter.get_count(counter_pid)
 ```
 
-Anything you can accomplish with an `Agent`, you could instead accomplish with a `GenServer`. However, using an `Agent` is more lightweight and effective if all you need is to manage state.
+Anything you can accomplish with an [Agent](https://hexdocs.pm/elixir/Agent.html), you could instead accomplish with a [GenServer](https://hexdocs.pm/elixir/GenServer.html). However, using an [Agent](https://hexdocs.pm/elixir/Agent.html) is more lightweight and effective if all you need is to manage state.
 
 ## Erlang Term Storage (ETS)
 
@@ -398,9 +398,9 @@ However, be aware that caching can lead to issues and should be well considered.
 
 For example, a slow Fibonacci function with a cache is no replacement for a fast Fibonacci function!
 
-There are many ways to implement a cache. For example `GenServer`, `Agent`, and `:ets` all expose state which could be used as a cache. We can even use module attributes for simple static caches.
+There are many ways to implement a cache. For example [GenServer](https://hexdocs.pm/elixir/GenServer.html), [Agent](https://hexdocs.pm/elixir/Agent.html), and `:ets` all expose state which could be used as a cache. We can even use module attributes for simple static caches.
 
-Here's an example cache using `Agent` which can get and set values.
+Here's an example cache using [Agent](https://hexdocs.pm/elixir/Agent.html) which can get and set values.
 
 ```elixir
 defmodule AgentCache do
@@ -463,7 +463,7 @@ However, `CachedFib` should handle larger numbers.
 
 ### Your Turn
 
-Use `GenServer` to create a cache.
+Use [GenServer](https://hexdocs.pm/elixir/GenServer.html) to create a cache.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -557,10 +557,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-caching_agent_ets
+$ git checkout -b exercise-agents_and_ets
 $ git add .
-$ git commit -m "finish caching agent ets section"
-$ git push origin exercise-caching_agent_ets
+$ git commit -m "finish agents and ets section"
+$ git push origin exercise-agents_and_ets
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -573,6 +573,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                                       | Next                                                             |
-| ------------------------------------------------------------------------------ | ---------------------------------------------------------------: |
-| [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) | [Inventory Management](../exercises/inventory_management.livemd) |
+| Previous                                                                       | Next                                               |
+| ------------------------------------------------------------------------------ | -------------------------------------------------: |
+| [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) | [Agent Journal](../exercises/agent_journal.livemd) |

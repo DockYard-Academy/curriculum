@@ -18,7 +18,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Agent Journal
 
-For this exercise, you're going to create a `Journal` `Agent` which will store journal entries as strings.
+For this exercise, you're going to create a `Journal` [Agent](https://hexdocs.pm/elixir/Agent.html) which will store journal entries as strings.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -205,7 +205,7 @@ end
 
 </details>
 
-Implement the `AdvancedJournal` using `Agent` as documented below.
+Implement the `AdvancedJournal` using [Agent](https://hexdocs.pm/elixir/Agent.html) as documented below.
 
 ```elixir
 defmodule AdvancedJournal do
@@ -233,7 +233,7 @@ defmodule AdvancedJournal do
   @doc """
   Return all entries. Entries are automatically assigned an `:id` starting at `0` in the
   order they are created in. The `:created_at` and `:updated_at` fields should be the current
-  UTC `DateTime` at the moment of creation.
+  UTC [DateTime](https://hexdocs.pm/elixir/DateTime.html) at the moment of creation.
 
   We do not include `:created_at` and `:updated_at` in doctests as small differences 
   in time could cause these tests to fail.
@@ -260,7 +260,7 @@ defmodule AdvancedJournal do
       ..>  %{id: 1, title: "Entry 2", content: "Entry 2", created_at: _, updated_at: _}
       ..>] = AdvancedJournal.all_entries(pid)
 
-      Acending order (default).
+      Ascending order (default).
 
       iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Entry 1", content: "Entry 1"}, %{title: "Entry 2", content: "Entry 2"}])
       iex>
@@ -308,7 +308,7 @@ defmodule AdvancedJournal do
 
   @doc """
   Update a journal entry. 
-  This should automatically set the `:updated_at` field to the current `DateTime`.
+  This should automatically set the `:updated_at` field to the current [DateTime](https://hexdocs.pm/elixir/DateTime.html).
 
   ## Examples
 
@@ -340,14 +340,22 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-journal_cli
+$ git checkout -b exercise-agent_journal
 $ git add .
-$ git commit -m "finish journal cli exercise"
-$ git push origin exercise-journal_cli
+$ git commit -m "finish agent journal exercise"
+$ git push origin exercise-agent_journal
 ```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                                             |
+| -------------------------------------------------- | ---------------------------------------------------------------: |
+| [Agents And ETS](../reading/agents_and_ets.livemd) | [Inventory Management](../exercises/inventory_management.livemd) |

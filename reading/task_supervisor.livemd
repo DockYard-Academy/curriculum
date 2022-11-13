@@ -18,9 +18,9 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Task Supervisor
 
-We can start `Task` processes under a `Task.Supervisor` which can dynamically supervise tasks. The supervisor will automatically restart tasks if they encounter an error.
+We can start [Task](https://hexdocs.pm/elixir/Task.html) processes under a `Task.Supervisor` which can dynamically supervise tasks. The supervisor will automatically restart tasks if they encounter an error.
 
-Generally speaking, we should start `Task` processes under a supervisor.
+Generally speaking, we should start [Task](https://hexdocs.pm/elixir/Task.html) processes under a supervisor.
 
 > We encourage developers to rely on supervised tasks as much as possible. Supervised tasks improves the visibility of how many tasks are running at a given moment and enable a huge variety of patterns that gives you explicit control on how to handle the results, errors, and timeouts. Here is a summary:
 > 
@@ -28,7 +28,7 @@ Generally speaking, we should start `Task` processes under a supervisor.
 > 
 > Using `Task.Supervisor.async/2 + Task.await/2` allows you to execute tasks concurrently and retrieve its result. If the task fails, the caller will also fail.
 > 
-> Using `Task.Supervisor.async_nolink/2` + `Task.yield/2` + `Task.shutdown/2` allows you to execute tasks concurrently and retrieve their results or the reason they failed within a given time frame. If the task fails, the caller won't fail. You will receive the error reason either on yield or shutdown.
+> Using `Task.Supervisor.async_nolink/2` + [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) + [Task.shutdown/2](https://hexdocs.pm/elixir/Task.html#shutdown/2) allows you to execute tasks concurrently and retrieve their results or the reason they failed within a given time frame. If the task fails, the caller won't fail. You will receive the error reason either on yield or shutdown.
 > 
 > * [Hexdocs: Dynamically Supervised Tasks](https://hexdocs.pm/elixir/Task.html#module-dynamically-supervised-tasks)
 
@@ -59,7 +59,7 @@ Kino.Process.sup_tree(supervisor_pid)
 
 ## Async Tasks
 
-Now we can spawn supervised `Task` processes under `MyTaskSupervisor` using `Task.Supervisor.async/3`.
+Now we can spawn supervised [Task](https://hexdocs.pm/elixir/Task.html) processes under `MyTaskSupervisor` using `Task.Supervisor.async/3`.
 
 ```elixir
 task =
@@ -120,7 +120,7 @@ Re-evaluate the cell above a few times, and you'll see several tasks under the `
 children = Supervisor.which_children(MyTaskSupervisor)
 ```
 
-We can provide a `:restart` strategy when we start a process. By default, `Task.Supervisor.start_child/2` uses the `:temporary` `:restart` strategy. These `Task` processes will never be restarted.
+We can provide a `:restart` strategy when we start a process. By default, `Task.Supervisor.start_child/2` uses the `:temporary` `:restart` strategy. These [Task](https://hexdocs.pm/elixir/Task.html) processes will never be restarted.
 
 ```elixir
 {:ok, pid} =
@@ -139,11 +139,11 @@ Supervisor.which_children(MyTaskSupervisor)
 |> IO.inspect(label: "Children after exit")
 ```
 
-Instead we can use the `:permanent` process to always restart a `Task` or `:transient` to restart a `Task` if it's exit reason is not `:normal`, `:shutdown`, or `{:shutdown, reason}`.
+Instead we can use the `:permanent` process to always restart a [Task](https://hexdocs.pm/elixir/Task.html) or `:transient` to restart a [Task](https://hexdocs.pm/elixir/Task.html) if it's exit reason is not `:normal`, `:shutdown`, or `{:shutdown, reason}`.
 
 See [Task.Supervisor.start_child/3#options](https://hexdocs.pm/elixir/Task.Supervisor.html#start_child/3-options) for more.
 
-Now when we kill a `Task` started with the `:transient` strategy, notice that a new process with a different `pid` is started under `MyTaskSupervisor`.
+Now when we kill a [Task](https://hexdocs.pm/elixir/Task.html) started with the `:transient` strategy, notice that a new process with a different `pid` is started under `MyTaskSupervisor`.
 
 ```elixir
 {:ok, pid} =
@@ -180,20 +180,22 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-task
+$ git checkout -b exercise-task_supervisor
 $ git add .
-$ git commit -m "finish task section"
-$ git push origin exercise-task
+$ git commit -m "finish task supervisor section"
+$ git push origin exercise-task_supervisor
 ```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                                     | Next                                                                           |
-| ---------------------------------------------------------------------------- | -----------------------------------------------------------------------------: |
-| [Games Global Score Tracker](../exercises/games_global_score_tracker.livemd) | [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) |
+| Previous                       | Next                                                                           |
+| ------------------------------ | -----------------------------------------------------------------------------: |
+| [Task](../reading/task.livemd) | [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) |
