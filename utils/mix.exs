@@ -23,9 +23,7 @@ defmodule Utils.MixProject do
   defp deps do
     [
       {:credo, "~> 1.6", runtime: false, only: [:dev, :test]},
-      {:livebook, "~> 0.7", runtime: false, only: [:dev, :test]},
-      # poison needed for livebook
-      {:poison, "~> 5.0", only: [:dev, :test]}
+      {:livebook_formatter, "~> 0.1.2", runtime: false}
     ]
   end
 end

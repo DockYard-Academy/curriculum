@@ -213,8 +213,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * GenServers
 * Asynchronous Messages
 * Supervisor Basics and Fault Tolerance
-* Testing GenServers
 * Mix Projects & Processes
+* Testing GenServers
 * State Management With Agents
 * Concurrency With Tasks
 * Erlang-Term Storage (ETS)
