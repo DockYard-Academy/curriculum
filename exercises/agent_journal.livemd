@@ -1,0 +1,361 @@
+# Agent Journal
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Agent Journal
+
+For this exercise, you're going to create a `Journal` [Agent](https://hexdocs.pm/elixir/Agent.html) which will store journal entries as strings.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Journal do
+  use Agent
+
+  def start_link(opts) do
+    entries = Keyword.get(opts, :entries, [])
+    Agent.start_link(fn -> entries end)
+  end
+
+  def all_entries(pid, opts \\ []) do
+    entries = Agent.get(pid, fn state -> state end)
+    if opts[:order] == :desc, do: Enum.reverse(entries), else: entries
+  end
+
+  def add_entry(pid, entry) do
+    # Using ++ is less performant than prepending.
+    # A more optimal solution would be to store entries in reverse order so they can be prepended.
+    Agent.update(pid, fn state -> state ++ [entry] end)
+  end
+end
+```
+
+</details>
+
+Implement the `Journal` module as documented below.
+
+```elixir
+defmodule Journal do
+  @moduledoc """
+  Documentation for `Journal`
+  """
+  use Agent
+
+  @doc """
+  Start the Agent process.
+
+  ## Examples
+
+      Default.
+
+      iex> {:ok, pid} = Journal.start_link([])
+
+      With initial entries.
+
+      iex> {:ok, pid} = Journal.start_link(entries: ["Entry1", "Entry 2"])
+  """
+  def start_link(_opts) do
+  end
+
+  @doc """
+  Get all journal entries.
+
+  ## Examples
+      
+      Empty journal.
+      
+      iex> {:ok, pid} = Journal.start_link([])
+      iex> Journal.all_entries(pid)
+      []
+
+      Journal with entries. Entries are returned in ascending order (oldest entries first).
+
+      iex> {:ok, pid} = Journal.start_link(["Entry 1", "Entry 2"])
+      iex> Journal.all_entries(pid)
+      ["Entry 1", "Entry 2"]
+       
+      Ascending order (default).
+      
+      iex> {:ok, pid} = Journal.start_link(["Entry 1", "Entry 2"])
+      iex> Journal.all_entries(pid, order: :asc)
+      ["Entry 2", "Entry 1"]
+
+      Descending order.
+
+      iex> {:ok, pid} = Journal.start_link(["Entry 1", "Entry 2"])
+      iex> Journal.all_entries(pid, order: :desc)
+      ["Entry 2", "Entry 1"]
+  """
+  def all_entries(pid, opts \\ []) do
+  end
+
+  @doc """
+  Add a journal entry.
+
+  ## Examples
+
+    iex> {:ok, pid} = Journal.start_link([])
+    iex> Journal.add_entry(pid, "Entry 1")
+    :ok
+    iex> Journal.add_entry(pid, "Entry 2")
+    :ok
+    iex> Journal.all_entries(pid)
+    ["Entry 1", "Entry 2"]
+  """
+  def add_entry(pid, entry) do
+  end
+end
+```
+
+## Bonus: Advanced Journal
+
+Expand upon your original journal with several additional features. Journal entries will now be stored as a map with `:id`, `:title`, `:content`, `:updated_at`, and `created_at` fields.
+
+```elixir
+example_entry = %{
+  # ids start at `0` and auto increment with each new entry.
+  id: 0,
+  title: "Title",
+  content: "Content",
+  created_at: DateTime.utc_now(),
+  updated_at: DateTime.utc_now()
+}
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule AdvancedJournal do
+  use Agent
+
+  def start_link(opts) do
+    entry_attrs = Keyword.get(opts, :entries, [])
+
+    entries =
+      entry_attrs
+      |> Enum.with_index()
+      |> Enum.map(fn {attrs, index} -> make_entry(index, attrs) end)
+      |> Enum.reverse()
+
+    Agent.start_link(fn -> %{entries: entries, current_index: Enum.count(entries)} end)
+  end
+
+  def all_entries(pid, opts \\ []) do
+    entries = Agent.get(pid, fn state -> state.entries end)
+    if opts[:order] == :desc, do: entries, else: Enum.reverse(entries)
+  end
+
+  def add_entry(pid, attrs) do
+    Agent.update(pid, fn state ->
+      entry = make_entry(state.current_index, attrs)
+
+      %{
+        state
+        | current_index: state.current_index + 1,
+          entries: [entry | state.entries]
+      }
+    end)
+  end
+
+  def update_entry(pid, id, attrs) do
+    Agent.update(pid, fn state ->
+      index = Enum.find_index(state.entries, fn entry -> entry.id == id end)
+
+      new_entries = List.update_at(state.entries, index, fn entry -> Map.merge(entry, attrs) end)
+
+      %{state | entries: new_entries}
+    end)
+  end
+
+  def delete_entry(pid, id) do
+    Agent.update(pid, fn state ->
+      new_entries = Enum.reject(state.entries, fn entry -> entry.id == id end)
+      %{state | entries: new_entries}
+    end)
+  end
+
+  defp make_entry(index, attrs) do
+    Map.merge(
+      %{
+        id: index,
+        created_at: DateTime.utc_now(),
+        updated_at: DateTime.utc_now()
+      },
+      attrs
+    )
+  end
+end
+```
+
+</details>
+
+Implement the `AdvancedJournal` using [Agent](https://hexdocs.pm/elixir/Agent.html) as documented below.
+
+```elixir
+defmodule AdvancedJournal do
+  @moduledoc """
+  Documentation for `AdvancedJournal`
+  """
+  use Agent
+
+  @doc """
+  Start the Agent process
+
+  ## Examples
+
+      Default.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link([])
+
+      With initial entries.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Entry 1", content: "Entry 1 Content"}])
+  """
+  def start_link(opts) do
+  end
+
+  @doc """
+  Return all entries. Entries are automatically assigned an `:id` starting at `0` in the
+  order they are created in. The `:created_at` and `:updated_at` fields should be the current
+  UTC [DateTime](https://hexdocs.pm/elixir/DateTime.html) at the moment of creation.
+
+  We do not include `:created_at` and `:updated_at` in doctests as small differences 
+  in time could cause these tests to fail.
+
+  ## Examples
+
+      Empty journal.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link([])
+      iex> AdvancedJournal.all_entries(pid)
+      []
+
+      One entry. 
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Title", content: "Content"}])
+      iex> [%{id: 0, title: "Title", content: "Content", created_at: _, updated_at: _}] = AdvancedJournal.all_entries(pid)
+
+      Multiple entries. Order is ascending by default.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Entry 1", content: "Entry 1"}, %{title: "Entry 2", content: "Entry 2"}])
+      iex>
+      ..>[
+      ..>  %{id: 0, title: "Entry 1", content: "Entry 1", created_at: _, updated_at: _},
+      ..>  %{id: 1, title: "Entry 2", content: "Entry 2", created_at: _, updated_at: _}
+      ..>] = AdvancedJournal.all_entries(pid)
+
+      Ascending order (default).
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Entry 1", content: "Entry 1"}, %{title: "Entry 2", content: "Entry 2"}])
+      iex>
+      ..>[
+      ..>  %{id: 0, title: "Entry 1", content: "Entry 1", created_at: _, updated_at: _},
+      ..>  %{id: 1, title: "Entry 2", content: "Entry 2", created_at: _, updated_at: _}
+      ..>] = AdvancedJournal.all_entries(pid, order: :asc)
+
+      Descending order.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Entry 1", content: "Entry 1"}, %{title: "Entry 2", content: "Entry 2"}])
+      iex>
+      ..>[
+      ..>  %{id: 1, title: "Entry 2", content: "Entry 2", created_at: _, updated_at: _}
+      ..>  %{id: 0, title: "Entry 1", content: "Entry 1", created_at: _, updated_at: _},
+      ..>] = AdvancedJournal.all_entries(pid, order: :desc)
+  """
+  def all_entries(pid, opts \\ []) do
+  end
+
+  @doc """
+  Add a journal entry. Automatically create `:id`, `:created_at`, and `:updated_at` fields.
+
+  ## Examples
+
+      One entry.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link([])
+      iex> AdvancedJournal.add_entry(pid, %{title: "Title", content: "Content"})
+      iex> [%{id: 0, title: "Title", content: "Content", created_at: _, updated_at: _}] = AdvancedJournal.all_entries(pid)
+
+      Multiple entries.
+
+      iex> {:ok, pid} = AdvancedJournal.start_link([])
+      iex> AdvancedJournal.add_entry(pid, %{title: "Entry 1", content: "Entry 1"})
+      iex> AdvancedJournal.add_entry(pid, %{title: "Entry 2", content: "Entry 2"})
+      iex>
+      ..>[
+      ..>  %{id: 0, title: "Entry 1", content: "Entry 1", created_at: _, updated_at: _}
+      ..>  %{id: 1, title: "Entry 2", content: "Entry 2", created_at: _, updated_at: _},
+      ..>] = AdvancedJournal.all_entries(pid)
+  """
+  def add_entry(pid, attrs) do
+  end
+
+  @doc """
+  Update a journal entry. 
+  This should automatically set the `:updated_at` field to the current [DateTime](https://hexdocs.pm/elixir/DateTime.html).
+
+  ## Examples
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Title", content: "Content"}])
+      iex> AdvancedJournal.update_entry(pid, 0, %{title: "Updated Title", content: "Updated Content"})
+      iex> [%{id: 0, title: "Updated Title", content: "Updated Content", created_at: _, updated_at: _}] = AdvancedJournal.all_entries(pid)
+  """
+  def update_entry(pid, id, attrs) do
+  end
+
+  @doc """
+  Delete a journal entry by it's id.
+
+  ## Examples
+
+      iex> {:ok, pid} = AdvancedJournal.start_link(entries: [%{title: "Title", content: "Content"}])
+      iex> AdvancedJournal.delete_entry(pid, 0)
+      iex> []
+  """
+  def delete_entry(pid, id, attrs) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-agent_journal
+$ git add .
+$ git commit -m "finish agent journal exercise"
+$ git push origin exercise-agent_journal
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                                             |
+| -------------------------------------------------- | ---------------------------------------------------------------: |
+| [Agents And ETS](../reading/agents_and_ets.livemd) | [Inventory Management](../exercises/inventory_management.livemd) |

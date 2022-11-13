@@ -1,0 +1,578 @@
+# State: Agent and ETS
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## State
+
+State allows us to persist a value during the runtime of our application. We've seen how we can start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) process which stores and manipulates its internal state.
+
+Now we're going to learn about managing state using [Agent](https://hexdocs.pm/elixir/Agent.html)s and [ETS (Erlang Term Storage)](https://elixir-lang.org/getting-started/mix-otp/ets.html)
+
+## Agents
+
+[Agent](https://hexdocs.pm/elixir/Agent.html)s are a wrapper around state. They are less fully-featured and simpler than a [GenServer](https://hexdocs.pm/elixir/GenServer.html). Unlike [GenServer](https://hexdocs.pm/elixir/GenServer.html)s, they do not send and receive messages. Instead, the [Agent](https://hexdocs.pm/elixir/Agent.html) module provides functions such as [Agent.get/3](https://hexdocs.pm/elixir/Agent.html#get/3) and [Agent.update/3](https://hexdocs.pm/elixir/Agent.html#update/3) to get and update the [Agent](https://hexdocs.pm/elixir/Agent.html) process's state.
+
+```elixir
+{:ok, counter_pid} = Agent.start_link(fn -> 0 end)
+```
+
+```elixir
+Agent.update(counter_pid, fn state -> state + 1 end)
+```
+
+```elixir
+Agent.get(counter_pid, fn state -> state end)
+```
+
+Often, we'll put Agent functions into a module to abstract how state is stored and manipulated and only expose the desired functionality.
+
+```elixir
+defmodule Counter do
+  use Agent
+
+  def start_link(_opts) do
+    Agent.start_link(fn -> 0 end)
+  end
+
+  def increment(pid) do
+    Agent.update(pid, fn state -> state + 1 end)
+  end
+
+  def get_count(pid) do
+    Agent.get(pid, fn state -> state end)
+  end
+end
+
+{:ok, counter_pid} = Counter.start_link([])
+
+:ok = Counter.increment(counter_pid)
+:ok = Counter.increment(counter_pid)
+2 = Counter.get_count(counter_pid)
+```
+
+Anything you can accomplish with an [Agent](https://hexdocs.pm/elixir/Agent.html), you could instead accomplish with a [GenServer](https://hexdocs.pm/elixir/GenServer.html). However, using an [Agent](https://hexdocs.pm/elixir/Agent.html) is more lightweight and effective if all you need is to manage state.
+
+## Erlang Term Storage (ETS)
+
+We can use [ETS](https://elixir-lang.org/getting-started/mix-otp/ets.html)
+tables for a convenient in-memory cache. `:ets` is a library provided by Erlang
+through the `:ets` module.
+
+While an [Agent](https://hexdocs.pm/elixir/Agent.html) is a simple solution for an in-memory cache best for small loads or non-concurrent operations, an `:ets` table generally
+performs better and can support concurrent read and write operations.
+
+Generally, We can use `:ets` for a more performant in-memory key-value store.
+
+`:ets` tables are much like a [GenServer](https://hexdocs.pm/elixir/GenServer.html) except designed explicitly for in-memory key-value storage.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+subgraph ETS
+  Process[Process] --> State
+  State --> KV[Key Value Storage]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Livebook allows us to view the `:ets` process as a table. Let's start a new `:ets` table called
+`:example_table`.
+
+```elixir
+table = :ets.new(:example_table, [])
+```
+
+We can then insert values into the table with `:ets.insert/2`. We insert
+values as `{key, value}` tuples.
+
+The key and the value can be nearly any value, but we'll often use an atom for the key.
+
+### Your Turn
+
+Try changing the `:key` and `value` to see that the `:ets` table will store any key-value pair.
+However, the `:ets` table will only store one value for a given key.
+
+```elixir
+:ets.insert(table, {:key, "value"})
+```
+
+### Named Tables
+
+`:ets` tables can be created with a `:named_table` option. This allows us to create
+the table and refer to them without the variable bound to their pid.
+
+```elixir
+:ets.new(:my_table, [:named_table])
+```
+
+Now we can insert values to the table using the atom name
+`:my_table` instead of the PID.
+
+```elixir
+:ets.insert(:my_table, {:key, "value"})
+```
+
+The same goes for looking up values.
+
+```elixir
+:ets.lookup(:my_table, :key)
+```
+
+### Your Turn
+
+In the Elixir cell below, create a `:super_heros` `:ets` table.
+You should be able to insert super hero's and their
+secret identities.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+:ets.insert(:super_heros, {"Spider Man", "Peter Parker"})
+```
+
+```elixir
+
+```
+
+## ETS Configuration
+
+`:ets` Tables are configured with a **Table Type** and an **Access Control**.
+
+**Table Types**
+
+* `:set` (default). One value per unique key.
+* `:ordered_set` One value per unique key, ordered by Elixir terms.
+* `:bag` Many values per key, but only one instance of each value per key.
+* `:duplicate_bag` Many values per key with duplicates allowed.
+
+**Access Control**
+
+* `:protected` (default) Read from all process. Write allowed only for the parent process.
+* `:public` Read/Write available from all processes.
+* `:private` Read/Write allowed only for the parent process.
+
+By default, `:ets` tables use the `:set` and `:protected` configuration values. So we may include or exclude them when starting an `:ets` table, and it does not have any effect.
+
+```elixir
+default_table = :ets.new(:default_table, [:set, :protected])
+:ets.insert(default_table, {:key, "value"})
+
+# We return the default table to display the table in livebook.
+default_table
+```
+
+With `:protected` access control, the `:ets` raises an [ArgumentError](https://hexdocs.pm/elixir/ArgumentError.html) if another process attempts to write to it.
+
+Uncomment and execute this code. Notice that the child process crashes.
+
+```elixir
+# Task.start(fn ->
+#   :ets.insert(default_table, {:new_key, "new value"})
+# end)
+```
+
+However, reading from other processes is allowed.
+
+```elixir
+Task.start(fn ->
+  :ets.lookup(default_table, :key) |> IO.inspect(label: "lookup result")
+end)
+```
+
+**:public**
+
+A public table can be read and written from any process, so the following no longer crashes.
+
+```elixir
+public = :ets.new(:public_example, [:public])
+
+Task.start(fn ->
+  :ets.insert(public, {:key, "value"})
+end)
+
+# We return the public table to display it in livebook.
+public
+```
+
+**:bag**
+
+A `:bag` table type allows for multiple keys but not the same value under the same key.
+
+```elixir
+bag = :ets.new(:bag_example, [:bag])
+
+:ets.insert(bag, {:key, "duplicate value"})
+:ets.insert(bag, {:key, "duplicate value"})
+:ets.insert(bag, {:key, "non-duplicate value"})
+
+# We return the bag table to display it in livebook.
+bag
+```
+
+**:duplicate_bag**
+
+`:duplicate_bag` allows for duplicate keys with the same value.
+
+```elixir
+bag = :ets.new(:bag_example, [:duplicate_bag])
+
+:ets.insert(bag, {:key, "duplicate value"})
+:ets.insert(bag, {:key, "duplicate value"})
+:ets.insert(bag, {:key, "non-duplicate value"})
+
+# We return the bag table to display it in livebook.
+bag
+```
+
+### Your Turn
+
+In the Elixir cell below, use the `:ordered_set` and `:private` configuration values to make
+an ordered and private `:ets` table.
+
+Demonstrate that the table will not allow read/write operations to the `:ets` table
+from another process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+table = :ets.new(:example, [:private, :ordered_set])
+
+# Writing from the owner process is allowed.
+:ets.insert(table, {:key, "value"})
+
+# The following will cause a crash.
+spawn(fn ->
+  :ets.insert(table, {:key, "value"})
+end)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Race Conditions
+
+Concurrency is a powerful tool, but it introduces a new class of bugs.
+For example, **race conditions** are a common problem.
+
+A race condition occurs when events of operations occur in an unexpected order.
+
+Below we have an `:ets` table, which stores a count. Two tasks read the current count and then increment it. We use `Process.sleep(100)` to simulate a time-consuming computation, then insert a new count.
+
+If these tasks were synchronous, we would expect the count to increment twice and return two. However, when both of these operations are concurrent, both tasks read the count when it's zero, then increment the count to one. They then save the resulting count in the `:ets` table. As a result, the count is one rather than the expected value of two. This is a classic issue you'll often run into when working with concurrency.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+sequenceDiagram
+ETS Table->>ETS Table: sets count = 0
+    ETS Table->>Task 1: reads count (0)
+    ETS Table->>Task 2: reads count (0)
+    Task 1->>ETS Table: sets count = 1
+    Task 2->>ETS Table: sets count = 1
+```
+
+```
+activate Child Process
+Child Process-->>Parent Process: pid
+deactivate Child Process
+```
+
+```elixir
+table = :ets.new(:concurrent, [:public])
+
+:ets.insert(table, {:count, 0})
+
+increment_task1 =
+  Task.async(fn ->
+    [count: count] = :ets.lookup(table, :count)
+    Process.sleep(100)
+    :ets.insert(table, {:count, count + 1})
+  end)
+
+increment_task2 =
+  Task.async(fn ->
+    [count: count] = :ets.lookup(table, :count)
+    Process.sleep(100)
+    :ets.insert(table, {:count, count + 1})
+  end)
+
+Task.await(increment_task1)
+Task.await(increment_task2)
+
+table
+```
+
+For an overview of race conditions and how large systems deal with many concurrent operations, there is an excellent video by Tom Scott.
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=RY_2gElt3SA")
+```
+
+## Caches
+
+A cache allows us to store data to avoid computing values.
+
+We commonly use caches to avoid performance-demanding functions or re-retrieving external resources.
+
+```mermaid
+flowchart LR
+input --> e[expensive computation] --> output
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+A cache can store the expected output for a given input to a function for quicker access.
+
+```mermaid
+flowchart
+input --> cache --cached value--> output
+cache --no cached value --> e[expensive computation] --> output
+```
+
+Some caches are smart and save newly computed values in the cache to avoid recomputing the same value.
+
+Other caches may be static or infrequently changing data that occasionally updates in the background.
+
+Let's take a slow implementation of the fibonacci sequence $fib(n) = fib(n - 1) + fib(n-2)$ as an example. Currently, `Fib` will recompute many of the same inputs. In the example below, we print every computation of `fib(n)`. Notice that many of the same inputs repeat.
+
+```elixir
+defmodule SlowFib do
+  def of(0), do: 0
+  def of(1), do: 1
+
+  def of(n) do
+    IO.puts("Computing fib(#{n})")
+    of(n - 1) + of(n - 2)
+  end
+end
+
+SlowFib.of(6)
+```
+
+We can improve performance by saving each input/output in a cache so we don't have to re-compute the same values over and over. You can think of this cache as a table of inputs and outputs. For each input, we store the computed output rather than re-performing the calculation.
+
+<!-- livebook:{"attrs":{"source":"defmodule Fib do\n  def get(n) do\n    sequence =\n      Stream.unfold({1, 1}, fn {a, b} ->\n        {a, {b, a + b}}\n      end)\n      |> Enum.take(n)\n\n    [0 | sequence]\n  end\nend\n\nFib.get(150)\n|> Enum.with_index()\n|> Enum.map(fn {value, index} -> %{input: index, output: value} end)\n|> Kino.DataTable.new()","title":"Fib Cache"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+defmodule Fib do
+  def get(n) do
+    sequence =
+      Stream.unfold({1, 1}, fn {a, b} ->
+        {a, {b, a + b}}
+      end)
+      |> Enum.take(n)
+
+    [0 | sequence]
+  end
+end
+
+Fib.get(150)
+|> Enum.with_index()
+|> Enum.map(fn {value, index} -> %{input: index, output: value} end)
+|> Kino.DataTable.new()
+```
+
+For any already computed input, the cache will return the cached output. This significantly improves our performance at the cost of memory and initial setup time.
+
+However, be aware that caching can lead to issues and should be well considered. The cache permanently takes up memory in your program, so there's a considerable memory cost. Often it's best to consider how you can improve the performance of your application rather than immediately reaching for a cache.
+
+For example, a slow Fibonacci function with a cache is no replacement for a fast Fibonacci function!
+
+There are many ways to implement a cache. For example [GenServer](https://hexdocs.pm/elixir/GenServer.html), [Agent](https://hexdocs.pm/elixir/Agent.html), and `:ets` all expose state which could be used as a cache. We can even use module attributes for simple static caches.
+
+Here's an example cache using [Agent](https://hexdocs.pm/elixir/Agent.html) which can get and set values.
+
+```elixir
+defmodule AgentCache do
+  use Agent
+
+  def start_link(opts \\ []) do
+    Agent.start_link(fn -> %{} end, opts)
+  end
+
+  def get(pid, input) do
+    Agent.get(pid, fn state -> state[input] end)
+  end
+
+  def set(pid, input, output) do
+    Agent.update(pid, fn state -> Map.put(state, input, output) end)
+  end
+end
+```
+
+We can use this cache to store values during the runtime of our application. For example, here's how we can use this cache with our `Fib` module. Notice we no longer re-compute already cached values.
+
+```elixir
+# Named process simplifies accessing the cache.
+AgentCache.start_link(name: :fib_cache)
+# Resetting cache to preserve the example.
+Agent.update(:fib_cache, fn state -> %{} end)
+
+defmodule CachedFib do
+  def of(0), do: 0
+  def of(1), do: 1
+
+  def of(n) do
+    cached_value = AgentCache.get(:fib_cache, n)
+
+    if cached_value do
+      cached_value
+    else
+      IO.puts("Computing fib(#{n})")
+      result = of(n - 1) + of(n - 2)
+      AgentCache.set(:fib_cache, n, result)
+      result
+    end
+  end
+end
+
+CachedFib.of(50)
+```
+
+### Your Turn
+
+Compare the `SlowFib` module with the `CachedFib` module. What value of `n` can they both handle before they are no longer performant?
+
+Depending on your computer, we recommend you don't use `SlowFib` with a value larger than `25` or so otherwise you might crash this Livebook!
+
+However, `CachedFib` should handle larger numbers.
+
+```elixir
+
+```
+
+### Your Turn
+
+Use [GenServer](https://hexdocs.pm/elixir/GenServer.html) to create a cache.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule GenServerCache do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], opts)
+  end
+
+  def get(pid, key) do
+    GenServer.call(pid, {:get, key})
+  end
+
+  def set(pid, key, value) do
+    GenServer.call(pid, {:set, key, value})
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, %{}}
+  end
+
+  @impl true
+  def handle_call({:get, key}, _from, state) do
+    {:reply, state[key], state}
+  end
+
+  def handle_call({:set, key, value}, _from, state) do
+    {:reply, :ok, Map.put(state, key, value)}
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule GenServerCache do
+  use GenServer
+end
+```
+
+### Your Turn
+
+Use `:ets` to create a cache.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule ETSCache do
+  def new(opts \\ []) do
+    :ets.new(:cache, opts)
+  end
+
+  def set(ref, key, value) do
+    :ets.insert(ref, {key, value})
+  end
+
+  def get(ref, key) do
+    case :ets.lookup(ref, key) do
+      [{_key, value}] -> value
+      _ -> nil
+    end
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule ETSCache do
+end
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Lang: Agent](https://elixir-lang.org/getting-started/mix-otp/agent.html)
+* [HexDocs: Agent](https://hexdocs.pm/elixir/Agent.html)
+* [Elixir Schools: ETS](https://elixirschool.com/en/lessons/storage/ets).
+* [Elixir Lang: ETS](https://elixir-lang.org/getting-started/mix-otp/ets.html).
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-agents_and_ets
+$ git add .
+$ git commit -m "finish agents and ets section"
+$ git push origin exercise-agents_and_ets
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                                       | Next                                               |
+| ------------------------------------------------------------------------------ | -------------------------------------------------: |
+| [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) | [Agent Journal](../exercises/agent_journal.livemd) |
