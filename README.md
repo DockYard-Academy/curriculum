@@ -216,7 +216,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Testing GenServers
 * Mix Projects & Processes
 * Concurrency With Tasks
-* State Management
+* State Management With Agents and ETS
 * Registry
 * Files and Data Validation
 ## Web Servers and Phoenix
