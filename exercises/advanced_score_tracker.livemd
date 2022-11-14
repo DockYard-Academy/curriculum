@@ -1,4 +1,4 @@
-# Games: Global Score Tracker
+# Advanced Score Tracker
 
 ```elixir
 Mix.install([
@@ -16,9 +16,35 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-## Games: Global Score Tracker
+## Advanced Score Tracker
 
-You're going to create a named process `Games.GlobalScoreTracker` which will track player score history across multiple different games. `Games.GlobalScoreTracker` should automatically start as part of the `Games` [Supervisor](https://hexdocs.pm/elixir/Supervisor.html).
+Create a new supervised mix project `AdvancedScoreTracker`.
+
+```
+$ mix new advanced_score_tracker --sup
+```
+
+The `AdvancedScoreTracker` will use an [Agent](https://hexdocs.pm/elixir/Agent.html) to create a general purpose score tracker that tracks player score history across multiple different games. The `AdvancedScoreTracker` [Agent](https://hexdocs.pm/elixir/Agent.html) should start as part of the application's supervision tree.
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+Consider how you want to store your state, and how to update it.
+For example, you might consider a map.
+
+```elixir
+state = %{
+  player1: %{
+    ping_pong: [0, 20]
+  },
+  player2: %{
+    ping_pong: [0, 20]
+    rock_paper_scissors: [3, 2]
+  }
+}
+```
+
+</details>
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -30,14 +56,13 @@ Create a full suite of test cases for all of the features described below.
 
 ### Score
 
-The `Games.GlobalScoreTracker` should be able to add a certain number of points given a player name and a game name.
-A game should start with `0` points be default.
+The `AdvancedScoreTracker` should be able to add a certain number of points given a player name and a game name. A game should start with `0` points by default.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Games.GlobalScoreTracker.add(:ping_pong, :player1, 10)
-Games.GlobalScoreTracker.add(:ping_pong, :player1, 10)
+AdvancedScoreTracker.add(:player1, :ping_pong, 10)
+AdvancedScoreTracker.add(:player1, :ping_pong, 10)
 ```
 
 It should also be able to retrieve the total number of points for the current game when provided the name of the game and the player.
@@ -45,19 +70,21 @@ It should also be able to retrieve the total number of points for the current ga
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-20 = Games.GlobalScoreTracker.get(:player1, :ping_pong)
+20 = AdvancedScoreTracker.get(:player1, :ping_pong)
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### New Game
 
-When a game is finished, `Games.GlobalScoreTracker` should be able to start a `new/2` game with a default score of `0`.
+When a game is finished, `AdvancedScoreTracker` should be able to start a new point total with a default score of `0`.
+The previous game total should be saved, see the **History** section below.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Games.GlobalScoreTracker.new(:player1, :ping_pong)
+AdvancedScoreTracker.new(:player1, :ping_pong)
+0 = AdvancedScoreTracker.get(:player1, :ping_pong)
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -67,25 +94,39 @@ Games.GlobalScoreTracker.new(:player1, :ping_pong)
 Retrieve a history of scores for a player and a game as a list of point totals.
 The most recent game should be at the start of the list.
 
-Each value should be the total number of points accumulated before calling `Games.GlobalScoreTracker.new/2` to start a new game.
+Each value should be the total number of points accumulated before calling `AdvancedScoreTracker.new/2` to start a new game.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-[0, 20] = Games.GlobalScoreTracker.history(:player1, :ping_pong)
+[0, 20] = AdvancedScoreTracker.history(:player1, :ping_pong)
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### High Score
 
-Find the highest score from the players history.
+Find a player's highest score from their history.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-20 = Games.GlobalScoreTracker.high_score(:player1, :ping_pong)
+20 = AdvancedScoreTracker.high_score(:player1, :ping_pong)
 ```
+
+Find the highest score out of all players for a game.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = AdvancedScoreTracker.high_score(:ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create A GitHub Repository
+
+Connect your `AdvancedScoreTracker` project to a GitHub repository and create a README to describe the purpose of the project and what you learned building it.
 
 ## Commit Your Progress
 
@@ -94,10 +135,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-games_global_score_tracker
+$ git checkout -b exercise-advanced_score_tracker
 $ git add .
-$ git commit -m "finish games global score tracker exercise"
-$ git push origin exercise-games_global_score_tracker
+$ git commit -m "finish advanced score tracker exercise"
+$ git push origin exercise-advanced_score_tracker
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.

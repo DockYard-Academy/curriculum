@@ -203,6 +203,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Testing With ExUnit
 * ExUnit With Mix Projects
 * Documentation and Static Analysis
+* Executables
+* Group Project
 ## OTP and Advanced Syntax
 * Protocols
 * Recursion

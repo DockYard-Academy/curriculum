@@ -1,0 +1,130 @@
+# Games: Menu
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Games: Menu
+
+In your existing [Games](./games_setup.livemd) project, you're going to create a `Games.Menu` module which allows players to select which game they would like to play.
+
+```
+$ iex -S mix
+iex> Games.Menu.display()
+Select a game:
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+Select: 
+```
+
+Depending on their choice, this let the player play either the [Guessing Game](games_guessing_game.livemd), [Rock Paper Scissors](./games_rock_paper_scissors.livemd),
+or  [Wordle](games_wordle.livemd) games you have already created.
+
+```
+Select a game:
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+Select: 3
+Enter a five letter word:  
+```
+
+## Games: Escript
+
+Configure your game as an Escript. You'll need to create a `Games.CLI` module with a `main/1` function to display the `Games.Menu`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Games.CLI do
+  def main(args) do
+    Games.Menu.display()
+  end
+end
+```
+
+And configure the `Games.CLI` module using the `:escript` option inside of the `Games.MixProject.project/0` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def project do
+    [
+      ...
+      escript: [main_module: Games.CLI]
+    ]
+  end
+```
+
+You should be able to build and start the games project as an escript.
+
+```
+$ mix escript.build
+$ ./games
+Select a game:
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+Select: 
+```
+
+## Bonus: Finish Game
+
+Allow the user to type `"stop"` to end any game. They should then be re-prompted with the menu to select the game they want to play.
+
+```
+Select a game:
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+Select: 1
+Enter your guess:
+stop
+Select a game:
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+Select: 
+```
+
+This may require custom stop logic in each existing game.
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-games_menu
+$ git add .
+$ git commit -m "finish games menu exercise"
+$ git push origin exercise-games_menu
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                     | Next                                         |
+| -------------------------------------------- | -------------------------------------------: |
+| [Executables](../reading/executables.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |
