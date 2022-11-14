@@ -30,9 +30,9 @@ spawn_pid =
   end)
 ```
 
-When we want to execute some code in a process, we shouldn't use [Kernel.spawn/1](https://hexdocs.pm/elixir/Kernel.html#spawn/1) or [Kernel.spawn_link/1](https://hexdocs.pm/elixir/Kernel.html#spawn_link/1) directly. Instead, we should instead rely on the [Task](https://hexdocs.pm/elixir/Task.html) module. The [Task](https://hexdocs.pm/elixir/Task.html) module allows us to spawn a process, perform some work in that process, then end the process when our work is finished.
+When we want to execute some code in a process, we shouldn't use [Kernel.spawn/1](https://hexdocs.pm/elixir/Kernel.html#spawn/1) or [Kernel.spawn_link/1](https://hexdocs.pm/elixir/Kernel.html#spawn_link/1) directly. Instead, we should rely on the [Task](https://hexdocs.pm/elixir/Task.html) module. The [Task](https://hexdocs.pm/elixir/Task.html) module allows us to spawn a process, perform some work in that process, then end the process when our work is finished.
 
-[Task](https://hexdocs.pm/elixir/Task.html) is also OTP-compliant, meaning it conform to certiain OTP conventions that improve error handling, and allow them to start under a supervisor.
+[Task](https://hexdocs.pm/elixir/Task.html) is also OTP-compliant, meaning it conform to certain OTP conventions that improve error handling, and allow them to start under a supervisor.
 
 ## Fire-and-Forget
 
@@ -87,7 +87,7 @@ Task.await(task1) |> IO.inspect(label: "Task 1 Response")
 Task.await(task2) |> IO.inspect(label: "Task 2 Response")
 ```
 
-A computer with a multi-core processor can perform these cpmcirremt computations in parallel, which may make our program faster. In reality, it's a bit more complicated than this, but this is a reasonable mental model for now to understand why concurrency is useful for improving performance.
+A computer with a multi-core processor can perform these concurrent computations in parallel, which may make our program faster. In reality, it's a bit more complicated than this, but this is a reasonable mental model for now to understand why concurrency is useful for improving performance.
 
 Here we use the **par** boxes to demonstrate operations happening in parallel.
 
@@ -185,7 +185,7 @@ Then we can also use enumeration to `await/1` each task.
 Enum.map(tasks, fn task -> Task.await(task) end)
 ```
 
-Alernatively, you can use the convenient `Taskl.await_many/1` function instead.
+Alternatively, you can use the convenient `Taskl.await_many/1` function instead.
 
 ```elixir
 tasks =
