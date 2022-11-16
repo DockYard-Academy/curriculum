@@ -31,11 +31,29 @@ Now we're going to learn about managing state using [Agent](https://hexdocs.pm/e
 ```
 
 ```elixir
-Agent.update(counter_pid, fn state -> state + 1 end)
+:sys.get_state(counter_pid)
 ```
 
 ```elixir
-Agent.get(counter_pid, fn state -> state end)
+Agent.update(counter_pid, fn state ->
+  Process.sleep(1000)
+  state + 1
+end)
+
+IO.puts("I ran")
+```
+
+```elixir
+Agent.get_and_update(counter_pid, fn previous_state ->
+  new_state = previous_state + 1
+  {new_state, new_state}
+end)
+```
+
+```elixir
+Agent.get(counter_pid, fn state ->
+  state
+end)
 ```
 
 Often, we'll put Agent functions into a module to abstract how state is stored and manipulated and only expose the desired functionality.
@@ -109,7 +127,13 @@ Try changing the `:key` and `value` to see that the `:ets` table will store any 
 However, the `:ets` table will only store one value for a given key.
 
 ```elixir
-:ets.insert(table, {:key, "value"})
+:ets.insert(table, {:hello, "hi"})
+```
+
+```elixir
+kw_list = :ets.lookup(table, :key)
+
+value = kw_list[:key]
 ```
 
 ### Named Tables
@@ -223,6 +247,10 @@ bag = :ets.new(:bag_example, [:bag])
 
 # We return the bag table to display it in livebook.
 bag
+```
+
+```elixir
+:ets.lookup(bag, :key)
 ```
 
 **:duplicate_bag**
@@ -366,7 +394,7 @@ defmodule SlowFib do
   end
 end
 
-SlowFib.of(6)
+SlowFib.of(100)
 ```
 
 We can improve performance by saving each input/output in a cache so we don't have to re-compute the same values over and over. You can think of this cache as a table of inputs and outputs. For each input, we store the computed output rather than re-performing the calculation.
@@ -446,7 +474,7 @@ defmodule CachedFib do
   end
 end
 
-CachedFib.of(50)
+CachedFib.of(100)
 ```
 
 ### Your Turn
