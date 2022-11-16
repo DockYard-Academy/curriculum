@@ -28,7 +28,7 @@ This set of drills is for [Supervisors](../reading/supervisors.livemd) and [GenS
 
 ## GenServer
 
-Create a `Zero` `Genserver` that does nothing other than store the integer `0` in its state. Use `GenServer.start_link/3` to start the `Zero` process. Use `:sys.get_state/1` to view the state of your `Zero` process.
+Create a `Zero` `Genserver` that does nothing other than store the integer `0` in its state. Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start the `Zero` process. Use `:sys.get_state/1` to view the state of your `Zero` process.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -53,7 +53,7 @@ end
 
 ```
 
-Use `GenServer.start_link/3` to start your `Zero` `GenServer` as a named process.
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start your `Zero` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as a named process.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -68,9 +68,9 @@ GenServer.start_link(Zero, "init_arg", [name: :my_name])
 
 ```
 
-Create a `SimpleCounter` `GenServer` whose state starts as `0`. Implement a `GenServer.handle_call/3` callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.
+Create a `SimpleCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose state starts as `0`. Implement a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.
 
-Use `GenServer.start_link/3` and `GenServer.call/3` to spawn a `SimpleCounter` process and send it an `:increment` message.
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) and [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) to spawn a `SimpleCounter` process and send it an `:increment` message.
 
 Use `:sys.get_state/1` to see that the state of the counter has incremented.
 
@@ -101,7 +101,7 @@ GenServer.call(pid, :increment)
 
 ```
 
-Create an `InitialState` `GenServer` whose initial state can be configured. Call `GenServer.start_link/3` to spawn a `State` GenServer with an initial state. Use `:sys.get_state/1` to confirm the state matches your configured state.
+Create an `InitialState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose initial state can be configured. Call [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to spawn a `State` GenServer with an initial state. Use `:sys.get_state/1` to confirm the state matches your configured state.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -131,9 +131,9 @@ Create a `State` module.
 
 It should:
 
-* Define a `State.get/1` function that uses `GenServer.call/3` and a `GenServer.handle_call/3` callback function to retrieve state.
-* Define a `State.set/2` function that uses `GenServer.cast/2` and a `GenServer.handle_cast/2` callback function to update state.
-* Define a `State.start_link/3` function with a `GenServer.init/1` callback function to initialize the `GenServer` with a configurable state.
+* Define a `State.get/1` function that uses [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) and a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function to retrieve state.
+* Define a `State.set/2` function that uses [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) and a [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2) callback function to update state.
+* Define a `State.start_link/3` function with a [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1) callback function to initialize the [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a configurable state.
 
 Manually test each function (`State.set/2`, `State.get/1` and `State.start_link/3`) to confirm they work as expected.
 
@@ -185,7 +185,7 @@ State.set(pid, "updated state")
 
 ```
 
-Create a minimal `Named` `GenServer` that can be started and configured as a named process using `Named.start_link/1`. Start a `Named` process and use `GenServer.whereis/1` and/or `Process.whereis/1` to find the pid of the named process.
+Create a minimal `Named` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process using `Named.start_link/1`. Start a `Named` process and use [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -214,7 +214,7 @@ Process.whereis(:my_configured_name)
 
 ```
 
-Create a minimal `NamedState` `GenServer` that can be started and configured as a named process with a configurable state using `NamedState.start_link`. Use `:sys.get_state/1` to confirm the initial state is as expected and `GenServer.whereis/1` and/or `Process.whereis/1` to find the pid of the named process.
+Create a minimal `NamedState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process with a configurable state using `NamedState.start_link`. Use `:sys.get_state/1` to confirm the initial state is as expected and [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -271,7 +271,7 @@ Process.whereis(:keyword_list_example)
 
 ## Supervisor
 
-We've created a `Worker` `GenServer` for you to use with the following `Supervisor` drills.
+We've created a `Worker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) for you to use with the following [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) drills.
 
 ```elixir
 defmodule Worker do
@@ -287,7 +287,7 @@ defmodule Worker do
 end
 ```
 
-Use `Supervisor.start_link/3` to start a supervisor process with no children. Use `Supervisor.which_children/1` to see the empty list of children.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) to start a supervisor process with no children. Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) to see the empty list of children.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -312,7 +312,7 @@ Supervisor.start_link([], strategy: :one_for_one)
 
 ```
 
-Use `Supervisor.start_link/3` function to start a supervisor with the `Worker` as a child using the **map** syntax.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -334,7 +334,7 @@ Supervisor.start_link(children, strategy: :one_for_one)
 
 ```
 
-Use `Supervisor.start_link/3` function to start a supervisor three `Worker` children using the **map** syntax.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor three `Worker` children using the **map** syntax.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -364,7 +364,7 @@ Supervisor.start_link(children, strategy: :one_for_one)
 
 ```
 
-Use `Supervisor.start_link/3` function to start a supervisor with the `Worker` as a child using the **tuple** syntax.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **tuple** syntax.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -383,7 +383,7 @@ Supervisor.start_link(children, strategy: :one_for_one)
 
 ```
 
-Use `Supervisor.start_link/3` function to start a supervisor with the `Worker` as a child using the **map** syntax to start the `Worker` process as a named process.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax to start the `Worker` process as a named process.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -405,9 +405,9 @@ Supervisor.start_link(children, strategy: :one_for_one)
 
 ```
 
-Usually worker GenServers should define a `start_link/1` function to start under a supervision tree. However, this is idiomatic and we can (but usually shoudn't) break this rule.
+Usually worker GenServers should define a `start_link/1` function to start under a supervision tree. However, this is idiomatic and we can (but usually shouldn't) break this rule.
 
-Start the following `NonIdiomatic` `GenServer` under a supervision tree using the `starter/3` function.
+Start the following `NonIdiomatic` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under a supervision tree using the `starter/3` function.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -439,7 +439,7 @@ defmodule NonIdiomatic do
 end
 ```
 
-Use `Supervisor.start_link/3` function to start a supervisor with three `Worker` children using the **tuple** syntax.
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with three `Worker` children using the **tuple** syntax.
 
 This should cause the supervisor to crash because each `Worker` has the same id.
 
@@ -470,7 +470,7 @@ Supervisor.start_link(children, strategy: :one_for_one)
 
 2. Create a new unsupervised mix project **without the `--sup` flag** and configure it with a supervisor.
 
-* Create an `Application` module in a `lib/my_app/application.ex` file.
+* Create an [Application](https://hexdocs.pm/elixir/Application.html) module in a `lib/my_app/application.ex` file.
   <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
@@ -500,10 +500,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-task_drills
+$ git checkout -b exercise-supervisor_and_genserver_drills
 $ git add .
-$ git commit -m "finish task drills exercise"
-$ git push origin exercise-task_drills
+$ git commit -m "finish supervisor and genserver drills exercise"
+$ git push origin exercise-supervisor_and_genserver_drills
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -516,6 +516,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                             | Next                                                               |
-| ---------------------------------------------------- | -----------------------------------------------------------------: |
-| [Task Supervisor](../reading/task_supervisor.livemd) | [Concurrent Word Count](../exercises/concurrent_word_count.livemd) |
+| Previous                                                           | Next                                                                 |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------: |
+| [Supervised Mix Project](../reading/supervised_mix_project.livemd) | [Games Supervisor Setup](../exercises/games_supervisor_setup.livemd) |
