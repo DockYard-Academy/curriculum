@@ -189,17 +189,17 @@ end
 ```elixir
 defmodule SafeRange do
   def range(first, last, step \\ 1) do
-    start..finish//step
+    first..last//step
   end
 
   def range!(first, last, step \\ 1) do
     cond do
       step < 0 and first < last ->
         raise "Invalid step value of: #{step}"
-      last < first ->
+      step > 0 and first > last ->
         raise "Invalid step value of: #{step}"
       true -> first..last//step
-    end       
+    end
   end
 end
 ```
