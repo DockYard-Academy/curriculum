@@ -31,29 +31,11 @@ Now we're going to learn about managing state using [Agent](https://hexdocs.pm/e
 ```
 
 ```elixir
-:sys.get_state(counter_pid)
+Agent.update(counter_pid, fn state -> state + 1 end)
 ```
 
 ```elixir
-Agent.update(counter_pid, fn state ->
-  Process.sleep(1000)
-  state + 1
-end)
-
-IO.puts("I ran")
-```
-
-```elixir
-Agent.get_and_update(counter_pid, fn previous_state ->
-  new_state = previous_state + 1
-  {new_state, new_state}
-end)
-```
-
-```elixir
-Agent.get(counter_pid, fn state ->
-  state
-end)
+Agent.get(counter_pid, fn state -> state end)
 ```
 
 Often, we'll put Agent functions into a module to abstract how state is stored and manipulated and only expose the desired functionality.
