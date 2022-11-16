@@ -1,0 +1,521 @@
+# Supervisor and GenServer Drills
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Supervisors](../reading/supervisors.livemd) and [GenServers](../reading/generic_server.livemd) and using them with [Supervised Mix Projects](../reading/supervised_mix_project.livemd).
+
+> A GenServer is a process like any other Elixir process and it can be used to keep state, execute code asynchronously and so on. The advantage of using a generic server process (GenServer) implemented using this module is that it will have a standard set of interface functions and include functionality for tracing and error reporting. It will also fit into a supervision tree.
+> 
+> [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html)
+
+> A supervisor is a process which supervises other processes, which we refer to as child processes. Supervisors are used to build a hierarchical process structure called a supervision tree. Supervision trees provide fault-tolerance and encapsulate how our applications start and shutdown.
+> 
+> [HexDocs: GenServer](https://hexdocs.pm/elixir/Supervisor.html)
+
+## GenServer
+
+Create a `Zero` `Genserver` that does nothing other than store the integer `0` in its state. Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start the `Zero` process. Use `:sys.get_state/1` to view the state of your `Zero` process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Zero do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Zero, "init_arg")
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start your `Zero` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as a named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+GenServer.start_link(Zero, "init_arg", [name: :my_name])
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a `SimpleCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose state starts as `0`. Implement a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.
+
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) and [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) to spawn a `SimpleCounter` process and send it an `:increment` message.
+
+Use `:sys.get_state/1` to see that the state of the counter has incremented.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule SimpleCounter do
+  use GenServer do
+  
+  def init(_opts) do
+    {:ok, 0}
+  end
+  
+  def handle_call(:increment, _from, state) do
+    {:reply, :ok, state + 1}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(SimpleCounter, [])
+GenServer.call(pid, :increment)
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create an `InitialState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose initial state can be configured. Call [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to spawn a `State` GenServer with an initial state. Use `:sys.get_state/1` to confirm the state matches your configured state.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule InitialState do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(InitialState, "my initial state")
+
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a `State` module.
+
+It should:
+
+* Define a `State.get/1` function that uses [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) and a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function to retrieve state.
+* Define a `State.set/2` function that uses [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) and a [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2) callback function to update state.
+* Define a `State.start_link/3` function with a [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1) callback function to initialize the [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a configurable state.
+
+Manually test each function (`State.set/2`, `State.get/1` and `State.start_link/3`) to confirm they work as expected.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule State do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state)
+  end
+
+  def get(pid) do
+    GenServer.call(pid, :get)
+  end
+  
+  def set(pid, new_state) do
+    GenServer.call(pid, {:set, new_state})
+  end
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_call(:get, _from, state) do
+    {:reply, state, state}
+  end
+  
+  @impl true
+  def handle_call({:set, new_state}, _from, state) do
+    # response is not specified
+    {:reply, new_state, new_state}
+  end
+end
+
+{:ok, pid} = State.start_link("initial state")
+"initial state" = State.get(pid)
+State.set(pid, "updated state")
+"updated state" = State.get(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a minimal `Named` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process using `Named.start_link/1`. Start a `Named` process and use [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Named do
+  use GenServer
+
+  def start_link(opts) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, [], name: name)
+  end
+
+  def init(_opts) do
+    {:ok, "any state!"}
+  end
+end
+
+Named.start_link([name: :my_configured_name])
+Process.whereis(:my_configured_name)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a minimal `NamedState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process with a configurable state using `NamedState.start_link`. Use `:sys.get_state/1` to confirm the initial state is as expected and [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+There are many ways to configure `NamedState.start_link/1`
+
+Using multiple parameters:
+
+```elixir
+defmodule NamedState do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+NamedState.start_link("initial state", name: :multi_arg_example)
+
+Process.whereis(:multi_arg_example)
+```
+
+Using a keyword list with different keys:
+
+```elixir
+defmodule NamedState do
+  use GenServer
+
+  def start_link(opts) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    state = Keyword.get(opts, :state)
+    GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+NamedState.start_link(state: "initial state", name: :keyword_list_example)
+Process.whereis(:keyword_list_example)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Supervisor
+
+We've created a `Worker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) for you to use with the following [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) drills.
+
+```elixir
+defmodule Worker do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) to start a supervisor process with no children. Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) to see the empty list of children.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We often bind `children` to a variable in demonstrations.
+
+```elixir
+children = []
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+But that's not enforced, just idiomatic.
+
+```elixir
+Supervisor.start_link([], strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state"]}
+  } 
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor three `Worker` children using the **map** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state"]}
+  },
+  %{
+    id: :worker2,
+    start: {Worker, :start_link, ["initial state"]}
+  },
+  %{
+    id: :worker3,
+    start: {Worker, :start_link, ["initial state"]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **tuple** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  {Worker, "initial state"}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax to start the `Worker` process as a named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state", name: :named_worker1]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Usually worker GenServers should define a `start_link/1` function to start under a supervision tree. However, this is idiomatic and we can (but usually shouldn't) break this rule.
+
+Start the following `NonIdiomatic` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under a supervision tree using the `starter/3` function.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :never_do_this,
+    start: {NonIdiomatic, :starter, ["arg", "arg", "arg"]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+defmodule NonIdiomatic do
+  use GenServer
+
+  def starter(_arg1, _arg2, _arg3) do
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def init(_opts) do
+    {:ok, "initial state"}
+  end
+end
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with three `Worker` children using the **tuple** syntax.
+
+This should cause the supervisor to crash because each `Worker` has the same id.
+
+Comment your solution when finished to avoid crashing this livebook.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  {Worker, "initial state"},
+  {Worker, "initial state"},
+  {Worker, "initial state"}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Mix Projects
+
+1. Create a new mix empty mix project using the `--sup` flag.
+
+2. Create a new unsupervised mix project **without the `--sup` flag** and configure it with a supervisor.
+
+* Create an [Application](https://hexdocs.pm/elixir/Application.html) module in a `lib/my_app/application.ex` file.
+  <!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = []
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+end
+```
+
+* Configure the mix project in `mix.exs` to use the application module.
+
+```elixir
+def application do
+  # make sure to keep the existing options and add the following:
+  [mod: {MyApp.Application, []}]
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-supervisor_and_genserver_drills
+$ git add .
+$ git commit -m "finish supervisor and genserver drills exercise"
+$ git push origin exercise-supervisor_and_genserver_drills
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                           | Next                                                                 |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------: |
+| [Supervised Mix Project](../reading/supervised_mix_project.livemd) | [Games Supervisor Setup](../exercises/games_supervisor_setup.livemd) |

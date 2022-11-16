@@ -20,7 +20,7 @@ This set of drills is for [Tasks](../reading/task.livemd). Follow the instructio
 
 ## Task.await/2
 
-Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to spawn a task process that doubles every number in the range `1..10`.
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to spawn a task process that returns any response.
 
 ```elixir
 
@@ -42,8 +42,52 @@ Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/
 
 Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) to spawn a task process that returns any response.
 
-```elixir
+<!-- livebook:{"break_markdown":true} -->
 
+### Slow Operation
+
+```elixir
+# 1000 operations
+{time, _result} = :timer.tc(fn -> Enum.map(1..10, fn int -> Process.sleep(1000) end) end)
+time
+```
+
+```elixir
+{time, _result} =
+  :timer.tc(fn ->
+    # 1000 tasks
+    # 1000 operations -> parallel
+    tasks =
+      Enum.map(1..10, fn int ->
+        Task.async(fn ->
+          IO.puts("starting task #{int}")
+          Process.sleep(1000)
+        end)
+      end)
+
+    Task.await_many(tasks)
+  end)
+
+10_009_225
+1_001_494
+```
+
+### Fast Operation
+
+```elixir
+# 1000 operations
+{time, _result} = :timer.tc(fn -> Enum.map(1..10, fn int -> int * 2 end) end)
+time
+```
+
+```elixir
+{time, _result} =
+  :timer.tc(fn ->
+    # 1000 tasks
+    # 1000 operations -> parallel
+    tasks = Enum.map(1..10, fn int -> Task.async(fn -> int * 2 end) end)
+    Task.await_many(tasks)
+  end)
 ```
 
 Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) to spawn a task process that sleeps for six seconds and returns any response. Notice that the yield is `nil`.
