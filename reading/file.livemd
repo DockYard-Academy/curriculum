@@ -46,6 +46,10 @@ CONTRIBUTING.md  README.md  data  exercises   flake.nix  reading                
 LICENSE          _build     deps  flake.lock  images     removed_content_tracking.md  start.livemd  v_graph.livemd
 ```
 
+```elixir
+Path.absname("exercises")
+```
+
 ## Absolute Path Vs Relative Path
 
 The **absolute path** is the absolute path to a file relative to the computer's root directory. For example, we can see the absolute path of the current file using [__DIR__](https://hexdocs.pm/elixir/1.13/Kernel.SpecialForms.html#__DIR__/0).
@@ -179,14 +183,18 @@ Experiment with the functions above. Refer to the documentation for examples you
 
 ## Bang Functions
 
-Many functions in the [File](https://hexdocs.pm/elixir/File.html) module have a bang version ending in `!`. Bang functions raise an error if they fail. Regular functions typically return an `{:ok, value}` or an `{:error, reason}` tuple.
+Many functions in the [File](https://hexdocs.pm/elixir/File.html) module have a bang version ending in `!`. 
+
+Bang functions raise an error if they fail. 
 
 ```elixir
-File.ls()
+File.ls!("invalid")
 ```
 
+Regular functions typically return an `{:ok, value}` or an `{:error, reason}` tuple.
+
 ```elixir
-File.ls!()
+File.ls("invalid")
 ```
 
 Use a bang function if you expect that the function should always succeed or if you want to raise an error. Use a regular function if you want specific error handling or don't care if the function fails.
@@ -298,6 +306,7 @@ File.write!("open_close.txt", content)
 IO.read(file, :line) |> IO.inspect()
 IO.read(file, :line) |> IO.inspect()
 IO.read(file, :line) |> IO.inspect()
+IO.read(file, :line) |> IO.inspect()
 
 File.close(file)
 
@@ -306,7 +315,7 @@ File.close(file)
 File.rm!("open_close.txt")
 ```
 
-[IO.binwrite/2](https://hexdocs.pm/elixir/IO.html#binwrite/2) writes over the entire content of the file. We need to open the file with the `:write` option to enable write permission.
+[IO.read/2](https://hexdocs.pm/elixir/IO.html#read/2) writes over the entire content of the file. We need to open the file with the `:write` option to enable write permission.
 
 ```elixir
 File.write!("open_close.txt", content)
