@@ -69,7 +69,8 @@ defmodule Journal do
 
       iex> {:ok, pid} = Journal.start_link(entries: ["Entry1", "Entry 2"])
   """
-  def start_link(_opts) do
+  def start_link(opts) do
+    Agent.start_link(fn -> opts end)
   end
 
   @doc """
@@ -101,8 +102,22 @@ defmodule Journal do
       iex> Journal.all_entries(pid, order: :desc)
       ["Entry 2", "Entry 1"]
   """
-  def all_entries(pid, opts \\ []) do
+
+  def all_entries(pid, order: :desc) do
+    Agent.get(pid, fn state -> state end)
   end
+
+  def all_entries(pid, order: :asc) do
+    Agent.get(pid, fn state -> state end) |> Enum.reverse()
+  end
+
+  def all_entries(pid) do
+    Agent.get(pid, fn state -> state end) |> Enum.reverse()
+  end
+
+  # def all_entries(pid, _opts \\ []) do
+  #   Agent.get(pid, fn state -> state end)
+  # end
 
   @doc """
   Add a journal entry.
@@ -118,8 +133,15 @@ defmodule Journal do
     ["Entry 1", "Entry 2"]
   """
   def add_entry(pid, entry) do
+    Agent.update(pid, fn state -> [entry | state] end)
   end
 end
+
+{:ok, pid} = Journal.start_link([])
+Journal.add_entry(pid, "First (oldest)")
+Journal.add_entry(pid, "Second")
+Journal.add_entry(pid, "Third (newest)")
+Journal.all_entries(pid)
 ```
 
 ## Bonus: Advanced Journal
