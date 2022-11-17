@@ -220,12 +220,12 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Concurrency With Tasks
 * State Management With Agents and ETS
 * Persistence Using the File System
-* Data Validation
 ## Web Servers and Phoenix
 * HTML and CSS
 * APIs & Parsing JSON
 * Phoenix
 ## Databases With Ecto
+* Data Validation
 * Relational Database Management Systems and Ecto
 * Phoenix and Ecto
 * Phoenix Authentication

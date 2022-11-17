@@ -1,0 +1,152 @@
+# Document Tools
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Document Tools
+
+You're going to create a `Document` module which provides some convenient function for working with text files.
+
+Once you have a working solution, consider how you can optimize it to reduce how much of a file you load into memory.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+There are many different solutions to this problem. This is only a single example.
+
+```elixir
+defmodule Document do
+  def word_count(file_name) do
+    file = File.open!(file_name)
+    count = count_words(file)
+    File.close(file)
+    count
+  end
+
+  defp count_words(file, count \\ 0) do
+    case IO.read(file, :line) do
+      :eof ->
+        count
+
+      line ->
+        word_count_in_line = line |> String.split(" ", trim: true) |> Enum.count()
+        count_words(file, count + word_count_in_line)
+    end
+  end
+
+  def line_count(file_name) do
+    file = File.open!("example")
+    count = count_lines(file)
+    File.close(file)
+    count
+  end
+
+  defp count_lines(file, count \\ 0) do
+    case IO.read(file, :line) do
+      :eof -> count
+      _ -> count_lines(file, count + 1)
+    end
+  end
+
+  def add_line_numbers(file_name) do
+    lined_content =
+      File.stream!(file_name)
+      |> Stream.with_index()
+      |> Stream.map(fn {line, index} -> "#{index + 1}. #{line}" end)
+      |> Enum.join("\n")
+
+    File.write!(file_name, lined_content)
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule Document do
+  @moduledoc """
+    Documentation for `Document` module.
+  """
+
+  @doc """
+  Count the number of words in a document.
+
+  ## Examples
+
+      Any sequence of characters separated by a space will be considered a word.
+
+      iex> File.write("word_count.txt", "one two three")
+      iex> Document.word_count("word_count.txt")
+      3
+      
+      Ensure your solution ignores newline characters.
+
+      iex> File.write("word_count.txt", "one\ntwo\nthree")
+      iex> Document.word_count("word_count.txt")
+      3
+  """
+  def word_count(file_name) do
+  end
+
+  @doc """
+  Count the number of words in a document.
+
+  ## Examples
+
+      iex> File.write("line_count.txt", "line1\nline2\nline3\n")
+      iex> Document.line_count("example.txt")
+      3
+  """
+  def line_count(file_name) do
+  end
+
+  @doc """
+  Add line numbers formatted as "X. rest of line" to an existing file.
+
+  ## Examples
+
+    iex> File.write("add_line_numbers.txt", "one\n\ntwo\nthree")
+    iex> Document.add_line_numbers("add_line_numbers.txt")
+    iex> File.read!("add_line_numbers.txt")
+    "1. one\n2. two\n3. three
+  """
+  def add_line_numbers(file_name) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-document_tools
+$ git add .
+$ git commit -m "finish document tools exercise"
+$ git push origin exercise-document_tools
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                         | Next                                           |
+| ---------------------------------------------------------------- | ---------------------------------------------: |
+| [File System Todo App](../exercises/file_system_todo_app.livemd) | [File Search](../exercises/file_search.livemd) |

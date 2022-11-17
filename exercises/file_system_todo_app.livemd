@@ -16,55 +16,83 @@ Mix.install([
 
 You're going to create a TodoList application with persistence using a file system.
 
-The `TodoList` module should be able to:
-
-`add/1` an item to our todo list.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-TodoList.add("go get groceries")
-{:ok, ["go get groceries"]}
-```
-
-`list/1` the items in our todo list.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-TodoList.list()
-["go get groceries"]
-```
-
-`complete/1` an item in our todo list. This should delete the item and return the remaining elements in the todo list.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-TodoList.complete("go get groceries")
-{:ok, []}
-```
-
-If an item does not exist, it should return an error tuple.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-TodoList.complete("non existing item")
-{:error, :not_found}
-```
-
-Enter your solution in the Elixir cell below.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule TodoList do
+  @storage "todolist"
+
+  def list do
+    case File.read(@storage) do
+      {:ok, list} -> :erlang.binary_to_term(list)
+      # other operations will create the storage if it does not yet exist.
+      _ -> []
+    end
+  end
+
   def add(item) do
+    new_list = [item | list()]
+    File.write(@storage, :erlang.term_to_binary(new_list))
   end
 
   def complete(item) do
+    new_list = list() -- [item]
+    File.write(@storage, :erlang.term_to_binary(new_list))
+  end
+end
+```
+
+</details>
+
+Implement the `TodoList` module as documented. You may choose any file for your persistence mechanism.
+
+```elixir
+defmodule TodoList do
+  @moduledoc """
+  Documentation for `TodoList`
+  """
+  @storage "todolist"
+
+  @doc """
+  Retrieve the persistent todo list.
+
+  ## Examples
+
+      iex> TodoList.list()
+      []
+  """
+  def list do
   end
 
-  def list do
+  @doc """
+  Add an item to our persistent todo list.
+
+  ## Examples
+
+      iex> TodoList.add("finish homework")
+      iex> TodoList.list()
+      ["finish homework"]
+      
+      iex> TodoList.add("task 1")
+      iex> TodoList.add("task 2")
+      iex> TodoList.list()
+      ["task 2", "task 1"]
+  """
+  def add(item) do
+  end
+
+  @doc """
+  Complete (remove) and item from the persistent todo list.
+
+  ## Examples
+
+      iex> TodoList.add("finish homework")
+      iex> TodoList.complete("finish homework")
+      iex> TodoList.list()
+      []
+  """
+  def complete(item) do
   end
 end
 ```
@@ -92,6 +120,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                   | Next                                         |
-| ------------------------------------------ | -------------------------------------------: |
-| [Save Game](../exercises/save_game.livemd) | [File Types](../exercises/file_types.livemd) |
+| Previous                                   | Next                                                 |
+| ------------------------------------------ | ---------------------------------------------------: |
+| [Save Game](../exercises/save_game.livemd) | [Document Tools](../exercises/document_tools.livemd) |

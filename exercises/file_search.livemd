@@ -1,0 +1,97 @@
+# File Search
+
+```elixir
+Mix.install([
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## File Search
+
+Create a `FileSearch` module which can recursively search files in all nested folders.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule FileSearch do
+  def all(folder) do
+    File.ls!(folder)
+    |> Enum.map(fn file_or_folder ->
+      path = Path.join(folder, file_or_folder)
+
+      if File.dir?(path) do
+        all(path)
+      else
+        file_or_folder
+      end
+    end)
+    |> List.flatten()
+  end
+end
+```
+
+</details>
+
+Implement the `FileSearch` module as documented.
+
+```elixir
+defmodule FileSearch do
+  @moduledoc """
+  Documentation for FileSearch
+  """
+
+  @doc """
+  Find all nested files.
+
+  For example, given the following folder structure
+  /main
+    /sub1
+      file1.txt
+    /sub2
+      file2.txt
+    /sub3
+      file3.txt
+    file4.txt
+
+  It would return:
+
+  ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
+  """
+  def all(folder) do
+  end
+end
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-file_search
+$ git add .
+$ git commit -m "finish file search exercise"
+$ git push origin exercise-file_search
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                             | Next                                   |
+| ---------------------------------------------------- | -------------------------------------: |
+| [Document Tools](../exercises/document_tools.livemd) | [HTML CSS](../reading/html_css.livemd) |
