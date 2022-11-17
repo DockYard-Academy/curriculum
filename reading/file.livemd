@@ -288,39 +288,39 @@ File.rm("stream.txt")
 
 We use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2) and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to open a file and perform some operations, then close it when we're finished.
 
-While the file is open, we use [IO](https://hexdocs.pm/elixir/IO.html) module functions [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2) and [IO.binwrite/2](https://hexdocs.pm/elixir/IO.html#binwrite/2) to read and write to the file. The [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2) function can read a new line each time we call it.
+While the file is open, we use `IO.read/2` and `IO.write/2` to read and write to the file. The [IO.read/2](https://hexdocs.pm/elixir/IO.html#read/2) function can read a new line each time we call it.
 
 ```elixir
-File.write!("binwrite_example.txt", content)
+File.write!("open_close.txt", content)
 
 {:ok, file} = File.open("open_close.txt")
 
-IO.binread(file, :line) |> IO.inspect()
-IO.binread(file, :line) |> IO.inspect()
-IO.binread(file, :line) |> IO.inspect()
+IO.read(file, :line) |> IO.inspect()
+IO.read(file, :line) |> IO.inspect()
+IO.read(file, :line) |> IO.inspect()
 
 File.close(file)
 
 # cleaning up file.
 
-File.rm!("binwrite_example.txt")
+File.rm!("open_close.txt")
 ```
 
 [IO.binwrite/2](https://hexdocs.pm/elixir/IO.html#binwrite/2) writes over the entire content of the file. We need to open the file with the `:write` option to enable write permission.
 
 ```elixir
-File.write!("binwrite_example.txt", content)
+File.write!("open_close.txt", content)
 
-{:ok, file} = File.open("binwrite_example.txt", [:write])
+{:ok, file} = File.open("open_close.txt", [:write])
 
-IO.binwrite(file, "written content")
+IO.write(file, "written content")
 
 File.close(file)
 
-File.read("binwrite_example.txt") |> IO.inspect(label: "Updated File")
+File.read("open_close.txt") |> IO.inspect(label: "Updated File")
 
 # cleaning up file.
-File.rm!("binwrite_example.txt")
+File.rm!("open_close.txt")
 ```
 
 ## Further Reading

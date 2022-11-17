@@ -1,4 +1,4 @@
-# File Types
+# File Search
 
 ```elixir
 Mix.install([
@@ -12,29 +12,59 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## File Types
+## File Search
 
-Create a `FileTypes` module which can display the number of files of a given type in a folder.
+Create a `FileSearch` module which can recursively search files in all nested folders.
 
-For example, we have create a `file_types` folder with several files inside of it.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-File.ls!("data/file_types")
+defmodule FileSearch do
+  def all(folder) do
+    File.ls!(folder)
+    |> Enum.map(fn file_or_folder ->
+      path = Path.join(folder, file_or_folder)
+
+      if File.dir?(path) do
+        all(path)
+      else
+        file_or_folder
+      end
+    end)
+    |> List.flatten()
+  end
+end
 ```
 
-Provided a folder, your `FileTypes` module should return the number of files by their extension.
+</details>
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-[txt: 2, ex: 2, png: 1, jpg: 1] = FileTypes.find("data/file_types")
-```
-
-Enter your solution below.
+Implement the `FileSearch` module as documented.
 
 ```elixir
-defmodule FileTypes do
-  def find(folder) do
+defmodule FileSearch do
+  @moduledoc """
+  Documentation for FileSearch
+  """
+
+  @doc """
+  Find all nested files.
+
+  For example, given the following folder structure
+  /main
+    /sub1
+      file1.txt
+    /sub2
+      file2.txt
+    /sub3
+      file3.txt
+    file4.txt
+
+  It would return:
+
+  ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
+  """
+  def all(folder) do
   end
 end
 ```
