@@ -133,7 +133,7 @@ It should:
 
 * Define a `State.get/1` function that uses [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) and a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function to retrieve state.
 * Define a `State.set/2` function that uses [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) and a [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2) callback function to update state.
-* Define a `State.start_link/3` function with a [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1) callback function to initialize the [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a configurable state.
+* Define a `State.start_link/3` function with a `State.init/1` callback function to initialize the [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a configurable state.
 
 Manually test each function (`State.set/2`, `State.get/1` and `State.start_link/3`) to confirm they work as expected.
 
@@ -141,20 +141,9 @@ Manually test each function (`State.set/2`, `State.get/1` and `State.start_link/
 <summary>Example Solution</summary>
 
 ```elixir
+
 defmodule State do
   use GenServer
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state)
-  end
-
-  def get(pid) do
-    GenServer.call(pid, :get)
-  end
-  
-  def set(pid, new_state) do
-    GenServer.call(pid, {:set, new_state})
-  end
 
   @impl true
   def init(state) do
@@ -162,14 +151,26 @@ defmodule State do
   end
 
   @impl true
+  def handle_cast({:set, new_state}, state) do
+    {:noreply, new_state}
+  end
+
+  @impl true
   def handle_call(:get, _from, state) do
+    # response is not specified
     {:reply, state, state}
   end
-  
-  @impl true
-  def handle_call({:set, new_state}, _from, state) do
-    # response is not specified
-    {:reply, new_state, new_state}
+
+  def start_link(state) do
+    GenServer.start_link(pid, state)
+  end
+
+  def set(pid, new_state) do
+    GenServer.cast(pid, {:set, new_state})
+  end
+
+  def get(pid) do
+    GenServer.call(pid, :get)
   end
 end
 
