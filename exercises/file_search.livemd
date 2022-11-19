@@ -13,6 +13,10 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
+## Mastery
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
+
 ## File Search
 
 Create a `FileSearch` module which can recursively search files in all nested folders.
@@ -34,6 +38,13 @@ defmodule FileSearch do
       end
     end)
     |> List.flatten()
+  end
+
+  def by_extension(folder) do
+    all(folder) |> Enum.reduce(%{}, fn file_name, acc ->
+      extension = Path.extname(file_name)
+      Map.update(acc, extension, [file_name], fn files -> [file_name | files] end)
+    end)
   end
 end
 ```
@@ -67,7 +78,58 @@ defmodule FileSearch do
   """
   def all(folder) do
   end
+
+  @doc """
+  Find all nested files and categorize them by their extension.
+
+  For example, given the following folder structure
+  /main
+    /sub1
+      file1.txt
+      file1.png
+    /sub2
+      file2.txt
+      file2.png
+    /sub3
+      file3.txt
+      file3.jpg
+    file4.txt
+
+  The exact order and return value are up to you as long as it finds all files 
+  and categorizes them by file extension.
+
+  For example, it might return the following:
+
+  %{
+    ".txt" => ["file1.txt", "file2.txt", "file3.txt", "file4.txt"],
+    ".png" => ["file1.png", "file2.png"],
+    ".jpg" => ["file3.jpg"]
+  }
+  """
+  def by_extension(folder) do
+  end
 end
+```
+
+### Configure Project As A Script
+
+Create a new mix project.
+
+```
+$ mix new file_search
+```
+
+Configure the project as a script. You should be able to run the following to list all files.
+
+```
+$ mix escript.build
+$ ./file_search
+```
+
+You should also be able to use a flag to list files by their extension.
+
+```
+$ ./file_search --by_type
 ```
 
 ## Commit Your Progress
@@ -93,6 +155,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                             | Next                                   |
-| ---------------------------------------------------- | -------------------------------------: |
-| [Document Tools](../exercises/document_tools.livemd) | [HTML CSS](../reading/html_css.livemd) |
+| Previous                                             | Next                                         |
+| ---------------------------------------------------- | -------------------------------------------: |
+| [Document Tools](../exercises/document_tools.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |

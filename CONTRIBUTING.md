@@ -284,3 +284,9 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [Exercise: Maps](https://exercism.org/tracks/elixir/concepts/maps)
 * [Elixir Lang: Pattern Matching](https://elixir-lang.org/getting-started/pattern-matching.html)
 * [Elixir Lang: Maps](https://elixir-lang.org/getting-started/keywords-and-maps.html#maps)
+
+- Mastery exercises should have the following blub at the top of the document.
+
+## Mastery
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
