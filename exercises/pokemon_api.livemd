@@ -15,56 +15,249 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
+## Master
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
+
 ## Pokemon API
+
+When we rely on an external API, it's possible for them to change the format of a response, and have that cause issues for our application.
+
+That's why it's often important to translate information from an API into a struct when we retrieve it. This way if the format of the API response changes then we can fix the issue in a single spot where we convert the API response into a struct. We can also keep only the information we want, rather than all of the data returned.
+
+Often, certain APIs will have a language-specific implementation that makes it easier to interact with the API.
+
+You're going to create a `Pokelixir` project which uses the [Pokemon API](https://pokeapi.co/) to return Elixir-friendly `Pokemon` structs.
+
+Create a new `Pokelixir` mix project.
+
+```
+mix new pokelixir
+```
+
+Ensure you add [HTTPoison](https://github.com/edgurgel/httpoison) and [Poison](https://github.com/devinus/poison) as dependencies.
+
+## Pokemon Structs
+
+A `Pokemon` struct should have the following (required) keys. You do not need to implement data validation.
+
+```mermaid
+classDiagram
+  class Pokemon {
+    id: integer
+    name: string
+    hp: integer
+    attack: integer
+    defense: integer
+    special_attack: integer
+    special_defense: integer
+    speed: integer
+    weight: integer
+    height: integer
+    types: list of strings
+  }
+```
+
+Here's that data represented as a `Pokemon` struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%Pokemon{
+  id: 6,
+  name: "charizard",
+  hp: 78,
+  attack: 84,
+  defense: 78,
+  special_attack: 109,
+  special_defense: 85,
+  speed: 100,
+  height: 17,
+  weight: 905,
+  types: ["fire", "flying"]
+}
+```
+
+## Get A Pokemon
 
 We can request information about Pokemon using the [Pokemon API](https://pokeapi.co/).
 
-When we rely on an external API, it's possible for them to change the format of a response, and have that cause issues
-for our application.
+You can retrieve information with the following URL where `name` is the name of the pokemon.
 
-That's why it's often important to translate information from an API into a struct when we retrieve it. This way
-if the format of the API response changes then we can fix the issue in a single spot where we convert the API response into a struct.
-We can also keep only the information we want, rather than all of the data returned.
-
-```elixir
-{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/charmander")
+```
+https://pokeapi.co/api/v2/pokemon/name
 ```
 
-In the `Pokemon.from_response/1` function,
-Decode the above `response` into an Elixir map using the [Poison](https://hexdocs.pm/poison/Poison.html) library.
-then use the converted response to create a `Pokemon` struct with `:name`, `:weight`, and `:height` fields.
+For example, you can retrieve the stats for `charizard` by making an HTTP GET request to the following URL.
+
+```
+https://pokeapi.co/api/v2/pokemon/charizard
+```
+
+You should be able to retrieve the data for a pokemon and return it as a `Pokemon` struct.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Pokemon.from_response(response)
-%Pokemon{name: "charmander", weight: 85, height: 6}
+Pokelixir.get("charizard")
 ```
 
-Enter your solution below.
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+You can retrieve and decode the response using `HTTPoison` and `Poison`.
 
 ```elixir
-defmodule Pokemon do
-  defstruct [:name, :weight, :height]
-
-  def from_response(response) do
-    nil
-  end
-end
-
-Pokemon.from_response(response)
+{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/charizard")
+response = Poison.decode!(response.body)
 ```
 
-### Types (Bonus)
+</details>
 
-Add `:types` to the `Pokemon` struct and use the `"types"` field from `response` to create a list of types.
+## Get All Pokemon
+
+You can retrieve a list of pokemon using the following URL.
+
+```
+https://pokeapi.co/api/v2/pokemon
+```
+
+By default, this URL only shows the the first `20` pokemon, and provides a `"next"` URL to retrieve the next `20` pokemon. This is a common [pagination](https://en.wikipedia.org/wiki/Pagination) strategy to avoid loading too much data at once.
+
+<details style="background-color: lightgrey; padding: 1rem; margin: 1rem 0;">
+<summary>Response Example</summary>
+
+```javascript
+{
+  "count": 1154,
+  "next": "https://pokeapi.co/api/v2/pokemon?offset=20&limit=20",
+  "previous": null,
+  "results": [
+    {
+    "name": "bulbasaur",
+    "url": "https://pokeapi.co/api/v2/pokemon/1/"
+    },
+    {
+    "name": "ivysaur",
+    "url": "https://pokeapi.co/api/v2/pokemon/2/"
+    },
+    {
+    "name": "venusaur",
+    "url": "https://pokeapi.co/api/v2/pokemon/3/"
+    },
+    {
+    "name": "charmander",
+    "url": "https://pokeapi.co/api/v2/pokemon/4/"
+    },
+    {
+    "name": "charmeleon",
+    "url": "https://pokeapi.co/api/v2/pokemon/5/"
+    },
+    {
+    "name": "charizard",
+    "url": "https://pokeapi.co/api/v2/pokemon/6/"
+    },
+    {
+    "name": "squirtle",
+    "url": "https://pokeapi.co/api/v2/pokemon/7/"
+    },
+    {
+    "name": "wartortle",
+    "url": "https://pokeapi.co/api/v2/pokemon/8/"
+    },
+    {
+    "name": "blastoise",
+    "url": "https://pokeapi.co/api/v2/pokemon/9/"
+    },
+    {
+    "name": "caterpie",
+    "url": "https://pokeapi.co/api/v2/pokemon/10/"
+    },
+    {
+    "name": "metapod",
+    "url": "https://pokeapi.co/api/v2/pokemon/11/"
+    },
+    {
+    "name": "butterfree",
+    "url": "https://pokeapi.co/api/v2/pokemon/12/"
+    },
+    {
+    "name": "weedle",
+    "url": "https://pokeapi.co/api/v2/pokemon/13/"
+    },
+    {
+    "name": "kakuna",
+    "url": "https://pokeapi.co/api/v2/pokemon/14/"
+    },
+    {
+    "name": "beedrill",
+    "url": "https://pokeapi.co/api/v2/pokemon/15/"
+    },
+    {
+    "name": "pidgey",
+    "url": "https://pokeapi.co/api/v2/pokemon/16/"
+    },
+    {
+    "name": "pidgeotto",
+    "url": "https://pokeapi.co/api/v2/pokemon/17/"
+    },
+    {
+    "name": "pidgeot",
+    "url": "https://pokeapi.co/api/v2/pokemon/18/"
+    },
+    {
+    "name": "rattata",
+    "url": "https://pokeapi.co/api/v2/pokemon/19/"
+    },
+    {
+    "name": "raticate",
+    "url": "https://pokeapi.co/api/v2/pokemon/20/"
+    }
+  ]
+}
+```
+
+</details>
+
+Each pokemon in the results list also has a URL you can use to get information about each pokemon.
+
+https://pokeapi.co/api/v2/pokemon/6/
+
+You should be able to return a list of `Pokemon` structs for every pokemon.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Pokemon.from_response(response)
-%Pokemon{name: "charmander", weight: 85, height: 6, types: ["fire"]}
+Pokemon.all()
 ```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+You can either recursively retrieve the next `20` pokemon using the `"next"` url, or
+you can make a request using the `limit` query parameter with a larger value than the number of pokemon.
+
+```elixir
+{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/?limit=1154")
+response = Poison.decode!(response.body)
+```
+
+</details>
+
+## GitHub Repository
+
+Connect your `Pokelixir` project to a GitHub repository and create a README to describe the purpose of the project and what you learned building it.
+
+Consider refactoring, adding documentation, and testing if you have not already to make this an even better resume project.
+
+## Further Feature Ideas
+
+This project is designed to be extendable to improve your skills. Here are some examples of how to expand the initial feature set.
+
+* Add a cache which caches each pokemon to retrieved to avoid re-requesting the same data from the API.
+* Add more endpoints from the Pokemon API. see: https://pokeapi.co/docs/v2.
+* Add more information to the `Pokemon` struct to make it more closely represent the data from the Pokemon API.
+* Add documentation + doctests and [publish your project on hex.pm](https://hex.pm/docs/publish)
 
 ## Commit Your Progress
 

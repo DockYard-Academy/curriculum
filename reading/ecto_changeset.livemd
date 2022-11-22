@@ -1,10 +1,11 @@
-# Ecto
+# Ecto Changesets
 
 ```elixir
 Mix.install([
   {:kino, "~> 0.7.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
 ])
 ```
 
@@ -17,7 +18,7 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-## Ecto
+## Ecto Changesets
 
 [Ecto](https://hexdocs.pm/ecto/Ecto.html) is a library we typically use to communicate with a database. We'll learn more about databases in future lessons,
 but for now, we'll see how Ecto helps to interact with data.
@@ -129,7 +130,7 @@ The changeset contains:
 * **data**: the source data for the changeset.
 * **valid?**: whether or not the desired change breaks any validation.
 * **errors**: a keyword list of errors for any changes.
-* **action**: you can ignore this for now and manually set it to `:update`. You can see the [documentation](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions) for why.
+* **action**: We'll gnore this for now as it is more important when working with databases. See [Changeset Actions](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions).
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -216,13 +217,13 @@ valid_changeset =
   |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
 ```
 
-To apply changes, we can use `Ecto.Changeset.apply_changes/1`, which will only apply the changes if the changes are valid.
+To apply changes, we can use `Ecto.Changeset.apply_changes/1`, which will only apply the changes if the changes are valid. Because we aren't using a database, we have to manually set the action to `:update`.
 
 ```elixir
 Ecto.Changeset.apply_action(valid_changeset, :update)
 ```
 
-If the changes are not valid, we will receive an error.
+If the changes are not valid, we will receive an error and the changeset.
 
 ```elixir
 Ecto.Changeset.apply_action(invalid_changeset, :update)
@@ -241,13 +242,32 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Use `Ecto.Changeset` to validate some parameters to create a blog.
+Use `Ecto.Changeset` to validate some parameters to create a book map.
 
-A blog should have:
+A book should have:
 
-* A required `:title` string field.
-* A required `:body` string field.
-* A list of tags no more than 5.
+* A required `:title` string field between `3` and `100` characters.
+* A required `:content` string field.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+Ecto.Changeset.cast(
+  {%{}, %{title: :string, content: :string}},
+  %{title: "title", content: "content"},
+  [:title, :content]
+)
+|> Ecto.Changeset.validate_required([:title, :content])
+|> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+|> Ecto.Changeset.apply_action(:update)
+```
+
+</details>
+
+```elixir
+
+```
 
 ## Schemaless Changesets
 
@@ -283,30 +303,41 @@ end
 User.new(%{username: "Peter Parker", password: "secret_spider", terms_and_conditions: true})
 ```
 
-We're reusing `Ecto.Changeset` a lot, so it may be worth importing it.
+### Your Turn
+
+Create a `Book` schemaless changeset struct. A book should have:
+
+* A required `:title` string field between `3` and `100` characters.
+* A required `:content` string field.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
-defmodule User do
-  import Ecto.Changeset
-  defstruct [:username, :password, :terms_and_conditions]
+defmodule Book do
+  defstruct [:title, :content]
 
-  @types %{username: :string, password: :string, terms_and_conditions: :boolean}
+  @types %{title: :string, content: :string}
 
-  def changeset(%User{} = user, params) do
-    {user, @types}
-    |> cast(params, Map.keys(@types))
-    |> validate_required([:username, :password])
-    |> validate_length(:password, min: 10)
-    |> validate_length(:username, min: 3, max: 40)
-    |> validate_acceptance(:terms_and_conditions)
+  def changeset(%Book{} = book, params) do
+    {book, @types}
+    |> Ecto.Changeset.cast(params, Map.keys(@types))
+    |> Ecto.Changeset.validate_required([:title, :content])
+    |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
   end
 
   def new(params) do
-    %User{}
+    %Book{}
     |> changeset(params)
-    |> apply_action(:update)
+    |> Ecto.Changeset.apply_action(:update)
   end
 end
+```
+
+</details>
+
+```elixir
+
 ```
 
 ### Your Turn
@@ -314,16 +345,36 @@ end
 In the Elixir cell below, create a `Book` schemaless changeset struct.
 A book should have:
 
-* A required `:title` field with a minimum of 3 characters and a maximum of 100 characters.
+* A required `:title` field between `3` and `100` characters.
+* A required `:content` string field.
 * A required `:published_status` field that is either `true` or `false`.
-* A `:body` string field.
-* A `:published_on` date field.
+* A `:published_on` date field which must exist if the `:published_status` is `true`.
 * An `:author` string field.
 * An `:is_licenced` field which must always be true.
 
 ```elixir
-defmodule Blog do
+defmodule Book do
+  defstruct [:title, :content, :published_status, :published_on]
+
+  @types %{username: :string, password: :string, terms_and_conditions: :boolean}
+
+  def changeset(%User{} = user, params) do
+    {user, @types}
+    |> Ecto.Changeset.cast(params, Map.keys(@types))
+    |> Ecto.Changeset.validate_required([:username, :password])
+    |> Ecto.Changeset.validate_length(:password, min: 10)
+    |> Ecto.Changeset.validate_length(:username, min: 3, max: 40)
+    |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
+  end
+
+  def new(params) do
+    %Book{}
+    |> changeset(params)
+    |> Ecto.Changeset.apply_action(:update)
+  end
 end
+
+User.new(%{username: "Peter Parker", password: "secret_spider", terms_and_conditions: true})
 ```
 
 ## Commit Your Progress
