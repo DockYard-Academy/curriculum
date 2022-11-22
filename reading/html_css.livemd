@@ -263,10 +263,33 @@ The `>` selects all elements with the `.child` class that are direct children of
 
 ```html
 <p class="parent">
-  <p class="child">This text will be green.</p>
+  <p class="child">
+    This text will be green.
+    <p class="grandchild"> This text will NOT be green. </p>
+  </p>
 </p>
 
-<p class="child">This text will NOT be green.</p>
+<p class="child">This text will NOT be green and bold.</p>
+```
+
+```mermaid
+flowchart LR
+    classDef green fill:#9f6
+
+    subgraph parent class
+    p1(p) 
+    end
+    subgraph child class
+    
+    p1 --> p2(p):::green
+    p2 --> text1(text):::green
+    p3(p)
+    p3 --> text2(text)
+    end
+    subgraph grandchild class
+    p2 --> p4(p)
+    p4 --> text4(text)
+    end
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -285,10 +308,33 @@ The space selects all elements with the `.child` class inside the`.parent` class
 
 ```html
 <p class="parent">
-  <p class="child">This text will be green and bold.</p>
+  <p class="child">
+    This text will be green.
+    <p class="grandchild"> This text will be green. </p>
+  </p>
 </p>
 
 <p class="child">This text will NOT be green and bold.</p>
+```
+
+```mermaid
+flowchart LR
+    classDef green fill:#9f6
+
+    subgraph parent class
+    p1(p) 
+    end
+    subgraph child class
+    
+    p1 --> p2(p):::green
+    p2 --> text1(text):::green
+    p3(p)
+    p3 --> text2(text)
+    end
+    subgraph grandchild class
+    p2 --> p4(p):::green
+    p4 --> text4(text):::green
+    end
 ```
 
 <!-- livebook:{"break_markdown":true} -->
