@@ -1,4 +1,4 @@
-# Sign Up Form
+# Book Changeset
 
 ```elixir
 Mix.install([
@@ -13,41 +13,40 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Sign Up Form
+## Book Changeset
 
-It's common for applications to have a sign up form that validates a user's email, password, and other information.
+You're going to create a `Book` schemaless changeset struct. A book should have:
 
-Create a `User` module which validates user's information.
+* A required `:title` field between `3` and `100` characters.
+* A required `:content` string field.
+* A required `:published_status` field that is either `true` or `false`.
+* A `:published_on` date field which must exist if the `:published_status` is `true`.
+* An `:author` string field.
+* An `:is_licenced` field which must always be true.
+  It's common for applications to have a sign up form that validates a user's email, password, and other information.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, user} =
-  User.new(%{
-    username: "Peter Parker",
-    password: "secret_spider",
-    email: "peter@spider.web",
-    terms_and_conditions: true
+{:ok, book} =
+  Book.new(%{
+    title: "Name of the Wind",
+    content: "My name is Kvothe. I have stolen princesses back from sleeping barrow kings.",
+    published_status: true,
+    published_on: ~D[2007-03-27],
+    is_licenced: true
   })
 ```
-
-We're going to allow any string for the recipient name, domain name, and top level domain.
-
-* `username` (required) a 3-12 character string.
-* `password` (required) a 12-50 character string.
-* `email` (required) a string in the format `recipient_name@domain_name.top_level_domain`. i.e. `"peter@gmail.com"`.
-* `age` (optional) an integer.
-* `agreed_to_terms_and_conditions` (required) a boolean which must be `true`.
 
 You should rely on Ecto Changesets and your own custom validation to validate the user information.
 Enter your solution below.
 
 ```elixir
-defmodule User do
+defmodule Book do
   use Ecto.Schema
   import Ecto.Changeset
 
-  def changeset(%User{} = user, params) do
+  def changeset(%Book{} = user, params) do
   end
 
   def new(params) do
@@ -62,10 +61,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-sign_up_form
+$ git checkout -b exercise-book_changeset
 $ git add .
-$ git commit -m "finish sign up form exercise"
-$ git push origin exercise-sign_up_form
+$ git commit -m "finish book changeset exercise"
+$ git push origin exercise-book_changeset
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -78,6 +77,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Ecto Changeset](../reading/ecto_changeset.livemd) | [Book Changeset](../exercises/book_changeset.livemd) |
+| Previous                                         | Next                             |
+| ------------------------------------------------ | -------------------------------: |
+| [Sign Up Form](../exercises/sign_up_form.livemd) | [RDBMS](../reading/rdbms.livemd) |

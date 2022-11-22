@@ -108,6 +108,8 @@ end)
 HTTPoison.get!("http://localhost:#{port}")
 ```
 
+The code above is purely for demonstration purposes. We won't need to write our own webserver, instead we'll rely on frameworks like [Phoenix](https://www.phoenixframework.org/) that do all of this for us.
+
 ## Web Server
 
 Putting all of this together, we can make a `WebServer` module. The `WebServer` module will listen on port `4000` and recursively accept client requests indefinitely.
@@ -161,12 +163,12 @@ In the `WebServer` module above, modify the original response:
 response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n It is #{current_time}"
 ```
 
-To a response using [Hyper Text Markup Language (HTML)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics). HTML is the code used to structure a web page. For example, we can modify the response to use an HTML header tag `<h>`.
+To a response using [Hyper Text Markup Language (HTML)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics). HTML is the code used to structure a web page. For example, we can modify the response to use an HTML header tag `<h1>`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n <h>It is #{current_time}<h/>"
+response = "HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n <h1>It is #{current_time}<h1/>"
 ```
 
 Visit http://localhost:4000 to see your modified content. You may need to stop the `WebServer` Elixir cell and start it again.

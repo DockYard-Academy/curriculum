@@ -28,6 +28,8 @@ Generally, API refers to web APIs, which are programs that run on the internet. 
 
 We won't go deep into networking or how the internet works, as that is beyond the scope of this course. However, Crash Course Computer Science provides an excellent overview.
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=AEaKrq3SpW8\")","title":"The Internet: Crash Course Computer Science"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=AEaKrq3SpW8")
 ```
@@ -92,7 +94,7 @@ We use web APIs to communicate with servers on the internet. These APIs provide 
 * The [OpenWeatherAPI](https://openweathermap.org/) provides live weather information.
 * The [JokeAPI](https://sv443.net/jokeapi/v2/#getting-started) returns a random joke.
 
-### HTTP
+## HTTP
 
 We use HTTP to communicate with web APIs. The browser hides the details of how we use HTTP to communicate with these APIs. However, as developers, we want to interact with them directly using the HTTP protocol to request and send information.
 
@@ -108,9 +110,7 @@ We use the [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) 
 
 The `:body` is the JSON response you saw previously in the browser, and `:headers` provide additional context and meta-data about the response. The `:status_code` specifies the response's status, where `200` indicates a successful response. The `:request_url` is simply the URL.
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Response Codes
+## Response Codes
 
 APIs use various response codes to communicate the status of a request. These are generally called [response codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) and are grouped into five classes.
 
@@ -127,9 +127,7 @@ You've already seen that a successful request returns a `200` response. You migh
 response.status_code
 ```
 
-### JSON
-
-<!-- livebook:{"break_markdown":true} -->
+## JSON and Poison
 
 To parse a JSON response into a more convenient data structure, we can use the [Poison](https://github.com/devinus/poison)
 library. [Poison.decode!/2](https://hexdocs.pm/poison/Poison.html#decode!/2)
@@ -168,7 +166,7 @@ Use [Poison.decode!/2](https://hexdocs.pm/poison/Poison.html#decode!/2) to decod
 string = "{\"hello\"\: \"world\"}"
 ```
 
-### HTTP GET and HTTP POST
+## HTTP POST
 
 HTTP GET requests retrieve data from a server and HTTP POST requests send data to a server.
 
@@ -182,7 +180,7 @@ Below we send a POST request to http://httparrot.herokuapp.com/post. The body is
 `Content-Type` header specifies that the data being sent is JSON.
 
 ```elixir
-HTTPoison.post("http://httparrot.herokuapp.com/post", "{\"body\": \"test\"}", [
+HTTPoison.post("http://httparrot.herokuapp.com/post", Poison.encode!(%{body: "value"}), [
   {"Content-Type", "application/json"}
 ])
 ```

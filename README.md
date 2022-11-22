@@ -224,7 +224,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * HTML and CSS
 * APIs & Parsing JSON
 * Phoenix
-## Databases With Ecto
 * Data Validation
 * Relational Database Management Systems and Ecto
 * Phoenix and Ecto
