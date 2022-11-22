@@ -27,21 +27,11 @@ There are many different solutions to this problem. This is only a single exampl
 ```elixir
 defmodule Document do
   def word_count(file_name) do
-    file = File.open!(file_name)
-    count = count_words(file)
-    File.close(file)
-    count
-  end
-
-  defp count_words(file, count \\ 0) do
-    case IO.read(file, :line) do
-      :eof ->
-        count
-
-      line ->
-        word_count_in_line = line |> String.split(" ", trim: true) |> Enum.count()
-        count_words(file, count + word_count_in_line)
-    end
+    File.stream!(file_name)
+    |> Stream.map(fn line ->
+      line |> String.split(" ", trim: true) |> Enum.count()
+    end)
+    |> Enum.sum()
   end
 
   def line_count(file_name) do
