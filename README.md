@@ -224,6 +224,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * HTML and CSS
 * APIs & Parsing JSON
 * Phoenix
+* Phoenix Components
+* Tailwind
 * Data Validation
 * Relational Database Management Systems and Ecto
 * Phoenix and Ecto
@@ -232,7 +234,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix and Ecto One-to-Many Relationships
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
-* Tailwind
 ## LiveView
 * LiveView
 * Testing LiveView
