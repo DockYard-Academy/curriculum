@@ -11,9 +11,12 @@ Create a `SlotMachine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) tha
 
 When the `SlotMachine.roll/1` function is called the user should have a one in three chance of getting a reward.
 
-The should be between `1` and the remaining balance of the machine.
+The reward should be between `1` and the remaining balance of the machine.
 
 * use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule SlotMachine do
@@ -35,7 +38,7 @@ defmodule SlotMachine do
     GenServer.start_link(__MODULE__, :ok)
   end
 
-  def init(:ok) do
+  def init(_) do
     {:ok, %{balance: 7000}}
   end
 
@@ -46,45 +49,90 @@ defmodule SlotMachine do
   Make sure that the machine doesn't give more rewards than its balance.
   Make sure the machine doesn't give negative rewards!
 
-  Use the :rand erlang module to generate random numbers.
+  The machine should either print "You lose!" or "You won ... pennies"
+  """
+  def roll(pid) do
+    chance = Enum.random([1, 2, 3])
 
-  The machine should either print "You lose!" or "You won ... dollars"
+    # Only give reward 1 in 3 times 
+    # Don't give reward if the machine does not have any money in it
+    if chance != 1 || get_current_balance(pid) == 0 do
+      IO.puts("You lose!")
+    else
+      # Provide random reward between 1 and 7000 pennies
+      reward = Enum.random(1..7_000)
+
+      # Don't give reward higher tham machine balance
+      if reward > get_current_balance(pid) do
+        reward = get_current_balance(pid)
+        subtract_from_balance(pid, reward)
+        IO.puts("You win #{reward} pennies!")
+      else
+        subtract_from_balance(pid, reward)
+        IO.puts("You won #{reward} pennies!")
+      end
+    end
+  end
+
+  def get_current_balance(pid) do
+    GenServer.call(pid, :get_balance)
+  end
+
+  def subtract_from_balance(pid, amount) do
+    GenServer.call(pid, {:subtract_balance, amount})
+  end
+
+  def handle_call({:subtract_balance, amount}, _from, state) do
+    state = %{balance: state.balance - amount}
+    {:reply, state, state}
+  end
+
+  def handle_call(:get_balance, _from, state) do
+    {:reply, state.balance, state}
+  end
+end
+
+```
+
+</details>
+
+```elixir
+defmodule SlotMachine do
+  @moduledoc """
+  The slot machine GenServer
+  """
+  use GenServer
+
+  @doc """
+    Start the slot machine
+
+    ## Example
+
+      iex> SlotMachine.start_link(1)
+      {:ok, pid}
+
+  """
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, :ok)
+  end
+
+  def init(_) do
+    {:ok, %{balance: 7000}}
+  end
+
+  @doc """
+  This is the main function for this module.
+
+  Make sure that that players get rewards only 30% of the time.
+  Make sure that the machine doesn't give more rewards than its balance.
+  Make sure the machine doesn't give negative rewards!
+
+  The machine should either print "You lose!" or "You won ... pennies"
   """
   def roll(pid) do
   end
-
-  @doc """
-  Get the current slot machine balance.
-
-  ## Example
-
-    iex> {:ok, pid} = SlotMachine.start_link()
-    iex> GenServer.call(pid, {:get_balance})
-    7000
-
-  """
-  def handle_call({:get_balance}, _from, state) do
-  end
-
-  @doc """
-  Subtract pennies from slot machine balance.
-
-  ## Example
-
-    iex> {:ok, pid} = SlotMachine.start_link()
-    iex> GenServer.call(pid, {:subtract_balance, 1000})
-    6000
-
-  """
-  def handle_call({:subtract_balance, amount}, _from, state) do
-  end
 end
 ```
-
-## TODO: Bonuses
-
-* Make numbers spin on screen with `IO.write` to make the slot machine more interesting.
-* Create another [GenServer](https://hexdocs.pm/elixir/GenServer.html) that represents a person in the casino and make that person have to pay money in order to use the slot machine. A person can no longer play if he runs out of money.
 
 ## Commit Your Progress
 
