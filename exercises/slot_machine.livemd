@@ -13,7 +13,7 @@ When the `SlotMachine.roll/1` function is called the user should have a one in t
 
 The reward should be between `1` and the remaining balance of the machine.
 
-* use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
+You can use `:sys.get_state/1` to make sure that the `SlotMachine` is handling its state properly.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -59,18 +59,10 @@ defmodule SlotMachine do
     if chance != 1 || get_current_balance(pid) == 0 do
       IO.puts("You lose!")
     else
-      # Provide random reward between 1 and 7000 pennies
-      reward = Enum.random(1..7_000)
-
-      # Don't give reward higher tham machine balance
-      if reward > get_current_balance(pid) do
-        reward = get_current_balance(pid)
-        subtract_from_balance(pid, reward)
-        IO.puts("You win #{reward} pennies!")
-      else
-        subtract_from_balance(pid, reward)
-        IO.puts("You won #{reward} pennies!")
-      end
+      # Provide random reward between 1 and current balance of pennies
+      reward = Enum.random(1..get_current_balance(pid))
+      subtract_from_balance(pid, reward)
+      IO.puts("You won #{reward} pennies!")
     end
   end
 
