@@ -159,8 +159,9 @@ invalid_params = %{name: 2, age: "hello"}
 invalid_changeset = Ecto.Changeset.cast({initial_data, types}, invalid_params, keys)
 ```
 
-You'll notice that the changeset stores `errors` in a keyword list. Both the `name` and `age` are invalid,
-and each stores a different error message.
+You'll notice that the changeset stores `errors` in a keyword list. Both the `name` and `age` are invalid, and each stores a different error message.
+
+## Ecto Validation Functgions
 
 We can also add additional validations to the changeset. For a full list of functions, see the
 [Ecto Validation Functions](https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_acceptance/3).
@@ -253,11 +254,13 @@ A book should have:
 <summary>Example Solution</summary>
 
 ```elixir
-Ecto.Changeset.cast(
-  {%{}, %{title: :string, content: :string}},
-  %{title: "title", content: "content"},
-  [:title, :content]
-)
+initial_data = %{}
+types = %{title: :string, content: :string}
+params = %{title: "title", content: "content"}
+keys = [:title, :content]
+
+{initial_data, types}
+|> Ecto.Changeset.cast(params, keys)
 |> Ecto.Changeset.validate_required([:title, :content])
 |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
 |> Ecto.Changeset.apply_action(:update)
@@ -309,6 +312,9 @@ Create a `Book` schemaless changeset struct. A book should have:
 
 * A required `:title` string field between `3` and `100` characters.
 * A required `:content` string field.
+* An `:author` string field.
+* An `:is_licenced` field which must always be true.
+* An `:is_published` boolean field.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -317,13 +323,20 @@ Create a `Book` schemaless changeset struct. A book should have:
 defmodule Book do
   defstruct [:title, :content]
 
-  @types %{title: :string, content: :string}
+  @types %{
+    title: :string,
+    content: :string,
+    author: :string,
+    is_licenced: :boolean,
+    is_published: :boolean
+  }
 
   def changeset(%Book{} = book, params) do
     {book, @types}
     |> Ecto.Changeset.cast(params, Map.keys(@types))
     |> Ecto.Changeset.validate_required([:title, :content])
     |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+    |> Ecto.Changeset.validate_acceptance(:is_licenced)
   end
 
   def new(params) do
@@ -338,43 +351,6 @@ end
 
 ```elixir
 
-```
-
-### Your Turn
-
-In the Elixir cell below, create a `Book` schemaless changeset struct.
-A book should have:
-
-* A required `:title` field between `3` and `100` characters.
-* A required `:content` string field.
-* A required `:published_status` field that is either `true` or `false`.
-* A `:published_on` date field which must exist if the `:published_status` is `true`.
-* An `:author` string field.
-* An `:is_licenced` field which must always be true.
-
-```elixir
-defmodule Book do
-  defstruct [:title, :content, :published_status, :published_on]
-
-  @types %{username: :string, password: :string, terms_and_conditions: :boolean}
-
-  def changeset(%User{} = user, params) do
-    {user, @types}
-    |> Ecto.Changeset.cast(params, Map.keys(@types))
-    |> Ecto.Changeset.validate_required([:username, :password])
-    |> Ecto.Changeset.validate_length(:password, min: 10)
-    |> Ecto.Changeset.validate_length(:username, min: 3, max: 40)
-    |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
-  end
-
-  def new(params) do
-    %Book{}
-    |> changeset(params)
-    |> Ecto.Changeset.apply_action(:update)
-  end
-end
-
-User.new(%{username: "Peter Parker", password: "secret_spider", terms_and_conditions: true})
 ```
 
 ## Commit Your Progress
@@ -402,4 +378,4 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 | Previous                                   | Next                                             |
 | ------------------------------------------ | -----------------------------------------------: |
-| [Portfolio](../exercises/portfolio.livemd) | [Sign Up Form](../exercises/sign_up_form.livemd) |
+| [Portfolio](../exercises/portfolio.livemd) | [Phoenix Forms](../reading/phoenix_forms.livemd) |

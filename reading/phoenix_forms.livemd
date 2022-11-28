@@ -1,0 +1,406 @@
+# Phoenix Forms
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Phoenix Forms
+
+Phoenix provides a [Phoenix HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html) library for working with HTML elements. The library is a thin wrapper around HTML elements with some additional benefits that makes it preferable to working with raw HTML.
+
+We can use the [Phoenix.HTML.Form.form_for/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/3) macro to create a form and other macros for form inputs such as:
+
+* [Phoenix.HTML.Form.text_input/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#text_input/3)
+* [Phoenix.HTML.Form.textarea/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#textarea/3)
+* [Phoenix.HTML.Form.checkbox/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#checkbox/3)
+* [Phoenix.HTML.Form.select/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#select/4)
+* [Phoenix.HTML.Form.number_input/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#number_input/3)
+
+Phoenix forms work alongside [Ecto Changesets](./ecto_changeset.livemd) to provide error handling and data validation.
+
+## Book Form
+
+To learn more about Phoenix.HTML.Form and Ecto.Changeset we're going to build a book creation form. This form would connect to a book search site that allows authors to upload their books.
+
+A book will have
+
+* A required `:title` field between `3` and `100` characters.
+* An `:author` string field.
+* A required `:content` string field.
+* A `:published_on` field that is a [Date](https://hexdocs.pm/elixir/Date.html).
+* An `:has_licence` field which must always be true.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create `BookForm` Project.
+
+Create, setup, and start your `BookForm` Phoenix project.
+
+```
+$ mix phx.new book_form
+$ mix ecto.create
+$ mix phx.server
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create the `BookForm` Form.
+
+Replace the existing `index.html.heex` file with the following form content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for :book, "/" , fn book_form -> %>
+  <label>
+    Title
+    <%= text_input book_form, :title %>
+  </label>
+
+  <label>
+    Author
+    <%= text_input book_form, :author %>
+  </label>
+
+  <label>
+    Content
+    <%= textarea book_form, :content %>
+  </label>
+
+  <label>
+    Published On
+    <%= date_select book_form, :published_on %>
+  </label>
+
+  <label>
+    Licenced
+    <%= checkbox book_form, :has_licence %>
+  </label>
+
+  <%= submit "Submit" %>
+<% end %>
+```
+
+This will create a book form on our main page. When we submit the form, it sends a POST request to the `"/"` route.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_forms_book_form.png)
+
+## Form Action
+
+has_licenceTo connect our form, we need to handle the appropriate HTTP POST action.
+
+Use [Phoenix.Router.post/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#post/4) to define the route in `router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", BookFormWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  # Add the `:create` action.
+  post "/", PageController, :create
+end
+```
+
+To handle this POST request, we need to define the `PageController.create/2` action in `page_controller.ex`. For now we'll just redirect the user back to the same page, and inspect the parameters from the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def create(conn, params) do
+    IO.inspect(params)
+    redirect conn, to: "/"
+  end
+```
+
+Press the `Submit` button and you should see the following params in your terminal.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{
+  "_csrf_token" => "YQUVIyQOOhoMITdzNXAqCQwefxE6DwoQPcvVa9otkoCED3fsED9hiNg_",
+  "book" => %{
+    "author" => "",
+    "content" => "",
+    "has_licence" => "false",
+    "published_on" => %{"day" => "1", "month" => "1", "year" => "2017"},
+    "title" => ""
+  }
+}
+```
+
+## Changeset
+
+We're going to use [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) to validate our form data.
+
+First, we need to provide a changeset to our form instead of our form name. Here's how we can create a simple empty changeset.
+
+```elixir
+types = %{
+  author: :string,
+  title: :string,
+  content: :string,
+  has_licence: :boolean,
+  published_on: :date
+}
+
+changeset = Ecto.Changeset.cast({%{}, types}, %{}, Map.keys(types))
+```
+
+Here's an example of how we can use a changeset to validate our book form data.
+
+```elixir
+book_params = %{
+  "author" => "Example Author",
+  "content" => "Example Content",
+  "has_licence" => "false",
+  "published_on" => %{"day" => "1", "month" => "1", "year" => "2017"},
+  "title" => "Example Title"
+}
+
+types = %{
+  author: :string,
+  title: :string,
+  content: :string,
+  has_licence: :boolean,
+  published_on: :date
+}
+
+changeset =
+  Ecto.Changeset.cast({%{}, types}, book_params, Map.keys(types))
+  |> Ecto.Changeset.validate_required([:title, :content])
+  |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+  |> Ecto.Changeset.validate_acceptance(:has_licence)
+```
+
+We can use changesets in combination with Phoenix forms to validate the form data. We need to provide the form with this changeset.
+
+First, well create a schemaless changeset for `Book`. Create a `lib/book.ex` file with the following content.
+
+```elixir
+defmodule BookForm.Book do
+  defstruct [:title, :author, :content, :has_licence, :published_on]
+
+  @types %{
+    title: :string,
+    author: :string,
+    content: :string,
+    has_licence: :boolean,
+    published_on: :date
+  }
+
+  def changeset(%__MODULE__{} = book, params \\ %{}) do
+    {book, @types}
+    |> Ecto.Changeset.cast(params, Map.keys(@types))
+    |> Ecto.Changeset.validate_required([:title, :content])
+    |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+    |> Ecto.Changeset.validate_acceptance(:has_licence)
+  end
+
+  def new(params) do
+    %__MODULE__{}
+    |> changeset(params)
+    |> Ecto.Changeset.apply_action(:update)
+  end
+end
+```
+
+We need to provide the form with an initial changeset, modify the `PageController.index/2` action in `page_controller.ex` to pass the changeset to the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, _params) do
+  changeset = BookForm.Book.changeset(%BookForm.Book{})
+  render(conn, "index.html", changeset: changeset)
+end
+```
+
+Now, use the `@changeset` value in the form in `page.html.heex` instead of the `:book` atom.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, "/", fn book_form -> %>
+  <label>
+    Title
+    <%= text_input book_form, :title %>
+  </label>
+
+  <label>
+    Author
+    <%= text_input book_form, :author %>
+  </label>
+
+  <label>
+    Content
+    <%= textarea book_form, :content %>
+  </label>
+
+  <label>
+    Published On
+    <%= date_select book_form, :published_on %>
+  </label>
+
+  <label>
+    Licenced
+    <%= checkbox book_form, :has_licence %>
+  </label>
+
+  <%= submit "Submit" %>
+<% end %>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+When we submit the form, we can use `BookForm.Book.new/2` to validate the book data and check if there are any errors.
+
+If the book data is valid it will return `{:ok, book}`.
+
+```elixir
+BookForm.Book.new(%{
+  title: "Example Title",
+  author: "Example Author",
+  content: "Example Content",
+  has_licence: true,
+  published_on: Date.utc_today()
+})
+```
+
+If the book data is invalid, `BookForm.Book.new/2` will return `{:error, changeset}`.
+
+```elixir
+BookForm.Book.new(%{})
+```
+
+We can pattern match on the return value to display an Error message. Phoenix provides [Phoenix.Controller.put_flash/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#put_flash/3) to flash a message on the screen. We'll use this to provide a success or failure message to the user.
+
+Modify `PageController.create/2` to be the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, params) do
+  case BookForm.Book.new(params["book"]) do
+    {:ok, _book} ->
+      conn
+      |> put_flash(:info, "Success!")
+      |> redirect(to: "/")
+
+    {:error, changeset} ->
+      conn
+      |> put_flash(:error, "Failure!")
+      |> render("index.html", changeset: changeset)
+  end
+end
+```
+
+Now when we submit the form with invalid data we'll see an error message. The changeset also preserves previous values from the form.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_forms_book_form_failure.png)
+
+## Error Handling
+
+Instead of providing a simple error message, we can provide error feedback on each form input individually.
+
+We can get all form errors using `form.errors` Phoenix provides an `error_tag` helper in `error_helpers.ex` which uses these errors and the name of the field to provide error feedback.
+
+Modify `index.html.heex` to include error tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, "/", fn book_form -> %>
+  <label>
+    Title
+    <%= text_input book_form, :title %>
+    <%= error_tag book_form, :title %>
+  </label>
+
+  <label>
+    Author
+    <%= text_input book_form, :author %>
+    <%= error_tag book_form, :author %>
+  </label>
+
+  <label>
+    Content
+    <%= textarea book_form, :content %>
+    <%= error_tag book_form, :content %>
+  </label>
+
+  <label>
+    Published On
+    <%= date_select book_form, :published_on %>
+    <%= error_tag book_form, :published_on %>
+  </label>
+
+  <label>
+    Licenced
+    <%= checkbox book_form, :has_licence %>
+    <%= error_tag book_form, :has_licence %>
+  </label>
+
+  <%= submit "Submit" %>
+<% end %>
+```
+
+Failure messages now display on each form input.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_forms_book_form_failure_with_error_tags.png)
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html)
+* [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-phoenix_forms
+$ git add .
+$ git commit -m "finish phoenix forms section"
+$ git push origin exercise-phoenix_forms
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                             |
+| -------------------------------------------------- | -----------------------------------------------: |
+| [Ecto Changeset](../reading/ecto_changeset.livemd) | [Sign Up Form](../exercises/sign_up_form.livemd) |
