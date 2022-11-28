@@ -20,34 +20,103 @@ You're going to create a `Book` schemaless changeset struct. A book should have:
 
 * A required `:title` field between `3` and `100` characters.
 * A required `:content` string field.
-* A required `:is_published` field that is either `true` or `false`.
-* A `:published_on` date field which must exist if the `:is_published` is `true`.
+* A `:published_on` date field.
+* A `:category` field which must be either `"action"`, `"fiction"`, or `"mystery"` (you may choose to add more categories if you wish)
+* A `:books_sold` integer which must be `0` or above.
+* A `:publisher_email` field which must be in the format `name@domain.extension`
 * An `:author` string field.
 * An `:has_license` field which must always be true.
-  It's common for applications to have a sign up form that validates a user's email, password, and other information.
+* A `:price` integer field which must be above `0`.
+
+For example, creating a book with the following invalid fields would return an `{:error, changeset}` tuple similar to the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, book} =
-  Book.new(%{
-    title: "Name of the Wind",
-    content: "My name is Kvothe. I have stolen princesses back from sleeping barrow kings...",
-    is_published: true,
-    published_on: ~D[2007-03-27],
-    is_licenced: true
-  })
+Book.new(%{category: "invalid", email: "invalid", books_sold: -1, price: -1})
+{:error,
+ #Ecto.Changeset<
+   action: :update,
+   changes: %{books_sold: -1, category: "invalid", price: -1},
+   errors: [
+     price: {"must be greater than %{number}",
+      [validation: :number, kind: :greater_than, number: 0]},
+     has_license: {"must be accepted", [validation: :acceptance]},
+     books_sold: {"must be greater than or equal to %{number}",
+      [validation: :number, kind: :greater_than_or_equal_to, number: 0]},
+     category: {"is invalid", [validation: :inclusion, enum: ["action", "fiction", "mystery"]]},
+     title: {"can't be blank", [validation: :required]},
+     content: {"can't be blank", [validation: :required]}
+   ],
+   data: #Book<>,
+   valid?: false
+ >}
+
 ```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+Read the [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) documentation.
+There, you'll find all of the `validate*` functions necessary for each field. For example, [Ecto.Changeset.validate_change/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_change/3) allows you to create custom validation.
+
+You can also refer to the [primitive types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) documentation for the list of allowed field types.
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Book do
+  @types %{
+    title: :string,
+    content: :string,
+    published_on: :date,
+    category: :string,
+    books_sold: :integer,
+    publisher_email: :string,
+    author: :string,
+    has_license: :boolean,
+    price: :integer
+  }
+
+  @keys Map.keys(@types)
+  
+  defstruct @keys
+
+  def changeset(%__MODULE__{} = user, params \\ %{}) do
+    {user, @types}
+    |> Ecto.Changeset.cast(params, @keys)
+    |> Ecto.Changeset.validate_required([:title, :content])
+    |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+    |> Ecto.Changeset.validate_inclusion(:category, ["action", "fiction", "mystery"])
+    |> Ecto.Changeset.validate_number(:books_sold, greater_than_or_equal_to: 0)
+    |> Ecto.Changeset.validate_change(:publisher_email, fn :publisher_email, publisher_email ->
+      if Regex.match?(~r/\w+@\w+\.\w+/, publisher_email) do
+        []
+      else
+        [email: "invalid email"]
+      end
+    end)
+    |> Ecto.Changeset.validate_acceptance(:has_license)
+    |> Ecto.Changeset.validate_number(:price, greater_than: 0)
+  end
+
+  def new(params) do
+    %__MODULE__{}
+    |> changeset(params)
+    |> Ecto.Changeset.apply_action(:update)
+  end
+end
+```
+
+</details>
 
 You should rely on Ecto Changesets and your own custom validation to validate the book information. Enter your solution below.
 
 ```elixir
 defmodule Book do
-  def changeset(%__MODULE__{} = user, params) do
-  end
-
-  def new(params) do
-  end
 end
 ```
 
