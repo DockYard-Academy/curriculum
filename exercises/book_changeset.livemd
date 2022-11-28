@@ -4,7 +4,8 @@
 Mix.install([
   {:kino, "~> 0.7.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
 ])
 ```
 
@@ -19,10 +20,10 @@ You're going to create a `Book` schemaless changeset struct. A book should have:
 
 * A required `:title` field between `3` and `100` characters.
 * A required `:content` string field.
-* A required `:published_status` field that is either `true` or `false`.
-* A `:published_on` date field which must exist if the `:published_status` is `true`.
+* A required `:is_published` field that is either `true` or `false`.
+* A `:published_on` date field which must exist if the `:is_published` is `true`.
 * An `:author` string field.
-* An `:is_licenced` field which must always be true.
+* An `:has_license` field which must always be true.
   It's common for applications to have a sign up form that validates a user's email, password, and other information.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -32,21 +33,17 @@ You're going to create a `Book` schemaless changeset struct. A book should have:
   Book.new(%{
     title: "Name of the Wind",
     content: "My name is Kvothe. I have stolen princesses back from sleeping barrow kings...",
-    published_status: true,
+    is_published: true,
     published_on: ~D[2007-03-27],
     is_licenced: true
   })
 ```
 
-You should rely on Ecto Changesets and your own custom validation to validate the user information.
-Enter your solution below.
+You should rely on Ecto Changesets and your own custom validation to validate the book information. Enter your solution below.
 
 ```elixir
 defmodule Book do
-  use Ecto.Schema
-  import Ecto.Changeset
-
-  def changeset(%Book{} = user, params) do
+  def changeset(%__MODULE__{} = user, params) do
   end
 
   def new(params) do
