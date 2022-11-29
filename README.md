@@ -226,7 +226,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix
 * Tailwind
 * Forms and Validation
-* Relational Database Management Systems and Ecto
 * Phoenix and Ecto
 * Phoenix Authentication
 * Testing Phoenix
