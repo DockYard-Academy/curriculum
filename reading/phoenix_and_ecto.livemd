@@ -19,11 +19,22 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-Phoenix uses [Ecto](https://hexdocs.pm/ecto/Ecto.html) to handle the data layer of a web application.
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) provides a standard API layer for communicating with the database of an Elixir application.
 
-We will walk through building a journal application to learn how to use Phoenix with Ecto.
+By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https://www.postgresql.org/) Database. Ensure you already have [PostgreSQL](https://www.postgresql.org/) installed on your computer from the [Relational Database Management Systems](rdbms.livemd) lesson.
 
-Our journal will store entries that have a title and content.
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) splits into four main modules.
+
+* [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html) handles all communication between the application and the database. `Ecto.Repo` reads and writes from the underlying PostgreSQL database.
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) built queries to retrieve and manipulate data with the `Ecto.Repo` repository.
+* [Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html) maps the application struct data representation to the underlying PostgreSQL database representation.
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) creates changesets for validating and applying constraints to structs.
+
+[Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) uses [Ecto](https://hexdocs.pm/ecto/Ecto.html) to handle the data layer of a web application.
+
+We will walk through building a journal application to learn how to use [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) with [Ecto](https://hexdocs.pm/ecto/Ecto.html).
+
+Our journal will store journal entries that have a title and content.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -39,7 +50,7 @@ classDiagram
 
 We will be able to create, read, update, and delete journal entries.
 
-These four CRUD actions (Create, Read, Update, and Delete) form the basis of most common applications.
+The four CRUD actions (create, read, update, and delete) form the basis of most applications.
 
 ## Create the Journal Project
 
@@ -71,9 +82,9 @@ $ mix phx.gen.html Entries Entry entries title:string content:text
 
 The `mix phx.gen.html` command accepts several arguments.
 
-* Entries: The context.
-* Entry: The schema module.
-* entries: The table name and an optional list of attributes and their types.
+* The context: `Entries`.
+* The schema module: `Entry`.
+* The table name and an optional list of attributes and their types: `entries title:string content:text`
 
 This command creates several modules and files.
 
@@ -147,6 +158,8 @@ The database for Journal.Repo has been created
 
 ## Resources and HTTP Actions
 
+### Router
+
 We need to add a route for entries. We'll replace the page controller and use the `"/"` route with the `resources/4` macro.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -187,6 +200,10 @@ entries_path  PATCH   /:id                                  JournalWeb.EntryCont
               PUT     /:id                                  JournalWeb.EntryController :update
 entries_path  DELETE  /:id                                  JournalWeb.EntryController :delete
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller
 
 When the client triggers one of these HTTP actions, the server executes the corresponding action in the `JournalWeb.EntryController`, either `:index`, `:edit`, `:new`, `:show`, `:create`, `:update`, or `:delete`.
 
@@ -259,9 +276,13 @@ defmodule JournalWeb.EntryController do
 end
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Resources
+
 The `resources/4` macro is for convenience, so we don't need to define individual routes.
 
-For example, replace `resources/4` with the following. The application will still have the same behavior.
+For example, we can replace `resources/4` with the following and the application will still have the same behavior.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -281,6 +302,183 @@ end
 ```
 
 See [Phoenix.Router.resources/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/4) for more configuration options.
+
+## Context
+
+Our `EntryController` uses the `Entries` context. Contexts are modules that group related functionality. In this case, the `Entries` context contains functions for working with entries in the database.
+
+Here's our `Entries` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Entries do
+  @moduledoc """
+  The Entries context.
+  """
+
+  import Ecto.Query, warn: false
+  alias Journal.Repo
+
+  alias Journal.Entries.Entry
+
+  @doc """
+  Returns the list of entries.
+
+  ## Examples
+
+      iex> list_entries()
+      [%Entry{}, ...]
+
+  """
+  def list_entries do
+    Repo.all(Entry)
+  end
+
+  @doc """
+  Gets a single entry.
+
+  Raises `Ecto.NoResultsError` if the Entry does not exist.
+
+  ## Examples
+
+      iex> get_entry!(123)
+      %Entry{}
+
+      iex> get_entry!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_entry!(id), do: Repo.get!(Entry, id)
+
+  @doc """
+  Creates a entry.
+
+  ## Examples
+
+      iex> create_entry(%{field: value})
+      {:ok, %Entry{}}
+
+      iex> create_entry(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_entry(attrs \\ %{}) do
+    %Entry{}
+    |> Entry.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a entry.
+
+  ## Examples
+
+      iex> update_entry(entry, %{field: new_value})
+      {:ok, %Entry{}}
+
+      iex> update_entry(entry, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_entry(%Entry{} = entry, attrs) do
+    entry
+    |> Entry.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a entry.
+
+  ## Examples
+
+      iex> delete_entry(entry)
+      {:ok, %Entry{}}
+
+      iex> delete_entry(entry)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_entry(%Entry{} = entry) do
+    Repo.delete(entry)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking entry changes.
+
+  ## Examples
+
+      iex> change_entry(entry)
+      %Ecto.Changeset{data: %Entry{}}
+
+  """
+  def change_entry(%Entry{} = entry, attrs \\ %{}) do
+    Entry.changeset(entry, attrs)
+  end
+end
+```
+
+## Schema
+
+The `Entries` context exposes functions for CRUD (create, read, update, delete) actions.
+These functions work with an `Entry` schema and the `Repo` module.
+
+An `Ecto.Schema` maps Elixir external data into Elixir structs. In this case, the `Entry` schema maps data from the `entries` table into an `Entry` struct.
+
+Here's our `Entry` schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Entries.Entry do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "entries" do
+    field :content, :string
+    field :title, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(entry, attrs) do
+    entry
+    |> cast(attrs, [:title, :content])
+    |> validate_required([:title, :content])
+  end
+end
+```
+
+The [Ecto.schema/2](https://hexdocs.pm/ecto/Ecto.Schema.html#schema/2) macro plays the same roll that `@types` does for schemaless changesets, which we learned about in the [Ecto Changesets](./ecto_changeset.livemd) material.
+
+Each [field/3](https://hexdocs.pm/ecto/Ecto.Schema.html#field/3) macro defines the fields of our schema and their type. You can find the full list of valid field types at [Ecto.Schema: Types and casting](https://hexdocs.pm/ecto/Ecto.Schema.html#module-types-and-casting).
+
+We can use the `Entry.changeset/2` function to validate data before we attempt to insert it into the database. For example, in the `Entires` context, the [Ecto.Repo.insert/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) takes in the changeset returned from `Entry.changeset/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def create_entry(attrs \\ %{}) do
+    %Entry{}
+    |> Entry.changeset(attrs)
+    |> Repo.insert()
+  end
+```
+
+## Repo
+
+The [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) module defines functions for working with the database.
+
+In our `Entries` context, we see some common functions:
+
+* [Repo.all](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2): get all records.
+* [Repo.get!](https://hexdocs.pm/ecto/Ecto.Repo.html#c:get!/3): get one record.
+* [Repo.insert/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2): insert a record.
+* [Repo.update](https://hexdocs.pm/ecto/Ecto.Repo.html#c:update/2): update existing record.
+* [Repo.delete](https://hexdocs.pm/ecto/Ecto.Repo.html#c:delete/2): delete record.
+
+These cover the full range of CRUD (create, read, update, delete) actions.
 
 ## GET :index
 
@@ -681,6 +879,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                       | Next                                                           |
-| ------------------------------ | -------------------------------------------------------------: |
-| [Ecto](../reading/ecto.livemd) | [Portfolio Blog Page](../exercises/portfolio_blog_page.livemd) |
+| Previous                         | Next                                         |
+| -------------------------------- | -------------------------------------------: |
+| [RDBMS](../reading/rdbms.livemd) | [Sql Drills](../exercises/sql_drills.livemd) |

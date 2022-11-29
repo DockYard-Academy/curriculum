@@ -1,11 +1,12 @@
-# RDBMS
+# Relational Database Management Systems
 
 ```elixir
 Mix.install([
   {:kino, "~> 0.7.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:kino_db, "~> 0.1.1"}
+  {:kino_db, "~> 0.2.0"},
+  {:postgrex, "~> 0.16.3"}
 ])
 ```
 
@@ -18,11 +19,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
-## Relational Database Management Systems (RDBMS)
+## Relational Database Management Systems
 
 Databases store long-term information in a program. There are many kinds of databases, but in Elixir we'll focus on Relational Database Management Systems (RDBMS) with PostgreSQL.
 
 Here's a great primer by Linux Academy.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=Tk1t3WKK-ZY\")","title":"PostgreSQL"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=Tk1t3WKK-ZY")
@@ -115,6 +118,8 @@ It often helps to "turn it off and on again." In this case, uninstall and re-ins
 
 Here, we've provided debugging instructions for some common issues.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### PostgreSQL Not Started
 
 On Linux (Ubuntu) you can start the postgresql process with the following command.
@@ -135,7 +140,9 @@ Then test if PostgreSQL is running on your computer again.
 $ pgrep -u postgres -fa -- -D
 ```
 
-#### Role Does Not Exist
+<!-- livebook:{"break_markdown":true} -->
+
+### Role Does Not Exist
 
 PostgreSQL uses different roles to manage permissions when communicating with your PostgreSQL databases. Ensure you are using the correct `postgres` role with the following command.
 
@@ -201,6 +208,8 @@ Now that we're connected to the database. We can use a Structured Query Language
 
 For a primer on SQL syntax, here's a great video by Danielle Thé.
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=27axs9dO7AE\")","title":"SQL"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=27axs9dO7AE")
 ```
@@ -242,8 +251,9 @@ example=# \dt
  public | users | table | postgres
 ```
 
-Now, we'll create the entries table, which will store journal entries that belong to users.
-The entries table will have a foreign key that references the users table, because each entry belongs to one user.
+Now, we'll create the entries table, which will store journal entries that belong to users. The entries table will have a foreign key that references the users table, because each entry belongs to one user.
+
+Entry content can be any size, so we use the `TEXT` SQL type for a string of unlimited length.
 
 Copy and paste the following into the psql prompt.
 
@@ -251,7 +261,7 @@ Copy and paste the following into the psql prompt.
 CREATE TABLE ENTRIES (
     ID INT NOT NULL,
     TITLE VARCHAR(255) NOT NULL,
-    CONTENT VARCHAR(255) NOT NULL,
+    CONTENT TEXT NOT NULL,
     USERID INT,
     PRIMARY KEY (ID),
     FOREIGN KEY (USERID) REFERENCES USERS(ID)
@@ -354,7 +364,7 @@ We can then use [SQL Comparison Operators](https://www.sqltutorial.org/sql-compa
 
 Livebook provides [Smart Cells](https://www.youtube.com/watch?v=4hVIxyHxwK8&ab_channel=ElixirConf) which can connect to our PostgreSQL Database. For example, the following smart cell should successfully connect to your `example` database if you used the default `postgres` user.
 
-<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 opts = [
@@ -362,8 +372,7 @@ opts = [
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "example",
-  socket_options: [:inet6]
+  database: "example"
 ]
 
 {:ok, conn} = Kino.start_child({Postgrex, opts})
@@ -371,15 +380,19 @@ opts = [
 
 Once connected, these smart cells can make SQL queries to our database. Here you should see your users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from USERS","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from USERS","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result2 = Postgrex.query!(conn, "select * from USERS", [])
 ```
 
-Use the following SQL smart cell to create a new user in the users table.
+### Your Turn
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"break_markdown":true} -->
+
+Use the following SQL smart cell to create a new user in the users table. Re-evaluate the smart cell above to see the new user in the table.
+
+<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result3 = Postgrex.query!(conn, "", [])
@@ -387,7 +400,7 @@ result3 = Postgrex.query!(conn, "", [])
 
 Use the following SQL smart cell to create a new entry in the entries table, which has a foreign key to the same user you previously created.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result4","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result4","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result4 = Postgrex.query!(conn, "", [])
@@ -473,13 +486,11 @@ In this case, there would be a **many-to-many** relationship between users.
 
 ## Further Reading
 
-PostgreSQL, SQL, and Relational Database Management Systems are massive topics.
+PostgreSQL, SQL, and Relational Database Management Systems are deep topics.
 
-In addition, you'll likely find yourself using [Ecto](ecto.livemd) as a wrapper around the database rather
-than directly interacting with PostgreSQL or writing SQL queries. This lesson is a primer to prepare you to use Ecto and understand what's happening under the hood.
+In the future, you'll use [Ecto](https://hexdocs.pm/ecto/Ecto.html) as a wrapper around the database rather than interacting directly with PostgreSQL using SQL. This lesson is a primer to prepare you to use Ecto and understand what's happening under the hood.
 
-However, if you do want to dive deeper into PostgreSQL and SQL,
-you might consider the following resources.
+Consider the following resource(s) to deepen your understanding of the topic.
 
 * [SQL Tutorial Org](https://www.sqltutorial.org/)
 * [PostgreSQL Tutorial](https://www.postgresqltutorial.com/)
@@ -507,6 +518,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                             | Next                           |
-| ---------------------------------------------------- | -----------------------------: |
-| [Book Changeset](../exercises/book_changeset.livemd) | [Ecto](../reading/ecto.livemd) |
+| Previous                                             | Next                                                   |
+| ---------------------------------------------------- | -----------------------------------------------------: |
+| [Book Changeset](../exercises/book_changeset.livemd) | [Phoenix And Ecto](../reading/phoenix_and_ecto.livemd) |

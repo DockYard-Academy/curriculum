@@ -69,15 +69,15 @@ Ecto provides a command to automate configuration.
 mix ecto.gen.repo -r Journal.Repo
 ```
 
-This command configures the Ecto Repository in `config.exs`.
+Configure the Ecto Repository in `config.exs`. By default, PostgreSQL uses a `postgres` user with a `postgres` password.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 config :journal, Journal.Repo,
   database: "journal_repo",
-  username: "user",
-  password: "pass",
+  username: "postgres",
+  password: "postgres",
   hostname: "localhost"
 ```
 
@@ -246,7 +246,7 @@ journal_repo=# \dt
 With the users table defined, we can use SQL to read and write data.
 We don't recommend doing this manually for your application, but we want to demonstrate that Ecto is simply a wrapper around PostgreSQL.
 
-<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 opts = [
@@ -267,7 +267,7 @@ In the Elixir smart cell below, enter the following SQL query to insert a user i
 INSERT INTO USERS (ID,NAME,EMAIL) VALUES (0, 'Peter', 'peter@spider.web');
 ```
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result2 = Postgrex.query!(conn, "", [])
@@ -275,7 +275,7 @@ result2 = Postgrex.query!(conn, "", [])
 
 Ensure the user was created by evaluating the cell below to display all users in the users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users ","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users ","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result3 = Postgrex.query!(conn, "select * from users ", [])
@@ -335,7 +335,7 @@ Assuming this succeeds with an `{:ok, user}` tuple, there should be a user in ou
 
 Re-evaluate the smart cell below to ensure a new user is in the users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result = Postgrex.query!(conn, "select * from users", [])
@@ -770,10 +770,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-ecto
+$ git checkout -b exercise-depicated_ecto
 $ git add .
-$ git commit -m "finish ecto section"
-$ git push origin exercise-ecto
+$ git commit -m "finish depicated ecto section"
+$ git push origin exercise-depicated_ecto
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -783,9 +783,3 @@ Create a pull request to your forked `main` branch. Please do not create a pull 
 Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
-
-## Up Next
-
-| Previous                         | Next                                                   |
-| -------------------------------- | -----------------------------------------------------: |
-| [RDBMS](../reading/rdbms.livemd) | [Phoenix And Ecto](../reading/phoenix_and_ecto.livemd) |
