@@ -148,13 +148,23 @@ line 3
 ```
 
 ```elixir
-File.stream!("multi-line.txt") |> Enum.to_list() |> Enum.filter(list, fn list -> list.[] < 3 end)
+num = "line 1"
+# num2 = "line 2"
+String.last(num) |> String.to_integer()
+```
+
+```elixir
+File.stream!("multi-line.txt") |> Enum.to_list()
 ```
 
 Use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2), [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2), and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to read the first line of `multi-line.txt`. Print the value.
 
 ```elixir
+{:ok, file} = File.open("multi-line.txt")
 
+IO.read(file, :line) |> IO.inspect()
+
+File.close(file)
 ```
 
 Use [File.mkdir_p/1](https://hexdocs.pm/elixir/File.html#mkdir_p/1) to create:
@@ -164,7 +174,9 @@ Use [File.mkdir_p/1](https://hexdocs.pm/elixir/File.html#mkdir_p/1) to create:
 * `"parent/sub_c"`
 
 ```elixir
-
+File.mkdir_p!("parent/sub_a/")
+File.mkdir_p!("parent/sub_b")
+File.mkdir_p!("parent/sub_c")
 ```
 
 Use [File.write!/3](https://hexdocs.pm/elixir/File.html#write!/3) to create six empty files:
@@ -177,13 +189,18 @@ Use [File.write!/3](https://hexdocs.pm/elixir/File.html#write!/3) to create six 
 * `"parent/sub_c/file"`
 
 ```elixir
-
+File.write!("parent/sub_a/file.txt", "")
+File.write!("parent/sub_a/file", "")
+File.write!("parent/sub_b/file.txt", "")
+File.write!("parent/sub_b/file", "")
+File.write!("parent/sub_c/file.txt", "")
+File.write!("parent/sub_c/file", "")
 ```
 
 Use [File.ls!/1](https://hexdocs.pm/elixir/File.html#ls!/1) to find all of the files/folders inside of the `parent` folder.
 
 ```elixir
-
+File.ls!("parent")
 ```
 
 ## Path
@@ -191,43 +208,52 @@ Use [File.ls!/1](https://hexdocs.pm/elixir/File.html#ls!/1) to find all of the f
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"/parent/"` and `"/child/"`
 
 ```elixir
+path1 = "/parent/"
+path2 = "/child/"
 
+Path.join(path1, path2)
 ```
 
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"parent"` and `"child"`
 
 ```elixir
+path1 = "parent"
+path2 = "child"
 
+Path.join(path1, path2)
 ```
 
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"folder"` and `"file.txt"`.
 
 ```elixir
+path1 = "folder"
+path2 = "file.txt"
 
+Path.join(path1, path2)
 ```
 
 Use [Path.absname/1](https://hexdocs.pm/elixir/Path.html#absname/1) to convert the current path `"."` to an absolute path.
 
 ```elixir
-
+Path.absname(".")
 ```
 
 Use [Path.dirname/1](https://hexdocs.pm/elixir/Path.html#dirname/1) to find the directory name of `"folder/subfolder/file.txt"`
 
 ```elixir
-
+Path.dirname("folder/subfolder/hello.txt")
 ```
 
 Use [Path.dirname/1](https://hexdocs.pm/elixir/Path.html#dirname/1) to find the directory name of `"file.txt"`.
 
 ```elixir
-
+Path.dirname("file.txt")
 ```
 
 Use [Path.wildcard/2](https://hexdocs.pm/elixir/Path.html#wildcard/2) to find all files in a nested folder `"parent/*"` that end in a `.txt` extension. You should see your three `file.txt` files created earlier.
 
 ```elixir
-
+Path.wildcard("parent/*/*.txt")
 ```
 
 Use [File.rm_rf/1](https://hexdocs.pm/elixir/File.html#rm_rf/1) to delete all folders created by this exercise.
@@ -237,7 +263,7 @@ CAUTION: DO NOT DELETE IMPORTANT FILES ON YOUR COMPUTER.
 </div>
 
 ```elixir
-
+File.rm_rf("drills")
 ```
 
 Use [File.rm/1](https://hexdocs.pm/elixir/File.html#rm/1) to delete any remaining files created by this exercise.
@@ -247,7 +273,8 @@ CAUTION: DO NOT DELETE IMPORTANT FILES ON YOUR COMPUTER.
 </div>
 
 ```elixir
-
+File.rm("hello.txt")
+File.rm("drills.txt")
 ```
 
 ## Commit Your Progress
