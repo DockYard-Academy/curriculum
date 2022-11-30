@@ -1,0 +1,98 @@
+# Blog: Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Blog: Setup
+
+You're going to build a `Blog` application to learn more about Phoenix and Ecto.
+
+```
+$ mix phx.new blog
+```
+
+blog posts should have a title, subtitle, and content.
+
+```mermaid
+classDiagram
+  class Post {
+    title: :string
+    subtitle: :string
+    content: :text
+  }
+```
+
+Use [Phoenix Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Html.html) to generate the Controller, Context, and other infrastructure for the post resource.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Generate the resource.
+
+```elixir
+$ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
+$ mix ecto.migrate
+```
+
+Then add the resource to `router.ex`.
+
+```elixir
+scope "/", BlogWeb do
+  pipe_through :browser
+
+  get "/", PageController, :home
+  resources "/posts", PostController
+end
+```
+
+</details>
+
+## Bonus: Validation
+
+Add the following validation rules to your `Post`.
+
+* `:title` must be between `3` and `10` characters.
+* `:subtitle` must be between `3` and `100` characters.
+
+Ensure these validations are enforced when you create or edit a post.
+
+## Bonus: Skip the Generators
+
+To solidify your understanding of Phoenix, recreate your blog application without using generators.
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-blog_setup
+$ git add .
+$ git commit -m "finish blog setup exercise"
+$ git push origin exercise-blog_setup
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                     | Next                                                         |
+| -------------------------------------------- | -----------------------------------------------------------: |
+| [Sql Drills](../exercises/sql_drills.livemd) | [Book Search Authors](../reading/book_search_authors.livemd) |

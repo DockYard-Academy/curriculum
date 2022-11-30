@@ -1,4 +1,4 @@
-# Portfolio: Blog Search
+# Blog: Search
 
 ```elixir
 Mix.install([
@@ -13,9 +13,10 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
 
-## Blog Page
+## Blog: Search
 
-You're going to add the ability to search for blogs posts to your portfolio project.
+You're going to add the ability to search for blogs posts to your `Blog` project.
+The UI should look similar to the following, but does not have to match exactly as long as it has the required search functionality.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -30,15 +31,15 @@ http://localhost:4000/blogs?title=input_string should only display blogs whose t
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Blog Context
+### Posts Context
 
-The blog context should be able to search for blogs by their title.
-The exact interface depends on how you have implemented blogs. You might consider something like the following.
+The Posts context should be able to search for blog posts by their title.
+The exact interface depends on how you have implemented posts. You might consider something like the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Blog.list_all(title: "My Title")
+Posts.list_all(title: "My Title")
 ```
 
 Which would return a list of blog structs that include the search string in their title (case insensitive).
@@ -53,8 +54,8 @@ Which would return a list of blog structs that include the search string in thei
 ]
 ```
 
-Filter out blogs that do not include the searched text in their title.
-Blogs that include the text should be found.
+Filter out posts that do not include the searched text in their title.
+posts that include the text should be found.
 
 Consider including the following test cases.
 
@@ -66,18 +67,39 @@ Consider including the following test cases.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Blog Controller
+### Posts Controller
 
-The blog controller should already display all blogs on the blog page when the client visits http://localhost:4000/blogs.
+The posts controller should already display all blogs on the blog page when the client visits http://localhost:4000/posts.
 
-There should be a form with a text input and a submit button that triggers a GET request to http://localhost:4000/blogs?title=search_string where `search_string` is the value of the text input.
+On the same page that lists all posts, create a form with a text input and a submit button that triggers a GET request to http://localhost:4000/blogs?title=search_string where `search_string` is the value of the text input.
 
 The blog controller should filter the list of blogs by the `title` query parameter when the client visits http://localhost:4000/blogs?title=search_string.
 
 Consider including the following test cases.
 
-* Visit http://localhost:4000/blogs and trigger form input with the text "MyTitle". Assert the client is redirected to http://localhost:4000/blogs?title=MyTitle.
+* Visit http://localhost:4000/blogs and trigger form input with the title "MyTitle". Assert the client is redirected to http://localhost:4000/blogs?title=MyTitle.
 * Visit http://localhost:4000/blogs?title=MyTitle and find matching blogs.
+
+## Bonus: Filter By Content
+
+Filter your posts by both content and title. Include partial and case-insensitive matches.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Posts.list_all(title: "My Title", content: "My Content")
+```
+
+Ensure you test both the context, and the controller similar to how you did with title. In addition, ensure you test that you can filter by both content and title at the same time.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Phoenix: Introduction to Testing](https://hexdocs.pm/phoenix/testing.html)
+* [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html)
+
+For a deep-dive into testing, we highly recommend the excellent book [Testing Elixir: Effective and Robust Testing for Elixir and its Ecosystem](https://pragprog.com/titles/lmelixir/testing-elixir/).
 
 ## Commit Your Progress
 
@@ -86,10 +108,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-portfolio_blog_search
+$ git checkout -b exercise-blog_search
 $ git add .
-$ git commit -m "finish portfolio blog search exercise"
-$ git push origin exercise-portfolio_blog_search
+$ git commit -m "finish blog search exercise"
+$ git push origin exercise-blog_search
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -102,6 +124,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                     | Next                                                     |
-| ------------------------------------------------------------ | -------------------------------------------------------: |
-| [Book Search Authors](../reading/book_search_authors.livemd) | [Book Search Books](../reading/book_search_books.livemd) |
+| Previous                                                     | Next                                                               |
+| ------------------------------------------------------------ | -----------------------------------------------------------------: |
+| [Book Search Authors](../reading/book_search_authors.livemd) | [Phoenix Authentication](../reading/phoenix_authentication.livemd) |

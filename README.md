@@ -227,15 +227,15 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Tailwind
 * Forms and Validation
 * Phoenix and Ecto
-* Phoenix Authentication
 * Testing Phoenix
+* Schemas and Migrations
+* Phoenix Authentication
 * Phoenix and Ecto One-to-Many Relationships
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
 ## LiveView
 * LiveView
 * Testing LiveView
-* Phoenix Forms
 * PubSub and Channels
 * GraphQL and Absinthe
 ## Capstone Project Preparation
