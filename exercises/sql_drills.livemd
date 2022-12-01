@@ -79,14 +79,14 @@ From the PostgreSQL prompt, connect to your `drills` database.
 
 ## SQL
 
-From your PostgreSQL prompt, create an `AUTHORS` table. `AUTHORS` should have an `ID` primary key field, and a `NAME` `VARCHAR` field.
+From your PostgreSQL prompt, create an `authors` table. `authors` should have an `ID` primary key field, and a `NAME` `VARCHAR` field.
 Every fields should be `NOT NULL`.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```
-CREATE TABLE AUTHORS (
+CREATE TABLE authors (
    ID    INT              NOT NULL,
    NAME  VARCHAR (255)    NOT NULL,
    PRIMARY KEY (ID)
@@ -97,21 +97,21 @@ CREATE TABLE AUTHORS (
 
 <!-- livebook:{"break_markdown":true} -->
 
-From your PostgreSQL prompt, create a `BOOKS` table. `BOOKS` should have a `TITLE` field up to `30` characters, and a `CONTENT` field of unlimited length. Both fields should be `NOT NULL`.
+From your PostgreSQL prompt, create a `books` table. `books` should have a `TITLE` field up to `30` characters, and a `CONTENT` field of unlimited length. Both fields should be `NOT NULL`.
 
-`BOOKS` should also store an optional `AUTHORID` `FOREIGN KEY` field that `REFERENCES` the `AUTHORS` table by `ID`.
+`books` should also store an optional `AUTHORID` `FOREIGN KEY` field that `REFERENCES` the `authors` table by `ID`.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```
-CREATE TABLE BOOKS (
+CREATE TABLE books (
     ID INT NOT NULL,
     TITLE VARCHAR(30) NOT NULL,
     CONTENT TEXT NOT NULL,
     AUTHORID INT,
     PRIMARY KEY (ID),
-    FOREIGN KEY (AUTHORID) REFERENCES AUTHORS(ID)
+    FOREIGN KEY (AUTHORID) REFERENCES authors(ID)
 );
 ```
 
@@ -132,26 +132,26 @@ From the PostgreSQL prompt, view both of your tables.
 
 <!-- livebook:{"break_markdown":true} -->
 
-From the PostgreSQL prompt, create an author in the `AUTHORS` table.
+From the PostgreSQL prompt, create an author in the `authors` table.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```
-INSERT INTO AUTHORS (ID,NAME) VALUES (1, 'Patrick Rothfuss');
+INSERT INTO authors (ID,NAME) VALUES (1, 'Patrick Rothfuss');
 ```
 
 </details>
 
 <!-- livebook:{"break_markdown":true} -->
 
-From the PostgreSQL prompt, create a book in the `BOOKS` table that belongs to the author you previously created.
+From the PostgreSQL prompt, create a book in the `books` table that belongs to the author you previously created.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```
-INSERT INTO BOOKS (ID,TITLE,CONTENT,AUTHORID) VALUES (1, 'Name of the Wind', 'My name is Kvothe, pronounced nearly the same as quothe', 1);
+INSERT INTO books (ID,TITLE,CONTENT,AUTHORID) VALUES (1, 'Name of the Wind', 'My name is Kvothe, pronounced nearly the same as quothe', 1);
 ```
 
 </details>
@@ -163,8 +163,8 @@ From the PostgreSQL prompt, select all authors.
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
-```
-SELECT * FROM AUTHORS;
+```sql
+SELECT * FROM authors;
 ```
 
 </details>
@@ -177,7 +177,7 @@ From the PostgreSQL prompt, select all books.
 <summary>Example Solution</summary>
 
 ```
-SELECT * FROM BOOKS
+SELECT * FROM books
 ```
 
 </details>
@@ -190,7 +190,7 @@ From the PostgreSQL prompt, select all books that belong to the author you previ
 <summary>Example Solution</summary>
 
 ```
-SELECT * FROM BOOKS b WHERE b.authorid = 1
+SELECT * FROM books b WHERE b.authorid = 1
 ```
 
 </details>
