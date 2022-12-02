@@ -60,7 +60,7 @@ defmodule CaesarCypher do
     |> Enum.map(fn char ->
       overflow = char + key > ?z
       if overflow do
-        rem(char + key, ?z) + ?a
+        ?a + rem(char + key, ?z) - 1
       else
         char + key
       end
