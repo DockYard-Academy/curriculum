@@ -226,7 +226,7 @@ We can create a table with the `CREATE TABLE` query, which creates a table and d
 Copy and past the following into the `psql` prompt.
 
 ```sql
-CREATE TABLE USERS (
+CREATE TABLE users (
    ID    INT              NOT NULL,
    NAME  VARCHAR (255)    NOT NULL,
    EMAIL VARCHAR (255)    NOT NULL,
@@ -258,13 +258,13 @@ Entry content can be any size, so we use the `TEXT` SQL type for a string of unl
 Copy and paste the following into the psql prompt.
 
 ```sql
-CREATE TABLE ENTRIES (
+CREATE TABLE entries (
     ID INT NOT NULL,
     TITLE VARCHAR(255) NOT NULL,
     CONTENT TEXT NOT NULL,
     USERID INT,
     PRIMARY KEY (ID),
-    FOREIGN KEY (USERID) REFERENCES USERS(ID)
+    FOREIGN KEY (USERID) REFERENCES users(ID)
 );
 ```
 
@@ -288,13 +288,13 @@ Now that we've created these two tables let's insert some data.
 First, we'll make a single user in the users table using the `INSERT INTO` query.
 
 ```sql
-INSERT INTO USERS (ID,NAME,EMAIL) VALUES (1, 'Peter', 'peter@spider.web');
+INSERT INTO users (ID,NAME,EMAIL) VALUES (1, 'Peter', 'peter@spider.web');
 ```
 
 We'll also create an entry for this user.
 
 ```sql
-INSERT INTO ENTRIES (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Today, I Encountered Rhino.', 1);
+INSERT INTO entries (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Today, I Encountered Rhino.', 1);
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -304,7 +304,7 @@ INSERT INTO ENTRIES (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Tod
 We can the records in our table using the `SELECT` query.
 
 ```sql
-SELECT * FROM USERS;
+SELECT * FROM users;
 ```
 
 The query above should display the following.
@@ -318,7 +318,7 @@ The query above should display the following.
 We can also see the data created in the entries table.
 
 ```sql
-SELECT * FROM ENTRIES;
+SELECT * FROM entries;
 ```
 
 The query above should display the following.
@@ -334,7 +334,7 @@ Alternatively, we can specify the fields we want to display.
 For example, here's how we could retrieve only the title and the content for each entry.
 
 ```sql
-SELECT TITLE,CONTENT from ENTRIES
+SELECT TITLE,CONTENT from entries
 ```
 
 The query above should display the following.
@@ -352,7 +352,7 @@ The query above should display the following.
 We can filter our `SELECT` results using the `WHERE` query. For example,
 
 ```sql
-SELECT * FROM USERS u WHERE u.id = 1
+SELECT * FROM users u WHERE u.id = 1
 ```
 
 The `u` before `WHERE` is conceptually similar to a variable bound to each user in the table.
@@ -380,10 +380,10 @@ opts = [
 
 Once connected, these smart cells can make SQL queries to our database. Here you should see your users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from USERS","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result2 = Postgrex.query!(conn, "select * from USERS", [])
+result2 = Postgrex.query!(conn, "select * from users", [])
 ```
 
 ### Your Turn

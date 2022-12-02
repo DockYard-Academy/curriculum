@@ -15,7 +15,7 @@ Mix.install([
 
 ## Blog: Search
 
-You're going to add the ability to search for blogs posts to your `Blog` project.
+You're going to add the ability to search for blog posts to your `Blog` project.
 The UI should look similar to the following, but does not have to match exactly as long as it has the required search functionality.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -24,10 +24,10 @@ The UI should look similar to the following, but does not have to match exactly 
 
 <!-- livebook:{"break_markdown":true} -->
 
-The blog page should have a text input and a search button that directs the user to http://localhost:4000/blogs?title=input_string
+The blog page should have a text input and a search button that directs the user to http://localhost:4000/posts?title=input_string
 where `search_string` is the text inside of the form.
 
-http://localhost:4000/blogs?title=input_string should only display blogs whose title includes the `search_string` (case-insensitive).
+http://localhost:4000/posts?title=input_string should only display blogs whose title includes the `search_string` (case-insensitive).
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -39,7 +39,7 @@ The exact interface depends on how you have implemented posts. You might conside
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Posts.list_all(title: "My Title")
+Posts.list_posts(title: "My Title")
 ```
 
 Which would return a list of blog structs that include the search string in their title (case insensitive).
@@ -48,9 +48,9 @@ Which would return a list of blog structs that include the search string in thei
 
 ```elixir
 [
-  %Blog{id: 1, title: "My Title", content: "My Example Content"},
-  %Blog{id: 3, title: "my title", content: "My Example Content"}
-  %Blog{id: 3, title: "MY TITLE", content: "My Example Content"}
+  %Post{id: 1, title: "My Title", content: "My Example Content"},
+  %Post{id: 3, title: "my title", content: "My Example Content"}
+  %Post{id: 3, title: "MY TITLE", content: "My Example Content"}
 ]
 ```
 
@@ -59,26 +59,26 @@ posts that include the text should be found.
 
 Consider including the following test cases.
 
-* Find blog(s) that exactly match search. (`"My Title"` matches `"My Title"`)
-* Find blog(s) that partially match search. (`"My Title"` matches `"This Includes My Title In It"`)
-* Find blog(s) that match search lower case insensitive. (`"My Title"` matches `"my title"`)
-* Find blog(s) that match search capital case insensitive. (`"My Title"` matches `"MY TITLE"`)
-* Do not find blogs that do not match search. (`"My Title"` does not match `"Non-matching Title"`)
+* Find posts that exactly match search. (`"My Title"` matches `"My Title"`)
+* Find posts that partially match search. (`"My Title"` matches `"This Includes My Title In It"`)
+* Find posts that match search lower case insensitive. (`"My Title"` matches `"my title"`)
+* Find posts that match search capital case insensitive. (`"My Title"` matches `"MY TITLE"`)
+* Do not find posts that do not match search. (`"My Title"` does not match `"Non-matching Title"`)
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Posts Controller
 
-The posts controller should already display all blogs on the blog page when the client visits http://localhost:4000/posts.
+The posts controller should already display all posts when the client visits http://localhost:4000/posts.
 
-On the same page that lists all posts, create a form with a text input and a submit button that triggers a GET request to http://localhost:4000/blogs?title=search_string where `search_string` is the value of the text input.
+On the same page that lists all posts, create a form with a text input and a submit button that triggers a GET request to http://localhost:4000/posts?title=search_string where `search_string` is the value of the text input.
 
-The blog controller should filter the list of blogs by the `title` query parameter when the client visits http://localhost:4000/blogs?title=search_string.
+The blog controller should filter the list of blogs by the `title` query parameter when the client visits http://localhost:4000/posts?title=search_string.
 
 Consider including the following test cases.
 
-* Visit http://localhost:4000/blogs and trigger form input with the title "MyTitle". Assert the client is redirected to http://localhost:4000/blogs?title=MyTitle.
-* Visit http://localhost:4000/blogs?title=MyTitle and find matching blogs.
+* Visit http://localhost:4000/posts and trigger form input with the title "MyTitle". Assert the client is redirected to http://localhost:4000/posts?title=MyTitle.
+* Visit http://localhost:4000/posts?title=MyTitle and find matching blogs.
 
 ## Bonus: Filter By Content
 
