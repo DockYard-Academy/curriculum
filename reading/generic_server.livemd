@@ -398,7 +398,7 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-This is the heart of generic servers. We can create an in-memory process have it store some state. Then, we send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
+This is the heart of generic servers. We can create an in-memory process, have it store some state, and then send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
 
 The built-in [GenServer](https://hexdocs.pm/elixir/GenServer.html) also has some additional functionality, which will become more important
 as you work with concurrency. But, for now, we're going to focus on using it as a tool for persistence, so
@@ -486,6 +486,18 @@ defmodule CounterClientAndServer do
     {:reply, next_count, next_count}
   end
 end
+```
+
+Let's start our [GenServer](https://hexdocs.pm/elixir/GenServer.html) and bind its PID to the `pid` variable.
+
+```elixir
+{:ok, pid} = CounterClientAndServer.start_link([])
+```
+
+Now execute the Elixir cell below a few times and notice that the counter increments on each execution just as before.
+
+```elixir
+CounterClientAndServer.increment(pid)
 ```
 
 ### `__MODULE__`
