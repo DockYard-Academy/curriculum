@@ -18,7 +18,65 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-# Ecto Schemas
+## Overview
+
+Ecto is a library for the Elixir programming language that is used for working with databases. Ecto.Schema is a module within Ecto that defines how data is mapped to and from a database. Ecto.Migrate is a module that is used for defining and running database migrations, which are a way to change the structure of a database over time in a predictable and organized manner. Ecto.Changeset is a module that is used to apply changes to data in a database, ensuring that the changes are valid and conform to the constraints defined in the associated Ecto.Schema.
+
+Here is an example of how these three modules might be used together:
+
+First, you would define your Ecto.Schema, which specifies the structure of the data you want to store in the database. For example:
+
+```elixir
+defmodule User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+  end
+end
+```
+
+Next, you would use Ecto.Migrate to define and run a migration for the "users" table in the database. This would involve creating a new module for the migration, in which you would use Ecto.Migrate to define the changes you want to make to the database structure:
+
+```elixir
+defmodule MyApp.Repo.Migrations.CreateUser do
+  use Ecto.Migration
+
+  def change do
+    create table(:users) do
+      add :name, :string
+      add :email, :string
+    end
+  end
+end
+```
+
+Once you have defined your migration, you can run it using the mix ecto.migrate command, which will apply the changes you defined to the database.
+
+Finally, when you want to make changes to data in the database, you would use Ecto.Changeset to apply those changes in a safe and predictable manner. For example:
+
+```elixir
+defmodule User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+  end
+
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email])
+    |> validate_required([:name, :email])
+  end
+end
+```
+
+In this example, the changeset/2 function is used to define the constraints that must be satisfied when applying changes to a user. In this case, the changeset ensures that the :name and :email fields are both present and valid.
+
+## Ecto Schemas
 
 [Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html) defines the shape and structure of data stored in a database. An [Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html) defines the fields that make up a particular data structure, as well as the data types and constraints for each field. This allows Ecto to automatically convert between Elixir data structures and the corresponding database records, as well as to validate and manipulate data as needed.
 
@@ -100,9 +158,9 @@ end
 
 You can use any of the [Elixir Primitive Types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) and they will be converted to the appropriate [Field Type](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#module-field-types) for your database.
 
-To run this migration, you would use the ecto.migrate task provided by Ecto. This task will automatically apply the migration to the database, creating the users table and adding the name and email columns to it.
+To run this migration, you would use the `mix ecto.migrate` task provided by Ecto. This task will automatically apply the migration to the database, creating the users table and adding the name and email columns to it.
 
-It's important to note that Ecto will track which migrations have been applied to the database, and it will only apply migrations that haven't been run before. This means that you can safely run the ecto.migrate task multiple times, and it will only apply new or unapplied migrations. This can be very useful for managing the evolution of your database over time.
+It's important to note that Ecto will track which migrations have been applied to the database, and it will only apply migrations that haven't been run before. This means that you can safely run the `mix ecto.migrate` task multiple times, and it will only apply new or unapplied migrations. This can be very useful for managing the evolution of your database over time.
 
 ## Generate a Migration
 
@@ -147,13 +205,13 @@ end
 
 In this example, the `alter/2` function is used to make several changes to the users table in the database. The `add/2` function is called to add a new phone column to the table, with a data type of :string. The `modify/3` function is then used to update the email and name columns, adding a unique constraint to the email column and making the name column non-nullable. Finally, the `drop/1` function is called to remove the age column from the table.
 
-Once this migration is run using the `ecto.migrate Mix task, the changes will be applied to the users table in the database, resulting in a new phone column, a modified email column, a modified name column, and a removed age column.
+Once this migration is run using the `mix ecto.migrate` Mix task, the changes will be applied to the users table in the database, resulting in a new phone column, a modified email column, a modified name column, and a removed age column.
 
 It's important to note that Ecto will only apply unapplied migrations, so you can safely run the ecto.migrate task multiple times without worrying about making the same changes to the database more than once. This can be very useful for managing the evolution of your database over time.
 
 
 
-# Schemas and Migrations
+## Schemas and Migrations
 
 Elixir schemas and migrations work together to define and manage the structure and content of a database. Schemas are used to define the shape and structure of data in a database, while migrations are used to apply changes to the database over time.
 
