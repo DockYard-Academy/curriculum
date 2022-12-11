@@ -1,4 +1,4 @@
-# Blog: Setup
+# Blog: Migration
 
 ```elixir
 Mix.install([
@@ -13,62 +13,49 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Blog: Setup
+## Blog: Migration
 
-You're going to build a `Blog` application to learn more about Phoenix and Ecto.
+Your existing [Blog](./blog_setup.livemd) application should have a blog posts with a `title`, `subtitle`, and `content`.
+
+You're going to create a migration or many migrations to modify the blog posts table with the following changes:
+
+* Remove the `subtitle` field
+* Add a `publish_on` `:date` field.
+* Add a `visible` `:boolean` field which defaults to `true`.
+
+Ensure your `Post` schema reflects these changes, and ensure all tests pass. Modify existing tests to include the new fields.
+
+Ensure all features of your application such as creating, reading, updating, and deleting posts continue to work. You will likely need to modify any pages using old fields that are no longer valid.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Form Fields
+
+Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
+
+Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
 
 ```
-$ mix phx.new blog
+iex -S mix
 ```
 
-blog posts should have a `title`, `subtitle`, and `content`. It should also have relevant timestamp information.
+<!-- livebook:{"break_markdown":true} -->
 
-```mermaid
-classDiagram
-  class Post {
-    title: :string
-    subtitle: :string
-    content: :text
-  }
-```
+### Bonus: Constraints
 
-Use [Phoenix Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Html.html) to generate the Controller, Context, and other infrastructure for the post resource.
+Create another migration to add the following constraints:
 
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
+* Modify the title field to be unique.
+* Modify the `title` so it must be between `3` and `50` characters.
+* Modify the `subtitle` field so it must be between `3` and `100` characters.
 
-Generate the resource.
+Ensure your `Post` schema reflects these constraints and validations.
 
-```elixir
-$ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
-$ mix ecto.migrate
-```
+<!-- livebook:{"break_markdown":true} -->
 
-Then add the resource to `router.ex`.
+### Bonus: Visibility
 
-```elixir
-scope "/", BlogWeb do
-  pipe_through :browser
-
-  get "/", PageController, :home
-  resources "/posts", PostController
-end
-```
-
-</details>
-
-## Bonus: Validation
-
-Add the following validation rules to your `Post`.
-
-* `:title` must be between `3` and `50` characters.
-* `:subtitle` must be between `3` and `100` characters.
-
-Ensure these validations are enforced when you create or edit a post.
-
-## Bonus: Skip the Generators
-
-To solidify your understanding of Phoenix, recreate your blog application without using generators.
+Hide any blog posts whose `visible` field is `false`. Hide any blog posts whose `published_on` field is after the current UTC date.
 
 ## Commit Your Progress
 
