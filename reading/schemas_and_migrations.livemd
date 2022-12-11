@@ -1,0 +1,625 @@
+# Schemas and Migrations
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+In Elixir, migrations and schemas are used to manage and manipulate data stored in a database.
+
+Migrations are modules that define changes to be made to the structure of a database. A migration can create, modify, or delete tables and columns in a database, and can be used to update the structure of the database to match the latest version of the application.
+
+Schemas are modules that define the structure of data that will be stored in a database. A schema specifies the fields that a record in the database will have, and the data types of those fields.
+
+When using migrations and schemas together in Elixir, the schema is typically used to define the structure of the data that will be stored in the database, and the migration is used to create and modify the tables and columns in the database to match the schema.
+
+For example, if you have a schema that defines a users table with name, email, and password_hash fields, you might create a migration that creates a users table in the database with the same fields as defined in the schema. Then, you can use the schema to insert, update, and query records in the users table.
+
+Migrations and schemas can be used together to make it easier to manage and manipulate data in a database. By defining the structure of the data in a schema and the structure of the database in a migration, you can ensure that the data in the database is always consistent with the schema and the latest version of the application.
+
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a library for the Elixir programming language that is used for working with databases. `Ecto.Schema` is a module within [Ecto](https://hexdocs.pm/ecto/Ecto.html) that defines how data is mapped to and from a database. `Ecto.Migration` is a module that is used for defining and running database migrations, which are a way to change the structure of a database over time in a predictable and organized manner. Ecto.Changeset is a module that is used to apply changes to data in a database, ensuring that the changes are valid and conform to the constraints defined in the associated `Ecto.Schema`.
+
+Here is an example of how these three modules might be used together:
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Schema
+
+First, you would define your `Ecto.Schema`, which specifies the structure of the data you want to store in the database. For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+    field :age, :integer
+
+    timestamps()
+  end
+end
+```
+
+This schema defines a `MyApp.User` module that can be used to represent a user in a database. The schema specifies that the user data will be stored in a table named users, and it defines three fields: `name`, `email`, and `age`. Each field has a corresponding data type, such as `:string` for the `name` and `email` fields, and `:integer` for the `age` field.
+
+The `timestamps/0` function is also called at the end of the schema, which will add `inserted_at` and `updated_at` fields to the `users` table. These fields will be automatically updated by Ecto to track the creation and modification timestamps for each user record.
+
+With this schema in place, you can use the `MyApp.User` module to define and manipulate user data in your Elixir application. Ecto will automatically convert between Elixir data structures and database records, making it easy to work with user data in a consistent and efficient way.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Migration
+
+Next, you would use `Ecto.Migration` to define and run a migration for the "users" table in the database. This would involve creating a new module for the migration, in which you would use Ecto.Migrate to define the changes you want to make to the database structure:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.CreateUser do
+  use Ecto.Migration
+
+  def change do
+    create table(:users) do
+      add :name, :string
+      add :email, :string
+    end
+  end
+end
+```
+
+A database migration is a way of changing the structure or content of a database over time. This can include things like adding or removing tables, columns, or rows; changing the data types or constraints of existing columns; or updating the data in existing rows.
+
+Database migrations are often used in software development to evolve the structure of a database as the underlying software changes and grows over time. They can help ensure that the database remains consistent and correct, even as the software and its requirements evolve.
+
+In general, database migrations involve writing code that specifies the changes to be made to the database. This code is typically run using a tool or library designed for managing database migrations, which will automatically apply the changes to the database in a safe and orderly manner. This can help ensure that the migration process is consistent, repeatable, and reversible, which is important for maintaining the integrity of the database over time.
+
+You can use any of the [Elixir Primitive Types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) and they will be converted to the appropriate [Field Type](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#module-field-types) for your database.
+
+To run this migration, you would use the `mix ecto.migrate` task provided by Ecto. This task will automatically apply the migration to the database, creating the users table and adding the `name`, `email`, and `age` columns to it.
+
+It's important to note that Ecto will track which migrations have been applied to the database, and it will only apply migrations that haven't been run before. This means that you can safely run the `mix ecto.migrate` task multiple times, and it will only apply new or unapplied migrations. This can be very useful for managing the evolution of your database over time.
+
+## Migration Generator
+
+To generate an Ecto migration in Elixir, you can use the `mix ecto.gen.migration` command. This command is provided by the Ecto library, and it can be used to create a new Ecto migration module, which you can use to define and apply changes to your database.
+
+To generate an Ecto migration, you can run the following command from the root directory of your Elixir project:
+
+```
+mix ecto.gen.migration <migration_name>
+```
+
+Replace `<migration_name>` with the desired name for your migration. This name should be a descriptive and unique identifier for the migration, such as `add_users_table` or `update_product_prices`.
+
+When you run this command, Ecto will generate a new migration module and place it in the `priv/repo/migrations/` directory of your project. The generated module will contain some basic skeleton code for defining and applying changes to your database. You can then edit this module to add the specific changes that you want to make.
+
+Once your migration is ready, you can apply it to your database using the `mix ecto.migrate` Mix task provided by Ecto. This task will automatically apply any unapplied migrations to your database, ensuring that it stays up-to-date and consistent with your application code.
+
+## Schema Generator
+
+`mix phx.gen.schema` is a Mix task provided by Phoenix. It is used to generate a new schema file for a given table in the database. This can save time and reduce the potential for errors when creating a schema, as it allows you to quickly generate the basic structure of the schema based on the structure of the existing database table.
+
+To use `mix phx.gen.schema`, you need to provide the name of the schema you want to generate, as well as the name of the database table that the schema will be based on. For example, if you have a table called `users` in your database and you want to generate a schema called `User`, you can use the following command:
+
+```
+mix phx.gen.schema User users
+```
+
+This will generate a new schema file called `user.ex` in the `lib/my_app/` directory (assuming the default directory structure for an Elixir project). The file will contain the basic structure of the schema, with fields for each column in the users table. You can then customize the schema as needed, adding additional fields or modifying the types of the existing fields.
+
+You can also include fields in the initial creation of a schema.
+
+```
+mix ecto.gen.schema User users name:string email:string age:integer
+```
+
+This would generate the following schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "users" do
+    field :age, :integer
+    field :email, :string
+    field :name, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email, :age])
+    |> validate_required([:name, :email, :age])
+  end
+end
+```
+
+And the following migration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.CreateUsers do
+  use Ecto.Migration
+
+  def change do
+    create table(:users) do
+      add :name, :string
+      add :email, :string
+      add :age, :integer
+
+      timestamps()
+    end
+  end
+end
+```
+
+## Manipulating Tables
+
+Ecto provides functions for manipulating tables in a database. Here are a few common functions:
+
+* [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2): creates a new table in the database
+* [alter/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#alter/2): modifies an existing table in the database
+* [rename/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#rename/2): renames an existing table in the database
+* [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2): removes an existing table from the database
+
+## Manipulating Fields
+
+To alter a table in an Elixir Ecto migration, you can use the `alter/2` function provided by Ecto. This function allows you to make changes to an existing table in the database, such as adding or removing columns, changing data types, or modifying constraints.
+
+[Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) provides functions for manipulating fields in a table. Here are a few to get you started.
+
+* [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new field to the table.
+* [modify/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#modify/3) modifies an existing field in the table.
+* [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2) removes an existing field from the table.
+
+Here is an example migration that uses some of these Ecto functions to manipulate fields on a table:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.AlterUsersTable do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      add :phone, :string
+
+      modify :email, :string, unique: true
+      modify :name, :string, null: false
+
+      drop :age
+    end
+  end
+end
+```
+
+In this example, the `alter/2` function is used to make several changes to the users table in the database. The `add/2` function is called to add a new phone column to the table, with a data type of :string. The `modify/3` function is then used to update the email and name columns, adding a unique constraint to the email column and making the name column non-nullable. Finally, the `drop/1` function is called to remove the age column from the table.
+
+Once this migration is run using the `mix ecto.migrate` Mix task, the changes will be applied to the users table in the database, resulting in a new phone column, a modified email column, a modified name column, and a removed age column.
+
+It's important to note that Ecto will only apply unapplied migrations, so you can safely run the ecto.migrate task multiple times without worrying about making the same changes to the database more than once. This can be very useful for managing the evolution of your database over time.
+
+## Ensure Schemas Reflect Migrations
+
+Elixir schemas and migrations work together to define and manage the structure and content of a database. Schemas are used to define the shape and structure of data in a database, while migrations are used to apply changes to the database over time.
+
+When alter our database table with a migration, we also have to modify the schema to reflect those changes.
+
+For example, if we want to modify our user table to add a `phone` field, remove the `age` field, modify the `email` field to be unique, and modify the `name` field to not be null, our schema should also reflect these changes otherwise we'll encounter issues when reading or writing to the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+    # add the phone field
+    field :phone, :string
+
+    # remove the age field
+    # field :age, :integer
+
+
+    timestamps()
+  end
+
+  # Modify changeset to reflect database constraints.
+  def changeset(user, params \\ %{}) do
+    user
+    |> cast(params, [:name, :email, :phone])
+    |> validate_required([:name])
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email)
+  end
+end
+```
+
+If our schema uses `Ecto.Changeset` to validate data in a `changeset/2` function, we may also want to modify any validations to reflect the database constraints.
+
+## Database Constraints
+
+Ecto provides the ability to add constraints to your database tables using migrations. Constraints are rules that specify the allowed values for fields in your table, such as the minimum and maximum values for numeric fields, or the maximum length for string fields.
+
+To add constraints to your table using Ecto, you can use the [constraint/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#constraint/3) function in your migration. This function takes the name of the constraint as its first argument, followed by the options for the constraint.
+
+Here is an example migration that adds some constraints to a `users` table:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.AddConstraints do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      constraint(:users_email_unique, unique: true)
+      constraint(:users_age_non_negative, check: "age >= 0")
+      constraint(:users_name_length, check: "char_length(name) <= 100")
+    end
+  end
+end
+```
+
+This migration adds three constraints to the `users` table. The first constraint, called `users_email_unique`, ensures that the `email` field in the table has unique values. The second constraint, called `users_age_non_negative`, ensures that the `age` field in the table is non-negative. The third constraint, called `users_name_length`, ensures that the `name` field in the table has a maximum length of 100 characters.
+
+In Ecto, it is generally recommended to enforce constraints in both the migration and the schema. This provides two layers of protection against invalid data being inserted into your database.
+
+The migration is responsible for defining the structure of the database, including the fields and constraints for each table. By adding constraints to the migration, you can ensure that the structure of the database is correct and that the fields in each table have the correct data types and constraints.
+
+The schema, on the other hand, is responsible for defining the structure of the data that will be stored in the database. By adding constraints to the schema, you can ensure that the data being inserted into the database conforms to the constraints you have defined. This can prevent invalid data from being inserted into the database, and can help ensure the integrity of your data.
+
+Therefore, it is generally recommended to enforce constraints in both the migration and the schema. This provides a robust and reliable way to ensure that the data in your database is valid and consistent.
+
+## Rollbacks
+
+In an Elixir Ecto migration, the `up` and `down` functions are used to define the changes that will be made to the database when the migration is run. The `up` function contains the code that will be executed to apply the changes, and the down function contains the code that will be executed to undo those changes.
+
+Here's an example of how you might use the `up` and `down` functions in a migration:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.CreateUsersTable do
+  use Ecto.Migration
+
+  def up do
+    create table(:users) do
+      add :name, :string
+      add :email, :string
+      add :password_hash, :string
+
+      timestamps()
+    end
+  end
+
+  def down do
+    drop table(:users)
+  end
+end
+```
+
+In this example, the `up` function uses the `create` Ecto function to create a new `users` table in the database. The `down` function uses the `drop` Ecto function to delete the users table from the database.
+
+When this migration is run using the `mix ecto.migrate` command, the `up` function will be executed and the `users` table will be created in the database. If you ever need to undo the changes made by this migration, you can run the `mix ecto.rollback` command, which will run the `down` function and delete the `users` table from the database.
+
+In general, the `up` and `down` functions should be used together to define a set of changes that can be applied to the database and then undone if necessary. This allows you to easily roll back changes if you encounter any problems or need to make changes to your database schema.
+
+## Ecto Commands
+
+In Elixir, the `mix ecto` commands are used to manage an Ecto project. Here is a list of all the mix ecto. commands and a brief description of what each one does:
+
+* `mix ecto.create`: This command creates a new database for an Ecto project.
+* `mix ecto.drop`: This command drops the database for an Ecto project.
+* `mix ecto.gen.migration`: This command generates a new migration file for an Ecto project.
+* `mix ecto.gen.schema`: This command generates a new schema file for an Ecto project.
+* `mix ecto.migrate`: This command runs all pending migrations for an Ecto project.
+* `mix ecto.rollback`: This command rolls back the latest migration for an Ecto project.
+* `mix ecto.reset`: This command rolls back all migrations and then runs them again for an Ecto project.
+* `mix ecto.setup`: This command sets up a new Ecto project by creating the database and running any pending migrations.
+* `mix ecto.version`: This command prints the current version of Ecto that is installed in the project.
+
+These commands can be used to perform various tasks related to managing an Ecto project, such as creating and dropping the database, generating and running migrations, and resetting the database schema.
+
+## Your Turn
+
+We're going to create a todo-list application to learn more about Ecto schemas and migrations.
+
+Generate a phoenix project.
+
+```
+mix phx.new todo_list
+```
+
+Create the Postgres database.
+
+```
+mix ecto.create
+```
+
+Ensure the project compiles and all tests pass.
+
+```
+mix test
+```
+
+We can generate both the migration and the schema with a single command. Note that we can
+create these files manually, generators are purely for convenience.
+
+```
+mix phx.gen.schema TodoItems.TodoItem todo_items title:string
+```
+
+This command generated the create todo items migration in `priv/repo/migrations`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.Repo.Migrations.CreateTodoItems do
+  use Ecto.Migration
+
+  def change do
+    create table(:todo_items) do
+      add :title, :string
+
+      timestamps()
+    end
+  end
+end
+```
+
+The command also generated the `TodoItem` schema in `lib/todo_list/todo_items/`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.TodoItems.TodoItem do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "todo_items" do
+    field :title, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(todo_item, attrs) do
+    todo_item
+    |> cast(attrs, [:title])
+    |> validate_required([:title])
+  end
+end
+```
+
+Run migrations with `mix ecto.migrate`.
+
+Open the IEx shell so we can ensure our schema and migration work as expected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> alias TodoList.TodoItems.TodoItem
+iex> changeset = TodoItem.changeset(%TodoItem{}, %{title: "finish schemas and migrations reading"})
+iex> TodoList.Repo.insert(changeset)
+iex> TodoList.Repo.all(TodoItem)
+```
+
+This Elixir code performs the following actions:
+
+1. It uses the alias keyword to create an alias for the TodoList.TodoItems.TodoItem module. This allows the code to refer to the module using the shorter TodoItem alias.
+2. It uses the `TodoItem.changeset/2` function to create a changeset for a new `TodoItem` record. The changeset is created by passing the empty `TodoItem` struct `%TodoItem{}` and a map of field values `%{title: "finish schemas and migrations reading"}` to the changeset/2 function.
+3. It uses the `TodoList.Repo.insert/1` function to insert the new `TodoItem` record into the database. This function is called by passing the changeset created in the previous step as an argument.
+4. It uses the `TodoList.Repo.all/1` function to fetch all `TodoItem` records from the database. This function is called by passing the TodoItem module as an argument.
+
+In summary, this code creates a new `TodoItem` record in the database and then fetches all TodoItem records from the database.
+
+Now that we have a working `TodoItem` schema and migration, let's add a `:complete` boolean field.
+
+First, we'll create a new migration. Once again, we can create this file manually, but it's more convenient to use a generator.
+
+```
+mix ecto.gen.migration add_complete_to_todo_items
+```
+
+In the generated `priv/repo/migrations/TIMESTAMP_add_complete_to_todo_items` migration, alter the `:todo_items` table to include a `:complete` boolean field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
+  use Ecto.Migration
+
+  def change do
+    alter table(:todo_items) do
+      add :complete, :boolean
+    end
+  end
+end
+```
+
+Run migrations
+
+```
+$ mix ecto.migrate
+```
+
+To learn about rolling back our database, let's add a new constraint to the `:complete` field. We'll make it so that the `complete` field cannot be null.
+
+Modify the existing migration for adding `:complete` to the `todo_items` table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
+  use Ecto.Migration
+
+  def change do
+    alter table(:todo_items) do
+      add :complete, :boolean, null: false
+    end
+  end
+end
+```
+
+To undo the migration, we can use the `mix ecto.rollback` command.
+
+Try to run the migration with `mix ecto.migrate` and you'll notice the following error because the existing database data has `TodoItem` records with no `:completed` field.
+
+```
+$ mix ecto.migrate
+
+19:29:06.032 [info] == Running 20221211032143 TodoList.Repo.Migrations.AddCompleteToTodoItems.change/0 forward
+
+19:29:06.035 [info] alter table todo_items
+** (Postgrex.Error) ERROR 23502 (not_null_violation) column "complete" contains null values
+```
+
+We have multiple ways to resolve this issue:
+
+1. In database where we don't need to preserve existing data (such as our local development environment), we could simply drop the database with `mix ecto.drop` then re-create the database with `mix ecto.create` and migrate the database with `mix ecto.migrate`. To accomplish all of the above we could simply run `mix ecto.reset`. This is far simpler, and perfectly fine in the early-stages of a project before deployment.
+2. In a database where we do need to preserve existing data, we can add the `completed` field, populate the `completed` field in the database, then add the not null constraint to the `completed` field.
+
+We're going to pretend we need to preserve existing data for the sake of learning the process.
+Modify our existing migration to the following:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
+  use Ecto.Migration
+  import Ecto.Query
+
+  def change do
+    alter table(:todo_items) do
+      add :complete, :boolean
+    end
+
+    # Immediately alter the todo_items table to ensure the `complete` field exists.
+    flush()
+
+    from("todo_items", update: [set: [complete: false]])
+    |> TodoList.Repo.update_all([])
+
+    alter table(:todo_items) do
+      modify :complete, :boolean, null: false
+    end
+  end
+end
+```
+
+The code above defines an Ecto migration that adds a `completed` field to the `todo_items` table in a database.
+
+The migration starts by using the `alter` function to add a new `complete` field to the todo_items table. The `complete` field has a data type of `boolean`, which means it can store either true or false values.
+
+Next, the `flush/1` function is called to immediately execute the changes and add the `complete` field to the `todo_items` table.
+
+Then, the `from/2` function is used to update all records in the `todo_items` table. The `update` option is used to specify that the `set` function should be used to set the `complete` field to `false` for all records in the table.
+
+Finally, the `alter` function is used again to modify the `complete` field. The `modify` function is used to set the `null` option to `false`, which means that the `complete` field cannot be empty. This ensures that all records in the todo_items table have a value for the `complete` field.
+
+In summary, this code adds a new `complete` field to the todo_items table, sets the `complete` field to false for all existing records in the table, and ensures that the `complete` field cannot be empty.
+
+Now we should be able to migrate the database without any issue.
+
+```
+mix ecto.migrate
+```
+
+Since we've added a new `completed` field with a migration, we also have to update the corresponding schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule TodoList.TodoItems.TodoItem do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "todo_items" do
+    field :title, :string
+    field :complete, :boolean
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(todo_item, attrs) do
+    todo_item
+    |> cast(attrs, [:title])
+    |> validate_required([:title, :complete])
+  end
+end
+```
+
+Test your solution in the IEx shell.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> alias TodoList.TodoItems.TodoItem
+iex> changeset = TodoItem.changeset(%TodoItem{}, %{title: "finish schemas and migrations reading", completed: true})
+iex> TodoList.Repo.insert(changeset)
+iex> TodoList.Repo.all(TodoItem)
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Ecto Basics](https://elixirschool.com/en/lessons/ecto/basics)
+* [Programming Ecto by Darin Wilson and Eric Meadows-Jönsson](https://pragprog.com/titles/wmecto/programming-ecto/)
+* [HexDocs: Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#content)
+* [HexDocs: Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html)
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-schemas_and_migrations
+$ git add .
+$ git commit -m "finish schemas and migrations section"
+$ git push origin exercise-schemas_and_migrations
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                       | Next                                                               |
+| ---------------------------------------------- | -----------------------------------------------------------------: |
+| [Blog Search](../exercises/blog_search.livemd) | [Phoenix Authentication](../reading/phoenix_authentication.livemd) |
