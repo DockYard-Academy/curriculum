@@ -1,4 +1,4 @@
-# Portfolio: Blog Comments
+# Blog: Blog Comments
 
 ```elixir
 Mix.install([
@@ -15,17 +15,17 @@ Mix.install([
 
 ## Blog Comments
 
-You're going to add a the ability to comment on a blog to your existing portfolio project.
+You're going to add a the ability to comment on a blog to your existing [Blog](./blog_setup) project.
 
-* Comments **belong to** a Blog.
-* Blogs **have many** Comments.
+* Comments **belong to** a blog `Post`.
+* a blog `Post` can **have many** Comments.
 
-Comments should have `:user_id`, `:content`, and `:blog_id` fields.
+Comments should have `:content`, and `:post_id` (foreign key) fields.
 
 ```mermaid
 classDiagram
   class Comment {
-    blog_id: :id
+    post_id: :id
     content: :text
   }
 ```
@@ -41,29 +41,13 @@ Ensure you:
 
 You do not need to handle commenting on a comment. All comments will be for the associated blog.
 
-### Bonus: Usernames
+<!-- livebook:{"break_markdown":true} -->
 
-Add a new `:username` field to each user if you have not already from a previous exercise.
-Associate comments with the currently signed in user, and display the User's `:username` above each comment.
+### Bonus: Comment on Comments
 
-This creates a new relationship between Comments and Users, but does not change the relationship between Comments and Blogs.
+Allow users to comment on comments. A comment can either have a `post_id` or a `comment_id` to be associated with a comment or a post.
 
-* Users **have many** Comments.
-* Comments **belong to** a User.
-
-```mermaid
-classDiagram
-  class User {
-    username: :text
-  }
-  class Comment {
-    user_id: :id
-  }
-```
-
-Ensure you:
-
-* Display the username of the user associated with each comment on the blog show page, in the list of comments.
+This means that a comment can **belong to** a comment, and it can **have many** comments.
 
 ## Commit Your Progress
 

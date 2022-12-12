@@ -19,21 +19,45 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ## Overview
 
-We will add books to our `BookSearch` application from the previous lesson.
-We need to associate books with a particular author.
+### One-to-many relationships
 
-If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/BrooklinJazz/book_search/tree/books) project.
+In a one-to-many relationship, a single record in one table can be related to multiple records in another table. For example, in a database for a school, a teacher may have multiple students, but each student is only associated with one teacher. In this case, the teacher and student tables would have a one-to-many relationship.
 
-To associate books with an author, we need to model their relationship in our Database.
-Ecto handles the data layer in our application. By default, Ecto uses PostgreSQL, which is a relational database.
+One-to-many relationships are commonly used in database design because they allow for efficient storage of data and easy retrieval of information. They are also flexible, as the number of records on either side of the relationship can change over time.
 
-Relational databases store data in any number of tables and use foreign keys to relate data to one another.
-One of the most common data relationships is **one-to-many**.
+For example, in the teacher-student example, if a teacher leaves the school, all the records in the student table associated with that teacher can be easily removed or updated to reflect the new teacher. Similarly, if a student graduates and is no longer associated with a teacher, their record can be removed from the student table without affecting the other records.
 
-We use **belongs to**, **has many**, to describe the nature of a **one-to-many** relationship.
+Overall, one-to-many relationships are an important part of database design and are used to represent the many-sided relationships that exist in real-world data.
 
-Authors and books have a one-to-many relationship because there are potentially many books for a single author.
-We would say that an author **has many** books, and a book **belongs to** a single author.
+<!-- livebook:{"break_markdown":true} -->
+
+### "has many" and "belongs to"
+
+In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a teacher-student relationship, the teacher "has many" students.
+
+On the other hand, "belongs to" is used to describe the relationship between the many side of the relationship and the one side. In the teacher-student example, a student "belongs to" a teacher.
+
+These terms are commonly used in database design and programming to describe the structure of one-to-many relationships. They help to clarify the direction of the relationship and make it easier to understand how the data is organized and accessed.
+
+For example, when querying a database for information, a developer may use the "has many" and "belongs to" relationships to navigate through the data and retrieve the desired information. In this way, these terms play an important role in the organization and management of data in a one-to-many relationship.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Foreign keys
+
+A foreign key is a field in a relational database table that is used to establish and enforce a link between the data in two tables. This link is known as a relationship, and it allows the data in one table to be related to the data in another table.
+
+Foreign keys are typically used to implement one-to-many relationships in a database. For example, in a database for a school, the student table may have a foreign key that references the primary key of the teacher table. This establishes a one-to-many relationship between teachers and students, where each teacher can have multiple students but each student is only associated with one teacher.
+
+Foreign keys are an important part of relational database design because they help to enforce the integrity of the data by ensuring that the relationships between tables are maintained. For example, if a record in the teacher table is deleted, the corresponding records in the student table that reference that teacher will also be deleted to maintain the relationship.
+
+Overall, foreign keys are an essential part of relational databases and are used to establish and enforce relationships between data in different tables.
+
+## BookSearch: Books
+
+To learn more about one-to-many relationships, we're going to add books to our [BookSearch](./book_search_authors.livemd) applications from the previous lesson. If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/BrooklinJazz/book_search/tree/books) project.
+
+Each book will belong to an author, and each author can have many books. Therefore, we need to associate books with a particular author.
 
 ```mermaid
 flowchart
@@ -43,7 +67,12 @@ flowchart
   Author --> Book3
 ```
 
-Sometimes we model relationships and data tables using diagrams. For example, there is a specific diagram specification called a [UML (Unified Modelling Language)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) with particular rules and symbols. However, we'll use a more lightweight style. Generally, `1` represents the **one** in the relationship, and `*` represent **many**.
+To associate books with an author, we need to model their relationship in our Database.
+Relational databases store data in any number of tables and use foreign keys to relate data to one another. In this case, each book will store a foreign key `author_id` to referance an author.
+
+Sometimes we model relationships and data tables using diagrams. For example, there is a diagram specification called a [UML (Unified Modelling Language)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) with particular rules and symbols. For our purposes, we'll use simple diagrams where `1` represents the **one** in the relationship, and `*` represent **many**.
+
+Here's a diagram to describe the one-to-many relationship between books and authors.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -62,8 +91,6 @@ classDiagram
   Book "1" --> "*" Author :belongs to
 ```
 
-Databases use foreign keys to associate one table with another. In this case, each book stores a foreign key `author_id` to an author.
-
 ## Run Book Search Project
 
 Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/BrooklinJazz/book_search) project.
@@ -74,16 +101,15 @@ All tests should pass.
 $ mix test
 ```
 
-Start the server.
+Ensure you start the server.
 
 ```
 $ mix phx.server
 ```
 
-## Books & Authors Association
+## Books & Authors Database Association
 
-Books will store a foreign key to reference the author. For example, we can generate the books resource with the following command.
-`author_id:references:author` creates the foreign key to the `"authors"` table.
+Books will store a foreign key to reference the author. For example, we can generate the books resource with the following command. `author_id:references:author` creates the foreign key to the `"authors"` table.
 
 ```
 $ mix phx.gen.html Books Book books title:string author_id:references:authors
@@ -112,14 +138,11 @@ defmodule BookSearch.Repo.Migrations.CreateBooks do
 end
 ```
 
-The [references/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2) function defines the foreign key relationship with the author table.
-`on_delete: :nothing` means that if an author is deleted, the book will remain in the Database.
+The [references/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2) function defines the foreign key relationship with the author table. `on_delete: :nothing` means that if an author is deleted, the book will remain in the Database.
 
-Instead, we want to delete all associated records. Change the delete behavior to `on_delete: :delete_all`. The `:delete_all` option means we'll delete all books associated with an author if we delete that author.
+If instead, we want to delete all associated books when we delete an author, we can use the `on_delete: :delete_all` option.
 
-We'll also add `null: false`. This indicates that books must have an author because the relationship is not allowed to be `null`.
-
-Replace the migration file with the following.
+Change the delete behavior to `on_delete: :delete_all`. We'll also add `null: false` to ensure that a book must have an author. Replace the migration file with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -146,12 +169,11 @@ Run migrations.
 $ mix ecto.migrate
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+## Books and Authors Schema Association
 
-### Has Many
+We've associated authors and books in our Database. However, we have not associated them in our schemas. We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
 
-Schemas describe the application domain representation of data in our Database.
-We've associated authors and books in our Database. However, we have not associated them in our application schemas. We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
+### has_many/3
 
 We can use the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) macro to indicate a one-to-many association with another schema.
 
@@ -182,7 +204,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Belongs to
+### belongs_to/3
 
 To indicate our books belong to a single author, we need to add the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship.
 Replace `field :author_id, :id` with the `belongs_to/3` macro.
@@ -210,9 +232,171 @@ defmodule BookSearch.Books.Book do
 end
 ```
 
-## Books Context
+## Building Associations
 
-Because we added the `null: false` constraint on the `BookSearch.Repo.Migrations.CreateBooks` migration, we have eight failing tests in the `Books` context.
+In the Elixir programming language, the Ecto framework provides a set of functions for building associations between database tables.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### build_assoc/3
+
+[build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) is a function in the Elixir programming language that is used to create a new record in a related table and associate it with an existing record in the current table. It is part of the Ecto framework, which is a domain-specific language for writing queries and interacting with databases in Elixir.
+
+We can call `build_assoc` in our code and pass it the current record, the name of the association, and the attributes of the new record.
+
+For example, let's say we have a database for a school with a `teachers` table and a `students` table. The `teachers` table has a one-to-many relationship with the `students` table, where each teacher can have multiple students. In this case, we could use `build_assoc` to create a new student and associate it with a specific teacher.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+build_assoc(teacher, :students, name: "Andrew")
+%Student{id: nil, teacher_id: 1, name: "Andrew"}
+```
+
+Here is an example of how we might use `build_assoc` in our code:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Define the association between the teachers and students tables in your Ecto models
+
+defmodule School.Teacher do
+  use Ecto.Schema
+
+  schema "teachers" do
+    has_many :students, School.Student
+  end
+end
+
+defmodule School.Student do
+  use Ecto.Schema
+
+  schema "students" do
+    field :name, :string
+    belongs_to :teacher, School.Teacher
+  end
+end
+
+# Now you can use `build_assoc` in your code to create a new student and associate it with a specific teacher
+
+# Find the teacher record in the database
+teacher = School.get_teacher!(teacher.id)
+
+# Use `build_assoc` to create a new student and associate it with the teacher
+student = build_assoc(teacher, :students, %{name: "Jon"})
+
+# Save the new student to the database
+{:ok, student} = School.Repo.insert(student)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### put_assoc/4
+
+[put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. This allows us to work with associations as a whole. For example, we can use `put_assoc/4` to update all student associations for a given teacher changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule School.Teacher do
+  use Ecto.Schema
+
+  schema "teachers" do
+    has_many :students, School.Student
+  end
+
+  def changeset(teacher, params) do
+    teacher
+    |> cast(params, [:name, :email])
+    |> put_assoc(:students, params[:student_id])
+  end
+end
+```
+
+`put_assoc/4` returns a changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
+
+# The above would return a Teacher changeset similar to the following:
+%Ecto.Changeset<
+  action: nil,
+  changes: %{
+    students: [
+      %Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: %Student<>, valid?: true>
+    ]
+  },
+  errors: [],
+  data: %Teacher<>,
+  valid?: true
+>
+```
+
+Using the teacher changeset to insert the teacher and associated students will overrite any existing student associations.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
+|> Repo.update!()
+```
+
+If we don't want to overrwrite existing associations, then we need to preserve them.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "Andrew"} | teacher.students])
+|> Repo.update!()
+```
+
+Instead of using `put_assoc/4` with the teacher record that has many students, we can use it with the student record to associate it with a single teacher.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%Student{name: "Jon"}
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:teacher, teacher)
+|> Repo.insert!()
+```
+
+However, in this example it would be more appropriate to use `build_assoc/3`.
+
+Instead, `put_assoc/4` is a better solution when we need to replace the entirety of an association. See [HexDocs: adding tags to a post](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4-example-adding-tags-to-a-post) for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### cast_assoc/3
+
+[cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) works similarly to `put_assoc/4` as it works with the entire association at once, however it's best used with external data we need to cast/validate with a changeset.
+
+> This function should be used when working with the entire association at once (and not a > single element of a many-style association) and receiving data external to the application.
+> 
+> * [HexDocs: cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Teacher
+|> Repo.get!(id)
+|> Repo.preload(:students) # Only required when updating data
+|> Ecto.Changeset.cast(params, [])
+|> Ecto.Changeset.cast_assoc(:students, with: &School.Student.changeset/2)
+```
+
+## Fix Failing Context Tests
+
+We have eight failing tests in the `Books` context because we added the `null: false` constraint on the `BookSearch.Repo.Migrations.CreateBooks` migration.
 
 Run the following to execute the failing tests.
 
@@ -234,6 +418,8 @@ The test output should include errors similar to the following.
 
      Failing row contains (18, some title, null, 2022-07-28 03:33:48, 2022-07-28 03:33:48).
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### list_books/0
 
@@ -409,6 +595,8 @@ $ mix test test/book_search/books_test.exs:14
 8 tests, 0 failures, 7 excluded
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### get_book!/1
 
 In the next test `"get_book!/1 returns the book with the given id"` we need to associate the author with the book.
@@ -489,6 +677,8 @@ Now the test should pass!
 ```
 $ mix test test/book_search/books_test.exs:20
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
@@ -576,7 +766,7 @@ defmodule BookSearch.BooksTest do
 end
 ```
 
-All tests should now pass.
+All context tests should now pass.
 
 ```
 $ mix test test/book_search/books_test.exs
@@ -584,7 +774,7 @@ $ mix test test/book_search/books_test.exs
 8 tests, 0 failures
 ```
 
-## Book Controller Tests
+## Fix Failing Controller Tests
 
 Our book controller tests fail due to the association between authors and books. To associate authors and books, we can nest resources in our router.
 
@@ -1581,7 +1771,7 @@ Looking good! That's the power of associating data!
 
 ![](images/list_book_all_authors_with_author_name.png)
 
-## List Books By Author
+## List All Books By Author
 
 We need a new test for listing books by their author. First, we'll create two authors, each with one book. Then we'll use the `get/3` macro to send a GET request to `http://localhost:4000/authors/1/books` where `1` is the author's id. Lastly, we assert we only find the author's book on the page.
 
@@ -1800,9 +1990,7 @@ Now the form will not display when we visit http://localhost:4000/authors/1/book
 
 ### Your Turn (Bonus)
 
-We omitted tests for `Books.list_books(name: name)`. Create tests to ensure we can filter books by their name. You may take inspiration from how we've already tested `Authors.list_authors/1`.
-
-<!-- livebook:{"break_markdown":true} -->
+We omitted tests for `Books.list_books(title: title)`. Create tests to ensure we can filter books by their title. You may take inspiration from how we've already tested `Authors.list_authors/1`.
 
 ## Further Reading
 
