@@ -229,8 +229,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix and Ecto
 * Testing Phoenix
 * Schemas and Migrations
-* Phoenix Authentication
 * Phoenix and Ecto One-to-Many Relationships
+* Phoenix Authentication
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
 ## LiveView
