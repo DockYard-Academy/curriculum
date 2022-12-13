@@ -194,7 +194,7 @@ To alter a table in an Elixir Ecto migration, you can use the `alter/2` function
 
 * [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new field to the table.
 * [modify/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#modify/3) modifies an existing field in the table.
-* [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2) removes an existing field from the table.
+* [remove/2](https://hexdocs.pm/ecto/Ecto.Migration.html#remove/1) removes an existing field from the table.
 
 Here is an example migration that uses some of these Ecto functions to manipulate fields on a table:
 
@@ -211,13 +211,13 @@ defmodule MyApp.Repo.Migrations.AlterUsersTable do
       modify :email, :string, unique: true
       modify :name, :string, null: false
 
-      drop :age
+      remove :age
     end
   end
 end
 ```
 
-In this example, the `alter/2` function is used to make several changes to the users table in the database. The `add/2` function is called to add a new phone column to the table, with a data type of :string. The `modify/3` function is then used to update the email and name columns, adding a unique constraint to the email column and making the name column non-nullable. Finally, the `drop/1` function is called to remove the age column from the table.
+In this example, the `alter/2` function is used to make several changes to the users table in the database. The `add/2` function is called to add a new phone column to the table, with a data type of :string. The `modify/3` function is then used to update the email and name columns, adding a unique constraint to the email column and making the name column non-nullable. Finally, the `remove/1` function is called to remove the age column from the table.
 
 Once this migration is run using the `mix ecto.migrate` Mix task, the changes will be applied to the users table in the database, resulting in a new phone column, a modified email column, a modified name column, and a removed age column.
 
@@ -349,6 +349,8 @@ These commands can be used to perform various tasks related to managing an Ecto 
 
 ## Your Turn
 
+### Generate Todo List Application
+
 We're going to create a todo-list application to learn more about Ecto schemas and migrations.
 
 Generate a phoenix project.
@@ -418,13 +420,22 @@ defmodule TodoList.TodoItems.TodoItem do
 end
 ```
 
-Run migrations with `mix ecto.migrate`.
+<!-- livebook:{"break_markdown":true} -->
+
+### Run Migrations and Create A TodoItem Record
+
+Run migrations to add the `todo_items` table to your database.
+
+```
+mix ecto.migrate
+```
 
 Open the IEx shell so we can ensure our schema and migration work as expected.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+$ iex -S mix
 iex> alias TodoList.TodoItems.TodoItem
 iex> changeset = TodoItem.changeset(%TodoItem{}, %{title: "finish schemas and migrations reading"})
 iex> TodoList.Repo.insert(changeset)
@@ -436,75 +447,70 @@ This Elixir code performs the following actions:
 1. It uses the alias keyword to create an alias for the TodoList.TodoItems.TodoItem module. This allows the code to refer to the module using the shorter TodoItem alias.
 2. It uses the `TodoItem.changeset/2` function to create a changeset for a new `TodoItem` record. The changeset is created by passing the empty `TodoItem` struct `%TodoItem{}` and a map of field values `%{title: "finish schemas and migrations reading"}` to the changeset/2 function.
 3. It uses the `TodoList.Repo.insert/1` function to insert the new `TodoItem` record into the database. This function is called by passing the changeset created in the previous step as an argument.
-4. It uses the `TodoList.Repo.all/1` function to fetch all `TodoItem` records from the database. This function is called by passing the TodoItem module as an argument.
+4. It uses the `TodoList.Repo.all/1` function to fetch all `TodoItem` records from the database. This function is called by passing the `TodoItem` module as an argument.
 
-In summary, this code creates a new `TodoItem` record in the database and then fetches all TodoItem records from the database.
+In summary, this code creates a new `TodoItem` record in the database and then fetches all TodoItem records from the database. You should see a `TodoItem` record similar to the following:
 
-Now that we have a working `TodoItem` schema and migration, let's add a `:complete` boolean field.
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[debug] QUERY OK source="todo_items" db=0.3ms queue=0.5ms idle=1322.0ms
+SELECT t0."id", t0."title", t0."inserted_at", t0."updated_at" FROM "todo_items" AS t0 []
+↳ :erl_eval.do_apply/7, at: erl_eval.erl:744
+[
+  %TodoList.TodoItems.TodoItem{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "todo_items">,
+    id: 1,
+    inserted_at: ~N[2022-12-13 05:56:42],
+    title: "finish schemas and migrations reading",
+    updated_at: ~N[2022-12-13 05:56:42]
+  }
+]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Add A `completed` Field
+
+Now that we have a working `TodoItem` schema and migration, let's add a `:completed` boolean field.
 
 First, we'll create a new migration. Once again, we can create this file manually, but it's more convenient to use a generator.
 
 ```
-mix ecto.gen.migration add_complete_to_todo_items
+mix ecto.gen.migration add_completed_to_todo_items
 ```
 
-In the generated `priv/repo/migrations/TIMESTAMP_add_complete_to_todo_items` migration, alter the `:todo_items` table to include a `:complete` boolean field.
+In the generated `priv/repo/migrations/TIMESTAMP_add_completed_to_todo_items` migration, alter the `todo_items` table to include a `completed` boolean field. We're going to make `completed` a required field so it cannot be `null`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
+defmodule TodoList.Repo.Migrations.AddCompletedToTodoItems do
   use Ecto.Migration
 
   def change do
     alter table(:todo_items) do
-      add :complete, :boolean
+      add :completed, :boolean, null: false
     end
   end
 end
 ```
 
-Run migrations
-
-```
-$ mix ecto.migrate
-```
-
-To learn about rolling back our database, let's add a new constraint to the `:complete` field. We'll make it so that the `complete` field cannot be null.
-
-Modify the existing migration for adding `:complete` to the `todo_items` table.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
-  use Ecto.Migration
-
-  def change do
-    alter table(:todo_items) do
-      add :complete, :boolean, null: false
-    end
-  end
-end
-```
-
-To undo the migration, we can use the `mix ecto.rollback` command.
-
-Try to run the migration with `mix ecto.migrate` and you'll notice the following error because the existing database data has `TodoItem` records with no `:completed` field.
+Run migrations. You'll notice an error because the existing database data has TodoItem records with no completed field.
 
 ```
 $ mix ecto.migrate
 
-19:29:06.032 [info] == Running 20221211032143 TodoList.Repo.Migrations.AddCompleteToTodoItems.change/0 forward
+19:29:06.032 [info] == Running 20221211032143 TodoList.Repo.Migrations.AddCompletedToTodoItems.change/0 forward
 
 19:29:06.035 [info] alter table todo_items
-** (Postgrex.Error) ERROR 23502 (not_null_violation) column "complete" contains null values
+** (Postgrex.Error) ERROR 23502 (not_null_violation) column "completed" contains null values
 ```
 
-We have multiple ways to resolve this issue:
+There are multiple ways to resolve this issue:
 
 1. In database where we don't need to preserve existing data (such as our local development environment), we could simply drop the database with `mix ecto.drop` then re-create the database with `mix ecto.create` and migrate the database with `mix ecto.migrate`. To accomplish all of the above we could simply run `mix ecto.reset`. This is far simpler, and perfectly fine in the early-stages of a project before deployment.
-2. In a database where we do need to preserve existing data, we can add the `completed` field, populate the `completed` field in the database, then add the not null constraint to the `completed` field.
+2. In a database where we do need to preserve existing data, we can add the `completed` field, populate the `completed` field in the database, then add the `null: false` constraint to the `completed` field.
 
 We're going to pretend we need to preserve existing data for the sake of learning the process.
 Modify our existing migration to the following:
@@ -512,23 +518,23 @@ Modify our existing migration to the following:
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule TodoList.Repo.Migrations.AddCompleteToTodoItems do
+defmodule TodoList.Repo.Migrations.AddCompletedToTodoItems do
   use Ecto.Migration
   import Ecto.Query
 
   def change do
     alter table(:todo_items) do
-      add :complete, :boolean
+      add :completed, :boolean
     end
 
-    # Immediately alter the todo_items table to ensure the `complete` field exists.
+    # Immediately alter the todo_items table to ensure the `completed` field exists.
     flush()
 
-    from("todo_items", update: [set: [complete: false]])
+    from("todo_items", update: [set: [completed: false]])
     |> TodoList.Repo.update_all([])
 
     alter table(:todo_items) do
-      modify :complete, :boolean, null: false
+      modify :completed, :boolean, null: false
     end
   end
 end
@@ -536,15 +542,15 @@ end
 
 The code above defines an Ecto migration that adds a `completed` field to the `todo_items` table in a database.
 
-The migration starts by using the `alter` function to add a new `complete` field to the todo_items table. The `complete` field has a data type of `boolean`, which means it can store either true or false values.
+The migration starts by using the `alter` function to add a new `completed` field to the todo_items table. The `completed` field has a data type of `boolean`, which means it can store either true or false values.
 
-Next, the `flush/1` function is called to immediately execute the changes and add the `complete` field to the `todo_items` table.
+Next, the `flush/1` function is called to immediately execute the changes and add the `completed` field to the `todo_items` table.
 
-Then, the `from/2` function is used to update all records in the `todo_items` table. The `update` option is used to specify that the `set` function should be used to set the `complete` field to `false` for all records in the table.
+Then, the `from/2` function is used to update all records in the `todo_items` table. The `update` option is used to specify that the `set` function should be used to set the `completed` field to `false` for all records in the table.
 
-Finally, the `alter` function is used again to modify the `complete` field. The `modify` function is used to set the `null` option to `false`, which means that the `complete` field cannot be empty. This ensures that all records in the todo_items table have a value for the `complete` field.
+Finally, the `alter` function is used again to modify the `completed` field. The `modify` function is used to set the `null` option to `false`, which means that the `completed` field cannot be empty. This ensures that all records in the todo_items table have a value for the `completed` field.
 
-In summary, this code adds a new `complete` field to the todo_items table, sets the `complete` field to false for all existing records in the table, and ensures that the `complete` field cannot be empty.
+In summary, this code adds a new `completed` field to the `todo_items` table, sets the `completed` field to false for all existing records in the table, and ensures that the `completed` field cannot be empty.
 
 Now we should be able to migrate the database without any issue.
 
@@ -563,7 +569,7 @@ defmodule TodoList.TodoItems.TodoItem do
 
   schema "todo_items" do
     field :title, :string
-    field :complete, :boolean
+    field :completed, :boolean
 
     timestamps()
   end
@@ -571,8 +577,8 @@ defmodule TodoList.TodoItems.TodoItem do
   @doc false
   def changeset(todo_item, attrs) do
     todo_item
-    |> cast(attrs, [:title])
-    |> validate_required([:title, :complete])
+    |> cast(attrs, [:title. :completed])
+    |> validate_required([:title, :completed])
   end
 end
 ```
@@ -582,6 +588,7 @@ Test your solution in the IEx shell.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+$ iex -S mix
 iex> alias TodoList.TodoItems.TodoItem
 iex> changeset = TodoItem.changeset(%TodoItem{}, %{title: "finish schemas and migrations reading", completed: true})
 iex> TodoList.Repo.insert(changeset)
