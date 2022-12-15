@@ -31,7 +31,7 @@ Overall, one-to-many relationships are an important part of database design and 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### "has many" and "belongs to"
+### `has_many` and `belongs_to`
 
 In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a teacher-student relationship, the teacher "has many" students.
 
@@ -158,7 +158,7 @@ Run migrations.
 $ mix ecto.migrate
 ```
 
-## Creating a Book with an Author
+## Creating A Book With An Author
 
 We're going to use the IEx shell to better understand the association between authors and books.
 
@@ -279,7 +279,7 @@ You should see the `author_id` on the created book.
 
 ## Books and Authors Schema Association
 
-Instead of casting the `author_id` manually, it's more idiomatic to build the association using one of three functions provided by `Ecto`.
+Instead of casting the `author_id` manually, it's more idiomatic to build the association using one of three functions provided by [Ecto](https://hexdocs.pm/ecto/Ecto.html).
 
 * [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) builds a struct from the given association in the struct.
 * [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. Typically used for data internal to the application.
@@ -350,7 +350,7 @@ end
 
 ## Building Associations
 
-Now that we've defined the `has_many/3` and `belongs_to/3` relationship in our `Author` and `Book` schema, we can use the `Ecto` functions to create a book with an author.
+Now that we've defined the `has_many/3` and `belongs_to/3` relationship in our `Author` and `Book` schema, we can use the [Ecto](https://hexdocs.pm/ecto/Ecto.html) functions to create a book with an author.
 
 Make sure to recompile the IEx shell.
 
@@ -641,7 +641,7 @@ This creates an author and their associated book(s).
  }
 ```
 
-If we tried to create a book with invalid data, we would recieve an error.
+If we tried to create a book with invalid data, we would receive an error.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -671,7 +671,7 @@ iex> |> Repo.insert()
  >}
 ```
 
-## Deploy To GitHub
+## Deploy to GitHub
 
 Ensure all of your tests continue to pass.
 
