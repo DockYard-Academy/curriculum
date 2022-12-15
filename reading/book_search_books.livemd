@@ -31,7 +31,7 @@ Overall, one-to-many relationships are an important part of database design and 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### "has Many" and "belongs To"
+### "has many" and "belongs to"
 
 In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a teacher-student relationship, the teacher "has many" students.
 
@@ -88,7 +88,7 @@ classDiagram
     author_id: :id
   }
 
-  Book "1" --> "*" Author :belongs to
+  Book "*" --> "1" Author :belongs to
 ```
 
 ## Run Book Search Project
@@ -308,7 +308,7 @@ defmodule School.Teacher do
   def changeset(teacher, params) do
     teacher
     |> cast(params, [:name, :email])
-    |> put_assoc(:students, params[:student_id])
+    |> put_assoc(:students, params[:students])
   end
 end
 ```
