@@ -32,11 +32,13 @@ By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https:
 
 [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) uses [Ecto](https://hexdocs.pm/ecto/Ecto.html) to handle the data layer of a web application.
 
-We will walk through building a journal application to learn how to use [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) with [Ecto](https://hexdocs.pm/ecto/Ecto.html).
+## Create A Journal Project
+
+We're going to build a journal application to learn how to use [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) with [Ecto](https://hexdocs.pm/ecto/Ecto.html).
+
+You can reference the DockYard Academy [Journal](https://github.com/DockYard-Academy/journal) project example if you want to see the completed project.
 
 Our journal will store journal entries that have a title and content.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 classDiagram
@@ -46,13 +48,9 @@ classDiagram
   }
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 We will be able to create, read, update, and delete journal entries.
 
 The four CRUD actions (create, read, update, and delete) form the basis of most applications.
-
-## Create the Journal Project
 
 First, create a new journal project.
 
@@ -116,49 +114,159 @@ We can see the exact files created in the output.
 * injecting test/support/fixtures/entries_fixtures.ex
 ```
 
-## Migrations
+## Phoenix Pipeline
 
-Earlier, the `mix phx.gen.html` command generated an Ecto migration file `priv/repo/migrations/create_entries.ex` which creates the entries table in our PostgreSQL database.
+In the Phoenix web framework, HTTP requests flow through a pipeline of components before being processed and returned to the client.
+
+The first component in the pipeline is the Endpoint, which is responsible for receiving the incoming HTTP request and passing it on to the Router. The Router uses the request's path and method to determine which controller should handle the request.
+
+Once the appropriate controller has been identified, the request is passed to the controller, which is responsible for handling the request. The controller may perform various tasks, such as querying a database or calling other services, in order to generate a response to the request.
+
+The controller delegates to the context, which provides access to the business logic of our application. The controller might use the context to read or write data to the database as part of handling the request.
+
+Next, controller delegates to the view, which is responsible for rendering the response for our request. Typically, the view uses data provided by the controller to populate the template, and returns the resulting HTML to the client.
+
+Finally, the response is returned to the client, completing the flow of the HTTP request through the Phoenix pipeline.
+
+Overall, the Phoenix pipeline is designed to provide a modular, flexible way to process HTTP requests and generate responses in a web application. The pipeline allows developers to customize and extend the behavior of their application at each stage of the request-response cycle.
+
+Here's a diagram with an overview of that process.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_application_architecture_overview.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now that we're adding Ecto, we're expanding the layers for the `Model` portion of the diagram.
+
+The context is the entry point to the business logic of our application. Each context module  provides access to various resources that may be needed by the controller to handle an HTTP request, for example our `mix phx.gen.html` command generated an `Entries` context in our Journal application.
+
+To better understand the context, we'll provide a high-level overview of how data flows through our database from the context.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Writing Data
+
+When writing data to the database, our context will typically build up a `Changeset` using the `Schema` module for a resource.
+
+```mermaid
+flowchart
+  subgraph Context
+    attrs --> Schema --> Changeset --validated data--> Repo --SQL--> DB[Write To Database]
+  end
+```
+
+Here's an example of this flow using the `Entries.create_entry/2` context function in `entries.ex` from our `Journal` application.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Journal.Repo.Migrations.CreateEntries do
-  use Ecto.Migration
-
-  def change do
-    create table(:entries) do
-      add :title, :string
-      add :content, :text
-
-      timestamps()
-    end
+  def create_entry(attrs \\ %{}) do
+    # Create Changeset 
+    %Entry{}
+    |> Entry.changeset(attrs)
+    # Provide Changeset to Repo to generate the SQL to insert an entry into the database
+    |> Repo.insert()
   end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Reading Data
+
+When reading data from the database, we use the `Ecto.Query` module to build up a query, then pass the query to the `Repo` to retrieve data from the database.
+
+```mermaid
+flowchart
+  subgraph Context
+    attrs --> Schema --> Ecto.Query --> Repo
+  end
+```
+
+Here's an example using the `Entries.list_entries/0` function from our `Journal` application.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_entries do
+  Repo.all(Entry)
 end
 ```
 
-> The actual file will have a timestamp in its name. i.e. `20220710205852_create_entries`.
+It may not immediately be clear what the `Ecto.Query` portion is, because `Repo` understands we want to retrieve all data from the entries table when we pass it the `Entry` schema.
 
-`:string` is a simple string limited to `255` characters, and `:text` is a string with a larger character limit.
+This is shorthand for the following query which retrieves all journal entries from the `entries` table using the [Ecto.Query.from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2) macro.
 
-See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)  documentation for a complete list of attribute types.
+<!-- livebook:{"force_markdown":true} -->
 
-Run the following command to run all migration files in the `priv/repo/migrations/` folder.
-
-```
-$ mix ecto.migrate
-The database for Journal.Repo has been created
-
-14:13:55.631 [info]  == Running 20220710205852 Journal.Repo.Migrations.CreateEntries.change/0 forward
-
-14:13:55.633 [info]  create table entries
-
-14:13:55.642 [info]  == Migrated 20220710205852 in 0.0s
+```elixir
+def list_entries do
+  from(entry in Entry)
+  |> Repo.all()
+end
 ```
 
-## Resources and HTTP Actions
+`Ecto.Query` is smart enough to understand to use the `"entries"` table from the `Entry` schema and transform the data into an `Entry` struct.
 
-### Router
+For demonstration purposes, we can use the table name and perform this transformation manually.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_entries do
+  from(entry in "entries",
+    select: %Entry{
+      id: entry.id,
+      title: entry.title,
+      content: entry.content,
+      inserted_at: entry.inserted_at,
+      updated_at: entry.updated_at
+    }
+  )
+  |> Repo.all()
+end
+```
+
+Clearly this is more verbose than using the schema, so we'll revert back to using the `Entry` schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_entries do
+  Repo.all(Entry)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here's a visual diagram of all the components in our Phoenix application and how they connect.
+
+```mermaid
+flowchart
+  direction BT
+  subgraph app
+    direction LR
+    Context --> Database
+    subgraph Database
+      subgraph Read
+        Ecto.Schema --> Ecto.Query --> Ecto.Repo
+      end
+      subgraph Write
+        direction TB
+        ES1[Ecto.Schema] --> Ecto.Changeset --> ER1[Ecto.Repo]
+      end
+      Ecto.Migration
+    end
+  end
+  subgraph app_web
+    direction LR
+    Endpoint --> Router --> Controller --> View --> Template
+  end
+  app_web --Controller Delegates To--> app
+```
+
+## Router
 
 We need to add a route for entries. We'll replace the page controller and use the `"/"` route with the `resources/4` macro.
 
@@ -172,7 +280,26 @@ scope "/", JournalWeb do
 end
 ```
 
-The `resources/4` macro creates a standard matrix of HTTP actions.
+The `resources/4` macro creates a standard matrix of HTTP actions. The `resources/4` macro is for convenience, so we don't need to define individual routes. For example, we can replace `resources/4` with the following and the application will still have the same behavior.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", JournalWeb do
+  pipe_through :browser
+
+  get "/", EntryController, :index
+  get "/:id/edit", EntryController, :edit
+  get "/new", EntryController, :new
+  get "/:id", EntryController, :show
+  post "/", EntryController, :create
+  patch "/:id", EntryController, :update
+  put "/:id", EntryController, :update
+  delete "/:id", EntryController, :delete
+end
+```
+
+See [Phoenix.Router.resources/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/4) for more configuration options.
 
 The main HTTP actions are GET, POST, PATCH, PUT, and DELETE. They generally refer to different intentions for manipulating a resource, such as our journal entries.
 
@@ -201,9 +328,9 @@ entries_path  PATCH   /:id                                  JournalWeb.EntryCont
 entries_path  DELETE  /:id                                  JournalWeb.EntryController :delete
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+These routes correspond to our controller actions.
 
-### Controller
+## Controllers
 
 When the client triggers one of these HTTP actions, the server executes the corresponding action in the `JournalWeb.EntryController`, either `:index`, `:edit`, `:new`, `:show`, `:create`, `:update`, or `:delete`.
 
@@ -276,32 +403,7 @@ defmodule JournalWeb.EntryController do
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Resources
-
-The `resources/4` macro is for convenience, so we don't need to define individual routes.
-
-For example, we can replace `resources/4` with the following and the application will still have the same behavior.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-scope "/", JournalWeb do
-  pipe_through :browser
-
-  get "/", EntryController, :index
-  get "/:id/edit", EntryController, :edit
-  get "/new", EntryController, :new
-  get "/:id", EntryController, :show
-  post "/", EntryController, :create
-  patch "/:id", EntryController, :update
-  put "/:id", EntryController, :update
-  delete "/:id", EntryController, :delete
-end
-```
-
-See [Phoenix.Router.resources/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/4) for more configuration options.
+Many of our controller actions delegate to functions defined in the context.
 
 ## Context
 
@@ -480,15 +582,57 @@ In our `Entries` context, we see some common functions:
 
 These cover the full range of CRUD (create, read, update, delete) actions.
 
+## Migrations
+
+Earlier, the `mix phx.gen.html` command generated an Ecto migration file `priv/repo/migrations/create_entries.ex` which creates the entries table in our PostgreSQL database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Repo.Migrations.CreateEntries do
+  use Ecto.Migration
+
+  def change do
+    create table(:entries) do
+      add :title, :string
+      add :content, :text
+
+      timestamps()
+    end
+  end
+end
+```
+
+> The actual file will have a timestamp in its name. i.e. `20220710205852_create_entries`.
+
+`:string` is a simple string limited to `255` characters, and `:text` is a string with a larger character limit.
+
+See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)  documentation for a complete list of attribute types.
+
+Run the following command to run all migration files in the `priv/repo/migrations/` folder.
+
+```
+$ mix ecto.migrate
+The database for Journal.Repo has been created
+
+14:13:55.631 [info]  == Running 20220710205852 Journal.Repo.Migrations.CreateEntries.change/0 forward
+
+14:13:55.633 [info]  create table entries
+
+14:13:55.642 [info]  == Migrated 20220710205852 in 0.0s
+```
+
 ## GET :index
 
-Now ensure you have started the server, and visit http://localhost:4000.
+To better understand our `journal` project we're going to walk through all of the HTTP requests and how they flow through our application.
+
+Ensure you have started the server, and visit http://localhost:4000.
 
 ```
 $ mix phx.server
 ```
 
-We'll see the following HTML web page.
+You'll see the following HTML web page.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -826,35 +970,30 @@ Click the `"Delete"` link in the browser and see it deleted from the page.
 
 ![](images/journal_entry_deleted.png)
 
-## Your Turn: Notes
+## Cleanup and Push to GitHub
 
-Generators are fantastic for quickly building a CRUD application with standard boilerplate code. However, many applications deviate from this structure. So, it's essential to understand the boilerplate code well enough that we can confidently edit it and write it from scratch.
+Since we removed the main page from the project, we no longer need the `PageController`.
 
-Without using the `mix phx.gen.html` generator, create a notes resource in your existing journal application.
+Remove the following files/folders:
 
-Notes should have identical functionality to Entries. However, they will only have a `:content` field.
+* `test/journal/controllers/page_controller.ex`
+* `test/journal_web/controllers/page_controller_test.ex`
+* `test/journal/templates/page`
 
-<!-- livebook:{"break_markdown":true} -->
+Ensure that all tests pass.
 
-```mermaid
-classDiagram
-  class Note {
-    content: :text 
-  }
+```
+mix test
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+Now stage and commit your changes from the `journal` project folder.
 
-Ensure that you:
+```
+git add .
+git commit -m "finish journal project"
+```
 
-* create a migration file (you can generate a template migration file by running `mix ecto.gen.migration create_notes`).
-* add the routes for the notes resource.
-* create the controller for the notes resource.
-* create the view for the notes resource.
-* create the templates for the notes resource.
-* create the notes context with a context file `lib/notes.ex` and a schema file `lib/notes/note.ex`.
-
-You should handle the `:index`, `:edit`, `:new`, `:show`, `:create`, `:update`, and `:delete` actions.
+Now you can create a `journal` repository on [GitHub](https://github.com/) and push your project. Follow the instructions on GitHub to connect your local project to the remote repository.
 
 ## Further Reading
 
