@@ -17,6 +17,20 @@ Mix.install([
 
 Your existing [Blog](./blog_setup.livemd) application should have a blog posts with a `title`, `subtitle`, and `content`.
 
+If you do not already have an existing blog project, you can create one with the following commands:
+
+```
+$ mix phx.new blog
+$ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
+$ mix ecto.migrate
+```
+
+Ideally, you should complete the [Blog: Search](blog_search.livemd) exercise before this one. However, it is not strictly necessary.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Blog Post Migration
+
 You're going to create a migration or many migrations to modify the blog posts table with the following changes:
 
 * Remove the `subtitle` field
@@ -29,25 +43,21 @@ Ensure all features of your application such as creating, reading, updating, and
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Form Fields
+### Push To GitHub
 
-Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
+From the `blog` folder run the following commands.
 
-Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
+First, ensure that all tests pass.
 
 ```
-iex -S mix
+mix test
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-### Push to GitHub
-
-From the `blog` project folder, stage, commit, and push your changes.
+Then stage and commit your changes to the Blog project.
 
 ```
 git add .
-git commit -m "create migration to add fields to post"
+git commit -m "migrate post fields"
 git push
 ```
 
@@ -58,9 +68,23 @@ git push
 Create another migration to add the following constraints:
 
 * Modify the title field to be unique.
-* Modify the `title` so it must be between `3` and `50` characters.
+* Modify the `title` so it must be between `3` and `100` characters.
 
 Ensure your `Post` schema reflects these constraints and validations.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Form Fields
+
+Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
+
+Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
+
+```
+iex -S mix
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 <!-- livebook:{"break_markdown":true} -->
 

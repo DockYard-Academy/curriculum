@@ -1,4 +1,4 @@
-# Blog: Comments
+# Blog: Seeding
 
 ```elixir
 Mix.install([
@@ -13,60 +13,40 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
 
-## Blog: Comments
+## Blog: Seeding
 
-You're going to create a `comments` table to your existing [Blog](./blog_setup.livemd) project.
+You're going to create a seed file for your existing [Blog](./blog_setup.livemd) project.
+The seed file should:
 
-If you do not already have an existing blog project, you can create one with the following commands:
+You should have blog posts associated with comments. If not, you can generate the project with the following command.
 
-```
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
 $ mix phx.new blog
 $ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
-$ mix ecto.migrate
-```
-
-Ideally, you should complete the [Blog: Migration](./blog_migration.livemd) exercise before this exercise. However, it is not strictly necessary.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Comment/Post Association
-
-A comment should **belong to** a blog post and a blog post should **have_many** comments.
-
-Comments should have `:content`, and `:post_id` (foreign key) fields.
-
-```mermaid
-classDiagram
-  class Comment {
-    post_id: :id
-    content: :text
-  }
-```
-
-<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
-<summary>Hint</summary>
-
-You will need to:
-1. Create the comments resource and run migrations.
-
-```
 $ mix phx.gen.html Comments Comment comments content:text post_id:references:posts
 $ mix ecto.migrate
 ```
 
-2. Define the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) relationship in the `Post` schema.
+Ideally, you should complete the previous [Blog: Comments](./blog_comments.livemd) exercise. However, it is not strictly necessary.
 
-3. Define the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship in the `Comment` schema.
+<!-- livebook:{"break_markdown":true} -->
 
-</details>
+### Blog: Seeding
 
-Once complete use the IEx shell to do the following:
+Use the `priv/repo/seeds.exs` file to seed your database with:
 
-* Create a new blog post.
-* Use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to create a comment associated with your created blog post.
-* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to create a new blog post and create multiple comments associated with the blog post.
-* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to add a comment to one of your existing blog posts.
-* Use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create a new blog post and create multiple comments associated with the blog post.
+1. A blog post without any comments.
+2. A blog post with an associated comment.
+
+Once complete, use your seed file to seed the database.
+
+```
+$ mix ecto.reset
+```
+
+Then display comments on your `Post` show page.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -84,7 +64,7 @@ Then stage and commit your changes to the Blog project.
 
 ```
 git add .
-git commit -m "add comments to posts"
+git commit -m "seed comments and posts and add comments to posts"
 git push
 ```
 
