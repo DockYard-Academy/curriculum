@@ -28,7 +28,7 @@ Seeding a database with initial data can be useful in a number of situations. He
 
 * When setting up a new application: Seeding the database can help to ensure that the application has the necessary data it needs to function properly. This can be particularly useful when working with a team, as it ensures that everyone has the same initial data to work with.
 * When testing: Seeding a database with known data can make it easier to test the functionality of an application. For example, you might seed the database with data that represents different edge cases or error conditions, so you can verify that the application handles these situations correctly.
-* When testing incomplete features: Seeding a database allows us to create data before we've added the neccesary UI so that we can test portions of a feature in isolation.
+* When testing incomplete features: Seeding a database allows us to create data before we've added the necessary UI so that we can test portions of a feature in isolation.
 * When developing: Seeding a database with initial data can save time during development by eliminating the need to manually enter data each time you reset the database.
 * When deploying: Seeding the database with initial data can be useful when deploying an application to a new environment, as it ensures that the application has the necessary data it needs to function properly in the new environment.
 
@@ -150,7 +150,7 @@ MIX_ENV=test mix ecto.migrate
 
 After this lesson, it will no longer be safe to run `mix ecto.reset` for the test environment because by default `mix ecto.reset` seeds our database, which we typically don't want for our tests.
 
-## Create an Author
+## Create An Author
 
 We're going to create an author when we seed our database. We can alias the `Authors` context inside of our seed file and use the context functions normally.
 
@@ -232,7 +232,7 @@ iex> BookSearch.Books.list_books()
 ]
 ```
 
-## Create a Book and an Associated Author
+## Create A Book and An Associated Author
 
 Now we're going to create a book with an associated author.
 
@@ -408,7 +408,7 @@ Now our page will crash with a different error: `key :name not found in: nil. If
 
 This is where having a varied set of seed data is useful. We get this error because not all of our books have authors. It would have been easy to miss this error if we only had a book with an author, but we caught it since we have a book without an author.
 
-To resolve this issue, we can check if the author exists. Replace line `15` where we dispay the book's author's name with the following:
+To resolve this issue, we can check if the author exists. Replace line `15` where we display the book's author's name with the following:
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -514,7 +514,7 @@ In the context of database operations, idempotency is often used to describe the
 
 ### Proving Our Script Is Not Idempotent
 
-Our `seeds.exs` script is not **idempotent**. We've been hiding this issue by always resetting the databse, but now we'll prove it. In your terminal, reset the the database and run the seed file. This seeds our database twice because `mix ecto.reset` also runs the `seeds.exs` script.
+Our `seeds.exs` script is not **idempotent**. We've been hiding this issue by always resetting the database, but now we'll prove it. In your terminal, reset the the database and run the seed file. This seeds our database twice because `mix ecto.reset` also runs the `seeds.exs` script.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -567,7 +567,7 @@ iex> BookSearch.Authors.list_authors()
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Refactoring Our Seeds to be Idempotent
+### Refactoring Our Seeds to Be Idempotent
 
 If we want to achieve idempotency, which often makes our scripts more reliable, we could first check if the data exists. Replace your existing `seeds.exs` file with this idompotent version.
 
@@ -696,7 +696,7 @@ iex> Faker.Person.name()
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Create a new seed file
+### Create A New Seed File
 
 There is nothing special about the `priv/repo/seeds.exs` file other than being run by default in our `mix ecto.setup` command.
 
@@ -754,7 +754,7 @@ Now we have large amounts of data we can use to test our application if desired.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Large text
+### Large Text
 
 Often we find bugs in our UI when we use large amounts of data. We can use the [Faker.Lorem](https://hexdocs.pm/faker/Faker.Lorem.html) module for generating specific amounts of text.
 
@@ -844,10 +844,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-phoenix_forms
+$ git checkout -b exercise-book_search_seeding
 $ git add .
-$ git commit -m "finish phoenix forms section"
-$ git push origin exercise-phoenix_forms
+$ git commit -m "finish book search seeding section"
+$ git push origin exercise-book_search_seeding
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -862,4 +862,4 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 | Previous                                           | Next                                             |
 | -------------------------------------------------- | -----------------------------------------------: |
-| [Ecto Changeset](../reading/ecto_changeset.livemd) | [Sign Up Form](../exercises/sign_up_form.livemd) |
+| [Blog Comments](../exercises/blog_comments.livemd) | [Blog Seeding](../exercises/blog_seeding.livemd) |
