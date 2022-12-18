@@ -225,11 +225,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * APIs & Parsing JSON
 * Phoenix
 * Tailwind
-* Forms and Validation
+* Ecto Changesets
 * Phoenix and Ecto
 * Testing Phoenix
 * Schemas and Migrations
 * Phoenix and Ecto One-to-Many Associations
+* Seeding
+* Phoenix Forms
 * Phoenix Authentication
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships

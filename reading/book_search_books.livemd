@@ -183,7 +183,7 @@ Create a new author.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex> {:ok, author} = Author.changeset(%Author{}, %{name: "Patrick Rothfus"}) |> Repo.insert()
+iex> author = Author.changeset(%Author{}, %{name: "Patrick Rothfus"}) |> Repo.insert!()
 ```
 
 Now we can try to create a book using the author.
@@ -191,7 +191,7 @@ Now we can try to create a book using the author.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-iex> {:ok, book} = Book.changeset(%Book{}, %{title: "Name of the Wind", author_id: author.id}) |> Repo.insert()
+iex> book = Book.changeset(%Book{}, %{title: "Name of the Wind", author_id: author.id}) |> Repo.insert!()
 ```
 
 However, you'll notice that the created book does not have an author.
@@ -234,32 +234,12 @@ defmodule BookSearch.Books.Book do
 end
 ```
 
-We have many options for how to build this association. We'll start with the simplest, which is to cast the `:author_id` in our changeset. This may be the simplest, but it's also the least idiomatic approach.
-
-Modify the `Book.changeset/2` function to cast the `:author_id`.
+We have many options for how to build this association. One way to get around this issue is to include the `author_id` in the initial `Book` struct.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def changeset(book, attrs) do
-  book
-  |> cast(attrs, [:title, :author_id])
-  |> validate_required([:title])
-end
-```
-
-Recompile the project in the IEx shell.
-
-```
-iex> recompile()
-```
-
-Now create the book with an associated author.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-iex> {:ok, book} = Book.changeset(%Book{}, %{title: "Name of the Wind", author_id: author.id}) |> Repo.insert()
+iex> Book.changeset(%Book{author_id: author.id}, %{title: "Name of the Wind"}) |> Repo.insert!()
 ```
 
 You should see the `author_id` on the created book.
@@ -279,7 +259,7 @@ You should see the `author_id` on the created book.
 
 ## Books and Authors Schema Association
 
-Instead of casting the `author_id` manually, it's more idiomatic to build the association using one of three functions provided by [Ecto](https://hexdocs.pm/ecto/Ecto.html).
+Instead of including the `author_id` manually, it's more idiomatic to build the association using one of three functions provided by [Ecto](https://hexdocs.pm/ecto/Ecto.html).
 
 * [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) builds a struct from the given association in the struct.
 * [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. Typically used for data internal to the application.
@@ -392,7 +372,7 @@ We can use this as the initial struct for our `Book` changeset. Run the followin
 ```elixir
 iex> Ecto.build_assoc(author, :books) 
 iex> |> Book.changeset(%{title: "Name of the Wind"})
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 ```
 
 This creates a book with an `author_id` association.
@@ -450,7 +430,7 @@ For example, we can use `put_assoc/4` to create an author with multiple associat
 ```elixir
 iex> Author.changeset(%Author{}, %{name: "Dennis E Tailor"})
 iex> |> Ecto.Changeset.put_assoc(:books, [%Book{title: "We Are Legion"}, %Book{title: "For We Are Many"}])
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 ```
 
 This creates an `Author` with multiple books. It automatically preloads the `books` association.
@@ -495,7 +475,7 @@ If we want to add a new book in the author, we can put the `author` association 
 iex> author = BookSearch.Authors.get_author!(2)
 iex> Book.changeset(%Book{}, %{title: "All These Worlds"})
 iex> |> Ecto.Changeset.put_assoc(:author, author)
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 ```
 
 This creates a book associated with our author.
@@ -579,7 +559,7 @@ iex> |> Repo.preload([:books])
 # we aren't going to update any fields on the author, so we leave the attrs map empty.
 iex> |> Author.changeset(%{})
 iex> |> Ecto.Changeset.put_assoc(:books, [%Book{title: "All These Worlds"}])
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 ```
 
 You'll notice this error when you try to run `put_assoc/4`.
@@ -613,7 +593,7 @@ Run the following in the IEx shell to create a new author and validate the book 
 iex> %Author{}
 iex> |> Author.changeset(%{name: "Douglas Adams", books: [%{title: "The Hitchhiker's Guide to the Galaxy"}]})
 iex> |> Ecto.Changeset.cast_assoc(:books, with: &Book.changeset/2)
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 ```
 
 This creates an author and their associated book(s).
@@ -649,7 +629,7 @@ If we tried to create a book with invalid data, we would receive an error.
 iex> %Author{}
 iex> |> Author.changeset(%{name: "Douglas Adams", books: [%{}]})
 iex> |> Ecto.Changeset.cast_assoc(:books, with: &Book.changeset/2)
-iex> |> Repo.insert()
+iex> |> Repo.insert!()
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -673,13 +653,27 @@ iex> |> Repo.insert()
 
 ## Deploy to GitHub
 
+Add the book resources to your router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", BookSearchWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  resources "/authors", AuthorController
+  resources "/books", BookController
+end
+```
+
 Ensure all of your tests continue to pass.
 
 ```
 mix test
 ```
 
-**ONLY If you cloned the `book_search` project**, you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
+**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
 
 ```
 $ rm -rf .git
@@ -701,6 +695,7 @@ For more on Ecto and Phoenix, consider the following resources.
 * [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
 * [BookSearch Project With Books](https://github.com/DockYard-Academy/book_search/tree/books)
 * [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+* [Elixir Schools: Querying#preloading](https://elixirschool.com/en/lessons/ecto/querying_basics#preloading-9)
 * [Elixir Forum: build_assoc vs put_assoc vs cast_assoc](https://elixirforum.com/t/confussed-with-build-assoc-vs-put-assoc-vs-cast-assoc/29116)
 
 ## Commit Your Progress

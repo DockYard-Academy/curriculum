@@ -1,0 +1,865 @@
+# BookSearch: Seeding
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+### Seeding
+
+Database seeding refers to the process of populating a database with initial data. This is often done when a new database is created, or when a database needs to be reset to a known state for testing or development purposes.
+
+Seeding a database with initial data can be useful in a number of situations. Here are a few examples:
+
+* When setting up a new application: Seeding the database can help to ensure that the application has the necessary data it needs to function properly. This can be particularly useful when working with a team, as it ensures that everyone has the same initial data to work with.
+* When testing: Seeding a database with known data can make it easier to test the functionality of an application. For example, you might seed the database with data that represents different edge cases or error conditions, so you can verify that the application handles these situations correctly.
+* When testing incomplete features: Seeding a database allows us to create data before we've added the necessary UI so that we can test portions of a feature in isolation.
+* When developing: Seeding a database with initial data can save time during development by eliminating the need to manually enter data each time you reset the database.
+* When deploying: Seeding the database with initial data can be useful when deploying an application to a new environment, as it ensures that the application has the necessary data it needs to function properly in the new environment.
+
+Overall, seeding a database with initial data can help to improve the reliability and ease of use of an application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Seeding With Phoenix and Ecto
+
+By default, Phoenix creates a `priv/repo/seeds.exs` file which will seed our database.
+
+`priv` is a directory that keeps all resources that are necessary in production but are not directly part of your source code. We typically keep database scripts in the `priv` folder.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Script for populating the database. You can run it as:
+#
+#     mix run priv/repo/seeds.exs
+#
+# Inside the script, you can read and write to any of your
+# repositories directly:
+#
+#     MyApp.Repo.insert!(%MyApp.SomeSchema{})
+#
+# We recommend using the bang functions (`insert!`, `update!`
+# and so on) as they will fail if something goes wrong.
+```
+
+We can run this file from our project folder with the following command. This is the same way we run any `.exs` file in our mix project.
+
+```
+mix run priv/repo/seeds.exs
+```
+
+This file is automatically executed whenever we run `mix ecto.setup` or `mix ecto.reset`.
+We can see this in our mix commands in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp aliases do
+  [
+    setup: ["deps.get", "ecto.setup"],
+    "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+    "ecto.reset": ["ecto.drop", "ecto.setup"],
+    test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+    "assets.deploy": ["esbuild default --minify", "phx.digest"]
+  ]
+end
+```
+
+We'll be using `mix ecto.reset` frequently to re-run our seed file with a clean database.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Faker
+
+The Faker library is a Elixir library that generates fake data for a variety of purposes. It can be used to generate fake data for testing, development, or demonstrations of an application.
+
+Faker provides a simple and intuitive interface for generating fake data in Elixir. It includes a wide range of functions for generating fake data, such as names, addresses, phone numbers, and more.
+
+Here's an example of how you might use the Faker library to generate some fake data in Elixir:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Faker.Person.name()
+"John Smith"
+
+iex> Faker.Phone.EnUs.phone()
+"555-555-5555"
+
+iex> Faker.Address.street_address()
+"123 Main St."
+```
+
+The Faker library can be particularly useful when working with Elixir's Ecto library, as it provides a way to generate fake data to seed a database with initial data.
+
+For more, see the [Faker Documentation](https://hexdocs.pm/faker/readme.html)
+
+## BookSearch: Seeding
+
+To learn more about seeding the database, we're going to seed some data for our existing [BookSearch](./book_search_authors.livemd) application.
+
+If you need clarification during this reading, you can reference the completed [BookSearch/seeding](https://github.com/DockYard-Academy/book_search/tree/seeding) branch of the DockYard Academy example `BookSearch` project.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run the BookSearch Project
+
+Ensure your `BookSearch` project is up to date with [BookSearch: Books](./book_search_books.livemd) from the previous lesson. If not, you can clone the [BookSearch/one_to_many_authors_and_books](https://github.com/DockYard-Academy/book_search/tree/one_to_many_authors_and_books) branch of the project.
+
+All tests should pass.
+
+```
+mix test
+```
+
+Ensure you start the server.
+
+```
+mix phx.server
+```
+
+Reset to ensure we have a clean database for this exercise.
+
+```
+mix ecto.reset
+```
+
+If you encounter issues with your database in your tests, you can drop and recreate the database using the MIX_ENV environment variable to run commands in the test environment.
+
+```
+MIX_ENV=test mix ecto.drop
+MIX_ENV=test mix ecto.create
+MIX_ENV=test mix ecto.migrate
+```
+
+After this lesson, it will no longer be safe to run `mix ecto.reset` for the test environment because by default `mix ecto.reset` seeds our database, which we typically don't want for our tests.
+
+## Create An Author
+
+We're going to create an author when we seed our database. We can alias the `Authors` context inside of our seed file and use the context functions normally.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+
+# Create an author without any books.
+Authors.create_author(%{name: "Andrew Rowe"})
+```
+
+Reset the database to clean our database and run the seed file.
+
+```
+mix ecto.reset
+```
+
+Open the project in IEx.
+
+```
+iex -S mix
+```
+
+View the list of authors to see the author our seed file created.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> BookSearch.Authors.list_authors()
+[
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 1,
+    name: "Andrew Rowe",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 05:15:28],
+    updated_at: ~N[2022-12-18 05:15:28]
+  }
+]
+```
+
+## Create A Book
+
+Add the following to `seeds.exs` to create a book when we seed the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Add with your existing aliases
+alias BookSearch.Books
+
+# Create a book without an author.
+Books.create_book(%{title: "Beowulf"})
+```
+
+Reset the database to clean our database and run the seed file.
+
+```
+mix ecto.reset
+```
+
+View the list of books to see the book our seed file created.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> BookSearch.Books.list_books()
+[
+  %BookSearch.Books.Book{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+    id: 1,
+    title: "Beowulf",
+    author_id: nil,
+    author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+    inserted_at: ~N[2022-12-18 06:08:54],
+    updated_at: ~N[2022-12-18 06:08:54]
+  }
+]
+```
+
+## Create A Book and An Associated Author
+
+Now we're going to create a book with an associated author.
+
+Neither our `Authors` context or `Books` context allows us to create associated records yet.
+
+For now, we can manually create the associated data by creating a changeset and adding the association using [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Add with your existing aliases
+alias BookSearch.Books.Book
+alias BookSearch.Repo
+
+# Create an author and a book.
+{:ok, author} = Authors.create_author(%{name: "Patrick Rothfus"})
+
+%Book{}
+|> Book.changeset(%{title: "Name of the Wind"})
+|> Ecto.Changeset.put_assoc(:author, author)
+|> Repo.insert!()
+```
+
+Reset the database to clean our database and run the seed file.
+
+```
+mix ecto.reset
+```
+
+In the IEx shell, query the books table and preload the author to see the book and the associated author.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ iex -S mix
+iex> BookSearch.Repo.all(BookSearch.Books.Book) |> BookSearch.Repo.preload([:author])
+[
+  %BookSearch.Books.Book{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+    id: 1,
+    title: "Beowulf",
+    author_id: nil,
+    author: nil,
+    inserted_at: ~N[2022-12-18 06:28:37],
+    updated_at: ~N[2022-12-18 06:28:37]
+  },
+  %BookSearch.Books.Book{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+    id: 2,
+    title: "Name of the Wind",
+    author_id: 2,
+    author: %BookSearch.Authors.Author{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+      id: 2,
+      name: "Patrick Rothfus",
+      books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+      inserted_at: ~N[2022-12-18 06:28:37],
+      updated_at: ~N[2022-12-18 06:28:37]
+    },
+    inserted_at: ~N[2022-12-18 06:28:37],
+    updated_at: ~N[2022-12-18 06:28:37]
+  }
+]
+```
+
+We can also query our authors table to test our association from the authors perspective.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> BookSearch.Repo.all(BookSearch.Authors.Author) |> BookSearch.Repo.preload([:books])
+[
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 1,
+    name: "Andrew Rowe",
+    books: [],
+    inserted_at: ~N[2022-12-18 06:28:37],
+    updated_at: ~N[2022-12-18 06:28:37]
+  },
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 2,
+    name: "Patrick Rothfus",
+    books: [
+      %BookSearch.Books.Book{
+        __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+        id: 2,
+        title: "Name of the Wind",
+        author_id: 2,
+        author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+        inserted_at: ~N[2022-12-18 06:28:37],
+        updated_at: ~N[2022-12-18 06:28:37]
+      }
+    ],
+    inserted_at: ~N[2022-12-18 06:28:37],
+    updated_at: ~N[2022-12-18 06:28:37]
+  }
+]
+```
+
+## Using Seeds For Manual Testing
+
+Now that we have an author, a book, and an associated book/author, let's use them to test our application.
+
+Start the Phoenix server if it's not already running.
+
+```
+$ mix phx.server
+```
+
+Visit http://localhost:4000/books to view the list of books.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_list.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Listing Books With Authors
+
+It would be nice if our list of books included the author in it as well. Lets add that feature to demonstrate the benefit of our seeded data.
+
+Modify our `index.heex.html` file in the `books` folder to include an author column.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for book <- @books do %>
+    <tr>
+      <td><%= book.author.name %></td>
+      <td><%= book.title %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.book_path(@conn, :show, book) %></span>
+        <span><%= link "Edit", to: Routes.book_path(@conn, :edit, book) %></span>
+        <span><%= link "Delete", to: Routes.book_path(@conn, :delete, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Book", to: Routes.book_path(@conn, :new) %></span>
+```
+
+The page will crash with the error: `key :name not found in: #Ecto.Association.NotLoaded<association :author is not loaded>`.
+
+That's because we haven't loaded the author association for this page. To load the association, we can preload the authors in our `BookController`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, _params) do
+  books = Books.list_books() |> BookSearch.Repo.preload([:author])
+  render(conn, "index.html", books: books)
+end
+```
+
+Now our page will crash with a different error: `key :name not found in: nil. If you are using the dot syntax, such as map.field, make sure the left-hand side of the dot is a map`. Progress!
+
+This is where having a varied set of seed data is useful. We get this error because not all of our books have authors. It would have been easy to miss this error if we only had a book with an author, but we caught it since we have a book without an author.
+
+To resolve this issue, we can check if the author exists. Replace line `15` where we display the book's author's name with the following:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<td><%= if book.author, do: book.author.name %></td>
+```
+
+Visit http://localhost:4000/books to view the list of books with their authors.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_list_with_authors.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Show Books With Authors
+
+Click on the `Show` button for a book, or visit http://localhost:4000/books/1 to view the show page for a book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_show.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+It would also be nice to display the book's author here. We'll anticipate the errors this time and make sure to preload our `author` in the `BookController` in `book_controller.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def show(conn, %{"id" => id}) do
+  book = Books.get_book!(id) |> BookSearch.Repo.preload([:author])
+  render(conn, "show.html", book: book)
+end
+```
+
+We'll also check if the author exists in the template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Show Book</h1>
+
+<ul>
+  <%= if @book.author do %>
+    <li>
+      <strong>Author:</strong>
+      <%= @book.author.name %>
+    </li>
+  <% end %>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @book.title %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.book_path(@conn, :edit, @book) %></span> |
+<span><%= link "Back", to: Routes.book_path(@conn, :index) %></span>
+```
+
+Visit http://localhost:4000/books/1 to see Beowulf without an author, and http://localhost:4000/books/2 to see Name of the Wind with an author.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_show_with_author.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+If you have any issues, here's what the final `seeds.exs` file should look like.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+alias BookSearch.Books
+alias BookSearch.Books.Book
+alias BookSearch.Repo
+
+# Create an author without any books
+Authors.create_author(%{name: "Andrew Rowe"})
+
+# Create a book without an author.
+Books.create_book(%{title: "Beowulf"})
+
+# Create an author with a book.
+{:ok, author} = Authors.create_author(%{name: "Patrick Rothfus"})
+
+%Book{}
+|> Book.changeset(%{title: "Name of the Wind"})
+|> Ecto.Changeset.put_assoc(:author, author)
+|> Repo.insert!()
+```
+
+## Idempotency
+
+Idempotency refers to the property of certain operations in which they can be applied multiple times without changing the result beyond the initial application. An operation is idempotent if applying it multiple times has the same effect as applying it once.
+
+In the context of database operations, idempotency is often used to describe the behavior of database scripts. A database script is considered idempotent if running it multiple times has the same effect as running it once. This means that the script should be designed in such a way that it can be safely re-run, even if it has already been applied to the database.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Proving Our Script Is Not Idempotent
+
+Our `seeds.exs` script is not **idempotent**. We've been hiding this issue by always resetting the database, but now we'll prove it. In your terminal, reset the the database and run the seed file. This seeds our database twice because `mix ecto.reset` also runs the `seeds.exs` script.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix ecto.reset
+$ mix run priv/repo/seeds.exs
+```
+
+In your IEx shell, view the list of authors. You'll notice duplicates because we ran the seed file twice.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> BookSearch.Authors.list_authors()
+[
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 1,
+    name: "Andrew Rowe",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:23:11],
+    updated_at: ~N[2022-12-18 07:23:11]
+  },
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 2,
+    name: "Patrick Rothfus",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:23:11],
+    updated_at: ~N[2022-12-18 07:23:11]
+  },
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 3,
+    name: "Andrew Rowe",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:24:38],
+    updated_at: ~N[2022-12-18 07:24:38]
+  },
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 4,
+    name: "Patrick Rothfus",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:24:38],
+    updated_at: ~N[2022-12-18 07:24:38]
+  }
+]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Refactoring Our Seeds to Be Idempotent
+
+If we want to achieve idempotency, which often makes our scripts more reliable, we could first check if the data exists. Replace your existing `seeds.exs` file with this idompotent version.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+alias BookSearch.Authors.Author
+alias BookSearch.Books
+alias BookSearch.Books.Book
+alias BookSearch.Repo
+
+# Create an author without any books
+case Repo.get_by(Author, name: "Andrew Rowe") do
+  %Author{} = author ->
+    IO.inspect(author.name, label: "Author Already Created")
+
+  nil ->
+    Authors.create_author(%{name: "Andrew Rowe"})
+end
+
+# Create a book without an author.
+case Repo.get_by(Book, title: "Beowulf") do
+  %Book{} = book ->
+    IO.inspect(book.title, label: "Book Already Created")
+
+  nil ->
+    Books.create_book(%{title: "Beowulf"})
+end
+
+# Create an author with a book.
+{:ok, author} =
+  case Repo.get_by(Author, name: "Patrick Rothfuss") do
+    %Author{} = author ->
+      IO.inspect(author.name, label: "Author Already Created")
+      {:ok, author}
+
+    nil ->
+      Authors.create_author(%{name: "Patrick Rothfuss"})
+  end
+
+case Repo.get_by(Book, title: "Name of the Wind") do
+  %Book{} = book ->
+    IO.inspect(book.title, label: "Book Already Created")
+
+  nil ->
+    %Book{}
+    |> Book.changeset(%{title: "Name of the Wind"})
+    |> Ecto.Changeset.put_assoc(:author, author)
+    |> Repo.insert!()
+end
+```
+
+Reset the database.
+
+```
+$ mix ecto.reset
+```
+
+Run the `seeds.exs` file again so we can confirm it's idempotent.
+
+```
+$ mix run priv/repo/seeds.exs
+```
+
+Display the list of authors in the IEx shell to confirm there are no duplicates.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ iex -S mix
+iex> BookSearch.Authors.list_authors()
+[
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 1,
+    name: "Andrew Rowe",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:39:20],
+    updated_at: ~N[2022-12-18 07:39:20]
+  },
+  %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    id: 2,
+    name: "Patrick Rothfuss",
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    inserted_at: ~N[2022-12-18 07:39:20],
+    updated_at: ~N[2022-12-18 07:39:20]
+  }
+]
+```
+
+Idempotency is not always a requirement of a seed file, but it's useful to be aware of for your future projects.
+
+## Case Specific Seed Files
+
+Sometimes we want to create special seed files to reproduce specific situations. For the sake of example, we're going to make a seed file that will seed our database with large amounts of data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Install Faker
+
+To make adding fake data easier, we're going to install `Faker`. Add the following to your list of dependencies in `mix.exs`. As the latest Faker version may change, check the version on [Hex.pm/faker](https://hex.pm/packages/faker)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:faker, "~> 0.17.0"}
+```
+
+Install dependencies.
+
+```
+mix deps.get
+```
+
+Open the IEx shell and confirm you can use the `Faker` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ iex -S mix
+iex> Faker.Person.name()                                      
+"Lester McKenzie"
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create A New Seed File
+
+There is nothing special about the `priv/repo/seeds.exs` file other than being run by default in our `mix ecto.setup` command.
+
+Create a new `priv/repo/seed_large_dataset.exs` file which is going to create a large amount of data. We're not going to make this script idempotent since it could be useful to re-run to add even more data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+alias BookSearch.Authors.Author
+alias BookSearch.Books
+alias BookSearch.Books.Book
+alias BookSearch.Repo
+
+# authors without books
+Enum.each(1..10, fn _ ->
+  Authors.create_author(%{name: Faker.Person.name()})
+end)
+
+# books without authors
+Enum.each(1..10, fn _ ->
+  Books.create_book(%{title: Faker.Lorem.sentence()})
+end)
+
+Enum.each(1..10, fn _ ->
+  {:ok, author} = Authors.create_author(%{name: Faker.Person.name()})
+
+  Enum.each(1..10, fn _ ->
+    %Book{}
+    |> Book.changeset(%{title: Faker.Lorem.sentence()})
+    |> Ecto.Changeset.put_assoc(:author, author)
+    |> Repo.insert!()
+  end)
+end)
+
+```
+
+Reset the database.
+
+```
+$ mix ecto.reset
+```
+
+Run the `seed_large_dataset.exs` file.
+
+```
+$ mix run priv/repo/seed_large_dataset.exs
+```
+
+Now we have large amounts of data we can use to test our application if desired.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_list_large_dataset.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Large Text
+
+Often we find bugs in our UI when we use large amounts of data. We can use the [Faker.Lorem](https://hexdocs.pm/faker/Faker.Lorem.html) module for generating specific amounts of text.
+
+Let's create a new `priv/repo/seed_large_text.exs` file which adds an author and a book with large amounts of text for their `name` and `title`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+alias BookSearch.Authors.Author
+alias BookSearch.Books
+alias BookSearch.Books.Book
+alias BookSearch.Repo
+
+# author without books
+Authors.create_author(%{name: Faker.Lorem.sentence(10)})
+
+# book without author
+Books.create_book(%{title: Faker.Lorem.sentence(10)})
+
+# author with a book
+{:ok, author} = Authors.create_author(%{name: Faker.Lorem.sentence(10)})
+
+Enum.each(1..10, fn _ ->
+  %Book{}
+  |> Book.changeset(%{title: Faker.Lorem.sentence(10)})
+  |> Ecto.Changeset.put_assoc(:author, author)
+  |> Repo.insert!()
+end)
+```
+
+Reset the database.
+
+```
+$ mix ecto.reset
+```
+
+Run the seed file.
+
+```
+$ mix run priv/repo/seed_large_text.exs
+```
+
+Visit http://localhost:4000/books to see how our UI handles large text content.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_seeding_book_list_large_text.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Looking good!
+
+## Deploy to GitHub
+
+Ensure all of your tests continue to pass.
+
+```
+mix test
+```
+
+**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
+
+```
+$ rm -rf .git
+$ git init
+```
+
+Then stage and commit your changes to GitHub from the `book_search` folder.
+
+```
+git add .
+git commit -m "create seed files"
+git push
+```
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html)
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-book_search_seeding
+$ git add .
+$ git commit -m "finish book search seeding section"
+$ git push origin exercise-book_search_seeding
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                           | Next                                             |
+| -------------------------------------------------- | -----------------------------------------------: |
+| [Blog Comments](../exercises/blog_comments.livemd) | [Blog Seeding](../exercises/blog_seeding.livemd) |

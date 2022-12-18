@@ -17,6 +17,20 @@ Mix.install([
 
 Your existing [Blog](./blog_setup.livemd) application should have a blog posts with a `title`, `subtitle`, and `content`.
 
+If you do not already have an existing blog project, you can create one with the following commands:
+
+```
+$ mix phx.new blog
+$ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
+$ mix ecto.migrate
+```
+
+Ideally, you should complete the [Blog: Search](blog_search.livemd) exercise before this one. However, it is not strictly necessary.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Blog Post Migration
+
 You're going to create a migration or many migrations to modify the blog posts table with the following changes:
 
 * Remove the `subtitle` field
@@ -29,7 +43,38 @@ Ensure all features of your application such as creating, reading, updating, and
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Form Fields
+### Push to GitHub
+
+From the `blog` folder run the following commands.
+
+First, ensure that all tests pass.
+
+```
+mix test
+```
+
+Then stage and commit your changes to the Blog project.
+
+```
+git add .
+git commit -m "migrate post fields"
+git push
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Constraints
+
+Create another migration to add the following constraints:
+
+* Modify the title field to be unique.
+* Modify the `title` so it must be between `3` and `100` characters.
+
+Ensure your `Post` schema reflects these constraints and validations.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Form Fields
 
 Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
 
@@ -40,15 +85,6 @@ iex -S mix
 ```
 
 <!-- livebook:{"break_markdown":true} -->
-
-### Bonus: Constraints
-
-Create another migration to add the following constraints:
-
-* Modify the title field to be unique.
-* Modify the `title` so it must be between `3` and `50` characters.
-
-Ensure your `Post` schema reflects these constraints and validations.
 
 <!-- livebook:{"break_markdown":true} -->
 
