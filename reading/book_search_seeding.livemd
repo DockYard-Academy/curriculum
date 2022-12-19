@@ -5,7 +5,8 @@ Mix.install([
   {:kino, "~> 0.7.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:ecto, "~> 3.9"}
+  {:ecto, "~> 3.9"},
+  {:faker, "~> 0.17.0"}
 ])
 ```
 
@@ -122,16 +123,16 @@ If you need clarification during this reading, you can reference the completed [
 
 Ensure your `BookSearch` project is up to date with [BookSearch: Books](./book_search_books.livemd) from the previous lesson. If not, you can clone the [BookSearch/one_to_many_authors_and_books](https://github.com/DockYard-Academy/book_search/tree/one_to_many_authors_and_books) branch of the project.
 
+If you cloned the project, checkout into the `one_to_many_authors_and_books` branch.
+
+```
+git checkout one_to_many_authors_and_books
+```
+
 All tests should pass.
 
 ```
 mix test
-```
-
-Ensure you start the server.
-
-```
-mix phx.server
 ```
 
 Reset to ensure we have a clean database for this exercise.
@@ -153,6 +154,8 @@ After this lesson, it will no longer be safe to run `mix ecto.reset` for the tes
 ## Create An Author
 
 We're going to create an author when we seed our database. We can alias the `Authors` context inside of our seed file and use the context functions normally.
+
+Add the following to `priv/repo/seeds.exs`.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -696,6 +699,24 @@ iex> Faker.Person.name()
 
 <!-- livebook:{"break_markdown":true} -->
 
+We're going to use Faker to create names of authors.
+
+```elixir
+Faker.Person.name()
+```
+
+We can also use it to generate a sentence.
+
+```elixir
+Faker.Lorem.sentence()
+```
+
+We can also specify a certain number of words for our sentence.
+
+```elixir
+Faker.Lorem.sentence(10)
+```
+
 ### Create A New Seed File
 
 There is nothing special about the `priv/repo/seeds.exs` file other than being run by default in our `mix ecto.setup` command.
@@ -808,7 +829,7 @@ Visit http://localhost:4000/books to see how our UI handles large text content.
 
 Looking good!
 
-## Deploy to GitHub
+## Push to GitHub
 
 Ensure all of your tests continue to pass.
 
@@ -816,12 +837,14 @@ Ensure all of your tests continue to pass.
 mix test
 ```
 
-**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
+**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it.
 
 ```
 $ rm -rf .git
 $ git init
 ```
+
+[Create a GitHub Repository](https://github.com/new) and follow the instructions to connect your local `book_search` project.
 
 Then stage and commit your changes to GitHub from the `book_search` folder.
 
@@ -830,12 +853,6 @@ git add .
 git commit -m "create seed files"
 git push
 ```
-
-## Further Reading
-
-For more on Phoenix, consider the following resources.
-
-* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html)
 
 ## Commit Your Progress
 

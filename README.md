@@ -235,6 +235,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix Authentication
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
+* Deployment
 ## LiveView
 * LiveView
 * Testing LiveView
@@ -247,18 +248,10 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Observability
 * Factories & Mocks
 * CI/CD, Code Coverage, GitHub Actions & Hooks
-## Group Project
-* Project Management
-* Group Project
 ## External Libraries
 * Emailing & Swoosh
 * Oban
 * Advanced Livebook
-## Elixir Applications in Production
-* Umbrella Projects
-* Genserver Bottlenecks
-* Worker Pools
-* Deployment
 ## Final Project
 * Demo Day
 <!-- course-outline-end -->

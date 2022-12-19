@@ -1,0 +1,613 @@
+# Book Search: Book Form
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Overview
+
+### Phoenix Forms
+
+Phoenix provides a [Phoenix HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html) library for working with HTML elements. The library is a thin wrapper around HTML elements with some additional benefits that makes it preferable to working with raw HTML.
+
+In Phoenix, forms are used to create and handle HTML forms in your web application. A form is used to gather input from the user and submit it to the server for processing.
+
+To create a form in Phoenix, you can use the [Phoenix.HTML.Form.form_for/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/3) macro in your template. This function takes a changeset and a URL to submit an HTTP POST request to.
+
+Inside of the form, we use other macros to create inputs such as:
+
+* [Phoenix.HTML.Form.text_input/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#text_input/3)
+* [Phoenix.HTML.Form.textarea/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#textarea/3)
+* [Phoenix.HTML.Form.checkbox/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#checkbox/3)
+* [Phoenix.HTML.Form.select/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#select/4)
+* [Phoenix.HTML.Form.number_input/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#number_input/3)
+
+Here's an example of a simple form in Phoenix:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, Routes.book_path(@conn, :create), fn f -> %>
+  Title: <%= text_input f, :title %>
+<% end %>
+```
+
+In the code above, the [Phoenix.HTML.Form.form_for/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/3) macro defines a form. Inside of the form we define a text input with [Phoenix.HTML.Form.text_input/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#text_input/3).
+
+`@changeset` is an [Ecto Changeset](./ecto_changeset.livemd) provided by the controller. Phoenix forms work alongside changesets to provide error handling and data validation.
+
+The `Routes.book_path(@conn, :create)` call returns the URL to send the `HTTP POST` request to. For example, we could replace this with `"books"`. We use the helper to raise an error of the URL does not exist, and ensure our code continues to work if the route changes.
+
+Typically, this would correspond to a route defined by our router in `router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+post "/books", BookController, :create
+```
+
+This route specifies that when a `POST` request is sent to the `/books` URL, the `create` action in the `BookController` should be invoked to handle the request.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params}) do
+  # Call the Books module's `create_book/1` function to create a new book
+  case Books.create_book(book_params) do
+    # If the book was created successfully, set a flash message and redirect the user to the book's show page
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.") # <-- PUT FLASH
+      |> redirect(to: Routes.book_path(conn, :show, book))
+
+    # If the book couldn't be created, render the form again with the validation errors displayed
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+## Follow Along: BookSearch: Book Form
+
+To learn more about forms with associations, we're going to add a book form where we can select an author to our [BookSearch](./book_search_authors.livemd) applications from the previous lesson. If you need clarification during this reading, you can reference the completed [BookSearch/book_form](https://github.com/DockYard-Academy/book_search/tree/book_form) branch of the DockYard Academy example `BookSearch` project.
+
+Ensure you have completed the [BookSearch: Seeding](./book_search_seeding.livemd) project from the previous lesson. If not, you can clone the [BookSearch/seeding](https://github.com/DockYard-Academy/book_search/tree/seeding) branch of the project.
+
+If you have cloned the project, make sure you are on the `seeding` branch.
+
+```
+git checkout seeding
+```
+
+All tests should pass.
+
+```
+mix test
+```
+
+Ensure you start the server.
+
+```
+mix phx.server
+```
+
+If you encounter any issues with your database you may need to reset it. Reset the database now to ensure you have a clean database.
+
+```
+mix ecto.reset
+```
+
+If you encounter issues with your database in your test environment, you can drop and recreate the database.
+
+```
+MIX_ENV=test mix ecto.drop
+MIX_ENV=test mix ecto.create
+MIX_ENV=test mix ecto.migrate
+```
+
+## Creating A Book
+
+When we generated the books resource for our `BookSearch` application, it automatically added a form for creating and updating books in `book_search_web/templates/book/form.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :title %>
+  <%= text_input f, :title %>
+  <%= error_tag f, :title %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>
+```
+
+This form is used on the `book_search_web/templates/book/new.html.heex` template for creating books.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>New Book</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.book_path(@conn, :create)) %>
+
+<span><%= link "Back", to: Routes.book_path(@conn, :index) %></span>
+```
+
+This forms send a `HTTP POST` request to create a book. These requests are handled in our router in `router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+resources "/books", BookController
+```
+
+Remember that [resources/2](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/2) creates a standard matrix of HTTP actions. It's simply syntax sugar for the following routes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+get "/books", BookController, :index
+get "/books/:id/edit", BookController, :edit
+get "/books/new", BookController, :new
+get "/books/:id", BookController, :show
+post "books/", BookController, :create # Handles HTTP POST request to "/books"
+patch "/books/:id", BookController, :update
+put "/books/:id", BookController, :update
+delete "/books/:id", BookController, :delete
+```
+
+Our router then invokes the `BookController.create/2` action.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params}) do
+  case Books.create_book(book_params) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.book_path(conn, :show, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+This either creates a book and redirects the user to show page on `"books/:id"`, or re-renders the template with an updated changeset.
+
+## Associate A Book With An Author
+
+We've associated books with authors in our database, but currently we're unable to create or update a book with an author from the browser.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Add the Author Field to Our Book Form
+
+To create a book with an associated author, we're going to add an `author` field on our book form that allows us to select an author for our book.
+
+In order to select an author, our `BookController` needs to provide the list of authors to our template.
+
+Modify our `BookController.new/2` function to provide the list of authors to our template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Add alias with our other aliases
+alias BookSearch.Authors
+
+# Modify the new/2 action to provide `authors` to the `new.html.heex` template.
+def new(conn, _params) do
+  changeset = Books.change_book(%Book{})
+  authors = Authors.list_authors()
+  render(conn, "new.html", changeset: changeset, authors: authors)
+end
+```
+
+We'll add a select input to our book form template file `form.html.heex`. To avoid issues with other pages that render this form, we'll check if `@authors` exists before rendering the select input. Remember that `@authors` is just shorthand for `assigns.authors`, so we can use `assigns[:authors]` to safely retrieve the list of authors from the `assigs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :title %>
+  <%= text_input f, :title %>
+  <%= error_tag f, :title %>
+
+  <%= label f, :author_id %>
+  <%= select f, :author_id, Enum.map(@authors, fn author -> {author.name, author.id} end), prompt: "Select an author" %>
+  <%= error_tag f, :author_id %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Fix Failing Tests
+
+By adding `@authors` to our template, we made several tests fail with a **`(KeyError) key :authors not found`**. That's because now any template that renders our form requires the list of authors to be defined in the associated controller.
+
+Any controller action that renders the `new.html.heex` template or the `edit.html.heex` file needs to be fixed.
+
+Modify your `BooksController` to the following to fix tests:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearchWeb.BookController do
+  use BookSearchWeb, :controller
+
+  alias BookSearch.Books
+  alias BookSearch.Books.Book
+  alias BookSearch.Authors
+
+  def index(conn, _params) do
+    books = Books.list_books() |> BookSearch.Repo.preload([:author])
+    render(conn, "index.html", books: books)
+  end
+
+  def new(conn, _params) do
+    changeset = Books.change_book(%Book{})
+    authors = Authors.list_authors()
+    render(conn, "new.html", changeset: changeset, authors: authors)
+  end
+
+  def create(conn, %{"book" => book_params}) do
+    case Books.create_book(book_params) do
+      {:ok, book} ->
+        conn
+        |> put_flash(:info, "Book created successfully.")
+        |> redirect(to: Routes.book_path(conn, :show, book))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        # list authors
+        authors = Authors.list_authors()
+        render(conn, "new.html", changeset: changeset, authors: authors)
+    end
+  end
+
+  def show(conn, %{"id" => id}) do
+    book = Books.get_book!(id) |> BookSearch.Repo.preload([:author])
+    render(conn, "show.html", book: book)
+  end
+
+  def edit(conn, %{"id" => id}) do
+    book = Books.get_book!(id)
+    changeset = Books.change_book(book)
+    
+    # list authors
+    authors = Authors.list_authors()
+    render(conn, "edit.html", book: book, changeset: changeset, authors: authors)
+  end
+
+  def update(conn, %{"id" => id, "book" => book_params}) do
+    book = Books.get_book!(id)
+
+    case Books.update_book(book, book_params) do
+      {:ok, book} ->
+        conn
+        |> put_flash(:info, "Book updated successfully.")
+        |> redirect(to: Routes.book_path(conn, :show, book))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        # list authors
+        authors = Authors.list_authors()
+        render(conn, "edit.html", book: book, changeset: changeset, authors: authors)
+    end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    book = Books.get_book!(id)
+    {:ok, _book} = Books.delete_book(book)
+
+    conn
+    |> put_flash(:info, "Book deleted successfully.")
+    |> redirect(to: Routes.book_path(conn, :index))
+  end
+end
+```
+
+All tests should pass.
+
+```
+mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+In the previous [BookSearch: Seeds](./book_search_seeds.livemd) reading, we created two authors in our seed file, so there should already be two authors to choose from in our form.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_book_from_select_author.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Currently this form doesn't actually associate the author with the book. That's because our `BookController` and `Books` context don't handle associating an author with a book.
+
+Our form sends the `"author_id"` as part of our `book_params` in the `BookController.create/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params}) do
+  case Books.create_book(book_params) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.book_path(conn, :show, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+These book params are then passed to `Books.create_book/1` in `books.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  %Book{}
+  |> Book.changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+We'll need to associate the author and book whenever we create a book to make this form work as desired.
+
+We have a number of options for how build the association between books and authors. We'll keep it simple and put the `author_id` field in the `Book` changeset in `book.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def changeset(book, attrs) do
+  book
+  |> cast(attrs, [:title, :author_id])
+  |> validate_required([:title])
+end
+```
+
+Now visit http://localhost:4000/books/new and create a book with an associated author!
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_book_form_created_book_with_author.png)
+
+## Your Turn: Adding Tests
+
+Test this feature. Write a test for:
+
+* The `BooksController` create action with an associated author.
+* The `BooksController` update action with an associated author.
+* The `Books.create_book/1` context function with an associated author.
+* The `Books.update_book/2` context function with an associated author.
+
+Then, compare your tests with the examples below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Context `create_book/1` Test
+
+Add the following test in `books_test.exs` in the `"books"` describe block with the other `create_book/1` tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Add to existing imports to get access to the `author_fixture` for creating authors.
+import BookSearch.AuthorsFixtures
+
+test "create_book/1 with author creates a book with an associated author" do
+  # Create an author record using the author_fixture function
+  author = author_fixture()
+  # Define valid attributes for a new book, including the author's id
+  valid_attrs = %{title: "some title", author_id: author.id}
+
+  # Call the create_book function with the valid attributes
+  assert {:ok, %Book{} = book} = Books.create_book(valid_attrs)
+
+  # Assert that the returned book has the expected title and author_id
+  assert book.title == "some title"
+  assert book.author_id == author.id
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Context `update_book/2` Test
+
+Add the following test in `books_test.exs` in the `"books"` describe block with the other `update_book/2` tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update_book/2 with author updates book's associated author" do
+  # Create an author record using the author_fixture function
+  original_author = author_fixture()
+  
+  # Create another author record using the author_fixture function
+  updated_author = author_fixture()
+  
+  # Create a book record with the original author using the book_fixture function
+  book = book_fixture(author_id: original_author.id)
+
+  # Define update attributes for the book, including the new author's id
+  update_attrs = %{title: "some updated title", author_id: updated_author.id}
+
+  # Call the update_book function with the book and update attributes as arguments
+  assert {:ok, %Book{} = book} = Books.update_book(book, update_attrs)
+
+  # Assert that the returned book has the expected updated title and author_id
+  assert book.title == "some updated title"
+  assert book.author_id == updated_author.id
+end
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller `create` Test
+
+Add the following test inside of the `"create book"` describe block in `book_controller_test.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Add with our existing imports so we get access to the author_fixture function
+import BookSearch.AuthorsFixtures
+
+test "create a book with an associated author", %{conn: conn} do
+  # Create an author record using the author_fixture function
+  author = author_fixture()
+
+  # Add the author's id to the create_attrs map
+  create_attrs_with_author = Map.put(@create_attrs, :author_id, author.id)
+
+  # Send a POST request to create a new book, including the author's id in the request body
+  conn = post(conn, Routes.book_path(conn, :create), book: create_attrs_with_author)
+
+  # Assert that the response is a redirect, and extract the id from the response
+  assert %{id: id} = redirected_params(conn)
+
+  # Assert that the redirect is to the show page for the new book
+  assert redirected_to(conn) == Routes.book_path(conn, :show, id)
+
+  # Send a GET request to the show page for the new book
+  conn = get(conn, Routes.book_path(conn, :show, id))
+
+  # Assert that the response is an HTML page with a 200 status code
+  response = html_response(conn, 200)
+
+  # Assert that the HTML page contains the expected text and the author's name
+  assert response =~ "Show Book"
+  assert response =~ author.name
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller `update` Test
+
+Add the following test inside of the `"update book"` describe block in `book_controller_test.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update a book with an associated author", %{conn: conn, book: book} do
+  # Create an author record using the author_fixture function
+  author = author_fixture()
+
+  # Update the create_attrs map to include the author's id
+  update_attrs_with_author = Map.put(@create_attrs, :author_id, author.id)
+
+  # Send a PUT request to the update action for the book with the updated attributes
+  conn = put(conn, Routes.book_path(conn, :update, book), book: update_attrs_with_author)
+
+  # Assert that the request is redirected to the show action for the book
+  assert redirected_to(conn) == Routes.book_path(conn, :show, book)
+
+  # Send a GET request to the show action for the book
+  conn = get(conn, Routes.book_path(conn, :show, book))
+
+  # Get the response from the show action
+  response = html_response(conn, 200)
+
+  # Assert that the response includes the updated title of the book
+  assert response =~ "some updated title"
+
+  # Assert that the response includes the name of the associated author
+  assert response =~ author.name
+end
+```
+
+## Push to GitHub
+
+Ensure all of your tests pass.
+
+```
+mix test
+```
+
+**ONLY If you cloned the project**: remove the existing `.git` folder, and re-initialize the project.
+
+```
+$ rm -rf .git
+$ git init
+```
+
+[Create a new GitHub repository](https://github.com/new) and follow the instructions to connect your local project to your new remote project.
+
+Stage, commit, and push your changes to GitHub.
+
+```
+git add .
+git commit -m "associate books with authors"
+git push
+```
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html)
+* [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html)
+* [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-book_search_book_form
+$ git add .
+$ git commit -m "finish book search book form section"
+$ git push origin exercise-book_search_book_form
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                         | Next                                                       |
+| ------------------------------------------------ | ---------------------------------------------------------: |
+| [Blog Seeding](../exercises/blog_seeding.livemd) | [Blog Comment Form](../exercises/blog_comment_form.livemd) |
