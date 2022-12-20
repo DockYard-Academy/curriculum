@@ -50,7 +50,17 @@ In the code above, the [Phoenix.HTML.Form.form_for/3](https://hexdocs.pm/phoenix
 
 `@changeset` is an [Ecto Changeset](./ecto_changeset.livemd) provided by the controller. Phoenix forms work alongside changesets to provide error handling and data validation.
 
-The `Routes.book_path(@conn, :create)` call returns the URL to send the `HTTP POST` request to. For example, we could replace this with `"books"`. We use the helper to raise an error of the URL does not exist, and ensure our code continues to work if the route changes.
+The `Routes.book_path(@conn, :create)` call returns the URL to send the `HTTP POST` request to. For example, we could replace this with `"/books"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, "/books", fn f -> %>
+  Title: <%= text_input f, :title %>
+<% end %>
+```
+
+We use the helper to raise an error of the URL does not exist, and ensure our code continues to work if the route changes.
 
 Typically, this would correspond to a route defined by our router in `router.ex`.
 
@@ -204,7 +214,7 @@ We've associated books with authors in our database, but currently we're unable 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Add the Author Field to Our Book Form
+### Add the author field to our book form
 
 To create a book with an associated author, we're going to add an `author` field on our book form that allows us to select an author for our book.
 
@@ -518,7 +528,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Controller `update` Test
+### Controller `update` test
 
 Add the following test inside of the `"update book"` describe block in `book_controller_test.exs`.
 
@@ -552,24 +562,22 @@ test "update a book with an associated author", %{conn: conn, book: book} do
 end
 ```
 
-## Push to GitHub
+## Push To GitHub
 
-Ensure all of your tests pass.
+Ensure all of your tests continue to pass.
 
 ```
 mix test
 ```
 
-**ONLY If you cloned the project**: remove the existing `.git` folder, and re-initialize the project.
+**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
 
 ```
 $ rm -rf .git
 $ git init
 ```
 
-[Create a new GitHub repository](https://github.com/new) and follow the instructions to connect your local project to your new remote project.
-
-Stage, commit, and push your changes to GitHub.
+Then stage and commit your changes to GitHub from the `book_search` folder.
 
 ```
 git add .
@@ -592,10 +600,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-book_search_book_form
+$ git checkout -b exercise-phoenix_forms
 $ git add .
-$ git commit -m "finish book search book form section"
-$ git push origin exercise-book_search_book_form
+$ git commit -m "finish phoenix forms section"
+$ git push origin exercise-phoenix_forms
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
@@ -605,9 +613,3 @@ Create a pull request to your forked `main` branch. Please do not create a pull 
 Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
-
-## Up Next
-
-| Previous                                         | Next                                                       |
-| ------------------------------------------------ | ---------------------------------------------------------: |
-| [Blog Seeding](../exercises/blog_seeding.livemd) | [Blog Comment Form](../exercises/blog_comment_form.livemd) |
