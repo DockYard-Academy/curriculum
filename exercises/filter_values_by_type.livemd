@@ -46,7 +46,7 @@ defmodule Filter do
   end
 
   def numbers(list) do
-    Enum.filter(list, fn number -> is_integer(number) or is_float(number) end)
+    Enum.filter(list, fn number -> is_number(number) end)
   end
 
   def atoms(list) do
@@ -54,7 +54,7 @@ defmodule Filter do
   end
 
   def lists(list) do
-    Enum.filter(list, &is_list/1)
+    Enum.filter(list, fn item -> is_list(item) and item != [] end)
   end
 
   def maps(list) do
