@@ -32,7 +32,7 @@ For example, if you have a schema that defines a users table with name, email, a
 
 Migrations and schemas can be used together to make it easier to manage and manipulate data in a database. By defining the structure of the data in a schema and the structure of the database in a migration, you can ensure that the data in the database is always consistent with the schema and the latest version of the application.
 
-[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a library for the Elixir programming language that is used for working with databases. `Ecto.Schema` is a module within [Ecto](https://hexdocs.pm/ecto/Ecto.html) that defines how data is mapped to and from a database. `Ecto.Migration` is a module that is used for defining and running database migrations, which are a way to change the structure of a database over time in a predictable and organized manner. Ecto.Changeset is a module that is used to apply changes to data in a database, ensuring that the changes are valid and conform to the constraints defined in the associated `Ecto.Schema`.
+[Ecto](https://hexdocs.pm/ecto/Ecto.html) is a library for the Elixir programming language that is used for working with databases. `Ecto.Schema` is a module within Ecto that defines how data is mapped to and from a database. `Ecto.Migration` is a module that is used for defining and running database migrations, which are a way to change the structure of a database over time in a predictable and organized manner. Ecto.Changeset is a module that is used to apply changes to data in a database, ensuring that the changes are valid and conform to the constraints defined in the associated `Ecto.Schema`.
 
 Here is an example of how these three modules might be used together:
 
@@ -227,7 +227,7 @@ It's important to note that Ecto will only apply unapplied migrations, so you ca
 
 Elixir schemas and migrations work together to define and manage the structure and content of a database. Schemas are used to define the shape and structure of data in a database, while migrations are used to apply changes to the database over time.
 
-When alter our database table with a migration, we also have to modify the schema to reflect those changes.
+When we alter our database table with a migration, we also have to modify the schema to reflect those changes.
 
 For example, if we want to modify our user table to add a `phone` field, remove the `age` field, modify the `email` field to be unique, and modify the `name` field to not be null, our schema should also reflect these changes otherwise we'll encounter issues when reading or writing to the database.
 
@@ -577,7 +577,7 @@ defmodule TodoList.TodoItems.TodoItem do
   @doc false
   def changeset(todo_item, attrs) do
     todo_item
-    |> cast(attrs, [:title. :completed])
+    |> cast(attrs, [:title, :completed])
     |> validate_required([:title, :completed])
   end
 end
