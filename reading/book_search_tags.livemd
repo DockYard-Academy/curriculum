@@ -84,12 +84,12 @@ The `"book_tags"` table stores a foreign key to both the book and the tag. We ca
 
 ## Follow Along: BookSearch: Tags
 
-Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch/book_search](https://github.com/DockYard-Academy/book_search/tree/book_search) project.
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch/book_form](https://github.com/DockYard-Academy/book_search/tree/book_form) project.
 
-If you cloned the project, ensure you use the latest code on the `book_search` branch from the previous exercise.
+If you cloned the project, ensure you use the latest code on the `book_form` branch from the previous exercise.
 
 ```
-$ git checkout book_search
+$ git checkout book_form
 ```
 
 All tests should pass.
@@ -993,7 +993,7 @@ describe "show" do
     # Create an author.
     author = author_fixture()
     # Create a book fixture with the associated tag and author.
-    book = book_fixture(author: author, tags: [tag])
+    book = book_fixture([author: author], [tag])
 
     # Send a GET request to the 'show' action with the tag's id as a parameter.
     conn = get(conn, Routes.tag_path(conn, :show, tag))
@@ -1004,6 +1004,23 @@ describe "show" do
     assert response =~ author.name
     assert response =~ book.title
   end
+end
+```
+
+This required a modification to the `book_fixture` to use tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def book_fixture(attrs \\ %{}, tags \\ []) do
+  {:ok, book} =
+    attrs
+    |> Enum.into(%{
+      title: "some title"
+    })
+    |> BookSearch.Books.create_book(tags)
+
+  book
 end
 ```
 
