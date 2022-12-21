@@ -84,12 +84,12 @@ The `"book_tags"` table stores a foreign key to both the book and the tag. We ca
 
 ## Follow Along: BookSearch: Tags
 
-Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch/book_search](https://github.com/DockYard-Academy/book_search/tree/book_search) project.
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch/book_form](https://github.com/DockYard-Academy/book_search/tree/book_form) project.
 
-If you cloned the project, ensure you use the latest code on the `book_search` branch from the previous exercise.
+If you cloned the project, ensure you use the latest code on the `book_form` branch from the previous exercise.
 
 ```
-$ git checkout book_search
+$ git checkout book_form
 ```
 
 All tests should pass.
@@ -362,7 +362,7 @@ We need to provide tags when we try to create a book in the `BookController.crea
 
 <div style="background-color: orange; padding: 1rem; margin: 1rem 0; font-weight: bold;">
 
-It's not performant to make a query to the database for every tag. It would be ideal to make a single query for all tags in our list of tag ids. However, this code is simpler and avoids unnecessary complexity for our demonstration.
+It's not performant to make a query to the database for every tag. It would be ideal to make a single query for all tags in our list of tag ids. However, this code is simpler and avoids unneccessary complexity for our demonstration.
 
 </div>
 
@@ -563,7 +563,7 @@ test "list_books/0 returns all books" do
 end
 ```
 
-Fails due to us loading the association when we create a book, but not when we list books.
+Failes due to us loading the association when we create a book, but not when we list books.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -979,7 +979,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Tag Controller `show` Test
+### Tag Controller `show` test
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -993,7 +993,7 @@ describe "show" do
     # Create an author.
     author = author_fixture()
     # Create a book fixture with the associated tag and author.
-    book = book_fixture(author: author, tags: [tag])
+    book = book_fixture([author: author], [tag])
 
     # Send a GET request to the 'show' action with the tag's id as a parameter.
     conn = get(conn, Routes.tag_path(conn, :show, tag))
@@ -1007,7 +1007,24 @@ describe "show" do
 end
 ```
 
-## Push to GitHub
+This required a modification to the `book_fixture` to use tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def book_fixture(attrs \\ %{}, tags \\ []) do
+  {:ok, book} =
+    attrs
+    |> Enum.into(%{
+      title: "some title"
+    })
+    |> BookSearch.Books.create_book(tags)
+
+  book
+end
+```
+
+## Push To GitHub
 
 Ensure all of your tests continue to pass.
 
@@ -1063,6 +1080,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                       | Next                                       |
-| -------------------------------------------------------------- | -----------------------------------------: |
-| [Blog Authentication](../exercises/blog_authentication.livemd) | [Blog Tags](../exercises/blog_tags.livemd) |
+| Previous                                                       | Next                                                 |
+| -------------------------------------------------------------- | ---------------------------------------------------: |
+| [Blog Authentication](../exercises/blog_authentication.livemd) | [Portfolio Tags](../exercises/portfolio_tags.livemd) |
