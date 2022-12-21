@@ -54,38 +54,184 @@ Then run migrations.
 $ mix ecto.migrate
 ```
 
-Add the authors to our routes.
+## Router
+
+When you generate authors, you'll see a message telling you to add `resources/2` to your router.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-scope "/", BookSearchWeb do
-  pipe_through :browser
+Add the resource to your browser scope in lib/book_search_web/router.ex:
 
-  get "/", PageController, :index
-  resources "/authors", AuthorController
+    resources "/authors", AuthorController
+```
+
+That's because we need to connect our generated `AuthorController` actions to a URL in our router.
+
+## Controller Tests
+
+The generator created an `author_controller_test.exs` file which tests our controller by manually sending HTTP GET, POST, PUT, and DELETE actions.
+
+Here is a documented version of the file to make it easier to understand.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearchWeb.AuthorControllerTest do
+  # Use the ConnCase module to provide a `conn` variable and functions/macros for testing a connection.
+  use BookSearchWeb.ConnCase
+
+  # Import the AuthorsFixtures module to provide some helper functions
+  import BookSearch.AuthorsFixtures
+
+  # Define some test attributes
+  @create_attrs %{name: "some name"}
+  @update_attrs %{name: "some updated name"}
+  @invalid_attrs %{name: nil}
+
+  # Define a test group for the `:index` action
+  describe "index" do
+    # Define a test for the `:index` action
+    test "lists all authors", %{conn: conn} do
+      # Make a GET request to the `:index` action
+      conn = get(conn, Routes.author_path(conn, :index))
+      # Assert that the response has a status of 200 and contains the string "Listing Authors"
+      assert html_response(conn, 200) =~ "Listing Authors"
+    end
+  end
+
+  # Define a test group for the `:new` action
+  describe "new author" do
+    # Define a test for the `:new` action
+    test "renders form", %{conn: conn} do
+      # Make a GET request to the `:new` action
+      conn = get(conn, Routes.author_path(conn, :new))
+      # Assert that the response has a status of 200 and contains the string "New Author"
+      assert html_response(conn, 200) =~ "New Author"
+    end
+  end
+
+  # Define a test group for the `:create` action
+  describe "create author" do
+    # Define a test for a successful `:create` action
+    test "redirects to show when data is valid", %{conn: conn} do
+      # Make a POST request to the `:create` action with valid attributes
+      conn = post(conn, Routes.author_path(conn, :create), author: @create_attrs)
+
+      # Assert that the response is a redirect to the `:show` action
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == Routes.author_path(conn, :show, id)
+
+      # Make a GET request to the `:show` action and assert that the response has a status of 200 and contains the string "Show Author"
+      conn = get(conn, Routes.author_path(conn, :show, id))
+      assert html_response(conn, 200) =~ "Show Author"
+    end
+
+    # Define a test for an unsuccessful `:create` action
+    test "renders errors when data is invalid", %{conn: conn} do
+      # Make a POST request to the `:create` action with invalid attributes
+      conn = post(conn, Routes.author_path(conn, :create), author: @invalid_attrs)
+      # Assert that the response has a status of 200 and contains the string "New Author"
+      assert html_response(conn, 200) =~ "New Author"
+    end
+  end
+
+  # Define a test group for the `:edit` action
+  describe "edit author" do
+    # Run the `create_author` function before each test in this group
+    setup [:create_author]
+
+    # Define a test for the `:edit` action
+    test "renders form for editing chosen author", %{conn: conn, author: author} do
+      # Make a GET request to the `:edit` action with the `author` variable as a parameter
+      conn = get(conn, Routes.author_path(conn, :edit, author))
+      # Assert that the response has a status of 200 and contains the string "Edit Author"
+      assert html_response(conn, 200) =~ "Edit Author"
+    end
+  end
+
+  # Define a test group for the `:update` action
+  describe "update author" do
+    # Run the `create_author` function before each test in this group
+    setup [:create_author]
+
+    # Define a test for a successful `:update` action
+    test "redirects when data is valid", %{conn: conn, author: author} do
+      # Make a PUT request to the `:update` action with the `author` variable as a parameter and valid attributes
+      conn = put(conn, Routes.author_path(conn, :update, author), author: @update_attrs)
+
+      # Assert that the response is a redirect to the `:show` action with the `author` variable as a parameter
+      assert redirected_to(conn) == Routes.author_path(conn, :show, author)
+
+      # Make a GET request to the `:show` action with the `author` variable as a parameter and assert that the response has a status of 200 and contains the string "some updated name"
+      conn = get(conn, Routes.author_path(conn, :show, author))
+      assert html_response(conn, 200) =~ "some updated name"
+    end
+
+    # Define a test for an unsuccessful `:update` action
+    test "renders errors when data is invalid", %{conn: conn, author: author} do
+      # Make a PUT request to the `:update` action with the `author` variable as a parameter and invalid attributes
+      conn = put(conn, Routes.author_path(conn, :update, author), author: @invalid_attrs)
+      # Assert that the response has a status of 200 and contains the string "Edit Author"
+      assert html_response(conn, 200) =~ "Edit Author"
+    end
+  end
+
+  # Define a test group for the `:delete` action
+  describe "delete author" do
+    # Run the `create_author` function before each test in this group
+    setup [:create_author]
+
+    # Define a test for the `:delete` action
+    test "deletes chosen author", %{conn: conn, author: author} do
+      # Make a DELETE request to the `:delete` action with the `author` variable as a parameter
+      conn = delete(conn, Routes.author_path(conn, :delete, author))
+      # Assert that the response is a redirect to the `:index` action
+      assert redirected_to(conn) == Routes.author_path(conn, :index)
+
+      # Assert that a 404 error is returned when making a GET request to the `:show` action with the `author` variable as a parameter
+      assert_error_sent 404, fn ->
+        get(conn, Routes.author_path(conn, :show, author))
+      end
+    end
+  end
+
+  # Define a private function to create an author
+  defp create_author(_) do
+    # Create an author using a fixture
+    author = author_fixture()
+    # Return a map with the `author` variable
+    %{author: author}
+  end
 end
 ```
 
-All tests should pass.
+<!-- livebook:{"break_markdown":true} -->
 
-```
-$ mix test
-```
+### Controller Test Breakdown
 
-Start the server.
+The `author_controller_text.exs` file uses the following macros from [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html) to simulate HTTP GET, POST, PUT, and DELETE actions.
 
-```
-$ mix phx.server
-```
+* [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) sends a GET request to a given URL with optional parameters and returns the response.
+* [post/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3) sends a POST request to a given URL with optional parameters and returns the response.
+* [put/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3) sends a PUT request to a given URL with optional parameters and returns the response.
+* [delete/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#delete/3) sends a DELETE request to a given URL with optional parameters and returns the response.
 
-## ConnCase & ConnTest
+It also uses several helper functions, also from [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html):
 
-Phoenix automatically generates controller tests to ensure we can perform CRUD (Create, Read, Update, Delete) actions for the generated resource.
+* [html_response/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#html_response/2) retrieves the HTML body of a response usually to check if it contains a given string or pattern.
+* [redirected_to/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#redirected_to/2) returns the URL to which a response has been redirected.
+* [get_flash/2](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get_flash/2) retrieves the value of a flash message with a given key from a response.
 
-Phoenix applications generate a `ConnCase` test module that simulates building the connection between a client and server.
+Several tests also use the [setup/1](https://hexdocs.pm/ex_unit/ExUnit.Callbacks.html#setup/1) function from [ExUnit.Callbacks](https://hexdocs.pm/ex_unit/ExUnit.Callbacks.html#content) in combination with the private `create_author/1` helper function to create an author for the test.
+
+The `create_author/1` function uses the `author_fixture/1` function from the `BookSearch.AuthorsFixtures` module in `support/fixtures/authors_fixtures.ex`.
 
 <!-- livebook:{"break_markdown":true} -->
+
+### `ConnCase`
+
+Phoenix applications generate a `ConnCase` test module that simulates building the connection between a client and server.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -132,32 +278,81 @@ defmodule BookSearchWeb.ConnCase do
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
 `BookSearch.ConnCase` imports [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html) which defines many functions for simulating HTTP requests.
 
 These functions often accept the `conn` structure built in the `setup` section of `BookSearch.ConnCase` using [Phoenix.ConnTest.build_conn/0](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#build_conn/0).
 
 `ConnCase` tests allow us to interact with our Phoenix web application programmatically and make assertions on its behavior or HTML response.
 
-<!-- livebook:{"break_markdown":true} -->
+When we `use BookSearchWeb.ConnCase` we automatically include the code inside the `using` block to `import` or `alias` modules, and run the `setup` block.
 
-```mermaid
-flowchart
+## Follow Along: Failing Tests
 
-ControllerTest --> ConnCase
-ControllerTest --> ConnTest
-ConnTest --> get/3
-ConnTest --> post/3
-ConnTest --> delete/3
-ConnTest --> put/3
-ConnTest --> put/3
+Run your tests.
 
-click get/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3" _blank
-click post/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3" _blank
-click put/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3" _blank
-click delete/3 href "https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#delete/3" _blank
 ```
+mix test
+```
+
+Currently, all of our `author_controller_test.exs` tests fail with the following error message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+** (UndefinedFunctionError) function BookSearchWeb.Router.Helpers.author_path/2 is undefined or private
+```
+
+That's because we haven't defined the routes that will dispatch to our `AuthorController` actions.
+
+We could solve this tests by adding the `resources/2` call in our router that defines the matrix of HTTP actions.
+
+Add the authors to our routes in `router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", BookSearchWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  resources "/authors", AuthorController
+end
+```
+
+All tests should pass.
+
+```
+$ mix test
+```
+
+However, instead of using `resources/2`, we'll manually add each route.
+
+Remove `resources/2` from your `router.ex` and add each route individually. We've added comments to the code to make it more clear, however usually these comments would be unnecessary for this self-explanatory code.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  # Set up a scope for the BookSearchWeb web application
+  scope "/", BookSearchWeb do
+    # Use the :browser pipeline for all routes within this scope
+    pipe_through :browser
+
+    # Define a route for the root path that maps to the index action of the PageController
+    get "/", PageController, :index
+
+    # Define routes for the AuthorController actions
+    get "/authors", AuthorController, :index            # Index action
+    get "/authors/new", AuthorController, :new          # New action
+    get "/authors/:id", AuthorController, :show         # Show action
+    get "/authors/edit/:id", AuthorController, :edit    # Edit action
+    post "/authors", AuthorController, :create          # Create action
+    put "/authors/:id", AuthorController, :update       # Update action
+    patch "/authors/:id", AuthorController, :update     # Update action
+    delete "/authors/:id", AuthorController, :delete    # Delete action
+  end
+```
+
+Now that all of our tests are passing, we'll dive deeply into how each test works.
 
 ## HTTP GET "/authors"
 
@@ -722,7 +917,7 @@ It also verifies that the author show page of the deleted author returns a 404 n
 
 ###
 
-## Author Search
+## Follow Along: Author Search
 
 To better understand how to write effective Phoenix Controller tests using `ConnCase` and `ConnTest` we're going to implement a new feature to search for authors.
 

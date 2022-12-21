@@ -55,7 +55,7 @@ Overall, foreign keys are an essential part of relational databases and are used
 
 ## BookSearch: Books
 
-To learn more about one-to-many relationships, we're going to add books to our [BookSearch](./book_search_authors.livemd) applications from the previous lesson. If you need clarification during this reading, you can reference the completed [BookSearch/one_to_many_authors_and_books](https://github.com/DockYard-Academy/book_search/tree/one_to_many_authors_and_books) branch of the DockYard Academy example `BookSearch` project.
+To learn more about one-to-many relationships, we're going to add books to our [BookSearch](./book_search_authors.livemd) applications from the previous lesson. If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/DockYard-Academy/book_search/tree/books) branch of the DockYard Academy example `BookSearch` project.
 
 Each book will belong to an author, and each author can have many books. Therefore, we need to associate books with a particular author.
 
@@ -113,10 +113,10 @@ If you encounter any issues with your database you may need to reset it.
 mix ecto.reset
 ```
 
-If you encounter issues with your database in your test environment, you can run the same command and set the `MIX_ENV` environment variable to `test`.
+If you encounter issues with your database in your test environment, you can drop the test database. It will be recreated when you run tests.
 
 ```
-MIX_ENV=test mix ecto.reset
+MIX_ENV=test mix ecto.drop
 ```
 
 ## Books & Authors Database Association
@@ -653,24 +653,45 @@ iex> |> Repo.insert!()
 
 ## Push to GitHub
 
-Add the book resources to your router.
+Add the routes for `BookController` to your router.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# Set up a scope for the BookSearchWeb web application
 scope "/", BookSearchWeb do
+  # Use the :browser pipeline for all routes within this scope
   pipe_through :browser
 
+  # Define a route for the root path that maps to the index action of the PageController
   get "/", PageController, :index
-  resources "/authors", AuthorController
-  resources "/books", BookController
+
+  # Define routes for the AuthorController actions
+  get "/authors", AuthorController, :index            # Index action
+  get "/authors/new", AuthorController, :new          # New action
+  get "/authors/:id", AuthorController, :show         # Show action
+  get "/authors/edit/:id", AuthorController, :edit    # Edit action
+  post "/authors", AuthorController, :create          # Create action
+  put "/authors/:id", AuthorController, :update       # Update action
+  patch "/authors/:id", AuthorController, :update     # Update action
+  delete "/authors/:id", AuthorController, :delete    # Delete 
+  
+  # Define routes for the BookController actions
+  get "/books", BookController, :index                # Index action
+  get "/books/new", BookController, :new              # New action
+  get "/books/:id", BookController, :show             # Show action
+  get "/books/edit/:id", BookController, :edit        # Edit action
+  post "/books", BookController, :create              # Create action
+  put "/books/:id", BookController, :update           # Update action
+  patch "/books/:id", BookController, :update         # Update action
+  delete "/books/:id", BookController, :delete        # Delete action
 end
 ```
 
 Ensure all of your tests continue to pass.
 
 ```
-mix test
+$ mix test
 ```
 
 **ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
@@ -683,9 +704,9 @@ $ git init
 Then stage and commit your changes to GitHub from the `book_search` folder.
 
 ```
-git add .
-git commit -m "associate books with authors"
-git push
+$ git add .
+$ git commit -m "associate books with authors"
+$ git push
 ```
 
 ## Further Reading
