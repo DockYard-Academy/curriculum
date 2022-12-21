@@ -121,12 +121,10 @@ If you encounter any issues with your database you may need to reset it. Reset t
 mix ecto.reset
 ```
 
-If you encounter issues with your database in your test environment, you can drop and recreate the database.
+If you encounter issues with your database in your test environment, you can drop it.
 
 ```
 MIX_ENV=test mix ecto.drop
-MIX_ENV=test mix ecto.create
-MIX_ENV=test mix ecto.migrate
 ```
 
 ## Creating A Book
@@ -182,7 +180,7 @@ get "/books", BookController, :index
 get "/books/:id/edit", BookController, :edit
 get "/books/new", BookController, :new
 get "/books/:id", BookController, :show
-post "books/", BookController, :create # Handles HTTP POST request to "/books"
+post "/books", BookController, :create # Handles HTTP POST request to "/books"
 patch "/books/:id", BookController, :update
 put "/books/:id", BookController, :update
 delete "/books/:id", BookController, :delete
@@ -502,7 +500,7 @@ test "create a book with an associated author", %{conn: conn} do
   # Create an author record using the author_fixture function
   author = author_fixture()
 
-  # Add the author's id to the create_attrs map
+  # Add the author's id to the @create_attrs map
   create_attrs_with_author = Map.put(@create_attrs, :author_id, author.id)
 
   # Send a POST request to create a new book, including the author's id in the request body
@@ -539,8 +537,8 @@ test "update a book with an associated author", %{conn: conn, book: book} do
   # Create an author record using the author_fixture function
   author = author_fixture()
 
-  # Update the create_attrs map to include the author's id
-  update_attrs_with_author = Map.put(@create_attrs, :author_id, author.id)
+   # Add the author's id to the @update_attrs map
+  update_attrs_with_author = Map.put(@update_attrs, :author_id, author.id)
 
   # Send a PUT request to the update action for the book with the updated attributes
   conn = put(conn, Routes.book_path(conn, :update, book), book: update_attrs_with_author)

@@ -1,0 +1,1364 @@
+# Book Search: Tags
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+We will add tags to our `BookSearch` application from the previous lesson.
+If you need clarification during this reading, you can reference the completed [BookSearch/tags](https://github.com/DockYard-Academy/book_search/tree/tags) project on the `tags` branch.
+
+Tags describe the type of book. For example we might have `"fiction"` or `"history"` tags.
+
+Books can have multiple tags. For example, a book might have both the `"action"` tag and the `"fiction"` tag.
+Tags can also have multiple books. For example, We want to be able to query all books that have the `"action"` tag.
+
+Books and Tags have a **many-to-many** relationship.
+
+To model many-to-many relationships in a Database we use a **join** table to associate one resource with another.
+
+### `books` Table
+
+| id  | name                |
+| --- | ------------------- |
+| 123 | "Name of the Wind"  |
+| 124 | "A Wise Man's Fear" |
+
+### `tags` Table
+
+| id  | name      |
+| --- | --------- |
+| 456 | "fiction" |
+| 457 | "action"  |
+
+### `book_tags` Table (join Table)
+
+| id  | book_id | tag_id |
+| --- | ------- | ------ |
+| 1   | 123     | 456    |
+| 2   | 124     | 456    |
+| 3   | 123     | 457    |
+| 14  | 124     | 457    |
+
+This way, tags can have many books, and books can have many tags.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  direction RL
+  class Book {
+    title: :string
+    tags: [Tag]
+  }
+
+  class Tag {
+    name: :string
+    books: [Book]
+  }
+
+  class BookTag {
+    book_id: :id
+    tag_id: :id
+  }
+
+  Book "*" --> "*" BookTag :has_many
+  Tag "*" --> "*" BookTag :has_many
+```
+
+The `"book_tags"` table stores a foreign key to both the book and the tag. We can query this table to find all of the tags for a book, and all of the books for a tag.
+
+## Run Book Search Project
+
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/DockYard-Academy/book_search/tree/books) project on the `books` branch.
+
+```
+$ git clone https://github.com/DockYard-Academy/book_search
+$ git checkout books
+```
+
+All tests should pass.
+
+```
+$ mix deps.get
+$ mix test
+```
+
+Start the server.
+
+```
+$ mix phx.server
+```
+
+## Books Tags Table
+
+We can run the following to create our tags resource.
+
+```
+$ mix phx.gen.html Tags Tag tags name:string
+```
+
+Then add the `"/tags"` resource to our router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/router.ex
+
+  scope "/", BookSearchWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+
+    resources "/authors", AuthorController do
+      resources "/books", BookController
+    end
+
+    get "/books", BookController, :index
+
+    resources "/tags", TagController
+  end
+```
+
+Run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+All tests should pass.
+
+```
+$ mix test
+```
+
+Now we can perform standard CRUD actions for tags when we visit http://localhost:4000/tags
+
+## Associating Tags and Books
+
+To associate Tags and Books we need to add join table.
+This table will store a reference (a foreign key) to both the books and the tags tables.
+
+We can generate `"book_tags"` table migration with the following. We don't need to generate a context or controller for the join
+table.
+
+```
+$ mix ecto.gen.migration create_book_tags
+```
+
+Now we need to create our join table migration in the generated migration `priv/repo/migrations/_create_book_tags.exs` file.
+The `:book_tags` table should contain a reference to `:book_id` and `:tag_id`. We want to delete the association if the book or the tag are deleted. We also want to enforce that both the `:book_id` and `:tag_id` cannot be `null`.
+
+The `create unique_index(:book_tags, [:book_id, :tag_id])` ensures we don't associate a book with the same tag multiple times. Each association must be unique.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Repo.Migrations.CreateBookTags do
+  use Ecto.Migration
+
+  def change do
+    create table(:book_tags) do
+      add :book_id, references(:books, on_delete: :delete_all), null: false
+      add :tag_id, references(:tags, on_delete: :delete_all), null: false
+    end
+
+    create unique_index(:book_tags, [:book_id, :tag_id])
+  end
+end
+```
+
+## Selecting Tags
+
+When we create a book, we want to be able to associate the book with selected tags.
+
+Ideally, clients should be able to select from a list of the existing tags.
+
+Phoenix provides a [Phoenix.HTML.Form.multiple_select/4](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#multiple_select/4)
+input we can use to select tags when creating a book. Add this select input to the book form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :title %>
+  <%= text_input f, :title %>
+  <%= error_tag f, :title %>
+
+  <%= label f, :tags %>
+  <%= multiple_select f, :tags, [], selected: [] %>
+  <%= error_tag f, :tags %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Visit http://localhost:4000/authors/1/books/new where `1` is the id of an author in your application, and we should see the following. The `multiple_select/4` input currently has no options because we haven't provided them.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/new_book_with_tag_blank_form.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We need to provide the tags to the template.
+
+The `multiple_select/4` input accepts a list of tuples with a label and a value as selection options.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+# Using Keyword lists
+<%= multiple_select f, :tags, ["label": "value"], selected: [] %>
+
+# Using Lists of Tuples
+<%= multiple_select f, :tags, [{"label", "value"}], selected: [] %>
+```
+
+To provide the tag options to the template, we can create a `tag_options/0` function in the view. All functions defined in the view are available in every template.
+
+We want the label to be the tag's name and the value to be the tag's id.
+We can map over the tags to create the list of `{label, value}` tuples.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/views/book_view.ex
+
+defmodule BookSearchWeb.BookView do
+  use BookSearchWeb, :view
+
+  def tag_options do
+    BookSearch.Tags.list_tags() |> Enum.map(fn tag -> {tag.name, tag.id} end)
+  end
+end
+```
+
+Provide `tag_options/0` to the `multiple_select/4` input.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<%= multiple_select f, :tags, tag_options(), selected: [] %>
+```
+
+## Seeding
+
+We haven't created any tags, so the text input is still empty. However, this is an excellent opportunity to demonstrate the value of seeding.
+
+Seeding is the initial creation of data in your database typically run before your tests or to create a convenient developer environment. Though, you can seed in a production or other environments as well.
+
+It would be convenient to programmatically create several authors, books, and tags in our development environment through a seed file. This way, we can explore and test features in our application without needing to do any manual setup.
+
+Fortunately, Phoenix provides a `priv/repo/seeds.exs` where we can seed data in our development and test environment.
+
+Add the following content to `priv/repo/seeds.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Authors
+alias BookSearch.Books
+alias BookSearch.Tags
+
+if Mix.env() == :dev do
+  {:ok, author1} = Authors.create_author(%{name: "Patrick Rothfuss"})
+  {:ok, author2} = Authors.create_author(%{name: "Dennis E Taylor"})
+
+  ["fiction", "fantasy", "history", "sci-fi"]
+  |> Enum.each(fn tag_name ->
+    Tags.create_tag(%{name: tag_name})
+  end)
+
+  Books.create_book(%{title: "Name of the Wind", author: author1})
+  Books.create_book(%{title: "We are Legend (We are Bob)", author: author2})
+end
+```
+
+For the most part, this code should look familiar other than perhaps `Mix.env() == :dev`.
+`Mix.env()` returns the current environment. When we run tests `Mix.env()` returns `:test`. When we run the application locally, `Mix.env()` returns `:dev`. We've added this condition to avoid seeding data in our tests, which could cause unexpected behavior.
+
+We can seed our database by running the following. Make sure you stop the server first. Otherwise, the command will fail.
+
+```
+$ mix run priv/repo/seeds.exs
+```
+
+However, keep in mind if we keep running this file, we'll keep creating duplicate values in the database. We currently don't prevent two authors having the same name.
+
+To avoid this issue, we can instead run the following command to drop the database, recreate an empty database, run migrations, and then run the seed file.
+
+```
+$ mix ecto.reset
+```
+
+This command is defined in our `mix.exs` file in the `aliases/0` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp aliases do
+  [
+    setup: ["deps.get", "ecto.setup"],
+    "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+    "ecto.reset": ["ecto.drop", "ecto.setup"],
+    test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+    "assets.deploy": ["esbuild default --minify", "phx.digest"]
+  ]
+end
+```
+
+After running `mix ecto.reset` our database is seeded correctly. Start the server again, and we should see the following when we visit http://localhost:4000/authors/1/books/new.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/new_book_with_seeded_tags.png)
+
+## Create Book Tags
+
+Submitting our form doesn't associate a book with a tag. However, it does provide the data we need for the controller action.
+
+Here's the `book_params` value in `BookController.create/2` when we submit the form with the first three tags selected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{"tags" => ["1", "2", "3"], "title" => ""}
+```
+
+Feel free to [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) the `book_params` in `BookController.create/2`, then create a book with tags selected to verify this is true.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/book_controller.ex
+
+def create(conn, %{"book" => book_params, "author_id" => author_id}) do
+  IO.inspect(book_params, label: "Book Params") # <- remove this IO.inspect when you are done
+  author = BookSearch.Authors.get_author!(author_id)
+
+  case Books.create_book(Map.put(book_params, :author, author)) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset, author_id: author_id)
+  end
+end
+```
+
+### Books.create_book/1
+
+Now that we know we can send a list of tags, let's start writing a test for the `Books.create_book/1` function. First, import the `BookSearch.TagsFixtures` into the test file. This import gives us access to the `tag_fixture/1` function to create tags in our tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/books_test.exs
+
+import BookSearch.AuthorsFixtures
+import BookSearch.BooksFixtures
+import BookSearch.TagsFixtures
+```
+
+Write a new `"create_book/1 with tags"` test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_book/1 with tags" do
+  author = author_fixture()
+  tag1 = tag_fixture()
+  tag2 = tag_fixture()
+  valid_attrs = %{title: "some title", author: author, tags: [tag1, tag2]}
+
+  assert {:ok, %Book{} = book} = Books.create_book(valid_attrs)
+  assert book.title == "some title"
+  assert book.tags == [tag1, tag2]
+end
+```
+
+We can use [Ecto.Changeset.put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4)
+to create the association between the book and the tags.
+
+> The `Ecto.Changeset.put_assoc/4` call should be the responsibility of the `Book` schema. We're calling `Ecto.Changeset.put_assoc/4` directly for demonstration purposes only.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+
+  author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, attrs.tags)
+  |> Repo.insert()
+end
+```
+
+To let [Ecto](https://hexdocs.pm/ecto/Ecto.html) handle this association with `put_assoc/4`, we need to tell the `Book` schema about the many-to-many relationship. The [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro lets us define the `:tags` field, the `Tag` struct value, and to join through the `"book_tags"` table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/book.ex
+
+defmodule BookSearch.Books.Book do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "books" do
+    field :title, :string
+    belongs_to :author, BookSearch.Authors.Author
+    many_to_many :tags, BookSearch.Tags.Tag, join_through: "book_tags"
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:title])
+    |> validate_required([:title])
+  end
+end
+```
+
+Now our test should pass! Run the following in the command line where `40` is the correct line number of the test.
+
+```
+$ mix test test/book_search/books_test.exs:40
+...
+9 tests, 0 failures, 8 excluded
+```
+
+However, if we visit http://localhost:4000/authors/1/books/new and submit the form with tags selected, we'll see the following error.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/key_tags_not_found.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+That's because `Books.create_book/1` expects `attrs` to contain a `:tags` field that is a list of tags. However, we're passing it a `"tags"` field that is a list of tag ids.
+
+Let's retrieve the tag for each tag id, and [Map.put/2](https://hexdocs.pm/elixir/Map.html#put/2) the `:tags` field into the `book_params` map. Also, we'll provide a default value for tags to avoid breaking existing controller tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params, "author_id" => author_id}) do
+  author = BookSearch.Authors.get_author!(author_id)
+  # Provide a default value for tag_ids to avoid breaking existing tests
+  {tag_ids, book_params} = Map.pop(book_params, "tags", [])
+  tags = Enum.map(tag_ids, &Tags.get_tag!/1)
+
+  book_params = book_params |> Map.put(:author, author) |> Map.put(:tags, tags)
+
+  case Books.create_book(book_params) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset, author_id: author_id)
+  end
+end
+```
+
+We're not allowed to pass a map with both string keys and atom keys to `Ecto.Changeset.cast/4`, so let's [Map.pop/2](https://hexdocs.pm/elixir/Map.html#pop/2) the `:tags` field in `Books.create_book/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+
+  author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Repo.insert()
+end
+```
+
+All tests should pass!
+
+```
+$ mix test
+...
+59 tests, 0 failures
+```
+
+## Show Book Tags
+
+To ensure we're creating books with tags successfully, let's display the list of tags on the book show page.
+
+First, add a controller test to create a book with tags. We'll then assert we find the tag text on the page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs
+
+describe "create book" do
+  test "with tags, displays tags on show page", %{conn: conn} do
+    author = author_fixture()
+    tag = tag_fixture(name: "Fantasy")
+    create_attrs = %{title: "some title", tags: [tag.id]}
+    conn = post(conn, Routes.author_book_path(conn, :create, author), book: create_attrs)
+
+    assert %{id: id} = redirected_params(conn)
+    assert redirected_to(conn) == Routes.author_book_path(conn, :show, author, id)
+
+    conn = get(conn, Routes.author_book_path(conn, :show, author, id))
+    assert html_response(conn, 200) =~ tag.name
+  end
+  ...
+end
+```
+
+We'll display the book's tags on the book show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/show.html.heex
+
+<h1>Show Book</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @book.title %>
+  </li>
+  <li>
+    <strong>Tags:</strong>
+    <%= for tag <- @book.tags do %>
+      <%= tag.name %>
+    <% end %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, @author_id, @book) %></span> |
+<span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
+```
+
+However, by default, we don't load the tags associated with each book, so this will fail when we visit http://localhost:4000/authors/1/books/1
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/show_page_tags_association_not_loaded.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+The book show page uses `Books.get_book!/1` to retrieve the book. Currently, this does not load the `:tags` association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/book_controller.exs
+
+def show(conn, %{"id" => id, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+  render(conn, "show.html", author_id: author_id, book: book)
+end
+```
+
+To load associations from other tables, we can use [Ecto.Query.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def get_book!(id), do: Book |> preload(:tags) |> Repo.get!(id)
+```
+
+`Ecto.Query.preload/3` loads the associated `tags` table through the `book_tags` table to preload each associated `BookSearch.Tags.Tag` struct. Now we have access to `book.tags` and our test passes!
+
+```sh
+$ mix test
+...
+60 tests, 0 failures
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Seeding
+
+Let's seed some tags in our books to ensure the show page displays tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Tags
+alias BookSearch.Authors
+alias BookSearch.Books
+
+if Mix.env() == :dev do
+  {:ok, author1} = Authors.create_author(%{name: "Patrick Rothfuss"})
+  {:ok, author2} = Authors.create_author(%{name: "Dennis E Taylor"})
+
+  [tag1, tag2, tag3, tag4] =
+    ["fiction", "fantasy", "history", "sci-fi"]
+    |> Enum.map(fn tag_name ->
+      {:ok, tag} = Tags.create_tag(%{name: tag_name})
+      tag
+    end)
+    |> IO.inspect()
+
+  Books.create_book(%{title: "Name of the Wind", author: author1, tags: [tag1, tag2]})
+
+  Books.create_book(%{
+    title: "We are Legend (We are Bob)",
+    author: author2,
+    tags: [tag3, tag4]
+  })
+end
+```
+
+Then stop the server and reset the database.
+
+```sh
+$ mix ecto.reset
+```
+
+Start the server again, and visit http://localhost:4000/authors/1/books/1. We should see the following.
+
+```sh
+$ mix phx.server
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_show_with_tags.png)
+
+## Edit Book Tags
+
+Currently, we cannot update a book's tags. We can visit http://localhost:4000/authors/1/books/1/edit and submit the form with different tags selected. However, the tags aren't updated.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_tags_not_updated.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's make a new test for updating books to catch this error.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs
+
+describe "update book" do
+  setup [:create_book]
+
+  test "with tags", %{conn: conn, book: book} do
+    tag = tag_fixture(name: "Fantasy")
+    update_attrs = %{title: "Name of the Wind", tags: [tag.id]}
+
+    conn =
+      put(conn, Routes.author_book_path(conn, :update, book.author_id, book), book: update_attrs)
+
+    assert redirected_to(conn) == Routes.author_book_path(conn, :show, book.author_id, book)
+    conn = get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
+    assert html_response(conn, 200) =~ update_attrs.title
+    assert html_response(conn, 200) =~ tag.name
+  end
+  ...
+end
+```
+
+To make the test pass, we need to retrieve all of the book tags by their id.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/book_controller.ex
+
+def update(conn, %{"id" => id, "book" => book_params, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+
+  {tag_ids, book_params} = Map.pop(book_params, "tags", [])
+  tags = Enum.map(tag_ids, &Tags.get_tag!/1)
+  book_params = Map.put(book_params, :tags, tags)
+
+  case Books.update_book(book, book_params) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book updated successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "edit.html", book: book, changeset: changeset, author_id: author_id)
+  end
+end
+```
+
+Let's also write a test for `Books.update_book/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/books_test.exs
+
+test "update_book/2 with tags" do
+  author = author_fixture()
+  tag1 = tag_fixture(name: "Fantasy")
+  tag2 = tag_fixture(name: "Fiction")
+  book = book_fixture(author: author, tags: [tag1])
+  update_attrs = %{title: "Name of the Wind", tags: [tag2]}
+
+  assert {:ok, %Book{} = book} = Books.update_book(book, update_attrs)
+  assert book.title == update_attrs.title
+  assert book.tags == [tag2]
+end
+```
+
+Then we need to use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to put the `:tags` association into the update book changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def update_book(%Book{} = book, attrs) do
+  {tags, attrs} = Map.pop(attrs, :tags, [])
+
+  book
+  |> Book.changeset(attrs)
+  |> Ecto.Changeset.put_assoc(:tags, tags)
+  |> Repo.update()
+end
+```
+
+However, our tests still fail. Run the following in the command line to run the test. Replace `57` with the correct line number of the `"update_book/2 with tags` test, and we'll see an interesting error.
+
+```sh
+$ mix test test/book_search/books_test.exs:57
+
+** (RuntimeError) you are attempting to change relation :tags of
+     BookSearch.Books.Book but the `:on_replace` option of this relation
+     is set to `:raise`.
+
+     By default it is not possible to replace or delete embeds and
+     associations during `cast`. Therefore Ecto requires the parameters
+     given to `cast` to have IDs matching the data currently associated
+     to BookSearch.Books.Book. Failing to do so results in this error message.
+
+     If you want to replace data or automatically delete any data
+     not sent to `cast`, please set the appropriate `:on_replace`
+     option when defining the relation. The docs for `Ecto.Changeset`
+     covers the supported options in the "Associations, embeds and on
+     replace" section.
+
+     However, if you don't want to allow data to be replaced or
+     deleted, only updated, make sure that:
+
+       * If you are attempting to update an existing entry, you
+         are including the entry primary key (ID) in the data.
+
+       * If you have a relationship with many children, all children
+         must be given on update.
+```
+
+This error explains that, by default, we cannot delete or replace associated data. That's because of the default value for the `:on_replace` option for [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3).
+
+We can see the default behavior of `:on_replace` is `:raise` in the documentation:
+
+> :on_replace - The action taken on associations when the record is replaced when casting or manipulating parent changeset. May be :raise (default), :mark_as_invalid, or :delete. :delete will only remove data from the join source, never the associated records. See Ecto.Changeset's section on related data for more info.
+
+By default, if we try to replace one associated record with another, we `:raise` an error. So instead, let's use the `:delete` option in the `Book` schema to delete the record in the `book_tags` join table and replace it with another record.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books/book.ex
+
+defmodule BookSearch.Books.Book do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "books" do
+    field :title, :string
+    belongs_to :author, BookSearch.Authors.Author
+    many_to_many :tags, BookSearch.Tags.Tag, join_through: "book_tags", on_replace: :delete
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:title])
+    |> validate_required([:title])
+  end
+end
+```
+
+Now our test passes! Replace `57` with the correct line number of the test.
+
+```
+$ mix test test/book_search/books_test.exs:57
+...
+10 tests, 0 failures, 9 excluded
+```
+
+Now we can update a book's tags when we visit http://localhost:4000/authors/1/books/1/edit.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_updated_successfully.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Preselecting
+
+By default, we don't select any tags in the book form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<%= multiple_select f, :tags, tag_options(), selected: [] %>
+```
+
+When we submit the edit form without selecting tags, we accidentally remove the tags associated with a book!
+
+To fix this, we need to use the book's tags as the default `:selected` option in `multiple_select/4`. The `:selected` option accepts a list of ids.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<%= multiple_select f, :tags, tag_options(), selected: [1, 2] %>
+```
+
+So we can retrieve a list of ids from `@book.tags`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<%= multiple_select f, :tags, tag_options(), selected: Enum.map(@book.tags, fn book -> book.id end) %>
+```
+
+Some pages use this form without an `@book` in the assigns, so we have to check if `:book` exists. If it doesn't, we won't have any pre-selected options.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/form.html.heex
+
+<%= multiple_select f, :tags, tag_options(), selected: if assigns[:book], do: Enum.map(@book.tags, fn book -> book.id end), else: [] %>
+```
+
+Now the book's tags will be selected by default.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_form_with_tags_preselected.png)
+
+## Lists Books By Tag
+
+We've shown we can retrieve tags that belong to a book, but what about  books that belong to a tag?
+
+To demonstrate, we're going to list all of the books associated with a tag on the tag show page.
+
+Let's start with our test. First, we'll import `BookSeach.BooksFixtures` to create books.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/tag_controller_test.exs
+
+import BookSearch.BooksFixtures
+import BookSearch.AuthorsFixtures
+import BookSearch.TagsFixtures
+```
+
+We'll create a new describe block for the `"show"` action with a test for displaying all books matching the tag.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/tag_controller.exs
+
+describe "show" do
+  test "lists all books matching the tag", %{conn: conn} do
+    author = author_fixture(name: "Dennis E Taylor")
+    tag = tag_fixture(name: "sci-fi")
+    tagged_book = book_fixture(author: author, title: "We are Legend (We are Bob)", tags: [tag])
+    untagged_book = book_fixture(author: author, title: "Name of the Wind")
+
+    conn = get(conn, Routes.tag_path(conn, :show, tag.id))
+    assert html_response(conn, 200) =~ tag.name
+    assert html_response(conn, 200) =~ tagged_book.title
+    refute html_response(conn, 200) =~ untagged_book.title
+  end
+end
+```
+
+We'll use the `tag.books` association to render the list of books on the tag show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/show.html.heex
+
+<h1>Show Tag</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @tag.name %>
+  </li>
+
+</ul>
+
+<%= for book <- @tag.books do %>
+    <tr>
+      <td><%= book.author.name %></td>
+      <td><%= book.title %></td>
+    </tr>
+<% end %>
+
+<span><%= link "Edit", to: Routes.tag_path(@conn, :edit, @tag) %></span> |
+<span><%= link "Back", to: Routes.tag_path(@conn, :index) %></span>
+```
+
+However, this association isn't loaded when we retrieve the tag, so we encounter the following error when we visit http://localhost:4000/tags/1.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/key_book_not_found_in_tags.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+That's because while we've defined the [Ecto.Schema.many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) relationship for books, we have not defined this relationship for tags. So let's add this now.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Tags.Tag do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "tags" do
+    field :name, :string
+    many_to_many :books, BookSearch.Books.Book, join_through: "book_tags"
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(tag, attrs) do
+    tag
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+  end
+end
+```
+
+Tags can also have many books through the same `book_tags` table.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+T1[Tag]
+T2[Tag]
+T3[Tag]
+BT[Book Tags]
+B1[Book]
+B2[Book]
+B3[Book]
+
+B1 --> BT
+B2 --> BT
+B3 --> BT
+BT <-- T1
+BT <-- T2
+BT <-- T3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now that we've defined the `:books` field in the `BookSearch.Tags.Tag`, we'll see a new error when we visit http://localhost:4000/tags/1.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/books_association_not_loaded.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To fix this issue, we need to load the associated books. The `TagController.show/2` action uses `Tags.get_tag!/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/tag_controller.ex
+
+def show(conn, %{"id" => id}) do
+  tag = Tags.get_tag!(id)
+  render(conn, "show.html", tag: tag)
+end
+```
+
+We'll preload the books in the `Tags.get_tag!/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/tags.ex
+
+def get_tag!(id), do: Tag |> preload(:books) |> Repo.get!(id)
+```
+
+However, that's not enough! For example, if we visit http://localhost:4000/tags/1 we'll see the following error.
+
+> If you don't see the error, try resetting your database with `mix ecto.reset` to ensure the tag has associated books. If no books are associated with the tag, then `@tag.books` returns an empty list, and we won't trigger the bug.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/key_book_author_not_found_in_tags.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We have an issue because while we're preloading the `:books` associated with the tag, we're not loading the `:author` associated with each book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+T1[Tag]
+B1[Book]
+A1[Author]
+n[name]
+
+T1 --> B1 --> A1 --> n
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+To resolve this, we can preload the author for each book by passing a keyword list to [Ecto.Query.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/tags.ex
+
+def get_tag!(id), do: Tag |> preload(books: [:author]) |> Repo.get!(id)
+```
+
+Our test should pass! Run the following and replace `20` with the correct line number of the `"list all books matching the tag"` test.
+
+```sh
+$ mix test test/book_search_web/controllers/tag_controller_test.exs:20
+...
+9 tests, 0 failures, 8 excluded
+```
+
+However, we've broken a couple of other tests by preloading this data.
+
+```sh
+$ mix test
+...
+63 tests, 2 failures
+```
+
+We can fix these tests by explicitly checking the fields on the tag.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/tags_test.exs
+
+test "get_tag!/1 returns the tag with given id" do
+  tag = tag_fixture()
+  retrieved_tag = Tags.get_tag!(tag.id)
+  assert retrieved_tag.id == tag.id
+  assert retrieved_tag.name == tag.name
+end
+```
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/tags_test.exs
+
+test "update_tag/2 with invalid data returns error changeset" do
+  tag = tag_fixture()
+  assert {:error, %Ecto.Changeset{}} = Tags.update_tag(tag, @invalid_attrs)
+  found_tag = Tags.get_tag!(tag.id)
+  assert found_tag.id == tag.id
+  assert found_tag.name == tag.name
+end
+```
+
+All tests should pass!
+
+```sh
+$ mix test
+...
+63 tests, 0 failures
+```
+
+## Filter Books By Tags
+
+Let's add the ability to search for books by tags. We'll need a `multiple_select/4` in the book search form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/index.html.heex
+
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <%= if assigns[:display_form] do %>
+    <.form let={f} for={@conn} method={"get"} action={Routes.book_path(@conn, :index)}>
+      <%= text_input f, :title %>
+      <%= error_tag f, :title %>
+
+      <%= label f, :tags %>
+      <%= multiple_select f, :tags, tag_options(), selected: [] %>
+      <%= error_tag f, :tags %>
+
+      <div>
+        <%= submit "Search" %>
+      </div>
+    </.form>
+  <% end %>
+  <%= for book <- @books do %>
+      <tr>
+        <td><%= book.author.name %></td>
+        <td><%= book.title %></td>
+
+        <td>
+          <span><%= link "Show", to: Routes.author_book_path(@conn, :show, book.author_id, book) %></span>
+          <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, book.author_id, book) %></span>
+          <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, book.author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= if assigns[:author_id] do %>
+  <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+<% end %>
+```
+
+Let's add a new test for searching by tags and the book title.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs`
+
+test "list all books filtered by search and tags query", %{conn: conn} do
+  author = author_fixture(name: "Brandon Sanderson")
+  tag = tags_fixture(name: "Fantasy")
+
+  book = book_fixture(author: author, title: "The Final Empire", tags: [tag])
+  untagged_book = book_fixture(author: author, title: "Mistborn: The Final Empire")
+  non_matching_book = book_fixture(author: author, title: "The Hero Of Ages")
+
+  conn = get(conn, Routes.book_path(conn, :index, title: "Empire", tags: [tag.id]))
+
+  assert html_response(conn, 200) =~ book.title
+  refute html_response(conn, 200) =~ untagged_book.title
+  refute html_response(conn, 200) =~ non_matching_book.title
+end
+```
+
+We'll add `"tags"` the the `BookController.index/2` action for searching by title.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/book_controller.ex`
+
+def index(conn, %{"title" => title, "tags" => tag_ids}) do
+  books = Books.list_books(title: title, tags: tag_ids)
+  render(conn, "index.html", books: books, display_form: true)
+end
+```
+
+We can search for tags by using [Ecto.Query.join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) to join the tags table. Then check if the book has any tags whose id is in the list of tag ids.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search/books.ex
+
+def list_books(title: title, tags: tag_ids) do
+  search = "%#{title}%"
+
+  Book
+  |> preload(:author)
+  |> where([book], ilike(book.title, ^search))
+  |> join(:inner, [book], tag in assoc(book, :tags))
+  |> where([book, tag], tag.id in ^tag_ids)
+  |> Repo.all()
+end
+```
+
+Our test passes! Replace `20` with the correct line number.
+
+```sh
+$ mix test test/book_search_web/controllers/book_controller_test.exs:20
+```
+
+However, we've broken our previous filtering test `"list all books filtered by search query"`. That's because it doesn't contain the `:tags` search field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search_web/controllers/book_controller_test.exs`
+
+test "list all books filtered by search query", %{conn: conn} do
+  author = author_fixture(name: "Brandon Sanderson")
+  book = book_fixture(author: author, title: "The Final Empire")
+  non_matching_book = book_fixture(author: author, title: "The Hero of Ages")
+
+  conn = get(conn, Routes.book_path(conn, :index, title: book.title))
+  assert html_response(conn, 200) =~ book.title
+  refute html_response(conn, 200) =~ non_matching_book.title
+end
+```
+
+We'll change the controller to provide a default value for tags since they won't be available if the list is empty.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/controllers/book_controller.ex
+
+def index(conn, %{"title" => title} = params) do
+  tag_ids = Map.get(params, "tags", [])
+
+  books = Books.list_books(title: title, tags: tag_ids)
+  render(conn, "index.html", books: books, display_form: true)
+end
+```
+
+The test still fails because of how we've written the query. For example, if tags is an empty list, then our [Ecto.Query.where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) query is always false.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+where([book, tag], tag.id in ^tag_ids)
+```
+
+There are many patterns for filtering queries ranging from simple to advanced solutions.
+
+For now, we'll show a pattern using control flow to re-bind the query depending on the value of `tag_ids`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_books(title: title, tags: tag_ids) do
+  search = "%#{title}%"
+
+  query =
+    Book
+    |> preload(:author)
+    |> where([book], ilike(book.title, ^search))
+
+  query =
+    case tag_ids do
+      [] ->
+        query
+      tag_ids ->
+        query
+        |> join(:inner, [book], tag in assoc(book, :tags))
+        |> where([book, tag], tag.id in ^tag_ids)
+    end
+
+  Repo.all(query)
+end
+```
+
+All tests should pass!
+
+```
+$ mix test
+...
+65 tests, 0 failures
+```
+
+We can visit http://localhost:4000/books and filter books by tags.
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-book_search_tags copy
+$ git add .
+$ git commit -m "finish book search tags copy section"
+$ git push origin exercise-book_search_tags copy
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
