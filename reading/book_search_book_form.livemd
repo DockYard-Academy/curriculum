@@ -50,7 +50,17 @@ In the code above, the [Phoenix.HTML.Form.form_for/3](https://hexdocs.pm/phoenix
 
 `@changeset` is an [Ecto Changeset](./ecto_changeset.livemd) provided by the controller. Phoenix forms work alongside changesets to provide error handling and data validation.
 
-The `Routes.book_path(@conn, :create)` call returns the URL to send the `HTTP POST` request to. For example, we could replace this with `"books"`. We use the helper to raise an error of the URL does not exist, and ensure our code continues to work if the route changes.
+The `Routes.book_path(@conn, :create)` call returns the URL to send the `HTTP POST` request to. For example, we could replace this with `"/books"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, "/books", fn f -> %>
+  Title: <%= text_input f, :title %>
+<% end %>
+```
+
+We use the helper to raise an error of the URL does not exist, and ensure our code continues to work if the route changes.
 
 Typically, this would correspond to a route defined by our router in `router.ex`.
 
@@ -554,22 +564,20 @@ end
 
 ## Push to GitHub
 
-Ensure all of your tests pass.
+Ensure all of your tests continue to pass.
 
 ```
 mix test
 ```
 
-**ONLY If you cloned the project**: remove the existing `.git` folder, and re-initialize the project.
+**ONLY If you cloned the `book_search` project**: you'll have to re-initialize it as a git project so you have ownership over the project. The following command removes the git folder and re-initializes it. You'll then have to create a repository on GitHub and follow the instructions to connect the project.
 
 ```
 $ rm -rf .git
 $ git init
 ```
 
-[Create a new GitHub repository](https://github.com/new) and follow the instructions to connect your local project to your new remote project.
-
-Stage, commit, and push your changes to GitHub.
+Then stage and commit your changes to GitHub from the `book_search` folder.
 
 ```
 git add .

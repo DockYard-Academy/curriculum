@@ -243,7 +243,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * GraphQL and Absinthe
 ## Capstone Project Preparation
 * Capstone Project
-* UX/UI Design + Accessibility
 ## Quality Assurance
 * Observability
 * Factories & Mocks
@@ -251,7 +250,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## External Libraries
 * Emailing & Swoosh
 * Oban
-* Advanced Livebook
 ## Final Project
 * Demo Day
 <!-- course-outline-end -->
