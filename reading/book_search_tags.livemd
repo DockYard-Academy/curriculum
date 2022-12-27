@@ -105,6 +105,18 @@ Start the server.
 $ mix phx.server
 ```
 
+If you encounter any issues with your database you may need to reset it. Reset the database now to ensure you have a clean database.
+
+```
+mix ecto.reset
+```
+
+If you encounter issues with your database in your test environment, you can drop it.
+
+```
+MIX_ENV=test mix ecto.drop
+```
+
 ## Create Tags Resource
 
 We can run the following to create our tags resource.
@@ -237,6 +249,7 @@ Add `tags` to our book `form.html.heex`.
   <%= select f, :author_id, Enum.map(@authors, fn author -> {author.name, author.id} end), prompt: "Select an author" %>
   <%= error_tag f, :author_id %>
 
+  <!-- Add the multiple_select input for tags -->
   <%= label f, :tags %>
   <%= multiple_select f, :tags, [] %>
   <%= error_tag f, :tags %>
@@ -249,7 +262,7 @@ Add `tags` to our book `form.html.heex`.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Visit http://localhost:4000/authors/1/books/new where `1` is the id of an author in your application, and we should see the following. The `multiple_select/4` input currently has no options because we haven't provided them.
+Visit http://localhost:4000/books/new where `1` is the id of an author in your application, and we should see the following. The `multiple_select/4` input currently has no options because we haven't provided them.
 
 <!-- livebook:{"break_markdown":true} -->
 
