@@ -1,0 +1,644 @@
+# Book Search: Deployment
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+### Software Deployment
+
+Software deployment is the process of making new or updated software available for users to use. This involves preparing the software for release, testing it to ensure it is working correctly, and installing it on the target systems. Deployment can be a complex process, especially for large and distributed systems, but automation tools and practices can help to streamline and simplify it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### DevOps
+
+DevOps is a software engineering culture and practice that aims to bring together the development and operations teams in an organization. It aims to increase collaboration and communication between these teams, and to automate the process of building, testing, and deploying software.
+
+The goal of DevOps is to enable organizations to rapidly and reliably deliver software changes, while also ensuring that these changes are of high quality and do not cause disruptions to users. By adopting DevOps practices, organizations can improve the speed and efficiency of their software development and delivery process, and increase the reliability and stability of their systems.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### CI/CD
+
+Continuous integration and continuous delivery (CI/CD) is a software development practice that aims to automate the process of building, testing, and deploying software. It involves integrating code changes into a shared repository frequently, and using automation to build, test, and deploy the software automatically.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Hosting Platforms
+
+A hosting platform is a service that helps you host and deploy your web applications and websites. It provides the necessary infrastructure and resources, such as servers, storage, and networking, as well as tools and features for building, deploying, and managing your apps. These tools may include support for various programming languages, database management, and monitoring and analytics.
+
+There are several different deployment platforms for Phoenix Applications including [Gigalixir](https://hexdocs.pm/phoenix/gigalixir.html), [Fly.io](https://hexdocs.pm/phoenix/fly.html), and [Heroku](https://hexdocs.pm/phoenix/heroku.html).
+
+While it's beyond the scope of this course, it's also possible to handle our own deployment by running a Phoenix application on a production machine. See [Introduction to Deployment](https://hexdocs.pm/phoenix/deployment.html) and [Deploying with Releases](https://hexdocs.pm/phoenix/releases.html) for more information.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Docker
+
+Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. Containers allow a developer to package an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+
+With Docker, developers can build and test applications in their own isolated environments, and then easily share them with others. This makes it easier to collaborate and ensures that applications will run the same way in different environments.
+
+Docker uses images to create containers. An image is a file that contains all the necessary components to run a specific application or service. When an image is run, Docker creates a new container from the image and runs the application or service inside the container.
+
+Docker also provides a centralized registry, called [Docker Hub](https://hub.docker.com/_/elixir), where users can store and share their own images. This makes it easy to share and distribute applications, as all the necessary components are packaged together in a single image.
+
+Fly.io uses a [Dockerfile](https://fly.io/docs/reference/builders/#dockerfile) to deploy your Phoenix application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### GitHub Actions
+
+GitHub Actions are a feature of GitHub that allows you to automate tasks (called "workflows") that are triggered by certain events in your repository. You can use GitHub Actions to build, test, and deploy your code, or to automate other tasks that are related to your repository.
+
+To use GitHub Actions, you create a workflows folder in your repository. Files in this folder defines the steps that should be taken when the workflow is triggered, and can be written in [YAML](https://en.wikipedia.org/wiki/YAML). You can configure your workflow to run whenever certain events occur in your repository, such as when you push code to the repository, when you open a pull request, or when you release a new version of your software.
+
+GitHub Actions makes it easy to automate many different types of tasks, including testing and deploying applications.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### BookSearch: Deployment
+
+To learn more about deployment, we're going to deploy our existing `BookSearch` application using [Fly.io](https://fly.io/).
+We're also going to connect a CI/CD process using GitHub actions to automatically test and deploy our application.
+
+## Follow Along: BookSearch: Deployment
+
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/DockYard-Academy/book_search/tree/book_content) project and checkout to the `book_content` branch. Remove the `.git` file so that you can own the project.
+
+```
+$ git clone https://github.com/DockYard-Academy/book_content
+$ git checkout book_content
+$ rm -rf .git
+$ git init
+```
+
+If you chose to clone the project, [Create GitHub repository](https://github.com/new) and follow the steps to connect your local project to the remote repository.
+
+If you are stuck at any point during this lesson, you can reference the completed [BookSearch/deployment](https://github.com/DockYard-Academy/book_search/tree/deployment) branch.
+
+Ensure dependencies are installed.
+
+```
+$ mix deps.get
+```
+
+All tests should pass.
+
+```
+$ mix test
+```
+
+Start the server.
+
+```
+$ mix phx.server
+```
+
+If you encounter any issues with your database you may need to reset it. Reset the database now to ensure you have a clean database.
+
+```
+$ mix ecto.reset
+```
+
+If you encounter issues with your database in your test environment, you can drop it.
+
+```
+$ MIX_ENV=test mix ecto.drop
+```
+
+## Deploy On Fly.io
+
+Follow the Phoenix [Deploying on Fly.io](https://hexdocs.pm/phoenix/fly.html) guide to deploy the project.
+
+Install the command-line interface for the Fly.io platform [here](https://fly.io/docs/hands-on/install-flyctl/).
+
+SignUp for a fly account.
+
+```
+$ fly auth signup
+```
+
+Then run the following command to configure Fly.io with the app. You will be prompted with a few steps.
+
+* Enter *Y* when prompted to create a PostgreSQL database.
+* Enter *N* when prompted to create an Upstash Redis database. Redis-compatible databases are beyond the scope of this course, but you can see [Redis by Upstash](https://fly.io/docs/reference/redis/) if you are curious to learn more.
+* Enter *Y* when asked if you would like to deploy now.
+
+```
+$ fly launch
+```
+
+Deploy the app.
+
+```
+$ fly deploy
+```
+
+Check that your application is deployed.
+
+```
+$ fly status
+```
+
+The result of `fly status` should say that your application is deployed.
+
+```
+App
+  Name     = booksearch          
+  Owner    = personal            
+  Version  = 0                   
+  Status   = running             
+  Hostname = booksearch.fly.dev  
+  Platform = nomad               
+
+Deployment Status
+  ID          = 7a992a8e-9ce9-4312-750f-cddbc035823d         
+  Version     = v0                                           
+  Status      = successful                                   
+  Description = Deployment completed successfully            
+  Instances   = 1 desired, 1 placed, 1 healthy, 0 unhealthy  
+
+Instances
+ID              PROCESS VERSION REGION  DESIRED STATUS  HEALTH CHECKS           RESTARTS        CREATED   
+df7a2978        app     0       sea     run     running 1 total, 1 passing      0               5m40s ago
+```
+
+You might encounter issues when deploying the application. For example, at the time of writing the default ELIXIR_VERSION and OTP_VERSION did not have the necessary docker image metadata and we encountered the following error:
+
+```
+ERROR [internal] load metadata for docker.io/hexpm/elixir:1.14.2-erlang-25.1.2-debian-bullseye-20210902-slim
+```
+
+You may not encounter this issue, but if you do, to resolve this issue, we changed the `OTP_VERSION` in the generated `Dockerfile` from `25.1.2` to `25.0.3` because `25.1.2` or any newer version was not available yet.
+
+```
+ARG OTP_VERSION=25.0.3
+```
+
+Open the application in your browser.
+
+```
+$ fly open
+```
+
+Your application should automatically open in the browser. If not, you may need to click the link provided by the `fly open` command.
+
+## Home Page and Navigation
+
+We still have the default homepage for our application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployed_default_home_page.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To demonstrate how to re-deploy our application with new changes, we're going to modify the home page and add navigation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Home Page
+
+Replace your home page in `page/index.html.heex` with the following content. Change `Brooklin` to your name. Feel free to customize this page as you see fit.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<section class="phx-hero">
+  <h1><%= gettext "My name is %{name}!", name: "Brooklin" %></h1>
+  <p>This is a demonstration Library project I built during DockYard Academy</p>
+</section>
+
+<section class="row">
+  <article class="column">
+    <h2>Topics Covered</h2>
+    <ul>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/overview.html">The Phoenix Framework</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/routing.html">Routing</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/controllers.html">Controllers</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/views.html#content">Views and Templates</a>
+      </li>
+      <li>
+        Forms with <a href="https://hexdocs.pm/phoenix_html/Phoenix.HTML.html">Phoenix.HTML</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/contexts.html">Contexts</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/ecto.html">Ecto</a>
+      </li>
+    </ul>
+  </article>
+  <article class="column">
+    <h2>Features</h2>
+    <ul>
+      <li>
+        <%= link "Authors", to: Routes.author_path(@conn, :index) %>
+      </li>
+      <li>
+        <%= link "Books", to: Routes.book_path(@conn, :index) %>
+      </li>
+      <li>
+        <%= link "Tags", to: Routes.tag_path(@conn, :index) %>
+      </li>
+    </ul>
+  </article>
+</section>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Navigation
+
+Replace your `root.html.heex` file with the following. Replace `Brooklin` with your name. The `live_title_tag` function controllers the text in the application's tab in your browser.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%= live_title_tag assigns[:page_title] || "BookSearch", suffix: " · By Brooklin" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+  </head>
+  <body>
+    <header>
+      <section class="container">
+        <nav>
+          <ul>
+              <li><%= link "Authors", to: Routes.author_path(@conn, :index) %></li>
+              <li><%= link "Books", to: Routes.book_path(@conn, :index) %></li>
+              <li><%= link "Tags", to: Routes.tag_path(@conn, :index) %></li>
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
+            <% end %>
+          </ul>
+        </nav>
+        <h1><%= link "BookSearch", to: Routes.page_path(@conn, :index) %></h1>
+      </section>
+    </header>
+    <%= @inner_content %>
+  </body>
+</html>
+```
+
+We broke a test in `page_controller_test.exs` so let's fix it. Replace `Brooklin` with your name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearchWeb.PageControllerTest do
+  use BookSearchWeb.ConnCase
+
+  test "GET /", %{conn: conn} do
+    conn = get(conn, "/")
+    assert html_response(conn, 200) =~ "Brooklin"
+  end
+end
+```
+
+Ensure tests pass.
+
+```
+$ mix test
+```
+
+Then redeploy your application.
+
+```
+fly deploy
+```
+
+You should see the new home page and navigation when it's finished.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_updated_home_page.png)
+
+## Seeding Production
+
+We're going to create some seed data in our production application. By default, deploying our application does not run any seed files in production, so we need to create the data ourselves.
+
+Access the console of your production access using the following command.
+
+```
+$ fly ssh console
+```
+
+You can then open the IEx shell using the following command from the production console.
+
+```
+# app/bin/book_search remote
+```
+
+See the following guide if you have any issues: [IEX into your running app](https://fly.io/docs/elixir/getting-started/iex-into-running-app/).
+
+From this IEx shell, we have access to all of our modules in production.
+
+For example, you could create an author like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> BookSearch.Authors.create_author(%{name: "Patrik Rothfus"}) 
+{:ok,
+ %BookSearch.Authors.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   id: 1,
+   name: "Patrik Rothfus",
+   books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+   inserted_at: ~N[2022-12-28 05:50:05],
+   updated_at: ~N[2022-12-28 05:50:05]
+ }}
+```
+
+Exit the IEx shell using <kbd>CTRL</kbd>+<kbd>C</kbd> <kbd>CTRL</kbd>+<kbd>C</kbd>. Then exit the console by typing `exit` and pressing enter.
+
+```
+# exit
+$
+```
+
+One common way of creating data in production is to create a module for seeding data. We're going to use the seed file we've already defined in `priv/repo/seeds.ex` and create a `lib/book_search/seed.ex` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Seeds do
+  alias BookSearch.Authors
+  alias BookSearch.Authors.Author
+  alias BookSearch.Books
+  alias BookSearch.Books.Book
+  alias BookSearch.Tags
+  alias BookSearch.Tags.Tag
+  alias BookSearch.Repo
+
+  def seed do
+    seed_author()
+    seed_book()
+    seed_author_with_book()
+    seed_tags()
+  end
+
+  def seed_author do
+    case Repo.get_by(Author, name: "Andrew Rowe") do
+      %Author{} = author ->
+        IO.inspect(author.name, label: "Author Already Created")
+
+      nil ->
+        Authors.create_author(%{name: "Andrew Rowe"})
+    end
+  end
+
+  def seed_book() do
+    case Repo.get_by(Book, title: "Beowulf") do
+      %Book{} = book ->
+        IO.inspect(book.title, label: "Book Already Created")
+
+      nil ->
+        Books.create_book(%{title: "Beowulf"})
+    end
+  end
+
+  # Create an author with a book.
+  def seed_author_with_book do
+    {:ok, author} =
+      case Repo.get_by(Author, name: "Patrick Rothfuss") do
+        %Author{} = author ->
+          IO.inspect(author.name, label: "Author Already Created")
+          {:ok, author}
+
+        nil ->
+          Authors.create_author(%{name: "Patrick Rothfuss"})
+      end
+
+    case Repo.get_by(Book, title: "Name of the Wind") do
+      %Book{} = book ->
+        IO.inspect(book.title, label: "Book Already Created")
+
+      nil ->
+        %Book{}
+        |> Book.changeset(%{title: "Name of the Wind"})
+        |> Ecto.Changeset.put_assoc(:author, author)
+        |> Repo.insert!()
+    end
+  end
+
+  def seed_tags do
+    # Create tags
+    ["fiction", "fantasy", "history", "sci-fi"]
+    |> Enum.each(fn tag_name ->
+      case Repo.get_by(Tag, name: tag_name) do
+        %Tag{} = _tag ->
+          IO.inspect(tag_name, label: "Tag Already Created")
+
+        nil ->
+          Tags.create_tag(%{name: tag_name})
+      end
+    end)
+  end
+end
+```
+
+We can also refactor our `priv/repo/seeds.exs` to use this module now. Replace `priv/repo.seeds.exs` with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+alias BookSearch.Seeds
+
+Seeds.seed()
+```
+
+Reset the database to ensure the seed file works as expected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix ecto.reset
+```
+
+Now redeploy the application to put the new `BookSearch.Seed` file into production.
+
+```
+$ fly deploy
+```
+
+Open the IEx shell in production.
+
+```
+$ fly ssh console
+# app/bin/book_search remote
+```
+
+Run the seed file from the IEx shell in production.
+
+```
+iex> BookSearch.Seeds.seed()
+```
+
+Exit the shell (see above instructions). Your production application should have a the seeded data now.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_seeded_book_page.png)
+
+## Continuous Integration With GitHub Actions
+
+GitHub allows us to define `.yml` files in a `.github/workflows` folder that will be automatically run on certain steps of the GitHub.
+
+Create a `.github/workflows/test.yml` file with the following content. Ensure your elixir and otp version are up to date. The name of the file does not matter.
+
+```yaml
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:11
+        ports: ['5432:5432']
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    name: run tests
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25.2'
+          elixir-version: '1.14.2'
+      - run: mix deps.get
+      - run: mix test
+```
+
+This file sets triggers our workflow to run our tests on every pull request. It also sets up a Postgres database for our tests.
+
+Checkout into a new branch.
+
+```
+$ git checkout -b setup-ci
+```
+
+Then push your code and make pull request and see your CI in action. If tests fail, you'll catch them anytime you make a PR. You can imagine how useful this is in a production application!
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_ci.png)
+
+## Continuous Deployment With GitHub Actions
+
+To learn more about continuous Deployment, we're going to set up a continuous deployment system that will automatically deploy changes when we merge a pull request into the `main` branch of our project.
+
+In order to authorize deployment from the GitHub action, we need a Fly.io token. Run the following from your project folder to get a token.
+
+```
+fly auth token
+```
+
+Add this token in your GitHub repository from the `Settings` section. Name the token `FLY_API_TOKEN`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_fly_api_token.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Create `.github/workflows/fly.yml` file with the following content. Notice this uses the secret token we just configured.
+
+```
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - main
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+  deploy:
+      name: Deploy app
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: superfly/flyctl-actions/setup-flyctl@master
+        - run: flyctl deploy --remote-only
+```
+
+Merge your pull request, and you should notice that the changes automatically deploy to your production application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_cd.png)
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [GitHub Actions](https://github.com/features/actions)
+* [HexDocs: Deploying on Fly.io](https://hexdocs.pm/phoenix/fly.html#content)
+* [Fly.io: IEx into your running app](https://fly.io/docs/elixir/getting-started/iex-into-running-app/)
+* [Fly.io: continuous deployment with github actions](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/)
+* [GitHub: erlef/setup-beam](https://github.com/erlef/setup-beam)
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-book_search_deployment
+$ git add .
+$ git commit -m "finish book search deployment section"
+$ git push origin exercise-book_search_deployment
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                         | Next                                                   |
+| ------------------------------------------------ | -----------------------------------------------------: |
+| [Blog Content](../exercises/blog_content.livemd) | [Blog Deployment](../exercises/blog_deployment.livemd) |
