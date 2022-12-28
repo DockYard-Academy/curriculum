@@ -1,4 +1,4 @@
-# Blog: Setup
+# Blog: Posts
 
 ```elixir
 Mix.install([
@@ -15,7 +15,7 @@ Mix.install([
 
 ## Blog: Posts
 
-You're going to build a `Blog` application to learn more about Phoenix and Ecto.
+You're going to build a `Blog` application to learn more about Phoenix and Ecto. See the [DockYard Academy: Blog](https://github.com/DockYard-Academy/blog) demonstration project if you would like to see an example.
 
 ```
 $ mix phx.new blog
@@ -51,8 +51,26 @@ Then add the resource to `router.ex`.
 scope "/", BlogWeb do
   pipe_through :browser
 
-  get "/", PageController, :home
+  get "/", PageController, :index
   resources "/posts", PostController
+end
+```
+
+Alternatively we can define every route individually.
+
+```elixir
+scope "/", BlogWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  get "/posts", PostController, :index
+  get "/posts/new", PostController, :new
+  post "/posts", PostController, :create
+  get "/posts/:id", PostController, :show
+  get "/posts/:id/edit", PostController, :edit
+  put "/posts/:id", PostController, :update
+  patch "/posts/:id", PostController, :update
+  delete "/posts/:id", PostController, :delete
 end
 ```
 

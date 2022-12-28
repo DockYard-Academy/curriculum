@@ -66,7 +66,7 @@ Add the resource to your browser scope in lib/book_search_web/router.ex:
     resources "/authors", AuthorController
 ```
 
-That's because we need to connect our generated `AuthorController` actions to a URL in our router.
+That's because we need to connect our generated `AuthorController` actions to a URL in our router. We'll do that in a moment.
 
 ## Controller Tests
 
@@ -1210,7 +1210,7 @@ We can use [like/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#like/2) from `Ec
 def list_authors(name) do
   search = "#{name}%"
   Author
-  |> where([author], like(author.name, search))
+  |> where([author], like(author.name, ^search))
   |> Repo.all()
 end
 ```
@@ -1242,7 +1242,7 @@ To make this pass, we need to use the `%` character at the start and end of the 
 def list_authors(name) do
   search = "%#{name}%"
   Author
-  |> where([author], like(author.name, search))
+  |> where([author], like(author.name, ^search))
   |> Repo.all()
 end
 ```
@@ -1269,7 +1269,7 @@ To make this test pass, we can use [ilike/2](https://hexdocs.pm/ecto/Ecto.Query.
 def list_authors(name) do
   search = "%#{name}%"
   Author
-  |> where([author], ilike(author.name, search))
+  |> where([author], ilike(author.name, ^search))
   |> Repo.all()
 end
 ```
@@ -1291,6 +1291,14 @@ Generally, context tests run faster than controller tests. Controller tests requ
 Controller tests are more comprehensive. They test your application more holistically rather than testing a single function. As a result, controller tests (depending on how they are written) generally provide more confidence than context tests.
 
 However, this question doesn't have a simple answer! In this case, we've decided to comprehensively test the context because they are fast and easy to write. We then have fewer controller tests to ensure the controller and context integrate correctly. However, different situations require different styles of tests.
+
+## Further Reading
+
+Consider the following resources to deepen your understanding of the topic.
+
+* [Heiko Zeus: Search Filters With Ecto Queries](https://www.zweitag.de/en/blog/search-filters-with-ecto-queries/)
+* [Elixir Schools: Querying](https://elixirschool.com/en/lessons/ecto/querying_basics)
+* [HexDocs: Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
 
 ## Commit Your Progress
 
