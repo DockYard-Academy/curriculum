@@ -1,4 +1,4 @@
-# Macros
+# Metaprogramming
 
 ```elixir
 Mix.install([
@@ -17,15 +17,61 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
-## Metaprogramming
+## Overview
+
+###
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Compile-time Vs Runtime
+
+In programming, compile-time refers to the period of time during which a program is being compiled from source code into executable machine code, and runtime refers to the period of time during which a program is executing.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [OTP](https://en.wikipedia.org/wiki/Open_Telecom_Platform)
+
+The Open Telecom Platform (OTP) is a collection of Erlang libraries and tools for building concurrent, fault-tolerant, and distributed systems in the Erlang programming language.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [The BEAM (Erlang Virtual Machine)](https://en.wikipedia.org/wiki/BEAM_(Erlang_virtual_machine))
+
+The BEAM is the runtime environment for the Erlang and Elixir. It is a virtual machine that runs on a wide variety of platforms, including Unix-like operating systems, Windows, and MacOS. We often use the terms **Erlang Virtual Machine** and **BEAM** interchangeably.
+
+The Elixir compiler compiles Elixir source code into [bytecode](https://en.wikipedia.org/wiki/Bytecode) `.beam` files that are executed on the BEAM.
+
+The BEAM is part of the Erlang Run-Time System (ERTS).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Erlang Run-time System](https://www.erlang.org/doc/apps/erts/erts.pdf)
+
+The Erlang Run-Time System (ERTS) is a component of the Open Telecom Platform (OTP) and is responsible for executing Erlang and Elixir programs on the Erlang Virtual Machine (VM). The BEAM virtual machine is part of the Erlang Run-Time System.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Abstract Syntax Tree (AST)](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+
+The Abstract Syntax Tree (AST) is a representation of the structure of a program's source code as a tree-like data structure. The Elixir AST is used by the Elixir compiler to transform Elixir code into bytecode that can be executed by the BEAM virtual machine. The Elixir compiler converts the Elixir code into the AST, and then uses the AST to generate the bytecode.
+
+The AST provides a convenient intermediate representation of the source code that can be used to perform various optimizations and transformations on the code before it is translated into bytecode.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Metaprogramming
 
 Metaprogramming is the process of writing code that generates code.
 
-In Elixir, we use macros for code generation. Macros are a powerful tool for generating code. But, as always, with great power comes great responsibility.
+In Elixir, we use macros for code generation. Macros are a powerful tool for generating code. However, they can lead to additional complexity and should be used with care.
 
 > Even though Elixir attempts its best to provide a safe environment for macros, the major responsibility of writing clean code with macros falls on developers. Macros are harder to write than ordinary Elixir functions and it’s considered to be bad style to use them when they’re not necessary. So write macros responsibly.
 > 
 > * [elixir-lang.org](https://elixir-lang.org/getting-started/meta/macros.html)
+
+We're going to learn how to leverage metaprogramming to extend the Elixir language and minimize boilerplate code.
+
+While we're not likely to use metaprogramming in our day-to-day programming (depending on what you're building), we're going to use metaprogramming to gain a better understanding of the inner-workings of Elixir.
 
 ## Quote
 
@@ -100,8 +146,7 @@ sum = fn int1, int2, int3 -> int1 + int2 + int3 end
 quote do: sum(1, 2, 3)
 ```
 
-Here's the same anonymous function as a named function when
-broken down into a quoted expression.
+Here's a named function as a quoted expression.
 
 ```elixir
 defmodule Math do
@@ -129,6 +174,10 @@ Use the `quote` macro to discover the AST representation of the following expres
 2 + 2 + 2
 ```
 
+```elixir
+
+```
+
 ## Unquote
 
 `unquote` injects code into the `quote` macro.
@@ -151,6 +200,14 @@ quote do
 end
 ```
 
+Notice this is not the same AST as `2 + 1 + 1`, which breaks down into multiple three-element tuples, because it is actually two separate addition expressions.
+
+```elixir
+quote do
+  2 + 1 + 1
+end
+```
+
 Variables outside the quote block will not be available within the quote block. So we can use `unquote` to inject their evaluated value.
 
 ```elixir
@@ -169,7 +226,102 @@ quote do
 end
 ```
 
-## `defmacro`
+## Macro and Code Modules
+
+The Elixir [Code](https://hexdocs.pm/elixir/Code.html) module is a module in the Elixir standard library that provides functions for working with code at runtime. The [Code](https://hexdocs.pm/elixir/Code.html) module provides several functions for evaluating code, such as [Code.eval_string/2](https://hexdocs.pm/elixir/Code.html#eval_string/2) and [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2), which allow you to dynamically generate and execute code based on runtime conditions.
+
+The Code module also provides functions for working with the Abstract Syntax Tree (AST) of Elixir code, such as [Code.string_to_quoted/1](https://hexdocs.pm/elixir/Code.html#string_to_quoted/1) which allow you to convert between Elixir code as a string and the AST representation of the code.
+
+The [Macro](https://hexdocs.pm/elixir/Macro.html) modules contains functions for manipulating the AST and implementing macros. The [Macro](https://hexdocs.pm/elixir/Macro.html) module provides the [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1)
+
+The Code module is often used in conjunction with metaprogramming techniques in Elixir, as it allows you to manipulate and execute code at runtime. However, it is important to use these functions carefully, as dynamically generating and executing code can be complex and difficult to understand, and can have unintended consequences if not used correctly.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Reading AST
+
+We can use [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1) to convert a quoted expression into an Elixir expression (in a string).
+
+```elixir
+quoted = quote do: 2 + 2
+
+Macro.to_string(quoted)
+```
+
+We can provide the AST directly as a three-element tuple.
+
+```elixir
+ast = {:+, [context: Elixir, imports: [{1, Kernel}, {2, Kernel}]], [2, 5]}
+
+# => "%{}"
+Macro.to_string(ast)
+```
+
+### Evaluating Strings As Source Code
+
+We can evaluate a string as Elixir code using the [Code.eval_string/3](https://hexdocs.pm/elixir/Code.html#eval_string/3) function.
+
+```elixir
+Code.eval_string("2 + 5")
+```
+
+Variables in the string can be provided by providing a keyword list of bindings as the second argument to the function.
+
+```elixir
+Code.eval_string("2 + a", a: 2)
+```
+
+### Evaluating AST
+
+We can use the [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2) function to evaluate the AST. Here, we take a quoted expression and evaluate it to find the result.
+
+```elixir
+quoted =
+  quote do
+    2 + 2
+  end
+
+Code.eval_quoted(quoted)
+```
+
+Quoted expressions to not have access to bound variables. Below we'll see that `a` is not defined in the quoted expression.
+
+```elixir
+a = 2
+
+quoted =
+  quote do
+    a + 2
+  end
+
+Code.eval_quoted(quoted)
+```
+
+To gain access to the variable, we can use `unquote` to evalate it into the quoted expression.
+
+```elixir
+a = 2
+
+quoted =
+  quote do
+    unquote(a) + 2
+  end
+
+Code.eval_quoted(quoted)
+```
+
+Alternatively, we can provide the variable bindings in a keyword list as the second argument to the [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2) function.
+
+```elixir
+quoted =
+  quote do
+    unquote(a) + 2
+  end
+
+Code.eval_quoted(quoted, a: 2)
+```
+
+## Macros
 
 We can use macros to extend the Elixir language or create [DSLs (Domain-specific Languages)](https://en.wikipedia.org/wiki/Domain-specific_language). For example, every time you use `test` and `assert` in ExUnit, you use ExUnit macros.
 
@@ -187,17 +339,37 @@ end
 ExUnit.run()
 ```
 
-Notice above that ExUnit can determine the operator used in the assertion `1 == 2`.
+It's often idiomatic to use macros without round brackets. However, there's nothing preventing you from using brackets with macros. `do end` blocks are actually just an alternative syntax for writing a keyword list as an argument.
 
-To demonstrate how ExUnit leverages the power of macros to provide better test feedback, we're going to create our own `assert` macro.
+```elixir
+ExUnit.start(auto_run: false)
 
-The `assert` macro will accept a truthy expression and print a message with feedback.
+defmodule BracketExample do
+  use ExUnit.Case
+
+  test("example", do: assert(1 == 1))
+end
+
+ExUnit.run()
+```
+
+Much of Elixir syntax is implemented using macros. Keywords such as `def` are actually just macros on the [Kernel](https://hexdocs.pm/elixir/Kernel.html) module, and `do end` blocks are actually just keyword lists being provided as an argument to the macro. 🤯
+
+```elixir
+Kernel.defmodule(Mind, do: Kernel.def(blown, do: "🤯"))
+
+Mind.blown()
+```
+
+## Writing Our Own Macro
+
+Unlike functions, macros are expanded at compile-time, so they retain knowledge of the values they are called with.
+
+Notice that ExUnit can determine the operator and values used in the assertion `assert 1 == 2` to provide test feedback.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-assert 1 == 2
-
 """
 Assertion with `==` failed.
 
@@ -206,43 +378,43 @@ right: 2
 """
 ```
 
-Notice that we cannot accomplish this with a function.
-Functions accept the evaluated result expressions as arguments. We lose the context about the operator and values.
+To understand how ExUnit leverages the power of macros to provide better test feedback, we're going to create our own `assert` macro.
+
+The `assert` macro will accept a truthy expression and print a message with feedback. Notice that we cannot accomplish this with a function. Functions accept the evaluated result of an expressions an argument. We lose the context about the operator and values.
 
 ```elixir
-assert = fn expression ->
-  if expression do
-    IO.puts("Success")
-  else
-    IO.puts("Failure")
+inspect_argument = fn expression ->
+  IO.inspect(expression, label: "Evaluated Result Of Expression")
+end
+
+inspect_argument.(1 == 2)
+```
+
+We use `defmacro` to define a macro.
+
+The AST representation of an expression knows the function and the arguments the macro was called with.
+
+```elixir
+defmodule ASTInspector do
+  defmacro inspect(ast) do
+    IO.inspect(ast, label: "ast")
   end
 end
-
-assert.(1 == 2)
 ```
 
-We use `defmacro` to define a macro. We'll create an `assert` macro in an `Assertion` module.
+To use a macro, we need to `require` it.
 
 ```elixir
-defmodule Assertion do
-  defmacro assert do
-  end
-end
+require ASTInspector
+
+ASTInspector.inspect(2 == 1)
 ```
 
-Arguments to the `assert` macro are the AST representation of the code. The AST representation of an expression will always be a three-element tuple. Specifically, in this case, the quoted expression for `1 == 2`.
+We have everything we need in this AST tuple to get the `operator`, the `left` side of the expression, and the `right` side of the expression.
 
 ```elixir
-quote do
-  2 == 2
-end
-```
-
-We can pattern match on this expression in the macro definition.
-
-```elixir
-defmodule Assertions do
-  defmacro assert({operator, _meta, [left, right]}) do
+defmodule ExpressionInspector do
+  defmacro inspect({operator, _meta, [left, right]}) do
     IO.inspect(operator, label: "operator")
     IO.inspect(left, label: "left")
     IO.inspect(right, label: "right")
@@ -250,61 +422,35 @@ defmodule Assertions do
 end
 ```
 
-To use macros, we must [require](https://elixir-lang.org/getting-started/alias-require-and-import.html#require) the module that defines them.
-
-Notice the the operator is `:==`, the `left` value is `1`, and the `right` value is `2`. Unlike with a function, the macro retains context about the expression given to it.
-
 ```elixir
-require Assertions
+require ExpressionInspector
 
-Assertions.assert(2 == 2)
+ExpressionInspector.inspect(2 == 2)
 ```
 
-We can use the `operator`, `left`, and `right` variables to print the assertion message.
-
-```elixir
-defmodule Assertions do
-  defmacro assert({operator, _meta, [left, right]}) do
-    IO.puts("""
-    Assertion with #{operator} failed.
-    left: #{left}
-    right: #{right}
-    """)
-  end
-end
-```
-
-```elixir
-require Assertions
-
-Assertions.assert(1 == 2)
-```
-
-We want to verify if the `left` and `right` values are equal.
-
-We can delegate to a separate function now that the `assert` macro separates the expression into its quoted expression.
-
-This function will take the values from the quoted expression and print the assertion success or failure message.
+We want to verify if the `left` and `right` values are equal. We'll make an `Assertion.Test` module that uses pattern matching to return a success message, or failed assertion message depending on if the `left` and `right` sides are equal.
 
 ```elixir
 defmodule Assertion.Test do
   def assert(:==, left, right) when left == right do
-    IO.puts("Success!")
+    "Success!"
   end
 
   def assert(:==, left, right) do
-    IO.puts("""
+    """
     Assertion with == failed.
     left: #{left}
     right: #{right}
-    """)
+    """
   end
 end
 
-Assertion.Test.assert(:==, 1, 2)
+Assertion.Test.assert(:==, 1, 2) |> IO.puts()
 ```
 
-We'll use the `Assertion.Test.assert` function inside our macro. Remember, we need to use `unquote` to use bound variables inside the quote block. The same is true for parameters. So we need to use `unquote` to inject their evaluated value into the `quote` block.
+Then we can use a Macro to get the `operator`, `left`, and `right` values to use with our `Assertion.Test` module.
+
+A macro generates code, so generally it should return an AST expression, not a return value. We use `quote` to create the AST representation of our function call. We'll use the `Assertion.Test.assert` function inside our quoted expression. We also need to use `unquote` to use bound variables inside the quote block. The same is true for parameters. So we need to use `unquote` to inject their evaluated value into the `quote` block.
 
 ```elixir
 defmodule Assertion do
@@ -316,18 +462,18 @@ defmodule Assertion do
 end
 ```
 
-When we call the `assert` macro below it compiles into `Assertion.Test.assert(:==, 1, 2)`.
+When we call the `assert` macro below it compiles into `Assertion.Test.assert(:==, 1, 2)` which then evaluates during runtime.
 
 ```elixir
 require Assertion
 
-Assertion.assert(1 == 2)
+Assertion.assert(1 == 2) |> IO.puts()
 ```
 
-Alternatively, we can use `bind_quoted` to bind multiple values to the quoted expression without `unquote`.
+Alternatively, we can use `bind_quoted` to bind multiple values to the quoted expression without `unquote`. This is just a syntax sugar to avoid using `unquoted` multiple times.
 
 ```elixir
-defmodule Assertion do
+defmodule AssertionWithBindQuoted do
   defmacro assert({operator, _meta, [left, right]}) do
     quote bind_quoted: [operator: operator, left: left, right: right] do
       Assertion.Test.assert(operator, left, right)
@@ -339,16 +485,17 @@ end
 The macro continues to work as expected.
 
 ```elixir
-require Assertion
-Assertion.assert(1 == 2)
+require AssertionWithBindQuoted
+
+AssertionWithBindQuoted.assert(1 == 2) |> IO.puts()
 ```
 
 ### Your Turn
 
-Expand the `Assertion.Test` module to include the `<`, `<=`, `>`, `>=`, and `===` operators.
+Expand the `AllAssertions.Test` module to include the `<`, `<=`, `>`, `>=`, and `===` operators.
 
 ```elixir
-defmodule Assertion.Test do
+defmodule AllAssertions.Test do
   def assert(:==, left, right) when left == right do
     IO.puts("Success!")
   end
@@ -362,7 +509,7 @@ defmodule Assertion.Test do
   end
 end
 
-defmodule Assertion do
+defmodule AllAssertions do
   defmacro assert({operator, _meta, [left, right]}) do
     quote bind_quoted: [operator: operator, left: left, right: right] do
       Assertion.Test.assert(operator, left, right)
@@ -371,21 +518,21 @@ defmodule Assertion do
 end
 ```
 
-You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without causing a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
+You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without raising a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
 
 ```elixir
-require Assertion
+require AllAssertions
 
-Assertion.assert(1 == 2)
-Assertion.assert(1 == 2)
-Assertion.assert(1 > 2)
-Assertion.assert(1 >= 2)
-Assertion.assert(2 < 1)
-Assertion.assert(2 <= 1)
-Assertion.assert(1 === 1.0)
+AllAssertions.assert(1 == 2) |> IO.puts()
+AllAssertions.assert(1 == 2) |> IO.puts()
+AllAssertions.assert(1 > 2) |> IO.puts()
+AllAssertions.assert(1 >= 2) |> IO.puts()
+AllAssertions.assert(2 < 1) |> IO.puts()
+AllAssertions.assert(2 <= 1) |> IO.puts()
+AllAssertions.assert(1 === 1.0) |> IO.puts()
 ```
 
-## `use` and `__using__`
+## Use and __using__
 
 While you may not write macros often, you are likely to use them daily.
 For example, we have already relied on macros with the `use` keyword.
@@ -437,18 +584,21 @@ end
 Once we define our pattern, we can reuse it throughout our program and extend its functionality.
 
 ```elixir
-"hello" = ExtendedTemplate.template_function()
-"hello world" = ExtendedTemplate.extended_function()
+ExtendedTemplate.template_function()
 ```
 
-For a real-world example, it's common to create custom ExUnit cases for common test scenarios. The example below is only a small example of what's possible.
+```elixir
+ExtendedTemplate.extended_function()
+```
+
+For a real-world example, it's common to create custom ExUnit cases for common test scenarios. The example below is only a small example of what's possible. Here we create an `IOCase` module which automatically imports the `ExUnit.CaptureIO` module that provides the [capture_io/1](https://hexdocs.pm/ex_unit/ExUnit.CaptureIO.html#capture_io/1) for testing if we print a message using [IO](https://hexdocs.pm/elixir/IO.html).
 
 ```elixir
 defmodule IOCase do
   # Use the module
   defmacro __using__(_opts) do
     quote do
-      use ExUnit.Case, async: true
+      use ExUnit.Case
       import ExUnit.CaptureIO
     end
   end
@@ -456,7 +606,7 @@ end
 
 ExUnit.start(auto_run: false)
 
-defmodule Test do
+defmodule IOTest do
   use IOCase
 
   test "capure io" do
@@ -495,6 +645,13 @@ Call `Usage.hello()` to ensure your solution works correctly.
 Usage.hello()
 ```
 
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: Metaprogramming](https://elixirschool.com/en/lessons/advanced/metaprogramming/)
+* [PragProg: Metaprogramming Elixir](https://pragprog.com/titles/cmelixir/metaprogramming-elixir/)
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
@@ -515,3 +672,9 @@ Create a pull request to your forked `main` branch. Please do not create a pull 
 Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                       | Next                                         |
+| -------------------------------------------------------------- | -------------------------------------------: |
+| [Games Score Tracker](../exercises/games_score_tracker.livemd) | [Macro Math](../exercises/macro_math.livemd) |
