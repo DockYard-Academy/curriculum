@@ -23,7 +23,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Compile-time vs Runtime
+### Compile-time Vs Runtime
 
 In programming, compile-time refers to the period of time during which a program is being compiled from source code into executable machine code, and runtime refers to the period of time during which a program is executing.
 
@@ -228,11 +228,11 @@ end
 
 ## Macro and Code Modules
 
-The Elixir `Code` module is a module in the Elixir standard library that provides functions for working with code at runtime. The `Code` module provides several functions for evaluating code, such as `Code.eval_string/2` and `Code.eval_quoted/2`, which allow you to dynamically generate and execute code based on runtime conditions.
+The Elixir [Code](https://hexdocs.pm/elixir/Code.html) module is a module in the Elixir standard library that provides functions for working with code at runtime. The [Code](https://hexdocs.pm/elixir/Code.html) module provides several functions for evaluating code, such as [Code.eval_string/2](https://hexdocs.pm/elixir/Code.html#eval_string/2) and [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2), which allow you to dynamically generate and execute code based on runtime conditions.
 
-The Code module also provides functions for working with the Abstract Syntax Tree (AST) of Elixir code, such as `Code.string_to_quoted/1` which allow you to convert between Elixir code as a string and the AST representation of the code.
+The Code module also provides functions for working with the Abstract Syntax Tree (AST) of Elixir code, such as [Code.string_to_quoted/1](https://hexdocs.pm/elixir/Code.html#string_to_quoted/1) which allow you to convert between Elixir code as a string and the AST representation of the code.
 
-The `Macro` modules contains functions for manipulating the AST and implementing macros. The `Macro` module provides the `Macro.to_string/1`
+The [Macro](https://hexdocs.pm/elixir/Macro.html) modules contains functions for manipulating the AST and implementing macros. The [Macro](https://hexdocs.pm/elixir/Macro.html) module provides the [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1)
 
 The Code module is often used in conjunction with metaprogramming techniques in Elixir, as it allows you to manipulate and execute code at runtime. However, it is important to use these functions carefully, as dynamically generating and executing code can be complex and difficult to understand, and can have unintended consequences if not used correctly.
 
@@ -240,7 +240,7 @@ The Code module is often used in conjunction with metaprogramming techniques in 
 
 ### Reading AST
 
-We can use `Macto.to_string/1` to convert a quoted expression into an Elixir expression (in a string).
+We can use [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1) to convert a quoted expression into an Elixir expression (in a string).
 
 ```elixir
 quoted = quote do: 2 + 2
@@ -257,9 +257,9 @@ ast = {:+, [context: Elixir, imports: [{1, Kernel}, {2, Kernel}]], [2, 5]}
 Macro.to_string(ast)
 ```
 
-### Evaluating Strings as Source Code
+### Evaluating Strings As Source Code
 
-We can evaluate a string as Elixir code using the `Code.eval_string/3` function.
+We can evaluate a string as Elixir code using the [Code.eval_string/3](https://hexdocs.pm/elixir/Code.html#eval_string/3) function.
 
 ```elixir
 Code.eval_string("2 + 5")
@@ -273,7 +273,7 @@ Code.eval_string("2 + a", a: 2)
 
 ### Evaluating AST
 
-We can use the `Code.eval_quoted/2` function to evaluate the AST. Here, we take a quoted expression and evaluate it to find the result.
+We can use the [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2) function to evaluate the AST. Here, we take a quoted expression and evaluate it to find the result.
 
 ```elixir
 quoted =
@@ -310,7 +310,7 @@ quoted =
 Code.eval_quoted(quoted)
 ```
 
-Alternatively, we can provide the variable bindings in a keyword list as the second argument to the `Code.eval_quoted/2` function.
+Alternatively, we can provide the variable bindings in a keyword list as the second argument to the [Code.eval_quoted/2](https://hexdocs.pm/elixir/Code.html#eval_quoted/2) function.
 
 ```elixir
 quoted =
@@ -353,7 +353,7 @@ end
 ExUnit.run()
 ```
 
-Much of Elixir syntax is implemented using macros. Keywords such as `def` are actually just macros on the `Kernel` module, and `do end` blocks are actually just keyword lists being provided as an argument to the macro. 🤯
+Much of Elixir syntax is implemented using macros. Keywords such as `def` are actually just macros on the [Kernel](https://hexdocs.pm/elixir/Kernel.html) module, and `do end` blocks are actually just keyword lists being provided as an argument to the macro. 🤯
 
 ```elixir
 Kernel.defmodule(Mind, do: Kernel.def(blown, do: "🤯"))
@@ -532,7 +532,7 @@ AllAssertions.assert(2 <= 1) |> IO.puts()
 AllAssertions.assert(1 === 1.0) |> IO.puts()
 ```
 
-## use and __using__
+## Use and __using__
 
 While you may not write macros often, you are likely to use them daily.
 For example, we have already relied on macros with the `use` keyword.
@@ -591,7 +591,7 @@ ExtendedTemplate.template_function()
 ExtendedTemplate.extended_function()
 ```
 
-For a real-world example, it's common to create custom ExUnit cases for common test scenarios. The example below is only a small example of what's possible. Here we create an `IOCase` module which automatically imports the `ExUnit.CaptureIO` module that provides the [capture_io/1](https://hexdocs.pm/ex_unit/ExUnit.CaptureIO.html#capture_io/1) for testing if we print a message using `IO`.
+For a real-world example, it's common to create custom ExUnit cases for common test scenarios. The example below is only a small example of what's possible. Here we create an `IOCase` module which automatically imports the `ExUnit.CaptureIO` module that provides the [capture_io/1](https://hexdocs.pm/ex_unit/ExUnit.CaptureIO.html#capture_io/1) for testing if we print a message using [IO](https://hexdocs.pm/elixir/IO.html).
 
 ```elixir
 defmodule IOCase do
@@ -672,3 +672,9 @@ Create a pull request to your forked `main` branch. Please do not create a pull 
 Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                       | Next                                         |
+| -------------------------------------------------------------- | -------------------------------------------: |
+| [Games Score Tracker](../exercises/games_score_tracker.livemd) | [Macro Math](../exercises/macro_math.livemd) |

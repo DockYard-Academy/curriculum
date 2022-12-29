@@ -210,15 +210,16 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Benchmarking and Performance
 * Streams
 * Performance Optimization
+* Persistence Using the File System
 * Processes
 * GenServers
 * Asynchronous Messages
 * Supervisor Basics and Fault Tolerance
 * Testing GenServers
+* Metaprogramming
 * Mix Projects & Processes
 * Concurrency With Tasks
 * State Management With Agents and ETS
-* Persistence Using the File System
 * Rubix Cube Project
 ## Web Servers and Phoenix
 * HTML and CSS
@@ -246,7 +247,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Quality Assurance
 * Observability
 * Factories & Mocks
-* CI/CD, Code Coverage, GitHub Actions & Hooks
 ## External Libraries
 * Emailing & Swoosh
 * Oban
