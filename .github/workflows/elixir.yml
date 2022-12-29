@@ -14,23 +14,30 @@ jobs:
 
     name: Build and test
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        elixir: [1.14.2]
+        otp: [25.2]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.14.2' # Define the elixir version [required]
-        otp-version: '25.2' # Define the OTP version [required]
-    - name: Restore dependencies cache
-      uses: actions/cache@v3
+        elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
+        otp-version: ${{ matrix.otp }} # Define the OTP version [required]
+    - name: Retrieve Mix Dependencies Cache
+      uses: actions/cache@v1
+      id: mix-cache #id to use in retrieve action
       with:
         path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      working-directory: ./utils
-      run: mix deps.get
+        key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) 
+    - name: Install Mix Dependencies
+        if: steps.mix-cache.outputs.cache-hit != 'true'
+        working-directory: ./utils
+        run: |
+            mix local.rebar --force
+            mix local.hex --force
+            mix deps.get
     - name: Check code format
       working-directory: ./utils
       run: mix format --check-formatted
