@@ -274,7 +274,7 @@ Replace your home page in `page/index.html.heex` with the following content. Cha
 
 ### Navigation
 
-Replace your `root.html.heex` file with the following. Replace `Brooklin` with your name. The `live_title_tag` function controllers the text in the application's tab in your browser.
+Replace your `root.html.heex` file with the following. Replace `Brooklin` with your name. The `live_title_tag` function controls the text in the application's tab in your browser.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -351,6 +351,8 @@ We're going to create some seed data in our production application. By default, 
 Access the console of your production access using the following command.
 
 ```
+$ fly ssh establish
+$ fly ssh issue --agent
 $ fly ssh console
 ```
 
@@ -388,7 +390,7 @@ Exit the IEx shell using <kbd>CTRL</kbd>+<kbd>C</kbd> <kbd>CTRL</kbd>+<kbd>C</kb
 $
 ```
 
-One common way of creating data in production is to create a module for seeding data. We're going to use the seed file we've already defined in `priv/repo/seeds.ex` and create a `lib/book_search/seed.ex` file with the following content.
+One common way of creating data in production is to create a module for seeding data. We're going to use the seed file we've already defined in `priv/repo/seeds.ex` and create a `lib/book_search/seeds.ex` file with the following content.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -469,7 +471,7 @@ defmodule BookSearch.Seeds do
 end
 ```
 
-We can also refactor our `priv/repo/seeds.exs` to use this module now. Replace `priv/repo.seeds.exs` with the following.
+We can also refactor our `priv/repo/seeds.exs` to use this module now. Replace `priv/repo/seeds.exs` with the following.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -516,7 +518,7 @@ Exit the shell (see above instructions). Your production application should have
 
 GitHub allows us to define `.yml` files in a `.github/workflows` folder that will be automatically run on certain steps of the GitHub.
 
-Create a `.github/workflows/test.yml` file with the following content. Ensure your elixir and otp version are up to date. The name of the file does not matter.
+Create a `.github/workflows/test.yml` file with the following content inside of the `book_search` project folder. Ensure your elixir and otp version are up to date. The name of the file does not matter.
 
 ```yaml
 on: push
@@ -556,7 +558,7 @@ Checkout into a new branch.
 $ git checkout -b setup-ci
 ```
 
-Then push your code and make pull request and see your CI in action. If tests fail, you'll catch them anytime you make a PR. You can imagine how useful this is in a production application!
+Then stage, commit, and push your code. Make pull request and see your CI in action. If tests fail, you'll catch them anytime you make a PR. You can imagine how useful this is in a production application!
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -600,11 +602,55 @@ jobs:
         - run: flyctl deploy --remote-only
 ```
 
+To make sure our CD system works, add the following to our list of Topics Covered in `page/index.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<li>
+  <a href="https://hexdocs.pm/phoenix/fly.html#content">Deployment With Fly</a>
+</li>
+```
+
 Merge your pull request, and you should notice that the changes automatically deploy to your production application.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/book_search_deployment_cd.png)
+
+## Fly Dashboard
+
+Fly provides some tools for managing and monitoring your application on the [Fly Dashboard](https://fly.io/dashboard).
+
+For example, you can select your application from the Dashboard and go to **Monitoring** to see your application logs.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_fly_dashboard_monitoring.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+You can also set up metrics with Fly using tools such as [Prometheus](https://fly.io/docs/reference/metrics/#prometheus-on-fly), however that is beyond the scope of this lesson.
+
+## Error Reporting
+
+Error reporting tools such as [Honeybadger](https://hexdocs.pm/honeybadger/0.6.2/readme.html) and [Sentry](https://docs.sentry.io/platforms/elixir/) allow you to monitor your application and receive notifications when users encounter errors.
+
+This is beyond the scope of this lesson, but you should be aware of these services.
+
+## Your Turn
+
+Add any **Topics Covered** in `page.html.heex` that you would like to include in your `BookSearch` project. Then use your CI/CD system to automatically test and deploy these changes.
+
+For example, you might add CI/CD as a topic covered.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<li>
+  <a href="https://fly.io/docs/elixir/advanced-guides/github-actions-elixir-ci-cd/">CI/CD</a>
+</li>
+```
 
 ## Further Reading
 
@@ -613,8 +659,9 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [GitHub Actions](https://github.com/features/actions)
 * [HexDocs: Deploying on Fly.io](https://hexdocs.pm/phoenix/fly.html#content)
 * [Fly.io: IEx into your running app](https://fly.io/docs/elixir/getting-started/iex-into-running-app/)
-* [Fly.io: continuous deployment with github actions](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/)
+* [Fly.io: Continuous deployment with github actions](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/)
 * [GitHub: erlef/setup-beam](https://github.com/erlef/setup-beam)
+* [Fly.io: Metrics](https://fly.io/docs/reference/metrics/)
 
 ## Commit Your Progress
 
