@@ -232,7 +232,7 @@ The Elixir [Code](https://hexdocs.pm/elixir/Code.html) module is a module in the
 
 The Code module also provides functions for working with the Abstract Syntax Tree (AST) of Elixir code, such as [Code.string_to_quoted/1](https://hexdocs.pm/elixir/Code.html#string_to_quoted/1) which allow you to convert between Elixir code as a string and the AST representation of the code.
 
-The [Macro](https://hexdocs.pm/elixir/Macro.html) modules contains functions for manipulating the AST and implementing macros. The [Macro](https://hexdocs.pm/elixir/Macro.html) module provides the [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1)
+The [Macro](https://hexdocs.pm/elixir/Macro.html) modules contains functions for manipulating the AST and implementing macros. The [Macro](https://hexdocs.pm/elixir/Macro.html) module provides the [Macro.to_string/1](https://hexdocs.pm/elixir/Macro.html#to_string/1) function.
 
 The Code module is often used in conjunction with metaprogramming techniques in Elixir, as it allows you to manipulate and execute code at runtime. However, it is important to use these functions carefully, as dynamically generating and executing code can be complex and difficult to understand, and can have unintended consequences if not used correctly.
 
@@ -253,7 +253,6 @@ We can provide the AST directly as a three-element tuple.
 ```elixir
 ast = {:+, [context: Elixir, imports: [{1, Kernel}, {2, Kernel}]], [2, 5]}
 
-# => "%{}"
 Macro.to_string(ast)
 ```
 
@@ -488,48 +487,6 @@ The macro continues to work as expected.
 require AssertionWithBindQuoted
 
 AssertionWithBindQuoted.assert(1 == 2) |> IO.puts()
-```
-
-### Your Turn
-
-Expand the `AllAssertions.Test` module to include the `<`, `<=`, `>`, `>=`, and `===` operators.
-
-```elixir
-defmodule AllAssertions.Test do
-  def assert(:==, left, right) when left == right do
-    IO.puts("Success!")
-  end
-
-  def assert(:==, left, right) do
-    IO.puts("""
-    Assertion with == failed.
-    left: #{left}
-    right: #{right}
-    """)
-  end
-end
-
-defmodule AllAssertions do
-  defmacro assert({operator, _meta, [left, right]}) do
-    quote bind_quoted: [operator: operator, left: left, right: right] do
-      Assertion.Test.assert(operator, left, right)
-    end
-  end
-end
-```
-
-You should be able to use the `Assertion.assert` macro to display a failure message for the following assertions without raising a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
-
-```elixir
-require AllAssertions
-
-AllAssertions.assert(1 == 2) |> IO.puts()
-AllAssertions.assert(1 == 2) |> IO.puts()
-AllAssertions.assert(1 > 2) |> IO.puts()
-AllAssertions.assert(1 >= 2) |> IO.puts()
-AllAssertions.assert(2 < 1) |> IO.puts()
-AllAssertions.assert(2 <= 1) |> IO.puts()
-AllAssertions.assert(1 === 1.0) |> IO.puts()
 ```
 
 ## Use and __using__
