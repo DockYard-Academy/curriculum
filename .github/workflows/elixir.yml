@@ -27,7 +27,6 @@ jobs:
         otp-version: ${{ matrix.otp }} # Define the OTP version [required]
       # Step: Define how to cache deps. Restores existing cache if present.
     - name: Cache deps
-      working-directory: ./utils
       id: cache-deps
       uses: actions/cache@v3
       env:
@@ -42,7 +41,6 @@ jobs:
       # this speeds up tests runs a lot. This includes not re-compiling our
       # project's downloaded deps every run.
     - name: Cache compiled build
-      working-directory: ./utils
       id: cache-build
       uses: actions/cache@v3
       env:
@@ -68,10 +66,10 @@ jobs:
         mix clean
       shell: sh
 
-      # Step: Download project dependencies. If unchanged, uses
-      # the cached version.
-      - name: Install dependencies
-        run: mix deps.get
+    # Step: Download project dependencies. If unchanged, uses
+    # the cached version.
+    - name: Install dependencies
+      run: mix deps.get
     - name: Install dependencies
       working-directory: ./utils
       run: mix deps.get
