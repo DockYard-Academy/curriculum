@@ -2,53 +2,90 @@ name: Elixir CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   build:
-
     name: Build and test
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        elixir: [1.14.2]
+        otp: [25.2]
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: '1.14.2' # Define the elixir version [required]
-        otp-version: '25.2' # Define the OTP version [required]
-    - name: Restore dependencies cache
-      uses: actions/cache@v3
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      working-directory: ./utils
-      run: mix deps.get
-    - name: Check code format
-      working-directory: ./utils
-      run: mix format --check-formatted
-    - name: Check compilation warnings
-      working-directory: ./utils
-      run: mix compile --warnings-as-errors
-    - name: Run tests
-      working-directory: ./utils
-      run: mix test --exclude=skip_ci --warnings-as-errors
+      - uses: actions/checkout@v3
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
+          otp-version: ${{ matrix.otp }} # Define the OTP version [required]
+        # Step: Define how to cache deps. Restores existing cache if present.
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-deps
+        with:
+          path: utils/deps
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+
+        # Step: Define how to cache the `_build` directory. After the first run,
+        # this speeds up tests runs a lot. This includes not re-compiling our
+        # project's downloaded deps every run.
+      - name: Cache compiled build
+        id: cache-build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-compiled-build
+        with:
+          path: utils/_build
+          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{ env.cache-name }}-
+            ${{ runner.os }}-mix-
+
+      # Step: Conditionally bust the cache when job is re-run.
+      # Sometimes, we may have issues with incremental builds that are fixed by
+      # doing a full recompile. In order to not waste dev time on such trivial
+      # issues (while also reaping the time savings of incremental builds for
+      # *most* day-to-day development), force a full recompile only on builds
+      # that are retried.
+      - name: Clean to rule out incremental build as a source of flakiness
+        working-directory: ./utils
+        if: github.run_attempt != '1'
+        run: |
+          mix deps.clean --all
+          mix clean
+        shell: sh
+
+      - name: Install dependencies
+        working-directory: ./utils
+        run: mix deps.get
+      - name: Check code format
+        working-directory: ./utils
+        run: mix format --check-formatted
+      - name: Check compilation warnings
+        working-directory: ./utils
+        run: mix compile --warnings-as-errors
+      - name: Run tests
+        working-directory: ./utils
+        run: mix test --exclude=skip_ci --warnings-as-errors
 
   codespell:
     name: Check for spelling errors
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: codespell-project/actions-codespell@master
-      with:
-        check_filenames: true
-        check_hidden: true
-        skip: "./.git,./utils/.credo.exs,./utils/lib/assets*"
-        ignore_words_list: falsy
+      - uses: actions/checkout@v3
+      - uses: codespell-project/actions-codespell@master
+        with:
+          check_filenames: true
+          check_hidden: true
+          skip: "./.git,./utils/.credo.exs,./utils/lib/assets*"
+          ignore_words_list: falsy
