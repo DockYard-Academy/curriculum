@@ -25,6 +25,53 @@ jobs:
       with:
         elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
         otp-version: ${{ matrix.otp }} # Define the OTP version [required]
+      # Step: Define how to cache deps. Restores existing cache if present.
+    - name: Cache deps
+      working-directory: ./utils
+      id: cache-deps
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-elixir-deps
+      with:
+        path: deps
+        key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-mix-${{ env.cache-name }}-
+
+      # Step: Define how to cache the `_build` directory. After the first run,
+      # this speeds up tests runs a lot. This includes not re-compiling our
+      # project's downloaded deps every run.
+    - name: Cache compiled build
+      working-directory: ./utils
+      id: cache-build
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-compiled-build
+      with:
+        path: _build
+        key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-mix-${{ env.cache-name }}-
+          ${{ runner.os }}-mix-
+
+    # Step: Conditionally bust the cache when job is re-run.
+    # Sometimes, we may have issues with incremental builds that are fixed by
+    # doing a full recompile. In order to not waste dev time on such trivial
+    # issues (while also reaping the time savings of incremental builds for
+    # *most* day-to-day development), force a full recompile only on builds
+    # that are retried.
+    - name: Clean to rule out incremental build as a source of flakiness
+      working-directory: ./utils
+      if: github.run_attempt != '1'
+      run: |
+        mix deps.clean --all
+        mix clean
+      shell: sh
+
+      # Step: Download project dependencies. If unchanged, uses
+      # the cached version.
+      - name: Install dependencies
+        run: mix deps.get
     - name: Install dependencies
       working-directory: ./utils
       run: mix deps.get
