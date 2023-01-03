@@ -112,13 +112,13 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-### LiveView [mount/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:mount/3) callback
+### LiveView [mount/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:mount/3) Callback
 
 Phoenix LiveViews define a `mount/3` callback that initializes the LiveView. `mount/3` is called once to do the initial page load, and again to establish the live socket.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### LiveView [render/1](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:render/1) callback
+### LiveView [render/1](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:render/1) Callback
 
 Phoenix LiveViews define a `render/1` callback that renders a template. The `render/1` callback is invoked whenever the LiveView detects new content to render and send to the client.
 
@@ -126,7 +126,7 @@ Phoenix LiveViews define a `render/1` callback that renders a template. The `ren
 
 ### LiveView Events
 
-Once the client and LiveView establish a stateful connection they can send a recieve messages.
+Once the client and LiveView establish a stateful connection they can send a receive messages.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -217,7 +217,7 @@ $ mix phx.server
 
 The server should automatically reload every time we change our code. If you are a Linux user, you may have to install [inotify-tools](https://hexdocs.pm/phoenix/installation.html#inotify-tools-for-linux-users).
 
-## Define The LiveView Route
+## Define the LiveView Route
 
 The [Phoenix.Router](https://hexdocs.pm/phoenix/Phoenix.Router.html) uses the [Phoenix.LiveView.Router.live/4](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Router.html#live/4) macro to define the route handled by the [Phoenix.LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html).
 
@@ -234,7 +234,7 @@ scope "/", CounterWeb do
 end
 ```
 
-## Create The CounterLive LiveView
+## Create the CounterLive LiveView
 
 ### CounterLive "Hello World"
 
@@ -268,12 +268,12 @@ Visit http://localhost:4000 and you will see the following page.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### The mount/3 callback
+### The mount/3 Callback
 
 The `mount/3` callback accepts three parameters
 
 1. `params` contains public information that can be set by the user such as query params and router path parameters.
-2. `session` contains session information specific to the current client. For example, this contains the [Cross-site request forgery token](https://en.wikipedia.org/wiki/Cross-site_request_forgery).
+2. `session` contains session information specific to the current client. For example, this contains the [cross-site request forgery token](https://en.wikipedia.org/wiki/Cross-site_request_forgery).
 3. `socket` A [Phoenix.LiveView.Socket](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Socket.html) that contains the state of the LiveView and other socket information.
 
 The `mount/3` callback is called once to render the initial HTML, and once again when the socket is connected. This can sometimes cause unexpected issues by performing actions twice in the mount function.
@@ -330,7 +330,7 @@ We use the same `<%= elixir %>` syntax we've used in templates before to use Eli
 
 ```elixir
 defmodule CounterWeb.CounterLive do
-  use Phoenix.LiveView
+  use CounterWeb, :live_view
 
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :count, 0)}
@@ -366,7 +366,7 @@ To increment this count, we'll make a button the user can click. This button wil
 
 ```elixir
 defmodule CounterWeb.CounterLive do
-  use Phoenix.LiveView
+  use CounterWeb, :live_view
 
   def mount(_params, _session, socket) do
     {:ok, assign(socket, :count, 0)}
@@ -674,6 +674,6 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Up Next
 
-| Previous                                                           | Next                                       |
-| ------------------------------------------------------------------ | -----------------------------------------: |
-| [Book Search Deployment](../reading/book_search_deployment.livemd) | [Math Game](../exercises/math_game.livemd) |
+| Previous                                     | Next                                       |
+| -------------------------------------------- | -----------------------------------------: |
+| [Deployment](../exercises/deployment.livemd) | [Math Game](../exercises/math_game.livemd) |

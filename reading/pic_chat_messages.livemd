@@ -124,21 +124,28 @@ LiveView provides four primary functions for navigation.
 * From the client
   * [Phoenix.LiveView.Helpers.live_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_redirect/2)
   * [Phoenix.LiveView.Helpers.live_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_patch/2)
-    ```elixir
-    <span><%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %></span>
-    <span><%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %></span>
-    ```
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  <span><%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %></span>
+  <span><%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %></span>
+```
+
 * From the Server
   * [Phoenix.LiveView.push_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_redirect/2)
   * [Phoenix.LiveView.push_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_patch/2)
-    ```elixir
-    {:noreply, push_patch(socket, to: Routes.message_show_path(@socket, :show, message))}
-    ```
 
-Each servers a different purpose
+<!-- livebook:{"force_markdown":true} -->
 
-* `_patch` re-renders the current LiveView with different parameters.
-* `_redirect`  redirects to a different LiveView.
+```elixir
+{:noreply, push_patch(socket, to: Routes.message_show_path(@socket, :show, message))}
+```
+
+Each serves a different purpose.
+
+* `push_patch/` and `live_patch` re-render the current LiveView with different parameters.
+* `live_redirect` and `push_redirect`  redirects to a different LiveView.
 
 Unlike using a normal [link/2](https://hexdocs.pm/phoenix_html/3.2.0/Phoenix.HTML.Link.html#link/2) or redirect, these live navigation functions update the page without doing a full page reload. This is more performant and should be preferred when working with LiveView.
 
@@ -212,13 +219,13 @@ See [HexDocs: Phoenix.LiveViewTesting](https://hexdocs.pm/phoenix_live_view/Phoe
 Over the next few lessons we're going to build a Chat Application that can also upload images called `PicChat`.
 Our application will include a global chat where users can send messages and see the feed of messages update in real-time.
 
-We'll also save messages in a database with `Ecto` to demonstrate how to use CRUD (Create, Read, Update, Delete) actions with LiveViews.
+We'll also save messages in a database with [Ecto](https://hexdocs.pm/ecto/Ecto.html) to demonstrate how to use CRUD (Create, Read, Update, Delete) actions with LiveViews.
 
-You can see the completed [PicChat] application for the sake of reference.
+You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat) application for the sake of reference.
 
 In this lesson, we're going to create the initial feed of messages without images. Follow along with each step of the instruction to build your own `PicChat` application.
 
-## Create The Phoenix Project
+## Create the Phoenix Project
 
 Create the Phoenix project
 
@@ -232,7 +239,7 @@ Make sure to create the Ecto database.
 $ mix ecto.create
 ```
 
-## Create the `Chat` context.
+## Create the Chat Context.
 
 We're going to create a `Chat` context with a `Message` resource in a `messages` table.
 Messages will have a `:content` and `:from` field.
@@ -266,6 +273,8 @@ end
 ```
 
 Notice that unlike with MVC generators, the generator only generates two LiveViews `MessageLive.Index` and `MessageLive.Show`. It then uses the `:index`, `:new`, `:edit`, and `:show` parameters to conditionally render a modal. We'll dive into how this works in a moment.
+
+Since we removed the `PageController` route, make sure to remove `page_view_test.exs`, `page_view.ex`, `page_controller_test.ex`, and `page_controller.ex`, and `/page/index.html.heex`.
 
 ## The MessageLive.Index LiveView
 
@@ -601,7 +610,7 @@ defp apply_action(socket, :edit, %{"id" => id}) do
 end
 ```
 
-Also, the `FormComponent` calls the `save_message/3` funtion with the `:edit` live_action.
+Also, the `FormComponent` calls the `save_message/3` function with the `:edit` live_action.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -704,7 +713,7 @@ This sets the `live_action` field in our socket to display the modal.
 
 This is the exact same modal form we've already seen, so we're not going to walk through it again.
 
-## Delete a Message
+## Delete A Message
 
 The `MessageLive.Index` LiveView also renders a delete button in the `index.html.heex` template.
 
@@ -744,6 +753,6 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Up Next
 
-| Previous                                                           | Next                                       |
-| ------------------------------------------------------------------ | -----------------------------------------: |
-| [Book Search Deployment](../reading/book_search_deployment.livemd) | [Math Game](../exercises/math_game.livemd) |
+| Previous                                   | Next                                             |
+| ------------------------------------------ | -----------------------------------------------: |
+| [Math Game](../exercises/math_game.livemd) | [Rubber Ducky](../exercises/rubber_ducky.livemd) |

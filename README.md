@@ -239,6 +239,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Deployment
 ## LiveView
 * LiveView
+* LiveView & Ecto
+* LiveView Image Uploads
 * Testing LiveView
 * PubSub and Channels
 * GraphQL and Absinthe
