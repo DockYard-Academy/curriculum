@@ -125,6 +125,8 @@ LiveView provides four primary functions for navigation.
   * [Phoenix.LiveView.Helpers.live_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_redirect/2)
   * [Phoenix.LiveView.Helpers.live_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_patch/2)
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
   <span><%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %></span>
   <span><%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %></span>
@@ -134,14 +136,16 @@ LiveView provides four primary functions for navigation.
   * [Phoenix.LiveView.push_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_redirect/2)
   * [Phoenix.LiveView.push_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_patch/2)
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
-  {:noreply, push_patch(socket, to: Routes.message_show_path(@socket, :show, message))}
+{:noreply, push_patch(socket, to: Routes.message_show_path(@socket, :show, message))}
 ```
 
-Each servers a different purpose
+Each serves a different purpose.
 
-* `_patch` re-renders the current LiveView with different parameters.
-* `_redirect`  redirects to a different LiveView.
+* `push_patch/` and `live_patch` re-render the current LiveView with different parameters.
+* `live_redirect` and `push_redirect`  redirects to a different LiveView.
 
 Unlike using a normal [link/2](https://hexdocs.pm/phoenix_html/3.2.0/Phoenix.HTML.Link.html#link/2) or redirect, these live navigation functions update the page without doing a full page reload. This is more performant and should be preferred when working with LiveView.
 
@@ -217,7 +221,7 @@ Our application will include a global chat where users can send messages and see
 
 We'll also save messages in a database with [Ecto](https://hexdocs.pm/ecto/Ecto.html) to demonstrate how to use CRUD (Create, Read, Update, Delete) actions with LiveViews.
 
-You can see the completed [PicChat] application for the sake of reference.
+You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat) application for the sake of reference.
 
 In this lesson, we're going to create the initial feed of messages without images. Follow along with each step of the instruction to build your own `PicChat` application.
 
@@ -235,7 +239,7 @@ Make sure to create the Ecto database.
 $ mix ecto.create
 ```
 
-## Create the `Chat` Context.
+## Create the Chat Context.
 
 We're going to create a `Chat` context with a `Message` resource in a `messages` table.
 Messages will have a `:content` and `:from` field.
