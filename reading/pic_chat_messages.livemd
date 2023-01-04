@@ -17,11 +17,36 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Use the following questions for improved reading comprehension and further research.
+
+* What are the four main methods of LiveView navigation? Compare and contrast them.
+* What is a live action?
+* How do you render a Phoenix Component?
+* Compare and contrast Phoenix Components vs Phoenix LiveViews.
+* What is the purpose of `handle_params/3`?
+* How do you define a route for a LiveView?
+* What is the `:page_title` on the socket assigns?
+* How do you render a template with a LiveView?
+* Where is the `<.modal>` component defined?
+* How do you mount a LiveView in a test?
+* How do you test a form in a LiveView?
+* How do you test clicking a button or anchor link in a LiveView?
+* How do you test if some string is rendered in the LiveView's HTML?
+* Does a LiveComponent have the same `assigns` as its parent LiveView?
+* What is the purpose of `apply_action/3` in the scaffolded Phoenix application?
+* What benefits does a form in a LiveView offer compared to a form in a traditional MVC pattern?
+* **research required** What are slots?
+* **research required** How do you create a stateless function component?
+
 ## Overview
 
 ### Phoenix Live Generator
 
 We can use `mix phx.gen.live` similar to how we have already used `mix phx.gen.html` to generate the boilerplate code for a resource.
+
+Do not run this command. This is for demonstration purposes only.
 
 ```
 mix phx.gen.live Context Schema table field_name:field_type
@@ -128,8 +153,8 @@ LiveView provides four primary functions for navigation.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  <span><%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %></span>
-  <span><%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %></span>
+<%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %>
+<%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %>
 ```
 
 * From the Server
@@ -153,7 +178,7 @@ See [HexDocs: LiveNavigation](https://hexdocs.pm/phoenix_live_view/0.17.12/live-
 
 <!-- livebook:{"break_markdown":true} -->
 
-### LiveView Testing
+### [LiveView Testing](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#content)
 
 We can mount a LiveView in a test using the [live/2](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#live/2) macro.
 
@@ -747,12 +772,13 @@ Read through the `message_live_test.ex` file to get a better understanding of pa
 Consider the following resource(s) to deepen your understanding of the topic.
 
 * [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+* [HexDocs: LiveComponent](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveComponent.html)
 * [HexDocs: Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
 * [Elixir Schools: LiveView](https://elixirschool.com/blog/phoenix-live-view/)
 * [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)
 
 ## Up Next
 
-| Previous                                   | Next                                             |
-| ------------------------------------------ | -----------------------------------------------: |
-| [Math Game](../exercises/math_game.livemd) | [Rubber Ducky](../exercises/rubber_ducky.livemd) |
+| Previous                                   | Next                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------: |
+| [Math Game](../exercises/math_game.livemd) | [Pic Chat Image Upload](../reading/pic_chat_image_upload.livemd) |
