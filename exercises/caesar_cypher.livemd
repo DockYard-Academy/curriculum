@@ -47,7 +47,12 @@ CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
 ```elixir
 defmodule CaesarCypher do
  def encode(string) do
-    encode(string, 1)
+    String.to_charlist(string)
+    |> Enum.map(fn
+      ?z -> ?a
+      char -> char + 1
+    end)
+    |> List.to_string()
   end
 
   def encode(string, key) do
@@ -63,6 +68,12 @@ defmodule CaesarCypher do
     |> List.to_string()
   end
 end
+```
+
+As a possible refactoring step, once you have a solution for the generic problem of encoding a cypher for any key, you might simply re-use this solution.
+
+```elixir
+def encode(string), do: encode(string, 1)
 ```
 
 </details>
@@ -86,7 +97,6 @@ defmodule CaesarCypher do
   """
   @spec encode(String.t()) :: String.t()
   def encode(string) do
-    2
   end
 
   @doc """
