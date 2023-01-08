@@ -221,6 +221,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Concurrency With Tasks
 * State Management With Agents and ETS
 * Rubix Cube Project
+## Capstone Project Preparation
+* Capstone Project
 ## Web Servers and Phoenix
 * HTML and CSS
 * APIs & Parsing JSON
@@ -241,18 +243,11 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * LiveView
 * LiveView & Ecto
 * LiveView Image Uploads
+* PubSub
 * LiveView JS Interoptability
-* Testing LiveView
-* PubSub and Channels
 * GraphQL and Absinthe
-## Capstone Project Preparation
-* Capstone Project
-## Quality Assurance
-* Observability
-* Factories & Mocks
 ## External Libraries
 * Emailing & Swoosh
-* Oban
 ## Final Project
 * Demo Day
 <!-- course-outline-end -->
