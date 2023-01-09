@@ -244,7 +244,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * LiveView & Ecto
 * LiveView Image Uploads
 * PubSub
-* LiveView JS Interoptability
+* LiveView JS Interoperability and Pagination
 * GraphQL and Absinthe
 ## External Libraries
 * Emailing & Swoosh

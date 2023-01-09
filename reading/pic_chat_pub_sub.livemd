@@ -350,31 +350,66 @@ end
 
 Open http://localhost:4000 in two different browser tabs. Create a message and notice that it appears in real-time on both tabs.
 
-While not performant, we've re-retrieved the full list of messages for demonstration purposes. To improve performance, we could make a more specific handler to simply prepend the message to our current list of messages.
-
-We'll leave the demonstration code simple, but here's an example of how you could achieve this functionality.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-# Specific event handler (Example only)
-def handle_info(%{topic: "messages", event: "create_message", payload: message}, socket) do
-  {:noreply, assign(socket, :messages, [message | socket.assigns.messages])}
-end
-
-# Generic handler
-def handle_info(%{topic: "messages"}, socket) do
-  {:noreply, assign(socket, :messages, list_messages())}
-end
-```
-
 <!-- livebook:{"break_markdown":true} -->
 
-### Your Turn: Broadcast "update_message" and "delete_message"events
+### Your Turn: Broadcast "update_message" and "delete_message" Events
 
 You're going to broadcast a message every time you update or delete a chat message. Your list of messages displayed on http://localhost:4000 should update in real time.
 
 See [PicChat](https://github.com/DockYard-Academy/pic_chat) on the `pubsub` branch for reference.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+Broadcast after successfully editing a message in `form_component.ex`.
+
+```elixir
+defp save_message(socket, :edit, message_params) do
+  case Chat.update_message(socket.assigns.message, message_params) do
+    {:ok, message} ->
+      PicChatWeb.Endpoint.broadcast("messages", "update_message", message)
+
+      {:noreply,
+        socket
+        |> put_flash(:info, "Message updated successfully")
+        |> push_redirect(to: socket.assigns.return_to)}
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      {:noreply, assign(socket, :changeset, changeset)}
+  end
+end
+```
+
+Broadcast when deleting a message with the `"delete"` event in `index.ex`.
+Either you can omit the assigning of `:messages` to the socket (this is our preferred solution to avoid issues in the next infinite-scroll lesson)
+
+```elixir
+@impl true
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+  {:ok, _} = Chat.delete_message(message)
+
+  PicChatWeb.Endpoint.broadcast("messages", "delete_message", id)
+
+  # assigning :messages is no longer necessary, as the `"messages"` event handler retrieves the new list of messages.
+  {:noreply, socket}
+end
+```
+
+Alternatively, you could use `broadcast_from/4`, then handle the current LiveView individually.
+
+```elixir
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+  {:ok, _} = Chat.delete_message(message)
+
+  PicChatWeb.Endpoint.broadcast_from(self(), "messages", "delete_message", id)
+
+  {:noreply, assign(socket, :messages, list_messages())}
+end
+```
+
+</details>
 
 ## Further Reading
 
@@ -388,27 +423,6 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Up Next
 
-| Previous                                                 | Next                                             |
-| -------------------------------------------------------- | -----------------------------------------------: |
-| [Pic Chat Messages](../reading/pic_chat_messages.livemd) | [Rubber Ducky](../exercises/rubber_ducky.livemd) |
-
-## Commit Your Progress
-
-Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
-Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
-
-```
-$ git checkout main
-$ git checkout -b exercise-/home/brook/dockyard/curriculum/reading/pic_chat_pub_sub.livemd
-$ git add .
-$ git commit -m "finish pic chat pub sub section"
-$ git push origin exercise-/home/brook/dockyard/curriculum/reading/pic_chat_pub_sub.livemd
-```
-
-Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
-
-**DockYard Academy Students Only:**
-
-Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
-
-If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+| Previous                                                         | Next                                                                   |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------: |
+| [Pic Chat Image Upload](../reading/pic_chat_image_upload.livemd) | [Pic Chat Infinite Scroll](../reading/pic_chat_infinite_scroll.livemd) |
