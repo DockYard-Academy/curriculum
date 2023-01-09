@@ -317,7 +317,7 @@ mix ecto.reset
 
 We could simply implement page buttons that would control the page of data to render. There's nothing wrong with this solution, however we're going to take the opportunity to learn more about JavaScript Interoperability by implementing infinite scroll.
 
-Infinite scroll is a feature you should already be familiar with by using sites such as YouTube. Essentially, an application displays a list of elements and loads more elements everytime the user scrolls to the bottom of the list.
+Infinite scroll is a feature you should already be familiar with by using sites such as YouTube. Essentially, an application displays a list of elements and loads more elements every time the user scrolls to the bottom of the list.
 
 We'll need to use the JavaScript `"scroll"` event to listen for when we've scrolled close to the bottom of our list of messages. We'll then send a `"load-more"` event from our JavaScript client to our server that causes the server to load more messages.
 
@@ -348,7 +348,7 @@ We'll define an `InfiniteScroll` hook in `app.js`. Hooks belong in a single Java
 
 This is not a JavaScript course. If you were solving this feature on your own, likely you would do some research and find the following snippet by [Chris McChord](https://elixirforum.com/t/how-can-i-implement-an-infinite-scroll-in-liveview/30457/2).
 
-We've simplified the snippet slighty for our purposes. The code below listens to the `"scoll"` event when our element mounts, and sends a `"load-more"` event when the downward scroll percentage is greater than `90%`.
+We've simplified the snippet slightly for our purposes. The code below listens to the `"scroll"` event when our element mounts, and sends a `"load-more"` event when the downward scroll percentage is greater than `90%`.
 
 Add the following hook in `app.js`.
 
@@ -397,7 +397,7 @@ So, we divide the number of pixels that the element is currently scrolled vertic
 
 For example, if the element is scrolled down `300` pixels and the total height of the element's content is `1000` pixels, with an inner height of `500` pixels, the scroll position would be `30%` $(300 / (1000 - 500) * 100)$.
 
-## The load-more event
+## The Load-more Event
 
 Our client now sends a `"load-more"` event to our server whenever we scroll down in the list of messages. We'll handle this `"load-more"` event by getting the next page of messages.
 
@@ -539,7 +539,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### handleEvent
+### HandleEvent
 
 We can then handle the event in our JavaScript `InfiniteScroll` hook to add a `"highlight"` class to the message matching the id.
 
@@ -612,10 +612,10 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout main
-$ git checkout -b exercise-/home/brook/dockyard/curriculum/reading/pic_chat_pub_sub.livemd
+$ git checkout -b exercise-pic_chat_infinite_scroll
 $ git add .
-$ git commit -m "finish pic chat pub sub section"
-$ git push origin exercise-/home/brook/dockyard/curriculum/reading/pic_chat_pub_sub.livemd
+$ git commit -m "finish pic chat infinite scroll section"
+$ git push origin exercise-pic_chat_infinite_scroll
 ```
 
 Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
