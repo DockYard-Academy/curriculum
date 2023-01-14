@@ -44,7 +44,7 @@ defmodule Mailbox do
   end
 
   def send(mailbox_pid, mail) do
-    GenServer.call(mailbox_pid, {:mail, mail})
+    GenServer.cast(mailbox_pid, {:mail, mail})
   end
 
   def all_messages(mailbox_pid) do
@@ -129,7 +129,7 @@ defmodule Mailbox do
 
   ## Examples
 
-      iex> {:ok, pid} = GenServer.start_link(Mailbox, [])
+      iex> {:ok, _pid} = GenServer.start_link(Mailbox, [])
   """
   @impl true
   def init(state) do
