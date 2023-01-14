@@ -18,25 +18,48 @@ Mix.install([
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively,
 you can evaluate the Elixir cells as you read.
 
-## Source Control
+## Overview
 
-Source control allows us to maintain several different versions of a codebase. Source control makes it easier
-to share and collaborate on code.
+### Version Control
 
-Projects share a **main** branch. Then developers working on the project can submit changes to the main branch.
-These changes are called a **commit**.
+Version control is the management of changes to files, typically source code, configuration files and documentation, over time. The purpose of source control is to keep track of the changes made to the files, who made the changes, when the changes were made, and why the changes were made. This allows for easy collaboration, rollback of changes, and the ability to easily manage and maintain different versions of the codebase.
 
-Source control also provides a **history** of the changes made to a project along
-with associated descriptions of the change.
+<!-- livebook:{"break_markdown":true} -->
 
-There are many source control tools. The industry standard is **Git** and **GitHub**.
+### Git
 
-## Git
+Git is a distributed version control system (VCS) used for tracking changes in source code during software development. It allows multiple developers to work on the same codebase simultaneously, and keeps track of the changes made by each developer.
 
-Git is a locally installed program on your computer. If you installed [GitHub Desktop](https://desktop.github.com/)
-you should already have Git installed on your computer.
+Git provides a number of features that make it a popular VCS, such as being able to roll back changes, view the history of the codebase, and merge different versions of the code together. It also allows for easy collaboration and sharing of code between developers.
 
-Enter the following into the command line to confirm you have Git installed. You should see a similar output.
+It's widely used for open-source and closed-source projects, and it's the default VCS for many platforms such as GitHub, GitLab, and Bitbucket.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Local and Remote
+
+With Git, developers can work on their own copies of the code, known as "local repositories", and then "commit" their changes to a "remote repository" which can be shared among the team members. It also allows for easy branching, which allows developers to work on new features or bug fixes without affecting the main codebase.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### GitHub
+
+GitHub is a web-based platform that provides hosting for software development and a community of developers to collaborate and contribute to open-source and closed-source projects. It is built on top of Git and provides a user-friendly interface for developers to manage their code.
+
+GitHub provides several key features for developers, including:
+
+* **Repositories**: Developers can create and host their code in individual "repositories" on GitHub, which can be easily shared and collaborated on with other developers. These repositories can be **public** or **private**.
+* **Collaboration**: Developers can easily collaborate on code by "forking" a repository, making changes, and then submitting those changes back to the original repository through a "pull request".
+* **Issues**: Developers can track and manage bugs, feature requests, and other tasks by creating "issues" within a repository.
+* **Pull requests (PRs)**: Developers can submit changes to a repository by creating a "pull request", which can be reviewed and approved by other members of the development team.
+  Branching: Developers can create and work on multiple branches of a repository, allowing them to work on different features or bug fixes without affecting the main codebase.
+* **Wiki**: Developers can create a wiki for their repository to provide documentation and other information about the codebase.
+
+## Install Git
+
+Git is a locally installed program on your computer. Git comes pre-installed on macOS and Linux operating systems. If you use Windows, you'll have to [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+Enter the following into the command line to confirm you have Git installed. You should see a similar output, but likely with a different git version.
 
 ```sh
 $ git --version
@@ -45,17 +68,16 @@ git version 2.25.1
 
 You can use Github Desktop, the command line, or a source control extension in your code editor for interacting with Git.
 
-## GitHub
+However, we generally provide instructions in this course using the command line and the code editor.
 
-[GitHub](https://github.com/) hosts your git projects and provides tools for easier collaboration with Git.
+## Create a GitHub Account
 
-For example, this entire project is on GitHub. It is a **public** repository meaning that anyone can view the code and
-request to make a pull request. However, only **contributors** with valid permission can approve those changes.
+You'll use [GitHub](https://github.com/) to store the source code for your git managed projects.
+You'll also use GitHub to collaborate on projects with others students, and receive feedback from your teacher.
 
-**public** repositories
-are generally called **open-source projects** if they accept changes from other developers.
+Since you already have this course running, you likely already have a GitHub Account. If not, you can [Create a GitHub Account](https://docs.github.com/en/get-started/signing-up-for-github/signing-up-for-a-new-github-account). Remember that your GitHub is your public face in the code community. You'll want to ensure you represent yourself well, as it may be seen by future employers and co-workers.
 
-Alternatively **private** repositories can only be seen and modified by authorized users.
+Out of the box, GitHub may ask you to enter your user credentials when running common commands. This can become tedius, and if you experience this, we recommend you [Setup SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) or use an alternative method to avoid tediously r-entering your credentials.
 
 ## Raising An Issue
 
@@ -252,36 +274,11 @@ Remote --git clone--> Local
 
 There are many methods for cloning a remote repository onto your computer.
 
-### GitHub Desktop
-
-[GitHub Desktop](https://docs.github.com/en/desktop/contributing-and-collaborating-using-github-desktop/adding-and-cloning-repositories/cloning-and-forking-repositories-from-github-desktop)
-is the most straightforward way to clone a repository.
-
-On a GitHub repository, click the **Code** button to see your options for cloning.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/git_clone_button.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Click the **Open with Github Desktop** button, enter a valid **Local path** and click **Clone**.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/github_desktop_clone_example.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Now you should be able to follow these steps with any GitHub repository to clone the project to
-your computer.
-
 <!-- livebook:{"break_markdown":true} -->
 
 ### Cloning With the Command Line
 
-Many developers prefer using the command line rather than the GitHub desktop.
-You can use HTTPS, SSH, or the Github CLI.
+Many developers prefer using the command line using either HTTP, SSH, or the GitHub CLI.
 
 You can find instructions for each method on GitHub:
 
@@ -362,8 +359,7 @@ It's beyond the scope of this course, but you can [learn more here](https://gith
 
 Clone your `github_example` project onto your computer under a new name `github_example2`.
 
-To clone a project under a new name, either select a new location in the GitHub desktop UI or provide
-a new name to `git clone`.
+To clone a project under a new name provide a new name to the `git clone` command.
 
 ```
 $ git clone <url> github_example2
@@ -598,6 +594,13 @@ You should see that there are merge conflicts.
 Use Visual Studio Code to resolve the conflicts by accepting both changes.
 
 Stage, commit, and push your resolved changes.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Git Documentation and Guides](https://git-scm.com/)
+* [GitHub Documentation and Guides](https://docs.github.com/en)
 
 ## Up Next
 
