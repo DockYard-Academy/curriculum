@@ -25,6 +25,7 @@
             beam.packages.erlangR25.elixir_1_14
           ];
           shellHook = ''
+              export LOCALE_ARCHIVE=${pkgs.glibcLocales}/lib/locale/locale-archive
               export MIX_HOME=$PWD/.nix_mix
               export HEX_HOME=$PWD/.nix_hex
               export PATH=$MIX_HOME/bin:$PATH
