@@ -26,7 +26,7 @@ but for now, we'll see how Ecto helps to interact with data.
 In addition to being the layer that we use to communicate with the database,
 Ecto is powerful for validating data. So far, you've created structs with their own (limited) data validation.
 
-Structs allow you to enforce keys and write validation functions or guards.
+Structs are not always ideal for validating, as they only allow us to enforce keys. We then have to write functions with data validation or guards.
 
 ```elixir
 defmodule Person do
@@ -45,7 +45,7 @@ defmodule Person do
 end
 ```
 
-Then the struct typically returns an `{ok, struct}` tuple or an `{:error, message}` tuple.
+Struct creation functions typically returns an `{ok, struct}` tuple or an `{:error, message}` tuple.
 
 ```elixir
 # Valid params
@@ -55,15 +55,13 @@ Then the struct typically returns an `{ok, struct}` tuple or an `{:error, messag
 {:error, :invalid_params} = Person.new(%{name: ["invalid name"], age: 20})
 ```
 
-However, this is pretty clunky, especially as the struct gets larger and validations
-grow in complexity.
+As the struct grows in complexity, this solution does not always scale well. That's because structs don't have any built-in data validation other than enforcing keys.
 
-Structs don't have any built-in data validation other than enforcing keys.
-Ecto helps us validate data with **changeset** structs.
+As an alternative, we can use [Ecto Changesets](https://hexdocs.pm/ecto/Ecto.Changeset.html) to validate data.
 
 ## Changesets
 
-An [`Ecto.Changeset`](https://hexdocs.pm/ecto/Ecto.Changeset.html) struct allows us to validate data and return helpful error messages when something is invalid.
+An [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) struct allows us to validate data and return helpful error messages when something is invalid.
 
 A changeset describes the expected shape of your data and ensures that data conforms to the desired shape.
 
@@ -115,10 +113,10 @@ the allowable types, see the [Primitive Types](https://hexdocs.pm/ecto/Ecto.Sche
 
 ```elixir
 initial_data = %{}
-
 params = %{name: "Peter", age: 22}
 types = %{name: :string, age: :integer}
 keys = [:name, :age]
+
 changeset = Ecto.Changeset.cast({initial_data, types}, params, keys)
 ```
 
@@ -184,6 +182,8 @@ changeset =
 Let's take the `User` example from above. A `User` should have a `username` between `3` and `40` characters,
 a password greater than `10` characters, and should accept our `:terms_and_conditions`.
 
+Here's an example with invalid data. Notice there is a list of `errors` on the returned changeset.
+
 ```elixir
 initial_data = %{}
 
@@ -196,12 +196,12 @@ invalid_changeset =
   {initial_data, types}
   |> Ecto.Changeset.cast(params, keys)
   |> Ecto.Changeset.validate_required([:username, :password])
-  |> Ecto.Changeset.validate_length(:password, min: 10)
   |> Ecto.Changeset.validate_length(:username, min: 3, max: 40)
+  |> Ecto.Changeset.validate_length(:password, min: 10)
   |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
 ```
 
-When the user enters the correct `params`, the changeset will be valid.
+Here's an example with valid params. Notice there are no `errors` on the changeset.
 
 ```elixir
 initial_data = %{}
@@ -213,8 +213,8 @@ keys = [:username, :password, :terms_and_conditions]
 valid_changeset =
   Ecto.Changeset.cast({initial_data, types}, params, keys)
   |> Ecto.Changeset.validate_required([:username, :password])
-  |> Ecto.Changeset.validate_length(:password, min: 10)
   |> Ecto.Changeset.validate_length(:username, min: 3, max: 40)
+  |> Ecto.Changeset.validate_length(:password, min: 10)
   |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
 ```
 
@@ -274,35 +274,50 @@ keys = [:title, :content]
 
 ## Schemaless Changesets
 
-We often store the associated changeset and validations inside of a struct. The struct typically has a `changeset/2` function
-to create the changeset and a function `new/1` that creates a struct. This allows us to use a changeset to validate
-the creation of a struct.
+We often store the associated changeset and validations inside of a module that defines a struct. Conventionally, the module defines a `changeset/2` function
+to create the changeset and `new/1` function to create the struct instance.
 
-We've reorganized the same code as above into a `User` struct rather than a generic map. Everything mostly remains unchanged other than putting `types` into an `@types` module attribute and using `Map.keys(@types)` to
-get the list of keys.
+This module is called a [Schemaless Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-schemaless-changesets). The Schema is a concept we'll return to when we cover Databases.
+
+For now, know that we can rely on the [Schemaless Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-schemaless-changesets) to validate data before creating an instance of the struct.
+
+Here's an example, taken by converting the `User` struct above to use a schemaless changeset.
 
 ```elixir
 defmodule User do
+  # Define the struct for User with fields :username, :password, and :terms_and_conditions
   defstruct [:username, :password, :terms_and_conditions]
 
+  # Define the types for the fields in the struct
   @types %{username: :string, password: :string, terms_and_conditions: :boolean}
 
+  # Define the changeset function for a User struct
   def changeset(%User{} = user, params) do
+    # Cast the user struct and the types defined earlier with the keys from the params map
     {user, @types}
     |> Ecto.Changeset.cast(params, Map.keys(@types))
+    # Validate that the username and password fields are present
     |> Ecto.Changeset.validate_required([:username, :password])
+    # Validate that the password field is at least 10 characters long
     |> Ecto.Changeset.validate_length(:password, min: 10)
+    # Validate that the username field is between 3 and 40 characters long
     |> Ecto.Changeset.validate_length(:username, min: 3, max: 40)
+    # Validate that the terms_and_conditions field is accepted
     |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
   end
 
+  # Define a new function for creating a new user
   def new(params) do
+    # Start with an empty User struct
     %User{}
+    # Pass the struct and the params to the changeset function
     |> changeset(params)
+    # Apply the update action to the changeset
     |> Ecto.Changeset.apply_action(:update)
   end
 end
 
+# Create a new user with the provided parameters
 User.new(%{username: "Peter Parker", password: "secret_spider", terms_and_conditions: true})
 ```
 
