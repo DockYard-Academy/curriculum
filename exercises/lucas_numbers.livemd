@@ -52,7 +52,7 @@ defmodule Lucas do
   end
 
   def sequence(length) do
-    Enum.map(1..length, &number/1)
+    Enum.map(1..length, &number(&1 - 1)
   end
 end
 
@@ -62,9 +62,17 @@ Lucas.sequence(10)
 To avoid recomputing lucas numbers over and over, we can implement `sequence/1` using [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3) instead.
 
 ```elixir
-def sequence(length) do
+def sequence(length) when length == 1 do
+  [2]
+end
+
+def sequence(length) when length == 2 do
+  [2, 1]
+end
+
+def sequence(length) when length > 2 do
   {_, _, list} =
-    Enum.reduce(2..length, {2, 1, [1, 2]}, fn each, {prev2, prev1, list} ->
+    Enum.reduce(2..length-1, {2, 1, [1, 2]}, fn each, {prev2, prev1, list} ->
       current = prev2 + prev1
       {prev1, current, [current | list]}
     end)
@@ -129,7 +137,7 @@ defmodule Lucas do
     [2, 1, 3, 4]
 
     iex> Lucas.sequence(10)
-    [2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 123]
+    [2, 1, 3, 4, 7, 11, 18, 29, 47, 76]
   """
 
   def sequence(length) do
