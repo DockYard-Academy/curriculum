@@ -36,6 +36,17 @@ JavaScript interoperability refers to the ability to call JavaScript functions f
 
 <!-- livebook:{"break_markdown":true} -->
 
+```mermaid
+flowchart
+a1[app.js]
+a2[app.js]
+start --define Hooks object--> a1
+a1 --bind phx-hook to element--> template -->a2
+a2 --Define hook logic and listeners, then push event to server --> S[LiveView] --handle event, update socket assigns, send diff --> Client
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 ### JavaScript Events
 
 JavaScript uses `listeners` to listen to triggered events on some target such as an element or the `window`. Listeners trigger a callback function whenever the specified event is delivered to the target.
@@ -150,7 +161,7 @@ For example, we connect an element with a hook using `phx-hook`.
 Then trigger the JavaScript by providing a matching `Hooks` callback object to the socket.
 The object specifies the JS to run, and the lifecycle event to trigger the JS during.
 
-```
+```javascript
 // app.js
 
 let Hooks = {
@@ -358,7 +369,6 @@ let Hooks = {
         page() { return parseInt(this.el.dataset.page) },
         // a helper function to get the current scroll percentage
         scrollAt() {
-            # 
             return this.el.scrollTop / (this.el.scrollHeight - this.el.clientHeight) * 100
         },
         mounted() {
