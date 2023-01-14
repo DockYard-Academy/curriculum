@@ -321,3 +321,19 @@ git add .
 git commit -m "associate books with authors"
 git push
 ```
+
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Question 1
+* Question 2
+* Question 3
+* Question 4
+
+## (Bonus) Further Study
+
+A student who wants to do further research beyond this material may consider the following questions as inspiration. 
+
+* Question 1
+* Question 2
