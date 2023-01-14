@@ -17,6 +17,14 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you use a struct to structure data?
+* Why might you use a struct vs a map?
+* How do you manipulate and access values in a struct?
+
 ## Structs
 
 We've learned how to abstract behavior in our programs, but what about data?
@@ -25,79 +33,53 @@ It's often useful to be able to create a custom data structure. That's what stru
 **Struct** is simply a short word for structure. They are an extension on top of maps that enforce
 constraints on your data.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Defining A Struct
 
-Let's say you're building a family tree but this time, you want to make sure that every
-`Person` has a name. You could define a struct with the `:name` key.
+We use the `defstruct` keyword to define the allowed keys in our struct. Instances of the struct will not be allowed to contain any data other than these keys.
+
+Here's an example struct called `StructName`. The name `StructName` could be any valid module name. We define `:key1`, `:key2`, and `:key3` keys for the struct. Keys in a struct should always be atoms, but they can be any valid atom.
 
 ```elixir
-defmodule Person do
-  defstruct [:name]
+defmodule StructName do
+  defstruct [:key1, :key2, :key3]
 end
 ```
 
-You'll notice that structs are defined using modules. The only new concept here is the `defstruct` construct.
+You'll notice that structs definitions are created inside of a module. We then use the module name to create an instance of the struct.
 
-`defstruct` is an Elixir keyword that means "this module is a struct". You then define a list of keys for the struct
-that will always exist on the struct.
+Keep in mind, the **struct definition** in the module is like the blueprint to a house. It contains the plans, but it's not the actual physical building.
 
-### Using A Struct
+Similarly, the **struct instance** is the actual instance of the struct. It's one instance of actual stuct data as defined by the struct definition.
 
-A struct is essentially a custom data structure that we've defined. You create instances
-using `%STRUCT{}` syntax that looks very similar to how you create a map.
+We can create an instance of as struct using `%StructName{}` syntax. This looks similar to a map, because structs are actually implemented using maps under the hood.
 
 ```elixir
-%Person{}
+%StructName{}
 ```
 
 You'll notice that the struct has a name key, but no value since we didn't provide anything.
 
-Here's how you can pass in a name.
+Here's how you can pass in a value for a given key.
 
 ```elixir
-%Person{name: "Peter Parker"}
+%StructName{key1: "value 1"}
 ```
 
-So, why not just use a map? We could easily define a similar map and it looks exactly the same.
+We can pass in values for any or all of our keys.
 
 ```elixir
-%{name: "Peter Parker"}
+%StructName{key1: "value 1", key2: "value 2", key2: "value 2"}
 ```
 
-Unlike maps, Structs provide structure to our data. We can ensure specific keys exist.
-
-For example, using a struct guarantees that certain keys exist, even if the value is `nil`. So it's always safe to use `.` syntax. Notice how `map.name` results in an error, but `struct.name` simply returns `nil`.
+If we provide an invalid value, our struct instance will raise a `KeyError`.
 
 ```elixir
-map = %{}
-map.name
+%StructName{invalid_key: "invalid key value"}
 ```
 
-```elixir
-struct = %Person{}
-struct.name
-```
-
-We also guarantee that other keys don't exist. For example, if we don't define `age` on our person struct,
-it can't be set. This helps ensure we use the data structure as intended.
-
-```elixir
-%Person{age: 20}
-```
-
-### Multiple Keys
-
-We define the keys for our struct in a list of atoms.
-
-```elixir
-defmodule Character do
-  defstruct [:name, :age]
-end
-```
-
-```elixir
-%Character{name: "Peter Parker", age: 24}
-```
+This enforcement of data shape is why we might want to use a struct instead of a map, which does not enforce which keys must be present.
 
 ## Default Values
 
@@ -170,7 +152,7 @@ end
 
 ### Your Turn
 
-Define a `Coordinate` struct which must have `:x` and `:y` keys.
+Define a `Coordinate` struct which must have `:x` and `:y` keys. Enforce these keys.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
@@ -283,19 +265,33 @@ Use the `Hero.reveal/1` function on `hero` to ensure it works correctly.
 
 ```
 
-## Updating Structs
+## Manipulating Structs
 
 Structs are an extension of maps under the hood, so you can use the same map update syntax.
 
 ```elixir
-defmodule MyUpdatableStruct do
+defmodule MyStruct do
   defstruct [:key]
 end
 ```
 
 ```elixir
-initial = %MyUpdatableStruct{key: "value"}
+initial = %MyStruct{key: "value"}
 updated = %{initial | key: "new value"}
+```
+
+You can also access values using dot notation.
+
+```elixir
+instance = %MyStruct{key: "value"}
+
+instance.key
+```
+
+However, we can't use square bracket notation. That makes sense, since a struct instance should always have the keys the struct definition defines.
+
+```elixir
+instance[:key]
 ```
 
 ## Further Reading
