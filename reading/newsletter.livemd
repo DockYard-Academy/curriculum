@@ -107,7 +107,7 @@ Install [Hackney](https://hex.pm/packages/hackney), which is a required dependen
 {:hackney, "~> 1.18"}
 ```
 
-## Send a Development Email
+## Send A Development Email
 
 ### Build the Email
 
@@ -219,7 +219,7 @@ Normally we would configure this in `runtime.ex` to only run in the `:prod` envi
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# ## Configuring the mailer
+# ## Configuring the Mailer
 #
 # In production you need to configure the mailer to use a different adapter.
 # Also, you may need to configure the Swoosh API client of your choice if you
@@ -269,7 +269,7 @@ $ SENDGRID_API_KEY=YOUR_API_KEY iex -S mix phx.server
 
 This defines the SENDGRID_API_KEY environment variable retrieved by [System.get_env/2](https://hexdocs.pm/elixir/System.html#get_env/2).
 
-## Send a Production Email
+## Send A Production Email
 
 Now send an email from the IEx shell. Replace `example@example.com` with your email address so that you can verify it's sent.
 
@@ -313,7 +313,7 @@ Visit http://localhost:4000/subscribers/new and you should see the subscriber fo
 
 Whenever we create a new newsletter subscriber we want to send them a welcome email.
 
-We can do this whenever we successfully create a subscriber from the controller. This prevents sending users an email if they did not successfuly join our subscriber list.
+We can do this whenever we successfully create a subscriber from the controller. This prevents sending users an email if they did not successfully join our subscriber list.
 
 Send an email in `subscriber_controller.ex`.
 
@@ -339,7 +339,7 @@ Send an email in `subscriber_controller.ex`.
 
 ## Environment Variables
 
-It's fairly tedious to include the SENDGRID_API_KEY everytime we start the Phoenix server. Instead, we can store or private environment configuration in files ignored by git. This keeps our secret values protected while still being convenient.
+It's fairly tedious to include the SENDGRID_API_KEY every time we start the Phoenix server. Instead, we can store or private environment configuration in files ignored by git. This keeps our secret values protected while still being convenient.
 
 There are two main methods for private environment variables that we'll cover.
 
@@ -490,7 +490,7 @@ After five seconds you should see the printed inspect value.
 PERFORMING JOB: %{"email" => "example", "name" => "example"}
 ```
 
-Now when we schedule the job, we want to send an email. We could write some code to create a custom daily email, but that's beyond the scope of this demonstration. Intead, we'll re-use the `welcome` email.
+Now when we schedule the job, we want to send an email. We could write some code to create a custom daily email, but that's beyond the scope of this demonstration. Instead, we'll re-use the `welcome` email.
 
 Replace the `perform/1` function with the following.
 
@@ -547,7 +547,7 @@ defmodule Newsletter.Workers.DailyNewsletter do
 end
 ```
 
-If you want to verify this works, change the `@day` value to a smaller number such as every `5` seconds and add an `IO.inspect/2` inside of the `perform` functions. Then, run the following in the IEx shell. Change the `name` and `email` to your own name and email.
+If you want to verify this works, change the `@day` value to a smaller number such as every `5` seconds and add an [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) inside of the `perform` functions. Then, run the following in the IEx shell. Change the `name` and `email` to your own name and email.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -580,7 +580,7 @@ Now, we want to schedule this recurring email when a user signs up. Add the foll
     end
 ```
 
-Now whenever a user subscribes to the newsletter, they will recieve a daily email!
+Now whenever a user subscribes to the newsletter, they will receive a daily email!
 
 Visit http://localhost:4000 to subscribe a user to the daily email. Keep in mind, this will only schedule jobs when our local application is running, so you don't need to worry about sending yourself a daily email.
 
@@ -604,7 +604,7 @@ Then configure Swoosh with SendGrid in `runtime.exs`. It should be towards the b
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# ## Configuring the mailer
+# ## Configuring the Mailer
 #
 # In production you need to configure the mailer to use a different adapter.
 # Also, you may need to configure the Swoosh API client of your choice if you
@@ -640,7 +640,7 @@ Clean up the project code and ensure all tests pass.
 mix test
 ```
 
-## Connect To GitHub
+## Connect to GitHub
 
 This newsletter can serve as a project for your future portfolio.
 
@@ -658,3 +658,24 @@ Consider the following resource(s) to deepen your understanding of the topic.
 | Previous                                                         | Next                                                                   |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------: |
 | [Pic Chat Image Upload](../reading/pic_chat_image_upload.livemd) | [Pic Chat Infinite Scroll](../reading/pic_chat_infinite_scroll.livemd) |
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout main
+$ git checkout -b exercise-/home/brook/dockyard/curriculum/reading/newsletter.livemd
+$ git add .
+$ git commit -m "finish newsletter section"
+$ git push origin exercise-/home/brook/dockyard/curriculum/reading/newsletter.livemd
+```
+
+Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
