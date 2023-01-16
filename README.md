@@ -195,8 +195,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Built-in Modules
 * Reduce
 * Dates and Time
-* Advanced Pattern Matching
-* Guards
 * String Manipulation
 ## Mix Projects
 * Elixir Build Tooling
@@ -205,6 +203,8 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Documentation and Static Analysis
 * Executables
 ## OTP and Advanced Syntax
+* Advanced Pattern Matching
+* Guards
 * Protocols
 * Recursion
 * Benchmarking and Performance
