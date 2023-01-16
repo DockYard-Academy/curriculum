@@ -19,7 +19,142 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* When and why might we use enumeration in programming?
+* How do we transform every element in an enumerable?
+* How do we remove elements from an enumerable?
+* How do we use every element in an enumerable to build an acculumator and return a transformed value?
+
 ## Overview
+
+### Enumeration
+
+Enumeration is the act of looping through elements. Unlike iteration, which you may have encountered in other programming languages, enumeration does not allow you to change (mutate) elements in the original collection.
+
+For example, we could enumerate through a list of numbers from one to five, and transform them into a new list of doubled numbers.
+
+```mermaid
+flowchart
+subgraph Original
+  direction LR
+  1 --- 2 --- 3 --- 4 --- 5
+end
+subgraph Transformed
+  direction LR
+  T2[2] --- T4[4] --- T6[6] --- T8[8] --- T10[10]
+end
+
+Original --> Transformed
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### `Enum`
+
+The Elixir `Enum` module contains functions for using enumeration with enumerable data structures.
+
+For example, there is the `Enum.map/2` function for applying a transformation function to each element in an enumerable.
+
+```elixir
+Enum.map([1, 2, 3, 4, 5], fn element -> element * 2 end)
+```
+
+### Enumerable
+
+Certain data types in Elixir implement the [Enumerable](https://hexdocs.pm/elixir/Enumerable.html) protocol. That means these we can enumerate through elements in these enumerable data types.
+
+Most enumerables are collections, but not all of them. For example a range doesn't contain other elements, but it is enumerable.
+
+```elixir
+Enum.map(1..5, fn element -> element * 2 end)
+```
+
+### Collections
+
+Data types that store other elements are often referred to as **collections**. For example, maps, lists, keyword lists, and tuples are all collections.
+
+Many collections are enumerable, but not all of them. For example, a tuple is not enumerable.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### map, filter, and reduce
+
+`Enum.map/2`, `Enum.filter/2`, and `Enum.reduce/2` are the most common functions for enumeration. By understanding these functions and when to use them, you'll be able to solve most enumeration problems.
+
+* `Enum.map/2` returns the same number of elements with a transformation applied to each.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+subgraph map
+  direction LR
+  subgraph input
+    direction LR
+    im1((1)) --> im2((2)) --> im3((3))
+  end
+  subgraph output
+    direction LR
+    om1[2] --> om2[4] --> om3[6]
+  end
+  input --"Enum.map(1..3, fn el -> el * 2 end)"--> output
+end
+```
+
+```elixir
+Enum.map(1..3, fn el -> el * 2 end)
+```
+
+* `Enum.filter/2` removes element(s) from an enumerable without transforming them.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+subgraph map
+  direction LR
+  subgraph input
+    direction LR
+    im1((1)) --> im2((2)) --> im3((3))
+  end
+  subgraph output
+    direction LR
+    om1((1)) --> om2((2))
+  end
+  input --"Enum.filter(1..3, fn el -> el <= 2 end)"--> output
+end
+```
+
+```elixir
+Enum.filter(1..3, fn el -> el <= 2 end)
+```
+
+* `Enum.reduce/2` uses the elements in an enumerable to build an accumulated value and return a transformed data structure.
+
+```mermaid
+flowchart
+subgraph map
+  direction LR
+  subgraph input
+    direction LR
+    im1((1)) --> im2((2)) --> im3((3))
+  end
+  subgraph output
+    direction LR
+    om1[[6]]
+  end
+  input --"Enum.reduce(1..3, fn el, acc -> acc + el end)"--> output
+end
+```
+
+```elixir
+Enum.reduce(1..3, fn el, acc -> acc + el end)
+```
+
+## Scenario
 
 Often while programming, you run into problems where you need the ability
 to do something many many times.
@@ -191,7 +326,7 @@ ranges without needing to define every element in the list.
 Enum.map(1..100, fn integer -> integer * 2 end)
 ```
 
-[Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) accepts any enumerable collection, and always returns a list, regardless of the input.
+[Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) accepts any enumerable, and always returns a list, regardless of the input.
 
 **keyword lists** and **maps** will be treated as lists of tuples for the sake of enumeration.
 
@@ -266,7 +401,7 @@ The function you provide as the second argument of [Enum.reduce/2](https://hexdo
 
 The first value in the collection will be the initial accumulator value.
 
-<!-- livebook:{"attrs":{"source":"frames = [\n      \"\nFirst, we define the call the [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) function with a list, and a function.\n```elixir\nEnum.reduce([1, 2, 3, 4], fn integer, accumulator -> integer + accumulator  end)\n```\n\",\n      \"\nThe first element in the list `1` is the initial accumulator value.\n```elixir\nEnum.reduce([2, 3, 4], fn integer, 1 -> integer + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `2`. The next accumulator is 2 + 1\n```elixir\nEnum.reduce([3, 4], fn 2, 1 -> 2 + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `3`. The next accumulator is 3 + 3\n```elixir\nEnum.reduce([4], fn 3, 3 -> 3 + 3  end)\n```\n\",\n      \"\nThe function is called on the next element `4`. The next accumulator is 4 + 6\n```elixir\nEnum.reduce([], fn 4, 6 -> 4 + 6  end)\n```\n\",\n      \"\n4 + 6 equals 10.\n```elixir\nEnum.reduce([], fn 4, 6 -> 10  end)\n```\n\",\n      \"\n`10` is the last accumulator value, so [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) returns `10`.\n```elixir\n                           10\n```\n\"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Kino.Markdown.new(Enum.at(frames, i))\nend)","title":"Reduce"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"frames = [\n      \"\nFirst, we define the call the [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) function with a list, and a function.\n```elixir\nEnum.reduce([1, 2, 3, 4], fn integer, accumulator -> integer + accumulator  end)\n```\n\",\n      \"\nThe first element in the list `1` is the initial accumulator value.\n```elixir\nEnum.reduce([2, 3, 4], fn integer, 1 -> integer + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `2`. The next accumulator is 2 + 1\n```elixir\nEnum.reduce([3, 4], fn 2, 1 -> 2 + 1  end)\n```\n\",\n      \"\nThe function is called on the next element `3`. The next accumulator is 3 + 3\n```elixir\nEnum.reduce([4], fn 3, 3 -> 3 + 3  end)\n```\n\",\n      \"\nThe function is called on the next element `4`. The next accumulator is 4 + 6\n```elixir\nEnum.reduce([], fn 4, 6 -> 4 + 6  end)\n```\n\",\n      \"\n4 + 6 equals 10.\n```elixir\nEnum.reduce([], fn 4, 6 -> 10  end)\n```\n\",\n      \"\n`10` is the last accumulator value, so [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2) returns `10`.\n```elixir\n                           10\n```\n\"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Kino.Markdown.new(Enum.at(frames, i))\nend)","title":"Reduce"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ````elixir
 frames = [
