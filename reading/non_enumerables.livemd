@@ -17,13 +17,31 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-## Enumeration With Non-Enumerables
+## Learning Outcomes
 
-Data types that do not contain multiple elements are not enumerable.
-However, it's still sometimes useful to enumerate over non-enumerable data types.
+Upon completing this lesson, a student should be able to answer the following questions.
 
-Even though we can't enumerate over them directly, the trick is to convert
-non-enumerable data into an enumerable data type, then convert them back if necessary.
+* What are some examples of non-enumerable vs enumerable data structures?
+* How do you enumerate over non-enumerable data structures?
+* How do you convert non-enumerable data structures into enumerable data structures?
+
+## Overview
+
+### Non-Enumerables
+
+Non-enumerable data types are any data type that does not implement the [Enumerable](https://hexdocs.pm/elixir/Enumerable.html) protocol. For example, integers, floats, strings, atoms, and tuples are all not enumerable.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Enumeration With Non-Enumerables
+
+To use enumeration with a non-enumerable data type, we need to convert the data into an enumerable data type.
+
+For example, we could convert a string `"abc"` into a list of characters `["a", "b", "c"]` if we wanted to enumerate over each character.
+
+## Converting Non-Enumerables Into Enumerables
+
+While we can't enumerate over non-enumerable data types, Elixir provides many functions we can use to convert non-enumerable data types into enumerable data types.
 
 ## Integers
 
@@ -162,35 +180,52 @@ joined_string = Enum.join(transformed_list)
 
 ### Your Turn
 
-Start with a string such as `"hello"`. Use enumeration to double every character in the string so the `"hello"` would become `"hheelllloo"`.
+Create a `CharacterCount` module that can count the number of characters in a string.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```elixir
-split_string = String.split("hello", "")
-
-doubled_string = Enum.map(split_string, fn char -> char <> char end)
-
-Enum.join(doubled_string)
-```
-
-You might also use the pipe operator.
-
-```elixir
-"hello"
-|> String.split("")
-|> Enum.map(fn char -> char <> char end)
-|> Enum.join()
+defmodule CharacterCount do
+  def count(string) do
+    string
+    |> String.split("", trim: true)
+    |> Enum.count()
+  end
+end
 ```
 
 </details>
 
-Enter your solution below.
-
 ```elixir
+defmodule CharacterCount do
+  @moduledoc """
+  Character Count
+  """
 
+  @doc """
+  Count the number of characters in a string
+
+  ## Examples
+
+      iex> CharacterCount.count("abc")
+      3
+
+      iex> CharacterCount.count("abcd")
+      4
+  """
+  def count(string) do
+  end
+end
 ```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [DockYard Academy: Enum](./enum.livemd)
+* [Elixir Schools: Enum](https://elixirschool.com/en/lessons/basics/enum)
+* [Elixir-lang: Enumerables](https://elixir-lang.org/getting-started/enumerables-and-streams.html#enumerables)
 
 ## Commit Your Progress
 

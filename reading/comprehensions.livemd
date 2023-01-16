@@ -17,6 +17,53 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* When should we use comprehensions vs `Enum`?
+* How do we create a comprehension using generators, filters, and collectables?
+
+## Overview
+
+### Comprehensions
+
+Comprehensions are a convenient way to create new lists, maps, or sets by iterating over an existing collection and applying a set of transformations. They are similar to the `Enum.map/2`, `Enum.filter/2`, and `Enum.reduce/2` functions but with a more concise syntax.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Generators
+
+A generator is an enumerable the comprehension will enumerate over to produce some output.
+
+```elixir
+generator = 1..3
+
+for element <- generator do
+  element * 2
+end
+```
+
+### Filters
+
+A filter is a true/false condition the generator uses to determine which elements should remain.
+
+```elixir
+for element <- 1..3, element >= 2 do
+  element
+end
+```
+
+### Collectable
+
+By default, a comprehension collects the result into a list. However, we can specify the data structure to collect the result into using the `:into` collector.
+
+```elixir
+for element <- 1..3, into: "" do
+  "#{element}"
+end
+```
+
 ## Comprehensions
 
 Let's try to comprehend comprehensions..sorry 🤦‍♂️.
@@ -40,7 +87,7 @@ my_comprehension =
 List.to_tuple(my_comprehension)
 ```
 
-A comprehension can even be piped into another function.
+A comprehension can even be piped into another function. This isn't usually idomatic, but it's possible.
 
 ```elixir
 for each <- 1..10 do
@@ -57,7 +104,6 @@ sum = 0
 
 for each <- 1..100 do
   sum = sum + each
-  sum
 end
 
 sum
@@ -172,7 +218,7 @@ each generator creates another nested loop and therefore has a significant perfo
 
 ### Your Turn
 
-In the Elixir cell below, use a comprehension to create a list of even integers from `2` to `100`.
+In the Elixir cell below, use a comprehension with a generator of `1..50` to create a list of even integers from `2` to `100`.
 
 ```elixir
 
@@ -186,6 +232,7 @@ For example, we could omit all values not divisible by 3.
 The comprehension will filter out all values that do not return `true` for the filter function.
 
 ```elixir
+# finds all values in 1..100 divisible by 3
 for n <- 1..100, rem(n, 3) === 0 do
   n
 end
@@ -228,26 +275,43 @@ end
 
 ### Your Turn
 
-In the Elixir cell below, create a comprehension with a filter that generates every combination
-of 2 numbers up to 6 that equal 7.
+You are given three generators that are ranges of numbers from `1..7`.
 
-```mermaid
-flowchart
-1 --- 6
-2 --- 5
-3 --- 4
-4b[4] --- 3b[3]
-5b[5] --- 2b[2]
-6b[6] --- 1b[1]
-```
-
-<!-- livebook:{"break_markdown":true} -->
+Find every trio of numbers in each range that when added together equals seven.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-[{1, 6}, {2, 5}, {3, 4}, {4, 3}, {5, 2}, {6, 1}]
+# expected output
+[
+  {1, 1, 5},
+  {1, 2, 4},
+  {1, 3, 3},
+  {1, 4, 2},
+  {1, 5, 1},
+  {2, 1, 4},
+  {2, 2, 3},
+  {2, 3, 2},
+  {2, 4, 1},
+  {3, 1, 3},
+  {3, 2, 2},
+  {3, 3, 1},
+  {4, 1, 2},
+  {4, 2, 1},
+  {5, 1, 1}
+]
 ```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+for a <- 1..7, b <- 1..7, c <- 1..7, a + b + c == 7 do
+  {a, b, c}
+end
+```
+
+</details>
 
 ```elixir
 
@@ -296,20 +360,36 @@ This includes strings!
 for n <- 1..10, do: "#{n}", into: ""
 ```
 
+Using a collector can be useful when we're using a comprehension with a non-list enumerable data type, for example when transforming maps.
+
+```elixir
+for {key, value} <- %{a: 1, b: 2}, into: %{} do
+  {key, value * 2}
+end
+```
+
 ### Your Turn
 
-In the Elixir cell below, create a comprehension that returns a map of letters `abcd` and their
-code points.
+Given the generator `%{a: 1, b: 2}`, use a comprehension with a collector to convert an atom-key map into a string key map.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-%{"a" => 97, "b" => 98, "c" => 99, "d" => 100}
+# input
+%{a: 1, b: 2}
+# output
+%{"a" => 1, "b" => 2}
 ```
 
-<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
-<summary>Hint</summary>
-You can use <code>:binary.first/1</code> to convert a variable bound to a string to a codepoint.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+for {key, value} <- %{a: 1, b: 2}, into: %{} do
+  {"#{key}", value}
+end
+```
+
 </details>
 
 ```elixir
@@ -324,6 +404,8 @@ Consider using comprehensions as a refactoring tool to improve the clarity of yo
 
 Avoid over relying on comprehensions, especially if you're from an Object Oriented Programming background and feel tempted to use comprehensions because they feel like for loops. Comprehensions are not for loops! Instead, consider using comprehensions to refactor and improve your code after you've already written it.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
 In the Elixir cell below, convert the following `Enum.map` into a comprehension.
@@ -332,7 +414,6 @@ In the Elixir cell below, convert the following `Enum.map` into a comprehension.
 
 ```elixir
 Enum.map(1..5, fn each -> each * 2 end)
-[2, 4, 6, 8, 10]
 ```
 
 ```elixir
@@ -345,7 +426,6 @@ In the Elixir cell below, convert the following `Enum.reduce` into a comprehensi
 
 ```elixir
 Enum.reduce(["a", "b", "c"], fn each, acc -> acc <> each end)
-"abc"
 ```
 
 ```elixir
@@ -358,7 +438,6 @@ In the Elixir cell below, convert the following nested `Enum.map` into a compreh
 
 ```elixir
 Enum.map(1..3, fn a -> Enum.map(1..3, fn b -> {a, b} end) end)
-[[{1, 1}, {1, 2}, {1, 3}], [{2, 1}, {2, 2}, {2, 3}], [{3, 1}, {3, 2}, {3, 3}]]
 ```
 
 ```elixir
