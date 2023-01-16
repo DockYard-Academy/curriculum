@@ -1,4 +1,4 @@
-# Pattern Matching
+# Advanced Pattern Matching
 
 ```elixir
 Mix.install([
@@ -17,153 +17,324 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
-## Pattern Matching
+## Learning Outcomes
 
-We've already used pattern matching for matching values in a data structure.
+Upon completing this lesson, a student should understand:
 
-```elixir
-[_, two, _] = [1, 2, 3]
+* How to achieve polymorphism with multiple function heads and case statements.
+* How to simpify our program's control-flow using polymorphism.
+* How to use pattern matching with enumeration.
 
-two
+## Overview
+
+### Polymorphism
+
+In functional programming, polymorphism refers to the ability of program to behave differently under different conditions.
+
+There are many ways to achieve polymorphism in Elixir such as pattern matching, higher-order functions, and multi-clause functions.
+
+In data-based polymorphism, a function can work with multiple types of inputs. For example, the `Enum` module is polymorphic, because it is data-agnostic and works on any enumerable data structure.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Pattern Matching
+
+Pattern matching with the `=` coerces the left side of the operator to match the right side.
+
+```
+left = right
 ```
 
-We can use pattern matching in a wide variety of other cases.
+We can use this to match on values in the right side of the expression and bind them to variables.
 
-## Pattern Matching With Case
-
-Previously, we talked about how the case statement checks for a match.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-case "same" do
-  "same" -> "this will return"
+{a, b} = {1, 2}
+```
+
+In addition to binding values, we can use pattern matching to trigger functionality.
+
+For example, when we use pattern matching with a `case` statement, we can trigger a different case clause depending on the shape of the data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+case {1, 2} -> do
+  [a, b] -> "behavior for list" 
+  {a, b} -> "behavior for tuple"
 end
 ```
 
-We're also able to use pattern matching for case statements. The first valid match will execute,
-and you can use the variables you assign in the instruction.
+See the previous reading material if you need a refresher on how to pattern match on each data type.
+
+* [Atoms](./atoms.livemd)
+* [Tuples](./tuples.livemd)
+* [Lists](./lists.livemd)
+* [Keyword Lists](./keyword_lists.livemd)
+* [Maps](./maps.livemd)
+
+## Pattern Matching with the match operator
+
+We can pattern match using the match operator.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-case [1, 2] do
-  [] -> nil
-  [one] -> one
-  [one, two] -> one + two
+{:ok, one} = {:ok, 1}
+```
+
+We're able to use the match operator in more places than you might think. Anytime we have an Elixir term bound to a parameter we can use the `=` operator. This is useful for binding the entire parameter of a function while still using pattern matching to match on values within the parameter.
+
+```elixir
+defmodule PatternParamExample do
+  def inspect([a, b, c] = param1) do
+    IO.inspect(a, label: "a")
+    IO.inspect(b, label: "b")
+    IO.inspect(c, label: "c")
+    IO.inspect(param1, label: "c")
+  end
 end
+
+PatternParamExample.inspect([1, 2, 3])
+```
+
+Sometimes we use this pattern to validate that a particular parameter is the shape of data that we expect. For example, the following confirms the parameter in the function is a `map`.
+
+```elixir
+defmodule MapsOnly do
+  def inspect(%{} = map) do
+    IO.inspect(map)
+  end
+end
+
+MapsOnly.inspect(%{})
+```
+
+Any non-map data type would crash the function with a `FunctionClauseError`.
+
+```elixir
+MapsOnly.inspect("this should crash")
+```
+
+We can do the same inside of a `case` statement, or with other data types such as lists.
+
+```elixir
+case [1, 2, 3] do
+  [head | tail] = list ->
+    IO.inspect(head, label: "head")
+    IO.inspect(tail, label: "tail")
+    IO.inspect(list, label: "list")
+end
+```
+
+We can use the match operator anytime we have a value bound to a parameter or variable that we want to match on. Pattern matching can also be used with control flow to trigger application behavior based if the pattern matches.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+Create a `case` statement that will return the first element in a 2 element tuple, or the first element in 2 element a list.
+
+```elixir
+
+```
+
+Use pattern matching to ensure the `Check.must_have_elements!/1` function returns true when called with a list that has more than one element and otherwise causes a `FunctionClauseError`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Check do
+  def must_have_elements!([_head | _tail] = list) do
+    true
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule Check do
+  @doc """
+  Doubles a list
+
+  ## Examples
+
+      iex> Check.must_have_elements!([1, 2, 3])
+      true
+
+      iex> Check.must_have_elements!([1])
+      true
+
+      iex> Check.must_have_elements!([])
+      ** (FunctionClauseError) no function clause matching in Check.must_have_elements!/1
+  """
+  def must_have_elements!(list) do
+    true
+  end
+end
+```
+
+## Pattern Matching In a Function Clause
+
+We can ommit the `=` when pattern matching in a function.
+
+```elixir
+defmodule Coords do
+  def inspect({x, y}) do
+    IO.inspect(x, label: "x axis")
+    IO.inspect(y, label: "y axis")
+  end
+end
+
+Coords.inspect({1, 2})
+```
+
+### Multi-Clause Functions
+
+We can use with pattern matching with multi-clause functions. This essentially using multi-clause functions to replicate the same behavior as a single function with a case statement.
+
+```elixir
+defmodule SingleCaseExample do
+  def run(param) do
+    case param do
+      [] -> "1"
+      [_] -> "2"
+      [_, _] -> "3"
+    end
+  end
+end
+
+SingleCaseExample.run([]) |> IO.inspect(label: "first")
+SingleCaseExample.run([1]) |> IO.inspect(label: "second")
+SingleCaseExample.run([1, 1]) |> IO.inspect(label: "third")
+```
+
+```elixir
+defmodule MultiClauseExample do
+  def run([]) do
+    "1"
+  end
+
+  def run([_]) do
+    "1"
+  end
+
+  def run([_, _]) do
+    "1"
+  end
+end
+
+MultiClauseExample.run([]) |> IO.inspect(label: "first")
+MultiClauseExample.run([1]) |> IO.inspect(label: "second")
+MultiClauseExample.run([1, 1]) |> IO.inspect(label: "third")
+```
+
+This is often used for advanced control flow.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Anonymous Functions
+
+We can also pattern match in multiple function heads in an anonymous callback function.
+
+```elixir
+anonymous_run = fn
+  [] -> "1"
+  [_] -> "2"
+  [_, _] -> "3"
+end
+
+anonymous_run.([]) |> IO.inspect(label: "first")
+anonymous_run.([1]) |> IO.inspect(label: "second")
+anonymous_run.([1, 1]) |> IO.inspect(label: "third")
 ```
 
 ### Your Turn
 
-Trigger the `"A"` case. Replace `nil` with your answer.
-
-```elixir
-case nil do
-  [_, _, 3] -> "A"
-  _ -> "default"
-end
-```
-
-## Pattern Matching Multi-Clause Functions
-
-You create multi-clause functions with pattern matching.
+Use multi-clause functions to create a `Greeter` module which says different greetings based on what's provided as input to the `hello/1` function.
 
 ```elixir
 defmodule Greeter do
-  def greet([name1, name2]) do
-    "Hello, #{name1} and #{name2}"
-  end
+  @moduledoc """
+  Greeter
+  """
 
-  def greet(%{name: name, identity: identity}) do
-    "Hi #{identity} err..I mean #{name}"
-  end
+  @doc """
+  Return different greetings based on the number of elements in the list provided.
 
-  def greet(name) do
-    "Hello, #{name}"
-  end
-end
-```
+  ## Examples
 
-The function that first pattern matches with the provided input will be executed.
+      iex> Greeter.hello(["Russel"])
+      "Hi Russel!"
 
-```elixir
-Greeter.greet("Peter")
-```
+      iex> Greeter.hello(["Icia", "Stephen"])
+      "Hi Icia, Hello Stephen!"
 
-```elixir
-Greeter.greet(["Peter", "Bruce"])
-```
-
-```elixir
-Greeter.greet(%{name: "Batman", identity: "Bruce Wayne"})
-```
-
-### Your Turn
-
-Use pattern matching to create a `Hello.everyone/1` function which only accepts a list with three or more elements.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example solution</summary>
-<code>
-defmodule Hello do
-  def everyone([_, _, _ | _tail]) do
-    "Hello, everyone!"
-  end
-end
-</code>
-</details>
-
-Enter your solution below.
-
-```elixir
-defmodule Hello do
-  def everyone(list) do
+      iex> Greeter.hello(["Swamy", "Jeff", "Jeremy"])
+      "Hello everyone!"
+  """
+  def hello(names) do
   end
 end
 ```
 
-## Pattern Matching in Anonymous Functions
+## Pattern Matching In Enumeration
 
-We can use pattern matching in anonymous functions.
-
-```elixir
-hello = fn
-  "Peter" -> "Hey Spidey!"
-  name -> "Hello, #{name}."
-end
-
-hello.("Bruce")
-```
+We can combine pattern matching in a function with enumeration to achieve polymorphic behavior with an enumerable data structure.
 
 ```elixir
-hello.("Peter")
-```
+enumerable = [double: 1, double: 2, triple: 3, quadruple: 4]
 
-Pattern matching becomes seriously powerful when leveraged with the [Enum](https://hexdocs.pm/elixir/Enum.html) module.
-
-```elixir
-list = [1, 2, 3]
-
-Enum.map(list, fn
-  1 -> "one"
-  int -> int * 2
+Enum.map(enumerable, fn
+  {:double, value} -> value * 2
+  {:triple, value} -> value * 3
+  {:quadruple, value} -> value * 4
 end)
 ```
 
-Now we can enumerate and handle different patterns of data separately.
+The same can be done with other `Enum` functions that accept a callback function such as `Enum.filter/2` and `Enum.reduce/3`.
 
 ```elixir
-list = [{:add, 4}, {:subtract, 2}, {:multiply, 2}, 10, %{add: 2}]
+enumerable = [add: 1, subtract: 2, add: 4, multiply: 3]
 
-Enum.reduce(list, 0, fn
-  {:add, int}, acc -> acc + int
-  {:subtract, int}, acc -> acc - int
-  {:multiply, int}, acc -> acc * int
-  %{add: int}, acc -> acc + int
-  int, acc -> acc + int
+Enum.reduce(enumerable, 0, fn
+  {:add, value}, acc -> acc + value
+  {:subtract, value}, acc -> acc - value
+  {:multiply, value}, acc -> acc * value
+end)
+```
+
+```elixir
+enumerable = [keep: 1, remove: 2, keep: 4, remove: 1]
+
+Enum.filter(enumerable, fn
+  {:keep, _} -> true
+  {:remove, _} -> false
 end)
 ```
 
 ### Your Turn
 
-Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) with pattern matching and multi-clause functions to double `{:double, integer}` tuples and half `{:halve, integer}` tuples in the following list.
+Create a `Converter` module which uses pattern matching with enumeration and multiple function clauses in an anonymous function to convert the a list of integers into their named string representation.
+
+```elixir
+defmodule Converter do
+  @doc """
+
+  """
+  def to_named_strings(integers) do
+  end
+end
+```
+
+### Your Turn
+
+Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2) with pattern matching and multi-clause functions to double `{:double, integer}` tuples and divide (`div`) `{:halve, integer}` tuples in the following list.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -184,7 +355,7 @@ end)
 </details>
 
 ```elixir
-[{:double, 2}, {:halve, 10}, {:double, 4}]
+
 ```
 
 ## Pattern Matching Vs. If
@@ -196,7 +367,7 @@ However, only admin users are allowed to send messages.
 Using `if`, we could write the following.
 
 ```elixir
-defmodule Message do
+defmodule MessageIfExample do
   def send(user, message) do
     if user.is_admin do
       message
@@ -210,7 +381,7 @@ end
 Let's say we also need to handle empty messages.
 
 ```elixir
-defmodule Message do
+defmodule MessageNestedIfExample do
   def send(user, message) do
     if user.is_admin do
       if message == "" do
@@ -224,7 +395,7 @@ defmodule Message do
   end
 end
 
-Message.send(%{is_admin: true}, "")
+MessageNestedIfExample.send(%{is_admin: true}, "")
 ```
 
 Nested `if` statements are generally a cue that we should consider an alternative implementation.
@@ -232,7 +403,7 @@ Nested `if` statements are generally a cue that we should consider an alternativ
 Let's see how we could solve this problem with pattern matching.
 
 ```elixir
-defmodule Message do
+defmodule MessageMatchExample do
   def send(%{is_admin: true}, "") do
     {:error, :empty_message}
   end
@@ -248,31 +419,15 @@ end
 ```
 
 ```elixir
-Message.send(%{is_admin: true}, "")
+MessageMatchExample.send(%{is_admin: true}, "")
 ```
 
 ```elixir
-Message.send(%{is_admin: false}, "Error!")
+MessageMatchExample.send(%{is_admin: false}, "Error!")
 ```
 
 ```elixir
-Message.send(%{is_admin: true}, "Successful!")
-```
-
-Pattern matching can help reduce the complexity of our control flow.
-
-Anytime that we can use multiple function clauses, we can also use a `case` statement.
-
-```elixir
-defmodule Message do
-  def send(user, message) do
-    case {user, message} do
-      {%{is_admin: true}, ""} -> {:error, :empty_message}
-      {%{is_admin: true}, message} -> message
-      {%{is_admin: false}, _} -> {:error, :not_authorized}
-    end
-  end
-end
+MessageMatchExample.send(%{is_admin: true}, "Successful!")
 ```
 
 ## Pin Operator
@@ -322,6 +477,29 @@ And the following is the same as `[1, 2, 3] = [1, 2, 3]`
 first = 1
 actual = [1, 2, 3]
 [^first, 2, 3] = actual
+```
+
+We'll also use the pin operator when triggering control flow with pattern matching. For example, we might use it in a case statement.
+
+```elixir
+pinned_value = 1
+
+case {:ok, 1} do
+  {:ok, ^pinned_value} -> "clause 1"
+  {:ok, generic_value} -> "clause 2"
+end
+```
+
+If we don't pin the value, the bound variable will be treated as though we were re-binding the variable, and the first case clause will always match.
+
+```elixir
+pinned_value = 1
+
+# despite being 2, not 1, clause 1 is triggered because we didn't pin the value.
+case {:ok, 2} do
+  {:ok, pinned_value} -> "clause 1"
+  {:ok, generic_value} -> "clause 2"
+end
 ```
 
 ### Your Turn

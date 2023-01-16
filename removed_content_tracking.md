@@ -35,7 +35,7 @@ Removed to be sorted
 
 * [Bomb Defusal](exercises/bomb_defusal.livemd)
 * [Character Generator](exercises/character_generator.livemd)
-* [DEPRECATED School Grades](exercises/DEPRECATED_school_grades.livemd)
+* [DEPRECATED School Grades](exercises/deprecated_school_grades.livemd)
 * [Journal](exercises/journal.livemd)
 * [Mining Simulator](exercises/mining_simulator.livemd)
 * [Mix Math](exercises/mix_math.livemd)
