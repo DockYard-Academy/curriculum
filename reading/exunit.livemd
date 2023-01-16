@@ -17,6 +17,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we effectively organize and name our tests?
+* How do we use assertions to write robust tests?
+
 ## Testing
 
 We test to ensure our code behaves as expected.
@@ -142,7 +149,7 @@ ExUnit.run()
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule FailingTest do
+defmodule FailingTestWithMessage do
   use ExUnit.Case
 
   test "failing example" do
@@ -267,7 +274,7 @@ string =~ "hello"
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule MapMergeTest do
+defmodule StringContainsTest do
   use ExUnit.Case
 
   test "string contains hello" do
@@ -386,7 +393,7 @@ of input and output, and assume that the system under test continues to behave a
 However, there are a potentially infinite number of inputs and outputs for the `Math.add/2` function.
 Is it safe to assume that a single example comprehensively tests all inputs?
 
-<!-- livebook:{"attrs":{"source":"for int1 <- 1..3, int2 <- 1..3 do\n  [input: int1, input: int2, output: int1 + int2]\nend\n|> Kino.DataTable.new()","title":"Example Based Testing"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"for int1 <- 1..3, int2 <- 1..3 do\n  [input: int1, input: int2, output: int1 + int2]\nend\n|> Kino.DataTable.new()","title":"Example Based Testing"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 for int1 <- 1..3, int2 <- 1..3 do
@@ -398,7 +405,7 @@ end
 For example, we can make our `NumberTest` pass with a fake solution.
 
 ```elixir
-defmodule Number do
+defmodule FakeNumber do
   def double(number) do
     if number == 2 do
       4
@@ -410,12 +417,12 @@ end
 
 ExUnit.start(auto_run: false)
 
-defmodule NumberTest do
+defmodule FakeNumberTest do
   use ExUnit.Case
 
   test "double/1" do
-    assert Number.double(2) == 4
-    assert Number.double(3) == 6
+    assert FakeNumber.double(2) == 4
+    assert FakeNumber.double(3) == 6
   end
 end
 
@@ -428,26 +435,17 @@ A robust test ensures the code behaves correctly under many scenarios.
 To improve the robustness of our tests, we could write more example-based tests or more assertions in the same test.
 
 ```elixir
-defmodule Number do
-  def double(number) do
-    if number == 2 do
-      4
-    else
-      6
-    end
-  end
-end
-
 ExUnit.start(auto_run: false)
 
-defmodule NumberTest do
+defmodule RobustNumberTest do
   use ExUnit.Case
 
   test "double/1" do
-    assert Number.double(2) == 4
-    assert Number.double(3) == 6
-    assert Number.double(4) == 8
-    assert Number.double(5) == 10
+    # now we catch that `FakeNumber` fails many test cases.
+    assert FakeNumber.double(2) == 4
+    assert FakeNumber.double(3) == 6
+    assert FakeNumber.double(4) == 8
+    assert FakeNumber.double(5) == 10
   end
 end
 
@@ -467,7 +465,7 @@ There are three primary types of tests.
 * **End to End (E2E)** tests that cover the whole system from start to finish.
 
 So far, we have only seen examples of Unit Tests. In addition, the definition of a unit is
-often hotly debated in the programming community, so the lines between integration and unit tests are blurry.
+often hotly debated in the programming community, so the lines between integration and unit tests can be blurry.
 
 We'll have the opportunity to see various types of tests. For now, it's sufficient to be aware that there are multiple types.
 
@@ -517,7 +515,7 @@ In our `Number` module example that translates to:
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-test "double/ with 2 returns 4"
+test "double/1 with 2 returns 4"
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -544,33 +542,33 @@ the goal of the test. How you do this is up to you, and many development teams d
 We can group tests into a [describe/2](https://hexdocs.pm/ex_unit/1.14.1/ExUnit.Case.html#describe/2) block. A [describe/2](https://hexdocs.pm/ex_unit/1.14.1/ExUnit.Case.html#describe/2) block organizes tests by some commonality. For example, it's common to group tests for a single function in the module under test together.
 
 ```elixir
-defmodule Number do
+defmodule OrganizedNumber do
   def double(number), do: number * 2
   def triple(number), do: number * 3
 end
 
 ExUnit.start(auto_run: false)
 
-defmodule NumberTest do
+defmodule OrganizedNumberTest do
   use ExUnit.Case
 
   describe "double/1" do
     test "1 -> 2" do
-      assert Number.double(1) == 2
+      assert OrganizedNumber.double(1) == 2
     end
 
     test "2 -> 4" do
-      assert Number.double(2) == 4
+      assert OrganizedNumber.double(2) == 4
     end
   end
 
   describe "triple/1" do
     test "1 -> 3" do
-      assert Number.triple(1) == 3
+      assert OrganizedNumber.triple(1) == 3
     end
 
     test "2 -> 6" do
-      assert Number.triple(2) == 6
+      assert OrganizedNumber.triple(2) == 6
     end
   end
 end

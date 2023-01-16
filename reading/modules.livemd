@@ -17,6 +17,16 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you define a module?
+* How do you use public vs private named functions?
+* What is scope and how does it relate to modules?
+* What is function arity?
+* How do you read module documentation and run doctests?
+
 ## Modules
 
 As you create more and more functions, it becomes necessary to organize them. That's just one of the many reasons to use a **module**. A module is more or less a "bag of functions". We use them to organize and group related functions together.
@@ -42,68 +52,61 @@ Modules define functions inside of them. Each function has a name, so they are c
 You can define functions inside a module using the following syntax.
 
 ```elixir
-defmodule Greeter do
-  def hello do
-    "hello world"
+defmodule ModuleName do
+  def function_name do
+    "return value"
   end
 end
 ```
 
 Let's break down the named function above.
 
-1. `def` this means "define function"
+1. `def` this means "define function". The function name in this example is `function_name` but it could be any valid function name.
 2. `do` a keyword that separates the function head and the function body.
-3. `"hello world"` this is the function body. This function returns the string "hello world".
+3. `"return value"` this is the function body. This function returns the string `"return value"`, but it could return any Elixir term.
 4. `end` is a keyword that ends the function definition.
 
-### Calling A Named Function
+## Calling Named Functions
 
-To call a function inside a module, you use `Module.function(arguments)` syntax.
+To call a named function, you use round brackets `()`.
 
 ```elixir
-Greeter.hello()
+ModuleName.function_name()
 ```
 
-### Named Functions With Parameters
+### Arguments and Parameters
 
-You can create multiple functions in a module.
-
-Here's a new `hi/1` function that says hi to a person.
+You can provide **arguments** to a function when you call it. These arguments are bound to **parameters** in the function definition.
 
 ```elixir
-defmodule Greeter do
-  def hello do
-    "Hello"
-  end
-
-  def hi(name) do
-    "Hi #{name}"
+defmodule ArgsAndParamsExample do
+  def call(param) do
+    IO.inspect(param, label: "Called with the following argument")
   end
 end
+
+ArgsAndParamsExample.call("argument")
 ```
 
-You call the named function in the module by passing it an argument.
+### Multiple Arguments and Params
+
+You can define multiple parameters in a function, each separated by a comma. The names of parameters follow the same naming rules as variables.
+
+We can use `binding()` to get a keyword list of all bound values. We commonly use this to conveniently inspect our code.
 
 ```elixir
-Greeter.hi("Peter Parker")
+defmodule MultiParamExample do
+  def call(param1, param2, param3) do
+    IO.inspect(binding(), label: "Called with the following bindings")
+  end
+end
+
+MultiParamExample.call("argument1", "argument2", "argument3")
 ```
 
 ### Your Turn
 
-Create a `Math` module with an `add/2` function that adds two numbers together.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example solution</summary>
-
-```elixir
-defmodule Math do
-  def add(int1, int2) do
-    int1 + int2
-  end
-end
-```
-
-</details>
+Call the `MutliParamExample` with different arguments.
 
 ```elixir
 
@@ -111,70 +114,35 @@ end
 
 ## Internal Module Functions
 
-A module can use its own functions.
+A module can use its own functions without using the module's name before the function.
 
 ```elixir
-defmodule InspectorGadget do
-  def gogo(gadget) do
-    "Go go gadget #{gadget}!"
+defmodule InternalExample do
+  def internal do
+    IO.inspect("Internal was called")
   end
 
-  def necktie do
-    InspectorGadget.gogo("Necktie")
+  def public do
+    InternalExample.internal()
+    internal()
+    "public finished executing"
   end
 end
 
-InspectorGadget.necktie()
+InternalExample.public()
 ```
 
-The module can omit the module name when calling an internal function. Below, we call `gogo/1` instead of `InspectorGadget.gogo/1`
+The world outside of the module must use the module name to know which function to execute.
 
 ```elixir
-defmodule InspectorGadget do
-  def gogo(gadget) do
-    "Go go gadget #{gadget}!"
-  end
-
-  def necktie do
-    gogo("necktie")
-  end
-end
-
-InspectorGadget.necktie()
+InternalExample.public()
 ```
 
-However, we must include the module name when using the module's function outside of the module. For example, the following will raise an error.
+The module name is optional inside of the module. However, we must include the module name when using the module's function outside of the module. For example, the following will raise an error.
 
 ```elixir
-gogo("necktie")
+public()
 ```
-
-### Your Turn
-
-Add an `arms/0` function to the `InspectorGadget` module above that calls `gogo("arms")`.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example solution</summary>
-
-```elixir
-defmodule InspectorGadget do
-  def gogo(gadget) do
-    "Go go gadget #{gadget}!"
-  end
-
-  def necktie do
-    gogo("necktie")
-  end
-
-  def arms do
-    gogo("arms")
-  end
-end
-
-InspectorGadget.arms()
-```
-
-</details>
 
 ## Private Functions
 
@@ -202,29 +170,30 @@ Often it communicates to other developers how to use your module.
 You can create a private module function with `defp` instead of `def`. You'll notice that below the `Speaker.think/0` function is undefined to the outside world.
 
 ```elixir
-defmodule Speaker do
+defmodule PrivateThoughts do
   defp think() do
-    "hi there"
+    "I really want to say hi..."
   end
 end
 
-Speaker.think()
+PrivateThoughts.think()
 ```
 
 We use private functions internally in the module, which means that public functions could expose their values.
 
 ```elixir
-defmodule Speaker do
+defmodule ThoughtfulSpeaker do
   defp think() do
-    "hi there"
+    IO.inspect("I really want to say hi...")
   end
 
   def speak() do
     think()
+    "hi there"
   end
 end
 
-Speaker.speak()
+ThoughtfulSpeaker.speak()
 ```
 
 ## Callback Functions
@@ -346,7 +315,7 @@ Enter your solution below.
 It's also possible, though not very common, to define a module inside another module. This will automatically nest the namespaces.
 
 ```elixir
-defmodule Languages do
+defmodule NestedLanguages do
   defmodule English do
     def greeting do
       "Hello"
@@ -362,11 +331,11 @@ end
 ```
 
 ```elixir
-Languages.English.greeting()
+NestedLanguages.English.greeting()
 ```
 
 ```elixir
-Languages.Spanish.greeting()
+NestedLanguages.Spanish.greeting()
 ```
 
 ## Module Attributes
@@ -412,9 +381,7 @@ We can use module attributes to avoid significant code repetition where many fun
 
 ### Your Turn
 
-Change the module attributes for the `Hero` module above to match your favourite super hero. Re-evaluate the `Hero` functions to see the output change.
-
-You will have to re-evaluate the `Hero` module after changing it, to ensure it compiles with the latest version.
+Change the module attributes for the `Hero` module above to match your favourite super hero and villain. Re-evaluate the `Hero` module, then re-evaluate each function call to see the output change.
 
 ## Module Scope
 
@@ -442,61 +409,69 @@ Notice how the following example has an error because we cannot access the varia
 ```elixir
 top_level_scope = 1
 
-defmodule MyModule do
-  def my_function do
+defmodule ModuleScope1 do
+  def function_scope do
     top_level_scope
   end
 end
 ```
 
-The same is true for the module scope.
+The same is true for the module scope. However, it's uncommon to bind variables in the module scope. Generally we use module attributes instead.
 
 ```elixir
-defmodule MyModule do
+defmodule ModuleScope2 do
   module_scope = 2
 
-  def my_function do
+  def function_scope do
     module_scope
   end
 end
 ```
 
-We've already seen we can share a value between functions in a module using module attributes. We can also use module attributes to provide access to outside variables. This isn't very common, and should not be overused, but it's a useful trick to be aware of.
+To use a variable, it must be bound in the same scope.
 
 ```elixir
-name = "Jon"
+top_level_scope = "top level scope"
+IO.inspect(top_level_scope)
 
-defmodule Greeter do
-  @name name
-  def hello do
-    "Hello #{@name}!"
+defmodule CorrectModuleScope do
+  module_scope = "module scope"
+  IO.inspect(module_scope)
+
+  def function_scope do
+    function_scope = "function scope"
+    IO.inspect(function_scope)
   end
 end
 
-Greeter.hello()
+CorrectModuleScope.function_scope()
 ```
 
 ## Multiple Function Clauses
 
-Elixir allows us to define multiple functions with the same name but that expect different parameters.
+Elixir allows us to define multiple functions with the same name but that expect different parameters, either with different arity or different values.
 
 ```elixir
-defmodule Greeter do
-  def hi(name1, name2) do
-    "hi #{name1}, hi #{name2}"
+defmodule MultipleFunctionClauses do
+  def my_function do
+    "arity is 0"
   end
 
-  def hi(name) do
-    "hi #{name}"
+  def my_function(_param1) do
+    "arity is 1"
+  end
+
+  def my_function(_param1, _param2) do
+    "arity is 2"
   end
 end
 
-Greeter.hi("Peter Parker", "Mary Jane")
+MultipleFunctionClauses.my_function(1)
 ```
 
-Each function clause has a different **arity**. We can treat each function with a different arity as a completely separate function.
+Each function clause has a different **arity**. We can treat each function with a different arity as a completely separate function. In Elixir, we ofen refer to functions by their name and arity.
 
-So above we have a `Greeter.hi/1` function, and a `Greeter.hi/2` function.
+So above we define `MultipleFunctionClauses.find_arity/1`, `MultipleFunctionClauses.find_arity/2`, and `MultipleFunctionClauses.find_arity/3` functions.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -539,59 +514,62 @@ You can provide default arguments to functions using the `\\` syntax after the p
  and then the default value.
 
 ```elixir
-defmodule Greeter do
-  def greet(name, greeting \\ "Hello") do
-    "#{greeting} #{name}!"
+defmodule DefaultArgsExample do
+  def call(param \\ "default argument") do
+    param
   end
 end
 
-Greeter.greet("Peter")
+DefaultArgsExample.call()
 ```
 
-Then if desired, you can override the default value.
+If desired, you can override the default value.
 
 ```elixir
-defmodule Greeter do
-  def greet(name, greeting \\ "Hello") do
-    "#{greeting} #{name}!"
-  end
-end
-
-Greeter.greet("Peter", "Hi")
+DefaultArgsExample.call("overridden argument")
 ```
 
 Multiple parameters can have default values.
 
 ```elixir
-defmodule Greeter do
-  def greet(name \\ "Peter", greeting \\ "Hello") do
-    "#{greeting} #{name}!"
+defmodule MutlipleDefaultArgs do
+  def all_defaults(param1 \\ "default argument 1", param2 \\ "default argument 2") do
+    binding()
+  end
+
+  def some_defaults(param1 \\ "default arg 1", param2) do
+    binding()
   end
 end
-
-Greeter.greet()
 ```
-
-You can even have a default for the first of multiple parameters. Elixir
-is smart enough to handle that!
 
 ```elixir
-defmodule Greeter do
-  def greet(name \\ "Peter", greeting) do
-    "#{greeting} #{name}!"
-  end
-end
-
-Greeter.greet("HI")
+MutlipleDefaultArgs.all_defaults()
 ```
 
-This sometimes results in some confusion with the function's arity, and the number of arguments passed into the function. For example, the `Greeter.greet/2` function above has an arity of `2`, despite only being called with fewer than two arguments.
+We can even provide default arguments for only some parameters in the function.
+
+```elixir
+MutlipleDefaultArgs.some_defaults("overridden argument")
+```
+
+This sometimes results in some confusion with the function's arity, and the number of arguments passed into the function. For example, the `MutlipleDefaultArgs.some_defaults/2` function above has an arity of `2`, despite only being called with one argument.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
-In the Elixir cell below, define a module with a function that uses a default argument.
+In the Elixir cell below, define a module `Greeting` module with a `hello/1` function that uses a default argument. The `hello/1` function should return `Hello name!` where `name` is some default value that you choose.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Greeting.hello()
+"Hello Jon!"
+
+Greeting.hello("Andrew")
+"Hello Andrew!"
+```
 
 ```elixir
 
@@ -604,39 +582,41 @@ We can document modules using `@doc` and `@moduledoc` module attributes with a m
 `@moduledoc` should describe the module at a high level. `@doc` should document a single function in the module.
 
 ```elixir
-defmodule Greeter do
+defmodule DocumentedModule do
   @moduledoc """
-  Greeter
+  Documented Module
 
-  Return common greetings.
+  Explanation of the module
   """
 
   @doc """
-  Returns a personalized greeting for one person.
+  Explanation of the documented function 1
   """
-  def greet(name) do
-    "Hello #{name}!"
+  def documented_function1 do
   end
 
   @doc """
-  Returns a personalized greeting for two people.
+  Explanation of the documented function 1
   """
-  def greet(name1, name2) do
-    "Hello #{name1}! Hello #{name2}!"
+  def documented_function2 do
   end
 end
 ```
 
-Sometimes documentation will include examples of how the code should behave. This is usually kept in an examples section.
+### Doctests
 
-We use `iex>` to declare that the code example should be executable. This represents the [IEx Shell](./iex.livemd) which we will learn more about in a future lesson.
+Often documentation contains examples of how the code should behave. Livebook automatically runs these examples to ensure the module is working correctly.
+
+By starting a line with `iex>` in the documentation, we declare that the code example should be executable. This represents the [IEx Shell](./iex.livemd) which we will learn more about in a future lesson.
+
+We often use these doctests to provide test feedback for exercises. You'll want to get comfortable reading this feedback.
 
 ```elixir
-defmodule Greeter do
+defmodule DoctestExample do
   @moduledoc """
-  Greeter
+  DoctestExample
 
-  Return common greetings.
+  Explains doctests with examples
   """
 
   @doc """
@@ -644,30 +624,87 @@ defmodule Greeter do
 
   ## Examples
 
-    iex> Greeter.greet("Bill")
+    iex> DoctestExample.hello()
+    "Hello Jon!"
+
+    iex> DoctestExample.hello("Bill")
     "Hello Bill!"
   """
-  def greet(name) do
+  def hello(name \\ "Jon") do
     "Hello #{name}!"
-  end
-
-  @doc """
-  Returns a personalized greeting for two people.
-
-    ## Examples
-
-    iex> Greeter.greet("Bill", "Jon")
-    "Hello Bill! Hello Jon!"
-  """
-  def greet(name1, name2) do
-    "Hello #{name1}! Hello #{name2}!"
   end
 end
 ```
 
-Livebook automatically executes these examples to ensure they work as documented. You will start to see these used in course exercises.
+### Failing Doctests
+
+If the doctests fail, you'll see a failure message and explanation of why.
+
+```elixir
+defmodule DoctestFailure do
+  @moduledoc """
+  DoctestFailure
+
+  Explains doctest failures with examples
+  """
+
+  @doc """
+  Purposely fails doctest
+
+  ## Examples
+
+    iex> DoctestFailure.test()
+    "expected return value"
+  """
+  def test do
+    "actual return value"
+  end
+end
+```
+
+The result displays information about where the test failed, and what the expected vs actual result of the function was.
+
+You can use this feedback to debug your exercises.
 
 <!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Fix the failing `DoctestFailure` module so that it's doctests pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Crashing Doctests
+
+Unfortunately, if the doctest causes code to crash, it usually won't display nicely formatted test results. Instead, it will either crash Livebook, or cause tests not to run.
+
+If this is the case, you either have to fix your code, or remove/comment the crashing doctest.
+
+### Your Turn
+
+Uncomment the following code and evaluate the cell to see an example. Re-comment your code to avoid crashing the livebook as you continue with the lesson.
+
+```elixir
+# defmodule DoctestCrash do
+#   @moduledoc """
+#   DoctestCrash
+
+#   Explains doctest crashes with examples
+#   """
+
+#   @doc """
+#   Purposely crashes doctest using invalid pattern matching
+
+#   ## Examples
+
+#     iex> {} = DoctestCrash.crash()
+#     "2"
+#   """
+#   def crash do
+
+#   end
+# end
+```
 
 ### Your Turn
 

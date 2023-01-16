@@ -17,6 +17,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following.
+
+* Explain codepoints, strings, binaries, and charlists.
+* Why do lists in Elixir sometimes print unnexpected values, and how do you get around it?
+
 ## Strings and Binaries
 
 Strings are a common data type in most programming languages.
@@ -61,7 +68,7 @@ the left when it reaches `10` in base 10 or `2` in base 2.
 
 Here's a table of binary numbers and their corresponding integer values.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..300, fn integer ->
@@ -97,7 +104,7 @@ We've already seen we can find the code point of a character using `?` in Elixir
 Here we can see a table of alphabetical characters and their code points. Notice that capital letters and
 lowercase letters have different code points.
 
-<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend) |> Kino.DataTable.new()","title":"Code Points"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend) |> Kino.DataTable.new()","title":"Code Points"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -231,10 +238,10 @@ sixteen symbols (0-9 a-f).
 
 Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the letters `a` to `f` as you can see in the following table.
 
-<!-- livebook:{"attrs":{"source":"\"0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f\"\n|> String.split(\",\")\n|> Enum.with_index()\n|> Enum.map(fn {symbol, index} -> %{integer: \"#{index}\", hexadecimal: symbol} end)\n|> Enum.take(-10)\n|> Kino.DataTable.new()","title":"Hexadecimal"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"\"0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f\"\n|> String.split(\",\")\n|> Enum.with_index()\n|> Enum.map(fn {symbol, index} -> %{integer: \"#{index}\", hexadecimal: symbol} end)\n|> Enum.take(-10)\n|> Kino.DataTable.new()","title":"Hexadecimal"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-"0,1,2,3,4,5,6,7,8,9,10,a,b,c,d,e,f"
+"0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f"
 |> String.split(",")
 |> Enum.with_index()
 |> Enum.map(fn {symbol, index} -> %{integer: "#{index}", hexadecimal: symbol} end)
@@ -411,6 +418,12 @@ Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect 
 
 ```
 
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir-lang: Binaries, strings, and charlists](https://elixir-lang.org/getting-started/binaries-strings-and-char-lists.html)
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
@@ -434,6 +447,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                     | Next                             |
-| -------------------------------------------- | -------------------------------: |
-| [RPS Guards](../exercises/rps_guards.livemd) | [Regex](../reading/regex.livemd) |
+| Previous                                 | Next                             |
+| ---------------------------------------- | -------------------------------: |
+| [Timeline](../exercises/timeline.livemd) | [Regex](../reading/regex.livemd) |

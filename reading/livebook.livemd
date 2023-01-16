@@ -18,34 +18,42 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
-## Livebook
+## Learning Outcomes
 
-This lesson is going to be very meta. We're talking about
-Livebook within a Livebook.
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you evaluate LiveBook Elixir cells?
+* How do you format LiveBook Elixir cells?
+* How do you manipulate LiveBook Markdown cells?
+
+## Overview
+
+### LiveBook
 
 Livebook is an interactive and collaborative code notebook for Elixir.
-It's commonly used as a documentation tool, and this is
-the first course to use it so extensively for teaching Elixir.
+It's commonly used as a documentation tool, and this is the first course to use it so extensively for teaching Elixir.
 
-Inside these interactive notebooks, we can write formatted content (like you're reading right now)
-and execute Elixir code.
+Inside these interactive notebooks, we can write formatted content (like you're reading right now) and execute Elixir code.
 
-## Markdown
+<!-- livebook:{"break_markdown":true} -->
 
-Livebook allows us to create `.livemd` files that power
-the interactive notebooks that you've read so far!
+### Markdown
 
-`.livemd` stands for **live markdown**. Markdown is
-a lightweight markup language that allows you to write
+Markdown is a lightweight markup language that allows you to write
 formatted content using only special symbols. It's like writing a formatted google document with only text.
 
 ```markdown
+<!-- headings -->
 # Heading 1
 ## Heading 2
 ### Heading 3
 #### Heading 4
+
+<!-- font styles -->
 **bold**
 *italic*
+
+<!-- bullet points -->
 1. First item
 2. Second item
 3. Third item
@@ -56,56 +64,98 @@ an overview of markdown syntax.
 
 Markdown is everywhere! It's even valid input for chat apps like Slack and Discord.
 
-## Cells
+<!-- livebook:{"break_markdown":true} -->
 
-Livebooks are split into **cells**. There are **markdown cells** which allow for the creation
-of styled text using the formatting markers just described.
-As you hover and click your cursor <i class="ri-cursor-fill"></i> on a markdown cell. You'll notice each
-has a <span style="color: rgba(101,131,255,.5)">blue</span> highlight on the left
+### Cells
+
+Livebooks are split into **cells**. There are **markdown cells** for formatted text, and **elixir cells** for Elixir code. There are also more advanced cells that are beyond the scope of this course.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Markdown Cells
+
+As you hover and click your cursor <i class="ri-cursor-fill"></i> on a markdown cell. You'll notice each has a <span style="color: rgba(101,131,255,.5)">blue</span> highlight on the left
 and some controls.
 
 You can edit <i class="ri-pencil-line"></i>, move up<i class="ri-arrow-up-s-line"></i>,
-move down <i class="ri-arrow-down-s-line"></i>, and delete <i class="ri-delete-bin-line"></i> cells.
+move down <i class="ri-arrow-down-s-line"></i>, and delete <i class="ri-delete-bin-line"></i> cells. You can also upload images <i class="ri-image-add-line"></i>.
 
-You can also upload images <i class="ri-image-add-line"></i>.
+While completing interactive reading material and exercises, you generally do not need to use these controls. However, it's useful to be aware of them if you would like to use Livebook in your own time, or to resolve an issue if you accidentally manipulate a Livebook.
 
-While completing interactive reading material and exercises, you generally do not need to use these controls.
+Double click on any markdown cell and you'll see the markdown editor for that cell.
 
 <!-- livebook:{"break_markdown":true} -->
+
+### Elixir Cells
+
+Elixir Cells are interactive code blocks that run Elixir code. These cells can be used to test and experiment with Elixir code, and the results of the code execution are displayed directly in the notebook. We'll often use these cells to show examples, and have you complete exercises.
+
+Here you can see an Elixir cell that adds two integers.
+
+```elixir
+2 + 2
+```
+
+### Livebook Shortcuts
+
+Click on the keyboard shortcuts <i class="ri-keyboard-box-line"></i> icon on the sidebar to view
+available Livebook shortcuts depending on the current mode.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Navigation Mode Vs Insert Mode
+
+**Navigation mode** is the default mode. If you are editing a Markdown cell or Elixir cell, then you are in **insert mode**.
+
+For example, while in Navigation mode, you can evaluate every Elixir cell in a Livebook notebook by pressing <kbd>e</kbd> and then <kbd>a</kbd>.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### LiveMarkdown
+
+Livebook allows us to create `.livemd` files that power the interactive notebooks that you've read so far! `.livemd` stands for **live markdown**. Livebook persists the notebook information in the `.livemd` file.
+
+You can see the changes made to these files in your git version control. This is often useful if you accidentally deleted part of a lesson or exercise and need to refer to the old version.
+
+## Edit A Markdown Cell
 
 Hover and click on this markdown cell to see the controls. Click the <i class="ri-pencil-line"></i> edit button
 to see the Markdown content inside.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Elixir cells contain Elixir code. Evaluate the cell to show the result.
+<div style="padding: 1rem;background-color:lightgray; text-align: center;">
 
-You can click on an Elixir cell to see the <i class="ri-play-circle-fill"></i> Evaluate button.
-Alternatively you can evaluate an Elixir cell by clicking on it the cell and pressing <kbd>CTRL</kbd>+<kbd>Enter</kbd> (Windows & Linux) or <kbd>CMD</kbd>+<kbd>Enter</kbd> (MacOS).
+### Click Me
 
-Click on the Elixir cell below and then click <i class="ri-play-circle-fill"></i> Evaluate to see the result. You
-should see `10` because `5 + 5` equals `10`.
+</div>
+
+## Evaluate An Elixir Cell
+
+Elixir cells contain Elixir code. You can evaluate the cell to show the result of the code.
+
+Click on an Elixir cell and press the <i class="ri-play-circle-fill"></i> Evaluate button to see the cell's output.
+
+Alternatively, you can press <kbd>CTRL</kbd>+<kbd>Enter</kbd> (Windows & Linux) or <kbd>CMD</kbd>+<kbd>Enter</kbd> (MacOS) while focused on the cell to re-evaluate it.
+
+Evaluate the cell below. You should see `10` because `5 + 5` equals `10`.
 
 ```elixir
 5 + 5
 ```
 
-The result of the cell is the last value in the cell. For example, this cell
-returns `10`.
+In Elixir, the last value will always be the return value
+
+For example, this cell returns `10`, not `5`.
 
 ```elixir
 5
 10
 ```
 
-You can also evaluate every Elixir cell in a notebook by pressing <kbd>e</kbd> and then <kbd>a</kbd>. You need to be
-in **Navigation mode**. Navigation mode is the default mode. If you are editing a markdown cell or
-Elixir cell, then you are in **Insert mode**.
+As you complete reading material, you're expected to evaluate cells to see their output. Alternatively, you can press `ea` to evaluate every cell in a Livebook.
 
-Click on the keyboard shortcuts <i class="ri-keyboard-box-line"></i> icon on the sidebar to view
-available Livebook shortcuts depending on the current mode.
-
-## Evaluation
+## Evaluation Order
 
 By default, Elixir cells evaluate in order when you run the `ea` command. Cells above
 automatically evaluate when you evaluate a cell below.
@@ -134,6 +184,8 @@ Re-evaluate the cell to see *Evaluated\** change to **Evaluated**.
 5
 ```
 
+Sometimes order of evaluation can cause issues in Exercises. Make sure to evaluate a code cell whenever you make a change.
+
 ## Formatting
 
 You can format Elixir code using the <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>F</kbd> (Windows & Linux) Keybinding or <kbd>SHIFT</kbd>+<kbd>OPTION</kbd>+<kbd>F</kbd> (MacOS).
@@ -157,141 +209,6 @@ code is invalid. Notice that you cannot use <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd
 
 ```elixir
           1 +
-```
-
-## Tests
-
-Throughout this course, you will perform exercises with test feedback. Under the hood we use a project called [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) which you will use in the future to write tests.
-
-Evaluate the Elixir cell below to see a failing test. Then change `4` to `5` to see a passing test.
-
-<!-- livebook:{"attrs":{"assertions":"assert five == 5","attempts":1,"code":"five = 4","solution":"five = 5","title":"Exercise"},"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Assertion do
-  use ExUnit.Case
-
-  test "Exercise" do
-    try do
-      Process.flag(:trap_exit, true)
-      five = 4
-      assert five == 5
-    catch
-      error ->
-        flunk("""
-          Your solution threw the following error:
-
-          #{inspect(error)}
-        """)
-
-      :exit, {error, {GenServer, message_type, [_pid, message, _timeout]}} ->
-        flunk("""
-            GenServer crashed with the following error:
-
-            #{inspect(error)}
-
-            When it received: #{inspect(message)} #{message_type}
-
-            Likely you need to define the corresponding handler for #{inspect(message)}.
-
-            Ensure you defined a handle_call/3, handle_info/2, or handle_cast/2 or appropriate handler function.
-
-              def handle_call(:message, _from, state) do
-                ...
-              end
-
-            Also ensure you call GenServer.call/2, GenServer.cast/2, or otherwise send the message correctly.
-
-              GenServer.call(pid, :message)
-        """)
-
-      :exit, error ->
-        flunk("""
-          Unhandled exit with the following error:
-
-          #{inspect(error)}
-        """)
-    after
-      # all warnings and errors are printed to the previous Kino Frame
-      # to avoid cluttering the test results display.
-      Process.sleep(10)
-      Kino.render(Kino.Markdown.new("### Test Results
-<hr/>"))
-    end
-  end
-end
-
-ExUnit.run()
-
-# Make variables and modules defined in the test available.
-# Also allows for exploration using the output of the cell.
-# Unfortunately, this results in duplication of warnings.
-five = 4
-```
-
-Let's break down the test feedback.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-1) test  (Assertion)
-     reading/livebook.livemd#cell:5
-     Assertion with == failed
-     code:  assert five == 5
-     left:  4
-     right: 5
-     stacktrace:
-       reading/livebook.livemd#cell:7: (test)
-
-
-
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 1 failure
-
-Randomized with seed 613714
-```
-
-ExUnit tells you that the test failed.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Assertion with == failed
-```
-
-Then it may provide information about the test being run. You may not be familiar with
-this code, and that's perfectly OK.
-
-For this example, the test asserted that the answer should have been 5.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-code:  assert five == 5
-```
-
-Generally, **left** is the provided answer, and **right** is the expected answer.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-left:  4
-right: 5
-```
-
-Passing tests are more straightforward. Each `.` is a passing test.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-.
-
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 0 failures
-
-Randomized with seed 736220
 ```
 
 ## Up Next
