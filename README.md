@@ -245,9 +245,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * LiveView Image Uploads
 * PubSub
 * LiveView JS Interoperability and Pagination
-* GraphQL and Absinthe
 ## External Libraries
 * Emailing, Swoosh, and Oban
-## Final Project
-* Demo Day
 <!-- course-outline-end -->
