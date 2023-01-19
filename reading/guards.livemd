@@ -17,6 +17,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you use guards to prevent invalid function input?
+* How do you use guards to trigger polymorphic behavior?
+
 ## Guards
 
 Guards allow you to guard your functions to only accept certain input.
@@ -33,45 +40,45 @@ provides clearer feedback.
 Guards start with a `when` keyword followed by a boolean expression. For example,
 
 ```elixir
-defmodule Multiplier do
+defmodule IntegerGuardExample do
   def double(int) when is_integer(int) do
     int * 2
   end
 end
 
-Multiplier.double(2)
+IntegerGuardExample.double(2)
 ```
 
-The `Multiplier` module above will only accept integers, so it will crash with a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html) if we
+The `IntegerGuardExample` module above will only accept integers, so it will crash with a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html) if we
 provide it a float.
 
 ```elixir
-Multiplier.double(1.5)
+IntegerGuardExample.double(1.5)
 ```
 
 You can use multiple guards together in the same function head. For example, we could
 use both `is_integer/1` and `is_float/1` in the same `double/1` function.
 
 ```elixir
-defmodule Multiplier do
+defmodule MutlipleGuardExample do
   def double(value) when is_integer(value) or is_float(value) do
     value * 2
   end
 end
 
-Multiplier.double(1.3)
+MutlipleGuardExample.double(1.3)
 ```
 
 While useful for demonstration, we should realistically use the `is_number/1` guard instead.
 
 ```elixir
-defmodule Multiplier do
+defmodule NumberGuardExample do
   def double(value) when is_number(value) do
     value * 2
   end
 end
 
-Multiplier.double(1.3)
+NumberGuardExample.double(1.3)
 ```
 
 Guards must return `true` or `false` values and be pure input and output.
@@ -85,7 +92,7 @@ You can reference the [Guard Documentation](https://hexdocs.pm/elixir/master/pat
 * "type-check" functions (`is_list/1`, `is_number/1`, `is_map/1`, `is_binary/1`, `is_integer/1` etc)
 * functions that work on built-in datatypes (`hd/1`, `tail/1`, `length/1` and others)
 
-## `defguard`
+## defguard
 
 You can define your own custom guard with `defguard`. For example, let's say
 we're building a rock paper scissors game which should only accept `:rock`, `:paper`, and `:scissors` as
@@ -112,7 +119,7 @@ RockPaperScissors.winner(:rock)
 Invalid guesses will now raise a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
 
 ```elixir
-RockPaperScissors.winner("rock")
+RockPaperScissors.winner("invalid guess")
 ```
 
 ## Polymorphic Functions With Guards
@@ -133,7 +140,7 @@ We can use the built-in `is_binary` guard to check if the variable is a string.
 That's because internally strings in Elixir are represented as binaries.
 
 ```elixir
-defmodule Multiplier do
+defmodule PolymorphicGuardExample do
   def double(num) when is_number(num) do
     num * 2
   end
@@ -143,20 +150,19 @@ defmodule Multiplier do
   end
 end
 
-Multiplier.double("example")
+PolymorphicGuardExample.double("example")
 ```
 
-There are many guards available in Elixir. If you ever need a specific guard, you can refer to the
-[Guards](https://hexdocs.pm/elixir/Kernel.html#guards) documentation.
+There are many guards available in Elixir. If you ever need a specific guard, you can refer to the [Guards](https://hexdocs.pm/elixir/Kernel.html#guards) documentation.
 
-**Function order matters**. The first function who's function head matches the input executes.
+**Function order matters**.
 
-For example. if you remove
-the `is_number/1` guard. Now the first function expects any type of input, so it will always
-execute instead of the `is_binary/1` version.
+The first function who's guard returns true with the provided input will execute.
+
+For example. if you remove the `is_number/1` guard. Now the first function expects any type of input, so it will always execute instead of the `is_binary/1` version.
 
 ```elixir
-defmodule Multiplier do
+defmodule OrderingIssueExample do
   def double(num) do
     num * 2
   end
@@ -166,7 +172,7 @@ defmodule Multiplier do
   end
 end
 
-Multiplier.double("example")
+OrderingIssueExample.double("example")
 ```
 
 You'll notice our program crashes with an error.
@@ -179,7 +185,7 @@ If you move the more generic function lower, then strings will match the
 `is_binary/1` version first and our `Multiplier.double/1` function works as expected.
 
 ```elixir
-defmodule Multiplier do
+defmodule OrderFixedExample do
   def double(string) when is_binary(string) do
     string <> string
   end
@@ -189,15 +195,15 @@ defmodule Multiplier do
   end
 end
 
-Multiplier.double("example")
+OrderFixedExample.double("example")
 ```
 
 ```elixir
-Multiplier.double(1)
+OrderFixedExample.double(1)
 ```
 
 ```elixir
-Multiplier.double(2.5)
+OrderFixedExample.double(2.5)
 ```
 
 ### Your Turn
@@ -207,8 +213,8 @@ Create a `Say.hello/1` function which only accepts a string as it's input.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Say.hello("Brian")
-"Hello, Brian."
+Say.hello("Stephen")
+"Hello, Stephen!"
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -217,7 +223,7 @@ Say.hello("Brian")
 ```elixir
 defmodule Say do
   def hello(name) when is_bitstring(name) do
-    "Hello, #{name}."
+    "Hello, #{name}!"
   end
 end
 ```
