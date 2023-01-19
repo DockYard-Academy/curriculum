@@ -13,17 +13,22 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How can we test the behavior rather than the implementation of a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
+
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
 ## Testing GenServers
 
-We've seen how to perform tests on a module and function, but how do you test something stateful like a process?
-Let's consider how we could test a simple `Counter` process that should store an integer in it's state and increment the value.
+We've seen how to perform tests on a module and function, but how do you test something stateful like a process? Let's consider how we could test a simple `CounterServer` process that should store an integer in it's state and increment the value.
 
 ```elixir
-defmodule Counter do
+defmodule CounterServer do
   use GenServer
 
   @impl true
@@ -52,11 +57,11 @@ For example, the following test is coupled to implementation.
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule CounterTest do
+defmodule CounterServerTest do
   use ExUnit.Case
 
   test "Counter receives :increment call" do
-    {:ok, pid} = GenServer.start_link(Counter, 0)
+    {:ok, pid} = GenServer.start_link(CounterServer, 0)
     GenServer.call(pid, :increment)
     assert :sys.get_state(pid) == 1
   end
@@ -65,19 +70,14 @@ end
 ExUnit.run()
 ```
 
-So if any of the internals change, these tests could break, even though the behavior of the counter module doesn't.
-Instead, we generally want to test on the [client interface](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis) of the [GenServer](https://hexdocs.pm/elixir/GenServer.html).
+So if any of the internals change, these tests could break, even though the behavior of the counter module doesn't. Instead, we generally want to test on the [client interface](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis) of the [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
-Here's the `Counter` module separated into the `Client` and `Server` interface.
+Here's a `CounterClient` module which contains the client interface for the `CounterServer` module.
 
 ```elixir
-defmodule Counter do
-  use GenServer
-
-  # Client
-
+defmodule CounterClient do
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, 0)
+    GenServer.start_link(CounterServer, 0)
   end
 
   def increment(pid) do
@@ -87,23 +87,6 @@ defmodule Counter do
   def get_count(pid) do
     GenServer.call(pid, :get_count)
   end
-
-  # Server
-
-  @impl true
-  def init(state) do
-    {:ok, state}
-  end
-
-  @impl true
-  def handle_call(:get_count, _from, state) do
-    {:reply, state, state}
-  end
-
-  @impl true
-  def handle_call(:increment, _from, state) do
-    {:reply, state, state + 1}
-  end
 end
 ```
 
@@ -112,24 +95,25 @@ Now we can use these functions in our test.
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule CounterTest do
+defmodule CounterClientTest do
   use ExUnit.Case
 
   test "increment/1" do
-    {:ok, pid} = Counter.start_link([])
-    Counter.increment(pid)
-    assert Counter.get_count(pid) == 1
+    {:ok, pid} = CounterClient.start_link([])
+    CounterClient.increment(pid)
+    assert CounterClient.get_count(pid) == 1
   end
 end
 
 ExUnit.run()
 ```
 
-Now if any of the internals of `Counter` change, so long as the client interface and behavior remain the same the tests will not break.
-For example, let's say we decide to change how we store state in the `Counter`. Instead of an integer, it will be a keyword list like so.
+This makes our tests more robust to implementation changes of the `CounterServer`. So long as the client interface remains the same, then tests will not break.
+
+For example, let's say we decide to change how we store state in the counter. Instead of an integer, we'll use a `%{count: value}` map. We've co-located the Client and the Server functions for the sake of example.
 
 ```elixir
-defmodule Counter do
+defmodule CounterMapExample do
   use GenServer
 
   # Client
@@ -170,13 +154,13 @@ Our tests still pass, because the behavior and interface has not changed.
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule CounterTest do
+defmodule CounterMapTest do
   use ExUnit.Case
 
   test "increment/1" do
-    {:ok, pid} = Counter.start_link([])
-    Counter.increment(pid)
-    assert Counter.get_count(pid) == 1
+    {:ok, pid} = CounterMapExample.start_link([])
+    CounterMapExample.increment(pid)
+    assert CounterMapExample.get_count(pid) == 1
   end
 end
 
@@ -188,11 +172,11 @@ However, the old test suite breaks, because it was coupled to the underlying imp
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule CounterTest do
+defmodule CounterMapExampleTest do
   use ExUnit.Case
 
   test "handle_call :increment" do
-    {:ok, pid} = GenServer.start_link(Counter, 0)
+    {:ok, pid} = GenServer.start_link(CounterMapExample, 0)
     GenServer.call(pid, :increment)
     assert :sys.get_state(pid) == 1
   end
@@ -203,7 +187,7 @@ ExUnit.run()
 
 For more on testing [GenServer](https://hexdocs.pm/elixir/GenServer.html)s, there is an excellent talk by Tyler Young.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=EZFLPG7V7RM\")","title":"Testing GenServers"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=EZFLPG7V7RM\")","title":"Testing GenServers"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=EZFLPG7V7RM")
@@ -211,24 +195,16 @@ YouTube.new("https://www.youtube.com/watch?v=EZFLPG7V7RM")
 
 ### Your Turn
 
-Implement and test a `decrement/1` function on the `Counter` module.
+Implement and test a `decrement/1` function on the `CountDown` module.
 
 ```elixir
-defmodule Counter do
+defmodule CountDown do
   use GenServer
 
   # Client
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, %{count: 0})
-  end
-
-  def increment(pid) do
-    GenServer.call(pid, :increment)
-  end
-
-  def get_count(pid) do
-    GenServer.call(pid, :get_count)
+    # Implementation
   end
 
   def decrement(pid) do
@@ -244,12 +220,7 @@ defmodule Counter do
 
   @impl true
   def handle_call(:get_count, _from, state) do
-    {:reply, state.count, state}
-  end
-
-  @impl true
-  def handle_call(:increment, _from, state) do
-    {:reply, state.count + 1, %{state | count: state.count + 1}}
+    # Implementation
   end
 
   @impl true
@@ -263,12 +234,7 @@ ExUnit.start(auto_run: false)
 defmodule CounterTest do
   use ExUnit.Case
 
-  test "increment/1" do
-    {:ok, pid} = Counter.start_link([])
-    Counter.increment(pid)
-    assert Counter.get_count(pid) == 1
-  end
-
+  # implement your test
   test "decrement/1"
 end
 

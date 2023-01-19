@@ -27,6 +27,13 @@ end
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How does Big O Notation ($O(n), O(n^2), etc$) describe the performance of our application as data $n$ grows?
+* Why is Big O Notation useful, how do you think you'll use it to describe your programs in the future?
+
 ## Big O Notation
 
 As programmers, we are generally more concerned with how performance grows in our
@@ -44,7 +51,7 @@ of the data.
 
 Here's a video by Tom Scott for an introductory overview.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=RGuJga2Gl_k\")","title":"Big O Complexity"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=RGuJga2Gl_k\")","title":"Big O Complexity"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=RGuJga2Gl_k")
@@ -81,7 +88,7 @@ mathematical guarantee that for some size of data, a pigeon will be faster than 
 We can see the nature of how a constant travel time for some amount of data always intersects with the
 expected internet speed in the graph below.
 
-<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"data\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 200\n\ninternet = for n <- init..max, do: %{data: n, time: n, type: \"Internet\"}\npigeon = for n <- init..max, do: %{data: n, time: 100, type: \"Pigeon\"}\n\nKino.VegaLite.push_many(widget, internet)\nKino.VegaLite.push_many(widget, pigeon)\nwidget","title":"Pigeon Beats The Internet Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"data\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 200\n\ninternet = for n <- init..max, do: %{data: n, time: n, type: \"Internet\"}\npigeon = for n <- init..max, do: %{data: n, time: 100, type: \"Pigeon\"}\n\nKino.VegaLite.push_many(widget, internet)\nKino.VegaLite.push_many(widget, pigeon)\nwidget","title":"Pigeon Beats The Internet Graph"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 size = 600
@@ -121,7 +128,7 @@ perform approximately the same number of additional calculations.
 
 Plotted onto a graph you would expect that as we increase the number of elements, time grows in a constant line upward.
 
-<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nlinear = for n <- 1..100, do: %{\"number of elements\": n, time: n, type: \"O(n)\"}\n\nKino.VegaLite.push_many(widget, linear)\nwidget","title":"Linear Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.encode_field(:color, \"type\", title: \"Linear Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nlinear = for n <- 1..100, do: %{\"number of elements\": n, time: n, type: \"O(n)\"}\n\nKino.VegaLite.push_many(widget, linear)\nwidget","title":"Linear Complexity Graph"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 size = 600
@@ -185,7 +192,7 @@ end)
 
 In other words, it creates $n^2$ elements. We can see how this grows in the following table.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 2,\n    notation: \"#{each}**2\",\n    equation: \"#{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>2</sup> Complexity"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 2,\n    notation: \"#{each}**2\",\n    equation: \"#{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>2</sup> Complexity"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..1000, fn each ->
@@ -326,7 +333,7 @@ end)
 
 We can see how $n^3$ grows in the following table.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 3,\n    notation: \"#{each}**3\",\n    equation: \"#{each} * #{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>3</sup> Complexity"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..1000, fn each ->\n  %{\n    \"# of elements\": each,\n    result: each ** 3,\n    notation: \"#{each}**3\",\n    equation: \"#{each} * #{each} * #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"n<sup>3</sup> Complexity"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..1000, fn each ->
@@ -343,7 +350,7 @@ end)
 Plotted onto a graph, we can see that polynomial complexity results in an upward curve, and
 the size of the power significantly increases the growth.
 
-<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Polonomial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 5\n\nn2 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 2, type: \"n^2\"}\nn3 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 3, type: \"n^3\"}\nn4 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 4, type: \"n^4\"}\n\nKino.VegaLite.push_many(widget, n2)\nKino.VegaLite.push_many(widget, n3)\nKino.VegaLite.push_many(widget, n4)\nwidget","title":"Polynomial Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"number of elements\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"time\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Polonomial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 5\n\nn2 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 2, type: \"n^2\"}\nn3 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 3, type: \"n^3\"}\nn4 = for n <- init..max, do: %{\"number of elements\": n, time: n ** 4, type: \"n^4\"}\n\nKino.VegaLite.push_many(widget, n2)\nKino.VegaLite.push_many(widget, n3)\nKino.VegaLite.push_many(widget, n4)\nwidget","title":"Polynomial Complexity Graph"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 size = 600
@@ -396,7 +403,7 @@ In other words, it executes $$10^n$$ attempts. Now often you'll see exponential 
 represented as $2^n$  or $C^n$ where `2` or `C` represents some constant value. In the case of a password cracker, it would
 be `10`.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..100, fn each ->\n  %{\n    \"# of elements\": each,\n    result: 10 ** each,\n    equation: \"100 ** #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"Exponential Growth Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..100, fn each ->\n  %{\n    \"# of elements\": each,\n    result: 10 ** each,\n    equation: \"100 ** #{each}\"\n  }\nend) |> Kino.DataTable.new()","title":"Exponential Growth Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..100, fn each ->
@@ -409,7 +416,7 @@ end)
 |> Kino.DataTable.new()
 ```
 
-<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Exponential Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 10\n\nexponential = for n <- init..max, do: %{x: n, y: 10 ** n, type: \"2^n\"}\n\nKino.VegaLite.push_many(widget, exponential)\nwidget","title":"Exponential Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Exponential Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\ninit = 1\nmax = 10\n\nexponential = for n <- init..max, do: %{x: n, y: 10 ** n, type: \"2^n\"}\n\nKino.VegaLite.push_many(widget, exponential)\nwidget","title":"Exponential Complexity Graph"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 size = 600
@@ -495,7 +502,7 @@ For example $5!$ is $5 * 4 * 3 * 2 * 1$.
 Factorial complexity grows incredibly fast, as you can see according to this graph and corresponding
 data table.
 
-<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Factorial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nfactorial = for n <- 1..5, do: %{x: n, y: Factorial.of(n), type: \"n!\"}\n\nKino.VegaLite.push_many(widget, factorial)\nwidget","title":"Factorial Complexity Graph"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"size = 600\n\nwidget =\n  VegaLite.new(width: size, height: size)\n  |> VegaLite.mark(:line)\n  |> VegaLite.encode_field(:x, \"x\", type: :quantitative)\n  |> VegaLite.encode_field(:y, \"y\", type: :quantitative)\n  |> VegaLite.transform(groupby: [\"color\"], extent: [2500, 6500])\n  |> VegaLite.encode_field(:color, \"type\", title: \"Factorial Growth\", type: :nominal)\n  |> Kino.VegaLite.new()\n\nfactorial = for n <- 1..5, do: %{x: n, y: Factorial.of(n), type: \"n!\"}\n\nKino.VegaLite.push_many(widget, factorial)\nwidget","title":"Factorial Complexity Graph"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 size = 600
@@ -515,7 +522,7 @@ Kino.VegaLite.push_many(widget, factorial)
 widget
 ```
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: each ** each, equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: each ** each, equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..10, fn each ->

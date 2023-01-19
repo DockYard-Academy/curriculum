@@ -15,6 +15,15 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* What are common HTTP request methods and what do they do?
+* What is a web API, and how can we communcate with one using [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html)?
+* What is JSON, and how can we parse it from an API response using [Poison](https://hexdocs.pm/poison/Poison.html)?
+* How can we authorize requests for a private API?
+
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
@@ -94,13 +103,36 @@ We use web APIs to communicate with servers on the internet. These APIs provide 
 * The [OpenWeatherAPI](https://openweathermap.org/) provides live weather information.
 * The [JokeAPI](https://sv443.net/jokeapi/v2/#getting-started) returns a random joke.
 
-## HTTP
+## HTTP Request Methods
 
-We use HTTP to communicate with web APIs. The browser hides the details of how we use HTTP to communicate with these APIs. However, as developers, we want to interact with them directly using the HTTP protocol to request and send information.
+[HTTP (Hypertext Transfer Protocol)](https://developer.mozilla.org/en-US/docs/Web/HTTP) is the protocol used for transferring data on the web. [The HTTP request methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods), also known as verbs, indicate the desired action to be performed on the identified resource.
 
-In Elixir, we use an HTTP client to make HTTP requests. We've installed the popular [HTTPoison](https://github.com/edgurgel/httpoison) HTTP client library for you in this livebook to demonstrate how to make HTTP requests.
+```mermaid
+flowchart LR
+Client --HTTP Method--> Server
+```
 
-With [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) we can programmatically request information from the same Joke API you visited in the browser.
+* **GET:** The GET method requests a representation of the specified resource. GET is the most common HTTP method and is used to retrieve data. It is a safe method, which means that it should not have any side effects on the server or the resource, and it should only retrieve data.
+
+* **POST:** The POST method submits an entity to the specified resource, often causing a change in state or side effects on the server. It is used to create a new resource or to submit data to be processed by the resource identified by the URI.
+
+* **PUT:** The PUT method replaces all current representations of the target resource with the request payload. It is used to update a current resource with new data.
+
+* **PATCH:** The PATCH method applies partial modifications to a resource. It is used to update only a part of the current resource, rather than replacing the whole resource like PUT.
+
+* **DELETE:** The DELETE method deletes the specified resource. It is used to delete a resource identified by a URI.
+
+When you use a browser, you're actually using HTTP under the hood. The browser hides the details of how we use HTTP to communicate with these APIs.
+
+As developers, we want to interact with web APIs directly using the HTTP protocol to request and send information.
+
+## HTTPoison
+
+In Elixir, we use an HTTP client to make HTTP requests. There are many libraries, but for our purpose we've chosen install the popular [HTTPoison](https://github.com/edgurgel/httpoison) HTTP client library for you in this livebook.
+
+We're going to use [HTTPoison](https://github.com/edgurgel/httpoison) to demonstrate how to make HTTP requests.
+
+For a simple example, here's how we can request a joke from the same API you visited earlier in the browser.
 
 ```elixir
 HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")

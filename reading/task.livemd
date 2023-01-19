@@ -17,6 +17,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we use tasks to leverage concurrency?
+* How do we use tasks to send one-off fire-and-forget jobs?
+
 ## Task
 
 We've already seen we can use [Kernel.spawn/1](https://hexdocs.pm/elixir/Kernel.html#spawn/1) or `Kernal.spawn_link/1` to spawn a process that performs some work and then dies.
@@ -96,11 +103,11 @@ Here we use the **par** boxes to demonstrate operations happening in parallel.
 
 ```mermaid
 sequenceDiagram
-  par ParentProcess to Task1
+  par 
     ParentProcess ->> Task1: spawns
     ParentProcess ->> Task2: spawns
   end
-  par Task1 to Task2
+  par
     Task1 ->> Task1: performs work
     Task2 ->> Task2: performs work
   end

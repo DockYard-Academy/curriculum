@@ -17,6 +17,14 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Why would you use an Agent instead of a GenServer?
+* Why might you use `:ets` instead of an Agent?
+* Why and how could you implement a cache?
+
 ## State
 
 State allows us to persist a value during the runtime of our application. We've seen how we can start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) process which stores and manipulates its internal state.
@@ -382,7 +390,7 @@ SlowFib.of(100)
 
 We can improve performance by saving each input/output in a cache so we don't have to re-compute the same values over and over. You can think of this cache as a table of inputs and outputs. For each input, we store the computed output rather than re-performing the calculation.
 
-<!-- livebook:{"attrs":{"source":"defmodule Fib do\n  def get(n) do\n    sequence =\n      Stream.unfold({1, 1}, fn {a, b} ->\n        {a, {b, a + b}}\n      end)\n      |> Enum.take(n)\n\n    [0 | sequence]\n  end\nend\n\nFib.get(150)\n|> Enum.with_index()\n|> Enum.map(fn {value, index} -> %{input: index, output: value} end)\n|> Kino.DataTable.new()","title":"Fib Cache"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"defmodule Fib do\n  def get(n) do\n    sequence =\n      Stream.unfold({1, 1}, fn {a, b} ->\n        {a, {b, a + b}}\n      end)\n      |> Enum.take(n)\n\n    [0 | sequence]\n  end\nend\n\nFib.get(150)\n|> Enum.with_index()\n|> Enum.map(fn {value, index} -> %{input: index, output: value} end)\n|> Kino.DataTable.new()","title":"Fib Cache"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 defmodule Fib do
