@@ -322,7 +322,7 @@ git commit -m "associate books with authors"
 git push
 ```
 
-## Learning Outcomes
+## Review Questions
 
 Upon completing this lesson, a student should be able to answer the following questions.
 
