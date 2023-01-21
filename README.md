@@ -217,7 +217,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Supervisor Basics and Fault Tolerance
 * Testing GenServers
 * Metaprogramming
-* Mix Projects & Processes
+* Mix Projects and Processes
 * Concurrency With Tasks
 * State Management With Agents and ETS
 * Rubix Cube Project
@@ -225,7 +225,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Capstone Project
 ## Web Servers and Phoenix
 * HTML and CSS
-* APIs & Parsing JSON
+* APIs and Parsing JSON
 * Phoenix
 * Tailwind
 * Ecto Changesets
@@ -241,7 +241,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Deployment
 ## LiveView
 * LiveView
-* LiveView & Ecto
+* LiveView and Ecto
 * LiveView Image Uploads
 * PubSub
 * LiveView JS Interoperability and Pagination

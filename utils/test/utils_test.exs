@@ -89,6 +89,15 @@ defmodule UtilsTest do
     end)
   end
 
+  test "All outline files exist" do
+    outline = File.read!("../start.livemd")
+
+    Regex.scan(~r/\[[^\]]+\]\(([^\)]+\.livemd)\)/, outline)
+    |> Enum.each(fn [_, file_name] ->
+      assert File.exists?(Path.join("../", file_name))
+    end)
+  end
+
   test "Ensure no broken / empty links in livebooks" do
     Notebooks.stream_lines(Notebooks.reading() ++ Notebooks.exercises(), fn line, file_name ->
       # Empty Links

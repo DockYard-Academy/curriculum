@@ -83,39 +83,17 @@ defmodule WordCount do
 end
 ```
 
-Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
-Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
-
-```
-$ git checkout main
-$ git checkout -b exercise-concurrent_image_processing
-$ git add .
-$ git commit -m "finish concurrent image processing exercise"
-$ git push origin exercise-concurrent_image_processing
-```
-
-Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
-
-**DockYard Academy Students Only:**
-
-Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
-
-If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.## Up Next
-
-| Previous                                 | Next                                                     |
-| ---------------------------------------- | -------------------------------------------------------: |
-| [Tasks](../exercises/task_drills.livemd) | [State: Agent and ETS](../reading/agents_and_ets.livemd) |
-
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"[_, file_name] = Regex.run(~r/([^\\/]+).livemd/, __ENV__.file)\nprogress_path = __DIR__ <> \"/../student_progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-[_, file_name] = Regex.run(~r/([^\\/]+).livemd/, __ENV__.file)
-progress_path = __DIR__ <> "/../student_progress.json"
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
 existing_progress = File.read!(progress_path) |> Jason.decode!()
 
-default = Map.get(existing_progress, file_name <> "_exercise", false)
+default = Map.get(existing_progress, file_name, false)
 
 form =
   Kino.Control.form(

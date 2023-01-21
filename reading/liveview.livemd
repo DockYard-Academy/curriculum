@@ -680,22 +680,19 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
 * [HexDocs: Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
 * [Elixir Schools: LiveView](https://elixirschool.com/blog/phoenix-live-view/)
-* [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)## Up Next
-
-| Previous                                           | Next                                       |
-| -------------------------------------------------- | -----------------------------------------: |
-| [Blog: Deployment](../exercises/deployment.livemd) | [Math Game](../exercises/math_game.livemd) |
+* [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)\nprogress_path = __DIR__ <> \"/../student_progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)
-progress_path = __DIR__ <> "/../student_progress.json"
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
 existing_progress = File.read!(progress_path) |> Jason.decode!()
 
-default = Map.get(existing_progress, file_name <> "_reading", false)
+default = Map.get(existing_progress, file_name, false)
 
 form =
   Kino.Control.form(
@@ -721,13 +718,13 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout solutions
-$ git checkout -b /home/brook/dockyard/curriculum/reading/liveview.livemd-reading
+$ git checkout -b liveview-reading
 $ git add .
-$ git commit -m "finish /home/brook/dockyard/curriculum/reading/liveview.livemd reading"
-$ git push origin /home/brook/dockyard/curriculum/reading/liveview.livemd-reading
+$ git commit -m "finish liveview reading"
+$ git push origin liveview-reading
 ```
 
-Create a pull request from your `/home/brook/dockyard/curriculum/reading/liveview.livemd-reading` branch to your `solutions` branch.
+Create a pull request from your `liveview-reading` branch to your `solutions` branch.
 Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**

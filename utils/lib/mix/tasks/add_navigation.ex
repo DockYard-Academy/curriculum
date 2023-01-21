@@ -15,10 +15,10 @@ defmodule Mix.Tasks.Bc.AddNavigation do
     |> Enum.each(fn file_name ->
       path = Path.join("../", file_name)
       file = File.read!(path)
-      file_with_navigation_removed = Regex.replace(~r/\n\#\# Up Next(.|\n)+/, file, "")
+      file_with_navigation_removed = Regex.replace(~r/\#\# Up Next(.|\n)+/, file, "")
       File.write!(path, file_with_navigation_removed)
       content = Notebooks.navigation(navigation_blocks, file_name)
-      File.write!(path, content, [:append])
+      File.write!(path, "\n#{content}", [:append])
     end)
   end
 end

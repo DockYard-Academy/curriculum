@@ -652,22 +652,19 @@ This newsletter can serve as a project for your future portfolio.
 Consider the following resource(s) to deepen your understanding of the topic.
 
 * [HexDocs: Oban](https://hexdocs.pm/oban/Oban.html)
-* [HexDocs: Swoosh](https://hexdocs.pm/swoosh/Swoosh.html)## Up Next
-
-| Previous                                                               | Next |
-| ---------------------------------------------------------------------- | ---: |
-| [PicChat: Infinite Scroll](../reading/pic_chat_infinite_scroll.livemd) | -    |
+* [HexDocs: Swoosh](https://hexdocs.pm/swoosh/Swoosh.html)
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)\nprogress_path = __DIR__ <> \"/../student_progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)
-progress_path = __DIR__ <> "/../student_progress.json"
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
 existing_progress = File.read!(progress_path) |> Jason.decode!()
 
-default = Map.get(existing_progress, file_name <> "_reading", false)
+default = Map.get(existing_progress, file_name, false)
 
 form =
   Kino.Control.form(
@@ -693,13 +690,13 @@ Ensure that you do not already have undesired or unrelated changes by running `g
 
 ```
 $ git checkout solutions
-$ git checkout -b /home/brook/dockyard/curriculum/reading/newsletter.livemd-reading
+$ git checkout -b newsletter-reading
 $ git add .
-$ git commit -m "finish /home/brook/dockyard/curriculum/reading/newsletter.livemd reading"
-$ git push origin /home/brook/dockyard/curriculum/reading/newsletter.livemd-reading
+$ git commit -m "finish newsletter reading"
+$ git push origin newsletter-reading
 ```
 
-Create a pull request from your `/home/brook/dockyard/curriculum/reading/newsletter.livemd-reading` branch to your `solutions` branch.
+Create a pull request from your `newsletter-reading` branch to your `solutions` branch.
 Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**

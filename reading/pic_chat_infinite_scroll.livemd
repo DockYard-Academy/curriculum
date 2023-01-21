@@ -608,62 +608,7 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [HexDocs: Client Hooks](https://hexdocs.pm/phoenix_live_view/js-interop.html#client-hooks-via-phx-hook)
 * [HexDocs: Phoenix.LiveView.JS](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html)
 * [HexDocs: Handling server-pushed events](https://hexdocs.pm/phoenix_live_view/js-interop.html#handling-server-pushed-events)
-* [MDN: CSS Animations](https://developer.mozilla.org/pt-BR/docs/Web/CSS/CSS_Animations)## Up Next
-
-| Previous                                              | Next                                       |
-| ----------------------------------------------------- | -----------------------------------------: |
-| [PicChat: PubSub](../reading/pic_chat_pub_sub.livemd) | [Newsletter](../reading/newsletter.livemd) |
-
-## Mark As Completed
-
-<!-- livebook:{"attrs":{"source":"[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)\nprogress_path = __DIR__ <> \"/../student_progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-```elixir
-[_, file_name] = Regex.run(~r/([^\\\\/]+).livemd/, __ENV__.file)
-progress_path = __DIR__ <> "/../student_progress.json"
-existing_progress = File.read!(progress_path) |> Jason.decode!()
-
-default = Map.get(existing_progress, file_name <> "_reading", false)
-
-form =
-  Kino.Control.form(
-    [
-      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
-    ],
-    report_changes: true
-  )
-
-Task.async(fn ->
-  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
-    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
-  end
-end)
-
-form
-```
-
-## Commit Your Progress
-
-Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
-Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
-
-```
-$ git checkout solutions
-$ git checkout -b /home/brook/dockyard/curriculum/reading/pic-chat-infinite-scroll.livemd-reading
-$ git add .
-$ git commit -m "finish /home/brook/dockyard/curriculum/reading/pic chat infinite scroll.livemd reading"
-$ git push origin /home/brook/dockyard/curriculum/reading/pic-chat-infinite-scroll.livemd-reading
-```
-
-Create a pull request from your `/home/brook/dockyard/curriculum/reading/pic-chat-infinite-scroll.livemd-reading` branch to your `solutions` branch.
-Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
-
-**DockYard Academy Students Only:**
-
-Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
-You (or your teacher) may merge your PR into your solutions branch after review.
-
-If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+* [MDN: CSS Animations](https://developer.mozilla.org/pt-BR/docs/Web/CSS/CSS_Animations)
 
 ## Up Next
 

@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Bc.CreateStudentProgress do
 
   alias Utils.Notebooks
 
-  @student_progress_path "../student_progress.json"
+  @student_progress_path "../progress.json"
   @outline_path "../start.livemd"
 
   use Mix.Task
