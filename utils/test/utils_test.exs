@@ -111,8 +111,6 @@ defmodule UtilsTest do
       end)
       |> List.flatten()
 
-    image_paths = Enum.map(file_and_image_paths, fn {_, image_path} -> image_path end)
-
     Enum.each(file_and_image_paths, fn {file_path, image_path} ->
       assert File.exists?(image_path), "Could not find image #{image_path} in #{file_path}"
     end)
