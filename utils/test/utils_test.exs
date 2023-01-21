@@ -98,6 +98,26 @@ defmodule UtilsTest do
     end)
   end
 
+  test "Ensure all images are used and exist" do
+    file_and_image_paths =
+      Path.wildcard("../*/*.livemd")
+      |> Enum.map(fn file_path ->
+        content = File.read!(file_path)
+
+        Regex.scan(~r/!\[[^\]]*\]\(([^http][^\)]+)\)/, content)
+        |> Enum.map(fn [_, image_path] ->
+          {file_path, Path.join(Path.dirname(file_path), URI.decode(image_path))}
+        end)
+      end)
+      |> List.flatten()
+
+    image_paths = Enum.map(file_and_image_paths, fn {_, image_path} -> image_path end)
+
+    Enum.each(file_and_image_paths, fn {file_path, image_path} ->
+      assert File.exists?(image_path), "Could not find image #{image_path} in #{file_path}"
+    end)
+  end
+
   test "Ensure fileu not in outline are deprecated" do
     outline = File.read!("../start.livemd")
 
