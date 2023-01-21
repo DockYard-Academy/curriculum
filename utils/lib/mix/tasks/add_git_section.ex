@@ -6,16 +6,11 @@ defmodule Mix.Tasks.Bc.AddGitSection do
 
   @impl Mix.Task
   def run(_) do
-    base_path = Path.expand("../")
-    reading = Path.wildcard(base_path <> "/reading/*.livemd")
-    exercises = Path.wildcard(base_path <> "/exercises/*.livemd")
+    outline = File.read!("../start.livemd")
 
-    Enum.each(reading, fn path ->
-      add_git_section_to_file(path, :reading)
-    end)
-
-    Enum.each(exercises, fn path ->
-      add_git_section_to_file(path, :exercise)
+    Regex.scan(~r/(reading|exercise)s*\/([^\/]+).livemd/, outline)
+    |> Enum.each(fn [basename, type, file_name] ->
+      add_git_section_to_file(Path.join("../", basename), file_name, type)
     end)
   end
 
@@ -49,7 +44,7 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     end)
 
     form
-  ```
+    ```
 
     ## Commit Your Progress
 
@@ -76,26 +71,10 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     """
   end
 
-  defp deprecated_file?(path) do
-    String.contains?(path, "DEPRECATED")
-  end
-
-  defp add_git_section_to_file(path, type) do
+  defp add_git_section_to_file(path, file_name, type) do
     file = File.read!(path)
-
-    if String.contains?(file, "## Mark As Complete") do
-      new_file =
-        Regex.replace(
-          # Commit Your Progress are always at the end for now.
-          # If this changed, we could use a negative lookahead instead.
-          ~r/\n\#\# Mark As Complete(.|\n)+/,
-          file,
-          commit_snippet(Path.basename(path, ".livemd"), type)
-        )
-
-      File.write!(path, new_file)
-    else
-      File.write!(path, commit_snippet(path, type), [:append])
-    end
+    file_with_section_removed = Regex.replace(~r/\n\#\# Mark As Complete(.|\n)+/, file, "")
+    File.write!(path, file_with_section_removed)
+    File.write!(path, commit_snippet(file_name, type), [:append])
   end
 end

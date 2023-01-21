@@ -1,5 +1,5 @@
 defmodule Utils.NotebooksTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Utils.Notebooks
   doctest Utils.Notebooks
 
