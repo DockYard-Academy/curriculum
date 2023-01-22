@@ -207,7 +207,18 @@ defmodule UtilsTest do
         "../exercises/custom_assertions.livemd",
         "../exercises/supervisor_and_genserver_drills.livemd",
         "../exercises/anagram.livemd",
-        "../exercises/tic-tac-toe.livemd"
+        "../exercises/tic-tac-toe.livemd",
+        "../reading/phoenix_authentication.livemd",
+        "../reading/generic_server.livemd",
+        "../reading/schemas_and_migrations.livemd",
+        "../reading/iex.livemd",
+        "../reading/agents_and_ets.livemd",
+        "../reading/newsletter.livemd",
+        "../reading/phoenix_1.7.livemd",
+        "../reading/executables.livemd",
+        "../reading/phoenix_1.6.livemd",
+        "../reading/supervised_mix_project.livemd",
+        "../reading/liveview.livemd"
       ]
 
       Enum.each(duplicates, fn
