@@ -1,0 +1,206 @@
+# Pokemon Protocols
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Overview
+
+Pokemon are creatures which have the ability to evolve into more powerful versions of
+themselves.
+
+For example, Charmander evolves into Charmeleon, and Charmeleon evolves into Charizard.
+
+```mermaid
+flowchart LR
+  c1[Charmander]
+  c2[Charmeleon]
+  c3[Charizard]
+  c1 --> c2 --> c3
+```
+
+In this exercise, you will create an `Evolvable` protocol which returns the evolved
+version of a Pokemon.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Evolvable.evolve(%Charmander{})
+%Charmeleon{hp: 58, attack: 64: defense: 58}
+```
+
+## Pokemon Structs
+
+In the Elixir cell below, Using the stats from [Pokemon DB](https://pokemondb.net/pokedex), you're going to create a struct that represents each of the following Pokemon.
+
+* [Charmander](https://pokemondb.net/pokedex/charmander)
+* [Charmeleon](https://pokemondb.net/pokedex/charmeleon)
+* [Charizard](https://pokemondb.net/pokedex/charizard)
+
+Each struct should include the following.
+
+* `:hp`
+* `:attack`
+* `:defense`
+
+You can use the base values as defaults from Pokemon DB as
+shown in the following diagram.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  class Charmander {
+    hp: 39
+    attack: 52
+    defense: 43
+  }
+
+  class Charmeleon {
+    hp: 58
+    attack: 64
+    defense: 58
+  }
+
+  class Charizard {
+    hp: 78
+    attack: 84
+    defense: 78
+  }
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Charmander do
+  defstruct hp: 39, attack: 52, defense: 43
+end
+
+defmodule Charmeleon do
+  defstruct hp: 58, attack: 64, defense: 58
+end
+
+defmodule Charizard do
+  defstruct hp: 78, attack: 84, defense: 78
+end
+```
+</details>
+
+```elixir
+defmodule Charmander do
+end
+
+defmodule Charmeleon do
+end
+
+defmodule Charizard do
+end
+```
+
+## Evolvable Protocol
+
+In the Elixir cell below, create an `Evolvable` protocol with an `evolve/1` function.
+
+A `Charmander` struct should return a new `Charmeleon` struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Evolvable.evolve(%Charmander{})
+%Charmeleon{hp: 58, attack: 64: defense: 58}
+```
+
+A `Charmeleon` struct should return a new `Charizard` struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Evolvable.evolve(%Charmeleon{})
+%Charizard{hp: 78, attack: 84: defense: 78}
+```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defprotocol Evolvable do
+  def evolve(pokemon)
+end
+
+defimpl Evolvable, for: Charmander do
+  def evolve(_charmander), do: %Charmeleon{}
+end
+
+defimpl Evolvable, for: Charmeleon do
+  def evolve(_charmeleon), do: %Charizard{}
+end
+```
+</details>
+
+```elixir
+defprotocol Evolvable do
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b pokemon-protocols-exercise
+$ git add .
+$ git commit -m "finish pokemon protocols exercise"
+$ git push origin pokemon-protocols-exercise
+```
+
+Create a pull request from your `pokemon-protocols-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

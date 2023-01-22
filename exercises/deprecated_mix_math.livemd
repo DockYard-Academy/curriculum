@@ -1,0 +1,406 @@
+# Mix Math
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Mix Math
+
+To learn how to create a mix project, you're going to recreate a familiar exercise of
+building a `Math` module that can abstract away the operators for adding different data types.
+
+It should be able to handle adding `strings`, `integers`, `floats`, `lists`, and `maps`.
+
+You'll use **Dialyzer** to create type specifications and **Credo** to ensure code consistency.
+
+You will also use **ExUnit** and **DocTests** to create a comprehensive suite of tests and documentation.
+
+After creating the fully functional `Math` module, you will document the project with **HexDoc**.
+
+## Create A New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `math`.
+
+```
+mix new math
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+## Configure Dialyzer
+
+Add the following to your dependencies in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+```
+
+Run the following in the command line to ensure Dialyzer is working correctly:
+
+```
+mix deps.get
+mix dialyzer
+```
+
+## Configure Credo
+
+Add the following to your dependencies in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+```
+
+Run the following in the command line to ensure Credo is working correctly:
+
+```
+mix deps.get
+mix credo
+```
+
+## Configure ExDoc
+
+Add the following to your dependencies in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ex_doc, "~> 0.27", only: :dev, runtime: false}
+```
+
+Run the following in the command line to ensure `ExDoc` is working correctly.
+
+```
+mix deps.get
+mix docs
+```
+
+Then open the generated `doc/index.html` to see the project documentation. You will need
+to re-run `mix docs` if you wish to update the documentation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/ex_doc_mix_math_example.png)
+
+## Doc Test Cases
+
+In the `math.exs` file create a full suite of doctests for the `Math` module.
+
+### add/2
+
+Create a suite of doc tests to represent the following cases.
+
+* adding two numbers
+* adding (concatenate) two strings
+* adding two lists
+* adding two maps.
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+
+Math.add(1, 1)
+2
+
+Math.add("1", "1")
+"11"
+
+Math.add([1], [2])
+[1, 2]
+
+Math.add(%{1 => 1}, %{2 => 2})
+%{1 => 1, 2 => 2}
+```
+
+## Comprehensive ExUnit Tests (Reading)
+
+The current doctests are not comprehensive enough to properly test functionality.
+
+For example, you can pass the doc tests by simply returning the same output like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# math.exs
+
+@doc ~S"""
+  Adds two similar data types together.
+
+  ## Examples
+
+  iex> Math.add("1", "1")
+  "11"
+"""
+
+def add(string1, string2) do
+  "11"
+end
+```
+
+This passing test is a **false-positive** because it would pass even though the implementation
+is incomplete.
+
+Tests are more comprehensive when there are fewer or no possible implementations that produce
+false positives.
+
+For example, the following test is more comprehensive but can still
+produce a false positive.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# math_test.exs
+test "add/2 add two numbers" do
+  assert Math.add(1, 1) == 2
+  assert Math.add(2, 1) == 3
+end
+
+# math.ex
+def add(number1, number2) do
+  if number1 == 1 do
+    2
+  else
+    3
+  end
+end
+```
+
+Randomized values can make your tests more comprehensive.
+
+For example, the following test should ensure that `Math.add/2` works correctly with two integers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# math_test.exs
+test "add/2 two random integers" do
+  number1 = Enum.random(0..99)
+  number2 = Enum.random(0..99)
+  assert Math.add(number1, number2) == number1 + number2
+end
+```
+
+## False Positives
+
+Add the bare-minimum code necessary to make the current doctests pass. Do not write a
+full solution yet.
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  # math.exs
+  def add(map1, map2) when is_map(map1) and is_map(map2) do
+    %{1 => 1, 2 => 2}
+  end
+
+  def add(string1, string2) when is_binary(string1) and is_binary(string2) do
+    "11"
+  end
+
+  def add(list1, list2) when is_list(list1) and is_list(list2) do
+    [1, 2]
+  end
+
+  def add(number, number) do
+    2
+  end
+```
+
+## Add Typespecs
+
+Add typespects using `@spec` for the `add/2` function.
+
+You will need a separate `@spec` for each of the following types:
+
+* number
+* bitstring
+* list
+* map
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  @spec add(number(), number()) :: number()
+  def add(number1, number2) do
+    number1 + number2
+  end
+```
+
+Run `mix dialyzer` in the command line to ensure that your typespecs are correct.
+
+## Combative Pairing (Partner Exercise)
+
+### add/2
+
+Create a comprehensive ExUnit test for the following test cases:
+
+* adding two integers
+* adding two floats
+* adding two lists
+* adding two maps
+
+Do not implement the code to make the tests pass yet. Once complete, find a partner.
+
+### Partner Implementation
+
+Complete the following exercise with a partner. One partner will be the **TESTER** and the other
+partner will be the **IMPLEMENTER**.
+
+This exercise is best completed through **LiveShare** in Visual Studio Code.
+
+If you do not have a partner, you can complete the exercise being both roles.
+
+Use the test suite created by the **TESTER** in the previous exercise.
+
+As the **IMPLEMENTER**, create a false positive implementation that will make the **TESTER**'s test suite pass.
+
+The **TESTER** will rewrite their tests until the **IMPLEMENTER** cannot think of a way to create a false positive
+and must write a valid solution.
+
+Once complete, swap roles and repeat the exercise.
+
+## Complete!
+
+To finish this exercise:
+
+* Ensure your tests all pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```
+mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+* Ensure your Dialyzer check passes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```
+mix dialyzer
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+* Ensure your Credo check passes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```
+  mix credo
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+* Ensure you have generated the latest documentation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```
+mix docs
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Then make sure to add your changes to git from the `curriculum` folder.
+
+```
+git add .
+git commit -m "finish mix math exercise"
+git push
+```
+
+## Edge Case Tests (Bonus)
+
+It's important to consider edge cases with your tests. For example, what do we want
+to happen when we use the `Math` module incorrectly?
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Math.add(%{}, [])
+** (ArithmeticError) bad argument in arithmetic expression: %{} + []
+    :erlang.+(%{}, [])
+    (math 0.1.0) lib/math.ex:40: Math.add/2
+```
+
+> Depending on your implementation, you may get a different error than the above.
+
+[ArithmeticError](https://hexdocs.pm/elixir/ArithmeticError.html) is not particularly clear. Instead, use `assert_raise` to test that we
+raise a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html). Then, write the code necessary to make the test pass.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b mix-math-exercise
+$ git add .
+$ git commit -m "finish mix math exercise"
+$ git push origin mix-math-exercise
+```
+
+Create a pull request from your `mix-math-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

@@ -1,0 +1,216 @@
+# Behaviours
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Behaviours
+
+Behaviours allow us to create modules that all share a common pattern but need different implementations.
+
+You can define a behaviour, and then two other modules will implement it.
+
+```mermaid
+flowchart
+  A[Behaviour] --> B[Module]
+  A[Behaviour] --> C[Module]
+```
+
+This enforces that both modules will implement a shared **application programming interface**
+or **API**. What is an API? Well, in this specific context the API is the set of
+public-facing functions in a module. More generically an interface is the point at which two systems
+interact. Since we're talking about systems for programming applications, we call it the application
+programming interface.
+
+To define a behaviour, we start by defining a module. However, instead of implementing
+functions, we create `@callback` module attributes. These @callback module attributes
+define the signature of a function.
+
+The signature of a function is the name, params, and expected return value, but not the implementation.
+Essentially, it's the expected input, and output types in our program, but not the actual
+implementation.
+
+To define the expected return value we use `::` and then the data type we expect to return.
+Elixir provides a set of types. You can see the full list of types in the [Typespecs](https://hexdocs.pm/elixir/typespecs.html#basic-types)
+documentation. For now, we're going to use the `String.t()` type. Some other common
+types are `atom()`, `boolean()`, `integer()`, `float()`, and `any()` if you don't require a specific output.
+
+```elixir
+defmodule Villain do
+  @callback catchphrase() :: String.t()
+end
+```
+
+Now a module can use the `Villain` behaviour using the `@behaviour` module attribute.
+You'll notice that Elixir displays a warning because the `DarthVader` module is supposed
+to implement a `catchphrase/0` function.
+
+```elixir
+defmodule DarthVader do
+  @behaviour Villain
+end
+```
+
+To remove the warning, we need to implement `my_function/0` and it should return a string.
+
+```elixir
+defmodule DarthVader do
+  @behaviour Villain
+  def catchphrase do
+    "No, I am your father."
+  end
+end
+
+DarthVader.catchphrase()
+```
+
+So, why use a behaviour?
+
+Primarily, behaviours ensure that any module that implements the behaviour provides the expected set
+of functions and that those functions match the expected function signatures.
+
+Behaviours are another way to achieve `polymorphism`. We can define
+a behaviour, and then several different modules can implement that behaviour. Behaviours
+allow us to create "templates" for modules to ensure each module is consistent.
+
+The **caller**, which is the place in the code where we call a module's function, can
+then have a consistent experience between modules.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  A --> C
+  A --> D
+  A --> E
+  A --> F
+  C --> B
+  D --> B
+  E --> B
+  F --> B
+
+  A[Caller]
+  B[Behaviour]
+  C[Implementation]
+  D[Implementation]
+  E[Implementation]
+  F[Implementation]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+If the behaviour ever needs to change, we can modify the behaviour, and know which modules
+need to be updated thanks to the warnings Elixir provides.
+
+You can also implement behaviours with [dynamic dispatching](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html#dynamic-dispatch)
+which allows the caller to deal with a single module, and swap out the implementation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+  A --> B
+
+  B --> C
+  B --> D
+  B --> E
+  B --> F
+  A[Caller]
+  B[Behaviour]
+  C[Implementation]
+  D[Implementation]
+  E[Implementation]
+  F[Implementation]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+But that's beyond the scope of this lesson.
+
+### Your Turn
+
+In the Elixir cell below, convert the `Pet` module into a behavior.
+The `Pet` behavior should define an `@callback` for a `speak/0` function that returns a string.
+
+```elixir
+defmodule Pet do
+end
+```
+
+Once complete, re-evaluate the following module. It should display a warning.
+
+> speak/0 required by behaviour Pet is not implemented (in module Dog)
+
+Add a `speak/0` function to the `Dog` module. When you re-evaluate the cell, the warning should be gone.
+
+```elixir
+defmodule Dog do
+  @behaviour Pet
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b behaviours-reading
+$ git add .
+$ git commit -m "finish behaviours reading"
+$ git push origin behaviours-reading
+```
+
+Create a pull request from your `behaviours-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

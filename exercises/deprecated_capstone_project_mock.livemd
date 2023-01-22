@@ -1,0 +1,98 @@
+# Capstone: Mock
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Capstone Project
+
+The Capstone Project is an opportunity to demonstrate everything you have learned so far in DockYard Academy, and solidify your skills. It will also be an excellent project you can use on your resume.
+
+In this exercise, plan the features for your Capstone Project. Assuming your project includes visual features, create a mock of your application with [Figma](https://www.figma.com/) or your preferred design software.
+
+Ideally, your capstone project should:
+
+* Demonstrate your skills and knowledge.
+* Help you learn and be fun to build.
+* Be extendable so you can continue to add features as your skillset grows.
+
+Consider the following advice as you decide on what your project should be:
+
+* Avoid feature bloat by defining a minimal set of MVP features you can accomplish before demo day, then bonus features if you have time or that you can work on after this course.
+* Include a personal touch to show off your personality, values, or interests. Make this project your own.
+* Can be ready in time for demo day.
+* Demonstrates what Elixir/Phoenix is great at (real-time features, concurrency, fault-taulerance, etc)
+
+### Examples
+
+* A web game (chess, checkers, etc) themed based on your personal interests. (i.e. A dungeons and dragons themed chess game)
+* A CRUD application such as a Recipe App, Habit Tracker, Note taking app, etc.
+* A real-time website such as a chat app.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Kanban Board
+
+Use [Trello](https://trello.com/) or some other Kanban application such as a [GitHub project board](https://docs.github.com/en/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards) to create a list of cards (features to complete) for your Capstone project.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b capstone-project-mock-exercise
+$ git add .
+$ git commit -m "finish capstone project mock exercise"
+$ git push origin capstone-project-mock-exercise
+```
+
+Create a pull request from your `capstone-project-mock-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

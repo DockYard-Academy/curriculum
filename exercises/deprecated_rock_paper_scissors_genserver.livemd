@@ -1,0 +1,194 @@
+# Rock Paper Scissors Genserver
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Rock Paper Scissors Genserver
+
+So far we've created synchronous rock paper scissors game where each player needs to enter their guess into the same function at the same time.
+
+Now, we're going to use message passing to create a real-time rock paper scissors game with two players and a game server.
+
+```mermaid
+flowchart
+  P1[Player1]
+  P2[Player2]
+  G[GameServer]
+
+  G --> P1
+  G --> P2
+```
+
+The `Game` server will store the current round, and the pids of the two players. Each `Player` will store their win/loss/tie ratio.
+
+```mermaid
+flowchart
+  P1[Player1]
+  P2[Player2]
+  G[GameServer]
+  P1S[State]
+  P2S[State]
+  GS[State]
+
+  P1 --> P1S
+  
+  P2 --> P2S
+
+  G  --> GS
+
+  P1S --> P1W[wins]
+  P1S --> P1L[loses]
+  P1S --> P1T[ties]
+
+  P2S --> P2W[wins]
+  P2S --> P2L[loses]
+  P2S --> P2T[ties]
+
+  GS  --> Player1[Player1 Pid]
+  GS  --> Player2[Player2 Pid]
+  GS  --> Round[Round]
+```
+
+We'll use message passing to have each `Player` submit their choice to the `Game` server. Once both players submit their
+choice the `Game` server should update the current round and send both players a message back to let them know if they won, lost, or tied.
+
+```mermaid
+flowchart
+  P1[Player1]
+  P2[Player2]
+  G[GameServer]
+
+  P1 --rock--> G
+  P2 --paper--> G
+
+  G --lose--> P1
+  G --win--> P2
+```
+
+The `Player` server should then update it's own win/lose/state.
+
+We should be able to start a `Player` server with `Player.new/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, player_pid} = Player.new()
+```
+
+The `Game` module should be able to start a new game process and accept the two player processes for
+player1 and player2.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, player1_pid} = Player.new()
+{:ok, player2_pid} = Player.new()
+{:ok, game_pid} = Game.start(player1_pid, player2_pid)
+```
+
+The `Player` module should be able to choose either `:rock`, `:paper`, or `:scissors`. This should
+send a message to the `Game` server.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Player.choose(game_pid, player1_pid, :rock)
+:ok
+```
+
+When both players submit their choice, the `Game` should update
+it's state, and send a message back to each player which should cause them to update their own state.
+
+We should be able to see the current `Game` information through the `Game.stats/1` function.
+And the current `Player` information through the `Player.stats/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Game.choose(game_pid, player1_pid, :rock)
+:ok
+Game.choose(game_pid, player2_pid, :scissors)
+:ok
+
+Game.stats(game_pid)
+%{round: 2}
+
+Player.stats(player1_pid)
+%{wins: 1, ties: 0, loses: 0}
+
+Player.stats(player2_pid)
+%{wins: 0, ties: 0, loses: 1}
+```
+
+In the Elixir cell below, create the `Game` and `Player` GenServer modules.
+
+```elixir
+defmodule Game do
+end
+
+defmodule Player do
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b rock-paper-scissors-genserver-exercise
+$ git add .
+$ git commit -m "finish rock paper scissors genserver exercise"
+$ git push origin rock-paper-scissors-genserver-exercise
+```
+
+Create a pull request from your `rock-paper-scissors-genserver-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

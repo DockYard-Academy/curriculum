@@ -1,0 +1,195 @@
+# Currency Conversion
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Currency Conversion
+
+You are building an app which accepts payments. Originally, your app was built assuming it would only
+accept a single currency, however it expands to accept multiple currencies.
+
+You are tasked with the assignment of converting one currency to another according to the
+following conversion rates.
+
+* Canadian Dollar (`:CAD`): $1.00
+* US Dollar (`:USD`): $1.29
+* European Euro (`:EUR`): $1.39
+
+While not a perfect solution, you may round currency conversions using `round/1`.
+
+For example, `500` `:EUR` would become `360` `:CAD`.
+
+```elixir
+round(500 / 1.39)
+```
+
+Remember that currency should not be stored in a float,
+instead money will be stored in a `Money` struct where `:amount` is stored as an integer of cents.
+
+> "If I had a dime for every time I've seen someone use FLOAT to store currency, I'd have $999.997634" -- Bill Karwin
+
+* Create a `Money` struct with `:amount` and `:currency`.
+* Create a `convert/2` function to convert a money struct from one currency to another.
+* Create an `add/2` function to add one money struct of the same currency to another.
+* Create a `subtract/2` function to subtract one money struct of the same currency to another.
+* Create a `multiply` function to multiply one money struct by a number.
+
+### Examples
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+five_eur = Money.new(500, :EUR)
+%Money{amount: 500, currency: :EUR}
+
+Money.convert(five_eur, :CAD)
+%Money{amount: 695, currency: :EUR}
+
+ten_eur = Money.add(five_eur, five_eur)
+%Money{amount: 10_00, currency: :EUR}
+
+hundred_eur = Money.multiply(ten_eur, 10)
+%Money{amount: 100_00, currency: :EUR}
+
+ninety_nine_eur = Money.subtract(hundred_eur, ten_eur)
+%Money{amount: 90, currency: :EUR}
+
+Money.add(%Money{amount: 500, :EUR}, %Money{amount: 500, :CAD})
+** (FunctionClauseError) no function clause matching in Money.add/2
+```
+
+Enter your solution below.
+
+```elixir
+defmodule Money do
+  defstruct []
+
+  @doc ~S"""
+  Create a new `Money` struct with the given `amount` and `currency`.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD)
+      %Money{amount: 500, currency: :CAD}
+
+  """
+  def new(amount, currency) do
+  end
+
+  @doc ~S"""
+  Converts a `Money` struct from its current currency to the given `currency`.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD) |> Money.convert(:EUR)
+      %Money{amount: 360, currency: :EUR}
+
+  """
+  def convert(money, currency) do
+  end
+
+  @doc ~S"""
+  Adds two `Money` structs of the same currency to one another.
+
+  ## Examples
+
+      iex> Money.new(500, :CAD) |> Money.add(Money.new(500, :CAD))
+      %Money{amount: 1000, currency: :CAD}
+
+  """
+  def add(money1, money2) do
+  end
+
+  @doc ~S"""
+  Multiplies a `Money` struct by the given `multiplier`.
+
+  ## Examples
+
+      iex> Money.new(100, :CAD) |> Money.multiply(10)
+      %Money{amount: 1000, currency: :CAD}
+
+      iex> Money.new(100, :CAD) |> Money.multiply(1.1)
+      %Money{amount: 110, currency: :CAD}
+
+  """
+  def multiply(money, multiplier) do
+  end
+
+  @doc ~S"""
+  Subtracts `money2` from `money1` given they are `Money` structs with the same currency.
+
+  ## Examples
+
+      iex> Money.new(10_000, :USD) |> Money.subtract(Money.new(100, :USD)
+      %Money{amount: 9900, currency: :USD}
+
+  """
+  def subtract(money1, money2) do
+  end
+end
+```
+
+This exercise is inspired by the Elixir [Money](https://github.com/elixirmoney/money) library.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b currency-conversion-exercise
+$ git add .
+$ git commit -m "finish currency conversion exercise"
+$ git push origin currency-conversion-exercise
+```
+
+Create a pull request from your `currency-conversion-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

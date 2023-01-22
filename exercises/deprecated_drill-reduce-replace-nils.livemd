@@ -1,0 +1,216 @@
+# Drill: Replace `nil`s in A List With Elements From A 2nd List
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Purpose
+
+This is a *drill* exercise:
+
+> *Drill* exercises are meant to provide practise of Elixir's
+> syntax and important language modules so developers can
+> type them out as fast as possible.
+> The problem should not be conceptually difficult to
+> facilitate this goal.
+> 
+> Developers need to commit both Elixir's syntax and core
+> modules/functions to (working) memory so that when writing
+> their code the developer is not slowed down having to
+> remember the syntax or which module function to use. This
+> is analogous to knowing how to spell and the grammar of
+> your (human) language.
+
+To develop familiarity with the `reduce` function, you will replace
+`nil` values in a list with values from a second list at the same
+index.
+
+For example:
+
+```elixir
+list1 = [0, nil, 2, 3, nil]
+list2 = [:a, :b, :c, :d, :e]
+
+ReplaceNils.replace(list1, list2)
+[0, :b, 2, 3, :e]
+```
+
+You can assume the lists are of the same length.
+
+Implement the `ReplaceNils` module as below:
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    nil
+  end
+end
+```
+
+Here are some additional test data to think about:
+
+```text
+Testcase 1:
+  Input1:   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Expected: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 2:
+  Input1:   [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  Input2:   [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  Expected: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 3:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+Testcase 4:
+  Input1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  Input2: [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+Testcase 5:
+  [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+```
+
+Here are some example solutions:
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 1</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    input1
+    |> Enum.with_index()
+    |> Enum.reduce([], fn
+      {element, index}, acc ->
+        if element == nil do
+          [Enum.at(input2, index) | acc]
+        else
+          [element | acc]
+        end
+    end)
+    |> Enum.reverse()
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 2</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(input1, input2) do
+    input1
+    |> Enum.with_index()
+    |> Enum.reduce([], fn
+      {nil, index}, acc -> [Enum.at(input2, index) | acc]
+      {element, _index} -> [element | acc]
+    end)
+    |> Enum.reverse()
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 3</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(as, bs) do
+    [as, bs]
+    |> Enum.zip()
+    |> Enum.reduce([], fn
+      {nil, b}, acc -> acc ++ [b]
+      {a, _b}, acc -> acc ++ [a]
+    end)
+  end
+end
+```
+
+</details>
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution 4</summary>
+
+```elixir
+defmodule ReplaceNils do
+  def replace(as, bs) do
+    a_or_b = fn {a, b}, acc -> [a || b | acc] end
+
+    [as, bs]
+    |> Enum.zip()
+    |> Enum.reduce([], a_or_b)
+    |> Enum.reverse()
+  end
+end
+```
+
+</details>
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b drill-reduce-replace-nils-exercise
+$ git add .
+$ git commit -m "finish drill-reduce-replace-nils exercise"
+$ git push origin drill-reduce-replace-nils-exercise
+```
+
+Create a pull request from your `drill-reduce-replace-nils-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

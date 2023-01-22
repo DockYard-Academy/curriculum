@@ -1,0 +1,146 @@
+# Mining Simulator
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Mining Simulator
+
+We're going to create a gold mining simulator game.
+
+This project is designed to learn about supervisors and fault tolerance.
+
+A `MineSupervisor` will supervise a dynamic number of `Mine` workers. Each `Mine` will be a [GenServer](https://hexdocs.pm/elixir/GenServer.html).
+
+```mermaid
+flowchart
+  MS[MineSupervisor]
+  M1[Mine]
+  M2[Mine]
+  M3[Mine]
+
+  MS --> M1
+  MS --> M2
+  MS --> M3
+```
+
+Each `Mine` will harvest `5` gold every `5` seconds.
+
+Upon harvesting, each `Mine` will send a message to the `ResourceStore` [GenServer](https://hexdocs.pm/elixir/GenServer.html) to store `5` more gold.
+
+```mermaid
+flowchart
+M1[Mine] --send 5 gold--> ResourceStore
+```
+
+## Create A New Mix Project
+
+Using the command line, create a new supervised project in the `projects` folder called `mining_simulator`.
+
+```
+mix new mining_simulator --sup
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Dialyzer, Credo, and ExDoc are optional for this project.
+
+## Configure the MineSupervisor
+
+Configure the MineSupervisor to start in `application.ex`.
+The MineSupervisor should be able to dynamically supervise its child `Mine` workers.
+
+## Configure the ResourceStore
+
+Configure the `ResourceStore` to start in `application.ex`.
+The `ResourceStore` should be a [GenServer](https://hexdocs.pm/elixir/GenServer.html) or [Agent](https://hexdocs.pm/elixir/Agent.html), which starts with `200` gold in its state.
+
+## MiningSimulator.new_mine/0
+
+The `MiningSimulator.new_mine/0` function should start a `Mine` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under the `MineSupervisor`.
+It should remove `200` gold from the `ResourceStore`.
+
+The `Mine` harvests resources on an interval and sends a message to add gold to the `ResourceStore`.
+
+If there is less than `200` gold in the `ResourceStore`, the `new_mine/0` function should return an error tuple `{:error, :not_enough_funds}`
+
+## MiningSimulator.explode/1
+
+Don't worry, these Mine's are `100%` robot operated and fully insured so if a mine explodes we can start
+a new mine.
+
+The `MiningSimulator.explode/1` function should take the `pid` of a `Mine` and kill the `Mine`'s process.
+The `MineSupervisor` should then automatically start up a new `Mine`.
+
+## (Bonus) Finite Resources
+
+Each `Mine` should start with a finite amount of resources (A random amount between `500` and `1000` gold).
+Every time the `Mine` harvests, resources decrease the total gold available by `5`.
+
+The' Mine' should terminate without being restarted by the `MineSupervisor` when the' Mine' runs out of resources.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b mining-simulator-exercise
+$ git add .
+$ git commit -m "finish mining simulator exercise"
+$ git push origin mining-simulator-exercise
+```
+
+Create a pull request from your `mining-simulator-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

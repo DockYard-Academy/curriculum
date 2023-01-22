@@ -1,0 +1,259 @@
+# Todo List
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Create A New Mix Project
+
+Create a new project in the `projects` folder called `candy_store` using the command line.
+
+```
+mix new todo_list --sup
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+## Install Ecto Dependencies
+
+Add the following to your dependencies in `mix.exs`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ecto_sql, "~> 3.0"},
+{:postgrex, ">= 0.0.0"}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Install dependencies with `mix deps.get`.
+
+## Generate the Repo
+
+Set up the Ecto configuration by running the following from the project folder.
+
+```
+mix ecto.gen.repo -r TodoList.Repo
+```
+
+You may need to change your `config/config.exs` file to match the username and password of your local PostgreSQL installation.
+
+For debugging instructions, see the [Ecto Documentation](https://hexdocs.pm/ecto/getting-started.html).
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :todo_list, TodoList.Repo,
+  database: "friends",
+  username: "user",
+  password: "pass",
+  hostname: "localhost"
+```
+
+```elixir
+
+```
+
+Add the following to your `config/config.exs` file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :todo_list,
+  ecto_repos: [TodoList.Repo]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Add the Repo to the applications supervision tree in `application.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{TodoList.Repo, []}
+```
+
+## Set Up the Database
+
+In the project folder, run the following from the command line.
+This will create the corresponding database for your application.
+
+```
+mix ecto.create
+```
+
+Hopefully, everything should run, and you will see:
+
+```
+The database for TodoList.Repo has been created.
+```
+
+However, you may encounter a bug.
+Here are some debugging tips to consider.
+
+* Ensure that the PostgreSQL service is running.
+* Ensure that your PostgreSQL username and password match.
+
+If you are stuck, you can speak with your teacher or classmates. You can also [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+on the DockYard Academy github with an explanation of your error.
+
+## Todo List
+
+Now that we have a mix project with Ecto, you will create a to-do list application.
+We should be able to:
+
+* create a to-do item
+* get all to-do items
+* update a to-do item
+* delete a to-do item
+
+## Create An Item Migration
+
+We can generate a new migration for items with:
+
+```
+mix ecto.gen.migration create_items
+```
+
+Define an `:items` table. Each item should have a `:title`, which is a `:string`.
+
+## Define An Item Schema
+
+Define a `TodoList.Item` Schema. Each `TodoList.Item` should have a `:title` which is a `:string`.
+
+## Create An Item
+
+Define a `TodoList.create_item/1` function which should accept a map to create a `TodoList.Item`.
+The created `TodoList.Item` should persist in the database.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.create_item(%{title: "My Title"})
+{:ok, %TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1})
+```
+
+## Get Items
+
+Define a `TodoList.all_items/0` function which should retrieve all created `TodoList.Item`s from the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.all_items()
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1}])
+```
+
+## Update Item
+
+Define a `TodoList.update_item/2` function. It should update an existing `TodoList.Item`.
+It should accept the `id` of an item and a map of fields to update.
+
+This new item should persist with the changes in the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.update_item(1, %{title: "My New Title"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My New Title", id: 1}])
+```
+
+## Delete Item
+
+Define a `TodoList.delete_item/1` function. It should delete an existing `TodoList.Item` from the
+database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.update_item(1, %{title: "My New Title"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My New Title", id: 1}])
+```
+
+## (Bonus) Filter Items
+
+Define a `TodoList.all_items/1` function which accepts a `map` of params to search for.
+It should be able to search by the `:title`. It should also search by partially matching titles.
+
+So `"My"` would find `"My Title"`
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+  <summary>Hint</summary>
+  You could filter using the <code>Enum</code> module, however, it will be more performant to rely on <code>Ecto.Query</code>..
+</details>
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+TodoList.all_items(%{"My"})
+{:ok, [%TodoList.Item{__meta__: #Ecto.Schema.Metadata<:loaded>, title: "My Title", id: 1}])
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b todo-list-exercise
+$ git add .
+$ git commit -m "finish todo list exercise"
+$ git push origin todo-list-exercise
+```
+
+Create a pull request from your `todo-list-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

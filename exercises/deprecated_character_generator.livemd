@@ -1,0 +1,164 @@
+# Character Generator
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Character Generator
+
+You are building a text RPG game where players can create a character.
+In the Elixir cell below,
+
+* Create a `Character` struct
+* `Character`s should have `health`, `class`, `description`, `name`, `level`, and `attack` fields.
+* `health` should be a **float**.
+* `class` should be an **atom** of either `:wizard`, `:warrior`, or `:ranger`.
+* `name` should be a **string**.
+* `description` should be a **string**.
+* `level` should be an integer defaulted to `1`
+* `attack` should be an integer defaulted to `5`
+
+```elixir
+defmodule Character do
+end
+```
+
+## Character Validation
+
+* Create a `Character.new/1` function which validates the parameters given to character.
+* `level` should not be used to create a character, all characters start at `1`
+* `attack` should not be used to create a character, all characters start at `5`
+* `health` should not be used to create a character, wizards start with `10` health, rangers `15`, and warriors `20`.
+* enforce that `class` one of the three correct atoms
+* enforce that `name` is a string
+* enforce that `description` is a string
+
+```elixir
+
+```
+
+## Character Randomizer
+
+* Create a `Character.randomize/1` function which accepts an existing `Character` struct and randomizes
+  the `class`, `name`, and `description`.
+* a **random** `class` should be one of `:wizard`, `:warrior`, and `:ranger`
+* a **random** `name` should be a random `7` to `14` letter string of random alphabetical characters.
+* a **random** `description` should be a random `100` to `200` letter string of random alphabetical characters.
+* `attack` should be updated to match the random `class`.
+* `level` and `attack` should be unchanged.
+
+## Character Form
+
+### Kino Inputs
+
+In order to complete this exercise, you're going to use [Kino](https://hexdocs.pm/kino/Kino.html). Kino is a library specifically for
+Livebook - the program you're using to run this course.
+
+```elixir
+text_input = Kino.Input.text("the label of your input")
+```
+
+Then you can access the value inside of the text input with `Kino.Input.read/1`
+
+```elixir
+text_input_value = Kino.Input.read(text_input)
+```
+
+You can also create select inputs with `Kino.Input.select`
+
+```elixir
+Kino.Input.select("Language", [{"key1", :value1}, {"key2", :value2}])
+```
+
+### Create A Character Form
+
+In the Elixir cell below, Create a `name` input using `Kino.Input.text/1`
+
+```elixir
+
+```
+
+Create a `description` input using `Kino.Input.text/1`
+
+```elixir
+
+```
+
+Create a `class` input using `Kino.Input.select/1`. It should have `:wizard`, `:warrior`, and `:ranger` as options.
+
+```elixir
+
+```
+
+In the Elixir cell below, use the inputs you defined above and `Kino.Input.read/1` to create
+an instance of a `Character` struct i.e. `%Character{params}`.
+
+```elixir
+
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b character-generator-exercise
+$ git add .
+$ git commit -m "finish character generator exercise"
+$ git push origin character-generator-exercise
+```
+
+Create a pull request from your `character-generator-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

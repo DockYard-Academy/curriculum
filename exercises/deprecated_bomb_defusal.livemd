@@ -1,0 +1,141 @@
+# Bomb Defusal
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Bomb Defusal
+
+We're going to create a bomb defusal game.
+
+There will be multiple bombs that need to be defused. If any of the bombs go off the entire game will be reset.
+
+A `BombSupervisor` will supervise three `Bomb`s. If any of the bombs detonate, every bomb detonates.
+
+```mermaid
+flowchart
+  S[BombSupervisor]
+  C1[Bomb]
+  C2[Bomb]
+  C3[Bomb]
+
+  S --> C1
+  S --> C2
+  S --> C3
+```
+
+That means when a `Bomb` process dies, the `BombSupervisor` will restart every `Bomb` process.
+
+## Create A New Mix Project
+
+Using the command line, create a new supervised project in the `projects` folder called `bomb_defusal`.
+
+```
+mix new bomb_defusal --sup
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Dialyzer, Credo, and ExDoc are optional for this project.
+
+## Create the Bomb GenServer
+
+Create a `Bomb` [GenServer](https://hexdocs.pm/elixir/GenServer.html). It should start as a minimal [GenServer](https://hexdocs.pm/elixir/GenServer.html) with no functionality.
+
+## Configure the BombSupervisor
+
+Configure the BombSupervisor to start in `application.ex`.
+It should start with 3 `Bomb` [GenServer](https://hexdocs.pm/elixir/GenServer.html)s as children.
+
+## :explode
+
+Send a `Bomb` an `:explode` message. It should handle the message by terminating.
+The `BombSupervisor` should automatically restart all of the `Bomb` processes.
+
+## (Bonus) :cut
+
+We will defuse bombs by sending them a `:cut` message with a `:red`, `:white`, or `:black` wire.
+
+When a `Bomb` is initialized, it should store a randomized wire of either `:red`, `:white`, or `:black` in
+it's state as the correct wire to defuse the bomb.
+
+If the wire from the `:cut` message is correct, defuse the bomb.
+
+A defused bomb will no longer terminal when sent the `:explode` message.
+
+## (Bonus) Timer
+
+Add a `Timer` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under the `BombSupervisor` tree.
+
+The `Timer` should store a `5` minute timer which decrements every second.
+
+Every time a `:cut` message is sent to a bomb with an incorrect value, the `Timer` should decrement by `30` seconds.
+
+When the `Timer` reaches `0` it should terminate the `BombSupervisor` which should automatically restart under
+the application supervisor.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b bomb-defusal-exercise
+$ git add .
+$ git commit -m "finish bomb defusal exercise"
+$ git push origin bomb-defusal-exercise
+```
+
+Create a pull request from your `bomb-defusal-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

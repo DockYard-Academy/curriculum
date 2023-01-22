@@ -1,0 +1,145 @@
+# Snowman Script
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Overview
+
+Snowman is a game where players guess a letter in a hidden word.
+For each incorrect guess they draw a piece of a snowman.
+If they finish the snowman before guessing the word then they lose.
+
+Players are given empty spaces representing characters in the word. They then guess a letter, and any letters in
+that word are revealed.
+
+For example, the player may be given a 5 letter word.
+
+```
+_ _ _ _ _
+```
+
+The player guesses the letter `e`, and the following is revealed.
+
+```
+_ e _ _ _
+```
+
+The player continues to guess, and gradually the answer is revealed as `"hello"`.
+
+```
+h e l l o
+```
+
+## Create A Snowman Script
+
+In the `projects` folder, create a `snowman.exs` script.
+
+When you execute the `snowman.exs` script it should randomly generate a word from
+a list of your choosing, for example:
+
+```elixir
+Enum.random(["snowball", "carrot", "winter"])
+```
+
+The game should prompt players to enter a guess and display empty underscores `_`.
+The player can then enter a single letter to guess.
+
+A correct guess should reveal any matching letters in the word. An incorrect guess
+should print the previously revealed letters.
+
+For example,
+
+```
+$ elixir snowman.exs
+_ _ _ _ _
+w
+w _ _ _ _
+o
+w o _ _ _
+r
+w o r _ _
+l
+w o r l _
+e
+w o r l _
+d
+w o r l d
+```
+
+## (Bonus) Draw A Snowman
+
+Draw a snowman or other ASCII picture of your choosing gradually with each failed guess. Once the player reaches
+the maximum number of guesses (based on how many steps it takes to draw your ASCII picture.) end the game with a failure
+message. For example, you might gradually draw the following:
+
+```
+   _==_ _
+ _,(",)|_|
+  \/. \-|
+__( :  )|_
+```
+
+> Art by Hayley Jane Wakenshaw
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b snowman-script-exercise
+$ git add .
+$ git commit -m "finish snowman script exercise"
+$ git push origin snowman-script-exercise
+```
+
+Create a pull request from your `snowman-script-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

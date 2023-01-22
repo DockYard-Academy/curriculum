@@ -99,4 +99,45 @@ defmodule Utils.Notebooks do
     end)
     |> Enum.join(" ")
   end
+
+  def student_progress_map(outline) do
+    Regex.scan(~r/\[[^\]]+\]\((reading|exercises)\/([^\)]+)\.livemd\)/, outline)
+    |> Enum.reduce(%{}, fn [_, type, name], acc ->
+      key =
+        case type do
+          "reading" -> "#{name}_reading"
+          "exercises" -> "#{name}_exercise"
+        end
+
+      Map.put(acc, key, false)
+    end)
+  end
+
+  def navigation_blocks(outline) do
+    files =
+      Regex.scan(~r/\[([^\]]+)\]\((\w+\/[^\)]+\.livemd)\)/, outline)
+      |> Enum.map(fn [_, lesson_name, file_name] ->
+        {file_name, "[#{lesson_name}](../#{file_name})"}
+      end)
+
+    Enum.reduce(Enum.with_index(files), %{}, fn {{file_name, _}, index}, acc ->
+      prev = index > 0 && Enum.at(files, index - 1)
+      next = Enum.at(files, index + 1)
+
+      Map.put(acc, file_name, %{
+        prev: (prev && elem(prev, 1)) || "-",
+        next: (next && elem(next, 1)) || "-"
+      })
+    end)
+  end
+
+  def navigation(navigation_map, file_name) do
+    """
+    ## Up Next
+
+    | Previous | Next |
+    | :------- | ----:|
+    | #{navigation_map[file_name].prev} | #{navigation_map[file_name].next} |
+    """
+  end
 end

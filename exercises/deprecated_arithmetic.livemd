@@ -1,0 +1,315 @@
+# Integers
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Balance the Scale
+
+Use integers to balance the scale.
+
+For example, if 10 were on the left and 20 were on the right, you would add `10`
+to the left or add `-10` to the right.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+Left --- Right
+subgraph Right
+100
+end
+
+subgraph Left
+10
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the left")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+17
+end
+
+subgraph Right
+13
+2
+5
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the left")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+20
+end
+
+subgraph Right
+5
+19
+1
+end
+```
+
+```elixir
+Kino.Input.number("add ___ from the right")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+-5
+10
+end
+
+subgraph Right
+1
+2
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the right")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+A[10 * 10]
+20
+end
+
+subgraph Right
+110
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the right")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+A[20 - 5]
+10
+end
+
+subgraph Right
+  20
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the right")
+```
+
+```mermaid
+flowchart LR
+Left --- Right
+
+subgraph Left
+25
+end
+
+subgraph Right
+20
+end
+```
+
+```elixir
+Kino.Input.number("add ___ to the left")
+```
+
+## Solve For X
+
+In the Elixir cells below, enter the result of the equation. You should use
+[Arithmetic Operators](../reading/arithmetic_operators) rather than solving the equation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Four plus 3 times 10.
+
+```elixir
+
+```
+
+Ten times ten times ten.
+
+```elixir
+
+```
+
+Ten to the power of two hundred and one.
+
+```elixir
+
+```
+
+Ten minus fourteen plus twelve.
+
+```elixir
+
+```
+
+The remainder of 10 / 3.
+
+```elixir
+
+```
+
+200 divided by 3.
+
+```elixir
+
+```
+
+Half of 214.
+
+```elixir
+
+```
+
+75% of 456.
+
+```elixir
+
+```
+
+Ten minus two times 5.
+
+```elixir
+
+```
+
+(Ten minus two) times 5.
+
+```elixir
+
+```
+
+Divide 10 by 3.
+
+```elixir
+
+```
+
+Use integer division to divide 10 by 3.
+
+```elixir
+
+```
+
+Ten minus two times 10 to the power of 2.
+
+```elixir
+
+```
+
+Negative ten plus four.
+
+```elixir
+
+```
+
+Five plus negative six minus negative two.
+
+```elixir
+
+```
+
+60 percent of 5 plus four.
+
+```elixir
+
+```
+
+Seventy divided by (ten plus two).
+
+```elixir
+
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b arithmetic-exercise
+$ git add .
+$ git commit -m "finish arithmetic exercise"
+$ git push origin arithmetic-exercise
+```
+
+Create a pull request from your `arithmetic-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

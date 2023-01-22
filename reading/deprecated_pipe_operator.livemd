@@ -1,0 +1,145 @@
+# Pipe Operator
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Lesson
+
+To create more complex behavior, you'll often compose smaller functions together. Composing functions together reflects
+nature of problem-solving where we take large problems and break them down into smaller ones.
+
+To help compose functions together, Elixir provides the pipe `|>` operator.
+That's the `|` symbol likely above your enter key, and the greater than `>` symbol side by side to make `|>`.
+
+The pipe operator allows you to take the output of one function and pass it in as an argument
+for the input of another function.
+
+```mermaid
+flowchart LR
+  A[Input] --> B[Function1]
+  B --> C[Pipe]
+  C --> D[Function2]
+  D --> E[Output]
+```
+
+Why is this useful? Without the pipe operator you can wind up writing deeply nested function calls.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+four.(three.(two.(one.())))
+```
+
+But with the pipe operator, you can chain functions together.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+one.() |> two.() |> three.() |> four.()
+```
+
+If a function is called with multiple arguments, the function piped in will be the first argument.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+two(1, 2) # how to call two/2 by itself.
+
+# How to use the pipe operator
+# to call the two/2 with one/1 as the first argument.
+one.() |> two.(2)
+```
+
+You can also pass in a value to a pipe.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+1 |> two.()
+```
+
+The pipe operator doesn't change the behavior of a program. Instead, the pipe operator
+exists as syntax sugar to improve the clarity of your code.
+
+```elixir
+add_grapes = fn shopping_list -> shopping_list ++ ["grapes"] end
+add_pizza = fn shopping_list -> shopping_list ++ ["pizza"] end
+add_blueberries = fn shopping_list -> shopping_list ++ ["blueberries"] end
+
+[]
+|> add_grapes.()
+|> add_pizza.()
+|> add_blueberries.()
+|> add_pizza.()
+|> add_blueberries.()
+
+# vs the alternative
+add_blueberries.(add_pizza.(add_blueberries.(add_pizza.(add_grapes.([])))))
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b pipe-operator-reading
+$ git add .
+$ git commit -m "finish pipe operator reading"
+$ git push origin pipe-operator-reading
+```
+
+Create a pull request from your `pipe-operator-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

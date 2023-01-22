@@ -4,52 +4,47 @@ defmodule Mix.Tasks.Bc.AddGitSection do
 
   use Mix.Task
 
-  @ignore_reading_files [
-    "code_editors.livemd",
-    "command_line.livemd",
-    "git.livemd",
-    "livebook.livemd"
-  ]
-  @ignore_exercise_files [
-    "command_line_family_tree.livemd",
-    "github_collab.livemd",
-    "github_engineering_journal.livemd",
-    "livebook_recovery.livemd"
-  ]
-
   @impl Mix.Task
   def run(_) do
-    %{reading: reading, exercise: exercise} = get_paths()
+    outline = File.read!("../start.livemd")
 
-    Enum.each(reading, fn path ->
-      add_git_section_to_file(path, "finish #{spaced_filename(path)} section")
-    end)
-
-    Enum.each(exercise, fn path ->
-      add_git_section_to_file(path, "finish #{spaced_filename(path)} exercise")
+    Regex.scan(~r/(reading|exercise)s*\/([^\/]+).livemd/, outline)
+    |> Enum.each(fn [basename, type, file_name] ->
+      add_git_section_to_file(Path.join("../", basename), file_name, type)
     end)
   end
 
-  defp get_paths do
-    base_path = Path.expand("../")
-
-    reading_files =
-      Path.wildcard(base_path <> "/reading/*.livemd")
-      |> Enum.filter(fn path ->
-        Path.basename(path) not in @ignore_reading_files && !deprecated_file?(path)
-      end)
-
-    exercise_files =
-      Path.wildcard(base_path <> "/exercises/*.livemd")
-      |> Enum.filter(fn path ->
-        Path.basename(path) not in @ignore_exercise_files && !deprecated_file?(path)
-      end)
-
-    %{reading: reading_files, exercise: exercise_files}
-  end
-
-  defp commit_snippet(exercise_name, commit_message) do
+  defp commit_snippet(file_name, type) do
     """
+
+    ## Mark As Completed
+
+    <!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \\"\\"), \\".livemd\\")\\n\\nprogress_path = __DIR__ <> \\"/../progress.json\\"\\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\\n\\ndefault = Map.get(existing_progress, file_name, false)\\n\\nform =\\n  Kino.Control.form(\\n    [\\n      completed: input = Kino.Input.checkbox(\\"Mark As Completed\\", default: default)\\n    ],\\n    report_changes: true\\n  )\\n\\nTask.async(fn ->\\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\\n  end\\nend)\\n\\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+    ```elixir
+    file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+    progress_path = __DIR__ <> "/../progress.json"
+    existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+    default = Map.get(existing_progress, file_name, false)
+
+    form =
+      Kino.Control.form(
+        [
+          completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+        ],
+        report_changes: true
+      )
+
+    Task.async(fn ->
+      for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+        File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+      end
+    end)
+
+    form
+    ```
 
     ## Commit Your Progress
 
@@ -57,51 +52,29 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
     ```
-    $ git checkout main
-    $ git checkout -b exercise-#{exercise_name}
+    $ git checkout solutions
+    $ git checkout -b #{String.replace(file_name, "_", "-")}-#{type}
     $ git add .
-    $ git commit -m "#{commit_message}"
-    $ git push origin exercise-#{exercise_name}
+    $ git commit -m "finish #{String.replace(file_name, "_", " ")} #{type}"
+    $ git push origin #{String.replace(file_name, "_", "-")}-#{type}
     ```
 
-    Create a pull request to your forked `main` branch. Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+    Create a pull request from your `#{String.replace(file_name, "_", "-")}-#{type}` branch to your `solutions` branch.
+    Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
     **DockYard Academy Students Only:**
 
     Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+    You (or your teacher) may merge your PR into your solutions branch after review.
 
     If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
     """
   end
 
-  defp deprecated_file?(path) do
-    String.contains?(path, "DEPRECATED")
-  end
-
-  defp add_git_section_to_file(path, commit_message) do
+  defp add_git_section_to_file(path, file_name, type) do
     file = File.read!(path)
-
-    if String.contains?(file, "## Commit Your") do
-      new_file =
-        Regex.replace(
-          # Commit Your Progress are always at the end for now.
-          # If this changed, we could use a negative lookahead instead.
-          ~r/\n\#\# Commit Your(.|\n)+/,
-          file,
-          commit_snippet(exercise_name(path), commit_message)
-        )
-
-      File.write!(path, new_file)
-    else
-      File.write!(path, commit_snippet(path, commit_message), [:append])
-    end
-  end
-
-  defp exercise_name(path) do
-    Path.basename(path) |> String.slice(0..-8)
-  end
-
-  defp spaced_filename(path) do
-    Path.basename(path) |> String.slice(0..-8) |> String.replace("_", " ")
+    file_with_section_removed = Regex.replace(~r/\n\#\# Mark As Complete(.|\n)+/, file, "")
+    File.write!(path, file_with_section_removed)
+    File.write!(path, commit_snippet(file_name, type), [:append])
   end
 end

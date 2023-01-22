@@ -1,0 +1,203 @@
+# Scripts
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Scripts
+
+With [Elixir installed](https://elixir-lang.org/install.html) we can execute an Elixir file ending in `.ex` or `.exs`.
+
+Elixir treats both file extensions similarly. However, we generally use `.exs` files for scripts.
+
+Let's create an Elixir script. First, create a `script.exs` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+IO.puts("Hello, world!")
+```
+
+Then execute the file from the command line. Any Elixir code inside of the file will execute.
+
+```
+$ elixir script.ex
+Hello, world!
+```
+
+## IO Module
+
+We can leverage the built-in [IO](https://hexdocs.pm/elixir/IO.html) module to
+retrieve user input and print information to the console.
+
+Let's build a simple number guessing game to see how we can apply this to our script.
+
+The game will generate a number between `1` and `10`, and prompt the user to answer. If their answer is correct, it will print `"Correct!"`.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+2
+Correct!
+```
+
+If their answer is incorrect, it will print `"Incorrect!"`.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+3
+Incorrect!
+```
+
+First, create a `guessing_game.exs` script.
+
+We can use the [IO.gets/2](https://hexdocs.pm/elixir/IO.html#gets/2) function to accept some user input and bind it to a variable. Note [IO.gets/2](https://hexdocs.pm/elixir/IO.html#gets/2) does
+not work in Livebook.
+
+The user input is a string, which we can parse with [Integer.parse/2](https://hexdocs.pm/elixir/Integer.html#parse/2).
+
+With the parsed integer, we can then compare it to a random integer generated with [Enum.random/1](https://hexdocs.pm/elixir/Enum.html#random/1).
+
+We then print the result to the console with [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+guess = IO.gets("Guess a number between 1 and 10.")
+{parsed_guess, _} = Integer.parse(guess)
+answer = Enum.random(1..10)
+
+if parsed_guess == answer do
+  IO.puts("Correct!")
+else
+  IO.puts("Incorrect")
+end
+```
+
+Currently, the guessing game ends after the player enters a single guess.
+How could you let the player guess until they get the correct answer?
+
+There are multiple solutions. One solution is to use recursion. We can recursively call
+[IO.gets/2](https://hexdocs.pm/elixir/IO.html#gets/2) until the answer matches the player's guess.
+
+To create a recursive function, we'll need a module. Copy the following code
+into your `guessing_game.exs` script.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule GuessingGame do
+  def guess do
+    player_guess = IO.gets("Guess a number between 1 and 10.")
+    answer = Enum.random(1..10)
+    if player_guess == answer do
+      IO.puts("Correct!")
+      else
+      guess()
+    end
+  end
+end
+
+GuessingGame.guess()
+```
+
+Now we can keep guessing.
+
+```
+$ elixir guessing_game.exs
+Guess a number between 1 and 10.
+2
+Incorrect!
+Guess a number between 1 and 10.
+3
+Incorrect!
+```
+
+However, we have a bug. The `answer` is re-bound every time we recursively call `GuessingGame.guess/0`.
+
+### Your Turn
+
+Modify the `guessing_game.ex` script so that the random `answer` does not change each time the player guesses
+a number.
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+Consider using module attributes, which are created at compile time and will not change.
+</details>
+
+## Loading Multiple Files
+
+Generally, a script is a single `.exs` file used for some singular purpose. While it is possible to load other
+files with the [Code](https://hexdocs.pm/elixir/Code.html) module to split up functionality and create larger projects, it's
+generally not something you will do on most projects, and therefore beyond the scope of this course.
+
+Instead, it's more common to use the
+[IEx shell](iex.livemd) or [Mix](mix.livemd) to create larger projects with multiple files, both of which
+you will learn about in the next sections.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b scripts-reading
+$ git add .
+$ git commit -m "finish scripts reading"
+$ git push origin scripts-reading
+```
+
+Create a pull request from your `scripts-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

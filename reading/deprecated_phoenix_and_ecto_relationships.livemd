@@ -1,0 +1,1393 @@
+# Phoenix and Ecto Relationships
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+Ecto handles the data layer in our application.
+
+By default, Ecto uses Postgres which is a relational database.
+
+Relational databases store data in any number of tables, and use foreign keys to relate data to one another.
+
+There are three primary relationships that data can have.
+
+* One-to-One.
+* One-to-Many.
+* Many-to-Many.
+
+We use **belongs to**, **has many**, and **has one** to describe the nature of the relationship.
+
+In order to understand relationships better, we're going to spend the next few lessons creating a book management software called `BookSearch` that manages authors and books.
+
+For the sake of example, our book management app will have authors, books, and tags.
+
+* Books belong to an author, and authors have many books (One-to-Many).
+* Schools have many teachers, and teachers have one school (One-to-Many).
+* Teachers have many students, and students have many teachers (Many-to-Many).
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  class School {
+    name: :string
+  }
+  class Principal {
+    name: :string
+  }
+  class Teacher {
+    name: :string
+  }
+  class Student {
+    name: :string
+  }
+
+  School "1" --> "1" Principal
+  School "1" --> "*" Teacher
+  Teacher "*" --> "*" Student
+```
+
+## Create Phoenix Project
+
+Initialize a new phoenix project and install dependencies when prompted.
+
+```
+$ mix phx.new faculty_manager
+```
+
+Then create the Database.
+
+```
+$ mix ecto.create
+```
+
+## Schools Schema
+
+To create schools, run the following command.
+
+```
+$ mix phx.gen.html Schools School schools name:string
+```
+
+Then run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+Add the schools to our routes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", FacultyManagerWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  resources "/schools", SchoolController
+end
+```
+
+And all tests should pass.
+
+```
+$ mix test
+```
+
+## Principals/Schools Association
+
+Principals have a one-to-many relationship with schools. We can create the principals resource and each principal will have a reference to a school.
+
+```
+$ mix phx.gen.html Principals Principal principals name:string school_id:references:schools
+```
+
+This generates a migration for principals.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# priv/repo/migrations/_create_principals
+
+defmodule FacultyManager.Repo.Migrations.CreatePrincipals do
+  use Ecto.Migration
+
+  def change do
+    create table(:principals) do
+      add :name, :string
+      add :school_id, references(:schools, on_delete: :nothing)
+
+      timestamps()
+    end
+
+    create index(:principals, [:school_id])
+  end
+end
+```
+
+The [references/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2) function defines a foreign key to associate each principal with a school. The `on_delete: :nothing` option descripts what to do if a school is deleted. By default, deleting a school does nothing to any principals that belong to that school.
+
+For the sake of example, we're going to enforce that principals reference a school. The `on_delete: :delete_all` option means any principals belonging to a school will be deleted if the school is deleted. The `null: false` option enforces that principals must reference a school.
+
+Replace the migration file with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule FacultyManager.Repo.Migrations.CreatePrincipals do
+  use Ecto.Migration
+
+  def change do
+    create table(:principals) do
+      add :name, :string
+      add :school_id, references(:schools, on_delete: :delete_all), null: false
+
+      timestamps()
+    end
+
+    create index(:principals, [:school_id])
+  end
+end
+```
+
+Run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Has Many
+
+To declare that our schools have many principals, we need to add the `has_many/3` relationship to their schema.
+
+The `has_many/3` macro makes the associated principals available, so we can call `school.principals` to retrieve a list of `Principal` structs if the data is loaded.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule FacultyManager.Schools.School do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "schools" do
+    field :name, :string
+    has_many :principals, FacultyManager.Principals.Principal
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(school, attrs) do
+    school
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  direction LR
+  class School {
+    name: :string
+    principals: [Principal]
+  }
+  class Principal {
+    name: :string
+    school_id: :id
+  }
+  School "1" --> "*" Principal : has many  
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Belongs to
+
+To declare that our principals belong to a single school, we need to add `belongs_to/3` to the `Principal` schema.
+
+The `belongs_to/3` macro makes associated schools available so we can call `principal.school` to retrieve the principal's `School` struct if the school data is loaded.
+
+We no longer need the `:school_id` field, so we can remove that as well.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule FacultyManager.Principals.Principal do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "principals" do
+    field :name, :string
+    belongs_to :school, FacultyManager.Schools.School
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(principal, attrs) do
+    principal
+    |> cast(attrs, [:name, :school_id])
+    |> validate_required([:name, :school_id])
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  direction LR
+  class School {
+    name: :string
+    principals: [Principal]
+  }
+  class Principal {
+    name: :string
+    school_id: :id
+  }
+  Principal "*" --> "1" School : belongs to 
+```
+
+## Principal Context
+
+Because we added the `null: false` constraint on the `FacultyManager.Repo.Migrations.CreatePrincipals` migration, we have seven failing tests in the `Principals` context.
+
+Run the following to execute the failing tests.
+
+```
+$ mix test test/faculty_manager/principals_test.exs
+...
+8 tests, 7 failures
+```
+
+Let's fix these tests, starting with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager/principals_test.exs
+   
+test "list_principals/0 returns all principals" do
+   principal = principal_fixture()
+   assert Principals.list_principals() == [principal]
+end
+```
+
+Execute the test by running the following where `13` is the line number of the test.
+
+```
+$ mix test test/faculty_manager/principals_test.exs:13
+```
+
+We should see the following error.
+
+```
+1) test principals list_principals/0 returns all principals (FacultyManager.PrincipalsTest)
+     test/faculty_manager/principals_test.exs:13
+     ** (Postgrex.Error) ERROR 23502 (not_null_violation) null value in column "school_id" violates not-null constraint
+     
+         table: principals
+         column: school_id
+     
+     Failing row contains (29, some name, null, 2022-07-21 04:53:12, 2022-07-21 04:53:12).
+     code: principal = principal_fixture()
+     stacktrace:
+       (ecto_sql 3.8.3) lib/ecto/adapters/sql.ex:932: Ecto.Adapters.SQL.raise_sql_call_error/1
+       (ecto 3.8.4) lib/ecto/repo/schema.ex:744: Ecto.Repo.Schema.apply/4
+       (ecto 3.8.4) lib/ecto/repo/schema.ex:367: anonymous fn/15 in Ecto.Repo.Schema.do_insert/4
+       (faculty_manager 0.1.0) test/support/fixtures/principals_fixtures.ex:16: FacultyManager.PrincipalsFixtures.principal_fixture/1
+       test/faculty_manager/principals_test.exs:14: (test)
+```
+
+`ERROR 23502 (not_null_violation) null value in column "school_id" violates not-null constraint` means we must have an associated school.
+
+The `principal_fixture/1` function causes this error. Let's abandon the fixture in favor of calling our context directly. We also need an associated school, so let's use the `FacultyManager.Schools.create_school/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "list_principals/0 returns all principals" do
+   {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+   {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+   assert Principals.list_principals() == [principal]
+end
+```
+
+We need to alter the `Principals.create_principal1` function to use the associated school.
+We have many different options for how to associate the principal with a school. We're going to use this as an opportunity to demonstrate [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) which builds a struct with the given association.
+
+Replace `Principals.create_principal/1` with the following `Principals.create_principal/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def create_principal(school, attrs \\ %{}) do
+    school
+    |> Ecto.build_assoc(:principals, attrs)
+    |> Principal.changeset(attrs)
+    |> Repo.insert()
+  end
+```
+
+[Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) builds the associated struct. This is the return value of [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) when we run our test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%FacultyManager.Principals.Principal{
+  __meta__: #Ecto.Schema.Metadata<:built, "principals">,
+  id: nil,
+  inserted_at: nil,
+  name: "Dumbledore",
+  school: #Ecto.Association.NotLoaded<association :school is not loaded>,
+  school_id: 21,
+  updated_at: nil
+}
+```
+
+This struct then gets saved to the Database when it's passed to `Repo.insert/2`.
+
+Now our first test passes! Re-run the test and it should succeed.
+
+```
+$ mix test test/faculty_manager/principals_test.exs:13
+```
+
+All of our tests can be resolved by using `FacultyManager.Principals.create_principal/2` and `FacultyManager.Principals.create_schools/2`. Replace `test/faculty_manager/principals_test.exs` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule FacultyManager.PrincipalsTest do
+  use FacultyManager.DataCase
+
+  alias FacultyManager.Principals
+  alias FacultyManager.Schools
+
+  describe "principals" do
+    alias FacultyManager.Principals.Principal
+
+    import FacultyManager.PrincipalsFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_principals/0 returns all principals" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+      assert Principals.list_principals() == [principal]
+    end
+
+    test "get_principal!/1 returns the principal with given id" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+      assert Principals.get_principal!(principal.id) == principal
+    end
+
+    test "create_principal/1 with valid data creates a principal" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %Principal{} = principal} = Principals.create_principal(school, valid_attrs)
+      assert principal.name == "some name"
+    end
+
+    test "create_principal/1 with invalid data returns error changeset" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      assert {:error, %Ecto.Changeset{}} = Principals.create_principal(school, @invalid_attrs)
+    end
+
+    test "update_principal/2 with valid data updates the principal" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %Principal{} = principal} =
+               Principals.update_principal(principal, update_attrs)
+
+      assert principal.name == "some updated name"
+    end
+
+    test "update_principal/2 with invalid data returns error changeset" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+
+      assert {:error, %Ecto.Changeset{}} = Principals.update_principal(principal, @invalid_attrs)
+      assert principal == Principals.get_principal!(principal.id)
+    end
+
+    test "delete_principal/1 deletes the principal" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+
+      assert {:ok, %Principal{}} = Principals.delete_principal(principal)
+      assert_raise Ecto.NoResultsError, fn -> Principals.get_principal!(principal.id) end
+    end
+
+    test "change_principal/1 returns a principal changeset" do
+      {:ok, school} = Schools.create_school(%{name: "Hogwarts"})
+      {:ok, principal} = Principals.create_principal(school, %{name: "Dumbledore"})
+
+      assert %Ecto.Changeset{} = Principals.change_principal(principal)
+    end
+  end
+end
+```
+
+We've added aliases for `FacultyManager.Schools` and `FacultyManager.Principals` for the sake of consiseness.
+
+All tests now pass!
+
+```
+$ mix test test/faculty_manager/principals_test.exs
+...
+8 tests, 0 failures
+```
+
+## List Principals By School
+
+While we're in the `Principals` context, we're going to need a `Principals.list_principals/1` function that will list principals by school, rather than just listing all principals.
+
+First, add a new test. This test will ensure we list principals by the provided school.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager/principals_test.exs
+
+test "list_principals/1 returns all principals by school" do
+  # create schools
+  {:ok, school1} = Schools.create_school(%{name: "Hogwarts"})
+  {:ok, school2} = Schools.create_school(%{name: "Springfield"})
+  {:ok, school3} = Schools.create_school(%{name: "Empty School"})
+
+  # create one principals for schools
+  {:ok, principal1} = Principals.create_principal(school1, %{name: "Dumbledore"})
+  {:ok, principal2} = Principals.create_principal(school2, %{name: "Skinner"})
+
+  # list school1 principals
+  assert Principals.list_principals(school1.id) == [principal1]
+
+  # list school2 principals
+  assert Principals.list_principals(school2.id) == [principal2]
+
+  # list school 3 principals
+  assert Principals.list_principals(school3.id) == []
+end
+```
+
+Now we need to add the `Principals.list_principal/1` function to make the test pass.
+
+There are many ways to build a query that will find all principals that belong to a school. Let's consider a few examples.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Where
+
+We can use the [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) function to filter the list of principals by their `school_id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_principals(school_id) do
+  FacultyManager.Principals.Principal
+  |> where([p], p.school_id == ^school_id)
+  |> Repo.all()
+end
+```
+
+**Why use where/3?**
+
+Filtering by the id using `where/3` is often the simplest and best performing query option when we want to retrieve data from a single table. However it's less flexible than the other options below for incorrorating data from multiple tables.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Preloading
+
+We can use the [preload](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) function to load an associated table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager/principals.ex
+
+def list_principals(school_id) do
+  school =
+    FacultyManager.Schools.School
+    |> preload([s], :principals)
+    |> Repo.get(school_id)
+
+  school.principals
+end
+```
+
+First, this will retrieve the school from the database in one query. Then, it will load the principals for that school in a second query.
+
+**Why use preloading?**
+
+Preloading is a fantastic way to retrieve associated data from a table. However, it's slower because it requires two queries unless we add further optimizations.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Join and Select
+
+We can [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) two associated tables together.
+Then use [select](https://hexdocs.pm/ecto/Ecto.Query.html#select/3) to return the nested principals field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager/principals.ex
+
+def list_principals(school_id) do
+  FacultyManager.Schools.School
+  |> where([s], s.id == ^school_id)
+  |> join(:inner, [s], p in assoc(s, :principals))
+  |> select([s, p], p)
+  |> Repo.all()
+end
+```
+
+**Why use join/5 and select/3?**
+
+Using `join/5` and `select/3` we can be extremely specific about our return value. For example, we could return a tuple with both the school name and the principal name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  FacultyManager.Schools.School
+  |> where([s], s.id == ^school_id)
+  |> join(:inner, [s], p in assoc(s, :principals))
+  |> select([s, p], {s.name, p.name})
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn: Which Solution Is Fastest?
+
+First, guess which approach you think will be fastest.
+
+Then, use either [Benchee](https://github.com/bencheeorg/benchee) (which you'll have to add to your `mix.exs`) or `:timer.tc` to determine which approach out of the above is the actually fastest.
+
+Which solution is fastest? Why do you think that is? What do you think would happen if you had more Schools or more Principals?
+
+Use the fastest solution for the `Principals.list_principals/1` function and ensure your tests pass.
+
+```
+$ mix test test/faculty_manager/principals_test.exs
+```
+
+## Table Joins
+
+Every resource in our application is stored in a separate table.
+
+### Schools Table
+
+| id  | name       |
+| --- | ---------- |
+| 1   | "Hogwarts" |
+
+### Principals Table
+
+| id  | name         | school_id |
+| --- | ------------ | --------- |
+| 1   | "Dumbledore" | 1         |
+
+While querying a resource, we often want to retrieve data from associated tables. We do this by joining two tables during the query.
+
+We use the [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) function from [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
+
+There are many different kinds of joins including `:inner`, `:left`, `:right`, `:cross`, `:full`, `:inner_lateral` or `:left_lateral`.
+
+The most commonly used join is the `:inner` join, so we'll focus on that. An inner join combines two associated tables that satisfy the join condition. For example, earlier when we used the following:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+join(:inner, [s], p in assoc(s, :principals))
+```
+
+We joined the schools and the principals table using the `:principals` association with `assoc`.
+
+Alternatively, we can specify the table to join using either the table name and the schema, then use the `:on` option to specify the join condition. In the example below, we join tables where the `school_id` field of the principal matches the school's id.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+join(:inner, [s], p in FacultyManager.Principals.Principal, on: p.school_id == s.id)
+```
+
+Both accomplish the same functionality. `assoc` is only syntax sugar in this example.
+
+## Nested Resources
+
+Presently, have several failing tests because we have not added the resources for principals to our router.
+
+We have eight more failing tests for our `PrincipalController` because we have not added the resources for principals to our router. Run the following to see these failing tests.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs
+...
+8 tests, 8 failures
+```
+
+We could add these resources to the router the usual way, however this does not account for the relationship between principals and schools.
+
+Instead, we'll use nested resources to associate one resource with another.
+
+Principals should always belong to a school, so we can nest the principal resource inside of the schools resource.
+
+Modify our router to include the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/router.ex
+
+scope "/", FacultyManagerWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+
+  resources "/schools", SchoolController do
+    resources "/principals", PrincipalController
+  end
+end
+```
+
+We can run `mix phx.routes` to view the new nested routes we've created.
+
+```
+$ mix phx.routes
+page_path  GET     /                                        FacultyManagerWeb.PageController :index
+          school_path  GET     /schools                                 FacultyManagerWeb.SchoolController :index
+          school_path  GET     /schools/:id/edit                        FacultyManagerWeb.SchoolController :edit
+          school_path  GET     /schools/new                             FacultyManagerWeb.SchoolController :new
+          school_path  GET     /schools/:id                             FacultyManagerWeb.SchoolController :show
+          school_path  POST    /schools                                 FacultyManagerWeb.SchoolController :create
+          school_path  PATCH   /schools/:id                             FacultyManagerWeb.SchoolController :update
+                       PUT     /schools/:id                             FacultyManagerWeb.SchoolController :update
+          school_path  DELETE  /schools/:id                             FacultyManagerWeb.SchoolController :delete
+school_principal_path  GET     /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :index
+school_principal_path  GET     /schools/:school_id/principals/:id/edit  FacultyManagerWeb.PrincipalController :edit
+school_principal_path  GET     /schools/:school_id/principals/new       FacultyManagerWeb.PrincipalController :new
+school_principal_path  GET     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :show
+school_principal_path  POST    /schools/:school_id/principals           FacultyManagerWeb.PrincipalController :create
+school_principal_path  PATCH   /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
+                       PUT     /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :update
+school_principal_path  DELETE  /schools/:school_id/principals/:id       FacultyManagerWeb.PrincipalController :delete
+  live_dashboard_path  GET     /dashboard                               Phoenix.LiveDashboard.PageLive :home
+  live_dashboard_path  GET     /dashboard/:page                         Phoenix.LiveDashboard.PageLive :page
+  live_dashboard_path  GET     /dashboard/:node/:page                   Phoenix.LiveDashboard.PageLive :page
+                       *       /dev/mailbox                             Plug.Swoosh.MailboxPreview []
+            websocket  WS      /live/websocket                          Phoenix.LiveView.Socket
+             longpoll  GET     /live/longpoll                           Phoenix.LiveView.Socket
+             longpoll  POST    /live/longpoll                           Phoenix.LiveView.Socket
+```
+
+## List Principals
+
+Ensure the server is running.
+
+```
+mix phx.server
+```
+
+Then visit http://localhost:4000/schools/new and create one school.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/create_new_school.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now visit http://localhost:4000/schools/1/principals. We want to see an empty list of principals for the school. However currently we see the following.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/principals_index_principal_path_is_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+The error above is because we used nested routes. By default, the Phoenix generator assumes all principal routes will use `Routes.principal_path` but instead they use `Routes.school_principal_path` which we saw when we ran `mix phx.routes`.
+
+To resolve the error above, we need to fix the `"index"` test in our controller tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "index" do
+  test "lists all principals", %{conn: conn} do
+    conn = get(conn, Routes.principal_path(conn, :index))
+    assert html_response(conn, 200) =~ "Listing Principals"
+  end
+end
+```
+
+We need to replace `Routes.principal_path/2` with `Routes.school_principal_path/3`. This new path requires we create a school and provide its id.
+
+Replace the test with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "index" do
+  test "lists all principals", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    conn = get(conn, Routes.school_principal_path(conn, :index, school.id))
+    assert html_response(conn, 200) =~ "Listing Principals"
+  end
+end
+```
+
+Now we need to modify the `PrincipalController`. Because we've used nested routes, we have access to the `"school_id"` parameter from the URL http://localhost:4000/schools/1/principals.
+
+Let's use the `school_id` to filter the list of principals, and pass `school_id: school_id` to the `render/3` function for the template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"school_id" => school_id}) do
+  principals = Principals.list_principals(school_id)
+  render(conn, "index.html", principals: principals, school_id: school_id)
+end
+```
+
+Now we need to use the proper `Routes.school_principal_path` instead of `Routes.principal_path` in the template file.
+
+Replace the index page with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/templates/principals/index.html.heex
+
+<h1>Listing Principals</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for principal <- @principals do %>
+    <tr>
+      <td><%= principal.name %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.school_principal_path(@conn, :show, @school_id, principal) %></span>
+        <span><%= link "Edit", to: Routes.school_principal_path(@conn, :edit, @school_id, principal) %></span>
+        <span><%= link "Delete", to: Routes.school_principal_path(@conn, :delete, @school_id, principal), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Principal", to: Routes.school_principal_path(@conn, :new, @school_id) %></span>
+```
+
+Now re-run the test where `7` is the line number of the `"index"` test and it should pass.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:7
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+To ensure we've correctly fixed the issue, visit http://localhost:4000/schools and create a school.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_new_school.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Then visit http://localhost:4000/schools/1/principals and we should see the list principals page.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![List Principals](images/faculty_manager_list_principals.png)
+
+## New Principal
+
+We have the same `principal_path/2` is undefined issue when we click the **New Principal** link.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_new_principals_principal_path_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To solve this, we need to fix the `"new principal, renders form"` test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "new principal" do
+  test "renders form", %{conn: conn} do
+    conn = get(conn, Routes.principal_path(conn, :new))
+    assert html_response(conn, 200) =~ "New Principal"
+  end
+end
+```
+
+Replace the test with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "new principal" do
+  test "renders form", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    conn = get(conn, Routes.school_principal_path(conn, :new, school.id))
+    assert html_response(conn, 200) =~ "New Principal"
+  end
+end
+```
+
+Replace the `PrincipalController.new/2` function with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/controllers/principal_controller
+
+def new(conn, %{"school_id" => school_id}) do
+  changeset = Principals.change_principal(%Principal{})
+  render(conn, "new.html", changeset: changeset, school_id: school_id)
+end
+```
+
+Then replace the template file to remove calls to `Routes.principal_path/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/templates/principal/new.html.heex
+
+<h1>New Principal</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.school_principal_path(@conn, :create, @school_id)) %>
+
+<span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
+```
+
+Now the test should pass when we run the following where `18` is the line number of the `"new principal"` test.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:18
+```
+
+http://localhost:4000/schools/1/principals/new should no longer crash.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_new_principals.png)
+
+## Create Principal
+
+Now, if we attempt to submit the form on http://localhost:4000/schools/1/principals/new, we'll see the following error.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/create_new_principal_no_function_clause_error.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To resolve this, we need to fix the tests for `"create principal"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "create principal" do
+  test "redirects to show when data is valid", %{conn: conn} do
+    conn = post(conn, Routes.principal_path(conn, :create), principal: @create_attrs)
+
+    assert %{id: id} = redirected_params(conn)
+    assert redirected_to(conn) == Routes.principal_path(conn, :show, id)
+
+    conn = get(conn, Routes.principal_path(conn, :show, id))
+    assert html_response(conn, 200) =~ "Show Principal"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn} do
+    conn = post(conn, Routes.principal_path(conn, :create), principal: @invalid_attrs)
+    assert html_response(conn, 200) =~ "New Principal"
+  end
+end
+```
+
+Replace these tests with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "create principal" do
+  test "redirects to show when data is valid", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+
+    conn =
+      post(conn, Routes.school_principal_path(conn, :create, school.id),
+        principal: @create_attrs
+      )
+
+    assert %{id: id} = redirected_params(conn)
+    assert redirected_to(conn) == Routes.school_principal_path(conn, :show, school.id, id)
+
+    conn = get(conn, Routes.school_principal_path(conn, :show, school.id, id))
+    assert html_response(conn, 200) =~ "Show Principal"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+
+    conn =
+      post(conn, Routes.school_principal_path(conn, :create, school.id),
+        principal: @invalid_attrs
+      )
+
+    assert html_response(conn, 200) =~ "New Principal"
+  end
+end
+```
+
+Update the `PrincipalController.create/2` function to use the `school_id`. We need to use `Routes.school_principal_path` instead of `Routes.principal_path`. We also need to provide the `school` to the `Principals.create_principal/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/controllers/principal_controller
+
+def create(conn, %{"principal" => principal_params, "school_id" => school_id}) do
+  school = FacultyManager.Schools.get_school!(school_id)
+
+  # provide the school to create_principal/2
+  case Principals.create_principal(school, principal_params) do
+    {:ok, principal} ->
+      conn
+      |> put_flash(:info, "Principal created successfully.")
+      # use school_principal_path
+      |> redirect(to: Routes.school_principal_path(conn, :show, school_id, principal))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      # bind the school_id to the assigns
+      render(conn, "new.html", changeset: changeset, school_id: school_id)
+  end
+end
+```
+
+Since `PrincipalController.create/2` redirects the use using `:show`, we also need to update `PrincipalController.show/2` to use the `school_id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/controllers/principal_controller
+
+def show(conn, %{"id" => id, "school_id" => school_id}) do
+  principal = Principals.get_principal!(id)
+  render(conn, "show.html", principal: principal, school_id: school_id)
+end
+```
+
+Then replace the show template with the following content to replace all instances of `Routes.principal_path/2` with `Routes.school_principal_path/3`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/templates/principal/show.html.heex
+
+<h1>Show Principal</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @principal.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.school_principal_path(@conn, :edit, @school_id, @principal) %></span> |
+<span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
+```
+
+Now the tests should pass when we run the following.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:27
+```
+
+When we create a principal from the browser, we'll be successfully redirected to http://localhost:4000/schools/1/principals/1.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/show_principal_page_after_creation.png)
+
+## Edit Principals
+
+If we click the **Edit** button to go to http://localhost:4000/schools/1/principals/1/edit we encounter the same error.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/edit_principal_page_principal_path_is_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To resolve this issue, we need to fix the `"edit principal"` test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "edit principal" do
+  setup [:create_principal]
+
+  test "renders form for editing chosen principal", %{conn: conn, principal: principal} do
+    conn = get(conn, Routes.principal_path(conn, :edit, principal))
+    assert html_response(conn, 200) =~ "Edit Principal"
+  end
+end
+```
+
+Replace the test with the following. We're going to opt out of using the `:create_principal` function and instead manually create a school and principal. We also replace
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "edit principal" do
+  test "renders form for editing chosen principal", %{conn: conn} do
+    # create school and principal
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+
+    # use Routes.school_principal_path instead of Routes.principal_path
+    conn = get(conn, Routes.school_principal_path(conn, :edit, school.id, principal))
+    assert html_response(conn, 200) =~ "Edit Principal"
+  end
+end
+```
+
+Update the `PrincipalController.edit/2` function to use the `school_id` in the assigns.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_web/controllers/principal_controller.ex
+
+def edit(conn, %{"id" => id, "school_id" => school_id}) do
+  principal = Principals.get_principal!(id)
+  changeset = Principals.change_principal(principal)
+  render(conn, "edit.html", principal: principal, changeset: changeset, school_id: school_id)
+end
+```
+
+Fix the principal edit page to replace `Routes.principal_path` with `Routes.school_principal_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_web/templates/principal/edit.html.heex
+
+<h1>Edit Principal</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.school_principal_path(@conn, :update, @school_id, @principal)) %>
+
+<span><%= link "Back", to: Routes.school_principal_path(@conn, :index, @school_id) %></span>
+```
+
+The test should pass when we run the following in the command line where `55` is the correct line number of the test.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:55
+```
+
+We should see the following page when we click the **Edit** button to navigate to http://localhost:4000/schools/1/principals/1/edit.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_edit_principals.png)
+
+## Update Principal
+
+Submitting the form on http://localhost:4000/schools/1/principals/1/edit causes the following error.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_update_principals_principal_path_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To resolve this issue we need to fix the `"update principal"` tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "update principal" do
+  setup [:create_principal]
+
+  test "redirects when data is valid", %{conn: conn, principal: principal} do
+    conn = put(conn, Routes.principal_path(conn, :update, principal), principal: @update_attrs)
+    assert redirected_to(conn) == Routes.principal_path(conn, :show, principal)
+
+    conn = get(conn, Routes.principal_path(conn, :show, principal))
+    assert html_response(conn, 200) =~ "some updated name"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn, principal: principal} do
+    conn = put(conn, Routes.principal_path(conn, :update, principal), principal: @invalid_attrs)
+    assert html_response(conn, 200) =~ "Edit Principal"
+  end
+end
+```
+
+Replace the tests with the following. We're manually creating the school and principal, and replacing `Routes.principal_path` with `Routes.school_principal_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/faculty_manager_web/controllers/principal_controller_test.exs
+
+describe "update principal" do
+  test "redirects when data is valid", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+
+    conn =
+      put(conn, Routes.school_principal_path(conn, :update, school.id, principal),
+        principal: @update_attrs
+      )
+
+    assert redirected_to(conn) ==
+              Routes.school_principal_path(conn, :show, school.id, principal)
+
+    conn = get(conn, Routes.school_principal_path(conn, :show, school.id, principal))
+    assert html_response(conn, 200) =~ "some updated name"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+
+    conn =
+      put(conn, Routes.school_principal_path(conn, :update, school.id, principal),
+        principal: @invalid_attrs
+      )
+
+    assert html_response(conn, 200) =~ "Edit Principal"
+  end
+end
+```
+
+Modify the `PrincipalController.update/2` function to use the `school_id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/faculty_manager_web/controllers/principal_controller.ex
+
+def update(conn, %{"id" => id, "principal" => principal_params, "school_id" => school_id}) do
+  principal = Principals.get_principal!(id)
+
+  case Principals.update_principal(principal, principal_params) do
+    {:ok, principal} ->
+      conn
+      |> put_flash(:info, "Principal updated successfully.")
+      |> redirect(to: Routes.school_principal_path(conn, :show, school_id, principal))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "edit.html", principal: principal, changeset: changeset, school_id: school_id)
+  end
+end
+```
+
+Tests should pass when we run the following where `64` is the line number of the test.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:64
+```
+
+We should be able to update a principal when we submit the form on http://localhost:4000/schools/1/principals/1/edit.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_update_principals.png)
+
+## Delete Principal
+
+On to our last issue! We see the following error when we visit http://localhost:schools/1/principals and delete a principal.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_delete_principals_principal_path_undefined.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We need to fix the `"delete principal"` test to resolve this issue.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "delete principal" do
+  setup [:create_principal]
+
+  test "deletes chosen principal", %{conn: conn, principal: principal} do
+    conn = delete(conn, Routes.principal_path(conn, :delete, principal))
+    assert redirected_to(conn) == Routes.principal_path(conn, :index)
+
+    assert_error_sent 404, fn ->
+      get(conn, Routes.principal_path(conn, :show, principal))
+    end
+  end
+end
+```
+
+Replace the test with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "delete principal" do
+  test "deletes chosen principal", %{conn: conn} do
+    {:ok, school} = FacultyManager.Schools.create_school(%{name: "Hogwarts"})
+    {:ok, principal} = FacultyManager.Principals.create_principal(school, %{name: "Dumbledore"})
+
+    conn = delete(conn, Routes.school_principal_path(conn, :delete, school.id, principal))
+    assert redirected_to(conn) == Routes.school_principal_path(conn, :index, school.id)
+
+    assert_error_sent 404, fn ->
+      get(conn, Routes.school_principal_path(conn, :show, school.id, principal))
+    end
+  end
+end
+```
+
+Modify the `PrincipalController.delete/2` function to use the `school_id`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def delete(conn, %{"id" => id, "school_id" => school_id}) do
+  principal = Principals.get_principal!(id)
+  {:ok, _principal} = Principals.delete_principal(principal)
+
+  conn
+  |> put_flash(:info, "Principal deleted successfully.")
+  |> redirect(to: Routes.school_principal_path(conn, :index, school_id))
+end
+```
+
+Tests should pass when we run the following where `94` is the correct line number of the test.
+
+```
+$ mix test test/faculty_manager_web/controllers/principal_controller_test.exs:94
+```
+
+When we visit http://localhost:schools/1/principals and delete a principal we should see the following.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/faculty_manager_delete_principals.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+With that, all of our tests should pass!
+
+```
+$ mix test
+...
+36 tests, 0 failures
+```
+
+## Untitled
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b phoenix-and-ecto-relationships-reading
+$ git add .
+$ git commit -m "finish phoenix and ecto relationships reading"
+$ git push origin phoenix-and-ecto-relationships-reading
+```
+
+Create a pull request from your `phoenix-and-ecto-relationships-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

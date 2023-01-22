@@ -1,0 +1,858 @@
+# Distributed Rock Paper Scissors
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Overview
+
+This is a teacher follow along exercise. It will be performed while following along with a teacher
+who can explain the concepts as you walk through them.
+
+In this exercise, you're going to create a distributed `RockPaperScissors` game where players can all play on the same network.
+
+Players should be able to create a player that represents them. We use `:player1` and `:player2` here,
+but these players could be named under any atom.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.start_link(:player1)
+{:ok, #PID<0.160.0>}
+RockPaperScissors.Player.start_link(:player2)
+{:ok, #PID<0.172.0>}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Each player process should store their active stats and current guess.
+
+```mermaid
+classDiagram
+  class Player {
+    wins: 0
+    loses: 0
+    draws: 0
+    guess: 0
+  }
+```
+
+This should be defined as a struct that we can view with `RockPaperScissors.Player.get/1`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.get(:player1)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 0}
+
+RockPaperScissors.Player.get(:player2)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Players should be able to enter their guess of `:rock`, `:paper`, or `:scissors`.
+This should update their current `:guess` state.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.guess(:player1, :rock)
+:ok
+
+RockPaperScissors.Player.get(:player1)
+%RockPaperScissors.Player{draws: 0, guess: :rock, loses: 0, wins: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Players should be able to use their current guess to play against another player.
+Upon playing, each players `:guess` should be reset and their stats should be updated
+according to who won.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.guess(:player1, :rock)
+:ok
+
+RockPaperScissors.Player.guess(:player2, :scissors)
+:ok
+
+RockPaperScissors.play(:player1, :player2)
+:ok
+
+RockPaperScissors.Player.get(:player1)
+%RockPaperScissors.Player{wins: 1, loses: 0, draws: 0, guess: nil}
+
+RockPaperScissors.Player.get(:player2)
+%RockPaperScissors.Player{wins: 0, loses: 1, draws: 0, guess: nil}
+```
+
+## Start New Mix Project
+
+Create a new rock paper scissors project with mix.
+
+```
+mix new rock_paper_scissors --sup
+```
+
+## Create Player Module
+
+Create a `RockPaperScissors.Player` module in the `lib/rock_paper_scissors` folder. This
+module will `use` [Agent](https://hexdocs.pm/elixir/Agent.html) to store state and define a struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule RockPaperScissors.Player do
+  use Agent
+  defstruct [wins: 0, loses: 0, draws: 0, guess: nil]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Create the associated module file under `test/rock_paper_scissors`. We'll alias `Player` to make it
+easier to write tests.
+
+```elixir
+defmodule RockPaperScissors.PlayerTest do
+  use ExUnit.Case
+  alias RockPaperScissors.Player
+end
+```
+
+## start_link/1
+
+Write the first test for `start_link/1`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  describe "Player" do
+    test "start_link/1" do
+      {:ok, pid} = Player.start_link(:player1)
+      assert is_pid(pid)
+    end
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the code to make the test pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def start_link(player) do
+    Agent.start_link(fn -> %__MODULE__{} end, name: player)
+  end
+```
+
+## get/1
+
+Add the test for `get/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get/1" do
+  Player.start_link(:player1)
+  assert %Player{wins: 0, loses: 0, draws: 0, guess: nil} = Player.get(:player1)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the code to make the test pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def get(player_name) do
+  Agent.get(player_name, fn player -> player end)
+end
+```
+
+## guess/2
+
+Add the test for `guess/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "guess/1" do
+  Player.start_link(:player1)
+  Player.guess(:player1, :rock)
+  assert %Player{wins: 0, loses: 0, draws: 0, guess: :rock} = Player.get(:player1)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the code to make the test pass.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def guess(player_name, guess) when guess in [:rock, :paper, :scissors] do
+  Agent.update(player_name, fn player -> %{player | guess: guess} end)
+end
+```
+
+## play/1
+
+Add the test for `play/1`. We'll start by writing just a simple test for draws rather than handling
+wins, draws, and losses all at once.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "play/1 _ draw with :rock" do
+  Player.start_link(:player1)
+  Player.start_link(:player2)
+  Player.guess(:player1, :rock)
+  Player.guess(:player2, :rock)
+  Player.play(:player1, :player2)
+  assert %Player{wins: 0, loses: 0, draws: 1, guess: nil} = Player.get(:player1)
+  assert %Player{wins: 0, loses: 0, draws: 1, guess: nil} = Player.get(:player2)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the code to make the test pass.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def play(player1_name, player2_name) do
+  Agent.update(player1_name, fn player ->
+    %{player | draws: player.draws + 1, guess: nil}
+  end)
+
+  Agent.update(player2_name, fn player ->
+    %{player | draws: player.draws + 1, guess: nil}
+  end)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+You may wish to create a private `draw/1` function to reduce repeated code.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp draw(player_name) do
+  Agent.update(player_name, fn player ->
+    %{player | draws: player.draws + 1, guess: nil}
+  end)
+end
+
+def play(player1_name, player2_name) do
+  draw(player1_name)
+  draw(player1_name)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Write a test to handle when the first player wins.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "play/1 _ :rock beats :scissors" do
+  Player.start_link(:player1)
+  Player.start_link(:player2)
+  Player.guess(:player1, :rock)
+  Player.guess(:player2, :scissors)
+  Player.play(:player1, :player2)
+  assert %Player{wins: 1, loses: 0, draws: 0, guess: nil} = Player.get(:player1)
+  assert %Player{wins: 0, loses: 1, draws: 0, guess: nil} = Player.get(:player2)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Implement the code to handle when the first player wins. You'll notice that we're leaving
+the `beats?/2` function minimal for now.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def beats?(guess1, guess2) do
+  guess1 === :rock and guess2 === :scissors
+end
+
+def play(player1_name, player2_name) do
+  guess1 = Agent.get(player1_name, fn player -> player.guess end)
+  guess2 = Agent.get(player2_name, fn player -> player.guess end)
+  if (beats?(guess1, guess2)) do
+    Agent.update(player1_name, fn player ->
+      %{player | wins: player.wins + 1, guess: nil}
+    end)
+    Agent.update(player1_name, fn player ->
+      %{player | loses: player.lose + 1, guess: nil}
+    end)
+  else
+    draw(player1_name)
+    draw(player1_name)
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now that our test is passing it's time to refactor.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp win(player_name) do
+  Agent.update(player_name, fn player ->
+    %{player | wins: player.wins + 1, guess: nil}
+  end)
+end
+
+defp lose(player_name) do
+  Agent.update(player_name, fn player ->
+    %{player | loses: player.lose + 1, guess: nil}
+  end)
+end
+
+defp get_guess(player_name) do
+  Agent.get(player_name, fn player -> player.guess end)
+end
+
+def play(player1_name, player2_name) do
+  guess1 = get_guess(player1_name)
+  guess2 = get_guess(player2_name)
+  if (beats?(guess1, guess2)) do
+    win(player_1_name)
+    lose(player_2_name)
+  else
+    draw(player1_name)
+    draw(player1_name)
+  end
+end
+```
+
+## beats?/2
+
+We could write many higher level tests to ensure the `play` function works for many
+different outcomes, or we could write many lower level unit tests on the `beats?/2` function.
+
+In general, unit testing the `beats?/2` function will be faster and cheaper. The tests will
+run faster and be easier to write. However, higher level tests are more comprehensive and catch
+more bugs.
+
+We're going to unit test the `beats?/2` function for now, however this is not an endorsement for one
+option or the other. Each choice has their place.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "beats?/1" do
+  assert Player.beats?(:rock, :scissors)
+  assert Player.beats?(:scissors, :paper)
+  assert Player.beats?(:paper, :rock)
+
+  refute Player.beats?(:rock, :paper)
+  refute Player.beats?(:scissors, :rock)
+  refute Player.beats?(:paper, :scissors)
+
+  refute Player.beats?(:rock, :rock)
+  refute Player.beats?(:paper, :paper)
+  refute Player.beats?(:scissors, :scissors)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Which drives us to expand the `beats?/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp beats?(guess1, guess2) do
+  case {guess1, guess2} do
+    {:rock, :scissors} -> true
+    {:scissors, :paper} -> true
+    {:paper, :rock} -> true
+    _ -> false
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We still need to ensure that the second player can beat the first player. We can copy paste the
+first test, but change who wins.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "play/1 _ :rock beats :scissors _ player2 wins" do
+  Player.start_link(:player1)
+  Player.start_link(:player2)
+  Player.guess(:player1, :scissors)
+  Player.guess(:player2, :rock)
+  Player.play(:player1, :player2)
+  assert %Player{wins: 0, loses: 1, draws: 0, guess: nil} = Player.get(:player1)
+  assert %Player{wins: 1, loses: 0, draws: 0, guess: nil} = Player.get(:player2)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now that there are
+more than 2 paths, `if` is no longer a suitable for control flow.
+
+If the control flow lends itself to pattern matching, we can use `case`, if not we can use `cond`.
+We'll choose `cond` for this example, but you might be able to make the code more clear with
+a different approach.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def play(player1_name, player2_name) do
+  guess1 = get_guess(player1_name)
+  guess2 = get_guess(player2_name)
+
+  cond do
+    beats?(guess1, guess2) ->
+      win(player1_name)
+      lose(player2_name)
+
+    beats?(guess2, guess1) ->
+      lose(player1_name)
+      win(player2_name)
+
+    guess1 === guess2 ->
+      draw(player1_name)
+      draw(player2_name)
+  end
+end
+```
+
+## Final Player Module
+
+Putting everything together you should end with a module that looks something like this.
+
+```elixir
+defmodule RockPaperScissors.Player do
+  use Agent
+
+  defstruct wins: 0, loses: 0, draws: 0, guess: nil
+
+  def start_link(player) do
+    Agent.start_link(fn -> %__MODULE__{} end, name: player)
+  end
+
+  def get(player_name) do
+    Agent.get(player_name, fn player -> player end)
+  end
+
+  def guess(player_name, guess) when guess in [:rock, :paper, :scissors] do
+    Agent.update(player_name, fn player -> %{player | guess: guess} end)
+  end
+
+  def play(player1_name, player2_name) do
+    guess1 = get_guess(player1_name)
+    guess2 = get_guess(player2_name)
+
+    cond do
+      beats?(guess1, guess2) ->
+        win(player1_name)
+        lose(player2_name)
+
+      beats?(guess2, guess1) ->
+        lose(player1_name)
+        win(player2_name)
+
+      guess1 === guess2 ->
+        draw(player1_name)
+        draw(player2_name)
+    end
+  end
+
+  defp get_guess(player_name) do
+    Agent.get(player_name, fn player -> player.guess end)
+  end
+
+  def beats?(guess1, guess2) do
+    case {guess1, guess2} do
+      {:rock, :scissors} -> true
+      {:scissors, :paper} -> true
+      {:paper, :rock} -> true
+      _ -> false
+    end
+  end
+
+  defp win(player_name) do
+    Agent.update(player_name, fn player ->
+      %{player | wins: player.wins + 1, guess: nil}
+    end)
+  end
+
+  defp lose(player_name) do
+    Agent.update(player_name, fn player ->
+      %{player | loses: player.loses + 1, guess: nil}
+    end)
+  end
+
+  defp draw(player) do
+    Agent.update(player, fn player_struct ->
+      %{player_struct | draws: player_struct.draws + 1, guess: nil}
+    end)
+  end
+end
+```
+
+## Running the Project
+
+You can run your project with `iex -S mix`.
+
+Then play a game of rock paper scissors in the terminal.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex(1)> alias RockPaperScissors.Player
+RockPaperScissors.Player
+iex(2)> Player.start_link(:player1)
+{:ok, #PID<0.172.0>}
+iex(3)> Player.start_link(:player2)
+{:ok, #PID<0.174.0>}
+iex(4)> Player.guess(:player1, :rock)
+:ok
+iex(5)> Player.guess(:player2, :scissors)
+:ok
+iex(6)> Player.play(:player1, :player2)
+:ok
+iex(7)> Player.get(:player1)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 1}
+iex(8)> Player.get(:player2)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 1, wins: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Cross Node Playing
+
+When we start the project it creates a **node**.
+
+By default [Agent](https://hexdocs.pm/elixir/Agent.html) allows us to do cross-node requests on the same network so
+long as we know the name of the node.
+
+```mermaid
+flowchart
+subgraph Network
+  n1[node 1]
+  n2[node 2]
+  n1 --> p1[:player1 process]
+  n2 --> p2[:player2 process]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+We can start a named node using the `--sname` flag in the terminal.
+In order to communicate, each node must also share a `--cookie` flag
+with the same value.
+
+Let's start one node called `player1_node`.
+
+```
+iex --sname player1_node --cookie secret -S mix
+```
+
+Let's do the name in another terminal for `player2_node`.
+
+```
+iex --sname player2_node --cookie secret -S mix
+```
+
+You'll notice that the iex terminal has the name of your computer in it now.
+Mine says `LAPTOP-1G9V4CP8` but yours will be different.
+
+```
+iex(player1_node@LAPTOP-1G9V4CP8)1>
+```
+
+In each node we can spawn a process for that player. Either node could store the processes.
+For example we could have a single node containing both processes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart
+subgraph Node1
+  p1[:player1 process]
+  p2[:player2 process]
+end
+subgraph Node2
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+But we're going to have each node store the process that it corresponds to.
+
+```mermaid
+flowchart
+subgraph Node2
+  p2[:player2 process]
+end
+subgraph Node1
+  p1[:player1 process]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now we can start each process like so. Make sure spawn the correct process in the correct node.
+
+```
+iex(player1_node@LAPTOP-1G9V4CP8)1> RockPaperScissors.Player.start_link(:player1)
+iex(player2_node@LAPTOP-1G9V4CP8)1> RockPaperScissors.Player.start_link(:player2)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+The goal is to communicate from one node to another node's process.
+
+```mermaid
+flowchart LR
+subgraph Node2
+  p2[:player2 process]
+end
+subgraph Node1
+  p1[:player1 process]
+end
+Node1 --message--> p2
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's start simple and try to get the state of `:player2` from `player1_node`.
+
+The following won't work, because [Agent](https://hexdocs.pm/elixir/Agent.html) needs the name of the node to access on the network.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex(player1_node@LAPTOP-1G9V4CP8)1> RockPaperScissors.Player.get(:player2)
+```
+
+<div style="color: red;">
+** (exit) exited in: GenServer.call(:player2, {:get, #Function<2.84454955/1 in RockPaperScissors.Player.get/1>}, 5000)
+    ** (EXIT) no process: the process is not alive or there's no process currently associated with the given name, possibly because its application isn't started
+    (elixir 1.13.2) lib/gen_server.ex:1019: GenServer.call/3
+</div>
+
+<!-- livebook:{"break_markdown":true} -->
+
+Instead, you can replace `:player2` with `{:player2, :"player2_node@COMPUTER-NAME"}` where `COMPUTER-NAME`
+is the name of your computer. This tells the agent which named node the process is stored under.
+
+```mermaid
+flowchart LR
+subgraph P1N[player1_node]
+  p1[:player1 process]
+end
+subgraph P2N[player2_node]
+  p2[:player2 process]
+end
+P1N --get--> p2
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+This works network wide, so you could even run a node on a separate computer under the
+same network and [Agent](https://hexdocs.pm/elixir/Agent.html) would know how to find the node.
+
+```mermaid
+flowchart RL
+Network
+subgraph Computer1
+  subgraph P1N[player1_node]
+    p1[:player1 process]
+  end
+end
+subgraph Computer2
+  subgraph P2N[player2_node]
+    p2[:player2 process]
+  end
+end
+
+P1N --get--> Network --get--> P2N
+P2N --payload--> Network --payload--> P1N
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+You should be able to play the same game of rock paper scissors, but now across two nodes
+on the network.
+
+Any communication that requires another node should use `{player, node_name}` syntax.
+so `:player1` becomes `{:player1, :"player1_node@COMPUTER-NAME"}` and `:player2` becomes
+`{:player2, :"player2_node@COMPUTER-NAME"}`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex(player1_node@COMPUTER-NAME)> Player.start_link(:player1)
+{:ok, #PID<0.160.0>}
+iex(player2_node@COMPUTER-NAME)> Player.start_link(:player2)
+{:ok, #PID<0.160.0>}
+iex(player1_node@COMPUTER-NAME)> Player.guess(:player1, :rock)
+:ok
+iex(player2_node@COMPUTER-NAME)> Player.guess(:player2, :scissors)
+:ok
+iex(player1_node@COMPUTER-NAME)> Player.play(:player1, {:player2, :"player2_node@COMPUTER-NAME"})
+:ok
+iex(player1_node@COMPUTER-NAME)> Player.get(:player1)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 0, wins: 1}
+iex(player2_node@COMPUTER-NAME)> Player.get(:player2)
+%RockPaperScissors.Player{draws: 0, guess: nil, loses: 1, wins: 0}
+```
+
+## Edge Cases (Your Turn)
+
+There are several bugs still present with the `RockPaperScissors` module.
+
+* guesses other than `:rock`, `:paper`, or `:scissors` are allowed.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.guess(:player1, "any value!")
+%RockPaperScissors.Player{draws: 1, guess: "any value!", loses: 0, wins: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+* Neither player guessing is considered a draw when it should not be allowed.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissors.Player.play(:player1, :player2)
+
+RockPaperScissors.Player.get(:player1)
+%RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
+
+RockPaperScissors.Player.get(:player2)
+%RockPaperScissors.Player{draws: 1, guess: nil, loses: 0, wins: 0}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+* One player without a guess causes a crash.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  RockPaperScissors.Player.guess(:player1, :rock)
+  RockPaperScissors.Player.play(:player1, :player2)
+```
+
+<div style="color: white; padding: 0.5rem; background:lightcoral; margin-top: 0.5rem;">
+** (CondClauseError) no cond clause evaluated to a truthy value
+  (rock_paper_scissors 0.1.0) lib/rock_paper_scissors/player.ex:35: RockPaperScissors.Player.play/2
+</div>
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In your project, write [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html) tests to catch the bugs noted above, and implement
+the necessary changes to fix the bugs.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b distributed-rock-paper-scissors-exercise
+$ git add .
+$ git commit -m "finish distributed rock paper scissors exercise"
+$ git push origin distributed-rock-paper-scissors-exercise
+```
+
+Create a pull request from your `distributed-rock-paper-scissors-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

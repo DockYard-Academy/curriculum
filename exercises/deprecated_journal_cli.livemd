@@ -1,0 +1,331 @@
+# Journal CLI
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Journal CLI
+
+You're going to create a Command Line Interface Application, generally referred to as a CLI.
+This CLI will automate the process of creating daily journals with a markdown template.
+
+Once complete, you will run the following in the command line:
+
+```
+./journal
+```
+
+Which will generate a markdown file based on the current date `yyyy-mm-dd.md` with a journal template.
+
+## Create A New Mix Project
+
+Using the command line, create a new project in the `projects` folder called `journal`.
+
+```
+mix new journal
+```
+
+## Configure the Project For the Command Line
+
+We want to be able to use the command line to execute this project.
+
+Command line applications run the `main/1` function on a configured module.
+
+First, add a `main/1` function to the `Journal` module in `journal.ex`. We're going to
+leave it with a blank [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) for now.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def main(args) do
+  IO.inspect(args)
+end
+```
+
+For a command line application, we need to tell Mix which module to run.
+Configure the `:escript` option with the `:main_module`. Tell Mix to use the `Journal` module in `mix.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def project do
+  [
+    app: :journal,
+    version: "0.1.0",
+    elixir: "~> 1.13",
+    start_permanent: Mix.env() == :prod,
+    deps: deps(),
+    # Added this line
+    escript: [main_module: Journal]
+  ]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Under the hood, Elixir builds an executable file called an **escript**. This escript can be invoked from the command
+line directly rather than using the IEx Shell.
+
+Run the following in the command line from the project folder to build the executable file.
+To pick up future changes, you will need to re-run this command.
+
+```
+mix escript.build
+```
+
+Execute the file with:
+
+```
+./journal
+```
+
+You should see it print an empty list. That's because we haven't passed in any arguments.
+
+```
+[]
+```
+
+Pass in arguments to see them in the list.
+
+```
+./journal argument1 argument2 --switch
+["argument1", "argument2", "--switch"]
+```
+
+## Create A Daily Journal
+
+With no arguments provided, the `./journal` command should create a markdown file `yyyy-mm-dd.md` in an `entries/` folder.
+
+The files contents should be blank except for a title matching todays date.
+
+```md
+# yyyy-mm-dd
+```
+
+Implement the `Journal.main/1` function when given no arguments.
+Once complete, run the following from the command line.
+
+```
+./journal
+```
+
+And ensure it generated a `entries/yyyy-mm-dd.md` file with the following content.
+
+```
+# yyyy-mm-dd
+```
+
+Where `yyyy-mm-dd` is the current date. i.e. `2022-05-25`.
+
+## Add the --folder Switch
+
+Command line applications use **switches** to alter functionality.
+You've already used a switch whenever you make a git commit.
+
+```
+git commit -m "my example commit"
+```
+
+`-m` is just an alias for `message`. So you could also use:
+
+```
+git commit --message "my example commit".
+```
+
+So `--message` is a switch for the `git` cli.
+
+You're going to create a `--folder` switch for our `journal` cli which will override the default `entries` folder.
+For example, the following will create a new file in the `example_folder`.
+
+```
+./journal --folder example_folder
+```
+
+You can use the built-in [OptionParser](https://hexdocs.pm/elixir/OptionParser.html) module to parse switches.
+Specify the `:switches` in a keyword list with their values. For example, a `--folder` switch could be handled with:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# journal.ex
+def main(args) do
+  options = [switches: [folder: :string]]
+  {opts, _, _} = OptionParser.parse(args, options)
+  IO.inspect(opts)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now `opts` for the following command would be: `[folder: "example"]`.
+
+```
+./journal --folder example_folder
+```
+
+Implement the `--folder` switch to store journal entries in a different folder.
+Continue to use `test_entries` if the `--folder` switch is not provided.
+
+## Add the --file Switch
+
+Implement the `--file` switch, which should override the default file name.
+
+So the following would create a new file `test.md`.
+
+```
+./journal --file test
+```
+
+## Add the --title Switch
+
+Implement the `--title` switch, which should override the default file title.
+
+So the following would create a new file `test.md`.
+
+```
+./journal --file test --title "My Title"
+```
+
+With the following content:
+
+```md
+# My Title
+```
+
+## Use the --template Switch
+
+Test and implement the `--template` switch.
+
+The template flag should allow users to use any custom template in a `templates` folder like so:
+
+```
+./journal --template bullet_journal
+```
+
+Where `templates/bullet_journal.md` is a markdown file with the following content:
+
+```md
+<!-- in templates/bullet_journal.md -->
+# Bullet Journal
+I am grateful for
+-
+-
+-
+
+Today I will
+-
+-
+-
+```
+
+## (BONUS) Handle An Existing Daily Journal
+
+Warn users if they already have a daily journal or a journal with the same name.
+You can use [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) to print a message to the user.
+
+```
+$ ./journal
+Error, daily journal already exists. Open test_entries/yyyy-mm-dd.md to see todays journal.
+```
+
+## (BONUS) Provide Custom Values in Templates
+
+If a template defines some content in the format `{DATE}`,
+replace that content with todays date.
+
+If a template defines some content in the format `{TITLE}` replace that value
+with the `--title` switch if it exists. If it does not exist, replace the `{TITLE}` with an empty string.
+
+For example:
+
+```md
+# {TITLE}
+Created on {DATE}
+```
+
+When provided `--title "My Title"` Would become:
+
+```md
+# My Title
+Created on 2022-04-06
+```
+
+## (Bonus) Search Entries
+
+Implement a `search` command you can use to find files who's file name contains the searched string.
+
+```
+./journal search "example"
+/entries/example_file1.md
+/entries/example_file2.md
+```
+
+You can use [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) to print information in the console.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b journal-cli-exercise
+$ git add .
+$ git commit -m "finish journal cli exercise"
+$ git push origin journal-cli-exercise
+```
+
+Create a pull request from your `journal-cli-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

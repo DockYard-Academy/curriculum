@@ -1,5 +1,5 @@
 defmodule UtilsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Utils
   alias Utils.Notebooks
 
@@ -87,6 +87,61 @@ defmodule UtilsTest do
         end
       end)
     end)
+  end
+
+  test "All outline files exist" do
+    outline = File.read!("../start.livemd")
+
+    Regex.scan(~r/\[[^\]]+\]\(([^\)]+\.livemd)\)/, outline)
+    |> Enum.each(fn [_, file_name] ->
+      assert File.exists?(Path.join("../", file_name))
+    end)
+  end
+
+  test "Ensure all images are used and exist" do
+    file_and_image_paths =
+      Path.wildcard("../*/*.livemd")
+      |> Enum.map(fn file_path ->
+        content = File.read!(file_path)
+
+        Regex.scan(~r/!\[[^\]]*\]\(([^http][^\)]+)\)/, content)
+        |> Enum.map(fn [_, image_path] ->
+          {file_path, Path.join(Path.dirname(file_path), URI.decode(image_path))}
+        end)
+      end)
+      |> List.flatten()
+
+    Enum.each(file_and_image_paths, fn {file_path, image_path} ->
+      assert File.exists?(image_path), "Could not find image #{image_path} in #{file_path}"
+    end)
+  end
+
+  test "Ensure fileu not in outline are deprecated" do
+    outline = File.read!("../start.livemd")
+
+    all_paths = Path.wildcard("../*/*.livemd")
+    ignored_paths = Path.wildcard("../*/_*.livemd")
+    deprecated_paths = Path.wildcard("../*/deprecated*.livemd")
+
+    outline_paths =
+      Regex.scan(~r/\[[^\]]+\]\(([^\)]+\.livemd)\)/, outline)
+      |> Enum.map(fn [_, file_name] ->
+        Path.join("../", file_name)
+      end)
+
+    remaining_paths = all_paths -- ignored_paths
+    remaining_paths = remaining_paths -- deprecated_paths
+    remaining_paths = remaining_paths -- outline_paths
+    assert remaining_paths == []
+
+    # Enum.each(remaining_paths, fn path ->
+    #   basename = Path.basename(path)
+    #   dirname = Path.dirname(path)
+
+    #   deprecated_path = Path.join(dirname, "deprecated_" <> basename)
+    #   File.cp!(path, deprecated_path)
+    #   File.rm!(path)
+    # end)
   end
 
   test "Ensure no broken / empty links in livebooks" do

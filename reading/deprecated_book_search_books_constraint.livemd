@@ -1,0 +1,2055 @@
+# Book Search: Books
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Overview
+
+### One-to-many Relationships
+
+In a one-to-many relationship, a single record in one table can be related to multiple records in another table. For example, in a database for a school, a teacher may have multiple students, but each student is only associated with one teacher. In this case, the teacher and student tables would have a one-to-many relationship.
+
+One-to-many relationships are commonly used in database design because they allow for efficient storage of data and easy retrieval of information. They are also flexible, as the number of records on either side of the relationship can change over time.
+
+For example, in the teacher-student example, if a teacher leaves the school, all the records in the student table associated with that teacher can be easily removed or updated to reflect the new teacher. Similarly, if a student graduates and is no longer associated with a teacher, their record can be removed from the student table without affecting the other records.
+
+Overall, one-to-many relationships are an important part of database design and are used to represent the many-sided relationships that exist in real-world data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### `has_many` and `belongs_to`
+
+In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a teacher-student relationship, the teacher "has many" students.
+
+On the other hand, "belongs to" is used to describe the relationship between the many side of the relationship and the one side. In the teacher-student example, a student "belongs to" a teacher.
+
+These terms are commonly used in database design and programming to describe the structure of one-to-many relationships. They help to clarify the direction of the relationship and make it easier to understand how the data is organized and accessed.
+
+For example, when querying a database for information, a developer may use the "has many" and "belongs to" relationships to navigate through the data and retrieve the desired information. In this way, these terms play an important role in the organization and management of data in a one-to-many relationship.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Foreign Keys
+
+A foreign key is a field in a relational database table that is used to establish and enforce a link between the data in two tables. This link is known as a relationship, and it allows the data in one table to be related to the data in another table.
+
+Foreign keys are typically used to implement one-to-many relationships in a database. For example, in a database for a school, the student table may have a foreign key that references the primary key of the teacher table. This establishes a one-to-many relationship between teachers and students, where each teacher can have multiple students but each student is only associated with one teacher.
+
+Foreign keys are an important part of relational database design because they help to enforce the integrity of the data by ensuring that the relationships between tables are maintained. For example, if a record in the teacher table is deleted, the corresponding records in the student table that reference that teacher will also be deleted to maintain the relationship.
+
+Overall, foreign keys are an essential part of relational databases and are used to establish and enforce relationships between data in different tables.
+
+## BookSearch: Books
+
+To learn more about one-to-many relationships, we're going to add books to our [BookSearch](./book_search_authors.livemd) applications from the previous lesson. If you need clarification during this reading, you can reference the completed [BookSearch/books](https://github.com/DockYard-Academy/book_search/tree/books) project.
+
+Each book will belong to an author, and each author can have many books. Therefore, we need to associate books with a particular author.
+
+```mermaid
+flowchart
+  Author
+  Author --> Book1
+  Author --> Book2
+  Author --> Book3
+```
+
+To associate books with an author, we need to model their relationship in our Database.
+Relational databases store data in any number of tables and use foreign keys to relate data to one another. In this case, each book will store a foreign key `author_id` to reference an author.
+
+Sometimes we model relationships and data tables using diagrams. For example, there is a diagram specification called a [UML (Unified Modelling Language)](https://en.wikipedia.org/wiki/Unified_Modeling_Language) with particular rules and symbols. For our purposes, we'll use simple diagrams where `1` represents the **one** in the relationship, and `*` represent **many**.
+
+Here's a diagram to describe the one-to-many relationship between books and authors.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  direction RL
+  class Author {
+    name: :string
+    books: [Book]
+  }
+  class Book {
+    title: :string
+    author_id: :id
+  }
+
+  Book "*" --> "1" Author :belongs to
+```
+
+## Run Book Search Project
+
+Ensure you have completed the `BookSearch` project from the previous lesson. If not, you can clone the [BookSearch](https://github.com/DockYard-Academy/book_search) project.
+
+All tests should pass.
+
+```
+$ mix test
+```
+
+Ensure you start the server.
+
+```
+$ mix phx.server
+```
+
+## Books & Authors Database Association
+
+Books will store a foreign key to reference the author. For example, we can generate the books resource with the following command. `author_id:references:author` creates the foreign key to the `"authors"` table.
+
+```
+$ mix phx.gen.html Books Book books title:string author_id:references:authors
+```
+
+We've generated the following migration for books.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# priv/repo/migrations/_create_books.exs
+
+defmodule BookSearch.Repo.Migrations.CreateBooks do
+  use Ecto.Migration
+
+  def change do
+    create table(:books) do
+      add :title, :string
+      add :author_id, references(:authors, on_delete: :nothing)
+
+      timestamps()
+    end
+
+    create index(:books, [:author_id])
+  end
+end
+```
+
+The [references/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2) function defines the foreign key relationship with the author table. `on_delete: :nothing` means that if an author is deleted, the book will remain in the Database.
+
+If instead, we want to delete all associated books when we delete an author, we can use the `on_delete: :delete_all` option.
+
+Change the delete behavior to `on_delete: :delete_all`. We'll also add `null: false` to ensure that a book must have an author. Replace the migration file with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Repo.Migrations.CreateBooks do
+  use Ecto.Migration
+
+  def change do
+    create table(:books) do
+      add :title, :string
+      add :author_id, references(:authors, on_delete: :delete_all), null: false
+
+      timestamps()
+    end
+
+    create index(:books, [:author_id])
+  end
+end
+```
+
+Run migrations.
+
+```
+$ mix ecto.migrate
+```
+
+## Books and Authors Schema Association
+
+We've associated authors and books in our Database. However, we have not associated them in our schemas. We'll need this association to access the `book.author` field of a book or the `author.books` field of the author.
+
+### has_many/3
+
+We can use the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) macro to indicate a one-to-many association with another schema.
+
+Add `has_many/3` to the `Author` schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Authors.Author do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "authors" do
+    field :name, :string
+    has_many :books, BookSearch.Books.Book
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(author, attrs) do
+    author
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### belongs_to/3
+
+To indicate our books belong to a single author, we need to add the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship.
+Replace `field :author_id, :id` with the `belongs_to/3` macro.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.Books.Book do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "books" do
+    field :title, :string
+    belongs_to :author, BookSearch.Authors.Author
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:title])
+    |> validate_required([:title])
+  end
+end
+```
+
+## Building Associations
+
+In the Elixir programming language, the Ecto framework provides a set of functions for building associations between database tables.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### build_assoc/3
+
+[build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) is a function in the Elixir programming language that is used to create a new record in a related table and associate it with an existing record in the current table. It is part of the Ecto framework, which is a domain-specific language for writing queries and interacting with databases in Elixir.
+
+We can call `build_assoc` in our code and pass it the current record, the name of the association, and the attributes of the new record.
+
+For example, let's say we have a database for a school with a `teachers` table and a `students` table. The `teachers` table has a one-to-many relationship with the `students` table, where each teacher can have multiple students. In this case, we could use `build_assoc` to create a new student and associate it with a specific teacher.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+build_assoc(teacher, :students, name: "Andrew")
+%Student{id: nil, teacher_id: 1, name: "Andrew"}
+```
+
+Here is an example of how we might use `build_assoc` in our code:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Define the association between the teachers and students tables in your Ecto models
+
+defmodule School.Teacher do
+  use Ecto.Schema
+
+  schema "teachers" do
+    has_many :students, School.Student
+  end
+end
+
+defmodule School.Student do
+  use Ecto.Schema
+
+  schema "students" do
+    field :name, :string
+    belongs_to :teacher, School.Teacher
+  end
+end
+
+# Now you can use `build_assoc` in your code to create a new student and associate it with a specific teacher
+
+# Find the teacher record in the database
+teacher = School.get_teacher!(teacher.id)
+
+# Use `build_assoc` to create a new student and associate it with the teacher
+student = build_assoc(teacher, :students, %{name: "Jon"})
+
+# Save the new student to the database
+{:ok, student} = School.Repo.insert(student)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### put_assoc/4
+
+[put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. This allows us to work with associations as a whole. For example, we can use `put_assoc/4` to update all student associations for a given teacher changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule School.Teacher do
+  use Ecto.Schema
+
+  schema "teachers" do
+    has_many :students, School.Student
+  end
+
+  def changeset(teacher, params) do
+    teacher
+    |> cast(params, [:name, :email])
+    |> put_assoc(:students, params[:students])
+  end
+end
+```
+
+`put_assoc/4` returns a changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
+
+# The above would return a Teacher changeset similar to the following:
+%Ecto.Changeset<
+  action: nil,
+  changes: %{
+    students: [
+      %Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: %Student<>, valid?: true>
+    ]
+  },
+  errors: [],
+  data: %Teacher<>,
+  valid?: true
+>
+```
+
+Using the teacher changeset to insert the teacher and associated students will overwrite any existing student associations.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
+|> Repo.update!()
+```
+
+If we don't want to overrwrite existing associations, then we need to preserve them.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+teacher
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "Andrew"} | teacher.students])
+|> Repo.update!()
+```
+
+Instead of using `put_assoc/4` with the teacher record that has many students, we can use it with the student record to associate it with a single teacher.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%Student{name: "Jon"}
+|> Ecto.Changeset.change()
+|> Ecto.Changeset.put_assoc(:teacher, teacher)
+|> Repo.insert!()
+```
+
+However, in this example it would be more appropriate to use `build_assoc/3`.
+
+Instead, `put_assoc/4` is a better solution when we need to replace the entirety of an association. See [HexDocs: adding tags to a post](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4-example-adding-tags-to-a-post) for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### cast_assoc/3
+
+[cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) works similarly to `put_assoc/4` as it works with the entire association at once, however it's best used with external data we need to cast/validate with a changeset.
+
+> This function should be used when working with the entire association at once (and not a > single element of a many-style association) and receiving data external to the application.
+> 
+> * [HexDocs: cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Teacher
+|> Repo.get!(id)
+|> Repo.preload(:students) # Only required when updating data
+|> Ecto.Changeset.cast(params, [])
+|> Ecto.Changeset.cast_assoc(:students, with: &School.Student.changeset/2)
+```
+
+## Fix Failing Context Tests
+
+We have eight failing tests in the `Books` context because we added the `null: false` constraint on the `BookSearch.Repo.Migrations.CreateBooks` migration.
+
+Run the following to execute the failing tests.
+
+```
+$ mix test test/book_search/books_test.exs
+...
+8 tests, 8 failures
+```
+
+The test output should include errors similar to the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+** (Postgrex.Error) ERROR 23502 (not_null_violation) null value in column "author_id" violates not-null constraint
+
+         table: books
+         column: author_id
+
+     Failing row contains (18, some title, null, 2022-07-28 03:33:48, 2022-07-28 03:33:48).
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### list_books/0
+
+Let's fix these tests, starting with `"list_books/0 returns all books"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# test/book_search/books_test.exs
+
+test "list_books/0 returns all books" do
+  book = book_fixture()
+  assert Books.list_books() == [book]
+end
+```
+
+The `book_fixture/1` function causes this error. That's because books must have an author, and the `book_fixture/1` function does not include an author.
+Let's import the `AuthorFixtures` and use the `author_fixture/1` function to create an author that we'll provide to the `book_fixture/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# import the AuthorFixtures where we already import BooksFixtures
+import BookSearch.BooksFixtures
+import BookSearch.AuthorsFixtures
+```
+
+Then create an author and pass it to the `book_fixture/1` in our test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "list_books/0 returns all books" do
+  author = author_fixture()
+  book = book_fixture(author: author)
+  assert Books.list_books() == [book]
+end
+```
+
+The `book_fixture/1` calls the `BookSearch.Books.create_book/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def book_fixture(attrs \\ %{}) do
+  {:ok, book} =
+    attrs
+    |> Enum.into(%{
+      title: "some title"
+    })
+    |> BookSearch.Books.create_book()
+
+  book
+end
+```
+
+So we need to modify the `create_book/1` function to associate the author with the book.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  %Book{}
+  |> Book.changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+We can use [Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to associate the author with the book.
+Replace the `create_book/1` function with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  attrs.author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+[Ecto.build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) builds the association with `author` in the `Book` struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%BookSearch.Books.Book{
+  __meta__: #Ecto.Schema.Metadata<:built, "books">,
+  author: %BookSearch.Authors.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    id: 329,
+    inserted_at: ~N[2022-07-28 03:59:10],
+    name: "some name",
+    updated_at: ~N[2022-07-28 03:59:10]
+  },
+  author_id: 329,
+  id: nil,
+  inserted_at: nil,
+  title: "some title",
+  updated_at: nil
+}
+```
+
+This struct then gets saved to the Database when it's passed to `Repo.insert/2`.
+
+Run our first test where `14` is the actual line number of the test, and unfortunately, it still fails.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix test test/book_search/books_test.exs:14
+1) test books list_books/0 returns all books (BookSearch.BooksTest)
+     test/book_search/books_test.exs:14
+     Assertion with == failed
+     code:  assert Books.list_books() == [book]
+     left:  [
+              %BookSearch.Books.Book{
+                __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+                author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+                author_id: 336,
+                id: 38,
+                inserted_at: ~N[2022-07-28 04:05:19],
+                title: "some title",
+                updated_at: ~N[2022-07-28 04:05:19]
+              }
+            ]
+     right: [
+              %BookSearch.Books.Book{
+                __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+                author: %BookSearch.Authors.Author{__meta__: #Ecto.Schema.Metadata<:loaded, "authors">, books: #Ecto.Association.NotLoaded<association :books is not loaded>, id: 336, inserted_at: ~N[2022-07-28 04:05:19], name: "some name", updated_at: ~N[2022-07-28 04:05:19]},
+                author_id: 336,
+                id: 38,
+                inserted_at: ~N[2022-07-28 04:05:19],
+                title: "some title",
+                updated_at: ~N[2022-07-28 04:05:19]
+              }
+            ]
+     stacktrace:
+       test/book_search/books_test.exs:17: (test)
+```
+
+We're very close! `Books.list_books/1` doesn't load the author association. That's why we see the difference between the two `:author` fields.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+author: %BookSearch.Authors.Author{__meta__: #Ecto.Schema.Metadata<:loaded, "authors">, books: #Ecto.Association.NotLoaded<association :books is not loaded>, id: 336, inserted_at: ~N[2022-07-28 04:05:19], name: "some name", updated_at: ~N[2022-07-28 04:05:19]},
+```
+
+We could modify the assertion, but instead, we'll use this opportunity to demonstrate loading associated data.
+We can use [Ecto.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) to load associated data in a query.
+
+Replace the `Books.list_books/1` function with the following to load the author association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_books do
+  Book
+  |> preload(:author)
+  |> Repo.all()
+end
+```
+
+Now the test should pass!
+
+```
+$ mix test test/book_search/books_test.exs:14
+...
+8 tests, 0 failures, 7 excluded
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### get_book!/1
+
+In the next test `"get_book!/1 returns the book with the given id"` we need to associate the author with the book.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get_book!/1 returns the book with given id" do
+  author = author_fixture()
+  book = book_fixture(author: author)
+  assert Books.get_book!(book.id) == book
+end
+```
+
+However, the test fails because the `:author` association is not loaded when we get a single book in the `Books.get_book!/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix test test/book_search/books_test.exs:20
+...
+1) test books get_book!/1 returns the book with given id (BookSearch.BooksTest)
+     test/book_search/books_test.exs:20
+     Assertion with == failed
+     code:  assert Books.get_book!(book.id) == book
+     left:  %BookSearch.Books.Book{
+              __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+              author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+              author_id: 340,
+              id: 42,
+              inserted_at: ~N[2022-07-28 04:17:03],
+              title: "some title",
+              updated_at: ~N[2022-07-28 04:17:03]
+            }
+     right: %BookSearch.Books.Book{
+              __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+              author: %BookSearch.Authors.Author{__meta__: #Ecto.Schema.Metadata<:loaded, "authors">, books: #Ecto.Association.NotLoaded<association :books is not loaded>, id: 340, inserted_at: ~N[2022-07-28 04:17:03], name: "some name", updated_at: ~N[2022-07-28 04:17:03]},
+              author_id: 340,
+              id: 42,
+              inserted_at: ~N[2022-07-28 04:17:03],
+              title: "some title",
+              updated_at: ~N[2022-07-28 04:17:03]
+            }
+     stacktrace:
+       test/book_search/books_test.exs:23: (test)
+```
+
+We could fix this using [Ecto.preload/3](https://hexdocs.pm/ecto/Ecto.html#preload/3) again. However, let's use this opportunity to demonstrate how we could alter the test to pass if we didn't want to load the author association.
+Replace the test with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get_book!/1 returns the book with given id" do
+  author = author_fixture()
+  %{title: title, id: id, author_id: author_id} = book_fixture(author: author)
+  assert %{title: ^title, id: ^id, author_id: ^author_id} = Books.get_book!(id)
+end
+```
+
+Above, we use the pin operator `^` and fields of the book created by `book_fiture/1` to assert that the `:title`, `:id`, and `:author_id` fields match. We could accomplish the same thing more verbosely with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get_book!/1 returns the book with given id" do
+  author = author_fixture()
+  book = book_fixture(author: author)
+  assert fetched_book = Books.get_book!(book.id)
+  assert fetched_book.id == book.id
+  assert fetched_book.author_id == book.author_id
+  assert fetched_book.title == book.title
+end
+```
+
+Now the test should pass!
+
+```
+$ mix test test/book_search/books_test.exs:20
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+You can resolve the remaining tests by following the same patterns.
+Fix the remaining tests. When complete, all tests should pass, and your `test/book_search/books_test.exs` file should look similar to the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BookSearch.BooksTest do
+  use BookSearch.DataCase
+
+  alias BookSearch.Books
+
+  describe "books" do
+    alias BookSearch.Books.Book
+
+    import BookSearch.BooksFixtures
+    import BookSearch.AuthorsFixtures
+
+    @invalid_attrs %{title: nil}
+
+    test "list_books/0 returns all books" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      assert Books.list_books() == [book]
+    end
+
+    test "get_book!/1 returns the book with given id" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      fetched_book = Books.get_book!(book.id)
+      assert fetched_book.id == book.id
+      assert fetched_book.author_id == book.author_id
+      assert fetched_book.title == book.title
+    end
+
+    test "create_book/1 with valid data creates a book" do
+      author = author_fixture()
+      valid_attrs = %{title: "some title", author: author}
+
+      assert {:ok, %Book{} = book} = Books.create_book(valid_attrs)
+      assert book.title == "some title"
+    end
+
+    test "create_book/1 with invalid data returns error changeset" do
+      author = author_fixture()
+      invalid_attrs = %{title: nil, author: author}
+      assert {:error, %Ecto.Changeset{}} = Books.create_book(invalid_attrs)
+    end
+
+    test "update_book/2 with valid data updates the book" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      update_attrs = %{title: "some updated title"}
+
+      assert {:ok, %Book{} = book} = Books.update_book(book, update_attrs)
+      assert book.title == "some updated title"
+    end
+
+    test "update_book/2 with invalid data returns error changeset" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      invalid_attrs = %{title: nil, author: author}
+      assert {:error, %Ecto.Changeset{}} = Books.update_book(book, invalid_attrs)
+      fetched_book = Books.get_book!(book.id)
+      assert fetched_book.id == book.id
+      assert fetched_book.author_id == book.author_id
+      assert fetched_book.title == book.title
+    end
+
+    test "delete_book/1 deletes the book" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      assert {:ok, %Book{}} = Books.delete_book(book)
+      assert_raise Ecto.NoResultsError, fn -> Books.get_book!(book.id) end
+    end
+
+    test "change_book/1 returns a book changeset" do
+      author = author_fixture()
+      book = book_fixture(author: author)
+      assert %Ecto.Changeset{} = Books.change_book(book)
+    end
+  end
+end
+```
+
+All context tests should now pass.
+
+```
+$ mix test test/book_search/books_test.exs
+...
+8 tests, 0 failures
+```
+
+## Fix Failing Controller Tests
+
+Our book controller tests fail due to the association between authors and books. To associate authors and books, we can nest resources in our router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", BookSearchWeb do
+  pipe_through(:browser)
+
+  get("/", PageController, :index)
+
+  resources "/authors", AuthorController do
+    resources "/books", BookController
+  end
+end
+```
+
+We can see the routes we've created by running `mix phx.routes`. Here are the important ones.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix phx.routes
+...
+        author_path  GET     /authors                               BookSearchWeb.AuthorController :index
+        author_path  GET     /authors/:id/edit                      BookSearchWeb.AuthorController :edit
+        author_path  GET     /authors/new                           BookSearchWeb.AuthorController :new
+        author_path  GET     /authors/:id                           BookSearchWeb.AuthorController :show
+        author_path  POST    /authors                               BookSearchWeb.AuthorController :create
+        author_path  PATCH   /authors/:id                           BookSearchWeb.AuthorController :update
+                     PUT     /authors/:id                           BookSearchWeb.AuthorController :update
+        author_path  DELETE  /authors/:id                           BookSearchWeb.AuthorController :delete
+   author_book_path  GET     /authors/:author_id/books              BookSearchWeb.BookController :index
+   author_book_path  GET     /authors/:author_id/books/:id/edit     BookSearchWeb.BookController :edit
+   author_book_path  GET     /authors/:author_id/books/new          BookSearchWeb.BookController :new
+   author_book_path  GET     /authors/:author_id/books/:id          BookSearchWeb.BookController :show
+   author_book_path  POST    /authors/:author_id/books              BookSearchWeb.BookController :create
+   author_book_path  PATCH   /authors/:author_id/books/:id          BookSearchWeb.BookController :update
+                     PUT     /authors/:author_id/books/:id          BookSearchWeb.BookController :update
+   author_book_path  DELETE  /authors/:author_id/books/:id          BookSearchWeb.BookController :delete
+...
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+All of our controller tests still fail. However, we've laid the groundwork for fixing them.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs
+...
+8 tests, 8 failures
+```
+
+We'll need authors to associate with our books, so add the `BookSearch.AuthorsFixtures` to `test/book_search_web/controllers/book_controller_test.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# add the import below the existing BookSearch.BooksFixtures import.
+import BookSearch.BooksFixtures
+import BookSearch.AuthorsFixtures
+```
+
+## BookController.index/2
+
+Let's start with the `"index"` test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "index" do
+  test "lists all books", %{conn: conn} do
+    conn = get(conn, Routes.book_path(conn, :index))
+    assert html_response(conn, 200) =~ "Listing Books"
+  end
+end
+```
+
+This test fails with the following error.
+
+```
+(UndefinedFunctionError) function BookSearchWeb.Router.Helpers.book_path/2 is undefined or private
+```
+
+That's because of our nested routes. We need to use `Routes.author_book_path` instead of `Routes.book_path`.
+
+Replace the test with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "lists all books", %{conn: conn} do
+  author = author_fixture()
+  conn = get(conn, Routes.author_book_path(conn, :index, author))
+  assert html_response(conn, 200) =~ "Listing Books"
+end
+```
+
+We still have the same error because the `lib/book_search_web/templates/books/index.html.heex` template also uses `Routes.book_path`.
+Replace `Routes.book_path` with `Routes.author_book_path`. `Routes.author_book_path` requires an author, so we'll pass in `@author_id`, which we'll define in a moment in the controller.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/books/index.html.heex
+
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for book <- @books do %>
+    <tr>
+      <td><%= book.title %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.author_book_path(@conn, :show, @author_id, book) %></span>
+        <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, @author_id, book) %></span>
+        <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, @author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+```
+
+We have access to the `"author_id"` in the second argument controller because we nested our author and book routes.
+We need to pass the `author_id` into the [render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) function to provide it to the template.
+
+Replace `BookController.index/2` with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+```
+
+The `"index"` test should pass!
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:12
+...
+8 tests, 0 failures, 7 excluded
+```
+
+We can create an author on http://localhost:4000/authors/new and then view an (empty) list of books for the author on
+http://localhost:4000/authors/1 where `1` is the id of the author.
+
+However, our test isn't very comprehensive. For example, the route is nested under the author, so we would expect to list only books that belong to that author. Currently, it simply lists all books. We'll circle back to this after we've resolved the other tests.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/list_books_page.png)
+
+## BookController.new/2
+
+The `"new book"` tests have the same issues as `"index"` where they use `Routes.book_path` instead of `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "new book" do
+  test "renders form", %{conn: conn} do
+    conn = get(conn, Routes.book_path(conn, :new))
+    assert html_response(conn, 200) =~ "New Book"
+  end
+end
+```
+
+Create an author and use `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "new book" do
+  test "renders form", %{conn: conn} do
+    author = author_fixture()
+    conn = get(conn, Routes.author_book_path(conn, :new, author))
+    assert html_response(conn, 200) =~ "New Book"
+  end
+end
+```
+
+Provide the `"author_id"` to the template in the controller.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def new(conn, %{"author_id" => author_id}) do
+  changeset = Books.change_book(%Book{})
+  render(conn, "new.html", changeset: changeset, author_id: author_id)
+end
+```
+
+Use the `@author_id` in the template and replace `Routes.book_path` with `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>New Book</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.author_book_path(@conn, :create, @author_id)) %>
+
+<span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
+```
+
+Now the test should pass! Replace `19` with the correct line number of the test.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:19
+...
+8 tests, 0 failures, 7 excluded
+```
+
+We should be able to visit http://localhost:4000/authors/1/books/new to view the new book page. However, we cannot yet submit the form to create a new book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/new_book_page.png)
+
+## BookController.create/2
+
+We need to associate an author and a book when we create them. There are two failing `"create book"` tests we need to fix.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "create book" do
+  test "redirects to show when data is valid", %{conn: conn} do
+    conn = post(conn, Routes.book_path(conn, :create), book: @create_attrs)
+
+    assert %{id: id} = redirected_params(conn)
+    assert redirected_to(conn) == Routes.book_path(conn, :show, id)
+
+    conn = get(conn, Routes.book_path(conn, :show, id))
+    assert html_response(conn, 200) =~ "Show Book"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn} do
+    conn = post(conn, Routes.book_path(conn, :create), book: @invalid_attrs)
+    assert html_response(conn, 200) =~ "New Book"
+  end
+end
+```
+
+### Valid Creation
+
+The first test performs a book creation with valid parameters and tests that the client is redirected to the book show page. It also verifies we can visit the show page directly.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "redirects to show when data is valid", %{conn: conn} do
+  conn = post(conn, Routes.book_path(conn, :create), book: @create_attrs)
+
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == Routes.book_path(conn, :show, id)
+
+  conn = get(conn, Routes.book_path(conn, :show, id))
+  assert html_response(conn, 200) =~ "Show Book"
+end
+```
+
+Create an author and replace `Routes.book_path` with `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "redirects to show when data is valid", %{conn: conn} do
+  author = author_fixture()
+  conn = post(conn, Routes.author_book_path(conn, :create, author), book: @create_attrs)
+
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == Routes.author_book_path(conn, :show, author, id)
+
+  conn = get(conn, Routes.author_book_path(conn, :show, author, id))
+  assert html_response(conn, 200) =~ "Show Book"
+end
+```
+
+Now we need to modify the `BookController.create/2` function to use the `"author_id"` parameter.
+And replace `Routes.book_path` with `Routes.author_book_path`.
+
+`Books.create_book/1` needs the full author, not just the id. So, we need to retrieve the author using `BookSearch.Authors.get_author!/1`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params, "author_id" => author_id}) do
+  author = BookSearch.Authors.get_author!(author_id)
+
+  case Books.create_book(Map.put(book_params, :author, author)) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset)
+  end
+end
+```
+
+However, we've got a problem. `BookSearch.create_book/1` expects the author is in an atom key.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def create_book(attrs \\ %{}) do
+    attrs.author
+    |> Ecto.build_assoc(:books, attrs)
+    |> Book.changeset(attrs)
+    |> Repo.insert()
+  end
+```
+
+Our test currently fails with the following.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:28
+** (Ecto.CastError) expected params to be a map with atoms or string keys, got a map with mixed keys: %{:author => %BookSearch.Authors.Author{__meta__: #Ecto.Schema.Metadata<:loaded, "authors">, books: #Ecto.Association.NotLoaded<association :books is not loaded>, id: 477, inserted_at: ~N[2022-07-28 06:17:24], name: "some name", updated_at: ~N[2022-07-28 06:17:24]}, "title" => "some title"}
+```
+
+That's because [Ecto.Changeset.cast/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4) expects a map with either string keys, or atom keys, not both.
+
+There are a few solutions to this problem. We've chosen to use [Map.pop!/2](https://hexdocs.pm/elixir/Map.html#pop!/2) to separate the `:author` key and the rest of the parameters. However, we could have changed the interface to the `Books.create_book/1` function.
+
+```elixir
+author = %{name: "Dennis E Taylor"}
+attrs = %{title: "We are Legion (We are Bob)", author: author}
+
+Map.pop!(attrs, :author)
+```
+
+Replace `Books.create_books/1` with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+
+  author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+We're successfully creating the book. However we encounter the `Routes.book_path` issue when we render the book show page.
+
+Replace `Routes.book_path` with `Routes.author_book_path` in the show template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Show Book</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @book.title %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, @author_id, @book) %></span> |
+<span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
+```
+
+An provide the author id in the `BookController.show/2` action.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def show(conn, %{"id" => id, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+  render(conn, "show.html", author_id: author_id, book: book)
+end
+```
+
+Now the test should pass! Run the following in the command line to run the test. Replace `28` with the correct line number.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:28
+...
+8 tests, 0 failures, 7 excluded
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Invalid Creation
+
+We have a second `"create book"` test `"renders errors when data is invalid"` that is still failing.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "renders errors when data is invalid", %{conn: conn} do
+  conn = post(conn, Routes.book_path(conn, :create), book: @invalid_attrs)
+  assert html_response(conn, 200) =~ "New Book"
+end
+```
+
+Create an author and replace `Routes.book_path` with `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "renders errors when data is invalid", %{conn: conn} do
+  author = author_fixture()
+  conn = post(conn, Routes.author_book_path(conn, :create, author), book: @invalid_attrs)
+  assert html_response(conn, 200) =~ "New Book"
+end
+```
+
+We need to provide the author id in the error case of `BookController.create/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"book" => book_params, "author_id" => author_id}) do
+  author = BookSearch.Authors.get_author!(author_id)
+
+  case Books.create_book(Map.put(book_params, :author, author)) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book created successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "new.html", changeset: changeset, author_id: author_id) # <-- Add the author_id
+  end
+end
+```
+
+Run the following from the command line and the test should pass. Replace `39` with the correct line number of the test.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:39
+...
+8 tests, 0 failures, 7 excluded
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now we can visit http://localhost:4000/authors/1/books/new.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/new_book_create_book.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Then submit the form to create a new book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/show_book_created_book.png)
+
+## Books.list_books/1
+
+Unfortunately, our previous change to `Books.create_book/1` caused one of our `Books` context tests to fail.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "list_books/0 returns all books" do
+  author = author_fixture()
+  book = book_fixture(author: author)
+  assert Books.list_books() == [book]
+end
+```
+
+That's because the `Books.create_book/1` function no longer builds the author association because `:author` is no longer in the `attrs` map.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_book(attrs \\ %{}) do
+  {author, attrs} = Map.pop!(attrs, :author)
+
+  author
+  |> Ecto.build_assoc(:books, attrs)
+  |> Book.changeset(attrs)
+  |> Repo.insert()
+end
+```
+
+The behavior of `list_books/0` to build the `:author` is desirable, so we don't need to change it. Instead, let's modify the `"list_books/0 returns all books"` test to check for the author association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "list_books/0 returns all books" do
+  author = author_fixture()
+  book = book_fixture(author: author)
+
+  assert [fetched_book] = Books.list_books()
+  assert fetched_book.title == book.title
+  assert fetched_book.author_id == book.author_id
+  assert fetched_book.author == author
+end
+```
+
+Now run the following in the command line to verify the test passes! Replace `14` with the correct line number of the test.
+
+```
+$ mix test test/book_search/books_test.exs:14
+...
+8 tests, 0 failures, 7 excluded
+```
+
+## BookController.edit/2
+
+The `"edit book"` tests use a setup function `:create_book`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "edit book" do
+  setup [:create_book]
+
+  test "renders form for editing chosen book", %{conn: conn, book: book} do
+    conn = get(conn, Routes.book_path(conn, :edit, book))
+    assert html_response(conn, 200) =~ "Edit Book"
+  end
+end
+```
+
+This function creates a book without an author, so it fails.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp create_book(_) do
+  book = book_fixture()
+  %{book: book}
+end
+```
+
+We can modify it to associate an author with the book or remove the function and use the fixtures directly.
+
+It can be an anti-pattern to create associated data in a fixture. With complex domains, this can cause unexpected behavior. However, we will associate an author with the book in the `create_book/1` function for demonstration purposes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp create_book(_) do
+  book = book_fixture(author: author_fixture())
+  %{book: book}
+end
+```
+
+Now we can replace `Routes.book_path` with `Routes.author_book_path` in the test. We'll use the `book.author_id` since we don't have an `author` variable.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "edit book" do
+  setup [:create_book]
+
+  test "renders form for editing chosen book", %{conn: conn, book: book} do
+    conn = get(conn, Routes.author_book_path(conn, :edit, book.author_id, book))
+    assert html_response(conn, 200) =~ "Edit Book"
+  end
+end
+```
+
+We need to replace `Routes.book_path` with `Routes.author_book_path` in the edit template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Edit Book</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.author_book_path(@conn, :update, @author_id, @book)) %>
+
+<span><%= link "Back", to: Routes.author_book_path(@conn, :index, @author_id) %></span>
+```
+
+Provide the author id to the template in the `BookController.edit/2` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def edit(conn, %{"id" => id, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+  changeset = Books.change_book(book)
+  render(conn, "edit.html", book: book, changeset: changeset, author_id: author_id)
+end
+```
+
+Run the following in the terminal, and the test should pass! Replace `46` with the correct line number of the test.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:46
+8 tests, 0 failures, 7 excluded
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now we should be able to visit the edit page on http://localhost:4000/authors/1/book/1/edit. We cannot yet submit the form.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/edit_book_page.png)
+
+## BookController.update/2
+
+The `"update book"` tests are very similar to the `"create book"` tests. There is one test for updating a book with valid parameters and another for updating a book with invalid parameters.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "update book" do
+  setup [:create_book]
+
+  test "redirects when data is valid", %{conn: conn, book: book} do
+    conn = put(conn, Routes.book_path(conn, :update, book), book: @update_attrs)
+    assert redirected_to(conn) == Routes.book_path(conn, :show, book)
+
+    conn = get(conn, Routes.book_path(conn, :show, book))
+    assert html_response(conn, 200) =~ "some updated title"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn, book: book} do
+    conn = put(conn, Routes.book_path(conn, :update, book), book: @invalid_attrs)
+    assert html_response(conn, 200) =~ "Edit Book"
+  end
+end
+```
+
+Replace `Routes.book_path` with `Routes.author_book_path` and use the `book.author_id` to provide the author id to the path.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "update book" do
+  setup [:create_book]
+
+  test "redirects when data is valid", %{conn: conn, book: book} do
+    conn =
+      put(conn, Routes.author_book_path(conn, :update, book.author_id, book),
+        book: @update_attrs
+      )
+
+    assert redirected_to(conn) == Routes.author_book_path(conn, :show, book.author_id, book)
+
+    conn = get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
+    assert html_response(conn, 200) =~ "some updated title"
+  end
+
+  test "renders errors when data is invalid", %{conn: conn, book: book} do
+    conn =
+      put(conn, Routes.author_book_path(conn, :update, book.author_id, book),
+        book: @invalid_attrs
+      )
+
+    assert html_response(conn, 200) =~ "Edit Book"
+  end
+end
+```
+
+We've already updated the show template, so we only need to modify the `BookController.update/2` function. The `Books.update_book/2` function doesn't require an author, so we only need to replace `Routes.book_path` with `Routes.author_book_path`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update(conn, %{"id" => id, "book" => book_params, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+
+  case Books.update_book(book, book_params) do
+    {:ok, book} ->
+      conn
+      |> put_flash(:info, "Book updated successfully.")
+      |> redirect(to: Routes.author_book_path(conn, :show, author_id, book))
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      render(conn, "edit.html", book: book, changeset: changeset, author_id: author_id)
+  end
+end
+```
+
+Run the following in your command line, and both tests should pass! Replace `55` with the correct line number of the `describe` block.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:55
+...
+8 tests, 0 failures, 6 excluded
+```
+
+Now we can visit http://localhost:4000/authors/1/book/1/edit.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/edit_book_page_ready_to_submit.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Then submit the form to edit our book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/show_page_after_update.png)
+
+## BookController.delete/2
+
+We're on to our last failing controller test `"delete book"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "delete book" do
+  setup [:create_book]
+
+  test "deletes chosen book", %{conn: conn, book: book} do
+    conn = delete(conn, Routes.book_path(conn, :delete, book))
+    assert redirected_to(conn) == Routes.book_path(conn, :index)
+
+    assert_error_sent 404, fn ->
+      get(conn, Routes.book_path(conn, :show, book))
+    end
+  end
+end
+```
+
+Replace `Routes.book_path` with `Routes.author_book_path` in the test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "delete book" do
+  setup [:create_book]
+
+  test "deletes chosen book", %{conn: conn, book: book} do
+    conn = delete(conn, Routes.author_book_path(conn, :delete, book.author_id, book))
+    assert redirected_to(conn) == Routes.author_book_path(conn, :index, book.author_id)
+
+    assert_error_sent 404, fn ->
+      get(conn, Routes.author_book_path(conn, :show, book.author_id, book))
+    end
+  end
+end
+```
+
+Replace `Routes.book_path` with `Routes.author_book_path` in the controller.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def delete(conn, %{"id" => id, "author_id" => author_id}) do
+  book = Books.get_book!(id)
+  {:ok, _book} = Books.delete_book(book)
+
+  conn
+  |> put_flash(:info, "Book deleted successfully.")
+  |> redirect(to: Routes.author_book_path(conn, :index, author_id))
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now we can visit http://localhost:4000/authors/1/books and press the **Delete** button to delete our book.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_deleted.png)
+
+## List All Books
+
+We have a bug in our application. The `BookController.index/2` function does not filter books by their author.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+```
+
+Let's expand the functionality of our `BookSearch` application. We want clients to be able to visit http://localhost:4000/books to view all books and http://localhost:4000/authors/1/books to view all books for an author.
+
+<!-- livebook:{"break_markdown":true} -->
+
+We'll start by writing the test for listing all books.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "lists all books", %{conn: conn} do
+  author = author_fixture()
+  conn = get(conn, Routes.author_book_path(conn, :index, author))
+  assert html_response(conn, 200) =~ "Listing Books"
+end
+```
+
+For this test, we want to visit http://localhost:4000/books. There's no defined route for that URL, so we need to make one in our router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", BookSearchWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+
+  resources "/authors", AuthorController do
+    resources "/books", BookController
+  end
+
+  get "/books", BookController, :index
+end
+```
+
+We can see the new route when we run `mix phx.routes`.
+
+```
+$ mix phx.routes
+...
+book_path  GET     /books                                 BookSearchWeb.BookController :index
+...
+```
+
+Replace `Routes.author_book_path` with `Routes.book_path`. We also want to create a book and assert that we find its title in the HTML response.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "lists all books", %{conn: conn} do
+  author = author_fixture()
+  book = book_fixture(author: author)
+  conn = get(conn, Routes.book_path(conn, :index))
+  assert html_response(conn, 200) =~ book.title
+end
+```
+
+This test fails because the `BookController.index/2` function assumes there's an `"author_id"` in the parameters.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+```
+
+Define a new `BookController.index/2` function clause to handle the case where there is no author id. Ensure it's after the first function clause, otherwise it will always match.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+
+def index(conn, _params) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books)
+end
+```
+
+We need to handle the case where there's no author id in the index template. We can use the `book.author_id` instead of `@author_id` for the list of books.
+
+We can wrap the **New Book** button in an if statement to only render if there is an `@author_id` value. We can use `assigns` with square bracket syntax to safely access a value that's may not exist.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for book <- @books do %>
+    <tr>
+      <td><%= book.title %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.author_book_path(@conn, :show, book.author_id, book) %></span>
+        <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, book.author_id, book) %></span>
+        <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, book.author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= if assigns[:author_id] do %>
+  <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+<% end %>
+```
+
+Now the test should pass. Run the following in the command line and replace `12` with the correct line number of the test.
+
+```
+$ mix test test/book_search_web/controllers/book_controller_test.exs:12
+...
+8 tests, 0 failures, 7 excluded
+```
+
+For convenient UI, let's add a **New Book** button to the author show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Show Author</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @author.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.author_path(@conn, :edit, @author) %></span> |
+<span><%= link "Back", to: Routes.author_path(@conn, :index) %></span> |
+<span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author) %></span>
+```
+
+We should be able to visit http://localhost:4000/books to view all books. Consider creating a couple of books under different authors.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/list_book_all_authors.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To make it more obvious, let's take advantage of the preloaded `:author` data in each book and add an **Author** column to our index page. Because we've preloaded the `:author` data we can access the associated author data through `book.author`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for book <- @books do %>
+    <tr>
+      <td><%= book.author.name %></td>
+      <td><%= book.title %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.author_book_path(@conn, :show, book.author_id, book) %></span>
+        <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, book.author_id, book) %></span>
+        <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, book.author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= if assigns[:author_id] do %>
+  <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+<% end %>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Looking good! That's the power of associating data!
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/list_book_all_authors_with_author_name.png)
+
+## List All Books By Author
+
+We need a new test for listing books by their author. First, we'll create two authors, each with one book. Then we'll use the `get/3` macro to send a GET request to `http://localhost:4000/authors/1/books` where `1` is the author's id. Lastly, we assert we only find the author's book on the page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "lists all books by author", %{conn: conn} do
+  author1 = author_fixture(name: "Dennis E Taylor")
+  author2 = author_fixture(name: "Patrick Rothfuss")
+
+  book1 = book_fixture(author: author1, title: "We are Legend")
+  book2 = book_fixture(author: author2, title: "Name of the Wind")
+
+  conn = get(conn, Routes.author_book_path(conn, :index, author1))
+
+  # find the title of the author's book
+  assert html_response(conn, 200) =~ book1.title
+  # Do not find the title of the other author's book
+  refute html_response(conn, 200) =~ book2.title
+end
+```
+
+Now modify the `BookController.index/2` function that accepts `"author_id"` as a parameter to pass the author id to the `Books.list_books/0` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books(author_id) # <-- provide author_id as an argument
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+```
+
+We'll need to implement the `Books.list_book/1` function. Create a new function clause as we still want the `Books.list_book/0` function to work. We can filter books by a matching author id with [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_books do
+  Book
+  |> preload(:author)
+  |> Repo.all()
+end
+
+def list_books(author_id) do
+  Book
+  |> preload(:author)
+  |> where([book], book.author_id == ^author_id)
+  |> Repo.all()
+end
+```
+
+All tests pass!
+
+```
+$ mix test
+```
+
+Now we can visit http://localhost:4000/authors/1/books to view only the books for a single author.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/list_book_by_author.png)
+
+## Search Books
+
+We're going to add a form to search for books. We'll be able to search all books, and search books by an author.
+
+First, let's add a form to the book index page. We're going to pass the action from the controller since it will be different depending on the current page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# lib/book_search_web/templates/book/index.html.heex
+
+<h1>Listing Books</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <.form let={f} for={@conn} method={"get"} action={@action}>
+    <%= text_input f, :title %>
+    <%= error_tag f, :title %>
+
+    <div>
+      <%= submit "Search" %>
+    </div>
+  </.form>
+  <%= for book <- @books do %>
+      <tr>
+        <td><%= book.author.name %></td>
+        <td><%= book.title %></td>
+
+        <td>
+          <span><%= link "Show", to: Routes.author_book_path(@conn, :show, book.author_id, book) %></span>
+          <span><%= link "Edit", to: Routes.author_book_path(@conn, :edit, book.author_id, book) %></span>
+          <span><%= link "Delete", to: Routes.author_book_path(@conn, :delete, book.author_id, book), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<%= if assigns[:author_id] do %>
+  <span><%= link "New Book", to: Routes.author_book_path(@conn, :new, @author_id) %></span>
+<% end %>
+```
+
+Let's add the test to ensure we filter books by the search query when we visit http://localhost:4000/books?name=search_input where `search_input` is the book name entered in the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+describe "index" do
+  test "list all books filtered by search query", %{conn: conn} do
+    author = author_fixture(name: "Brandon Sanderson")
+    book = book_fixture(author: author, title: "The Final Empire")
+    non_matching_book = book_fixture(author: author, title: "The Hero of Ages")
+
+    conn = get(conn, Routes.book_path(conn, :index, title: book.title))
+    assert html_response(conn, 200) =~ book.title
+    refute html_response(conn, 200) =~ non_matching_book.title
+  end
+...
+end
+```
+
+We'll add a new function clause for the `BookController.index/2` action. Do not delete any existing function clauses.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"name" => book_name}) do
+  books = Books.list_books(title: book_name)
+  render(conn, "index.html", books: books)
+end
+```
+
+We can implement the search using [ilike/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_books(name: name) do
+  search = "%#{name}%"
+
+  Book
+  |> preload(:author)
+  |> where([book], ilike(book.name, ^search))
+  |> Repo.all()
+end
+```
+
+All tests pass!
+
+```sh
+$ mix test
+...
+43 tests, 0 failures
+```
+
+However, we have a bug. The search input also displays on http://localhost:4000/authors/1/books, but it searches all books, not just books for the author.
+
+We'll use a value on the `assigns` called `:display_search` to toggle the search form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if assigns[:display_form] do %>
+  <.form let={f} for={@conn} method={"get"} action={@action}>
+    <%= text_input f, :title %>
+    <%= error_tag f, :title %>
+
+    <div>
+      <%= submit "Search" %>
+    </div>
+  </.form>
+<% end %>
+```
+
+Then enable the form through the `BookController.index/2` function clauses for listing all books, but not for listing books by author.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def index(conn, %{"author_id" => author_id}) do
+  books = Books.list_books(author_id)
+  render(conn, "index.html", books: books, author_id: author_id)
+end
+
+def index(conn, %{"title" => title}) do
+  books = Books.list_books(title: title)
+  render(conn, "index.html", books: books, display_form: true)
+end
+
+def index(conn, _params) do
+  books = Books.list_books()
+  render(conn, "index.html", books: books, display_form: true)
+end
+```
+
+Now the form will not display when we visit http://localhost:4000/authors/1/books.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/display_form_authors_search.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn (Bonus)
+
+We omitted tests for `Books.list_books(title: title)`. Create tests to ensure we can filter books by their title. You may take inspiration from how we've already tested `Authors.list_authors/1`.
+
+## Further Reading
+
+For more on Ecto and Phoenix, consider the following resources.
+
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
+* [BookSearch Project With Books](https://github.com/DockYard-Academy/book_search/tree/books)
+* [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+* [Elixir Forum: build_assoc vs put_assoc vs cast_assoc](https://elixirforum.com/t/confussed-with-build-assoc-vs-put-assoc-vs-cast-assoc/29116)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b book-search-books-constraint-reading
+$ git add .
+$ git commit -m "finish book search books constraint reading"
+$ git push origin book-search-books-constraint-reading
+```
+
+Create a pull request from your `book-search-books-constraint-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your teacher) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
