@@ -38,7 +38,7 @@ a --> b
 Recursion creates a loop effect where the function calls itself over and over.
 
 ```elixir
-defmodule Recursion do
+defmodule RecursiveLoop do
   def loop(n) do
     if n > 0 do
       IO.puts(n)
@@ -47,7 +47,7 @@ defmodule Recursion do
   end
 end
 
-Recursion.loop(5)
+RecursiveLoop.loop(5)
 ```
 
 This calls the loop function 5 times. Under the hood, this places 5 stack frames on the stack.
@@ -73,6 +73,8 @@ flowchart LR
 ```
 
 Computerphile explains recursion in excellent detail.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=Mv9NEXX1VHc\")","title":"Computerphile: Recursion"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=Mv9NEXX1VHc")
@@ -172,7 +174,7 @@ Recursion allows us to accomplish enumeration.
 For example, we could use recursion to enumerate through and sum the elements in a list.
 
 ```elixir
-defmodule Recursion do
+defmodule RecursiveSum do
   def sum(list, accumulator \\ 0) do
     case list do
       [] -> accumulator
@@ -181,7 +183,7 @@ defmodule Recursion do
   end
 end
 
-Recursion.sum([1, 2, 3], 0)
+RecursiveSum.sum([1, 2, 3], 0)
 ```
 
 We enumerate through the list by recursively calling `sum/2` on the tail of the list and building
@@ -276,12 +278,12 @@ In the `Recursion` module, the base case is when the `list` is empty and `sum/2`
 With multiple function clauses, the `Recursion` module could instead be implemented like so:
 
 ```elixir
-defmodule Recursion do
+defmodule BaseCaseExample do
   def sum([], accumulator), do: accumulator
   def sum([head | tail], accumulator), do: sum(tail, accumulator + head)
 end
 
-Recursion.sum([1, 2, 3], 0)
+BaseCaseExample.sum([1, 2, 3], 0)
 ```
 
 ### Your Turn

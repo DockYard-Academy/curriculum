@@ -16,7 +16,7 @@ Mix.install([
 
 ## Rock Paper Scissors Using Pattern Matching
 
-You're going to recreate your rock paper scissors game using pattern matching.
+You're going to recreate/refactor your rock paper scissors game using pattern matching.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -31,7 +31,21 @@ RockPaperScissors.play(:rock, :rock)
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
-Using `case`.
+Using multiple function clauses.
+
+```elixir
+defmodule RockPaperScissorsPatternMatching do
+  def play(:rock, :scissors), do: "rock beats scissors!"
+  def play(:paper, :rock), do: "paper beats rock!"
+  def play(:scissors, :paper), do: "scissors beats paper!"
+  def play(:rock, :paper), do: "paper beats rock!"
+  def play(:paper, :scissors), do: "scissors beats paper!"
+  def play(:scissors, :rock), do: "rock beats scissors!"
+  def play(_same, _same), do: "draw!"
+end
+```
+
+Here's how we might accomplish the same thing using `case`.
 
 ```elixir
 defmodule RockPaperScissorsPatternMatching do
@@ -46,20 +60,6 @@ defmodule RockPaperScissorsPatternMatching do
       {_same, _same} -> "draw!"
     end
   end
-end
-```
-
-Using multiple function clauses.
-
-```elixir
-defmodule RockPaperScissorsPatternMatching do
-  def play(:rock, :scissors), do: "rock beats scissors!"
-  def play(:paper, :rock), do: "paper beats rock!"
-  def play(:scissors, :paper), do: "scissors beats paper!"
-  def play(:rock, :paper), do: "paper beats rock!"
-  def play(:paper, :scissors), do: "scissors beats paper!"
-  def play(:scissors, :rock), do: "rock beats scissors!"
-  def play(_same, _same), do: "draw!"
 end
 ```
 

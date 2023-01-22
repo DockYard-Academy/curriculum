@@ -16,7 +16,7 @@ Mix.install([
 
 ## Rock Paper Scissors Lizard Spock
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=_PUEoDYpUyQ\")","title":"Rock Paper Scissors Lizard Spock. A Brief Introduction."},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=_PUEoDYpUyQ\")","title":"Rock Paper Scissors Lizard Spock. A Brief Introduction."},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=_PUEoDYpUyQ")
@@ -42,7 +42,25 @@ Then we add the following extra rules
 
 We'll represent these choices as atoms `:rock, :paper, :scissors, :lizard, :spock`.
 
-You're going to create a `RockPaperScissorsLizardSpock` module. Implement the functions as documented.
+1. Create a `beats?/2` function which determines if once choice beats another.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissorsLizardSpock.beats?(:rock, :lizard) # true
+```
+
+1. Create a `play/2` function which determines if player 1 or player 2 won the game.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RockPaperScissorsLizardSpock.play(:rock, :lizard) # "Player 1 Wins!"
+RockPaperScissorsLizardSpock.play(:lizard, :rock) # "Player 1 Wins!"
+RockPaperScissorsLizardSpock.play(:lizard, :lizard) # "Draw!"
+```
+
+Implement the `RockPaperScissorsLizardSpock` module as documented.
 
 ```elixir
 defmodule RockPaperScissorsLizardSpock do
@@ -57,30 +75,11 @@ defmodule RockPaperScissorsLizardSpock do
 
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :lizard)
     true
-    iex> RockPaperScissorsLizardSpock.beats?(:spock, :scissors)
-    true
-    iex> RockPaperScissorsLizardSpock.beats?(:scissors, :lizard)
-    true
-    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :paper)
-    true
-    iex> RockPaperScissorsLizardSpock.beats?(:paper, :spock)
-    true
-    iex> RockPaperScissorsLizardSpock.beats?(:spock, :rock)
-    true
-
-  ## Losing Examples
 
     iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
     false
-    iex> RockPaperScissorsLizardSpock.beats?(:scissors, :spock)
-    false
-    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :scissors)
-    false
-    iex> RockPaperScissorsLizardSpock.beats?(:paper, :lizard)
-    false
-    iex> RockPaperScissorsLizardSpock.beats?(:spock, :paper)
-    false
-    iex> RockPaperScissorsLizardSpock.beats?(:rock, :spock)
+
+    iex> RockPaperScissorsLizardSpock.beats?(:rock, :rock)
     false
   """
   def beats?(guess1, guess2) do
@@ -91,11 +90,14 @@ defmodule RockPaperScissorsLizardSpock do
 
   ## Examples
 
+    iex> RockPaperScissorsLizardSpock.play(:rock, :lizard)
+    "Player 1 Wins!"
+
     iex> RockPaperScissorsLizardSpock.play(:lizard, :rock)
     "Player 2 Wins!"
 
-    iex> RockPaperScissorsLizardSpock.play(:rock, :lizard)
-    "Player 1 Wins!"
+    iex> RockPaperScissorsLizardSpock.play(:lizard, :lizard)
+    "Player 2 Wins!"
   """
   def play(player1, player2) do
   end

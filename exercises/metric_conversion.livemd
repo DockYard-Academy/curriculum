@@ -18,7 +18,7 @@ Mix.install([
 
 You're going to build an app to convert metric measurements such as **millimeters**, **centimeters**, **meters**, and **kilometers** according to the following table.
 
-<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, meter: 0.001],\n  [unit: :centimeter, value: 1, meter: 0.01],\n  [unit: :meter, value: 1, meter: 1],\n  [unit: :kilometer, value: 1, meter: 1000],\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, meter: 0.001],\n  [unit: :centimeter, value: 1, meter: 0.01],\n  [unit: :meter, value: 1, meter: 1],\n  [unit: :kilometer, value: 1, meter: 1000],\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 [
@@ -28,10 +28,6 @@ You're going to build an app to convert metric measurements such as **millimeter
   [unit: :kilometer, value: 1, meter: 1000]
 ]
 |> Kino.DataTable.new()
-```
-
-```elixir
-1000 * 0.01 / 1000
 ```
 
 Users provide values using `{from_unit, value}` tuples, and the desired unit to convert to.
@@ -91,7 +87,7 @@ defmodule Metric do
     0.01
 
     iex> Metric.convert({:millimeter, 10}, :centimeter)
-    1
+    1.0
 
     iex> Metric.convert({:kilometer, 10}, :centimeter)
     1000000

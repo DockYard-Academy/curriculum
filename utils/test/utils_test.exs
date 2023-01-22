@@ -116,7 +116,7 @@ defmodule UtilsTest do
     end)
   end
 
-  test "Ensure fileu not in outline are deprecated" do
+  test "Ensure files not in outline are deprecated" do
     outline = File.read!("../start.livemd")
 
     all_paths = Path.wildcard("../*/*.livemd")
@@ -133,15 +133,6 @@ defmodule UtilsTest do
     remaining_paths = remaining_paths -- deprecated_paths
     remaining_paths = remaining_paths -- outline_paths
     assert remaining_paths == []
-
-    # Enum.each(remaining_paths, fn path ->
-    #   basename = Path.basename(path)
-    #   dirname = Path.dirname(path)
-
-    #   deprecated_path = Path.join(dirname, "deprecated_" <> basename)
-    #   File.cp!(path, deprecated_path)
-    #   File.rm!(path)
-    # end)
   end
 
   test "Ensure no broken / empty links in livebooks" do
@@ -190,6 +181,53 @@ defmodule UtilsTest do
 
              Manually resolve the issue or run mix bc.format_headings.
              """
+    end)
+  end
+
+  test "modules are only defined once" do
+    Notebooks.all_livebooks()
+    |> Enum.each(fn path ->
+      content = File.read!(path)
+
+      modules =
+        Regex.scan(~r/(?<!<\/summary>\n\n\`\`\`elixir\n)defmodule ((\w|\.)+) do/, content)
+        |> Enum.map(fn [_, module, _] -> {path, module} end)
+
+      non_duplicates = Enum.dedup(modules)
+
+      duplicates = modules -- non_duplicates
+
+      ignored_file_paths = [
+        "./exercises/product_filters.livemd",
+        "../exercises/mapset_product_filters.livemd",
+        "../exercises/product_filters.livemd",
+        "../exercises/rps_pattern_matching.livemd",
+        "../exercises/fizzbuzz.livemd",
+        "../exercises/lazy_product_filters.livemd",
+        "../exercises/custom_assertions.livemd",
+        "../exercises/supervisor_and_genserver_drills.livemd",
+        "../exercises/anagram.livemd",
+        "../exercises/tic-tac-toe.livemd"
+      ]
+
+      Enum.each(duplicates, fn
+        {path, module} ->
+          unless path in ignored_file_paths do
+            IO.puts("""
+            #{path} may contain duplicate module: #{module}.
+
+            Add this path to the ignored_file_paths in utils_tests.exs or resolve the issue.
+            """)
+          end
+      end)
+    end)
+  end
+
+  test "we no longer use Tested.Cell" do
+    Notebooks.all_livebooks()
+    |> Enum.each(fn path ->
+      content = File.read!(path)
+      refute content =~ "Elixir.TestedCell"
     end)
   end
 end

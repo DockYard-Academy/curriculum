@@ -40,6 +40,30 @@ You should be able to filter by:
 2. an inclusive `:min` and `:max` price.
 3. an exact `:category` field as an atom.
 
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# No filters returns all products.
+
+iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+[%{name: "Laptop", category: :tech, price: 100}]
+
+# Filter by name, partial and case insensitive.
+
+iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+[%{name: "Laptop", category: :tech, price: 100}]
+
+# Multiple filters.
+
+iex> products = [
+  %{name: "Laptop", category: :tech, price: 100},
+  %{name: "NOT FOUND", category: :tech, price: 100}
+]
+
+iex> Products.filter(products, min: 50, max: 200, name: "Laptop", category: :tech)
+[%{name: "Laptop", category: :tech, price: 100}]
+```
+
 <!-- livebook:{"break_markdown":true} -->
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -200,7 +224,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Implement and test the `Products` module based on the provided test cases and documentation.
+Implement and test the `Products` module. We've provided some example test case names to get your started.
 
 ```elixir
 defmodule Products do
@@ -209,62 +233,8 @@ defmodule Products do
   """
 
   @doc """
-  Filter products by name, category, and price.
-
-  ## Examples
-
-  No filters returns all products.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  Filter by name
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
-  []
-
-  Filter by category
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
-  []
-
-  Filter by min price.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
-  []
-
-  Filter by max price.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
-  []
-
-  Multiple filters.
-
-  Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+  Filter products by :name, :min, :max, and :category.
+  The name filter should be case insensitive and handle partial matches.
   """
   def filter(products, filters) do
   end

@@ -43,6 +43,7 @@ defmodule Utils.Notebooks do
     File.ls!(path)
     |> Stream.filter(&String.ends_with?(&1, ".livemd"))
     |> Enum.map(&(path <> &1))
+    |> Enum.reject(fn file_name -> String.contains?(String.downcase(file_name), "deprecated") end)
   end
 
   @doc """
