@@ -20,6 +20,19 @@ In this exercise, you will create dialogue for an RPG (Role Playing Game).
 
 To generate this dialogue define a `Character` struct with a `:name`, `:class`, and `:weapon` keys. Enforce that the `:name` key must have a value.
 
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  class Character {
+    name*: string
+    class: string
+    weapon: string
+  }
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
 
@@ -60,7 +73,16 @@ defmodule Character do
   Character
 
   Defines a character struct, and functions for creating character dialogue.
+
+  iex> %Character{name: "Frodo"}
+  %Character{name: "Frodo", weapon: nil, class: nil}
+
+  The :name key is required.
+
+  iex> %Character{name: "Frodo"}
+  ** (ArgumentError) the following keys must also be given when building struct Character: [:name]
   """
+  defstruct []
 
   @doc """
   Introduce the character by name.
@@ -71,7 +93,7 @@ defmodule Character do
     "My name is Gimli."
 
     iex> Character.introduce(%Character{name: "Aragorn"})
-     "My name is Aragorn."
+    "My name is Aragorn."
   """
   def introduce(character) do
   end

@@ -16,6 +16,8 @@ Mix.install([
 
 ## A Safe Range Function
 
+This is a guest post created by Quentin Crain and inspired by Jeff Helman, one of our fantastic beta-testers.
+
 In the lesson on creating a range of numbers using the `..`
 operator:
 
@@ -74,8 +76,7 @@ Two examples from the standard library may be referred to:
 
 [Enum.html](https://hexdocs.pm/elixir/1.14.0/Enum.html)
 
-The [Enum](https://hexdocs.pm/elixir/Enum.html) module provides two functions to retrieve an element
-from a list (`[]`) at a given index. The difference is in how
+The [Enum](https://hexdocs.pm/elixir/Enum.html) module provides two functions to retrieve an element from a list (`[]`) at a given index. The difference is in how
 they behave when the index is invalid; ex:
 
 <!-- livebook:{"force_markdown":true} -->
@@ -174,11 +175,9 @@ defmodule SafeRange do
 
     iex> SafeRange.range!(1, 5, -1)
     ** (RuntimeError) Invalid step value of: -1
-        iex: SafeRange.range!/3
 
     iex> SafeRange.range!(5, 1, 1)
     ** (RuntimeError) Invalid step value of: 1
-        iex: SafeRange.range!/3
   """
   def range!(first, last, step \\ DEFAULT) do
   end
@@ -191,7 +190,7 @@ end
 ```elixir
 defmodule SafeRange do
   def range(first, last, step \\ 1) do
-    first..last//step
+    Enum.to_list(first..last//step)
   end
 
   def range!(first, last, step \\ 1) do
@@ -200,15 +199,12 @@ defmodule SafeRange do
         raise "Invalid step value of: #{step}"
       step > 0 and first > last ->
         raise "Invalid step value of: #{step}"
-      true -> first..last//step
+      true -> Enum.to_list(first..last//step)
     end
   end
 end
 ```
 </details>
-
-* Thanks to Jeff Helman for asking the question and pursuing a
-  good answer!
 
 ## Mark As Completed
 

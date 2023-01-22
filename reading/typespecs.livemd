@@ -30,10 +30,10 @@ For example, we could add a `@spec` for the `math` module's `add/2` function.
 by the `::` symbol.
 
 ```elixir
-defmodule Number do
+defmodule IntegerTypespecExample do
   @spec double(integer()) :: integer()
-  def double(number) do
-    number * 2
+  def double(my_int) do
+    my_int * 2
   end
 end
 ```
@@ -62,10 +62,10 @@ section of the Elixir Typespecs documentation.
 
 ### Your Turn
 
-In the `Math` module below, create an `@spec` for integers with the `add/2` function.
+In the `Adder` module below, create an `@spec` for integers with the `add/2` function.
 
 ```elixir
-defmodule Math do
+defmodule Adder do
   def add(integer1, integer2) do
     integer1 + integer2
   end
@@ -77,7 +77,7 @@ end
 The `|` symbol allows us to combine multiple types. For example we can combine `integer()` and `float()` in our `Number` module
 
 ```elixir
-defmodule Number do
+defmodule NumberTypespecExample do
   @spec double(integer() | float()) :: integer() | float()
   def double(number) do
     number * 2
@@ -87,10 +87,12 @@ end
 
 ### Custom Types
 
-We can use `@type` to define custom types. We give our custom type a name then define it's value after the `::` symbol.
+We can use `@type` to define custom types. We give our custom type a name then define it's value after the `::` symbol. Once we've defined a custom type, we can use it anywhere in our application. This way we don't have to repeatedly define the same types over and over.
+
+Below, we've defined a custom `my_number()` type for the sake of example. However, in the real-world we should use the built-in `number()` type instead.
 
 ```elixir
-defmodule Number do
+defmodule CustomTypeExample do
   @type my_number() :: integer() | float()
 
   @spec double(my_number()) :: my_number()
@@ -99,21 +101,6 @@ defmodule Number do
   end
 end
 ```
-
-We can use types defined in modules outside of that module. This way we don't have to repeatedly define the same types over and over.
-
-```elixir
-defmodule Math do
-  @spec add(Number.my_number(), Number.my_number()) :: Number.my_number()
-  def add(number, number) do
-    number + number
-  end
-end
-```
-
-We've defined a custom `my_number()` type for the sake of example. However, in the real-world we should use the built-in `number()` type instead.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
@@ -176,15 +163,7 @@ Once complete, if you include a failing example in your `Math` module like so, y
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Math do
-  @moduledoc """
-  Documentation for `Math`.
-  """
-
-  def fail_example do
-    Math.add(%{}, %{})
-  end
-end
+Math.add(%{}, %{})
 ```
 
 Run dialyzer and you should see some errors because the typespec catches that `%{}` is an invalid input.

@@ -24,9 +24,7 @@ Saša has graciously allowed us to use code examples directly from his book [Eli
 ## Review Questions
 
 * What is the purpose of a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
-* How do you start a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
-* How do you send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) a message?
-* How does the callback function [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) work?
+* Explain the lifecycle of sending a message to a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and receiving a response.
 * **bonus:** What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? How might that bottleneck our program?
 
 ## Generic Server
@@ -126,11 +124,8 @@ a message.
 
 ```mermaid
 sequenceDiagram
-    Generic Server->> Generic Server: receive
-    Generic Server ->> Generic Server: handle_call(request, state)
-    Generic Server ->> Generic Server: new state
-    Generic Server ->> Process: send
-    Process->> Process: receive
+    Generic Server ->> Callback Module: handle_call(request, state)
+    Callback Module ->> Generic Server: response, new state
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -150,16 +145,6 @@ end
 ```
 
 The `GenericServer` then loops and receives messages while delegating to the `CallbackModule`
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-Caller --> GenericServer --> loop
---> receive --> c[CallbackModule.handle_call] --> response --> send --> Caller
-```
-
-<!-- livebook:{"break_markdown":true} -->
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -198,8 +183,9 @@ sequenceDiagram
     Generic Server ->> Generic Server: loop receive
 
     Caller Process ->> Generic Server: send
+    Generic Server ->> Generic Server: receive
     Generic Server ->> Callback Module: handle_call
-    Callback Module ->> Generic Server: new state, response
+    Callback Module ->> Generic Server: response, new state
     Generic Server ->> Generic Server: update state
     Generic Server ->> Caller Process: send
     Caller Process ->> Caller Process: receive
@@ -338,7 +324,7 @@ see the [@impl documentation](https://hexdocs.pm/elixir/main/Module.html#module-
 more on why.
 
 ```elixir
-defmodule Counter do
+defmodule SimpleServer do
   use GenServer
 
   @impl true
@@ -352,7 +338,7 @@ We use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_l
 There are no options, so the second parameter is an empty list.
 
 ```elixir
-{:ok, pid} = GenServer.start_link(Counter, [])
+{:ok, pid} = GenServer.start_link(SimpleServer, [])
 ```
 
 We can define `handle_call/3` functions. These look mostly the same as before, except
@@ -361,7 +347,7 @@ the second parameter will be the caller pid, and the third will be the state.
 We also always return `{:reply, response, new_state}` in a `handle_call/3` function.
 
 ```elixir
-defmodule Counter do
+defmodule CounterServer do
   use GenServer
 
   @impl true
@@ -377,7 +363,7 @@ defmodule Counter do
   end
 end
 
-{:ok, pid} = GenServer.start_link(Counter, 0)
+{:ok, pid} = GenServer.start_link(CounterServer, 0)
 ```
 
 Now let's test our new `Counter`! You can execute this Elixir cell below a few times and notice
@@ -396,7 +382,7 @@ GenServer.call(pid, :increment)
 sequenceDiagram
     Caller Process ->> GenServer: start_link
     GenServer ->> Callback Module: init
-    Callback Module ->> GenServer: init
+    Callback Module ->> GenServer: {:ok, state}
     GenServer ->> Caller Process: pid
 
     Caller Process ->> GenServer: GenServer.call/2
