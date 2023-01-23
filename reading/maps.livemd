@@ -29,54 +29,71 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 ## Maps
 
-Maps are another type of associative data structure. In fact maps are the common go-to for a key-value
-data structure. You can create a map using `%{}`. Similar to keyword lists they can have atoms as keys and then any value.
+Maps are another type of associative data structure. You can create a map using `%{}`. Maps can use almost any elixir term as a key. However, most commonly we use strings and atoms for map keys.
+
+Maps have a key and a value separated by an arrow `=>`, which is an equals symbol `=` and a less than symbol `>`.
+
+```elixir
+# string keys
+%{"key" => "value"}
+
+# atom keys
+%{:key => "value"}
+```
+
+multiple key-value pairs are separated by a comma `,`.
+
+```elixir
+%{:key => "value", "key" => "value"}
+```
+
+Maps with only atoms as keys can use a special piece of syntax sugar that makes them more convenient to write and read. This is purely syntax sugar and does not change their behavior.
+
+```elixir
+%{key1: "value", key2: "value"}
+```
+
+Maps are the common go-to for a key-value data structure. They are more expensive in terms of performance to create than keyword lists, however they are incredibly fast to access values. Unlike keyword lists, keys in a map must be unique. Also unlike keyword lists, maps also do not guarantee key order.
+
+For these reasons, you'll most often use maps for large amounts of data or when you want keys to be unique and do not care about order.
+
+We often use maps to represent properties of something. For example, you might have a `user` map that represents information about a book.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-%{key: "value"}
+%{
+  title: "Name of the Wind",
+  author: "Patrick Rothfuss",
+  description: """
+  The Name of the Wind is a fantasy novel by Patrick Rothfuss. It is the first book in the
+  Kingkiller Chronicle series and tells the story of Kvothe, a young orphan who becomes a
+  legendarily talented musician and magician. The novel is known for its intricate
+  world-building, complex characters, and themes of power, love, and loss.
+  """  
+}
 ```
 
-However, unlike keyword lists, keys must be unique; otherwise they will be overwritten.
+<!-- livebook:{"break_markdown":true} -->
+
 Elixir is very helpful and provides a warning to let us know we're overriding a duplicate key.
 
 ```elixir
 %{duplicate_key: "value1", duplicate_key: "value2"}
 ```
 
-Unlike keyword lists, maps do not guarantee key order, which is why you'll notice the returned value of the map below
-does not have the same order as the map created.
+As mentioned earlier, maps do not guarantee key order, which is why you'll notice the returned value of the map below does not have the same order as the map returned by the Elixir cell.
 
 ```elixir
 %{one: "one", two: "two", three: "three"}
 ```
 
-Unlike keyword lists, maps can have any values as the key. Commonly you will see atom-key maps
-
-<!-- livebook:{"force_markdown":true} -->
+Maps can have any elixir term as a key, this makes them incredibly flexible.
 
 ```elixir
-%{atom_key: "value"}
-```
-
-And also string-key maps.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-%{"string key" => "value"}
-```
-
-However, the key to a map could be anything! Even another map! You will need to use the `=>` symbol
-though, not a colon `:`. `=>` is an equals sign `=` and a greater than symbol `>`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-%{[1,2,3] => "value"}
-%{%{example: "my_example"} => "value"}
 %{1 => "value"}
+
+%{[1, 2, 3] => "value"}
 ```
 
 ## Accessing Map Values
