@@ -125,39 +125,19 @@ defmodule TrafficLightServer do
 
   @doc """
   Start a TrafficLightServer linked to the current caller process.
-
-  ## Examples
-
-      iex> {:ok, pid} = TrafficLightServer.start_link([])
-      {:ok, pid}
   """
   def start_link(opts) do
   end
 
   @doc """
   Transition the `TrafficLightServer`'s state.
-
-  ## Examples
-
-      iex> {:ok, pid} = TrafficLightServer.start_link([])
-      iex> TrafficLightServer.transition(pid)
-      :yellow
-      iex> TrafficLightServer.transition(pid)
-      :red
-      iex> TrafficLightServer.transition(pid)
-      :green
+  :green -> :yellow -> :red
   """
   def transition(pid) do
   end
 
   @doc """
   Get the `TrafficLightServer`'s current state.
-
-  ## Examples
-
-      iex> {:ok, pid} = TrafficLightServer.start_link([])
-      iex> TrafficLightServer.current_light(pid)
-      :green
   """
   def current_light(pid) do
   end
@@ -230,6 +210,46 @@ style R5 fill:lightcoral
 
 <!-- livebook:{"break_markdown":true} -->
 
+`transition/1` Examples:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> {:ok, pid} = TrafficGridServer.start_link([])
+iex> TrafficGridServer.transition(pid)
+[:yellow, :green, :green, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :green, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :yellow]
+
+iex> TrafficGridServer.transition(pid)
+[:red, :yellow, :yellow, :yellow, :yellow]
+
+iex> TrafficGridServer.transition(pid)
+[:red, :red, :yellow, :yellow, :yellow]
+```
+
+`current_lights/1` Examples:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> {:ok, pid} = TrafficGridServer.start_link([])
+iex> TrafficGridServer.current_lights(pid)
+[:green, :green, :green, :green, :green]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
@@ -289,12 +309,12 @@ Implement the `TrafficGrid` module as documented below. You will also have to de
 defmodule TrafficGridServer do
   use GenServer
 
-  @doc """
+  @doc ~S"""
   Start the `TrafficGridServer`.
 
   ## Examples
 
-      iex> {:ok, pid} = TraffigGridServer.start_link([])
+      TrafficGridServer.start_link([])
       {:ok, pid}
   """
   def start_link(_opts) do
@@ -304,22 +324,9 @@ defmodule TrafficGridServer do
   transition the current light state of the next light to transition.
 
   ## Examples
-
-      iex> {:ok, pid} = TrafficGridServer.start_link([])
-      iex> TrafficGridServer.transition(pid)
+      
+      TrafficGridServer.transition(pid)
       [:yellow, :green, :green, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :green, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :yellow, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :yellow, :yellow]
-      iex> TrafficGridServer.transition(pid)
-      [:red, :yellow, :yellow, :yellow, :yellow]
-      iex> TrafficGridServer.transition(pid)
-      [:red, :red, :yellow, :yellow, :yellow]
   """
   def transition(grid_pid) do
   end
@@ -329,8 +336,7 @@ defmodule TrafficGridServer do
 
   ## Examples
 
-      iex> {:ok, pid} = TrafficGridServer.start_link([])
-      iex> TrafficGridServer.current_lights(pid)
+      TrafficGridServer.current_lights(pid)
       [:green, :green, :green, :green, :green]
   """
   def current_lights(grid_pid) do
