@@ -41,6 +41,61 @@ flowchart
 Keyword lists belong to a family of data types known as **associative data structures**.
 you'll also often hear it referred to as a **key-value data structure**.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Why Use A Keyword List?
+
+Keyword lists guarantee order, and are more performant to create than maps. They are performant for small amounts of data, but less performant for large amounts of data than maps.
+
+Therefore, we want to use a keyword lists for smaller amounts of data, or when our data should be ordered.
+
+For example, we might have a "top five playlist" of our favourite songs stored in a keyword list. The name could represent the song, and the value could represent the song for the artist.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[artist1: "song 1", artist2: "song 2", artist3: "song 3", artist4: "song 4", artist5: "song 5"]
+```
+
+However, for a large playlist we might choose to use a [Map](./maps.livemd) since order doesn't matter, and we need the playlist to be performant for a large amount of data. We'll cover maps in the next lesson.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# map example
+%{
+  artist1: "song 1"
+  artist2: "song 1"
+  artist3: "song 1"
+  artist4: "song 1"
+  artist5: "song 1"
+  artist6: "song 1"
+  ...
+}
+```
+
+Most commonly, keyword lists are used to provide a list of key-value options.
+
+For example, when we want to label some data, `IO.inspect` accepts a keyword lists of options. The `:label` option labels the data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+IO.inspect("data", [label: "label for my data"])
+```
+
+When a keyword list is inside of a function, Elixir removes the square brackets so the above becomes the following when we format it.
+
+```elixir
+IO.inspect("data", label: "label for my data")
+```
+
+For a full list of options for `IO.inspect`, see: [Inspect.Opts](https://hexdocs.pm/elixir/Inspect.Opts.html)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Breakdown of Keyword Lists
+
 In Elixir, the key is an atom, and the value can be any data structure, even another keyword list.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -91,6 +146,8 @@ The keyword list syntax must come at the end of a list, or we'll cause a [Syntax
 ```
 
 List order is guaranteed, so the same is true for keyword lists.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
