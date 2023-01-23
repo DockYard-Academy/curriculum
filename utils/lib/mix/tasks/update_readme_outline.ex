@@ -9,6 +9,7 @@ defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
   @course_outline_path Path.join([@root_path, "start.livemd"])
   @outline_start_comment "<!-- course-outline-start -->"
   @outline_end_comment "<!-- course-outline-end -->"
+  @ignored_sections ["## Overview", "### Welcome"]
 
   def run(_args) do
     course_outline = File.read!(@course_outline_path)
@@ -33,7 +34,7 @@ defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
   @spec sections(String.t()) :: String.t()
   def sections(outline) do
     Regex.scan(~r/(\#{2,3})(.+)/, outline)
-    |> Enum.reject(fn [full, _, _] -> full =~ "Overview" end)
+    |> Enum.reject(fn [full, _, _] -> full in @ignored_sections end)
     |> Enum.map(fn
       [full, "##", _heading] -> full <> "\n"
       [_, "###", subheading] -> "*#{subheading}\n"
