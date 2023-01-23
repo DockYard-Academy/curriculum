@@ -229,6 +229,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix
 * Tailwind
 * Ecto Changesets
+* Group Project Blog
 * Phoenix and Ecto
 * Testing Phoenix
 * Schemas and Migrations
@@ -239,6 +240,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
 * Deployment
+## Group Project Presentation
 ## LiveView
 * LiveView
 * LiveView and Ecto
