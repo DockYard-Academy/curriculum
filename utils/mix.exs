@@ -18,8 +18,7 @@ defmodule Utils.MixProject do
       mod: {Utils.Application, []}
     ]
   end
-game = %{team1_name: "Team Team", team2_name: "Exersport", round1: %{team1: 10, team2: 20}, round2: %{team1: 30, team2: 10}, round3: %{team1: 25, team2: 30}}
-  # Run "mix help deps" to learn about dependencies.
+
   defp deps do
     [
       {:credo, "~> 1.6", runtime: false, only: [:dev, :test]},
