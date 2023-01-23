@@ -72,8 +72,8 @@ defmodule Mix.Tasks.Bc.AddGitSection do
 
     **DockYard Academy Students Only:**
 
-    Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
-    You (or your teacher) may merge your PR into your solutions branch after review.
+    Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+    You (or your instructor) may merge your PR into your solutions branch after review.
 
     If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
     """

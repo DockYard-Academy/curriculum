@@ -22,11 +22,11 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 ### One-to-many Relationships
 
-In a one-to-many relationship, a single record in one table can be related to multiple records in another table. For example, in a database for a school, a teacher may have multiple students, but each student is only associated with one teacher. In this case, the teacher and student tables would have a one-to-many relationship.
+In a one-to-many relationship, a single record in one table can be related to multiple records in another table. For example, in a database for a school, a instructor may have multiple students, but each student is only associated with one instructor. In this case, the instructor and student tables would have a one-to-many relationship.
 
 One-to-many relationships are commonly used in database design because they allow for efficient storage of data and easy retrieval of information. They are also flexible, as the number of records on either side of the relationship can change over time.
 
-For example, in the teacher-student example, if a teacher leaves the school, all the records in the student table associated with that teacher can be easily removed or updated to reflect the new teacher. Similarly, if a student graduates and is no longer associated with a teacher, their record can be removed from the student table without affecting the other records.
+For example, in the instructor-student example, if a instructor leaves the school, all the records in the student table associated with that instructor can be easily removed or updated to reflect the new instructor. Similarly, if a student graduates and is no longer associated with a instructor, their record can be removed from the student table without affecting the other records.
 
 Overall, one-to-many relationships are an important part of database design and are used to represent the many-sided relationships that exist in real-world data.
 
@@ -34,9 +34,9 @@ Overall, one-to-many relationships are an important part of database design and 
 
 ### `has_many` and `belongs_to`
 
-In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a teacher-student relationship, the teacher "has many" students.
+In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a instructor-student relationship, the instructor "has many" students.
 
-On the other hand, "belongs to" is used to describe the relationship between the many side of the relationship and the one side. In the teacher-student example, a student "belongs to" a teacher.
+On the other hand, "belongs to" is used to describe the relationship between the many side of the relationship and the one side. In the instructor-student example, a student "belongs to" a instructor.
 
 These terms are commonly used in database design and programming to describe the structure of one-to-many relationships. They help to clarify the direction of the relationship and make it easier to understand how the data is organized and accessed.
 
@@ -48,9 +48,9 @@ For example, when querying a database for information, a developer may use the "
 
 A foreign key is a field in a relational database table that is used to establish and enforce a link between the data in two tables. This link is known as a relationship, and it allows the data in one table to be related to the data in another table.
 
-Foreign keys are typically used to implement one-to-many relationships in a database. For example, in a database for a school, the student table may have a foreign key that references the primary key of the teacher table. This establishes a one-to-many relationship between teachers and students, where each teacher can have multiple students but each student is only associated with one teacher.
+Foreign keys are typically used to implement one-to-many relationships in a database. For example, in a database for a school, the student table may have a foreign key that references the primary key of the instructor table. This establishes a one-to-many relationship between instructors and students, where each instructor can have multiple students but each student is only associated with one instructor.
 
-Foreign keys are an important part of relational database design because they help to enforce the integrity of the data by ensuring that the relationships between tables are maintained. For example, if a record in the teacher table is deleted, the corresponding records in the student table that reference that teacher will also be deleted to maintain the relationship.
+Foreign keys are an important part of relational database design because they help to enforce the integrity of the data by ensuring that the relationships between tables are maintained. For example, if a record in the instructor table is deleted, the corresponding records in the student table that reference that instructor will also be deleted to maintain the relationship.
 
 Overall, foreign keys are an essential part of relational databases and are used to establish and enforce relationships between data in different tables.
 
@@ -245,13 +245,13 @@ In the Elixir programming language, the Ecto framework provides a set of functio
 
 We can call `build_assoc` in our code and pass it the current record, the name of the association, and the attributes of the new record.
 
-For example, let's say we have a database for a school with a `teachers` table and a `students` table. The `teachers` table has a one-to-many relationship with the `students` table, where each teacher can have multiple students. In this case, we could use `build_assoc` to create a new student and associate it with a specific teacher.
+For example, let's say we have a database for a school with a `instructors` table and a `students` table. The `instructors` table has a one-to-many relationship with the `students` table, where each instructor can have multiple students. In this case, we could use `build_assoc` to create a new student and associate it with a specific instructor.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-build_assoc(teacher, :students, name: "Andrew")
-%Student{id: nil, teacher_id: 1, name: "Andrew"}
+build_assoc(instructor, :students, name: "Andrew")
+%Student{id: nil, instructor_id: 1, name: "Andrew"}
 ```
 
 Here is an example of how we might use `build_assoc` in our code:
@@ -259,12 +259,12 @@ Here is an example of how we might use `build_assoc` in our code:
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Define the association between the teachers and students tables in your Ecto models
+# Define the association between the instructors and students tables in your Ecto models
 
-defmodule School.Teacher do
+defmodule School.instructor do
   use Ecto.Schema
 
-  schema "teachers" do
+  schema "instructors" do
     has_many :students, School.Student
   end
 end
@@ -274,17 +274,17 @@ defmodule School.Student do
 
   schema "students" do
     field :name, :string
-    belongs_to :teacher, School.Teacher
+    belongs_to :instructor, School.instructor
   end
 end
 
-# Now you can use `build_assoc` in your code to create a new student and associate it with a specific teacher
+# Now you can use `build_assoc` in your code to create a new student and associate it with a specific instructor
 
-# Find the teacher record in the database
-teacher = School.get_teacher!(teacher.id)
+# Find the instructor record in the database
+instructor = School.get_instructor!(instructor.id)
 
-# Use `build_assoc` to create a new student and associate it with the teacher
-student = build_assoc(teacher, :students, %{name: "Jon"})
+# Use `build_assoc` to create a new student and associate it with the instructor
+student = build_assoc(instructor, :students, %{name: "Jon"})
 
 # Save the new student to the database
 {:ok, student} = School.Repo.insert(student)
@@ -294,20 +294,20 @@ student = build_assoc(teacher, :students, %{name: "Jon"})
 
 ### put_assoc/4
 
-[put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. This allows us to work with associations as a whole. For example, we can use `put_assoc/4` to update all student associations for a given teacher changeset.
+[put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. This allows us to work with associations as a whole. For example, we can use `put_assoc/4` to update all student associations for a given instructor changeset.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule School.Teacher do
+defmodule School.instructor do
   use Ecto.Schema
 
-  schema "teachers" do
+  schema "instructors" do
     has_many :students, School.Student
   end
 
-  def changeset(teacher, params) do
-    teacher
+  def changeset(instructor, params) do
+    instructor
     |> cast(params, [:name, :email])
     |> put_assoc(:students, params[:students])
   end
@@ -319,11 +319,11 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-teacher
+instructor
 |> Ecto.Changeset.change()
 |> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
 
-# The above would return a Teacher changeset similar to the following:
+# The above would return a instructor changeset similar to the following:
 %Ecto.Changeset<
   action: nil,
   changes: %{
@@ -333,17 +333,17 @@ teacher
     ]
   },
   errors: [],
-  data: %Teacher<>,
+  data: %instructor<>,
   valid?: true
 >
 ```
 
-Using the teacher changeset to insert the teacher and associated students will overwrite any existing student associations.
+Using the instructor changeset to insert the instructor and associated students will overwrite any existing student associations.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-teacher
+instructor
 |> Ecto.Changeset.change()
 |> Ecto.Changeset.put_assoc(:students, [%Student{name: "John"}])
 |> Repo.update!()
@@ -354,20 +354,20 @@ If we don't want to overrwrite existing associations, then we need to preserve t
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-teacher
+instructor
 |> Ecto.Changeset.change()
-|> Ecto.Changeset.put_assoc(:students, [%Student{name: "Andrew"} | teacher.students])
+|> Ecto.Changeset.put_assoc(:students, [%Student{name: "Andrew"} | instructor.students])
 |> Repo.update!()
 ```
 
-Instead of using `put_assoc/4` with the teacher record that has many students, we can use it with the student record to associate it with a single teacher.
+Instead of using `put_assoc/4` with the instructor record that has many students, we can use it with the student record to associate it with a single instructor.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 %Student{name: "Jon"}
 |> Ecto.Changeset.change()
-|> Ecto.Changeset.put_assoc(:teacher, teacher)
+|> Ecto.Changeset.put_assoc(:instructor, instructor)
 |> Repo.insert!()
 ```
 
@@ -388,7 +388,7 @@ Instead, `put_assoc/4` is a better solution when we need to replace the entirety
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Teacher
+instructor
 |> Repo.get!(id)
 |> Repo.preload(:students) # Only required when updating data
 |> Ecto.Changeset.cast(params, [])
@@ -2049,7 +2049,7 @@ Please do not create a pull request to the DockYard Academy repository as this w
 
 **DockYard Academy Students Only:**
 
-Notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
-You (or your teacher) may merge your PR into your solutions branch after review.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
