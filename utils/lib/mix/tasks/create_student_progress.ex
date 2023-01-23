@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Bc.CreateStudentProgress do
     content =
       File.read!(@outline_path)
       |> Notebooks.student_progress_map()
-      |> Jason.encode!()
+      |> Jason.encode!(pretty: true)
 
     File.write!(@student_progress_path, content)
   end
