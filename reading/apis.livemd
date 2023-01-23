@@ -20,9 +20,9 @@ Mix.install([
 
 Upon completing this lesson, a student should be able to answer the following questions.
 
-* What are common HTTP request methods and what do they do?
+* What are the common HTTP request methods and what do they do?
 * What is a web API, and how can we communcate with one using [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html)?
-* What is JSON, and how can we parse it from an API response using [Poison](https://hexdocs.pm/poison/Poison.html)?
+* What is JSON, and how can we parse it from an API response using [Jason](https://hexdocs.pm/jason/Jason.html)?
 * How can we authorize requests for a private API?
 
 ## Setup
@@ -52,6 +52,8 @@ These APIs use a [client-server](https://en.wikipedia.org/wiki/Client%E2%80%93se
 
 You use APIs every time you open your browser (Chrome, Safari, Firefox, Edge, etc.). The browser is the client, and it requests information from a server. For example, when you search for a video on YouTube, your browser communicates with YouTube servers to retrieve the video file.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### URL (Uniform Resource Locator)
 
 The client uses a [URL](https://en.wikipedia.org/wiki/URL) (Uniform Resource Locator) to locate the server on the internet.
@@ -60,7 +62,7 @@ For example, you can visit the URL https://v2.jokeapi.dev/joke/Any?safe-mode&for
 
 The Joke API returns a JSON response. [JSON (JavaScript Object Notation)](https://en.wikipedia.org/wiki/Json) is a key-value format conceptually similar to a map in Elixir.
 
-```json
+```javascript
 {
     "error": false,
     "category": "Programming",
@@ -160,24 +162,61 @@ You've already seen that a successful request returns a `200` response. You migh
 response.status_code
 ```
 
-## JSON and Poison
+## JSON with Jason
 
-To parse a JSON response into a more convenient data structure, we can use the [Poison](https://github.com/devinus/poison)
-library. [Poison.decode!/2](https://hexdocs.pm/poison/Poison.html#decode!/2)
-converts the string representation of the JSON into an Elixir value.
+As mentioned, JSON is a format for storing information in a key-value structure.
 
-```elixir
-Poison.decode!("{\"key\"\: \"value\"}")
+```javascript
+{
+  "key1": "value1",
+  "key2": "value2",
+}
 ```
 
-By combining [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Poison](https://hexdocs.pm/poison/Poison.html) we can retrieve the JSON from the Joke API and return
+Elixir represents JASON as a string, not a key-value structure. For example, the above in Elixir would be:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+"{\"key1\":\"value1\",\"key2\":\"value2\"}"
+```
+
+APIs commonly return a JSON response. For example, here's the JSON reponse in the body of the request we've made to the JOKE API.
+
+```elixir
+{:ok, request} = HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
+
+request.body
+```
+
+When it's printed as a string, it has pretty formatting.
+
+```elixir
+IO.puts(request.body)
+```
+
+However, as a string, it's a difficult structure to work with if we want to access specific keys and values. There is no internal representation of JSON in Elixir, so to make it more convenient to work with, we need to **decode** it in to a key-value data structure such as a map.
+
+Similarly, if we need to send JSON to an API, then we need to **encode** a map into a JSON string.
+
+We can use the [Jason](https://hexdocs.pm/jason/Jason.html) library to make it easier to encode and decode JSON.
+
+```elixir
+Jason.encode!(%{key: "value"})
+```
+
+```elixir
+Jason.decode!("{\"key\"\: \"value\"}")
+```
+
+By combining [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Jason](https://hexdocs.pm/jason/Jason.html) we can retrieve the JSON from the Joke API and return
 an Elixir map.
 
 ```elixir
 response =
   case HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json") do
     {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-      Poison.decode!(body)
+      Jason.decode!(body)
   end
 ```
 
@@ -193,10 +232,26 @@ IO.puts("""
 
 ### Your Turn
 
-Use [Poison.decode!/2](https://hexdocs.pm/poison/Poison.html#decode!/2) to decode the following json string.
+Use [Jason.decode!/2](https://hexdocs.pm/jason/Jason.html#encode!/2) to decode the following JSON string.
 
 ```elixir
-string = "{\"hello\"\: \"world\"}"
+json = "{\"hello\"\: \"world\"}"
+```
+
+## Poison
+
+One popular alternative to [Jason](https://hexdocs.pm/jason/Jason.html) is the [Poison](https://hexdocs.pm/poison/Poison.html) library.
+
+It comes with similar functionality. We've chosen to use Jason in Livebook lessons as it has a faster compilation time.
+
+[Jason](https://hexdocs.pm/jason/Jason.html) and [Poison](https://hexdocs.pm/poison/Poison.html) must be installed as a project dependency to use them. We've already installed [Jason](https://hexdocs.pm/jason/Jason.html) in all Livebooks, but not [Poison](https://hexdocs.pm/poison/Poison.html).
+
+```elixir
+Poison.decode!("{\"key\"\: \"value\"}")
+```
+
+```elixir
+Poison.encode!(%{key: "value"})
 ```
 
 ## HTTP POST
