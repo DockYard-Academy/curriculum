@@ -16,17 +16,7 @@ Mix.install([
 
 ## Blog: Migration
 
-Your existing [Blog](./blog_posts.livemd) application should have a blog posts with a `title`, `subtitle`, and `content`.
-
-If you do not already have an existing blog project, you can create one with the following commands:
-
-```
-$ mix phx.new blog
-$ mix phx.gen.html Posts Post posts title:string subtitle:string content:text
-$ mix ecto.migrate
-```
-
-Ideally, you should complete the [Blog: Search](blog_search.livemd) exercise before this one. However, it is not strictly necessary.
+Your existing [Blog](./group_project_blog.livemd) application should already have blog posts with a `title`, `subtitle`, and `content`.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -35,12 +25,30 @@ Ideally, you should complete the [Blog: Search](blog_search.livemd) exercise bef
 You're going to create a migration or many migrations to modify the blog posts table with the following changes:
 
 * Remove the `subtitle` field
-* Add a `publish_on` `:date` field.
+* Add a `published_on` `:date` field.
 * Add a `visible` `:boolean` field which defaults to `true`.
 
 Ensure your `Post` schema reflects these changes, and ensure all tests pass. Modify existing tests to include the new fields.
 
 Ensure all features of your application such as creating, reading, updating, and deleting posts continue to work. You will likely need to modify any pages using old fields that are no longer valid.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Form Fields
+
+Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
+
+Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
+
+```
+iex -S mix
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Visibility
+
+When displaying a list of blog posts, hide any blog posts whose `visible` field is `false` or whose `published_on` field is after the current UTC date.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -54,13 +62,7 @@ First, ensure that all tests pass.
 mix test
 ```
 
-Then stage and commit your changes to the Blog project.
-
-```
-git add .
-git commit -m "migrate post fields"
-git push
-```
+Then create a pull request, review it, and merge it into your main branch.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -72,26 +74,6 @@ Create another migration to add the following constraints:
 * Modify the `title` so it must be between `3` and `100` characters.
 
 Ensure your `Post` schema reflects these constraints and validations.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Bonus: Form Fields
-
-Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
-
-Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
-
-```
-iex -S mix
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Bonus: Visibility
-
-Hide any blog posts whose `visible` field is `false`. Hide any blog posts whose `published_on` field is after the current UTC date.
 
 ## Mark As Completed
 
