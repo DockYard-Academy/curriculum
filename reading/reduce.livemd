@@ -194,6 +194,24 @@ end)
 
 ```
 
+## Multiple Accumulators
+
+One trick for reduce is to use a collection data-type to simulate having multiple accumulators.
+
+Here's an example of separating a range into even and odd numbers.
+
+```elixir
+Enum.reduce(1..10, {[], []}, fn integer, {evens, odds} ->
+  if rem(integer, 2) == 0 do
+    {[integer | evens], odds}
+  else
+    {evens, [integer | odds]}
+  end
+end)
+```
+
+Technically, there is only one actual accumulator, our tuple with two lists. However, this functions as a way to track multiple values with each enumeration in the reduce operation.
+
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
