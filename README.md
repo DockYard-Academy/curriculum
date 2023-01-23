@@ -204,7 +204,7 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Executables
 ## OTP and Advanced Syntax
 * Advanced Pattern Matching
-* Guards
+* Guarding
 * Protocols
 * Recursion
 * Benchmarking and Performance
