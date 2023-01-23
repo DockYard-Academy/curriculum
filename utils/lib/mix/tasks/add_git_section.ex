@@ -52,7 +52,6 @@ defmodule Mix.Tasks.Bc.AddGitSection do
     Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
     ```
-    $ git checkout solutions
     $ git checkout -b #{String.replace(file_name, "_", "-")}-#{type}
     $ git add .
     $ git commit -m "finish #{String.replace(file_name, "_", " ")} #{type}"
