@@ -19,7 +19,6 @@ defmodule Utils.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:credo, "~> 1.6", runtime: false, only: [:dev, :test]},

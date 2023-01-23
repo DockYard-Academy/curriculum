@@ -234,54 +234,46 @@ end
 
 ### Your Turn
 
-Use `with` to check that `scores`:
-
-* Has two elements
-* Each element is an integer.
-* Each element is ten or above.
-
-If so, sum the two scores together and return `{:ok, score}`. If not, return `{:error, :invalid}`.
+Use `with` to sum the numbers in two deeply nested maps. Return `{:error, :invalid}` if either input is invalid.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Points.tally([10, 20])
-{:ok, 30}
-
-Points.tally(10)
-{:error, :invalid}
-
-Points.tally([1, 10])
-{:error, :invalid}
-
-Points.tally([10, 20, 30])
-{:error, :invalid}
+Sum.sum_maps(%{value: 10}, %{value: 20})
+{:ok, 20}
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```elixir
-defmodule Points do
-  def tally(scores) do
-    with [score1, score2] <- scores,
-        true <- is_integer(score1) and is_integer(score2),
-        true <- score1 >= 10 and score2 >= 10 do
-      {:ok, score1 + score2}
+defmodule Sum do
+  def sum_maps(map1, map2) do
+    with %{value: value1} <- map1, %{value: value2} <- map2 do
+      {:ok, value1 + value2}
     else
       _ -> {:error, :invalid}
-    end 
-  end 
+    end
+  end
 end
 ```
 
 </details>
 
-Enter your solution below.
-
 ```elixir
-defmodule Points do
-  def tally(scores) do
+defmodule Sum do
+  @doc """
+  Sum two maps. Return {:ok, value} if valid, and {:error, :invalid} if either input is invalid.
+
+  ## Examples
+
+      iex> Sum.sum_maps(%{value: 10}, %{value: 10})
+      {:ok, 20}
+
+      iex> Sum.sum_maps(%{value: 20}, 10)
+      {:error, :invalid}
+  """
+  def sum_maps(map1, map2) do
   end
 end
 ```
@@ -321,7 +313,6 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout solutions
 $ git checkout -b with-reading
 $ git add .
 $ git commit -m "finish with reading"
@@ -337,3 +328,9 @@ Notify your teacher by including `@BrooklinJazz` in your PR description to get f
 You (or your teacher) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                           | Next                                                         |
+| ---------------------------------- | -----------------------------------------------------------: |
+| [Guards](../reading/guards.livemd) | [Message Validation](../exercises/message_validation.livemd) |
