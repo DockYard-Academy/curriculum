@@ -311,6 +311,26 @@ Enum.count/1           4.97 K - 1.07x slower +12.70 μs
 
 This is especially useful for benchmarking how larger data affects our system. It's also useful for creating different situations (i.e. worst case and best case scenarios) that may cause our system to behave differently than expected.
 
+## How to Make a Good Benchmark
+
+It's easy for a benchmark to misrepresent the actual performance of our system.
+
+To make our benchmarks more representative, consider the following metrics:
+
+* **variety:** Use a variety of inputs in your benchmark.
+* **size:** A system may be very fast with small amounts of data, but incredibly slow with large amounts of data. Consider using multiple different samples of data with different sizes to test where the system hits its limits.
+* **consistency**: Consider running your benchmark multiple times. Does it's performance change frequently due to edge cases?
+
+In general, you can use benchmarks to optimize your systems and see how they perform under pressure. Consider exactly how you want to stress your system to get benchmark metrics that make the most sense for your situation.
+
+We also want to consider what we're measuring. For example, if you read the `average` time instead of the `median`, it's easy to have outliers skew our data.
+
+For example:
+
+> Ben Hill Griffin Stadium, the stadium at the University of Florida, holds `88,548` people. In Florida the minimum wage is `$11.00` per hour. Working an eight hour day for five days a week fifty-two weeks a year this comes out to `$22,880` a year. If every seat in the stadium was filled by someone making minimum wage, the average annual income would be `$22,880`. and the total worth would be just over two billion `$2,025,978,240` In 2021 Jeff Bezos made ~ 197 Billion -- `$197,000,000,000`. If Jeff Bezos enters the stadium the total annual income is `$199,025,978,240` and the **AVERAGE** income would be about 2.24 million -- `$2,247,636`. One large outlier can really skew the average. This is often why we use the **median**, or middle value, of a set. It's less skewed by large outliers.
+> 
+> Example provided by Stephen Fowler
+
 ## Mark As Completed
 
 <!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
