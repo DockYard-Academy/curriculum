@@ -72,7 +72,9 @@ high = 1
 Enter your solution below.
 
 ```elixir
-
+low = -1
+normal = 0
+high = 1
 ```
 
 ## High Card
@@ -92,7 +94,7 @@ initial_count + high
 Enter your solution below.
 
 ```elixir
-
+count = 0 + high
 ```
 
 ## Low Card
@@ -112,7 +114,7 @@ initial_count + low
 Enter your solution below.
 
 ```elixir
-
+count = 0 + low
 ```
 
 ## Multiple Cards
@@ -134,7 +136,7 @@ You could omit the **normal** cards or allow **high** and **low** cards to balan
 Enter your solution below.
 
 ```elixir
-
+count = 5 + 5 * high + 2 * normal + 2 * low
 ```
 
 ## Bonus: Determining Card Values
@@ -176,7 +178,46 @@ You could omit the **normal** cards or allow **high** and **low** cards to balan
 Enter your solution below.
 
 ```elixir
+defmodule CardCounting do
+  def count(card) do
+    cond do
+      card >= 10 -> 1
+      card <= 6 -> -1
+      true -> 0
+    end
+  end
+end
 
+card1 = 8
+card2 = 3
+card3 = 6
+
+# random_cards =
+#   [Enum.random(1..13), Enum.random(1..13), Enum.random(1..13)]
+#   |> Enum.reduce(fn card, acc ->
+#     acc + CardCounting.count(card)
+#   end)
+
+cards =
+  [card1, card2, card3]
+  |> Enum.reduce(0, fn card, acc ->
+    acc + CardCounting.count(card)
+  end)
+
+# random_card1 = Enum.random(1..13)
+# random_card2 = Enum.random(1..13)
+# random_card3 = Enum.random(1..13)
+
+cards =
+  Enum.map([card1, card2, card3], fn random_card ->
+    cond do
+      random_card <= 6 -> low
+      random_card >= 10 -> high
+      true -> normal
+    end
+  end)
+
+Enum.sum(cards)
 ```
 
 ## Mark As Completed
