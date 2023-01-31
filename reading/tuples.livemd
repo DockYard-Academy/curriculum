@@ -68,7 +68,7 @@ the second element.
 </details>
 
 ```elixir
-
+{:ok, "got it!"}
 ```
 
 ## Pattern Matching
@@ -119,7 +119,7 @@ So long as the expression on the left side of match operator `=` matches the pat
 The tuple with variables bound on the left side must have the same number of elements as the tuple on the right side, otherwise we'll cause a [MatchError](https://hexdocs.pm/elixir/MatchError.html).
 
 ```elixir
-{one, two} = {1, 2, 3}
+{one, two, _} = {1, 2, 3}
 ```
 
 If we want to bind some of the variables in a tuple, and ignore others, we can use an `_` to ignore any variables.
@@ -148,7 +148,8 @@ jewel
 </details>
 
 ```elixir
-{"gold", "treasure", "jewel"}
+{_g, _t, jewel} = {"gold", "treasure", "jewel"}
+jewel
 ```
 
 ## Further Reading
