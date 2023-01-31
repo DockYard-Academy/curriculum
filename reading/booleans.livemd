@@ -59,17 +59,17 @@ flowchart LR
 
 In the Elixir cell below, turn the power on in our light control program to see the light turn on! Replace `false` with `true`.
 
-<!-- livebook:{"attrs":{"code":"power = false","source":"content = if power, do: \"/images/on.png\", else: \"/images/off.png\"\nKino.Image.new(File.read!(__DIR__ <> content), :png)","title":"Power on!"},"chunks":null,"kind":"Elixir.Visual","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"code":"power = true","source":"content = if power, do: \"/images/on.png\", else: \"/images/off.png\"\nKino.Image.new(File.read!(__DIR__ <> content), :png)","title":true},"kind":"Elixir.Visual","livebook_object":"smart_cell"} -->
 
 ```elixir
-power = false
+power = true
 content = if power, do: "/images/on.png", else: "/images/off.png"
 Kino.Image.new(File.read!(__DIR__ <> content), :png)
 ```
 
 For more on booleans consider this video by Crash Course Computer Science.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=gI-qXk7XojA\")","title":"Boolean Logic & Logic Gates"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=gI-qXk7XojA\")","title":"Boolean Logic & Logic Gates"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=gI-qXk7XojA")
@@ -313,7 +313,7 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"booleans_reading\"\n    \"exercises\" -> \"booleans_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"booleans_reading\"\n    \"exercises\" -> \"booleans_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
