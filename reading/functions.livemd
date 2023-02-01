@@ -65,7 +65,7 @@ Now, let's create our first function. At first, it's going to do nothing.
 A function must have an output. We can return `nil` for now.
 
 ```elixir
-double = fn -> nil end
+double = fn x -> 2 * x end
 ```
 
 You may see some weird-looking output like `#Function<45.65746770/0 in :erl_eval.expr/5>`.
@@ -122,7 +122,7 @@ Our `double` function doesn't do much at this point, but let's see the **output*
 We use the `.()` syntax in Elixir to get the function's output. We often say we are **executing** or **calling** a function.
 
 ```elixir
-double.()
+double.(3)
 ```
 
 `double` should return `nil` because that's all we've told it to do so far. However, we want
@@ -132,7 +132,7 @@ To do that, we need to make the function accept some input. To do this,
 we define a **parameter** in the function like so.
 
 ```elixir
-double = fn parameter -> nil end
+double = fn p -> 2 * p end
 ```
 
 You'll notice a warning above. That's because Elixir is smart and lets us know that we've
@@ -427,7 +427,8 @@ multiply_three = &(&1 * &2 * &3)
 Enter your solution below.
 
 ```elixir
-
+multiply_three = &(&1 * &2 * &3)
+multiply_three.(5, 2)
 ```
 
 ## First-class Functions
@@ -515,7 +516,9 @@ call_with_10_and_20 = fn callback -> callback.(10, 20) end
 Enter your solution below.
 
 ```elixir
-call_with_10_and_20 = nil
+call_with_10_and_20 = & &1.(10, 20)
+
+call_with_10_and_20.(&Kernel.+/2)
 ```
 
 ## Pipe Operator
@@ -628,7 +631,10 @@ multiply = fn int1, int2 -> int1 * int2 end
 Enter your solution below.
 
 ```elixir
-
+10
+|> Kernel.+(2)
+|> Kernel.*(5)
+|> Kernel.-(4)
 ```
 
 ## Mark As Completed
