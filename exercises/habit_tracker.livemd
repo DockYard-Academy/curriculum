@@ -53,7 +53,9 @@ small = 5
 Enter your solution below.
 
 ```elixir
-
+small = 5
+medium = 20
+large = 30
 ```
 
 ## Small, Medium, Large
@@ -83,7 +85,7 @@ small + medium + large
 Enter your answer in the code cell below.
 
 ```elixir
-
+total = small + medium + large
 ```
 
 ## Multiples
@@ -102,7 +104,7 @@ small * 10 + medium * 5 + large * 3
 Enter your answer below.
 
 ```elixir
-
+total = 10 * small + 5 * medium + 3 * large
 ```
 
 ## Progress Bar
@@ -133,7 +135,8 @@ points / goal
 Enter your answer below.
 
 ```elixir
-
+goal = 40
+percentage = (small + medium) / goal * 100
 ```
 
 ## Penalties and Rewards
@@ -160,7 +163,10 @@ small * 1.6 * 3 + medium * 2 + large * 2 * 0.5
 Enter your answer below.
 
 ```elixir
+early_bonus = 1.6
+late_bonus = 0.5
 
+total = 3 * small * early_bonus + 2 * medium + 2 * large * late_bonus
 ```
 
 ## Bonus: Add Your Own Feature
@@ -169,7 +175,27 @@ Add your own feature to the habit tracking app. Use comments to describe your fe
 how it would affect calculating the total score and/or the total percentage of completed habits.
 
 ```elixir
+# complete the habit for 6 days straight without lateness, and get a 100% late_bonus
+# represent habit as tuple {:timeliness, size}. ex: {:early, large}
 
+streak = fn habits ->
+  length(habits) >= 6 &&
+    Enum.all?(habits, fn habit ->
+      case habit do
+        {:early, _size} -> true
+        {:normal, _size} -> true
+        {:late, _size} -> false
+      end
+    end)
+end
+
+habitx = [
+  {:normal, 30},
+  {:normal, 30},
+  {:early, 30}
+]
+
+streak.(habitx)
 ```
 
 ## Mark As Completed
