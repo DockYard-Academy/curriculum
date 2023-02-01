@@ -121,7 +121,8 @@ end
 Enter your solution below.
 
 ```elixir
-
+temperature = 9
+(temperature > 10 && :hot) || :cold
 ```
 
 ## Clear Control Flow
@@ -266,7 +267,7 @@ We can provide any number of cases. Cases use pattern matching to decide which r
 Return each value from `1` to `5` by changing the `condition` variable below.
 
 ```elixir
-condition = nil
+condition = [:red, "blue", %{key: "value"}, 123, [1, 2, 3], :x]
 
 case condition do
   :red -> 1
@@ -276,6 +277,8 @@ case condition do
   [1, 2, 3] -> 5
   _ -> "default"
 end
+
+Enum.each(condition, &IO.inspect/1)
 ```
 
 ## Pattern Matching With Case
@@ -331,6 +334,7 @@ end
 ```elixir
 case "no match" do
   :sunny -> "t-shirt"
+  _ -> "x"
 end
 ```
 
@@ -339,7 +343,7 @@ To provide a default case for the `case` statement, you can use a variable, whic
 ```elixir
 case "no match" do
   "sunnny" -> "wear a t-shirt"
-  anything -> "wear clothing"
+  _anything -> "wear clothing"
 end
 ```
 
@@ -359,6 +363,8 @@ case "no match" do
   "sunnny" -> "wear a t-shirt"
   _ -> "wear clothing"
 end
+
+IO.inspect("1", label: "IF")
 ```
 
 ### Your Turn
@@ -366,7 +372,14 @@ end
 Return each result from `1` to `5` by changing the `condition` variable below.
 
 ```elixir
-condition = nil
+condition = [
+  [1, 2, 3],
+  [:h | [:t, :u]],
+  {:a, :b},
+  %{key1: :c, key2: "value"},
+  {1, :n, %{key: [1, :m, :o]}},
+  :x
+]
 
 case condition do
   [1, 2, 3] -> 1
@@ -375,6 +388,18 @@ case condition do
   %{key1: _, key2: "value"} -> 4
   {1, _, %{key: [1, _, _]}} -> 5
   _ -> "default"
+end
+
+Enum.each(condition, &IO.inspect/1)
+```
+
+```elixir
+c = :x
+
+case c do
+  true -> :t
+  false -> :f
+  _ -> IO.inspect(c)
 end
 ```
 
@@ -407,14 +432,17 @@ Here's how we can translate this into a program using `cond`.
 
 ```elixir
 # Change temperature to change the condition triggered.
-temperature = 6
+temperature = nil
+work = :done
 
 cond do
-  temperature >= 21 -> "t-shirt"
+  # work == :done -> :why
+  temperature >= 21 and temperature <= 200 -> "t-shirt"
   temperature >= 16 and temperature <= 20 -> "heavy shirt"
   temperature >= 11 and temperature <= 15 -> "light coat"
   temperature >= 6 and temperature <= 10 -> "coat"
   temperature <= 5 -> "thick coat"
+  work == :done -> :why
 end
 ```
 
@@ -559,7 +587,12 @@ In the Elixir cell below
 * Create an `unless` statement. which returns `"awake"` unless `tired`.
 
 ```elixir
+tired = Enum.random([true, false])
+IO.puts(tired)
 
+unless tired do
+  "awake"
+end
 ```
 
 ## Mark As Completed
