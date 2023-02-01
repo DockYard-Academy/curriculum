@@ -110,7 +110,7 @@ MultiParamExample.call("argument1", "argument2", "argument3")
 Call the `MutliParamExample` with different arguments.
 
 ```elixir
-
+MultiParamExample.call("one", "two", "three")
 ```
 
 ## Internal Module Functions
@@ -308,7 +308,13 @@ end
 Enter your solution below.
 
 ```elixir
+defmodule Languages.Greeting do
+  def greeting do
+    "欢迎"
+  end
+end
 
+Languages.Greeting.greeting()
 ```
 
 ### Nested Modules
@@ -378,7 +384,11 @@ Hero.defeat()
 
 We can use module attributes to avoid significant code repetition where many functions all need to use the same value.
 
-<!-- livebook:{"break_markdown":true} -->
+```elixir
+callback_fn = fn input -> IO.puts(input) end
+
+Enum.each([":abc"], callback_fn)
+```
 
 ### Your Turn
 
@@ -506,7 +516,13 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  def add(n1, n2, n3), do: n1 + n2 + n3
 
+  def add(n1, n2), do: n1 + n2
+end
+
+Math.add(1, 82, 23)
 ```
 
 ## Default Arguments
@@ -573,7 +589,13 @@ Greeting.hello("Andrew")
 ```
 
 ```elixir
+defmodule Greeting do
+  def hello(name \\ "human") do
+    "Hello #{name}!"
+  end
+end
 
+Greeting.hello("Andrew")
 ```
 
 ## Documentation
@@ -650,12 +672,11 @@ defmodule DoctestFailure do
   """
 
   @doc """
-  Purposely fails doctest
 
   ## Examples
 
     iex> DoctestFailure.test()
-    "expected return value"
+    "actual return value"
   """
   def test do
     "actual return value"
@@ -686,25 +707,25 @@ If this is the case, you either have to fix your code, or remove/comment the cra
 Uncomment the following code and evaluate the cell to see an example. Re-comment your code to avoid crashing the livebook as you continue with the lesson.
 
 ```elixir
-# defmodule DoctestCrash do
-#   @moduledoc """
-#   DoctestCrash
+defmodule DoctestCrash do
+  @moduledoc """
+  DoctestCrash
 
-#   Explains doctest crashes with examples
-#   """
+  Explains doctest crashes with examples
+  """
 
-#   @doc """
-#   Purposely crashes doctest using invalid pattern matching
+  @doc """
+  Purposely crashes doctest using invalid pattern matching
 
-#   ## Examples
+  ## Examples
 
-#     iex> {} = DoctestCrash.crash()
-#     "2"
-#   """
-#   def crash do
-
-#   end
-# end
+    iex> ok = DoctestCrash.crash()
+    "or not"
+  """
+  def crash do
+    "or not"
+  end
+end
 ```
 
 ### Your Turn
