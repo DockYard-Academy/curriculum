@@ -797,3 +797,37 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 | Previous                                                       | Next                                 |
 | -------------------------------------------------------------- | -----------------------------------: |
 | [Rock Paper Scissors](../exercises/rock_paper_scissors.livemd) | [Structs](../reading/structs.livemd) |
+
+```elixir
+## parent modules don't have access to defps of submodules
+
+defmodule Language do
+  defmodule En do
+    def gr() do
+      "yo"
+    end
+
+    defp m() do
+      "no"
+    end
+  end
+
+  defmodule Fr do
+    def gr() do
+      "bonjour"
+    end
+
+    defp n() do
+      "nnnno"
+    end
+  end
+
+  def x() do
+    Fr.n()
+  end
+end
+```
+
+```elixir
+Language.x()
+```
