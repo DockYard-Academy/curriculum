@@ -54,7 +54,20 @@ Then, return the winning choice of either `:rock`, `:paper`, or `:scissors` that
 Enter your solution below.
 
 ```elixir
+player_choice =
+  Enum.random([:rock, :paper, :scissors])
+  |> IO.inspect(label: "player choice")
 
+response = fn choice ->
+  case choice do
+    :rock -> :paper
+    :paper -> :scissors
+    :scissors -> :rock
+  end
+end
+
+response.(player_choice)
+|> IO.inspect(label: "response")
 ```
 
 ## Create Two Player Rock Paper Scissors
@@ -107,7 +120,44 @@ Bind a `player1_choice` and `player2_choice` variable to `:rock`, `:paper`, or `
 Enter your solution below.
 
 ```elixir
+player1_choice = Enum.random([:rock, :paper, :scissors])
+player2_choice = Enum.random([:rock, :paper, :scissors])
 
+IO.inspect(binding())
+
+# rock_paper_scissors = fn choice1, choice2 ->
+#   case {choice1, choice2} do
+#   {choice1, choice1} -> "Draw"
+#   p1_wins when p1_wins in [{:rock, :scissors}, {:scissors, :paper}, {:paper, :rock}]-> "Player 1 wins!"
+#   _p2_wins -> "Player 2 wins!"
+#   end
+# end
+
+rock_paper_scissors = fn choice1, choice2 ->
+  case {choice1, choice2} do
+    {choice1, choice1} ->
+      "Draw"
+
+    p1_wins when p1_wins in [{:rock, :scissors}, {:scissors, :paper}, {:paper, :rock}] ->
+      "Player 1 wins!"
+
+    _p2_wins ->
+      "Player 2 wins!"
+  end
+end
+
+# same fn with & operator
+# much harder to read 
+#
+# rock_paper_scissors = &(
+#   case {&1, &2} do
+#   {&1, &2} -> "Draw"
+#   p1_wins when p1_wins in [{:rock, :scissors}, {:scissors, :paper}, {:paper, :rock}]-> "Player 1 wins!"
+#   _p2_wins -> "Player 2 wins!"
+#   end
+# )
+
+rock_paper_scissors.(player1_choice, player2_choice)
 ```
 
 ## Mark As Completed
