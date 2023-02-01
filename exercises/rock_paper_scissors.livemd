@@ -54,7 +54,15 @@ Then, return the winning choice of either `:rock`, `:paper`, or `:scissors` that
 Enter your solution below.
 
 ```elixir
+player_choice = Enum.random([:rock, :paper, :scissors])
 
+IO.puts(player_choice)
+
+case player_choice do
+  :rock -> :paper
+  :paper -> :scissors
+  :scissors -> :rock
+end
 ```
 
 ## Create Two Player Rock Paper Scissors
@@ -107,7 +115,20 @@ Bind a `player1_choice` and `player2_choice` variable to `:rock`, `:paper`, or `
 Enter your solution below.
 
 ```elixir
+player = Enum.random([:rock, :paper, :scissors])
+ai = Enum.random([:rock, :paper, :scissors])
 
+IO.inspect(player: player, ai: ai)
+
+cond do
+  player == :rock && ai == :paper -> "ai"
+  player == :rock && ai == :scissors -> "player"
+  player == :scissors && ai == :rock -> "ai"
+  player == :scissors && ai == :paper -> "player"
+  player == :paper && ai == :scissors -> "ai"
+  player == :paper && ai == :rock -> "player"
+  player == ai -> "draw"
+end
 ```
 
 ## Mark As Completed
