@@ -200,7 +200,7 @@ Under the hood, when the function runs, the parameter is bound to the argument's
 
 Let's break down how a function executes step by step in the following slideshow.
 
-<!-- livebook:{"attrs":{"source":"frames =     [\n      \"\n  First, we define the `double` function and call it.\n  ```elixir\n  double = fn number -> number * 2 end\n  double.(3)\n  ```\n  \",\n      \"\n  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.\n  ```elixir\n  double = fn number -> number * 2 end\n  fn 3 -> 3 * 2 end\n  ```\n  \",\n      \"\n  The function evaluates the function body between the `->` and the `end`\n  ```elixir\n  double = fn number -> number * 2 end\n  3 * 2\n  ```\n  \",\n      \"\n  `3` * `2` is `6`, so the function call returns `6`.\n  ```elixir\n  double = fn number -> number * 2 end\n  6\n  ```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Function Flow"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"frames =     [\n      \"\n  First, we define the `double` function and call it.\n  ```elixir\n  double = fn number -> number * 2 end\n  double.(3)\n  ```\n  \",\n      \"\n  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.\n  ```elixir\n  double = fn number -> number * 2 end\n  fn 3 -> 3 * 2 end\n  ```\n  \",\n      \"\n  The function evaluates the function body between the `->` and the `end`\n  ```elixir\n  double = fn number -> number * 2 end\n  3 * 2\n  ```\n  \",\n      \"\n  `3` * `2` is `6`, so the function call returns `6`.\n  ```elixir\n  double = fn number -> number * 2 end\n  6\n  ```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Function Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ````elixir
 frames = [
@@ -286,7 +286,7 @@ is_even? = fn int -> rem(int, 2) == 0 end
 Enter your solution below.
 
 ```elixir
-
+is_even? = fn int -> rem(int, 2) == 0 end
 ```
 
 ## Multi-Parameter Functions
@@ -352,7 +352,7 @@ calculate_force = fn mass, acceleration -> mass * acceleration end
 Enter your solution below.
 
 ```elixir
-
+calculate_force = fn mass, acceleration -> mass * acceleration end
 ```
 
 ## Shorthand Syntax
@@ -401,7 +401,7 @@ subtract = &(&1 - &2)
 Enter your solution below.
 
 ```elixir
-
+subtract = &(&1 - &2)
 ```
 
 ### Your Turn
@@ -427,7 +427,7 @@ multiply_three = &(&1 * &2 * &3)
 Enter your solution below.
 
 ```elixir
-
+multiply_three = &(&1 * &2 * &3)
 ```
 
 ## First-class Functions
@@ -515,7 +515,9 @@ call_with_10_and_20 = fn callback -> callback.(10, 20) end
 Enter your solution below.
 
 ```elixir
-call_with_10_and_20 = nil
+add = fn int1, int2 -> int1 + int2 end
+call_with_10_and_20 = fn callback -> callback.(10, 20) end
+call_with_10_and_20.(add)
 ```
 
 ## Pipe Operator
@@ -619,7 +621,7 @@ multiply = fn int1, int2 -> int1 * int2 end
 
 10
 |> add.(2)
-|> multiply.(2)
+|> multiply.(5)
 |> subtract.(4)
 ```
 
@@ -628,12 +630,19 @@ multiply = fn int1, int2 -> int1 * int2 end
 Enter your solution below.
 
 ```elixir
+add = fn num1, num2 -> num1 + num2 end
+subtract = fn num1, num2 -> num1 - num2 end
+multiply = fn num1, num2 -> num1 * num2 end
 
+10
+|> add.(2)
+|> multiply.(5)
+|> subtract.(4)
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"functions_reading\"\n    \"exercises\" -> \"functions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"functions_reading\"\n    \"exercises\" -> \"functions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
