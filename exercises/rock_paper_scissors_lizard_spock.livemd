@@ -83,6 +83,17 @@ defmodule RockPaperScissorsLizardSpock do
     false
   """
   def beats?(guess1, guess2) do
+    {guess1, guess2} in [
+      {:rock, :scissors},
+      {:rock, :lizard},
+      {:paper, :rock},
+      {:paper, :spock},
+      {:scissors, :paper},
+      {:scissors, :lizards},
+      {:lizard, :paper},
+      {:lizard, :spock},
+      {:spock, :scissors}
+    ]
   end
 
   @doc """
@@ -101,8 +112,9 @@ defmodule RockPaperScissorsLizardSpock do
   """
 
   def play(player1, player2) do
-    case {player1, player2} do
-      {:rock, :paper} -> "Player 2 Wins!"
+    cond do
+      beats?(player1, player2) -> "Player 1 Wins!"
+      not beats?(player1, player2) -> "Player 2 Wins!"
     end
   end
 end
@@ -111,16 +123,7 @@ RockPaperScissorsLizardSpock.play(:rock, :paper)
 ```
 
 ```elixir
-# input/output
-# input -> :rock, :paper, etc...
-# output -> winner "Player 2 Wins!"
 
-player1 = :rock
-player2 = :paper
-
-case {player1, player2} do
-  {:rock, :paper} -> "Player 2 Wins!"
-end
 ```
 
 ## Mark As Completed
