@@ -110,7 +110,7 @@ MultiParamExample.call("argument1", "argument2", "argument3")
 Call the `MutliParamExample` with different arguments.
 
 ```elixir
-
+MultiParamExample.call("elvis", "fokoro", "france")
 ```
 
 ## Internal Module Functions
@@ -308,7 +308,11 @@ end
 Enter your solution below.
 
 ```elixir
-
+defmodule Languages.French do
+  def greeting do
+    "Bonjour!"
+  end
+end
 ```
 
 ### Nested Modules
@@ -347,15 +351,15 @@ We use the `@` symbol to define a compile-time module attribute.
 
 ```elixir
 defmodule Hero do
-  @name "Spider-Man"
-  @nemesis "Green Goblin"
+  @name "Batman"
+  @nemesis "Joker"
 
   def introduce do
     "Hello, my name is #{@name}!"
   end
 
   def catchphrase do
-    "I'm your friendly neighborhood #{@name}!"
+    "I'm #{@name}!"
   end
 
   def defeat do
@@ -506,7 +510,38 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  @moduledoc """
+  Math module
 
+  Addition functions
+  """
+
+  @doc """
+  Returns the sum of two numbers.
+
+  ## Examples
+
+    iex> Math.add(6, 7)
+    13
+  """
+  def add(num1, num2) do
+    num1 + num2
+  end
+
+  @doc """
+  Returns the sum of three numbers.
+
+  ## Examples
+
+    iex> Math.add(6, 7, 3)
+    16
+  """
+
+  def add(num1, num2, num3) do
+    num1 + num2 + num3
+  end
+end
 ```
 
 ## Default Arguments
@@ -573,7 +608,11 @@ Greeting.hello("Andrew")
 ```
 
 ```elixir
-
+defmodule Greeting do
+  def hello(name \\ "there") do
+    "Hello #{name}!"
+  end
+end
 ```
 
 ## Documentation
@@ -597,7 +636,7 @@ defmodule DocumentedModule do
   end
 
   @doc """
-  Explanation of the documented function 1
+  Explanation of the documented function 2
   """
   def documented_function2 do
   end
@@ -658,7 +697,7 @@ defmodule DoctestFailure do
     "expected return value"
   """
   def test do
-    "actual return value"
+    "expected return value"
   end
 end
 ```
@@ -686,25 +725,24 @@ If this is the case, you either have to fix your code, or remove/comment the cra
 Uncomment the following code and evaluate the cell to see an example. Re-comment your code to avoid crashing the livebook as you continue with the lesson.
 
 ```elixir
-# defmodule DoctestCrash do
-#   @moduledoc """
-#   DoctestCrash
+defmodule DoctestCrash do
+  @moduledoc """
+  DoctestCrash
 
-#   Explains doctest crashes with examples
-#   """
+  Explains doctest crashes with examples
+  """
 
-#   @doc """
-#   Purposely crashes doctest using invalid pattern matching
+  @doc """
+  Purposely crashes doctest using invalid pattern matching
 
-#   ## Examples
+  ## Examples
 
-#     iex> {} = DoctestCrash.crash()
-#     "2"
-#   """
-#   def crash do
-
-#   end
-# end
+    iex> {} = DoctestCrash.crash()
+    "2"
+  """
+  def crash do
+  end
+end
 ```
 
 ### Your Turn
@@ -713,7 +751,7 @@ Use `@doc` and `@moduledoc` to document the `Math` module you previously created
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"modules_reading\"\n    \"exercises\" -> \"modules_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"modules_reading\"\n    \"exercises\" -> \"modules_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
