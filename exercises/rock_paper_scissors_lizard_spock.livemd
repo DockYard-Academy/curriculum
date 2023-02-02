@@ -68,21 +68,37 @@ defmodule RockPaperScissorsLizardSpock do
   Rock Paper Scissors Lizard Spock Game
   """
 
+  @winners [
+    {:rock, :scissors},
+    {:scissors, :paper},
+    {:rock, :lizard},
+    {:lizard, :spock},
+    {:paper, :rock},
+    {:spock, :scissors},
+    {:scissors, :lizard},
+    {:lizard, :paper},
+    {:paper, :spock},
+    {:spock, :rock}
+  ]
+
   @doc """
-  Returns `true` if the first guess beats the second, and `false` otherwise.
+  Returns true if the first guess beats the second, and false otherwise.
 
   ## Winning Examples
 
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :lizard)
     true
 
-    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
-    false
+     iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
+     false
 
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :rock)
     false
   """
+  @type(guess :: :rock, :paper, :scissors)
+  @spec beats?(guess, guess) :: boolean
   def beats?(guess1, guess2) do
+    {guess1, guess2} in @winners
   end
 
   @doc """
@@ -97,9 +113,16 @@ defmodule RockPaperScissorsLizardSpock do
     "Player 2 Wins!"
 
     iex> RockPaperScissorsLizardSpock.play(:lizard, :lizard)
-    "Player 2 Wins!"
+    "Player Draws!"
   """
+
+  @spec play(guess, guess) :: String.t()
   def play(player1, player2) do
+    cond do
+      beats?(player1, player2) -> "Player 1 Wins!"
+      beats?(player2, player1) -> "Player 2 Wins!"
+      player1 == player2 -> "Player Draws!"
+    end
   end
 end
 ```
