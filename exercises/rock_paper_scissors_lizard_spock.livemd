@@ -83,6 +83,18 @@ defmodule RockPaperScissorsLizardSpock do
     false
   """
   def beats?(guess1, guess2) do
+    {guess1, guess2} in [
+      {:rock, :scissors},
+      {:paper, :rock},
+      {:scissors, :paper},
+      {:rock, :lizard},
+      {:lizard, :spock},
+      {:spock, :scissors},
+      {:scissors, :lizard},
+      {:lizard, :paper},
+      {:paper, :spock},
+      {:spock, :rock}
+    ]
   end
 
   @doc """
@@ -97,11 +109,31 @@ defmodule RockPaperScissorsLizardSpock do
     "Player 2 Wins!"
 
     iex> RockPaperScissorsLizardSpock.play(:lizard, :lizard)
-    "Player 2 Wins!"
+    "Draw!"
   """
+
+  def play() do
+    IO.inspect(player1 = Enum.random([:rock, :paper, :scissors, :lizard, :spock]),
+      label: "player1 chooses"
+    )
+
+    IO.inspect(player2 = Enum.random([:rock, :paper, :scissors, :lizard, :spock]),
+      label: "player2 chooses"
+    )
+
+    play(player1, player2)
+  end
+
   def play(player1, player2) do
+    cond do
+      beats?(player1, player2) -> "Player 1 Wins!"
+      beats?(player2, player1) -> "Player 2 Wins!"
+      player1 == player2 -> "Draw!"
+    end
   end
 end
+
+RockPaperScissorsLizardSpock.play()
 ```
 
 ## Mark As Completed
