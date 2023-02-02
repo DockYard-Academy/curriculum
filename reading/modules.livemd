@@ -97,7 +97,7 @@ We can use `binding()` to get a keyword list of all bound values. We commonly us
 
 ```elixir
 defmodule MultiParamExample do
-  def call(param1, param2, param3) do
+  def call(param2, param3, param4) do
     IO.inspect(binding(), label: "Called with the following bindings")
   end
 end
@@ -110,7 +110,7 @@ MultiParamExample.call("argument1", "argument2", "argument3")
 Call the `MutliParamExample` with different arguments.
 
 ```elixir
-
+MultiParamExample.call("argument1", "argument2", "argument3")
 ```
 
 ## Internal Module Functions
@@ -308,7 +308,13 @@ end
 Enter your solution below.
 
 ```elixir
+defmodule Languages.German do
+  def greeting do
+    "Guten Tag"
+  end
+end
 
+Languages.German.greeting()
 ```
 
 ### Nested Modules
@@ -347,8 +353,8 @@ We use the `@` symbol to define a compile-time module attribute.
 
 ```elixir
 defmodule Hero do
-  @name "Spider-Man"
-  @nemesis "Green Goblin"
+  @name "Super-Man"
+  @nemesis "Joker"
 
   def introduce do
     "Hello, my name is #{@name}!"
@@ -467,7 +473,7 @@ defmodule MultipleFunctionClauses do
   end
 end
 
-MultipleFunctionClauses.my_function(1)
+MultipleFunctionClauses.my_function(2)
 ```
 
 Each function clause has a different **arity**. We can treat each function with a different arity as a completely separate function. In Elixir, we ofen refer to functions by their name and arity.
@@ -506,7 +512,29 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  @moduledoc """
+  Documented Module
+  Module with add functions
+  """
 
+  @doc """
+  Add with 2 parameters
+  """
+
+  def add(int1, int2) do
+    int1 + int2
+  end
+
+  @doc """
+  Add with 3 parameters
+  """
+  def add(param1, param2, param3) do
+    param1 + param2 + param3
+  end
+end
+
+Math.add(1, 2, 3)
 ```
 
 ## Default Arguments
@@ -573,7 +601,13 @@ Greeting.hello("Andrew")
 ```
 
 ```elixir
+defmodule Greeting do
+  def hello(param1 \\ "hello fred") do
+    param1
+  end
+end
 
+Greeting.hello()
 ```
 
 ## Documentation
@@ -698,13 +732,13 @@ Uncomment the following code and evaluate the cell to see an example. Re-comment
 
 #   ## Examples
 
-#     iex> {} = DoctestCrash.crash()
+#   iex> {} = DoctestCrash.crash()
 #     "2"
 #   """
-#   def crash do
+def crash do
+end
 
-#   end
-# end
+DoctestCrash.crash()
 ```
 
 ### Your Turn
