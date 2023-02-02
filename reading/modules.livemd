@@ -308,7 +308,13 @@ end
 Enter your solution below.
 
 ```elixir
+defmodule Languages.German do
+  def greeting do
+    "Guten Tag"
+  end
+end
 
+Languages.German.greeting()
 ```
 
 ### Nested Modules
@@ -347,8 +353,8 @@ We use the `@` symbol to define a compile-time module attribute.
 
 ```elixir
 defmodule Hero do
-  @name "Spider-Man"
-  @nemesis "Green Goblin"
+  @name "Batman"
+  @nemesis "Penguin"
 
   def introduce do
     "Hello, my name is #{@name}!"
@@ -506,7 +512,29 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  @moduledoc """
+  Math Module
+  Module demonstrates 2 functions with same name and different arity
+  """
 
+  @doc """
+  add/2
+  """
+  def add(a, b) do
+    a + b
+  end
+
+  @doc """
+  add/3
+  """
+  def add(a, b, c) do
+    a + b + c
+  end
+end
+
+Math.add(2, 3)
+Math.add(2, 3, 4)
 ```
 
 ## Default Arguments
@@ -573,7 +601,14 @@ Greeting.hello("Andrew")
 ```
 
 ```elixir
+defmodule Greeting do
+  def hello(name \\ "fubar") do
+    "Hello #{name}"
+  end
+end
 
+Greeting.hello("extra fubar")
+Greeting.hello()
 ```
 
 ## Documentation
@@ -658,7 +693,7 @@ defmodule DoctestFailure do
     "expected return value"
   """
   def test do
-    "actual return value"
+    "expected return value"
   end
 end
 ```
@@ -686,25 +721,27 @@ If this is the case, you either have to fix your code, or remove/comment the cra
 Uncomment the following code and evaluate the cell to see an example. Re-comment your code to avoid crashing the livebook as you continue with the lesson.
 
 ```elixir
-# defmodule DoctestCrash do
-#   @moduledoc """
-#   DoctestCrash
+defmodule DoctestCrash do
+  @moduledoc """
+  DoctestCrash
 
-#   Explains doctest crashes with examples
-#   """
+  Explains doctest crashes with examples
+  """
 
-#   @doc """
-#   Purposely crashes doctest using invalid pattern matching
+  @doc """
+  Purposely crashes doctest using invalid pattern matching
 
-#   ## Examples
+  ## Examples
 
-#     iex> {} = DoctestCrash.crash()
-#     "2"
-#   """
-#   def crash do
+    iex> DoctestCrash.crash()
+    "2"
+  """
+  def crash do
+    "2"
+  end
+end
 
-#   end
-# end
+DoctestCrash.crash()
 ```
 
 ### Your Turn
