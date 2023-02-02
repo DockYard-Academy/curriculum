@@ -82,7 +82,20 @@ defmodule RockPaperScissorsLizardSpock do
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :rock)
     false
   """
+
   def beats?(guess1, guess2) do
+    {guess1, guess2} in [
+      {:rock, :scissors},
+      {:paper, :rock},
+      {:scissors, :paper},
+      {:rock, :lizard},
+      {:lizard, :spock},
+      {:spock, :scissors},
+      {:scissors, :lizard},
+      {:lizard, :paper},
+      {:paper, :spock},
+      {:spock, :rock}
+    ]
   end
 
   @doc """
@@ -100,6 +113,11 @@ defmodule RockPaperScissorsLizardSpock do
     "Draw"
   """
   def play(player1, player2) do
+    cond do
+      beats?(player1, player2) -> "Player 1 Wins!"
+      beats?(player2, player1) -> "Player 2 Wins!"
+      true -> "Draw"
+    end
   end
 end
 ```
