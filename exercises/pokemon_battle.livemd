@@ -133,14 +133,14 @@ defmodule Pokemon do
     {type1, type2} in [{:fire, :grass}, {:grass, :water}, {:water, :fire}]
   end
 
-  defp disadvantage?(type1, type2) do
-    {type1, type2} in [{:fire, :water}, {:grass, :fire}, {:water, :grass}]
-  end
+  # defp disadvantage?(type1, type2) do
+  #   {type1, type2} in [{:fire, :water}, {:grass, :fire}, {:water, :grass}]
+  # end
 
   defp bonus(type1, type2) do
     cond do
       advantage?(type1, type2) -> 2
-      disadvantage?(type1, type2) -> 0.5
+      advantage?(type2, type1) -> 0.5
       type1 == type2 -> 1
     end
   end
