@@ -120,11 +120,11 @@ defmodule VoterTally do
     iex> VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
     %{dog: 2, cat: 3, bird: 1}
   """
+
+  # Learned significance of Map.update/4 from ChatGPT
   def tally(votes) do
-    Enum.reduce(votes, %{dog: 0, cat: 0, bird: 0}, fn animal, acc ->
-      Map.put(acc, animal, acc[animal] + 1)
-      # can this be done with map update syntax? 
-      # %{acc | animal => animal + 1}
+    Enum.reduce(votes, %{}, fn animal, acc ->
+      Map.update(acc, animal, 1, fn count -> count + 1 end)
     end)
   end
 end
@@ -132,6 +132,10 @@ end
 
 ```elixir
 VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
+
+m = %{a: 1, b: 2, c: 4}
+
+Map.put(m, :e, 3)
 ```
 
 ## Mark As Completed
