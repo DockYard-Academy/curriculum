@@ -76,9 +76,44 @@ defmodule FizzBuzz do
     iex> FizzBuzz.run(10..15)
     ["buzz", 11, "fizz", 13, 14, "fizzbuzz"]
   """
+
   def run(range) do
+    Enum.map(range, fn number ->
+      case {rem(number, 3), rem(number, 5)} do
+        {0, 0} -> "fizzbuzz"
+        {0, _} -> "fizz"
+        {_, 0} -> "buzz"
+        _ -> number
+      end
+    end)
+  end
+
+  def run2(range) do
+    Enum.reduce(range, [], fn number, acc ->
+      cond do
+        rem(number, 3) == 0 && rem(number, 5) == 0 -> ["fizzbuzz" | acc]
+        rem(number, 3) == 0 -> ["fizz" | acc]
+        rem(number, 5) == 0 -> ["buzz" | acc]
+        true -> [number | acc]
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  def run3(range) do
+    for n <- range do
+      fizz = rem(n, 3) == 0
+      buzz = rem(n, 5) == 0
+
+      [(fizz * "Fizz") <> (buzz * "Buzz") <> ((not fizz and not buzz) * to_string(n))]
+    end
   end
 end
+```
+
+```elixir
+FizzBuzz.run(1..100)
+FizzBuzz.run2(1..100)
 ```
 
 ## Mark As Completed
