@@ -69,6 +69,9 @@ Then implement the `Character` functions to generate dialogue according to the d
 
 ```elixir
 defmodule Character do
+  @enforce_keys [:name, "Frodo"]
+  defstruct @enforce_keys ++ [:class, :weapon]
+
   @moduledoc """
   Character
 
@@ -82,7 +85,12 @@ defmodule Character do
   iex> %Character{name: "Frodo"}
   ** (ArgumentError) the following keys must also be given when building struct Character: [:name]
   """
-  defstruct []
+  # defstruct []
+  def character do
+    aragorn = %Character{name: "Aragorn", class: "ranger", weapon: "sword"}
+    gandalf = %Character{name: "Gandalf", class: "wizard", weapon: "staff"}
+    gimli = %Character{name: "Gimli", class: "warrior", weapon: "axe"}
+  end
 
   @doc """
   Introduce the character by name.
@@ -96,6 +104,7 @@ defmodule Character do
     "My name is Aragorn."
   """
   def introduce(character) do
+    "My name is #{character.name}."
   end
 
   @doc """
@@ -110,6 +119,7 @@ defmodule Character do
     "I attack with my sword!"
   """
   def attack(character) do
+    "I attack with my #{character.weapon}!"
   end
 
   @doc """
@@ -124,6 +134,7 @@ defmodule Character do
     "I am a ranger."
   """
   def class(character) do
+    "I am a #{character.class}"
   end
 
   @doc """
@@ -138,6 +149,7 @@ defmodule Character do
     "My name is Aragorn and I am a ranger!"
   """
   def war_cry(character) do
+    "My name is #{character.name} and I am a #{character.class}!"
   end
 
   @doc """
@@ -151,7 +163,9 @@ defmodule Character do
     iex> Character.defeat(%Character{name: "Aragorn"}, %Character{name: "Gimli", class: "warrior"})
     "My name is Aragorn and I have defeated the warrior Gimli!"
   """
+
   def defeat(character1, character2) do
+    "My name is #{character1.name} and I have defeated the #{character2.class} #{character2.name}!"
   end
 end
 ```

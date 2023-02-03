@@ -76,14 +76,31 @@ defmodule RockPaperScissorsLizardSpock do
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :lizard)
     true
 
-    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
-    false
+     iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
+     false
 
     iex> RockPaperScissorsLizardSpock.beats?(:rock, :rock)
     false
   """
-  def beats?(guess1, guess2) do
+
+  def beats?(throw1, throw2) do
+    case {throw1, throw2} do
+      {:rock, :scissors} -> true
+      {:scissors, :paper} -> true
+      {:rock, :lizard} -> true
+      {:lizard, :spock} -> true
+      {:paper, :rock} -> true
+      {:spock, :scissors} -> true
+      {:scissors, :lizard} -> true
+      {:lizard, :paper} -> true
+      {:paper, :spock} -> true
+      {:spock, :rock} -> true
+      _ -> false
+    end
   end
+
+  # player1 = Enum.random(["rock", "paper", "scissors", "lizard", "spock"])
+  # player2 = Enum.random(["rock", "paper", "scissors", "lizard", "spock"])
 
   @doc """
   Return "Player 1 Wins!", "Player 2 Wins!", or "Draw" depending on which player guess won.
@@ -97,9 +114,14 @@ defmodule RockPaperScissorsLizardSpock do
     "Player 2 Wins!"
 
     iex> RockPaperScissorsLizardSpock.play(:lizard, :lizard)
-    "Player 2 Wins!"
+    "Player Draws!"
   """
-  def play(player1, player2) do
+  def play(player1_guess, player2) do
+    cond do
+      player1 == player2 -> "Player Draws!"
+      beats?(player1, player2) == true -> "Player 1 Wins!"
+      beats?(player1, player2) == false -> "Player 2 Wins!"
+    end
   end
 end
 ```
