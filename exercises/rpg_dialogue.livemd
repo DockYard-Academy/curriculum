@@ -79,10 +79,10 @@ defmodule Character do
 
   The :name key is required.
 
-  iex> %Character{name: "Frodo"}
-  ** (ArgumentError) the following keys must also be given when building struct Character: [:name]
+
   """
-  defstruct []
+  @enforce_keys [:name]
+  defstruct [:name, :class, :weapon]
 
   @doc """
   Introduce the character by name.
@@ -96,6 +96,7 @@ defmodule Character do
     "My name is Aragorn."
   """
   def introduce(character) do
+    "My name is #{character.name}."
   end
 
   @doc """
@@ -110,6 +111,7 @@ defmodule Character do
     "I attack with my sword!"
   """
   def attack(character) do
+    "I attack with my #{character.weapon}!"
   end
 
   @doc """
@@ -124,6 +126,7 @@ defmodule Character do
     "I am a ranger."
   """
   def class(character) do
+    "I am a #{character.class}."
   end
 
   @doc """
@@ -138,6 +141,7 @@ defmodule Character do
     "My name is Aragorn and I am a ranger!"
   """
   def war_cry(character) do
+    "My name is #{character.name} and I am a #{character.class}!"
   end
 
   @doc """
@@ -152,6 +156,7 @@ defmodule Character do
     "My name is Aragorn and I have defeated the warrior Gimli!"
   """
   def defeat(character1, character2) do
+    "My name is #{character1.name} and I have defeated the #{character2.class} #{character2.name}!"
   end
 end
 ```
@@ -198,7 +203,9 @@ Character.introduce(aragorn)
 Enter your solution below.
 
 ```elixir
-
+aragorn = %Character{name: "Aragorn", class: "ranger", weapon: "sword"}
+gandalf = %Character{name: "Gandalf", class: "wizard", weapon: "staff"}
+gimli = %Character{name: "Gimli", class: "warrior", weapon: "axe"}
 ```
 
 ### Bonus: Handle `nil` Fields.
@@ -286,3 +293,7 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 | Previous                                                                                 | Next                                                 |
 | ---------------------------------------------------------------------------------------- | ---------------------------------------------------: |
 | [Rock Paper Scissors Lizard Spock](../exercises/rock_paper_scissors_lizard_spock.livemd) | [Pokemon Battle](../exercises/pokemon_battle.livemd) |
+
+```elixir
+
+```

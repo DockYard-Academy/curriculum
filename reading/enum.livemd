@@ -530,6 +530,70 @@ odd_numbers = Enum.filter(1..10, fn integer -> rem(integer, 2) != 0 end)
 Enter your solution below.
 
 ```elixir
+evens =
+  1..10
+  |> Enum.filter(&(rem(&1, 2) == 0))
+
+odds =
+  1..10
+  |> Enum.filter(&(rem(&1, 2) == 1))
+
+{evens, odds}
+
+{evens, odds} =
+  Enum.reduce(1..10, {[], []}, fn x, {evens, odds} ->
+    case rem(x, 2) do
+      0 -> {[x | evens], odds}
+      1 -> {evens, [x | odds]}
+    end
+
+    # {acc.list1, acc.list2} =
+    # if rem(x, 2) == 0 do 
+    #   %{acc | list2: [x | acc.list2]}
+    # else
+    #   %{acc | list1: [x | acc.list1]}
+    # end
+  end)
+
+# |> Tuple.to_list
+# |> Enum.map(&Enum.reverse/1)
+# |> List.to_tuple()
+
+{evens, odds} = {Enum.reverse(evens), Enum.reverse(odds)}
+```
+
+```elixir
+Enum.map({}, fn -> nil end)
+```
+
+```elixir
+tuple = Enum.to_list(1..10) |> List.to_tuple()
+elem(tuple, 9)
+```
+
+```elixir
+1..10
+|> Enum.split_with(fn num -> rem(num, 2) == 0 end)
+```
+
+```elixir
+evens = for num <- 1..10, rem(num, 2) == 0, do: num
+odds = for num <- 1..10, rem(num, 2) == 1, do: num
+{evens, odds}
+```
+
+```elixir
+1..10
+|> Enum.reduce({[], []}, fn num, {evens, odds} ->
+  case rem(num, 2) do
+    0 -> {[num | evens], odds}
+    1 -> {evens, [num | odds]}
+  end
+end)
+```
+
+```elixir
+{for num <- 1..10, rem(num, 2) == 0, do: num, for num <- 1..10, rem(num, 2) != 0, do: num}
 
 ```
 
@@ -584,7 +648,9 @@ Enum.all?(1..10_000_000, fn integer -> is_integer(integer) end)
 Use [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) to determine if all of the `colors` in this list of colors are `:green`. You may change the value of `colors` to experiment with [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2).
 
 ```elixir
-colors = [:green, :green, :red]
+colors =
+  [:green, :green, :green]
+  |> Enum.all?(&(&1 == :green))
 ```
 
 ## Enum.any/2
@@ -629,6 +695,7 @@ Use [Enum.any/2](https://hexdocs.pm/elixir/Enum.html#any/2) to determine if any 
 
 ```elixir
 [:cats, :dogs, :bears, :lions, :penguins]
+|> Enum.any?(&(&1 == :dogs))
 ```
 
 ## Enum.count/1
@@ -642,6 +709,8 @@ flowchart LR
 
 ```elixir
 Enum.count([1, 2, 3])
+
+String.length("123")
 ```
 
 The type of elements does not matter. Collections with multiple elements still only count as a single individual element.
@@ -655,7 +724,9 @@ Enum.count([{}, "hello", %{}, [[[]]]])
 In the Elixir cell below, count the number of elements in the `collection`. It should return `5`.
 
 ```elixir
-collection = [1, 2, 3, 4, 5]
+collection =
+  [1, 2, 3, 4, 5]
+  |> Enum.count()
 ```
 
 ## Enum.find/3
@@ -684,6 +755,11 @@ Use [Enum.find/2](https://hexdocs.pm/elixir/Enum.html#find/2) to find the first 
 
 ```elixir
 [1, "2", "three", 4, "five", 6]
+|> Enum.find(fn num -> is_integer(num) and rem(num, 2) == 0 end)
+```
+
+```elixir
+"hello" && "yo"
 ```
 
 ## Enum.random/1
@@ -710,7 +786,8 @@ Enum.map(1..10, fn _ -> Enum.random(0..9) end)
 Enter your solution below.
 
 ```elixir
-
+1..10
+|> Enum.random()
 ```
 
 ## Capture Operator and Module Functions
