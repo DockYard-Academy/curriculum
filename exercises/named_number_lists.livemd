@@ -75,7 +75,25 @@ flowchart
 Enter your solution below.
 
 ```elixir
+random_list = Enum.map(1..10, fn _int -> Enum.random(0..9) end)
+IO.inspect(random_list, label: "Random list")
 
+int_to_int_name = fn int ->
+  case int do
+    0 -> "zero"
+    1 -> "one"
+    2 -> "two"
+    3 -> "three"
+    4 -> "four"
+    5 -> "five"
+    6 -> "six"
+    7 -> "seven"
+    8 -> "eight"
+    9 -> "nine"
+  end
+end
+
+Enum.map(random_list, fn int -> int_to_int_name.(int) end)
 ```
 
 ## Mark As Completed
