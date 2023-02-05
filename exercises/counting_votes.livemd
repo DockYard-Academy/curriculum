@@ -79,7 +79,15 @@ defmodule Votes do
     iex> Votes.count([:apples, :oranges, :apples, :cats], :birds)
     0
   """
+  @spec count([atom()], atom()) :: non_neg_integer()
   def count(votes, vote) do
+    Enum.filter(votes, fn atom -> atom == vote end)
+    |> Enum.count()
+
+    # Enum.reduce(votes, 0, fn
+    #   atom, acc when atom === vote -> acc + 1
+    #   _atom, acc -> acc
+    # end)
   end
 end
 ```
@@ -118,8 +126,17 @@ defmodule VoterTally do
 
     iex> VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
     %{dog: 2, cat: 3, bird: 1}
+
+    iex> VoterTally.tally([:cat, :dog, :dog, :monkey, :cat, :cat, :cat, :bird, :monkey])
+    %{dog: 2, cat: 4, bird: 1, monkey: 2}
   """
   def tally(votes) do
+    Enum.reduce(votes, %{}, fn vote, acc ->
+      case Map.has_key?(acc, vote) do
+        true -> %{acc | vote => acc[vote] + 1}
+        false -> Map.put(acc, vote, 1)
+      end
+    end)
   end
 end
 ```
