@@ -70,6 +70,11 @@ defmodule Measurements do
     1
   """
   def increased(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.reduce(0, fn
+      [int1, int2], acc when int2 - int1 > 0 -> acc + 1
+      _chunk, acc -> acc
+    end)
   end
 
   @doc """
@@ -84,6 +89,8 @@ defmodule Measurements do
     [10, -10, 30]
   """
   def increments(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.map(fn [int1, int2] -> int2 - int1 end)
   end
 
   @doc """
@@ -99,6 +106,9 @@ defmodule Measurements do
     40
   """
   def increased_by(measurements) do
+    increments(measurements)
+    |> Enum.filter(fn elem -> elem > 0 end)
+    |> Enum.sum()
   end
 
   @doc """
@@ -114,6 +124,9 @@ defmodule Measurements do
     6
   """
   def average(measurements) do
+    sum = Enum.sum(measurements)
+    length = length(measurements)
+    div(sum, length)
   end
 end
 ```
