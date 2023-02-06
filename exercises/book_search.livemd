@@ -30,6 +30,8 @@ defmodule Book do
     iex> %Book{title: "My Book Title"}
     %Book{title: "My Book Title"}
   """
+  @enforce_keys [:title]
+  defstruct @enforce_keys
 
   @doc """
   Search a list of Book structs. Search should match any book that includes the
@@ -59,6 +61,7 @@ defmodule Book do
     [%Book{title: "ABC"}]
   """
   def search(books, query) do
+    Enum.filter(books, fn book -> Book[:title] == query end)
   end
 end
 ```

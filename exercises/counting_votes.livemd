@@ -80,6 +80,7 @@ defmodule Votes do
     0
   """
   def count(votes, vote) do
+    Enum.count(Enum.filter(votes, fn item -> item == vote end))
   end
 end
 ```
@@ -120,6 +121,14 @@ defmodule VoterTally do
     %{dog: 2, cat: 3, bird: 1}
   """
   def tally(votes) do
+    for {:dog, dogs}, {:cat, cats}, {:bird, birds} <- [votes] do
+      %{dog: dogs, cat: cats, bird: birds}
+    end
+
+    # dogs = Enum.count(Enum.filter(votes, fn item -> item == :dog end))
+    # cats = Enum.count(Enum.filter(votes, fn item -> item == :cat end))
+    # birds = Enum.count(Enum.filter(votes, fn item -> item == :bird end))
+    # %{dog: dogs, cat: cats, bird: birds}
   end
 end
 ```

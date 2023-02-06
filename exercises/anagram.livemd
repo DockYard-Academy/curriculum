@@ -67,6 +67,7 @@ defmodule Anagram do
     true
   """
   def anagram?(string1, string2) do
+    String.to_charlist(string1) |> Enum.sort() == String.to_charlist(string2) |> Enum.sort()
   end
 
   @doc """
@@ -84,6 +85,7 @@ defmodule Anagram do
     []
   """
   def filter_anagrams(word_list, anagram) do
+    Enum.filter(word_list, fn word -> anagram?(word, anagram) end)
   end
 end
 ```

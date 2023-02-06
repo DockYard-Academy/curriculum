@@ -108,6 +108,7 @@ Use [Kernel.elem/2](https://hexdocs.pm/elixir/Kernel.html#elem/2) to retrieve `1
 
 ```elixir
 tuple = {0, 4, 1, 100, 5, 7}
+elem(tuple, 3)
 ```
 
 ## Checking Types
@@ -149,31 +150,31 @@ is_atom(:example)
 ```
 
 ```elixir
-%{}
+is_map(%{})
 ```
 
 ```elixir
-{}
+is_map({})
 ```
 
 ```elixir
-[]
+is_list([])
 ```
 
 ```elixir
-true
+is_boolean(true)
 ```
 
 ```elixir
-1.0
+is_float(1.0)
 ```
 
 ```elixir
-1
+is_integer(1)
 ```
 
 ```elixir
-""
+is_binary("")
 ```
 
 The [Kernel](https://hexdocs.pm/elixir/Kernel.html) is reasonably large. Remember, our goal is not to memorize every function but to develop familiarity with repeated practice.
@@ -213,8 +214,10 @@ Created a `capped_seconds` variable that uses the value of `seconds` and cannot 
 Enter your solution below. if `seconds` is less than `0` `capped_seconds` should be `0`. If `seconds` is greater than `59`, then `capped_seconds` should be `59`.
 
 ```elixir
-seconds = 60
-capped_seconds = nil
+seconds = 20
+# min(seconds, 59)
+# max(seconds, 0)
+capped_seconds = max(min(seconds, 59), 0)
 ```
 
 ## Safe Inspection
@@ -264,7 +267,8 @@ map = %{}
 list = [1, 2, 3]
 tuple = {1, 2, 3}
 
-""
+# ""
+inspect(tuple)
 ```
 
 ## The Integer Module
@@ -345,7 +349,7 @@ Use the [Integer.gcd/2](https://hexdocs.pm/elixir/Integer.html#gcd/2) function t
 positive integer that divides both 10 and 15 evenly, so the result should be `5`.
 
 ```elixir
-
+Integer.gcd(10, 15)
 ```
 
 ## The String Module
@@ -427,7 +431,7 @@ Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to ge
 </details>
 
 ```elixir
-"hello"
+String.at("hello", 2)
 ```
 
 Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to retrieve the letter `"o"` in `"hello"`
