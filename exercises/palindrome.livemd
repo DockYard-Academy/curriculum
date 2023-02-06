@@ -47,6 +47,10 @@ end
 Implement the `Palindrome` module as documented below.
 
 ```elixir
+String.split("abcde", "", trim: true)
+```
+
+```elixir
 defmodule Palindrome do
   @moduledoc """
   Documentation for `Palindrome`.
@@ -70,6 +74,13 @@ defmodule Palindrome do
     false
   """
   def palindrome?(string) do
+    string === reverse(string)
+  end
+
+  defp reverse(string) do
+    String.split(string, "", trim: true)
+    |> Enum.reverse()
+    |> Enum.join()
   end
 end
 ```
