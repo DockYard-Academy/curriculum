@@ -57,7 +57,7 @@ Integer.digits(123)
 In the Elixir cell below, convert the integer `4389` into a list of digits.
 
 ```elixir
-
+Integer.digits(4389)
 ```
 
 ### Undigits
@@ -138,7 +138,7 @@ Now your string is an enumerable list of characters.
 In the Elixir cell below, convert the string `"Hello, world!"` into a list of single characters.
 
 ```elixir
-
+String.split("Hello, world!", "", trim: true)
 ```
 
 ### Joining Strings
@@ -158,7 +158,7 @@ Enum.join(["a", "b", "c"])
 Alternatively we can join the strings by some joining character.
 
 ```elixir
-Enum.join(["a", "b", "c"], "_")
+Enum.join(["a", "b", "c"], "")
 ```
 
 We can use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) and [Enum.join/2](https://hexdocs.pm/elixir/Enum.html#join/2) in combination with each other to split strings, enumerate over them applying some transformation, and then rejoining them.
@@ -216,8 +216,12 @@ defmodule CharacterCount do
       4
   """
   def count(string) do
+    String.split(string, "", trim: true)
+    |> Enum.count()
   end
 end
+
+CharacterCount.count("abcd")
 ```
 
 ## Further Reading
