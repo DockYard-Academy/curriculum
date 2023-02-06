@@ -74,6 +74,48 @@ defmodule Palindrome do
 end
 ```
 
+```elixir
+# # comprehensions, enumerating on non-enumerables
+# original = "fred"
+
+# # custom solution
+# reversed = original |> String.split("", trim: true) |> Enum.reverse() |> Enum.join()
+
+# # built in solution
+# reversed = String.reverse(original)
+
+# is_palindrome = original == reversed
+
+defmodule Palindrome1 do
+  @moduledoc """
+  Documentation for `Palindrome`.
+  """
+
+  @doc """
+  Determine if two strings are anagrams.
+
+  ## Examples
+
+    iex> Palindrome1.palindrome?("baab")
+    true
+
+    iex> Palindrome1.palindrome?("racecar")
+    true
+
+    iex> Palindrome1.palindrome?("kayak")
+    true
+
+    iex> Palindrome1.palindrome?("apples")
+    false
+  """
+  def palindrome?(string) do
+    string |> String.split("", trim: true) |> Enum.reverse() |> Enum.join() == string
+  end
+end
+
+Palindrome1.palindrome?("baab")
+```
+
 ## Mark As Completed
 
 <!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"palindrome_reading\"\n    \"exercises\" -> \"palindrome_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
