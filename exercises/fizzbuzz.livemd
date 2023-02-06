@@ -57,6 +57,63 @@ FizzBuzz.run(1..15)
 
 Enter your solution below.
 
+```elixir
+# In the Elixir cell below create a Module FizzBuzz with a function run/1 which takes in a range.
+
+# Enumerate through the integers and return a new list where
+
+#     integers divisible by 3 are replaced with fizz
+#     integers divisible by 5 are replaced with buzz
+#     integers divisible by 3 and 5 are replaced with fizzbuzz
+#     integers not matching the above stay the same.
+
+defmodule FizzBuzz do
+  @doc """
+  FizzBuzz.
+
+  ## Examples
+
+   # iex> FizzBuzz.run(1..15)
+   # [1, 2, "fizz", 4, "buzz", "fizz", 7, 8, "fizz", "buzz", 11, "fizz", 13, 14, "fizzbuzz"]
+
+   # iex> FizzBuzz.run(10..15)
+   # ["buzz", 11, "fizz", 13, 14, "fizzbuzz"]
+  """
+  def run(range) do
+    Enum.map(range, fn element ->
+      cond do
+        rem(element, 15) == 0 -> "fizzbuzz"
+        rem(element, 3) == 0 -> "fizz"
+        rem(element, 5) == 0 -> "buzz"
+        true -> element
+      end
+    end)
+
+    #     integers divisible by 3 are replaced with fizz
+    #     integers divisible by 5 are replaced with buzz
+    #     integers divisible by 3 and 5 are replaced with fizzbuzz
+    #     integers not matching the above stay the same.
+  end
+end
+
+FizzBuzz.run(1..15) |> Enum.join(" \n") |> IO.puts()
+```
+
+```elixir
+whichfizz = fn
+  0, 0, _ -> "FizzBuzz"
+  0, _, _ -> "Fizz"
+  _, 0, _ -> "Buzz"
+  _, _, n -> n
+end
+
+fizzbuzz = fn n ->
+  whichfizz.(rem(n, 3), rem(n, 5), n)
+end
+
+Enum.map(1..15, fizzbuzz) |> Enum.join(" \n") |> IO.puts()
+```
+
 <!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=QPZ0pIK_wsc&ab_channel=TomScott\")","title":"FizzBuzz"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir

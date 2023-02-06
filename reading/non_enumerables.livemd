@@ -57,7 +57,7 @@ Integer.digits(123)
 In the Elixir cell below, convert the integer `4389` into a list of digits.
 
 ```elixir
-
+Integer.digits(4389)
 ```
 
 ### Undigits
@@ -111,7 +111,7 @@ For example, we can split a string by every comma like so:
 String.split("a,b,c,d", ",")
 ```
 
-We can split a string into a list of characters by splitting on every empty space `""` This does create an empty string becaused of the start and the end of the list.
+We can split a string into a list of characters by splitting on every empty space `""` This does create an empty string because of the start and the end of the list.
 
 ```elixir
 String.split("abcde", "")
@@ -138,7 +138,7 @@ Now your string is an enumerable list of characters.
 In the Elixir cell below, convert the string `"Hello, world!"` into a list of single characters.
 
 ```elixir
-
+String.split("Helloworld", "", trim: true)
 ```
 
 ### Joining Strings
@@ -209,15 +209,19 @@ defmodule CharacterCount do
 
   ## Examples
 
-      iex> CharacterCount.count("abc")
-      3
+      #iex> CharacterCount.count("abc")
+      #3
 
-      iex> CharacterCount.count("abcd")
-      4
+      #iex> CharacterCount.count("abcd")
+      #4
   """
   def count(string) do
+    string
+    |> String.length()
   end
 end
+
+CharacterCount.count("abcd")
 ```
 
 ## Further Reading
