@@ -90,6 +90,8 @@ defmodule Pokemon do
   @enforce_keys [:name, :type, :health, :attack, :speed]
   defstruct [:name, :type, :speed, health: 20, attack: 5]
 
+  @advantageous_matchups [{:fire, :grass}, {:grass, :water}, {:water, :fire}]
+
   @doc """
   subtract the attack damage of an attacker from the defender's health.
   return an updated pokemon struct, and take type advantage into consideration.
@@ -118,19 +120,13 @@ defmodule Pokemon do
     %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
   """
   def attack(attacker, defender) do
-    updated_health = defender.health - bonus(attacker.type, defender.type) * attacker.attack
-
-    %Pokemon{
-      name: defender.name,
-      type: defender.type,
-      health: updated_health,
-      attack: defender.attack,
-      speed: defender.speed
-    }
+    # updated_health = defender.health - (bonus(attacker.type, defender.type) * attacker.attack)
+    # %Pokemon{name: defender.name, type: defender.type, health: updated_health, attack: defender.attack, speed: defender.speed}
+    %{defender | health: defender.health - bonus(attacker.type, defender.type) * attacker.attack}
   end
 
   defp advantage?(type1, type2) do
-    {type1, type2} in [{:fire, :grass}, {:grass, :water}, {:water, :fire}]
+    {type1, type2} in @advantageous_matchups
   end
 
   # defp disadvantage?(type1, type2) do
@@ -150,8 +146,8 @@ end
 Consider using the following Elixir cell to test your solution.
 
 ```elixir
-attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
 Pokemon.attack(attacker, defender)
 ```
 
