@@ -64,6 +64,23 @@ Votes.count([:dogs, :dogs, :dogs, :cats, :cats, :birds], :dogs)
 ```
 
 ```elixir
+m = [%{a: 1, b: 2, c: 4}]
+Enum.flat_map(m, fn e -> e end)
+
+k1 = [a: 1]
+k2 = [{:a, 1}]
+
+k1 == k2
+
+nested = [[[[1], [2]], [[3], [4]]], [[5], [6]]]
+
+Enum.map(nested, fn elem -> Enum.flat_map(elem, & &1) end)
+|> Enum.count()
+
+Enum.map_join([1, 2, 3], &(&1 * 2))
+```
+
+```elixir
 defmodule Votes do
   @doc """
   Count the number of votes.
@@ -80,6 +97,7 @@ defmodule Votes do
     0
   """
   def count(votes, vote) do
+    Enum.count(votes, fn animal -> animal == vote end)
   end
 end
 ```
@@ -119,9 +137,26 @@ defmodule VoterTally do
     iex> VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
     %{dog: 2, cat: 3, bird: 1}
   """
+
+  # Learned significance of Map.update/4 from ChatGPT
   def tally(votes) do
+    Enum.reduce(votes, %{}, fn animal, acc ->
+      Map.update(acc, animal, 1, fn count -> count + 1 end)
+    end)
   end
 end
+```
+
+```elixir
+
+```
+
+```elixir
+VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
+
+m = %{a: 1, b: 2, c: 4}
+
+Map.put(m, :e, 3)
 ```
 
 ## Mark As Completed
