@@ -16,7 +16,7 @@ Mix.install([
 
 ## Setup
 
-Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read. (If you are using Firefox remember to turn off "Search for text when you start typing" under Settings/General/Browsing).
 
 ## Review Questions
 
@@ -222,7 +222,11 @@ each generator creates another nested loop and therefore has a significant perfo
 In the Elixir cell below, use a comprehension with a generator of `1..50` to create a list of even integers from `2` to `100`.
 
 ```elixir
+generator = 1..50
 
+for element <- generator do
+  element * 2
+end
 ```
 
 ## Filters
@@ -315,7 +319,17 @@ end
 </details>
 
 ```elixir
+# You are given three generators that are ranges of numbers from 1..7.
 
+# Find every trio of numbers in each range that when added together equals seven.
+# Inputs
+# Create 3 generators (groups) = a, b, c
+# eg. a <- 1..7, b <- 1..7, c -> 1..7 then add each number in each generator a, b, c upto 7
+# then output in a tuple
+
+for a <- 1..7, b <- 1..7, c <- 1..7, a + b + c == 7 do
+  {a, b, c}
+end
 ```
 
 ## Collectables
@@ -394,14 +408,16 @@ end
 </details>
 
 ```elixir
-
+for {key, value} <- %{a: 1, b: 2} do
+  {"#{key}", value}
+end
 ```
 
 ## Why Use A Comprehension?
 
 [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2), and [Enum.filter/2](https://hexdocs.pm/elixir/Enum.html#filter/2) can accomplish all of the same functionality as a comprehension. In general, the [Enum](https://hexdocs.pm/elixir/Enum.html) is more broadly used than comprehensions.
 
-Consider using comprehensions as a refactoring tool to improve the clarity of your code. They are particularely useful for building and generating collections of data. It's typically non-idiomatic to use a comprehension when the [Enum](https://hexdocs.pm/elixir/Enum.html) module would work instead.
+Consider using comprehensions as a refactoring tool to improve the clarity of your code. They are particularely useful for building and generating collections of data. It's typically non-idiomatic (not good practice) to use a comprehension when the [Enum](https://hexdocs.pm/elixir/Enum.html) module would work instead.
 
 Avoid over relying on comprehensions, especially if you're from an Object Oriented Programming background and feel tempted to use comprehensions because they feel like for loops. Comprehensions are not for loops! Instead, consider using comprehensions to refactor and improve your code after you've already written it.
 
@@ -418,7 +434,9 @@ Enum.map(1..5, fn each -> each * 2 end)
 ```
 
 ```elixir
-
+for n <- 1..5 do
+  n * 2
+end
 ```
 
 In the Elixir cell below, convert the following `Enum.reduce` into a comprehension.
@@ -430,7 +448,22 @@ Enum.reduce(["a", "b", "c"], fn each, acc -> acc <> each end)
 ```
 
 ```elixir
+Enum.reduce(["a", "b", "c"], fn each, acc -> acc <> each end)
+```
 
+```elixir
+# input generator is a list
+# ["a", "b", "c"]
+# Output is string "abc"
+
+# for n <- ["a", "b", "c"], do
+#   n
+
+#   |> String.join
+#   # |> Enum.join("#{n}")
+# end
+
+for n <- ["a", "b", "c"], do: "#{n}", into: ""
 ```
 
 In the Elixir cell below, convert the following nested `Enum.map` into a comprehension.
@@ -442,7 +475,20 @@ Enum.map(1..3, fn a -> Enum.map(1..3, fn b -> {a, b} end) end)
 ```
 
 ```elixir
+Enum.map(1..3, fn a -> Enum.map(1..3, fn b -> {a, b} end) end)
+# This produces a list containing 3 lists containing tuples
 
+# for n <- 1..3, do: "#{n}", into: "" 
+
+# for a <- 1..7, b <- 1..7, c <- 1..7, a + b + c == 7 do
+#  {a, b, c}
+# end
+
+for a <- 1..3 do
+  for b <- 1..3 do
+    {a, b}
+  end
+end
 ```
 
 ## Mark As Completed
