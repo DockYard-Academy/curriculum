@@ -190,7 +190,7 @@ treasure_map = %{
   }
 }
 
-treasure_map["south ten paces"][10][:"east three paces"][[1, 2, 3]][{"turn", "right"}][:dig]
+treasure_map["south ten paces"][10][:"east three paces"][[1, 2, 3]][{"turn", "right"}].dig
 ```
 
 ### (Extra Bonus) Update the Treasure Map
@@ -294,8 +294,22 @@ maze = %{
   }
 }
 
-%{_1 => %{_2 => %{_3 => %{_4 => %{_5 => %{_6 => %{_7 => %{_8 => %{_9 => %{_t => exit}}}}}}}}}} =
-  maze
+exit = maze["south"]["east"]["south"]["west"]["south"]["west"]["south"]["east"]["south"]
+
+%{"south" => maze_value} = maze
+%{"east" => mv2} = maze_value
+%{"south" => mv3} = mv2
+%{"west" => mv4} = mv3
+%{"south" => mv5} = mv4
+%{"west" => mv6} = mv5
+%{"south" => mv7} = mv6
+%{"east" => mv8} = mv7
+%{"south" => exit} = mv8
+
+{n, s, e, w} = {"north", "south", "east", "west"}
+
+%{^s => %{^e => %{^s => %{^w => %{^s => %{^w => %{^s => %{^e => %{^s => exit}}}}}}}}} = maze
+exit
 ```
 
 ## BONUS: Create Your Own Maze

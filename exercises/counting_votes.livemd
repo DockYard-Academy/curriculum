@@ -64,6 +64,23 @@ Votes.count([:dogs, :dogs, :dogs, :cats, :cats, :birds], :dogs)
 ```
 
 ```elixir
+m = [%{a: 1, b: 2, c: 4}]
+Enum.flat_map(m, fn e -> e end)
+
+k1 = [a: 1]
+k2 = [{:a, 1}]
+
+k1 == k2
+
+nested = [[[[1], [2]], [[3], [4]]], [[5], [6]]]
+
+Enum.map(nested, fn elem -> Enum.flat_map(elem, & &1) end)
+|> Enum.count()
+
+Enum.map_join([1, 2, 3], &(&1 * 2))
+```
+
+```elixir
 defmodule Votes do
   @doc """
   Count the number of votes.
@@ -128,6 +145,10 @@ defmodule VoterTally do
     end)
   end
 end
+```
+
+```elixir
+
 ```
 
 ```elixir

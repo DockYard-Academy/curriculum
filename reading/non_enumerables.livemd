@@ -57,7 +57,7 @@ Integer.digits(123)
 In the Elixir cell below, convert the integer `4389` into a list of digits.
 
 ```elixir
-
+Integer.digits(4389)
 ```
 
 ### Undigits
@@ -138,7 +138,7 @@ Now your string is an enumerable list of characters.
 In the Elixir cell below, convert the string `"Hello, world!"` into a list of single characters.
 
 ```elixir
-
+String.split("Hello, world!", "", trim: true)
 ```
 
 ### Joining Strings
@@ -169,11 +169,9 @@ Here's a simple example of replacing all characters other than spaces with `"X"`
 split_string = String.split("secret information", "")
 
 transformed_list =
-  Enum.map(split_string, fn char ->
-    case char do
-      " " -> " "
-      _ -> "X"
-    end
+  Enum.map(split_string, fn
+    " " -> " "
+    _ -> "X"
   end)
 
 joined_string = Enum.join(transformed_list)
@@ -216,6 +214,9 @@ defmodule CharacterCount do
       4
   """
   def count(string) do
+    # String.length(string)
+    String.split(string, "", trim: true)
+    |> Enum.count()
   end
 end
 ```
