@@ -30,6 +30,7 @@ defmodule Book do
     iex> %Book{title: "My Book Title"}
     %Book{title: "My Book Title"}
   """
+  defstruct [:title]
 
   @doc """
   Search a list of Book structs. Search should match any book that includes the
@@ -59,6 +60,13 @@ defmodule Book do
     [%Book{title: "ABC"}]
   """
   def search(books, query) do
+    Enum.filter(books, fn book -> contains?(book.title, query) end)
+  end
+
+  defp contains?(string, query) do
+    string = String.downcase(string)
+    query = String.downcase(query)
+    String.contains?(string, query)
   end
 end
 ```
