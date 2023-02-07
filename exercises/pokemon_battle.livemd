@@ -134,10 +134,21 @@ defmodule Pokemon_play do
 
   def attack(attacker, defender) do
     cond do
-      attacker.type = defender.type -> IO.puts(defender)
-      {attacker.type, defender.type} in @disadvantages -> subtract_half()
-      {attacker.type, defender.type} in @advantages -> subtract_double()
+      attacker.type == defender.type -> IO.puts(defender)
+      {attacker.type, defender.type} in @disadvantages -> subtract_half(attacker, defender)
+      {attacker.type, defender.type} in @advantages -> subtract_double(attacker, defender)
+      true -> IO.puts("attack fail!")
     end
+  end
+
+  def subtract_half(attacker, defender) do
+    new_defender = %{defender | health: attacker.attack / 2}
+    new_defender
+  end
+
+  def subtract_double(attacker, defender) do
+    new_defender = %{defender | health: attacker.attack * 2}
+    new_defender
   end
 end
 
@@ -146,11 +157,15 @@ defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, spee
 Pokemon.attack(attacker, defender)
 ```
 
+```elixir
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+Pokemon.attack(attacker, defender)
+```
+
 Consider using the following Elixir cell to test your solution.
 
-```elixir
-
-```
+<!-- livebook:{"break_markdown":true} -->
 
 ### Pokemon Instances
 
