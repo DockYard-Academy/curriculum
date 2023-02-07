@@ -30,8 +30,7 @@ defmodule Book do
     iex> %Book{title: "My Book Title"}
     %Book{title: "My Book Title"}
   """
-  @enforce_keys [:title]
-  defstruct @enforce_keys
+  defstruct [:title]
 
   @doc """
   Search a list of Book structs. Search should match any book that includes the
@@ -40,6 +39,7 @@ defmodule Book do
   ## Examples
 
   Include books that exactly match the search query.
+  # Map.get(map, :title) == query
 
     iex> book1 = %Book{title: "A"}
     iex> book2 = %Book{title: "B"}
@@ -48,6 +48,8 @@ defmodule Book do
     [%Book{title: "A"}]
 
   Include books that partially match the search query.
+  # does the query match any letter of the title?
+  # split the title string and enum.filter over query
 
     iex> Book.search([%Book{title: "ABC"}], "A")
     [%Book{title: "ABC"}]
@@ -56,14 +58,34 @@ defmodule Book do
     [%Book{title: "BAC"}]
 
   Search should be case insensitive.
+  # lowercase the input and title
 
     iex> Book.search([%Book{title: "ABC"}], "a")
     [%Book{title: "ABC"}]
   """
+  def fuzzy_match(string, char) do
+    mysplit = String.split(string, "", trim: true)
+    Enum.filter(mysplit, fn element -> element == char end) && string
+  end
+
   def search(books, query) do
-    Enum.filter(books, fn book -> Book[:title] == query end)
+    # books that exactly match
+    # Enum.filter(books, fn book -> Map.get(book, :title) == query end)
+    book = Enum.filter(books, fn book -> Map.get(book, :title) end)
+    fuzzy_match(book, query)
   end
 end
+```
+
+```elixir
+mytitle = "ABC"
+myquery = "A"
+
+mysplit = String.split(mytitle, "", trim: true)
+# split string
+# filter split string to see if any char == query
+# if filter returns a match then return title
+Enum.filter(mysplit, fn char -> myquery == char end) && mytitle
 ```
 
 ## Mark As Completed
