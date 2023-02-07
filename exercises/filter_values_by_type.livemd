@@ -136,8 +136,7 @@ defmodule Filter do
   """
   def lists(list) do
     list
-    |> Enum.filter(&is_list/1)
-    |> Enum.filter(&(&1 != []))
+    |> Enum.filter(&(is_list(&1) and &1 != []))
   end
 
   @doc """
