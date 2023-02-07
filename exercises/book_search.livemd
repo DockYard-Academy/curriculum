@@ -72,7 +72,7 @@ defmodule Book do
     # books that exactly match
     # Enum.filter(books, fn book -> Map.get(book, :title) == query end)
     book = Enum.filter(books, fn book -> Map.get(book, :title) end)
-    fuzzy_match(book, query)
+    String.contains?(book, query)
   end
 end
 ```
