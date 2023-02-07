@@ -22,6 +22,7 @@ Represent each book as a `Book` struct with `title` key. Then create a `Book.sea
 
 ```elixir
 defmodule Book do
+  defstruct title: nil
   @moduledoc """
   Documentation for `Book`.
 
@@ -58,9 +59,28 @@ defmodule Book do
     iex> Book.search([%Book{title: "ABC"}], "a")
     [%Book{title: "ABC"}]
   """
+
   def search(books, query) do
+    Enum.filter(books, fn book.title -> match?(book.title, query) end)
+  end
+
+  def match? (book, query)
+    String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
   end
 end
+
+```
+
+```elixir
+book1 = %Book{title: "A"}
+book2 = %Book{title: "B"}
+book3 = %Book{title: "C"}
+Book.search([book1, book2, book3], "A")
+
+# Enum.filter([book1, book2, book3], fn book.title -> anagram?(book.title, query) end)
+
+# String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
+# String.to_charlist(string1) |> Enum.sort() == String.to_charlist(string2) |> Enum.sort()
 ```
 
 ## Mark As Completed
