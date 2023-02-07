@@ -46,13 +46,19 @@ end
 ```elixir
 defmodule Anagram do
   @moduledoc """
-  Documentation for `Anagram`.
+  Documentation for Anagram.
   """
 
   @doc """
   Determine if two strings are anagrams.
 
   ## Examples
+
+    iex> Anagram.anagram?("bob", "bob")
+    false
+
+    iex> Anagram.anagram?("it", "sit")
+    false
 
     iex> Anagram.anagram?("abc", "bac")
     true
@@ -66,7 +72,13 @@ defmodule Anagram do
     iex> Anagram.anagram?("robed", "bored")
     true
   """
+
+  def anagram?(string1, string2) when string1 == string2, do: false
+
   def anagram?(string1, string2) do
+    list1 = String.split(string1, "", trim: true)
+    list2 = String.split(string2, "", trim: true)
+    Enum.sort(list1) == Enum.sort(list2)
   end
 
   @doc """
@@ -78,12 +90,13 @@ defmodule Anagram do
     ["abc", "bca"]
 
     iex> Anagram.filter_anagrams(["rams", "mars", "arms", "alarms"], "arms")
-    ["rams", "mars", "arms"]
+    ["rams", "mars"]
 
     iex> Anagram.filter_anagrams(["stop"], "go")
     []
   """
   def filter_anagrams(word_list, anagram) do
+    Enum.filter(word_list, fn elem -> anagram?(elem, anagram) end)
   end
 end
 ```
@@ -113,6 +126,17 @@ defmodule AnagramSolver do
     ["abc", "acb", "bac", "bca", "cab", "cba"]
   """
   def solve(string) do
+    String.split(string, "", trim: true)
+    |> permutations()
+    |> Enum.map(&Enum.join/1)
+  end
+
+  def permutations([]), do: [[]]
+
+  def permutations(list) do
+    for elem <- list, rest <- permutations(list -- [elem]) do
+      [elem | rest]
+    end
   end
 end
 ```
