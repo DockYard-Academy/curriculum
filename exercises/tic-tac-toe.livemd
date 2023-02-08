@@ -125,6 +125,7 @@ defmodule TicTacToe do
   @moduledoc """
     Documentation for `TicTacToe`
   """
+  @symbols ["X", "O"]
 
   @doc """
   Read a coordinate on a board.
@@ -132,6 +133,7 @@ defmodule TicTacToe do
   ## Examples
 
     We've used a board with letter symbols for sake of example.
+  Remember that `Enum.at` can access a list at an index, however our coordinates are flipped
 
     iex> board = [["A", "B", "C"], ["D", "E", "F"], ["G", "H", "I"]]
     iex> TicTacToe.at(board, {0, 0})
@@ -153,7 +155,9 @@ defmodule TicTacToe do
     iex> TicTacToe.at(board, {2, 2})
     "C"
   """
-  def at(board, coordinate) do
+  def at(board, {x, y}) do
+    Enum.at(board, 2 - y)
+    |> Enum.at(x)
   end
 
   @doc """
@@ -176,8 +180,68 @@ defmodule TicTacToe do
   iex> TicTacToe.fill([[nil, "X", nil], [nil, "X", "O"], [nil, nil, "X"]], {2, 2}, "O")
   [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
   """
-  def fill(board, coordinate, symbol) do
+  def fill(board, {x, y} = coordinate, symbol) do
+    if at(board, coordinate) do
+      {:error, :position_occupied}
+    else
+      xs =
+        Enum.at(board, 2 - y)
+        |> List.update_at(x, fn _elem -> symbol end)
+
+      List.update_at(board, 2 - y, fn _elem -> xs end)
+    end
   end
+
+  @doc """
+  Determine if a player has won the game.
+
+  ## Examples
+
+    Row Wins:
+
+    iex> TicTacToe.winner([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+    "X"
+
+    Column Wins:
+
+    iex> TicTacToe.winner([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+    "X"
+
+    Diagonal Wins
+
+    iex> TicTacToe.winner([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+    "X"
+
+    No Winner
+
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+    nil
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, nil, nil]])
+    nil
+  """
+  ## Horizontally
+  def winner([[x, x, x], _, _]) when x in @symbols, do: x
+  def winner([_, [x, x, x], _]) when x in @symbols, do: x
+  def winner([_, _, [x, x, x]]) when x in @symbols, do: x
+  ## Vertically
+  def winner([[x, _, _], [x, _, _], [x, _, _]]) when x in @symbols, do: x
+  def winner([[_, x, _], [_, x, _], [_, x, _]]) when x in @symbols, do: x
+  def winner([[_, _, x], [_, _, x], [_, _, x]]) when x in @symbols, do: x
+  ## Diagonally
+  def winner([[x, _, _], [_, x, _], [_, _, x]]) when x in @symbols, do: x
+  def winner([[_, _, x], [_, x, _], [x, _, _]]) when x in @symbols, do: x
+  ## No winner
+  def winner(_), do: nil
 end
 ```
 
