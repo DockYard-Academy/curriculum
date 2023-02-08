@@ -126,6 +126,9 @@ defmodule TicTacToe do
     Documentation for `TicTacToe`
   """
 
+  @row_index 2
+  @symbols ["X", "O"]
+
   @doc """
   Read a coordinate on a board.
 
@@ -153,7 +156,9 @@ defmodule TicTacToe do
     iex> TicTacToe.at(board, {2, 2})
     "C"
   """
-  def at(board, coordinate) do
+  def at(board, {x, y} = coordinate) do
+    Enum.at(board, @row_index - y)
+    |> Enum.at(x)
   end
 
   @doc """
@@ -176,9 +181,101 @@ defmodule TicTacToe do
   iex> TicTacToe.fill([[nil, "X", nil], [nil, "X", "O"], [nil, nil, "X"]], {2, 2}, "O")
   [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
   """
-  def fill(board, coordinate, symbol) do
+  def fill(board, {x, y} = coordinate, symbol) do
+    if at(board, coordinate) do
+      {:error, "Attempt to insert symbol at already occupied location"}
+    else
+      xs =
+        Enum.at(board, @row_index - y)
+        |> List.update_at(x, fn _elem -> symbol end)
+
+      List.update_at(board, @row_index - y, fn _elem -> xs end)
+    end
+  end
+
+  @doc """
+  Determine if a player has winnerthe game.
+
+  ## Examples
+
+    Row Wins:
+
+    iex> TicTacToe.winner([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+    "X"
+
+    Column Wins:
+
+    iex> TicTacToe.winner([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+    "X"
+
+    Diagonal Wins
+
+    iex> TicTacToe.winner([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+    "X"
+
+    No Winner
+
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+    nil
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, nil, nil]])
+    nil
+
+  """
+
+  def winner([[x, x, x], [_, _, _], [_, _, _]]) when x in @symbols, do: x
+  def winner([[_, _, _], [x, x, x], [_, _, _]]) when x in @symbols, do: x
+  def winner([[_, _, _], [_, _, _], [x, x, x]]) when x in @symbols, do: x
+
+  # vertical winners
+  def winner([[x, _, _], [x, _, _], [x, _, _]]) when x in @symbols, do: x
+  def winner([[_, x, _], [_, x, _], [_, x, _]]) when x in @symbols, do: x
+  def winner([[_, _, x], [_, _, x], [_, _, x]]) when x in @symbols, do: x
+
+  # diagonal winners
+  def winner([[x, _, _], [_, x, _], [_, _, x]]) when x in @symbols, do: x
+  def winner([[_, _, x], [_, x, _], [x, _, _]]) when x in @symbols, do: x
+
+  # no winners
+  def winner(_), do: nil
+
+  # reset board coordinate origin to top left AND
+  # make display fn to rotate board for users
+
+  # reset_coordinates(display(board)) == board
+
+  def rotate([a, b, c]) do
+    [c, b, a]
   end
 end
+```
+
+```elixir
+x = 2
+y = 2
+z = 2
+
+x == y == (y == z)
+```
+
+```elixir
+defp vertical_winner(board) do
+end
+
+def winner([[x, x, x], _, _]), do: x
+
+def winner([_, [x, x, x], _]), do: x
+
+def winner([_, _, [x, x, x]]), do: x
 ```
 
 ### Bonus: Winner
@@ -315,6 +412,12 @@ Determine if a player has won the game.
 """
 def winner(board) do
 end
+```
+
+```elixir
+list = [1, 2, 3]
+
+Enum.at(list, {2, 0})
 ```
 
 ## Mark As Completed
