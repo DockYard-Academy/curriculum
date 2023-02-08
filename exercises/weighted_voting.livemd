@@ -82,12 +82,21 @@ defmodule WeightedVoting do
 
     iex> WeightedVoting.count([dogs: 20, dogs: 10], :dogs)
     30
+
     iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 30], :dogs)
     50
+    
     iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
     40
   """
   def count(votes, vote_to_count) do
+    Enum.reduce(votes, 0, fn {key, value}, acc ->
+      if key == vote_to_count do
+        acc + value
+      else
+        acc
+      end
+    end)
   end
 
   @doc """
@@ -100,13 +109,32 @@ defmodule WeightedVoting do
 
     iex> WeightedVoting.tally([dogs: 20, dogs: 10])
     [dogs: 30]
+
     iex> WeightedVoting.tally([cats: 10, dogs: 20, dogs: 10])
     [cats: 10, dogs: 30]
+
     iex> WeightedVoting.tally([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
     [birds: 20, cats: 30, dogs: 30]
   """
   def tally(votes) do
+    Enum.reduce(votes, [], fn {animal, value}, acc ->
+      Keyword.update(acc, animal, value, fn existing_value ->
+        value + existing_value
+      end)
+    end)
+    |> Enum.sort()
   end
+end
+```
+
+```elixir
+votes = [cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20]
+vote_to_count = :birds
+
+def count(votes, vote_to_count) do
+  Enum.reduce(votes, fn acc, vote_to_count ->
+    IO.inspect(binding())
+  end)
 end
 ```
 

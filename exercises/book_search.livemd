@@ -49,7 +49,7 @@ defmodule Book do
 
   Include books that partially match the search query.
   # does the query match any letter of the title?
-  # split the title string and enum.filter over query
+  # use String.contains(book, query)
 
     iex> Book.search([%Book{title: "ABC"}], "A")
     [%Book{title: "ABC"}]
@@ -63,29 +63,29 @@ defmodule Book do
     iex> Book.search([%Book{title: "ABC"}], "a")
     [%Book{title: "ABC"}]
   """
-  def fuzzy_match(string, char) do
-    mysplit = String.split(string, "", trim: true)
-    Enum.filter(mysplit, fn element -> element == char end) && string
-  end
+
+  # def fuzzy_match(string, char) do
+  #   mysplit = String.split(string, "", trim: true)
+  #   Enum.filter(mysplit, fn element -> element == char end) && string
+  # end
 
   def search(books, query) do
-    # books that exactly match
-    # Enum.filter(books, fn book -> Map.get(book, :title) == query end)
-    book = Enum.filter(books, fn book -> Map.get(book, :title) end)
-    String.contains?(book, query)
+    # books that match one letter
+    Enum.filter(books, fn book -> String.contains?(book, query) end)
+
+    # books that exactly match   
+    Enum.filter(books, fn book -> Map.get(book, :title) end)
   end
 end
 ```
 
 ```elixir
-mytitle = "ABC"
-myquery = "A"
+book = "ABC"
+query = "D"
+String.contains?(book, query)
 
-mysplit = String.split(mytitle, "", trim: true)
-# split string
-# filter split string to see if any char == query
-# if filter returns a match then return title
-Enum.filter(mysplit, fn char -> myquery == char end) && mytitle
+test = %{mybook: "mytitle"}
+Map.get(test, )
 ```
 
 ## Mark As Completed
