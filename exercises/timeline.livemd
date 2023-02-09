@@ -96,6 +96,14 @@ defmodule Timeline do
     [9, 12, 2]
   """
   def from_dates(dates) do
+    # chunk the date list into pairs with offset = 1
+    # map over the chunked pairs with Date.diff
+
+    pairs = Enum.chunk_every(dates, 2, 1, :discard)
+
+    Enum.map(pairs, fn [date1, date2] ->
+      Date.diff(date2, date1)
+    end)
   end
 
   @doc """
@@ -113,9 +121,29 @@ defmodule Timeline do
     iex> Timeline.from_strings(["2020-01-01", "2020-01-10", "2020-01-22", "2020-01-24"])
     [9, 12, 2]
   """
+
+  def make_date_from_string(string) do
+    [year, month, day] = String.split(string, "-", trim: true)
+    Date.new!(String.to_integer(year), String.to_integer(month), String.to_integer(day))
+  end
+
   def from_strings(date_strings) do
+    # convert list of strings to new list of dates
+    # call from_dates with new list of dates
+
+    new_list = Enum.map(date_strings, fn string -> make_date_from_string(string) end)
+    from_dates(new_list)
   end
 end
+```
+
+```elixir
+test_string = ["2020-01-01", "2020-01-10", "2020-01-22", "2020-01-24"]
+
+Enum.map(test_string, fn string ->
+  [year, month, day] = String.split(string, "-", trim: true)
+  Date.new!(String.to_integer(year), String.to_integer(month), String.to_integer(day))
+end)
 ```
 
 ## Mark As Completed

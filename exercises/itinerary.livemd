@@ -58,8 +58,19 @@ defmodule Itinerary do
     
   """
   def has_time?(start, finish, minutes) do
+    start = DateTime.to_unix(start)
+    finish = DateTime.to_unix(finish)
+
+    available_time = finish - start
+    task_time = minutes * 60
+
+    task_time <= available_time
   end
 end
+```
+
+```elixir
+DateTime.utc_now() |> DateTime.to_unix()
 ```
 
 ## Mark As Completed
