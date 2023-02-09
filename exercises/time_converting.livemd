@@ -74,6 +74,12 @@ defmodule TimeConverter do
 
   """
   def to_seconds(amount, unit) do
+    case unit do
+      :seconds -> amount
+      :minutes -> amount * 60
+      :hours -> amount * 3600
+      :days -> amount * 86400
+    end
   end
 
   @doc """
@@ -82,8 +88,8 @@ defmodule TimeConverter do
 
   ## Examples
 
-    iex> TimeConverter.from_seconds(1, :seconds)
-    1.0
+    iex> TimeConverter.from_seconds(2, :seconds)
+    2.0
 
     iex> TimeConverter.from_seconds(60, :minutes)
     1.0
@@ -96,6 +102,12 @@ defmodule TimeConverter do
 
   """
   def from_seconds(amount, unit) do
+    case unit do
+      :seconds -> amount / 1.0
+      :minutes -> amount / 60
+      :hours -> amount / 3600
+      :days -> amount / 86400
+    end
   end
 end
 ```
