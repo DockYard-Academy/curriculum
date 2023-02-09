@@ -88,6 +88,13 @@ defmodule WeightedVoting do
     40
   """
   def count(votes, vote_to_count) do
+    # Enum.reduce(votes, 0, fn {pet, num}, acc ->
+    #   if pet == vote_to_count, do: acc + num, else: acc
+    # end)
+    Enum.reduce(votes, 0, fn
+      {pet, num}, acc when pet == vote_to_count -> acc + num
+      {_pet, _num}, acc -> acc
+    end)
   end
 
   @doc """
@@ -106,6 +113,29 @@ defmodule WeightedVoting do
     [birds: 20, cats: 30, dogs: 30]
   """
   def tally(votes) do
+    Enum.reduce(votes, [], fn {pet, num}, acc ->
+      Keyword.update(acc, pet, num, fn val -> val + num end)
+    end)
+    |> Enum.sort()
+  end
+
+  @doc """
+  Tally the total number of votes in a keyword list, and return
+  the results as a map.
+
+  ## Examples
+
+    iex> WeightedVoting.tally_map([dogs: 20, dogs: 10])
+    %{dogs: 30}
+    iex> WeightedVoting.tally_map([cats: 10, dogs: 20, dogs: 10])
+    %{cats: 10, dogs: 30}
+    iex> WeightedVoting.tally_map([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
+    %{birds: 20, cats: 30, dogs: 30}
+  """
+  def tally_map(votes) do
+    Enum.reduce(votes, %{}, fn {pet, num}, acc ->
+      Map.update(acc, pet, num, fn val -> val + num end)
+    end)
   end
 end
 ```
