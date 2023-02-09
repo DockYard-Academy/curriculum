@@ -78,6 +78,9 @@ defmodule CustomEnum do
     [7, 6, 5, 4]
   """
   def reverse(list) do
+    Enum.reduce(list, [], fn elem, acc ->
+      [elem | acc]
+    end)
   end
 
   @doc """
@@ -92,6 +95,10 @@ defmodule CustomEnum do
     [true, true, true]
   """
   def map(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc ->
+      [callback_function.(elem) | acc]
+    end)
+    |> reverse()
   end
 
   @doc """
@@ -107,6 +114,14 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc ->
+      if callback_function.(elem) do
+        [elem | acc]
+      else
+        acc
+      end
+    end)
+    |> reverse()
   end
 
   @doc """
@@ -121,6 +136,7 @@ defmodule CustomEnum do
     3
   """
   def sum(list_of_integers) do
+    Enum.reduce(list_of_integers, &Kernel.+/2)
   end
 
   @doc """
@@ -135,8 +151,38 @@ defmodule CustomEnum do
     "Hello, World!"
   """
   def join(list_of_strings) do
+    # Enum.reduce(list_of_strings, & &2 <> &1)
+    Enum.reduce(list_of_strings, fn string, acc ->
+      acc <> string
+    end)
   end
 end
+```
+
+```elixir
+list = [1, 2, 3, 4, 5]
+
+CustomEnum.reverse(list)
+|> CustomEnum.reverse()
+
+reverse = fn list ->
+  Enum.reduce(list, [], fn elem, acc ->
+    [elem | acc]
+  end)
+end
+
+map = fn list, callback_fn ->
+  Enum.reduce(list, [], fn elem, acc ->
+    [callback_fn.(elem) | acc]
+  end)
+end
+
+reverse.(list)
+# callback_fn.(aitchesnaticnhesctaihnes)
+Enum.map(list, fn elem -> "#{elem}" end)
+
+map.(list, fn elem -> "#{elem}" end)
+|> CustomEnum.reverse()
 ```
 
 ## Mark As Completed
