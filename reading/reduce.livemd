@@ -191,7 +191,21 @@ end)
 </details>
 
 ```elixir
+Map.update(acc, integer, 1, fn current -> current + 1 end)
+```
 
+```elixir
+digits = Integer.digits(1_234_321)
+digits |> IO.inspect(label: "digits")
+
+Enum.reduce(digits, %{}, fn integer, acc ->
+  IO.inspect(binding())
+  Map.update(acc, integer, 1, fn current -> current + 1 end)
+  IO.inspect(binding())
+  integer |> IO.inspect(label: "integer")
+  acc |> IO.inspect(label: "acc")
+  digits |> IO.inspect(label: "digits")
+end)
 ```
 
 ## Multiple Accumulators

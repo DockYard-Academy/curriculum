@@ -121,6 +121,21 @@ end
 </details>
 
 ```elixir
+board = [["A", "B", "C"], ["D", "E", "F"], ["G", "H", "I"]]
+TicTacToe.at(board, {0, 0})
+```
+
+```elixir
+board = [
+  ["X", "O", nil],
+  [nil, "X", "O"],
+  [nil, nil, "X"]
+]
+
+Enum.at(board, 0)
+```
+
+```elixir
 defmodule TicTacToe do
   @moduledoc """
     Documentation for `TicTacToe`
@@ -153,7 +168,26 @@ defmodule TicTacToe do
     iex> TicTacToe.at(board, {2, 2})
     "C"
   """
+
+  # Define a function that takes a board and returns a coordinate on the board
+
+  # input:  is a board which is a list of 3 lists where the values can be either X, O, nil.
+  # 9 tuples with an x y coordinatefrom the board
+  ## Transformations
+  ## 1. Enum 
+  # output: The value at a specific coordinate. 
+  #  
+
   def at(board, coordinate) do
+    {x, y} = coordinate
+
+    board = [
+      ["X", "O", nil],
+      [nil, "X", "O"],
+      [nil, nil, "X"]
+    ]
+
+    Enum.at(board, 2 - y) |> Enum.at(x)
   end
 
   @doc """
