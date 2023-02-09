@@ -211,7 +211,7 @@ datetime.year
 When you want to display time information you can use the [Calendar](https://hexdocs.pm/elixir/Calendar.html) module's `strftime/3` function.
 
 ```elixir
-Calendar.strftime(DateTime.utc_now(), "%y-%m-%d %I:%M:%S %p")
+Calendar.strftime(DateTime.utc_now(), "%y-%m-%d %I:%M:%S %p %Z")
 ```
 
 The `strftime/3` function accepts a [Date](https://hexdocs.pm/elixir/Date.html), [Time](https://hexdocs.pm/elixir/Time.html), [DateTime](https://hexdocs.pm/elixir/DateTime.html), or [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html) and uses the
@@ -281,7 +281,9 @@ DateTime.new!(Date.new!(1938, 4, 19), Time.new!(12, 0, 0))
 Enter your solution below.
 
 ```elixir
-
+date = Date.new!(1938, 04, 19)
+time = Time.new!(12, 0, 0)
+DateTime.new!(date, time)
 ```
 
 If you solved the challenge above using sigils, complete it again using functions. If you solved the challenge using functions, then complete it again using sigils.
@@ -289,7 +291,7 @@ If you solved the challenge above using sigils, complete it again using function
 Enter your new solution below.
 
 ```elixir
-DateTime.new!(~D[1938-04-18])
+~U[1938-04-19 12:00:00Z]
 ```
 
 Create a [DateTime](https://hexdocs.pm/elixir/DateTime.html) for today at the current time in universal time.
@@ -306,7 +308,7 @@ DateTime.utc_now()
 Enter your solution below.
 
 ```elixir
-
+current_date = DateTime.utc_now()
 ```
 
 Use [DateTime.add/4](https://hexdocs.pm/elixir/DateTime.html#add/4) to add one day to the current [DateTime](https://hexdocs.pm/elixir/DateTime.html). This creates a new [DateTime](https://hexdocs.pm/elixir/DateTime.html) for tomorrow at the current time.
@@ -324,7 +326,7 @@ DateTime.add(DateTime.utc_now(), day_in_seconds)
 Enter your solution below
 
 ```elixir
-
+DateTime.add(DateTime.utc_now(), 24 * 60 * 60)
 ```
 
 Use [DateTime.compare/2](https://hexdocs.pm/elixir/DateTime.html#compare/2) to compare the [DateTime](https://hexdocs.pm/elixir/DateTime.html) below with the current [DateTime](https://hexdocs.pm/elixir/DateTime.html). The `date` below should be `:lt` (less than) the current [DateTime](https://hexdocs.pm/elixir/DateTime.html).
@@ -343,6 +345,7 @@ Enter your solution below.
 
 ```elixir
 date = DateTime.new!(~D[2020-01-01], ~T[12:00:00])
+DateTime.compare(date, DateTime.utc_now())
 ```
 
 Use [DateTime.diff/3](https://hexdocs.pm/elixir/DateTime.html#diff/3) to determine how many seconds are between `2000-01-01` and `2010-01-01`.
@@ -362,7 +365,10 @@ DateTime.diff(finish, start)
 Enter your solution below.
 
 ```elixir
+start = DateTime.new!(~D[2000-01-01], ~T[12:00:00])
+finish = DateTime.new!(~D[2010-01-01], ~T[12:00:00])
 
+DateTime.diff(finish, start)
 ```
 
 ## Timex
@@ -397,7 +403,7 @@ Use [Timex.now/1](https://hexdocs.pm/timex/Timex.html#now/1) to create a datetim
 to ensure it is correct.
 
 ```elixir
-
+Timex.now("Africa/Kampala")
 ```
 
 ## Further Reading
