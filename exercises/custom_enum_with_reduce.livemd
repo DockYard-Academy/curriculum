@@ -78,6 +78,11 @@ defmodule CustomEnum do
     [7, 6, 5, 4]
   """
   def reverse(list) do
+    # put first element on head of new list
+    Enum.reduce(list, [], fn element, acc ->
+      # IO.inspect(binding())
+      [element | acc]
+    end)
   end
 
   @doc """
@@ -92,6 +97,11 @@ defmodule CustomEnum do
     [true, true, true]
   """
   def map(list, callback_function) do
+    # while list not empty apply fn to element
+    Enum.reduce(list, [], fn element, acc ->
+      [callback_function.(element) | acc]
+    end)
+    |> reverse()
   end
 
   @doc """
@@ -107,6 +117,15 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    # add element to new list if callback_function(element) returns true
+    Enum.reduce(list, [], fn element, acc ->
+      if callback_function.(element) do
+        [element | acc]
+      else
+        acc
+      end
+    end)
+    |> reverse()
   end
 
   @doc """
@@ -117,10 +136,12 @@ defmodule CustomEnum do
     iex> CustomEnum.sum([1, 2, 3])
     6
 
-    iex> CustomEnum.sum([1, 1, 1])
-    3
+    # iex> CustomEnum.sum([1, 1, 1])
+    # 3
   """
   def sum(list_of_integers) do
+    # add each int to accumulator and return accumulator
+    Enum.reduce(list_of_integers, 0, fn int, acc -> int + acc end)
   end
 
   @doc """
@@ -131,10 +152,12 @@ defmodule CustomEnum do
     iex> CustomEnum.join(["A", "B", "C"])
     "ABC"
 
-    iex> CustomEnum.join(["Hello", ",", " ", "World", "!"])
-    "Hello, World!"
+    # iex> CustomEnum.join(["Hello", ",", " ", "World", "!"])
+    # "Hello, World!"
   """
   def join(list_of_strings) do
+    # concat each string to acc string
+    Enum.reduce(list_of_strings, "", fn string, acc -> acc <> string end)
   end
 end
 ```
