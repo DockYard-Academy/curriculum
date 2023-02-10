@@ -154,6 +154,11 @@ defmodule TicTacToe do
     "C"
   """
   def at(board, coordinate) do
+    {x, y} = coordinate
+
+    Enum.reverse(board)
+    |> Enum.at(y)
+    |> Enum.at(x)
   end
 
   @doc """
@@ -173,10 +178,19 @@ defmodule TicTacToe do
 
   Filling an existing board
 
-  iex> TicTacToe.fill([[nil, "X", nil], [nil, "X", "O"], [nil, nil, "X"]], {2, 2}, "O")
-  [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
+  # iex> TicTacToe.fill([[nil, "X", nil], [nil, "X", "O"], [nil, nil, "X"]], {2, 2}, "O")
+  # [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
   """
   def fill(board, coordinate, symbol) do
+    {x, y} = coordinate
+
+    row_index = 2 - y
+
+    row = Enum.at(board, row_index)
+
+    new_row = List.replace_at(row, x, symbol)
+
+    List.replace_at(board, row_index, new_row)
   end
 end
 ```
