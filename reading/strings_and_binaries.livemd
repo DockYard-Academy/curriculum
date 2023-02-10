@@ -218,13 +218,13 @@ String.graphemes("é")
 Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the [woman fire fighter](https://emojipedia.org/woman-firefighter/) emoji 👩‍🚒 to a list of graphemes.
 
 ```elixir
-
+String.graphemes("👩‍🚒")
 ```
 
 Use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1) to convert the emoji 👩‍🚒 into a list of codepoints. You'll notice it's actually a combination of the 👩 and 🚒 emojis.
 
 ```elixir
-
+String.codepoints("👩‍🚒")
 ```
 
 ## Hexadecimal
@@ -248,10 +248,6 @@ Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the let
 |> Enum.map(fn {symbol, index} -> %{integer: "#{index}", hexadecimal: symbol} end)
 |> Enum.take(-10)
 |> Kino.DataTable.new()
-```
-
-```elixir
-
 ```
 
 As the rightmost placeholder grows, it shifts to the left when it reaches `16`.
@@ -316,7 +312,7 @@ Use hexadecimal `0x` syntax to represent the number `15`.
 </details>
 
 ```elixir
-
+0x000F
 ```
 
 ## Bitstrings
@@ -416,7 +412,9 @@ Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect 
 </details>
 
 ```elixir
-
+"abcdefghijklmnopqrstuvwxyz"
+|> String.to_charlist()
+|> IO.inspect(charlists: :as_lists)
 ```
 
 ## Further Reading
