@@ -44,7 +44,7 @@ show all of the values the regular expression matches on.
 For example, the expression `~r/h/` will match the `"h"` character.
 
 ```elixir
-Regex.scan(~r/h/, "hello")
+Regex.scan(~r/h/, "hello hi how who haha")
 ```
 
 [Regex.scan/3](https://hexdocs.pm/elixir/Regex.html#scan/3) will find all matches in a string.
@@ -64,7 +64,7 @@ Regex.scan(~r/hello/, "hello, world!")
 We can also match patterns using special characters. For example, `\d` will match any digit.
 
 ```elixir
-Regex.scan(~r/\d/, "h3ll0")
+Regex.scan(~r/\d/, "hell0")
 ```
 
 ## Building Regular Expressions
@@ -154,7 +154,7 @@ Regex.scan(~r/1*/, "1121")
 `+` will match on strings that match one or more of the previous regular expressions.
 
 ```elixir
-Regex.scan(~r/1+/, "11211")
+Regex.scan(~r/o{2}/, "yooo")
 ```
 
 `?` functions like a conditional match, where the match may or may not exist.
@@ -292,7 +292,7 @@ Regex.run(~r/ab/, "ab")
 ```
 
 ```elixir
-Regex.run(~r/a(b)/, "ab")
+Regex.run(~r/a(bb)/, "abcdef")
 ```
 
 Capture groups match separately in regular expressions.
@@ -315,21 +315,14 @@ Regex.run(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111")
 Now we can use these capture groups in [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3).
 
 ```elixir
-Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111", fn full_match, capture_group ->
-  IO.inspect(full_match, label: "match")
-  IO.inspect(capture_group, label: "capture group")
-  "XXX-" <> capture_group
-end)
+
 ```
 
 Regular expressions handle an arbitrary number of capture groups. For example, let's obfuscate the phone number `111-111-1111` into `111-XXX-1111`.
 
 ```elixir
-Regex.replace(~r/(\d{3}-)\d{3}(-\d{4})/, "111-111-1111", fn match, group1, group2 ->
-  IO.inspect(match, label: "match")
-  IO.inspect(group1, label: "group1")
-  IO.inspect(group2, label: "group2")
-  group1 <> "XXX" <> group2
+Regex.replace(~r/(1{3})-(1{3})-(1{4})/, "111-111-1111", fn _match, group1, group2, group3 ->
+  group1 <> "-XXX-" <> group3
 end)
 ```
 
@@ -349,7 +342,9 @@ end)
 </details>
 
 ```elixir
-
+Regex.replace(~r/(\d{3})-(\d{3})-(\d{4})/, "999-999-9999", fn _match, group1, _group2, _group3 ->
+  group1 <> "-XXX-XXXX"
+end)
 ```
 
 ## Lookaround
@@ -429,7 +424,9 @@ end)
 </details>
 
 ```elixir
-
+Regex.replace(~r/(#1{3})(1{3})(1{4})/, "#9999999999", fn _match, group1, group2, group3 ->
+  group1 <> group2 <> group3
+end)
 ```
 
 ## Further Reading

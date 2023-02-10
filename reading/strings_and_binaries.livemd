@@ -69,12 +69,10 @@ the left when it reaches `10` in base 10 or `2` in base 2.
 
 Here's a table of binary numbers and their corresponding integer values.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
 ```elixir
 Enum.map(1..300, fn integer ->
   binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()
-  %{base10: integer, base2: binary}
+  %{"base10" => integer, "base2" => binary}
 end)
 |> Kino.DataTable.new()
 ```
@@ -82,7 +80,7 @@ end)
 Each byte stores an integer between `1` and `255` in binary. These integers are used to represent characters. For example, the number `65` represents the `"A"` character. This number is called the **codepoint**. We can find the codepoint of any character using the `?` symbol.
 
 ```elixir
-?A
+?a - ?A
 ```
 
 We can also see that a string is actually a series of binary bytes representing a codepoint using [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) with the `binaries: :as_binaries` option.
@@ -99,7 +97,7 @@ The [Unicode Standard](https://unicode.org/standard/standard.html) contains the 
 We've already seen we can find the code point of a character using `?` in Elixir. For example the code point of `h` is `104`.
 
 ```elixir
-?h
+?~
 ```
 
 Here we can see a table of alphabetical characters and their code points. Notice that capital letters and
@@ -196,11 +194,14 @@ For example, the character can be represented as the "e with acute" code point o
 You can see below that while both have the same appearance, they have different code points.
 
 ```elixir
-String.codepoints("é")
+[e, a] = String.codepoints("é")
+String.to_charlist(a)
 ```
 
 ```elixir
-String.codepoints("é")
+false = String.codepoints("é") == String.codepoints("é")
+false = String.graphemes("é") == String.graphemes("é")
+false = "é" == "é"
 ```
 
 When splitting a string into characters for the sake of enumeration, it's important to know if you want to enumerate through the
@@ -218,13 +219,13 @@ String.graphemes("é")
 Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the [woman fire fighter](https://emojipedia.org/woman-firefighter/) emoji 👩‍🚒 to a list of graphemes.
 
 ```elixir
-
+String.graphemes("👩‍🚒")
 ```
 
 Use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1) to convert the emoji 👩‍🚒 into a list of codepoints. You'll notice it's actually a combination of the 👩 and 🚒 emojis.
 
 ```elixir
-
+String.codepoints("👩‍🚒")
 ```
 
 ## Hexadecimal
@@ -316,7 +317,7 @@ Use hexadecimal `0x` syntax to represent the number `15`.
 </details>
 
 ```elixir
-
+0xF
 ```
 
 ## Bitstrings
@@ -345,7 +346,9 @@ You may have noticed that occasionally lists of integers in Elixir will display 
 characters.
 
 ```elixir
+# adding 233 to this list makes it no longer read as a charlist
 [97, 98, 99]
+# String.to_charlist("é") = 233
 ```
 
 That's because they are interpreted as a charlist. A charlist is a list of integers that
@@ -416,7 +419,8 @@ Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect 
 </details>
 
 ```elixir
-
+String.to_charlist("abcdefghijklmnopqrstuvwxyz")
+|> IO.inspect(charlists: :as_lists)
 ```
 
 ## Further Reading
