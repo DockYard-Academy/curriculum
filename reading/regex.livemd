@@ -349,7 +349,12 @@ end)
 </details>
 
 ```elixir
-
+Regex.replace(~r/\d{3}-\d{3}(-\d{4})/, "111-111-1111", fn match, group1, group2 ->
+  IO.inspect(match, label: "match")
+  IO.inspect(group1, label: "group1")
+  IO.inspect(group2, label: "group2")
+  group1 <> "XXX" <> group2
+end)
 ```
 
 ## Lookaround
