@@ -78,6 +78,7 @@ defmodule CustomEnum do
     [7, 6, 5, 4]
   """
   def reverse(list) do
+    Enum.reduce(list, [], fn elem, acc -> [elem | acc] end)
   end
 
   @doc """
@@ -92,6 +93,8 @@ defmodule CustomEnum do
     [true, true, true]
   """
   def map(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc -> [callback_function.(elem) | acc] end)
+    |> CustomEnum.reverse()
   end
 
   @doc """
@@ -107,6 +110,10 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc ->
+      if callback_function.(elem), do: [elem | acc], else: acc
+    end)
+    |> CustomEnum.reverse()
   end
 
   @doc """
@@ -121,6 +128,7 @@ defmodule CustomEnum do
     3
   """
   def sum(list_of_integers) do
+    Enum.reduce(list_of_integers, 0, fn elem, acc -> acc + elem end)
   end
 
   @doc """
@@ -135,6 +143,85 @@ defmodule CustomEnum do
     "Hello, World!"
   """
   def join(list_of_strings) do
+    Enum.reduce(list_of_strings, fn str, acc -> acc <> str end)
+  end
+
+  @doc """
+  Splits a list into two lists, leaving count (n) elements in the first one.
+
+  ## Examples
+
+    iex> CustomEnum.split([1, 2, 3], 2)
+    {[1, 2], [3]}
+
+    iex> CustomEnum.split([1, 2, 3], 10)
+    {[1, 2, 3], []}
+
+    iex> CustomEnum.split([1, 2, 3], 0)
+    {[], [1, 2, 3]}
+
+    iex> CustomEnum.split([1, 2, 3], -1)
+    {[1, 2], [3]}
+
+    iex> CustomEnum.split([1, 2, 3], -5)
+    {[], [1, 2, 3]}
+  """
+  def split(list, count) when count < 0 do
+    {left, right} =
+      CustomEnum.reverse(list)
+      |> split(abs(count))
+
+    {right, left}
+  end
+
+  def split(list, count) do
+    {left_list, right_list, _} =
+      Enum.reduce(list, {[], [], 0}, fn
+        elem, {left, right, num} when num < count ->
+          {[elem | left], right, num + 1}
+
+        elem, {left, right, num} ->
+          {left, [elem | right], num}
+      end)
+
+    {Enum.sort(left_list), Enum.sort(right_list)}
+  end
+
+  @doc """
+  Returns a list of results of invoking fun on every nth element of 
+  enumerable, starting with the first element.
+
+  ## Examples
+
+    iex> CustomEnum.map_every(1..10, 2, fn x -> x + 1000 end)
+    [1001, 2, 1003, 4, 1005, 6, 1007, 8, 1009, 10]
+
+    iex> CustomEnum.map_every(1..10, 3, fn x -> x + 1000 end)
+    [1001, 2, 3, 1004, 5, 6, 1007, 8, 9, 1010]
+
+    iex> CustomEnum.map_every(1..5, 0, fn x -> x + 1000 end)
+    [1, 2, 3, 4, 5]
+
+    iex> CustomEnum.map_every([1, 2, 3], 1, fn x -> x + 1000 end)
+    [1001, 1002, 1003]
+  """
+  def map_every(list, nth, _callback_function) when nth == 0 do
+    ## If nth is 0, then enumerable is directly converted to a list, 
+    # without fun being ever applied.
+    CustomEnum.map(list, fn elem -> elem end)
+  end
+
+  def map_every(list, nth, callback_function) do
+    {accumulator, _} =
+      Enum.reduce(list, {[], 0}, fn
+        elem, {acc, num} ->
+          case rem(num, nth) == 0 do
+            true -> {[callback_function.(elem) | acc], num + 1}
+            false -> {[elem | acc], num + 1}
+          end
+      end)
+
+    CustomEnum.reverse(accumulator)
   end
 end
 ```
