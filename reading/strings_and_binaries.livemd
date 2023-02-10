@@ -85,6 +85,10 @@ Each byte stores an integer between `1` and `255` in binary. These integers are 
 ?A
 ```
 
+```elixir
+?Z
+```
+
 We can also see that a string is actually a series of binary bytes representing a codepoint using [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) with the `binaries: :as_binaries` option.
 
 ```elixir
@@ -218,13 +222,13 @@ String.graphemes("é")
 Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the [woman fire fighter](https://emojipedia.org/woman-firefighter/) emoji 👩‍🚒 to a list of graphemes.
 
 ```elixir
-
+String.graphemes("👩‍🚒")
 ```
 
 Use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1) to convert the emoji 👩‍🚒 into a list of codepoints. You'll notice it's actually a combination of the 👩 and 🚒 emojis.
 
 ```elixir
-
+String.codepoints("👩‍🚒")
 ```
 
 ## Hexadecimal
@@ -316,7 +320,7 @@ Use hexadecimal `0x` syntax to represent the number `15`.
 </details>
 
 ```elixir
-
+0xF
 ```
 
 ## Bitstrings
@@ -416,7 +420,7 @@ Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect 
 </details>
 
 ```elixir
-
+IO.inspect(String.to_charlist("abcdefghijklmnopqrstuvwxyz"), charlists: :as_lists)
 ```
 
 ## Further Reading
