@@ -95,8 +95,30 @@ defmodule Timeline do
     iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]])
     [9, 12, 2]
   """
+
+  ### First solution
   def from_dates(dates) do
+    Enum.chunk_every(dates, 2, 1, :discard)
+    |> Enum.map(fn [date1, date2] -> Date.diff(date2, date1) end)
   end
+
+  ## Second solution
+  # def from_dates(dates) do
+  #   {_last, acc} =
+  #     Enum.reduce(tl(dates), {hd(dates), []}, fn date2, {date1, acc} ->
+  #       {date2, [Date.diff(date2, date1) | acc]}
+  #     end)
+
+  #   Enum.reverse(acc)
+  # end
+
+  ### Third solution ....etc
+  # def from_dates(dates, acc \\ [])
+  # def from_dates(dates, acc) when length(dates) <= 1, do: Enum.reverse(acc)
+
+  # def from_dates([date1, date2 | tail], acc) do
+  #   from_dates([date2 | tail], [Date.diff(date2, date1) | acc])
+  # end
 
   @doc """
   Given a list of "YYYY-MM-DD" strings return a timeline of days between each date.
@@ -113,8 +135,23 @@ defmodule Timeline do
     iex> Timeline.from_strings(["2020-01-01", "2020-01-10", "2020-01-22", "2020-01-24"])
     [9, 12, 2]
   """
+  ## First solution
   def from_strings(date_strings) do
+    Enum.map(date_strings, fn date -> Date.from_iso8601!(date) end)
+    |> from_dates()
   end
+
+  ## Second solution
+  # def from_strings(date_strings) do
+  #   {_last, acc} =
+  #     Enum.reduce(tl(date_strings), {hd(date_strings), []}, fn date2, {date1, acc} ->
+  #       date1_struct = Date.from_iso8601!(date1)
+  #       date2_struct = Date.from_iso8601!(date2)
+  #       {date2, [Date.diff(date2_struct, date1_struct) | acc]}
+  #     end)
+
+  #   Enum.reverse(acc)
+  # end
 end
 ```
 
