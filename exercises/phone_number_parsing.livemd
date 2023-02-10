@@ -113,8 +113,49 @@ defmodule PhoneNumber do
     "123-123-1234 456-456-4567"
   """
   def parse(string) do
+    Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "string", fn full_match, capture_group ->
+      IO.inspect(full_match, label: "match")
+      IO.inspect(capture_group, label: "capture group")
+      "XXX-" <> capture_group
+    end)
   end
 end
+
+# Regex.replace(~r/(\d{3}-)\d{3}(-\d{4})/, "111-111-1111", fn match, group1, group2 ->
+#   IO.inspect(match, label: "match")
+#   IO.inspect(group1, label: "group1")
+#   IO.inspect(group2, label: "group2")
+#   group1 <> "XXX" <> group2
+# end)
+
+# match: "111-111-1111"
+# group1: "111-"
+# group2: "-1111"
+# "111-XXX-1111"
+
+# Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111", fn full_match, capture_group ->
+#   IO.inspect(full_match, label: "match")
+#   IO.inspect(capture_group, label: "capture group")
+#   "XXX-" <> capture_group
+# end)
+
+# Regex.replace(~r/(\d{3}-)\d{3}-\d{4}/, "string", fn _match, group1 ->
+# group1 <> "XXX-" <> "XXXX"
+
+#   Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111", fn full_match, capture_group ->
+#   IO.inspect(full_match, label: "match")
+#   IO.inspect(capture_group, label: "capture group")
+#   "XXX-" <> capture_group
+# end)
+```
+
+```elixir
+Regex.replace(~r/(\d{3}-)\d{3}(-\d{4})/, "111-111-1111", fn match, group1, group2 ->
+  IO.inspect(match, label: "match")
+  IO.inspect(group1, label: "group1")
+  IO.inspect(group2, label: "group2")
+  group1 <> "XXX" <> group2
+end)
 ```
 
 ## Mark As Completed
