@@ -73,7 +73,17 @@ defmodule TimeConverter do
     86400
 
   """
+  def to_seconds(amount, :seconds), do: amount
+
+  def to_seconds(amount, :minutes), do: amount * 60
+
+  def to_seconds(amount, :hours), do: amount * 60 * 60
+
+  def to_seconds(amount, :days), do: amount * 60 * 60 * 24
+
   def to_seconds(amount, unit) do
+    {:error,
+     "to_seconds called without correct atom key. Arguments provided: Amount = #{amount}, Unit = #{unit}"}
   end
 
   @doc """
@@ -95,9 +105,23 @@ defmodule TimeConverter do
     1.0
 
   """
+  def from_seconds(amount, :seconds), do: amount / 1.0
+
+  def from_seconds(amount, :minutes), do: amount / 60
+
+  def from_seconds(amount, :hours), do: amount / 60 / 60
+
+  def from_seconds(amount, :days), do: amount / 60 / 60 / 24
+
   def from_seconds(amount, unit) do
+    {:error,
+     "from_seconds called without correct atom key. Arguments provided: Amount = #{amount}, Unit = #{unit}"}
   end
 end
+```
+
+```elixir
+TimeConverter.to_seconds(123, :yo)
 ```
 
 ## Mark As Completed

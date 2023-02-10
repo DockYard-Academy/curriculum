@@ -83,8 +83,8 @@ defmodule Timeline do
 
   ## Examples
 
-    iex> Timeline.from_dates([~D[2020-01-01]])
-    []
+    # iex> Timeline.from_dates([~D[2020-01-01]])
+    # []
 
     iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-02]])
     [1]
@@ -95,7 +95,34 @@ defmodule Timeline do
     iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]])
     [9, 12, 2]
   """
+
   def from_dates(dates) do
+    Enum.reduce(dates, 0, fn date1, date2, acc -> acc + Date.diff(date2, date1) end)
+  end
+
+  # How do we do this with reduce?
+  def from_dates([]), do: []
+
+  def from_dates(dates) do
+    {_last, acc} =
+      Enum.reduce(tl(dates), {hd(dates), []}, fn date1, {date2, acc} ->
+        {date1, [Date.diff(date1, date2) | acc]}
+      end)
+
+    Enum.reverse(acc)
+  end
+
+  def from_dates(dates) do
+    Enum.chunk_every(dates, 2, 1, :discard)
+    |> Enum.map(fn [date1, date2] -> Date.diff(date2, date1) end)
+  end
+
+  def from_dates_rec([_dates]), do: []
+
+  def from_dates_rec([date1, date2]), do: [Date.diff(date2, date1)]
+
+  def from_dates_rec([date1, date2 | dates]) do
+    [Date.diff(date2, date1) | from_dates([date2 | dates])]
   end
 
   @doc """
@@ -114,8 +141,58 @@ defmodule Timeline do
     [9, 12, 2]
   """
   def from_strings(date_strings) do
+    Enum.map(date_strings, fn str ->
+      String.split(str, "-", trim: true)
+      |> Enum.map(&Integer.parse/1)
+    end)
+    |> Enum.map(&date_maker/1)
+    |> from_dates()
   end
+
+  defp date_maker([{year, ""}, {month, ""}, {day, ""}]), do: Date.new!(year, month, day)
 end
+```
+
+```elixir
+dates = [~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]]
+
+Enum.chunk_every(dates, 2, 1, :discard)
+
+Enum.reduce(dates, 0, fn date1, date2, acc -> acc + Date.diff(date2, date1) end)
+```
+
+```elixir
+strings = ["2020-01-01", "2020-01-10", "2020-01-22", "2020-01-24"]
+
+date_maker = fn [{year, ""}, {month, ""}, {day, ""}] ->
+  Date.new!(year, month, day)
+end
+
+Enum.map(strings, fn str ->
+  String.split(str, "-", trim: true)
+  |> Enum.map(&Integer.parse/1)
+end)
+|> Enum.map(date_maker)
+
+# |> Enum.map(fn date_string -> &Integer.parse/1)
+
+# # Integer.parse(year)
+# Date.new!(year, month, day)
+```
+
+```elixir
+dates = [~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]]
+
+from_dates = fn dates ->
+  {_last, acc} =
+    Enum.reduce(tl(dates), {hd(dates), []}, fn date1, {date2, acc} ->
+      {date1, [Date.diff(date1, date2) | acc]}
+    end)
+
+  Enum.reverse(acc)
+end
+
+from_dates.(dates)
 ```
 
 ## Mark As Completed
