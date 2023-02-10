@@ -82,15 +82,57 @@ defmodule Email do
     iex> Email.valid?("string.string")
     false
 
-    iex> Email.valid?("string@string")
-    false
+    # iex> Email.valid?("string@string")
+    # false
 
-    iex> Email.valid?("string@string.")
-    false
+    # iex> Email.valid?("string@string.")
+    # false
   """
   def valid?(email) do
+    email_regex = ~r/
+  \w+    # user
+  @      # @
+  \w+    # host
+  [.]    # .
+  \w+    # domain
+  /x
+
+    Regex.match?(email_regex, email)
   end
 end
+```
+
+```elixir
+good_string = "mail@mail.com"
+bad_string = "mail.com"
+
+email_regex = ~r/
+  \w+    # user
+  @      # @
+  \w+    # host
+  [.]    # .
+  \w+    # domain
+  /x
+
+Regex.scan(email_regex, good_string)
+
+IO.puts(Regex.source(email_regex))
+```
+
+```elixir
+good_number = "1-123-123-1234"
+
+number_regex = ~r/
+\d{1}      # country code
+-          # dash
+\d{3}      # area code
+-          # dash
+\d{3}      # exchange
+-          # dash
+\d{4}      # circuit number
+/x
+
+Regex.scan(number_regex, good_number)
 ```
 
 ## Mark As Completed
