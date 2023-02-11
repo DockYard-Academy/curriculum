@@ -22,6 +22,8 @@ Represent each book as a `Book` struct with `title` key. Then create a `Book.sea
 
 ```elixir
 defmodule Book do
+  defstruct title: nil
+
   @moduledoc """
   Documentation for `Book`.
 
@@ -58,7 +60,14 @@ defmodule Book do
     iex> Book.search([%Book{title: "ABC"}], "a")
     [%Book{title: "ABC"}]
   """
+
   def search(books, query) do
+    query = String.upcase(query)
+
+    Enum.filter(books, fn book ->
+      query == book.title
+      String.contains?(book.title, query)
+    end)
   end
 end
 ```
