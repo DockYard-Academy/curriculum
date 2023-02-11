@@ -73,15 +73,18 @@ defmodule Votes do
     iex> Votes.count([:dogs, :dogs, :dogs, :cats], :dogs)
     3
 
-    iex> Votes.count([:dogs, :dogs, :dogs, :cats], :cats)
-    1
+    # iex> Votes.count([:dogs, :dogs, :dogs, :cats], :cats)
+    # 1
 
-    iex> Votes.count([:apples, :oranges, :apples, :cats], :birds)
-    0
+    # iex> Votes.count([:apples, :oranges, :apples, :cats], :birds)
+    # 0
   """
   def count(votes, vote) do
+    Enum.filter(votes, fn elem -> elem == vote end) |> Enum.count()
   end
 end
+
+Votes.count([:dogs, :dogs, :dogs, :cats], :dogs)
 ```
 
 ## Bonus: Voter Tally
@@ -120,8 +123,22 @@ defmodule VoterTally do
     %{dog: 2, cat: 3, bird: 1}
   """
   def tally(votes) do
+    dogs = Enum.filter(votes, fn elem -> elem == :dog end) |> Enum.count()
+    cats = Enum.filter(votes, fn elem -> elem == :cat end) |> Enum.count()
+    birds = Enum.filter(votes, fn elem -> elem == :bird end) |> Enum.count()
+    %{dog: dogs, cat: cats, bird: birds}
   end
 end
+
+VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
+
+# we have a list of votes
+# we need to separate the votes by key
+# then calculate their values
+```
+
+```elixir
+Enum.frequencies([:dog, :dog, :cat, :cat, :cat, :bird])
 ```
 
 ## Mark As Completed
