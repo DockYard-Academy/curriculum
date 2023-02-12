@@ -94,10 +94,9 @@ defmodule CaesarCypher do
     Regex.replace(~r/\w/, string, fn each ->
       String.to_charlist(each)
       |> IO.inspect(charlists: :as_lists)
+      |> Enum.map(fn char -> rem(char + 1 - ?a, 26) + ?a end)
+      |> List.to_string()
 
-      # |> Enum.map(fn each -> each + 1 end)
-      # |> IO.inspect(charlists: :as_lists)
-      # |> String.replace(~r/\d/, fn each -> Integer.to_string(each) end)
     end)
   end
 
@@ -118,11 +117,18 @@ defmodule CaesarCypher do
 
   # Encoding should work on any string.
 
-  #   iex> CaesarCypher.encode("hello", 1)
-  #   "ifmmp"
-  # """
-  # def encode(string, key) do
-  # end
+    iex> CaesarCypher.encode("hello", 1)
+    "ifmmp"
+  """
+  def encode(string, key) do
+    Regex.replace(~r/\w/, string, fn each ->
+      String.to_charlist(each)
+      |> IO.inspect(charlists: :as_lists)
+      |> Enum.map(fn char -> rem(char + key - ?a, 26) + ?a end)
+      |> List.to_string()
+    end)
+  end
+
 end
 ```
 
