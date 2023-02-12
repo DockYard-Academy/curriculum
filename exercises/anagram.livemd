@@ -118,7 +118,6 @@ defmodule AnagramSolver do
     String.split(string, "", trim: true)
     |> Enum.frequencies()
     |> List.to_string()
-
   end
 end
 
@@ -135,6 +134,44 @@ split = String.split(string, "", trim: true)
 
 Enum.reduce(split, fn char, acc -> acc * (char - 1) end)
 
+```
+
+```elixir
+# final list has x = permutations no. of entries
+# x = div(permutations, count) no. of entries begins with each letter of the original string (hd)
+# 
+
+# try this
+Enum.reduce(num_string, %{}, fn char, acc ->
+  Map.update(acc, char, 1, fn current -> current + 1 end)
+end)
+
+defmodule Fact do
+  def factorial(n) when n > 1 do
+    n * factorial(n - 1)
+  end
+
+  def factorial(n) when n <= 1 do
+    1
+  end
+end
+
+string = "abcd"
+
+split = String.split(string, "", trim: true)
+
+count = Enum.count(split)
+
+permutations = Fact.factorial(count)
+
+div(permutations, count)
+
+# Enum.reduce(split, [], fn [head | tail], acc -> 
+#   [elem, 0] = head
+#   if elem(split, 0) == head
+
+#   List.update_at(acc, -1, fn -> [head | tail] end)
+# end)
 ```
 
 ## Mark As Completed
