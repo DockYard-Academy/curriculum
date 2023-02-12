@@ -133,8 +133,7 @@ defmodule CaesarCypher do
   def encode(string, key) do
     string
     |> String.to_charlist()
-    |> Enum.map(fn char -> rem(char + key - ?a, 26) end)
-    |> Enum.map(fn char -> char + ?a end)
+    |> Enum.map(fn char -> ?a + rem(char + key - ?a, 26) end)
     |> List.to_string()
   end
 end

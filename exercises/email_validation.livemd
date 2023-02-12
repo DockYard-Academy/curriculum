@@ -89,10 +89,20 @@ defmodule Email do
     false
   """
   def valid?(email) do
-    Regex.match?(~r/\w+@\w+\.\w+/, email)
+    ## My original solution
+    # Regex.match?(~r/\w+@\w+\.\w+/, email)
 
-    # chatgpt version
-    # Regex.match?(~r/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, email)
+    ## @czrpb 's way cool solution
+    Regex.match?(
+      ~r/
+      \w+       # username
+      \@        # @
+      [a-zA-z]+ # hostname
+      \.        # .
+      [^\s]{2,} # top-level domain
+    /x,
+      email
+    )
   end
 end
 ```
