@@ -142,9 +142,31 @@ defmodule Rollable do
     "Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
   """
   def replace(string) do
+    Regex.replace(~r/\d+d\d+/, string, fn match ->
+      "[#{match}](https://www.google.com/search?q=roll+#{match})"
+    end)
   end
 
+  @doc """
+  Find rollable expressions and generates a random number based on the expression
+  """
   def roll(string) do
+    Regex.replace(~r/(\d+)d(\d+)/, string, fn _match, match1, match2 ->
+      num = String.to_integer(match1)
+      # |> IO.inspect(label: "Match 1")
+
+      face = String.to_integer(match2)
+      # |> IO.inspect(label: "Match 2")
+
+      rand_num_list(num, face)
+      # |> IO.inspect(label: "List")
+      |> Enum.sum()
+      |> Integer.to_string()
+    end)
+  end
+
+  def rand_num_list(num, face) do
+    Enum.map(1..num, fn _elem -> Enum.random(1..face) end)
   end
 end
 ```
