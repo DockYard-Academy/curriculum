@@ -70,6 +70,9 @@ defmodule Measurements do
     1
   """
   def increased(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.filter(fn [first, second] -> second > first end)
+    |> Enum.count()
   end
 
   @doc """
@@ -84,6 +87,9 @@ defmodule Measurements do
     [10, -10, 30]
   """
   def increments(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.reduce([], fn [first, second], acc -> [second - first] ++ acc end)
+    |> Enum.reverse()
   end
 
   @doc """
@@ -99,6 +105,10 @@ defmodule Measurements do
     40
   """
   def increased_by(measurements) do
+    Enum.chunk_every(measurements, 2, 1, :discard)
+    |> Enum.reduce([], fn [first, second], acc -> [second - first] ++ acc end)
+    |> Enum.filter(fn each -> each >= 0 end)
+    |> Enum.sum()
   end
 
   @doc """
@@ -114,8 +124,21 @@ defmodule Measurements do
     6
   """
   def average(measurements) do
+    total = Enum.sum(measurements)
+    count = Enum.count(measurements)
+
+    div(total, count)
   end
 end
+```
+
+```elixir
+measurements = [100, 150, 120, 130]
+
+Enum.chunk_every(measurements, 2, 1, :discard)
+|> Enum.reduce([], fn [first, second], acc -> [second - first] ++ acc end)
+|> Enum.filter(fn each -> each >= 0 end)
+|> Enum.sum()
 ```
 
 ## Mark As Completed
