@@ -91,31 +91,57 @@ defmodule CaesarCypher do
     "ifmmp"
   """
   def encode(string) do
+    Regex.replace(~r/\w/, string, fn each ->
+      String.to_charlist(each)
+      |> IO.inspect(charlists: :as_lists)
+      |> Enum.map(fn char -> rem(char + 1 - ?a, 26) + ?a end)
+      |> List.to_string()
+    end)
   end
 
-  @doc """
-  Encode a string using the caesar cypher and a provided key.
-  Shift every letter over by the provided key.
+  # @doc """
+  # Encode a string using the caesar cypher and a provided key.
+  # Shift every letter over by the provided key.
 
-  ## Examples
+  # ## Examples
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1)
-    "bcdefghijklmnopqrstuvwxyza"
+  #   iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1)
+  #   "bcdefghijklmnopqrstuvwxyza"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
-    "cdefghijklmnopqrstuvwxyzab"
+  #   iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
+  #   "cdefghijklmnopqrstuvwxyzab"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14)
-    "opqrstuvwxyzabcdefghijklmn"
+  #   iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14)
+  #   "opqrstuvwxyzabcdefghijklmn"
 
-  Encoding should work on any string.
+  # Encoding should work on any string.
 
     iex> CaesarCypher.encode("hello", 1)
     "ifmmp"
   """
   def encode(string, key) do
+    Regex.replace(~r/\w/, string, fn each ->
+      String.to_charlist(each)
+      |> IO.inspect(charlists: :as_lists)
+      |> Enum.map(fn char -> rem(char + key - ?a, 26) + ?a end)
+      |> List.to_string()
+    end)
   end
+
 end
+```
+
+```elixir
+string = "abcdefghijklmnopqrstuvwxyz"
+# output "bcdefghijklmnopqrstuvwxyza"
+
+String.to_charlist(string)
+|> Enum.map(fn each -> each + 1 end)
+|> 
+|> List.to_string()
+
+
+# Regex.replace(~r/\w/, string, fn each -> String.to_charlist(each) end)
 ```
 
 ## Mark As Completed
