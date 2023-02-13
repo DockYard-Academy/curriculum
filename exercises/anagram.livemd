@@ -67,6 +67,7 @@ defmodule Anagram do
     true
   """
   def anagram?(string1, string2) do
+    String.to_charlist(string1) |> Enum.sort() == String.to_charlist(string2) |> Enum.sort()
   end
 
   @doc """
@@ -84,6 +85,7 @@ defmodule Anagram do
     []
   """
   def filter_anagrams(word_list, anagram) do
+    Enum.filter(word_list, fn word -> anagram?(word, anagram) end)
   end
 end
 ```
@@ -113,8 +115,63 @@ defmodule AnagramSolver do
     ["abc", "acb", "bac", "bca", "cab", "cba"]
   """
   def solve(string) do
+    String.split(string, "", trim: true)
+    |> Enum.frequencies()
+    |> List.to_string()
   end
 end
+
+need(to(convert(string(to(enumerable(e.g.charlist))))))
+then(reorder(the(characters)))
+reordering = frequency(of(chars(is(maintained(but(all(possible(combinations(returned)))))))))
+```
+
+```elixir
+string = "abc"
+
+# count = String.split(string, "", trim: true) |> Enum.count()
+split = String.split(string, "", trim: true)
+
+Enum.reduce(split, fn char, acc -> acc * (char - 1) end)
+
+```
+
+```elixir
+# final list has x = permutations no. of entries
+# x = div(permutations, count) no. of entries begins with each letter of the original string (hd)
+# 
+
+# try this
+Enum.reduce(num_string, %{}, fn char, acc ->
+  Map.update(acc, char, 1, fn current -> current + 1 end)
+end)
+
+defmodule Fact do
+  def factorial(n) when n > 1 do
+    n * factorial(n - 1)
+  end
+
+  def factorial(n) when n <= 1 do
+    1
+  end
+end
+
+string = "abcd"
+
+split = String.split(string, "", trim: true)
+
+count = Enum.count(split)
+
+permutations = Fact.factorial(count)
+
+div(permutations, count)
+
+# Enum.reduce(split, [], fn [head | tail], acc -> 
+#   [elem, 0] = head
+#   if elem(split, 0) == head
+
+#   List.update_at(acc, -1, fn -> [head | tail] end)
+# end)
 ```
 
 ## Mark As Completed
