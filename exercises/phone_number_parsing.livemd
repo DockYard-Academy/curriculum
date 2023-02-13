@@ -112,7 +112,30 @@ defmodule PhoneNumber do
     iex> PhoneNumber.parse("1231231234 4564564567")
     "123-123-1234 456-456-4567"
   """
+
+  ## My Regex solution
+  # Regex.replace(~r/
+  #   # (\d{3})(\d{3})(\d{4}) # 1231231234
+  #   # (\d{3})\s(\d{3})\s(\d{4}) # 123 123 1234
+  #   # \((\d{3})\)\-(\d{3})\-(\d{4}) # (123)-123-1234
+  #   # \((\d{3})\)\s(\d{3})\s(\d{4}) # (123) 123 1234
+  #   # \((\d{3})\)(\d{3})\-(\d{4}) # (123)123-1234
+  # /x, string, fn _match, match1, match2, match3 -> "#{match1}-#{match2}-#{match3}" end)
+
   def parse(string) do
+    regexs = [
+      ~r/(\d{3})(\d{3})(\d{4})/,
+      ~r/(\d{3})\s(\d{3})\s(\d{4})/,
+      ~r/\((\d{3})\)\-(\d{3})\-(\d{4})/,
+      ~r/\((\d{3})\)\s(\d{3})\s(\d{4})/,
+      ~r/\((\d{3})\)(\d{3})\-(\d{4})/
+    ]
+
+    Enum.reduce(regexs, string, fn regex, string ->
+      Regex.replace(regex, string, fn _match, match1, match2, match3 ->
+        "#{match1}-#{match2}-#{match3}"
+      end)
+    end)
   end
 end
 ```
