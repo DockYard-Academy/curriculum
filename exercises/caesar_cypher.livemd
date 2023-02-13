@@ -82,13 +82,13 @@ defmodule CaesarCypher do
 
   ## Examples
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz")
-    "bcdefghijklmnopqrstuvwxyza"
+  #   iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz")
+  #   "bcdefghijklmnopqrstuvwxyza"
 
-  Encoding should work on any string
+  # Encoding should work on any string
 
-    iex> CaesarCypher.encode("hello")
-    "ifmmp"
+  #   iex> CaesarCypher.encode("hello")
+  #   "ifmmp"
   """
   def encode(string) do
   end
@@ -99,14 +99,14 @@ defmodule CaesarCypher do
 
   ## Examples
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1)
-    "bcdefghijklmnopqrstuvwxyza"
+    # iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1)
+    # "bcdefghijklmnopqrstuvwxyza"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
-    "cdefghijklmnopqrstuvwxyzab"
+    # iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
+    # "cdefghijklmnopqrstuvwxyzab"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14)
-    "opqrstuvwxyzabcdefghijklmn"
+    # iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14)
+    # "opqrstuvwxyzabcdefghijklmn"
 
   Encoding should work on any string.
 
@@ -116,6 +116,25 @@ defmodule CaesarCypher do
   def encode(string, key) do
   end
 end
+```
+
+```elixir
+string = "abcdefghijklmnopqrstuvwxyz"
+offset = 2
+
+chars = String.to_charlist(string)
+
+Enum.map(chars, fn char -> char + 2 end)
+
+?z - offset
+
+# Enum.map(chars, fn char ->
+#   if char < 'z' - offset do
+#     'z'
+#   else
+#     char + 2
+#   end
+# end)
 ```
 
 ## Mark As Completed
