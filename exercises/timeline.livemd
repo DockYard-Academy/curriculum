@@ -95,7 +95,21 @@ defmodule Timeline do
     iex> Timeline.from_dates([~D[2020-01-01], ~D[2020-01-10], ~D[2020-01-22], ~D[2020-01-24]])
     [9, 12, 2]
   """
+
+  # def from_dates(dates) do
+  #   Enum.chunk_every(dates, 2, 1, :discard)
+  #   |> Enum.map(fn element ->
+  #     date1 = Enum.at(element, 0)
+  #     date2 = Enum.at(element, 1)
+  #     Date.diff(date2, date1)
+  #   end)
+  # end
+
   def from_dates(dates) do
+    Enum.chunk_every(dates, 2, 1, :discard)
+    |> Enum.map(fn [date1, date2] ->
+      Date.diff(date2, date1)
+    end)
   end
 
   @doc """
@@ -114,8 +128,30 @@ defmodule Timeline do
     [9, 12, 2]
   """
   def from_strings(date_strings) do
+    date_strings_converted = Enum.map(date_strings, fn element -> Date.from_iso8601!(element) end)
+
+    Enum.chunk_every(date_strings_converted, 2, 1, :discard)
+    |> Enum.map(fn [date1, date2] ->
+      Date.diff(date2, date1)
+    end)
   end
 end
+```
+
+```elixir
+dates = [~D[2020-01-01], ~D[2020-01-02], ~D[2020-01-22]]
+
+dates
+|> Enum.chunk_every(2, 1, :discard)
+|> Enum.map(fn element ->
+  date1 = Enum.at(element, 0)
+  date2 = Enum.at(element, 1)
+  Date.diff(date2, date1)
+end)
+
+# pair1 = [~D[2020-01-01], ~D[2020-01-02]]
+# Enum.reduce(pair1, fn date, acc -> Date.diff(date, acc) end)
+
 ```
 
 ## Mark As Completed

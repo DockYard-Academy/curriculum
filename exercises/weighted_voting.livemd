@@ -87,7 +87,17 @@ defmodule WeightedVoting do
     iex> WeightedVoting.count([cats: 10, dogs: 20, dogs: 10, cats: 30], :cats)
     40
   """
+
+  # def count(votes, vote_to_count) do
+  #   total_animals = Enum.filter(votes, fn tuple -> elem(tuple, 0) == vote_to_count end)
+  #   animal_values = Enum.map(total_animals, fn animal -> elem(animal, 1) end)
+  #   Enum.sum(animal_values)
+  # end
+
   def count(votes, vote_to_count) do
+    Enum.filter(votes, fn tuple -> elem(tuple, 0) == vote_to_count end)
+    |> Enum.map(fn animal -> elem(animal, 1) end)
+    |> Enum.sum()
   end
 
   @doc """
@@ -106,6 +116,14 @@ defmodule WeightedVoting do
     [birds: 20, cats: 30, dogs: 30]
   """
   def tally(votes) do
+    unsorted_tally =
+      Enum.reduce(votes, [], fn {key, vote_count}, acc ->
+        Keyword.update(acc, key, vote_count, fn existing_value ->
+          existing_value + vote_count
+        end)
+      end)
+
+    Enum.sort(unsorted_tally)
   end
 end
 ```

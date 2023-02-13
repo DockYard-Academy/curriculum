@@ -22,6 +22,8 @@ Represent each book as a `Book` struct with `title` key. Then create a `Book.sea
 
 ```elixir
 defmodule Book do
+  defstruct title: nil
+
   @moduledoc """
   Documentation for `Book`.
 
@@ -58,9 +60,68 @@ defmodule Book do
     iex> Book.search([%Book{title: "ABC"}], "a")
     [%Book{title: "ABC"}]
   """
+
   def search(books, query) do
+    query = String.upcase(query)
+    Enum.filter(books, fn book ->
+      query == book.title
+      String.contains?(book.title, query)
+    end)
   end
+
+  # def fuzzy_match?(books, query) do
+  #   String.contains?(book.title, query)
+  # end
 end
+
+```
+
+```elixir
+book1 = %Book{title: "A"}
+book2 = %Book{title: "B"}
+book3 = %Book{title: "C"}
+Book.search([book1, book2, book3], "A")
+
+# Enum.filter([book1, book2, book3], fn book.title -> anagram?(book.title, query) end)
+
+# String.split(string, "", trim: true) |> Enum.sort() |> Enum.join()
+# String.to_charlist(string1) |> Enum.sort() == String.to_charlist(string2) |> Enum.sort()
+```
+
+```elixir
+book1 = %Book{title: "A"}
+book2 = %Book{title: "B"}
+book3 = %Book{title: "C"}
+books = [book1, book2, book3]
+
+query = "C"
+
+query = String.upcase(query)
+
+if query == book.title do
+  book.title
+else
+  String.contains?(book.title, query)
+end
+
+# Enum.filter(books, fn book -> query == book.title end)
+# String.contains?(book.title, query)
+
+# Enum.filter(books, fn book1 -> query == book1.title end)
+
+# String.contains?("#{inspect(books)}"), query)
+```
+
+```elixir
+defmodule BookNew do
+  defstruct title: nil
+end
+```
+
+```elixir
+book1 = %BookNew{title: "My Book Title"}
+
+book1.title
 ```
 
 ## Mark As Completed
