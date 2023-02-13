@@ -154,7 +154,7 @@ defmodule FailingTestWithMessage do
   use ExUnit.Case
 
   test "failing example" do
-    assert false, "This message will display for a failing test."
+    assert false, "assert failed for reason default"
   end
 end
 
@@ -231,7 +231,7 @@ defmodule NumberTest do
   use ExUnit.Case
 
   test "double/1" do
-    assert Number.double(2) == 4
+    assert Number.double(2) == 4, "2 + 2 = 4"
     assert Number.double(3) == 6
   end
 end
@@ -258,7 +258,7 @@ defmodule MapMergeTest do
   use ExUnit.Case
 
   test "merge/2" do
-    assert %{one: _value} = Map.merge(%{one: 1}, %{two: 2})
+    assert %{one: _value} = Map.merge(%{one: 1}, %{two: 2}), "assert pattern matching"
   end
 end
 
