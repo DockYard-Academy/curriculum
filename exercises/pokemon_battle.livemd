@@ -75,55 +75,94 @@ Pokemon.attack(attacker, defender)
 
 ```elixir
 defmodule Pokemon do
+  @enforce_keys [:name, :type, :speed, :health, :attack]
+  defstruct [:name, :type, :speed, health: 20, attack: 5]
+
+  @advantages [{:fire, :grass}, {:grass, :water}, {:water, :fire}]
+  @disadvantages [{:fire, :water}, {:grass, :fire}, {:water, :grass}]
+
   @moduledoc """
   Pokemon
 
-  ## Examples
+  #   iex> %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
 
-    iex> %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
+  #   %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  # """
 
-    iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
-    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-  """
+  # @doc """
+  # subtract the attack damage of an attacker from the defender's health.
+  # return an updated pokemon struct, and take type advantage into consideration.
 
-  @doc """
-  subtract the attack damage of an attacker from the defender's health.
-  return an updated pokemon struct, and take type advantage into consideration.
+  # ## Examples
 
-  ## Examples
+  #   Same Type
 
-    Same Type
+  #   iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   iex> Pokemon.attack(attacker, defender)
+  #   %Pokemon{name: "Charmander", type: :fire, health: 15, attack: 5, speed: 20}
 
-    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Charmander", type: :fire, health: 15, attack: 5, speed: 20}
+  #   Type Disadvantage
 
-    Type Disadvantage
+  #   iex> attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+  #   iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   iex> Pokemon.attack(attacker, defender)
+  #   %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5, speed: 20}
 
-    iex> attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5, speed: 20}
+  #   Type Advantage
 
-    Type Advantage
+  #   iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+  #   iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+  #   iex> Pokemon.attack(attacker, defender)
+  #   %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
+  # """
+  def subtract_half do
+    defender.health = defender.health - attacker.attack / 2
+    IO.puts(defender)
+  end
 
-    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
-  """
+  def subtract_double do
+    defender.health = defender.health - attacker.attack * 2
+    IO.puts(defender)
+  end
+
   def attack(attacker, defender) do
+    cond do
+      attacker.type == defender.type -> IO.puts(defender)
+      {attacker.type, defender.type} in @disadvantages -> subtract_half(attacker, defender)
+      {attacker.type, defender.type} in @advantages -> subtract_double(attacker, defender)
+      true -> IO.puts("attack fail!")
+    end
+  end
+
+  def subtract_half(attacker, defender) do
+    new_defender = %{defender | health: attacker.attack / 2}
+    new_defender
+  end
+
+  def subtract_double(attacker, defender) do
+    new_defender = %{defender | health: attacker.attack * 2}
+    new_defender
   end
 end
+
+```elixir
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+Pokemon.attack(attacker, defender)
+```
+
+```elixir
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+Pokemon.attack(attacker, defender)
 ```
 
 Consider using the following Elixir cell to test your solution.
 
-```elixir
-
-```
+<!-- livebook:{"break_markdown":true} -->
 
 ### Pokemon Instances
 
@@ -173,7 +212,9 @@ Pokemon.attack(charmander, bulbasaur)
 Enter your solution below.
 
 ```elixir
-
+charmander = %{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+bulbasaus = %{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+squirtle = %{name: "Squirtle", type: :water, health: 20, attack: 5, speed: 20}
 ```
 
 ## Mark As Completed

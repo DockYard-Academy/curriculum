@@ -78,6 +78,7 @@ defmodule CustomEnum do
     [7, 6, 5, 4]
   """
   def reverse(list) do
+    Enum.reduce(list, [], fn each, acc -> [each] ++ acc end)
   end
 
   @doc """
@@ -92,6 +93,9 @@ defmodule CustomEnum do
     [true, true, true]
   """
   def map(list, callback_function) do
+    Enum.reduce(list, [], fn each, acc ->
+      List.insert_at(acc, -1, callback_function.(each))
+    end)
   end
 
   @doc """
@@ -107,6 +111,13 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    Enum.reduce(list, [], fn each, acc ->
+      case callback_function.(each) do
+        true -> List.insert_at(acc, -1, each)
+        _ -> List.insert_at(acc, -1, nil)
+      end
+      |> List.delete(nil)
+    end)
   end
 
   @doc """
@@ -121,6 +132,7 @@ defmodule CustomEnum do
     3
   """
   def sum(list_of_integers) do
+    Enum.reduce(list_of_integers, fn each, acc -> each + acc end)
   end
 
   @doc """
@@ -135,8 +147,46 @@ defmodule CustomEnum do
     "Hello, World!"
   """
   def join(list_of_strings) do
+    Enum.reduce(list_of_strings, fn each, acc ->
+      acc <> each
+    end)
   end
 end
+```
+
+```elixir
+list = [1, 2, 3]
+
+callback = fn a, b ->
+  case is_integer(a) do
+    true -> List.insert_at(b, -1, a)
+    _ -> List.insert_at(b, -1, nil)
+  end
+  |> List.delete(nil)
+end
+
+Enum.reduce(list, [], fn each, acc ->
+  callback.(each, acc)
+end)
+
+#   case is_integer(each) do
+#     :true -> List.insert_at(acc, -1, each)
+#     _ -> List.insert_at(acc, -1, nil)
+#   end
+#   |> List.delete(nil)
+
+# Enum.reduce(list, fn each, acc -> 
+#   each <> acc 
+#   |> String.to_charlist()
+#   |> Enum.reverse()
+#   |> Enum.sort()
+#   |> List.to_string()
+
+# end)
+
+# Enum.reduce(list, [], fn each, acc -> 
+#   List.insert_at(acc, -1, each * 2) 
+# end)
 ```
 
 ## Mark As Completed

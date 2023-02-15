@@ -429,7 +429,18 @@ end)
 </details>
 
 ```elixir
+# string = "999-999-9999"
+# Regex.replace(~r/\d{3}-\d{4}/, string, "XXX-XXXX")
 
+string1 = """
+999-999-9999
+888-999-9999
+999-9999
+"""
+
+Regex.replace(~r/(\d{3})-(\d{3}-\d{4})/, string1, fn full_match, group1 ->
+  "#{group1}-XXX-XXXX"
+end)
 ```
 
 ## Further Reading
@@ -446,6 +457,12 @@ expressions as required.
 
 Not all languages use the same standard for regular expressions, so you may find information online that does not
 apply to Elixir.
+
+```elixir
+string = "WXYZ\\]^_`abcd"
+Regex.scan(~r/[A-z]/, string)
+# <<91, 92, 93, 94, 95, 96>>
+```
 
 ## Mark As Completed
 
