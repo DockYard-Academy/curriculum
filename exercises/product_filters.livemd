@@ -5,7 +5,9 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:benchee, "~> 1.1"},
+  {:faker, "~> 0.17"}
 ])
 ```
 
@@ -236,7 +238,86 @@ defmodule Products do
   Filter products by :name, :min, :max, and :category.
   The name filter should be case insensitive and handle partial matches.
   """
-  def filter(products, filters) do
+
+  def check?({:min, min}, product), do: min <= product.price
+  def check?({:max, max}, product), do: product.price <= max
+  def check?({:category, category}, product), do: category == product.category
+  def check?({:name, name}, product), do: String.downcase(product.name) =~ String.downcase(name)
+
+  def filter_ex2(products, filters) do
+    Enum.filter(products, fn product ->
+      Enum.all?(filters, fn filter -> check?(filter, product) end)
+    end)
+  end
+
+  def filter_ex1(products, filters) do
+    name = filters[:name] || ""
+    min = filters[:min]
+    max = filters[:max]
+    category = filters[:category]
+
+    products
+    |> Enum.filter(fn product ->
+      match_name = String.downcase(product.name) =~ String.downcase(name)
+      match_min = !min or product.price >= min
+      match_max = !max or product.price <= max
+      match_category = !category or product.category == category
+
+      match_name and match_min and match_max and match_category
+    end)
+  end
+
+  def filter_yusef(products, filters) do
+    products
+    |> filter_partial_name(filters[:name])
+    |> filter_category(filters[:category])
+    |> filter_min_price(filters[:min])
+    # |> IO.inspect()
+    |> filter_max_price(filters[:max])
+  end
+
+  defp filter_partial_name(products, name) do
+    if name do
+      products
+      |> Enum.filter(fn product ->
+        String.downcase(product.name) =~ String.downcase(name)
+      end)
+    else
+      products
+    end
+  end
+
+  defp filter_category(products, category) do
+    if category do
+      products
+      |> Enum.filter(fn product ->
+        product.category == category
+      end)
+    else
+      products
+    end
+  end
+
+  defp filter_min_price(products, min) do
+    if min do
+      products
+      |> Enum.filter(fn product ->
+        product.price >= min
+      end)
+    else
+      products
+    end
+  end
+
+  defp filter_max_price(products, max) do
+    if max do
+      products
+      |> Enum.filter(fn product ->
+        product.price <= max
+      end)
+    else
+      products
+    end
   end
 end
 
@@ -245,26 +326,141 @@ ExUnit.start(auto_run: false)
 defmodule ProductsTest do
   use ExUnit.Case
 
-  test "filter/2 empty filters"
+  @products [
+    %{name: "Headphones", category: :tech, price: 3000},
+    %{name: "Laptop", category: :tech, price: 100_000},
+    %{name: "Phone", category: :tech, price: 50000},
+    %{name: "Chocolate", category: :snacks, price: 200},
+    %{name: "Shampoo", category: :health, price: 1000}
+  ]
 
-  test "filter/2 by exact matching name"
+  test "filter/2 empty filters" do
+    assert Products.filter(@products, []) == @products
+  end
 
-  test "filter/2 by partial matching name"
+  test "filter/2 by exact matching name" do
+    assert Products.filter(@products, name: "Laptop") == [
+             %{name: "Laptop", category: :tech, price: 100_000}
+           ]
+  end
 
-  test "filter/2 by mixed case partial matching name"
+  test "filter/2 by partial matching name" do
+    assert Products.filter(@products, name: "apt") == [
+             %{name: "Laptop", category: :tech, price: 100_000}
+           ]
+  end
 
-  test "filter/2 by category"
+  test "filter/2 by mixed case partial matching name" do
+    assert Products.filter(@products, name: "mPo") == [
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
 
-  test "filter/2 by min price"
+  test "filter/2 by category" do
+    assert Products.filter(@products, category: :tech) == [
+             %{name: "Headphones", category: :tech, price: 3000},
+             %{name: "Laptop", category: :tech, price: 100_000},
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
+  end
 
-  test "filter/2 by max price"
+  test "filter/2 by min price" do
+    assert Products.filter(@products, min: 1200) == [
+             %{name: "Headphones", category: :tech, price: 3000},
+             %{name: "Laptop", category: :tech, price: 100_000},
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
+  end
 
-  test "filter/2 by max and min price"
+  test "filter/2 by max price" do
+    assert Products.filter(@products, max: 1000) == [
+             %{name: "Chocolate", category: :snacks, price: 200},
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
 
-  test "filter/2 all filters"
+  test "filter/2 by max and min price" do
+    assert Products.filter(@products, min: 900, max: 50_000) == [
+             %{name: "Headphones", category: :tech, price: 3000},
+             %{name: "Phone", category: :tech, price: 50000},
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
+
+  test "filter/2 all filters" do
+    assert Products.filter(@products, min: 100, max: 55000, name: "o", category: :tech) ==
+             [
+               %{name: "Headphones", category: :tech, price: 3000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ]
+  end
 end
 
 ExUnit.run()
+```
+
+```elixir
+Faker.start()
+count = 1000
+
+names = Enum.map(1..100, fn _ -> Faker.Person.name() end)
+categories = Enum.map(1..20, fn _ -> :"#{Faker.Company.bullshit_suffix()}" end)
+prices = Enum.map(1..10, fn _ -> Enum.random(1..1_000_000) end)
+
+# create_products = fn ->
+#     |> Enum.into(%{
+#       name: Enum.random(names),
+#       category: Enum.random(prices),
+#       price: Enum.random(prices)
+#     })
+#   end
+
+products =
+  Enum.map(1..count, fn _ ->
+    %{
+      name: Enum.random(names),
+      category: Enum.random(categories),
+      price: Enum.random(prices)
+    }
+  end)
+```
+
+```elixir
+Benchee.run(
+  %{
+    "example 1" => fn ->
+      Products.filter_ex1(products,
+        name: "v2.o43d987 inhs9823vr4",
+        max: 200_000,
+        min: 1_000,
+        category: :content
+      )
+    end,
+    "example 2" => fn ->
+      Products.filter_ex2(products,
+        name: "v2.o43d987 inhs9823vr4",
+        max: 200_000,
+        min: 1_000,
+        category: :content
+      )
+    end,
+    "yusef's version" => fn ->
+      Products.filter_yusef(products,
+        name: "v2.o43d987 inhs9823vr4",
+        max: 20_000,
+        min: 1_000,
+        category: :content
+      )
+    end
+  },
+  parallel: 1
+)
+```
+
+```elixir
+filters = [{:category, :dev}, {:name, "yusef"}]
+[{:name, name} | _rest] = filters
+name
 ```
 
 ## Mark As Completed
