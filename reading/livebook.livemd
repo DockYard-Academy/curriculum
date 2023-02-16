@@ -196,7 +196,7 @@ Evaluate the Elixir cell below, then change `5` to `4` to see **Evaluated** chan
 Re-evaluate the cell to see *Evaluated\** change to **Evaluated**.
 
 ```elixir
-5
+4
 ```
 
 Sometimes order of evaluation can cause issues in Exercises by using a stale version of an Elixir cell. Make sure to evaluate a code cell whenever you make a change.
@@ -210,7 +210,7 @@ Try uncommenting the following code (Remove the `#` character) then press <kbd>A
 Notice that the `1 + 1` code moves to the left.
 
 ```elixir
-#               1 + 1
+1 + 1
 ```
 
 If you have not evaluated any Elixir code cells, you may see a warning.
@@ -223,12 +223,12 @@ If you cannot format an Elixir cell, you can use this as a clue that you have a 
 code is invalid. Notice that you cannot use <kbd>ALT</kbd>+<kbd>SHIFT</kbd>+<kbd>F</kbd> to format the code.
 
 ```elixir
-          1 +
+1 + 1
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"livebook_reading\"\n    \"exercises\" -> \"livebook_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"assertions":"assert five == 5","attempts":1,"code":"five = 4","solution":"five = 5","title":"Exercise"},"chunks":null,"kind":"Elixir.TestedCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
