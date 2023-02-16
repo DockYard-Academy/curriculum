@@ -1,0 +1,124 @@
+# Blog: Tags
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Blog Tags
+
+You're going to add `Tags` to your existing [Blog](group_project_blog.livemd) project.
+
+Each blog post has a many-to-many association with tags.
+
+Tags should have `:name` field describing the type of tag such as `"tutorial"`, `"elixir"`, `"testing"`, etc.
+
+```mermaid
+classDiagram
+  class Tag {
+    name: :string
+  }
+```
+
+Blogs and tags should be associated through a **join** table `blog_tags`.
+
+```mermaid
+classDiagram
+  class BlogTag {
+    blog_id: :id
+    tag_id: :id
+  }
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Tag Requirements
+
+Ensure you:
+
+* Can perform standard CRUD operations for tags.
+* Can associate a blog with a tag using a multiple select when you create or update a blog.
+* Include a list of a blog's tags on the blog show page.
+
+## Bonus: Search By Tag
+
+Add the ability to see posts for a particular tag.
+
+For example, you might include a show blogs by tag page which displays all blogs that belong to a specified tag on the `"/blogs/tags/:id` route where `:id` is the id of a tag.
+
+Alternatively, you might create a form on the book index page to search for blogs by tag.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"blog_tags_reading\"\n    \"exercises\" -> \"blog_tags_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "blog_tags_reading"
+    "exercises" -> "blog_tags_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b blog-tags-exercise
+$ git add .
+$ git commit -m "finish blog tags exercise"
+$ git push origin blog-tags-exercise
+```
+
+Create a pull request from your `blog-tags-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                               | Next                                                                   |
+| ------------------------------------------------------ | ---------------------------------------------------------------------: |
+| [BookSearch: Tags](../reading/book_search_tags.livemd) | [BookSearch: Book Content](../reading/book_search_book_content.livemd) |

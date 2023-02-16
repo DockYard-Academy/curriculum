@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,6 +18,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do processes send and receive messages?
+* What is state and why might we use it in our programs?
+
 ## Processes
 
 > In Elixir, all code runs inside processes.
@@ -25,7 +34,17 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 > 
 > * [Elixir Documentation](https://elixir-lang.org/getting-started/processes.html#:~:text=In%20Elixir%2C%20all%20code%20runs,distributed%20and%20fault%2Dtolerant%20programs.)
 
+For an introduction to processes, how they work under the hood, and why that matters, we recommend the exceptional talk by Sasa Juric: "The Soul of Erlang."
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=JvBT4XBdoUE\")","title":"The Soul of Erlang and Elixir • Sasa Juric • GOTO 2019"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=JvBT4XBdoUE")
+```
+
 So all Elixir code runs inside of a process.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart
@@ -37,6 +56,8 @@ flowchart
 <!-- livebook:{"break_markdown":true} -->
 
 Processes are isolated from each other and communicate via message passing.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 sequenceDiagram
@@ -355,27 +376,68 @@ You should be able to send a `:decrement` message to a spawned `Counter`. Uncomm
 # send(counter_process, :decrement)
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"processes_reading\"\n    \"exercises\" -> \"processes_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "processes_reading"
+    "exercises" -> "processes_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-processes
+$ git checkout -b processes-reading
 $ git add .
-$ git commit -m "finish processes section"
-$ git push origin exercise-processes
+$ git commit -m "finish processes reading"
+$ git push origin processes-reading
 ```
+
+Create a pull request from your `processes-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                       | Next                                                 |
-| -------------------------------------------------------------- | ---------------------------------------------------: |
-| [Fibonacci Challenge](../exercises/fibonacci_challenge.livemd) | [Process Drills](../exercises/process_drills.livemd) |
+| Previous                                       | Next                                          |
+| ---------------------------------------------- | --------------------------------------------: |
+| [File Search](../exercises/file_search.livemd) | [Process](../exercises/process_drills.livemd) |

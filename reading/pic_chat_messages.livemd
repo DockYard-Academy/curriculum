@@ -1,0 +1,779 @@
+# PicChat: Messages
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How can we navigate the user from the client, and from the server?
+* How do we test a LiveView?
+* How do we use Phoenix Components to abstract and reuse code?
+* How can a LiveView render different UI based on URL params?
+
+## Overview
+
+### Phoenix Live Generator
+
+We can use `mix phx.gen.live` similar to how we have already used `mix phx.gen.html` to generate the boilerplate code for a resource.
+
+Do not run this command. This is for demonstration purposes only.
+
+```
+mix phx.gen.live Context Schema table field_name:field_type
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Phoenix LiveComponent](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveComponent.html)
+
+`Phoenix.LiveComponent` encapsulates the behavior of a LiveView (state, message handling, displaying html) into a sub-component that can be placed inside of another LiveView.
+
+This allows us to break apart our LiveViews into several smaller components, that can even be re-used.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule HelloComponent do
+  # If you generated an app with mix phx.new --live,
+  # the line below would be: use MyAppWeb, :live_component
+  use AppWeb, :live_component
+
+  def render(assigns) do
+    ~H"""
+    Hello, @name!
+    """
+  end
+end
+```
+
+We use the [Phoenix.Component.live_component/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#live_component/1) to render a LiveComponent. The `id` and `module` attributes are required. Other attributes are bound to the socket assigns.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.live_component module={HelloComponent} id="hello" name={@name} />
+```
+
+Like LiveViews, LiveComponents can send messages using `phx-*` bindings. By default, the message will be sent to their parent LiveView. Alternatively, you can use `@myself` to send a message to itself.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<button href="#" phx-click="greeting" phx-target={@myself}>
+  Say hello!
+</button>
+```
+
+LiveComponents can define event handlers using [handle_event/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveComponent.html#c:handle_event/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_event("greeting", _params, socket) do
+  # ...
+  {:noreply, socket}
+end
+```
+
+See [HexDocs: Phoenix.LiveComponent](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveComponent.html) for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [handle_params/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:handle_params/3)
+
+LiveViews can define a `handle_params/3` callback function which is invoked after mounting, or if there is a live patch event.
+
+`handle_params/3` is often used to handle changing query params, or to trigger different LiveView behavior for different URLs.
+
+Unlike Controller actions which often correspond to a single URL, A single LiveView might handle many different urls.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+live "/new", MessageLive.Index, :new
+live "/:id/edit", MessageLive.Index, :edit
+```
+
+`handle_params/3` can be used to handle each URL differently. The socket automatically assigns the `live_action`, which is the atom provided in the router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def handle_params(params, _url, socket) do
+    
+    # the atom (:new or :edit)
+    socket.assigns.live_action
+    # params from the path, or from query params.
+    params
+
+    {:noreply, socket}
+  end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Live Navigation
+
+LiveView provides four primary functions for navigation.
+
+* From the client
+  * [Phoenix.LiveView.Helpers.live_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_redirect/2)
+  * [Phoenix.LiveView.Helpers.live_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_patch/2)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %>
+<%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %>
+```
+
+* From the Server
+  * [Phoenix.LiveView.push_redirect/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_redirect/2)
+  * [Phoenix.LiveView.push_patch/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.html#push_patch/2)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:noreply, push_patch(socket, to: Routes.message_show_path(@socket, :show, message))}
+```
+
+Each serves a different purpose.
+
+* `push_patch/` and `live_patch` re-render the current LiveView with different parameters.
+* `live_redirect` and `push_redirect`  redirects to a different LiveView.
+
+Unlike using a normal [link/2](https://hexdocs.pm/phoenix_html/3.2.0/Phoenix.HTML.Link.html#link/2) or redirect, these live navigation functions update the page without doing a full page reload. This is more performant and should be preferred when working with LiveView.
+
+See [HexDocs: LiveNavigation](https://hexdocs.pm/phoenix_live_view/0.17.12/live-navigation.html) for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [LiveView Testing](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#content)
+
+We can mount a LiveView in a test using the [live/2](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#live/2) macro.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Make a request with `live/2` to mount the LiveView and get the resulting html
+{:ok, view, html} = live(conn, "/hello")
+
+# Assert that the module of `view` is `MyLiveViewModule`.
+assert view.module == MyLiveViewModule
+
+# Assert that "Hello, World!" is contained in the html.
+assert html =~ "Hello, World!"
+```
+
+It's also possible to select elements using [element/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#element/3).
+
+We can then use [render/1](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#render/1) to make assertions on the rendered html, or trigger events with functions such as [render_click/2](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#render_click/2)
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Make a request with `live/2` to mount the LiveView and get the resulting html
+{:ok, view, html} = live(conn, "/count")
+
+# The rendered view should start at count `0`.
+assert view
+       |> render() =~ "0"
+
+# The rendered view should incremement the count to `1` after clicking the increment button
+assert view
+       |> element("button", "increment")
+       |> render_click() =~ "1"
+```
+
+There's also [form/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#form/3) and [render_submit/2](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#render_submit/2) specifically for testing forms. [follow_redirect/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#follow_redirect/3) allows us to follow a redirect after submitting the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Make a request with `live/2`.
+{:ok, view, _html} = live(conn, Routes.message_index_path(conn, :index))
+
+# select the form, submit the form, and follow the redirect to "/". Bind the resulting html.
+{:ok, _, html} =
+  view
+  |> form("#message-form", message: %{content: "some content", from: "some user"})
+  |> render_submit()
+  |> follow_redirect(conn, "/")
+
+# Assert that "Message created successfully" is contained in `html`.
+assert html =~ "Message created successfully"
+
+# Assert that "some content" is contained in `html`.
+assert html =~ "some content"
+```
+
+See [HexDocs: Phoenix.LiveViewTesting](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#content) for more.
+
+## Follow Along: PicChat Messages
+
+Over the next few lessons we're going to build a Chat Application that can also upload images called `PicChat`.
+Our application will include a global chat where users can send messages and see the feed of messages update in real-time.
+
+We'll also save messages in a database with [Ecto](https://hexdocs.pm/ecto/Ecto.html) to demonstrate how to use CRUD (Create, Read, Update, Delete) actions with LiveViews.
+
+You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat) application for the sake of reference.
+
+In this lesson, we're going to create the initial feed of messages without images. Follow along with each step of the instruction to build your own `PicChat` application.
+
+## Create the Phoenix Project
+
+Create the Phoenix project
+
+```
+$ mix phx.new pic_chat
+```
+
+Make sure to create the Ecto database.
+
+```
+$ mix ecto.create
+```
+
+## Create the Chat Context.
+
+We're going to create a `Chat` context with a `Message` resource in a `messages` table.
+Messages will have a `:content` and `:from` field.
+
+We can use the [mix phx.gen.live](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Live.html) phoenix generator to create the scaffolding for CRUD actions using LiveViews.
+
+```
+$ mix phx.gen.live Chat Message messages content:text from:string 
+```
+
+The majority of this lesson will be reading through the generated code in order to better understand how we can build applications with LiveView.
+
+## Define Routes
+
+Add our routes in `router.ex`. We'll remove the `PageController` route so we can use the base url `"/"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", PicChatWeb do
+  pipe_through :browser
+
+  live "/", MessageLive.Index, :index
+  
+  live "/new", MessageLive.Index, :new
+  live "/:id/edit", MessageLive.Index, :edit
+
+  live "/:id", MessageLive.Show, :show
+  live "/:id/show/edit", MessageLive.Show, :edit
+end
+```
+
+Notice that unlike with MVC generators, the generator only generates two LiveViews `MessageLive.Index` and `MessageLive.Show`. It then uses the `:index`, `:new`, `:edit`, and `:show` parameters to conditionally render a modal. We'll dive into how this works in a moment.
+
+Since we removed the `PageController` route, make sure to remove `page_view_test.exs`, `page_view.ex`, `page_controller_test.ex`, and `page_controller.ex`, and `/page/index.html.heex`.
+
+## The MessageLive.Index LiveView
+
+Start your server.
+
+```
+$ mix phx.server
+```
+
+Visit http://localhost:4000 to view your `MessageLive.Index` page.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_index_live.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [handle_params/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:handle_params/3)
+
+When the `MessageLive.Index` module in `live/message_live/index.ex` mounts, it automatically invokes the `handle_params/3` callback.
+
+`handle_params/3` accepts `params` from the url and the `live_action` atom (defined previously in our `router.ex` for the corresponding url). It then calls the `apply_action/3` function to assign some values in our socket state.
+
+The `:message` field on the socket is used when editing or showing a message. The `:page_title` field displays a title in the tab in your browser.
+
+Here's a documented version of these functions for the sake of understanding.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@impl true
+def mount(_params, _session, socket) do
+  # This assigns the result of `list_messages()` to the `:messages` key of `socket`.
+  {:ok, assign(socket, :messages, list_messages())}
+end
+
+@impl true
+def handle_params(params, _url, socket) do
+  # The apply_action/3 function assigns values to the socket for the :edit, :show, and :index actions.
+  {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+end
+
+# Assigns values to the socket for the `:edit` action.
+defp apply_action(socket, :edit, %{"id" => id}) do
+  socket
+  |> assign(:page_title, "Edit Message")
+  |> assign(:message, Chat.get_message!(id))
+end
+
+# Assigns values to the socket for the `:new` action.
+defp apply_action(socket, :new, _params) do
+  socket
+  |> assign(:page_title, "New Message")
+  |> assign(:message, %Message{})
+end
+
+# Assigns values to the socket for the `:index` action.
+defp apply_action(socket, :index, _params) do
+  socket
+  |> assign(:page_title, "Listing Messages")
+  |> assign(:message, nil)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Template
+
+Our `MessageLive.Index` function doesn't define a `render/1` function. Instead it uses a template file. If you don't define a `render/1` callback function in a LiveView, it automatically attempts to render a template matching the module's name.
+
+In this case, it renders a `index.html.heex` template file. This file renders a list of messages using the `:messages` field from the socket.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= for message <- @messages do %>
+  <tr id={"message-#{message.id}"}>
+    <td><%= message.content %></td>
+    <td><%= message.from %></td>
+
+    <td>
+      <span><%= live_redirect "Show", to: Routes.message_show_path(@socket, :show, message) %></span>
+      <span><%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message) %></span>
+      <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: message.id, data: [confirm: "Are you sure?"] %></span>
+    </td>
+  </tr>
+<% end %>
+```
+
+## Creating A Message
+
+The New button uses `live_patch/2` to re-render the current LiveView with a different URL http://localhost:4000/new.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<span><%= live_patch "New Message", to: Routes.message_index_path(@socket, :new) %></span>
+```
+
+You can visit http://localhost:4000/new. or click on the `New` button to see a modal for creating messages.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_index_live_new.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### The `:new` `live_action`
+
+We're going to walk through the somewhat complex flow how how this form is rendered. Along the way we're going to be introduced to many new concepts.
+
+This re-triggered the `handle_params/3` function in `MessageLive.Index`. `handle_params/3` calls `apply_action/3` for the `:new` action.
+
+This assigns a new `:page_title` and `:message` field on our socket.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp apply_action(socket, :new, _params) do
+  socket
+  |> assign(:page_title, "New Message")
+  |> assign(:message, %Message{})
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### `<.modal>`
+
+The `index.html.heex` template uses these fields to render a modal.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.message_index_path(@socket, :index)}>
+    <.live_component
+      module={PicChatWeb.MessageLive.FormComponent}
+      id={@message.id || :new}
+      title={@page_title}
+      action={@live_action}
+      message={@message}
+      return_to={Routes.message_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+```
+
+`@live_action` comes from `router.ex` for our `"/new"` URL when we define the `:new` atom.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+live "/new", MessageLive.Index, :new
+```
+
+The `modal` component is built into Phoenix in our `PicChat.LiveHelpers` module in `live_helpers.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def modal(assigns) do
+  assigns = assign_new(assigns, :return_to, fn -> nil end)
+
+  ~H"""
+  <div id="modal" class="phx-modal fade-in" phx-remove={hide_modal()}>
+    <div
+      id="modal-content"
+      class="phx-modal-content fade-in-scale"
+      phx-click-away={JS.dispatch("click", to: "#close")}
+      phx-window-keydown={JS.dispatch("click", to: "#close")}
+      phx-key="escape"
+    >
+      <%= if @return_to do %>
+        <%= live_patch "✖",
+          to: @return_to,
+          id: "close",
+          class: "phx-modal-close",
+          phx_click: hide_modal()
+        %>
+      <% else %>
+        <a id="close" href="#" class="phx-modal-close" phx-click={hide_modal()}>✖</a>
+      <% end %>
+
+      <%= render_slot(@inner_block) %>
+    </div>
+  </div>
+  """
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### `<live_component>`
+
+[render_slot/2](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#render_slot/2) renders the HTML we place inside of the `<.modal>` element.
+
+This renders the `<.live_component>` element inside of the modal in `index.html.heex` with some attributes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.live_component
+  module={PicChatWeb.MessageLive.FormComponent}
+  id={@message.id || :new}
+  title={@page_title}
+  action={@live_action}
+  message={@message}
+  return_to={Routes.message_index_path(@socket, :index)}
+/>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### LiveComponent: FormComponent
+
+The [live_component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#live_component/1) inside our modal renders the `PicChatWeb.MessageLive.FormComponent` LiveComponent.
+
+This `PicChatWeb.MessageLive.FormComponent` renders the `form_component.html.heex` template because they have the same name, and the `FormComponent` does not define a `render/1` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<div>
+  <h2><%= @title %></h2>
+
+  <.form
+    let={f}
+    for={@changeset}
+    id="message-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save">
+  
+    <%= label f, :content %>
+    <%= textarea f, :content %>
+    <%= error_tag f, :content %>
+  
+    <%= label f, :from %>
+    <%= text_input f, :from %>
+    <%= error_tag f, :from %>
+  
+    <div>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </div>
+  </.form>
+</div>
+```
+
+This form uses the `phx-change` binding to send the `"validate"` event whenever we modify a field in the form. The form also uses the `phx-submit` binding to send the `"save"` event when we submit the form.
+
+These correspond to handlers defined in the `FormComponent` module. The `"validate"` handler
+uses the `Chat.Message` changeset to validate the form and display errors. The `"save"` handler attempts to save a message in the databasae.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_event("validate", %{"message" => message_params}, socket) do
+  changeset =
+    socket.assigns.message
+    |> Chat.change_message(message_params)
+    # The changeset will not display errors unless there is an action
+    # Usually, Ecto sets the action for us when we attempt to create the resource
+    # However, in this case, we want to display errors before attempting to create the resource
+    # See https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions for information
+    |> Map.put(:action, :validate)
+
+  {:noreply, assign(socket, :changeset, changeset)}
+end
+
+def handle_event("save", %{"message" => message_params}, socket) do
+  save_message(socket, socket.assigns.action, message_params)
+end
+```
+
+The `save_message/3` function is called with the `:new` action, which triggers the following function definition: This either saves a message and redirects the user to http://localhost:4000 or returns a changeset with errors.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp save_message(socket, :new, message_params) do
+  case Chat.create_message(message_params) do
+    {:ok, _message} ->
+      {:noreply,
+        socket
+        |> put_flash(:info, "Message created successfully")
+        # socket.assigns.return_to comes from the `return_to` attribute 
+        # in our `<.live_component>`
+        |> push_redirect(to: socket.assigns.return_to)}
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      {:noreply, assign(socket, changeset: changeset)}
+  end
+end
+```
+
+Use the form to create a message. It will display on your list of messages.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_index_live_created.png)
+
+## Your Turn: Updating A Message
+
+Updating a message walks through the exact same flow as creating a message.
+
+Click the `Edit` button and you'll be redirected to http://localhost:4000/1/edit to edit the message we created earlier.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_index_live_edit.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Read through your code from the `MessageLive.Index` module as your code flows down to the `FormComponent`.
+
+```mermaid
+flowchart
+MessageLive.Index --> mount --> handle_params --> apply_action --> index.html.heex --> modal[<.modal>] --> live_component[<.live_component>] --> FormComponent --> form.html.heex --> save[''save'' event] --> save_message/3
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Notice two major differences. The `MessageLive.Index.apply_action/3` is called with the `:edit` `live_action` and assigns a `:message` to the socket.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp apply_action(socket, :edit, %{"id" => id}) do
+  socket
+  |> assign(:page_title, "Edit Message")
+  |> assign(:message, Chat.get_message!(id))
+end
+```
+
+Also, the `FormComponent` calls the `save_message/3` function with the `:edit` live_action.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp save_message(socket, :edit, message_params) do
+  case Chat.update_message(socket.assigns.message, message_params) do
+    {:ok, _message} ->
+      {:noreply,
+        socket
+        |> put_flash(:info, "Message updated successfully")
+        |> push_redirect(to: socket.assigns.return_to)}
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      {:noreply, assign(socket, :changeset, changeset)}
+  end
+end
+```
+
+## The MessageLive.Show LiveView
+
+Visit http://localhost:4000/1 or click on the `Show` button to visit the `MessageLive.Show` LiveView.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_show_live.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `MessageLive.Show` LiveView is simpler than `MessageLive.Index` because it only handles displaying and editing a message. On mount, it invokes the `handle_params/3` function to assign the `:page_title` and `:message` fields to the socket.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(%{"id" => id}, _, socket) do
+    {:noreply,
+     socket
+     |> assign(:page_title, page_title(socket.assigns.live_action))
+     |> assign(:message, Chat.get_message!(id))}
+  end
+
+  defp page_title(:show), do: "Show Message"
+  defp page_title(:edit), do: "Edit Message"
+```
+
+This renders the `show.html.heex` template, which renders the content and buttons.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<ul>
+
+  <li>
+    <strong>Content:</strong>
+    <%= @message.content %>
+  </li>
+
+  <li>
+    <strong>From:</strong>
+    <%= @message.from %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.message_show_path(@socket, :edit, @message), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.message_index_path(@socket, :index) %></span>
+```
+
+Clicking the `Edit` button re-mounts the current liveview on http://localhost:4000/1/show/edit.
+This sets the `live_action` to `:edit` because of how we declared the live route in `router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+live "/:id/show/edit", MessageLive.Show, :edit
+```
+
+This sets the `live_action` field in our socket to display the modal.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.message_show_path(@socket, :show, @message)}>
+    <.live_component
+      module={PicChatWeb.MessageLive.FormComponent}
+      id={@message.id}
+      title={@page_title}
+      action={@live_action}
+      message={@message}
+      return_to={Routes.message_show_path(@socket, :show, @message)}
+    />
+  </.modal>
+<% end %>
+```
+
+This is the exact same modal form we've already seen, so we're not going to walk through it again.
+
+## Delete A Message
+
+The `MessageLive.Index` LiveView also renders a delete button in the `index.html.heex` template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: message.id, data: [confirm: "Are you sure?"] %></span>
+```
+
+This button uses the `phx_click` and `phx_value_id` attributes which map to the `phx-click` and `phx-value-id` bindings. When clicked, this sends a `"delete"` message with the `"id"` parameter to our `MessageLive.Index` LiveView.
+
+This triggers our handler in `MessageLive.Index` to delete the message and re-render the page with an updated list of messages.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+  {:ok, _} = Chat.delete_message(message)
+
+  {:noreply, assign(socket, :messages, list_messages())}
+end
+```
+
+## Your Turn: Tests
+
+Read through the `message_live_test.ex` file to get a better understanding of patterns for testing LiveViews.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+* [HexDocs: LiveComponent](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveComponent.html)
+* [HexDocs: Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
+* [Elixir Schools: LiveView](https://elixirschool.com/blog/phoenix-live-view/)
+* [HexDocs: Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html)
+* [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)
+
+## (Bonus) Further Study
+
+A student who wants to do further research beyond this material may consider the following questions as inspiration.
+
+* What are slots?
+* How do you create a stateless function component?
+
+## Up Next
+
+| Previous                                   | Next                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------: |
+| [Math Game](../exercises/math_game.livemd) | [PicChat: Image Upload](../reading/pic_chat_image_upload.livemd) |

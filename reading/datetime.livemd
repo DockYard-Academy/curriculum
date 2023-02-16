@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.7.0"},
   {:timex, "~> 3.0"},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
@@ -17,15 +19,90 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we represent dates and times using [Date](https://hexdocs.pm/elixir/Date.html), [Time](https://hexdocs.pm/elixir/Time.html), and [DateTime](https://hexdocs.pm/elixir/DateTime.html) structs?
+* How do we manipulate dates and times using [Date](https://hexdocs.pm/elixir/Date.html), [Time](https://hexdocs.pm/elixir/Time.html), and [DateTime](https://hexdocs.pm/elixir/DateTime.html) module functions?
+* How can we format a date/time for display purposes?
+* How do we get the current time in a particular timezone?
+
 ## Overview
+
+### UTC
+
+UTC (Coordinated Universal Time) is a standardized timezone. Typically we store times in UTC and the convert UTC to a desired timezone when necessary. This ensures consistency.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Date
+
+The [Date](https://hexdocs.pm/elixir/Date.html) module contains functionality related to calendar dates. [Date](https://hexdocs.pm/elixir/Date.html) structs store the `year`, `month`, and `day` and some other related fields.
+
+```elixir
+{:ok, date} = Date.new(2000, 10, 1)
+
+IO.inspect(date.year, label: "year")
+IO.inspect(date.month, label: "month")
+IO.inspect(date.day, label: "day")
+```
+
+### Time
+
+The [Time](https://hexdocs.pm/elixir/Time.html) module contains functionality related to times. Time structs store `hour`, `minute`, `second`.
+
+```elixir
+{:ok, time} = Time.new(12, 30, 10)
+
+IO.inspect(time.hour, label: "hour")
+IO.inspect(time.minute, label: "minute")
+IO.inspect(time.second, label: "second")
+```
+
+### DateTime
+
+[DateTime](https://hexdocs.pm/elixir/DateTime.html) is a hybrid of [Date](https://hexdocs.pm/elixir/Date.html) and [Time](https://hexdocs.pm/elixir/Time.html), so it can represent both a calendar day, and a time of day. The [DateTime](https://hexdocs.pm/elixir/DateTime.html) module contains functionality related to datetimes. The [DateTime](https://hexdocs.pm/elixir/DateTime.html) struct stores fields to represent both date values, and time values.
+
+```elixir
+{:ok, datetime} = DateTime.new(date, time)
+
+IO.inspect(datetime.year, label: "year")
+IO.inspect(datetime.month, label: "month")
+IO.inspect(datetime.day, label: "day")
+IO.inspect(datetime.hour, label: "hour")
+IO.inspect(datetime.minute, label: "minute")
+IO.inspect(datetime.second, label: "second")
+```
+
+### [Timex](https://github.com/bitwalker/timex)
+
+Timex is a library that makes it easier to manipulate dates/times. It also has timezone support, which Elixir does not provide out of the box.
+
+If you're planning on frequently manipulating dates and times, or need to use multiple timezones, then Timex might be a useful library to include in future projects.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Sigils
+
+We can create the [Date](https://hexdocs.pm/elixir/Date.html), [Time](https://hexdocs.pm/elixir/Time.html), and [DateTime](https://hexdocs.pm/elixir/DateTime.html) structs through an alternative [sigil](https://elixir-lang.org/getting-started/sigils.html) syntax using `~D[]`, `~T[]`, and `~U`.
+
+```elixir
+date = ~D[2000-10-01]
+time = ~T[12:30:10]
+# The Z offset specifies the timezone offset. Z is zero for UTC.
+datetime = ~U[2000-10-01 12:30:10Z]
+```
+
+## Timezones
 
 Time and timezones can get very complicated. It's not within the scope of this course to delve
 deeply into that complexity.
 
 This reading is intended as a primer to working with dates, times, and timezones. You will
-need to consult the documentation and do you own research to go deeper.
+need to consult the documentation and do your own research to go deeper.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=-5wpm-gesOY\")","title":"Time and Timezones"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=-5wpm-gesOY\")","title":"Time and Timezones"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=-5wpm-gesOY")
@@ -196,7 +273,7 @@ Using sigils.
 Using functions.
 
 ```elixir
-DateTime.new!(Date.new!(2022, 4, 19), Time.new!(12, 0, 0))
+DateTime.new!(Date.new!(1938, 4, 19), Time.new!(12, 0, 0))
 ```
 
 </details>
@@ -323,22 +400,75 @@ to ensure it is correct.
 
 ```
 
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [DateTime](https://hexdocs.pm/elixir/DateTime.html)
+* [Date](https://hexdocs.pm/elixir/Date.html)
+* [Time](https://hexdocs.pm/elixir/Time.html)
+* [Calendar](https://hexdocs.pm/elixir/Calendar.html)
+* [Elixir Schools: Dates and Time](https://elixirschool.com/en/lessons/basics/date_time)
+* [Timex](https://github.com/bitwalker/timex)
+* [Elixir-lang: Calendar Sigils](https://elixir-lang.org/getting-started/sigils.html#calendar-sigils)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"datetime_reading\"\n    \"exercises\" -> \"datetime_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "datetime_reading"
+    "exercises" -> "datetime_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-datetime
+$ git checkout -b datetime-reading
 $ git add .
-$ git commit -m "finish datetime section"
-$ git push origin exercise-datetime
+$ git commit -m "finish datetime reading"
+$ git push origin datetime-reading
 ```
+
+Create a pull request from your `datetime-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

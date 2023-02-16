@@ -1,0 +1,152 @@
+# Phoenix Drills
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Phoenix Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for the [Phoenix](../reading/phoenix_1.6.livemd) framework. Follow the instructions for each drill and complete them as quickly as you can.
+
+## Hello World
+
+Create a hello world and replace any existing content on the `"/"` route with "Hello World".
+
+```
+$ mix phx.new hello_world --no-ecto
+```
+
+## Random Number
+
+Create a random number web app that generates a random number between `1` and `100` on the `"/random_number"` route.
+
+```
+$ mix phx.new random_number --no-ecto
+```
+
+## Navigation
+
+Create a Phoenix application as a navigation example.
+
+```
+$ mix phx.new navigation --no-ecto
+```
+
+Define three pages in `router.ex` such as "/home", `"/about"`, and `"/projects"`.
+Each page should have it's own controller such as `HomeController`, `AboutController`, and `ProjectsController` and display a simple text response.
+
+Modify the existing `root.html.heex` file to include a [link](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Link.html#link/2) to each page.
+
+You can use `mix phx.routes` to find the available paths and [Path Helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers) to link to the correct path.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= link "Home", to: Routes.home_path(@conn, :index) %>
+```
+
+Alternatively, you can use the static path, but it's generally recommended to use [Path Helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers) because path helpers ensure we use actually defined routes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= link "Home", to: "/home" %>
+```
+
+## Counter
+
+Previously in the [Phoenix 1.6](../reading/phoenix_1.6.livemd) reading material you walked through creating a counter application.
+
+You're going to create another `Counter` application, this time on your own without referring to the reading material (as much as possible). However, you are encouraged to reference the [Phoenix](https://hexdocs.pm/phoenix/overview.html) and [Phoenix HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html) documentation.
+
+```
+$ mix phx.new counter --no-ecto
+```
+
+Store the current count in a [GenServer](https://hexdocs.pm/elixir/GenServer.html) or some other process under the application's supervision tree. Render the current count on the `"/"` route. The user should be able to increment the count by pressing a button, and set the amount to increment the count by using a number input.
+
+<div style="padding: 1rem; background-color: lightcoral; font-weight: bold;">
+Make sure you do not overwrite any existing `counter` project.
+</div>
+
+## Bonus: GitHub
+
+Create a new GitHub repository for each of your Phoenix applications above and add them to your GitHub.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"phoenix_drills_reading\"\n    \"exercises\" -> \"phoenix_drills_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "phoenix_drills_reading"
+    "exercises" -> "phoenix_drills_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b phoenix-drills-exercise
+$ git add .
+$ git commit -m "finish phoenix drills exercise"
+$ git push origin phoenix-drills-exercise
+```
+
+Create a pull request from your `phoenix-drills-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                     | Next                                                          |
+| -------------------------------------------- | ------------------------------------------------------------: |
+| [Phoenix 1.7](../reading/phoenix_1.7.livemd) | [In-Memory TodoList](../exercises/in-memory_todo_list.livemd) |

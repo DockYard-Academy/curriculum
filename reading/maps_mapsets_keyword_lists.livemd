@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -15,6 +17,13 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* When should you use a MapSet vs a list?
+* What are the performance impacts of MapSets, Maps, and Keyword Lists?
 
 ## Overview
 
@@ -147,7 +156,7 @@ The [MapSet](https://hexdocs.pm/elixir/MapSet.html) module contains functions fo
 Here's a few to get you started:
 
 * `new/1` create a new mapset.
-* `put/1` add an element into a mapset.
+* `put/2` add an element into a mapset.
 * `delete/2` remove an element from a mapset.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -200,27 +209,68 @@ the element `2`. Your answer should return `true`.
 
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"maps_mapsets_keyword_lists_reading\"\n    \"exercises\" -> \"maps_mapsets_keyword_lists_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "maps_mapsets_keyword_lists_reading"
+    "exercises" -> "maps_mapsets_keyword_lists_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-maps_mapsets_keyword_lists
+$ git checkout -b maps-mapsets-keyword-lists-reading
 $ git add .
-$ git commit -m "finish maps mapsets keyword lists section"
-$ git push origin exercise-maps_mapsets_keyword_lists
+$ git commit -m "finish maps mapsets keyword lists reading"
+$ git push origin maps-mapsets-keyword-lists-reading
 ```
+
+Create a pull request from your `maps-mapsets-keyword-lists-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                             | Next                                               |
-| ---------------------------------------------------- | -------------------------------------------------: |
-| [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) | [MapSet Drills](../exercises/mapset_drills.livemd) |
+| Previous                                              | Next                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------: |
+| [Lists and Tuples](../reading/lists_vs_tuples.livemd) | [Drills: MapSets](../exercises/mapset_drills.livemd) |

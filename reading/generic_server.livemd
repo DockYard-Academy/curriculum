@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -18,6 +20,12 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 
 This lesson is highly inspired by Saša Jurić.
 Saša has graciously allowed us to use code examples directly from his book [Elixir in Action](https://www.manning.com/books/elixir-in-action).
+
+## Review Questions
+
+* What is the purpose of a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
+* Explain the lifecycle of sending a message to a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and receiving a response.
+* **bonus:** What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? How might that bottleneck our program?
 
 ## Generic Server
 
@@ -116,11 +124,8 @@ a message.
 
 ```mermaid
 sequenceDiagram
-    Generic Server->> Generic Server: receive
-    Generic Server ->> Generic Server: handle_call(request, state)
-    Generic Server ->> Generic Server: new state
-    Generic Server ->> Process: send
-    Process->> Process: receive
+    Generic Server ->> Callback Module: handle_call(request, state)
+    Callback Module ->> Generic Server: response, new state
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -140,16 +145,6 @@ end
 ```
 
 The `GenericServer` then loops and receives messages while delegating to the `CallbackModule`
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-Caller --> GenericServer --> loop
---> receive --> c[CallbackModule.handle_call] --> response --> send --> Caller
-```
-
-<!-- livebook:{"break_markdown":true} -->
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -188,8 +183,9 @@ sequenceDiagram
     Generic Server ->> Generic Server: loop receive
 
     Caller Process ->> Generic Server: send
+    Generic Server ->> Generic Server: receive
     Generic Server ->> Callback Module: handle_call
-    Callback Module ->> Generic Server: new state, response
+    Callback Module ->> Generic Server: response, new state
     Generic Server ->> Generic Server: update state
     Generic Server ->> Caller Process: send
     Caller Process ->> Caller Process: receive
@@ -328,7 +324,7 @@ see the [@impl documentation](https://hexdocs.pm/elixir/main/Module.html#module-
 more on why.
 
 ```elixir
-defmodule Counter do
+defmodule SimpleServer do
   use GenServer
 
   @impl true
@@ -342,7 +338,7 @@ We use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_l
 There are no options, so the second parameter is an empty list.
 
 ```elixir
-{:ok, pid} = GenServer.start_link(Counter, [])
+{:ok, pid} = GenServer.start_link(SimpleServer, [])
 ```
 
 We can define `handle_call/3` functions. These look mostly the same as before, except
@@ -351,7 +347,7 @@ the second parameter will be the caller pid, and the third will be the state.
 We also always return `{:reply, response, new_state}` in a `handle_call/3` function.
 
 ```elixir
-defmodule Counter do
+defmodule CounterServer do
   use GenServer
 
   @impl true
@@ -367,7 +363,7 @@ defmodule Counter do
   end
 end
 
-{:ok, pid} = GenServer.start_link(Counter, 0)
+{:ok, pid} = GenServer.start_link(CounterServer, 0)
 ```
 
 Now let's test our new `Counter`! You can execute this Elixir cell below a few times and notice
@@ -386,7 +382,7 @@ GenServer.call(pid, :increment)
 sequenceDiagram
     Caller Process ->> GenServer: start_link
     GenServer ->> Callback Module: init
-    Callback Module ->> GenServer: init
+    Callback Module ->> GenServer: {:ok, state}
     GenServer ->> Caller Process: pid
 
     Caller Process ->> GenServer: GenServer.call/2
@@ -397,7 +393,7 @@ sequenceDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-This is the heart of generic servers. We can create an in-memory process have it store some state. Then, we send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
+This is the heart of generic servers. We can create an in-memory process, have it store some state, and then send the process messages to perform some work and return a response. Generic servers are often the go-to tool for short-term in-memory persistence.
 
 The built-in [GenServer](https://hexdocs.pm/elixir/GenServer.html) also has some additional functionality, which will become more important
 as you work with concurrency. But, for now, we're going to focus on using it as a tool for persistence, so
@@ -485,6 +481,18 @@ defmodule CounterClientAndServer do
     {:reply, next_count, next_count}
   end
 end
+```
+
+Let's start our [GenServer](https://hexdocs.pm/elixir/GenServer.html) and bind its PID to the `pid` variable.
+
+```elixir
+{:ok, pid} = CounterClientAndServer.start_link([])
+```
+
+Now execute the Elixir cell below a few times and notice that the counter increments on each execution just as before.
+
+```elixir
+CounterClientAndServer.increment(pid)
 ```
 
 ### `__MODULE__`
@@ -589,11 +597,6 @@ Now we can send the named process messages using the module name.
 GenServer.call(CounterSingleton, :increment)
 ```
 
-## Thought Provoking Questions
-
-* When would we want to use a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
-* What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? How might that bottleneck our program?
-
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
@@ -602,22 +605,63 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [ElixirLang: GenServer](https://elixir-lang.org/getting-started/mix-otp/genserver.html)
 * [Exercism: GenServer](https://exercism.org/tracks/elixir/concepts/genserver)
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"generic_server_reading\"\n    \"exercises\" -> \"generic_server_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "generic_server_reading"
+    "exercises" -> "generic_server_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-generic_server
+$ git checkout -b generic-server-reading
 $ git add .
-$ git commit -m "finish generic server section"
-$ git push origin exercise-generic_server
+$ git commit -m "finish generic server reading"
+$ git push origin generic-server-reading
 ```
+
+Create a pull request from your `generic-server-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,93 +18,108 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we use tasks to leverage concurrency?
+* How do we use tasks to send one-off fire-and-forget jobs?
+
 ## Task
 
-Rather than use `spawn/1` or `spawn_link/1` when we want to create a process, we often instead rely
-on the [Task](https://hexdocs.pm/elixir/Task.html) module which provides conveniences for spawning and awaiting processes.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Starting A Process
-
-Similar to `spawn` we can use [Task.start/1](https://hexdocs.pm/elixir/Task.html#start/1) to create a new short-lived process that dies when it's function executes.
+We've already seen we can use [Kernel.spawn/1](https://hexdocs.pm/elixir/Kernel.html#spawn/1) or `Kernal.spawn_link/1` to spawn a process that performs some work and then dies.
 
 ```elixir
-# using spawn
-spawn_pid = spawn(fn -> IO.puts("spawn ran!") end)
+spawn_pid =
+  spawn(fn ->
+    IO.puts("Job Started")
+    # simulating expensive process
+    Process.sleep(1000)
+    IO.puts("Job Ended")
+  end)
+```
 
-Process.sleep(100)
-Process.alive?(spawn_pid) || IO.puts("spawn is dead")
+When we want to execute some code in a process, we shouldn't use [Kernel.spawn/1](https://hexdocs.pm/elixir/Kernel.html#spawn/1) or [Kernel.spawn_link/1](https://hexdocs.pm/elixir/Kernel.html#spawn_link/1) directly. Instead, we should rely on the [Task](https://hexdocs.pm/elixir/Task.html) module. The [Task](https://hexdocs.pm/elixir/Task.html) module allows us to spawn a process, perform some work in that process, then end the process when our work is finished.
 
-# using task
+[Task](https://hexdocs.pm/elixir/Task.html) is also OTP-compliant, meaning it conform to certain OTP conventions that improve error handling, and allow them to start under a supervisor.
+
+## Fire-and-Forget
+
+We can use [Task.start/1](https://hexdocs.pm/elixir/Task.html#start/1) to create a new short-lived process that dies when it's function executes. This is a **fire-and-forget** process which does not block the caller process or return a response.
+
+```elixir
 {:ok, task_pid} = Task.start(fn -> IO.puts("task ran!") end)
 
+IO.puts("Parent keeps running")
 Process.sleep(100)
 Process.alive?(task_pid) || IO.puts("task is dead")
 ```
 
-### Awaiting Processes
+## Awaiting Task Response
 
-We can run two computations concurrently by separating them into two different processes.
-
-A computer with a multi-core processor can perform these computations in parallel, which may
-make our program faster. In reality, it's a bit more complicated than this, but this is a reasonable
-mental model for now to understand why concurrency is useful for improving performance.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-  Par[Parent Process]
-  CP1[Computation 1]
-  CP2[Computation 2]
-  P1[Process 1]
-  P2[Process 1]
-  Par --creates--> P1
-  Par --creates--> P2
-  P1 --performs --> CP1
-  P2 --performs --> CP2
-  CP1 --sends result to --> Par
-  CP2 --sends result to --> Par
-
-
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-In order to `spawn/1` a process and retrieve a value (send the parent a message), we need a fair bit of boilerplate code.
-
-```elixir
-parent = self()
-
-spawn(fn ->
-  # simulating expensive calculation
-  Process.sleep(1000)
-  send(parent, {:msg, "hello"})
-end)
-
-receive do
-  {:msg, value} -> value
-end
-```
-
-With [Task](https://hexdocs.pm/elixir/Task.html), we can use `async/1` and `await/1` to spawn a process, perform some calculation,
-and the retrieve the value when it's finished.
+With [Task](https://hexdocs.pm/elixir/Task.html), we can use `async/1` and `await/1` to spawn a process, perform some calculation, and the retrieve the value when it's finished.
 
 ```elixir
 task =
   Task.async(fn ->
     # simulating expensive calculation
     Process.sleep(1000)
-    {:msg, "hello"}
+    "response!"
   end)
 
 Task.await(task)
 ```
 
-Keep in mind that [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) returns a [Task](https://hexdocs.pm/elixir/Task.html) struct, not a pid. The [Task](https://hexdocs.pm/elixir/Task.html) struct
-contains information about who the parent (`:owner`) process is, the task's pid (`:pid`), and a reference (`:ref`) used
-to monitor if the task crashes.
+We can run two computations concurrently by separating them into two different [Task](https://hexdocs.pm/elixir/Task.html) processes.
+Here, we're simulating a clock tick-tocking every second in two separate processes to demonstrate the run in parallel.
+
+```elixir
+task1 =
+  Task.async(fn ->
+    IO.inspect("tick", label: "task 1")
+    Process.sleep(2000)
+    IO.inspect("tick", label: "task 1")
+    Process.sleep(1000)
+    "tick"
+  end)
+
+task2 =
+  Task.async(fn ->
+    Process.sleep(1000)
+    IO.inspect("tock", label: "task 2")
+    Process.sleep(2000)
+    IO.inspect("tock", label: "task 2")
+    "tock"
+  end)
+
+Task.await(task1) |> IO.inspect(label: "Task 1 Response")
+Task.await(task2) |> IO.inspect(label: "Task 2 Response")
+```
+
+A computer with a multi-core processor can perform these concurrent computations in parallel, which may make our program faster. In reality, it's a bit more complicated than this, but this is a reasonable mental model for now to understand why concurrency is useful for improving performance.
+
+Here we use the **par** boxes to demonstrate operations happening in parallel.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+sequenceDiagram
+  par 
+    ParentProcess ->> Task1: spawns
+    ParentProcess ->> Task2: spawns
+  end
+  par
+    Task1 ->> Task1: performs work
+    Task2 ->> Task2: performs work
+  end
+  Task1 ->> ParentProcess: return awaited result
+  Task2 ->> ParentProcess: return awaited result
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+[Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) returns a [Task](https://hexdocs.pm/elixir/Task.html) struct, not a pid. The [Task](https://hexdocs.pm/elixir/Task.html) struct
+contains information about who the parent (`:owner`) process is, the task's pid (`:pid`), and a reference (`:ref`) used to monitor if the task crashes.
 
 ```elixir
 Task.async(fn -> nil end)
@@ -177,7 +194,7 @@ Then we can also use enumeration to `await/1` each task.
 Enum.map(tasks, fn task -> Task.await(task) end)
 ```
 
-You may also choose to use the `await_many/1` convenience function provided by the [Task](https://hexdocs.pm/elixir/Task.html) module.
+Alternatively, you can use the convenient `Taskl.await_many/1` function instead.
 
 ```elixir
 tasks =
@@ -222,7 +239,7 @@ Task.await_many([task1, task2], 7000)
 ### Your Turn
 
 In the Elixir cell below, spawn a task which takes one second to complete.
-`await/2` the task and alter the timeout value to be less than one second. Awaiting the task should crash.
+`await/2` the task and alter the timeout value to be one second. Awaiting the task should crash.
 
 ```elixir
 
@@ -230,9 +247,49 @@ In the Elixir cell below, spawn a task which takes one second to complete.
 
 ## Further Reading
 
-For more on [Task](https://hexdocs.pm/elixir/Task.html), consider reading:
+Consider the following resource(s) to deepen your understanding of the topic.
 
-* The [Task HexDocs](https://hexdocs.pm/elixir/Task.html)
+* [HexDocs: Task](https://hexdocs.pm/elixir/Task.html)
+* [ElixirSchools: Task](https://elixirschool.com/en/lessons/intermediate/concurrency#tasks-5)
+* [Exercism: Task](https://exercism.org/tracks/elixir/concepts/tasks)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"task_reading\"\n    \"exercises\" -> \"task_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "task_reading"
+    "exercises" -> "task_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
 
 ## Commit Your Progress
 
@@ -240,21 +297,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-task
+$ git checkout -b task-reading
 $ git add .
-$ git commit -m "finish task section"
-$ git push origin exercise-task
+$ git commit -m "finish task reading"
+$ git push origin task-reading
 ```
+
+Create a pull request from your `task-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                   | Next                                                                           |
-| ---------------------------------------------------------- | -----------------------------------------------------------------------------: |
-| [Games Timed Typer](../exercises/games_timed_typer.livemd) | [Concurrent Image Processing](../exercises/concurrent_image_processing.livemd) |
+| Previous                                                                              | Next                                                 |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------: |
+| [Games: Supervised Score Tracker](../exercises/games_supervised_score_tracker.livemd) | [Task Supervisor](../reading/task_supervisor.livemd) |

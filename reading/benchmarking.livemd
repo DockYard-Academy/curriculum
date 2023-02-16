@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:benchee, "~> 1.1"}
@@ -16,6 +18,13 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How can we benchmark our programs using `:timer` and `benchee`?
+* Why is it important to benchmark our software, rather than relying on theoretical performance with Big O Notation?
 
 ## :timer
 
@@ -152,6 +161,8 @@ Make sure to replace `1.1` with the latest version. You can find the latest vers
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:benchee, "~> 1.1"},
 ])
 ```
@@ -300,27 +311,88 @@ Enum.count/1           4.97 K - 1.07x slower +12.70 μs
 
 This is especially useful for benchmarking how larger data affects our system. It's also useful for creating different situations (i.e. worst case and best case scenarios) that may cause our system to behave differently than expected.
 
+## How to Make A Good Benchmark
+
+It's easy for a benchmark to misrepresent the actual performance of our system.
+
+To make our benchmarks more representative, consider the following metrics:
+
+* **variety:** Use a variety of inputs in your benchmark.
+* **size:** A system may be very fast with small amounts of data, but incredibly slow with large amounts of data. Consider using multiple different samples of data with different sizes to test where the system hits its limits.
+* **consistency**: Consider running your benchmark multiple times. Does it's performance change frequently due to edge cases?
+
+In general, you can use benchmarks to optimize your systems and see how they perform under pressure. Consider exactly how you want to stress your system to get benchmark metrics that make the most sense for your situation.
+
+We also want to consider what we're measuring. For example, if you read the `average` time instead of the `median`, it's easy to have outliers skew our data.
+
+For example:
+
+> Ben Hill Griffin Stadium, the stadium at the University of Florida, holds `88,548` people. In Florida the minimum wage is `$11.00` per hour. Working an eight hour day for five days a week fifty-two weeks a year this comes out to `$22,880` a year. If every seat in the stadium was filled by someone making minimum wage, the average annual income would be `$22,880`. and the total worth would be just over two billion `$2,025,978,240` In 2021 Jeff Bezos made ~ 197 Billion -- `$197,000,000,000`. If Jeff Bezos enters the stadium the total annual income is `$199,025,978,240` and the **AVERAGE** income would be about 2.24 million -- `$2,247,636`. One large outlier can really skew the average. This is often why we use the **median**, or middle value, of a set. It's less skewed by large outliers.
+> 
+> Example provided by Stephen Fowler
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"benchmarking_reading\"\n    \"exercises\" -> \"benchmarking_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "benchmarking_reading"
+    "exercises" -> "benchmarking_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-benchmarking
+$ git checkout -b benchmarking-reading
 $ git add .
-$ git commit -m "finish benchmarking section"
-$ git push origin exercise-benchmarking
+$ git commit -m "finish benchmarking reading"
+$ git push origin benchmarking-reading
 ```
+
+Create a pull request from your `benchmarking-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                           | Next                                                         |
-| -------------------------------------------------- | -----------------------------------------------------------: |
-| [Big O Notation](../reading/big_o_notation.livemd) | [Games Benchmarking](../exercises/games_benchmarking.livemd) |
+| Previous                                           | Next                                                          |
+| -------------------------------------------------- | ------------------------------------------------------------: |
+| [Big O Notation](../reading/big_o_notation.livemd) | [Games: Benchmarking](../exercises/games_benchmarking.livemd) |

@@ -1,0 +1,181 @@
+# Document Tools
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Document Tools
+
+You're going to create a `Document` module which provides some convenient function for working with text files.
+
+Once you have a working solution, consider how you can optimize it to reduce how much of a file you load into memory.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Document do
+  def word_count(file_name) do
+    File.stream!(file_name)
+    |> Stream.map(fn line ->
+      line |> String.split(" ", trim: true) |> Enum.count()
+    end)
+    |> Enum.sum()
+  end
+
+  def line_count(file_name) do
+    file = File.open!(file_name)
+    count = count_lines(file)
+    File.close(file)
+    count
+  end
+
+  defp count_lines(file, count \\ 0) do
+    case IO.read(file, :line) do
+      :eof -> count
+      _ -> count_lines(file, count + 1)
+    end
+  end
+
+  def add_line_numbers(file_name) do
+    lined_content =
+      File.stream!(file_name)
+      |> Stream.with_index()
+      |> Stream.map(fn {line, index} -> "#{index + 1}. #{line}" end)
+      |> Enum.join("")
+
+    File.write!(file_name, lined_content)
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule Document do
+  @moduledoc """
+  Documentation for `Document` module.
+  """
+
+  @doc ~S"""
+  Count the number of words in a document.
+
+  ## Examples
+
+      Any sequence of characters separated by a space will be considered a word.
+
+      iex> File.write("word_count.txt", "one two three")
+      iex> Document.word_count("word_count.txt")
+      3
+
+      Ensure your solution ignores newline characters.
+
+      iex> File.write("word_count.txt", "one\ntwo\nthree")
+      iex> Document.word_count("word_count.txt")
+      3
+  """
+  def word_count(file_name) do
+  end
+
+  @doc ~S"""
+  Count the number of words in a document.
+
+  ## Examples
+
+      iex> File.write("line_count.txt", "line1\nline2\nline3\n")
+      iex> Document.line_count("line_count.txt")
+      3
+  """
+  def line_count(file_name) do
+  end
+
+  @doc ~S"""
+  Add line numbers formatted as "X. rest of line" to an existing file.
+
+  ## Examples
+
+      iex> File.write("add_line_numbers.txt", "one\ntwo\nthree")
+      iex> Document.add_line_numbers("add_line_numbers.txt")
+      iex> File.read!("add_line_numbers.txt")
+      "1. one\n2. two\n3. three"
+  """
+  def add_line_numbers(file_name) do
+  end
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"document_tools_reading\"\n    \"exercises\" -> \"document_tools_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "document_tools_reading"
+    "exercises" -> "document_tools_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b document-tools-exercise
+$ git add .
+$ git commit -m "finish document tools exercise"
+$ git push origin document-tools-exercise
+```
+
+Create a pull request from your `document-tools-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                         | Next                                           |
+| ---------------------------------------------------------------- | ---------------------------------------------: |
+| [File System Todo App](../exercises/file_system_todo_app.livemd) | [File Search](../exercises/file_search.livemd) |

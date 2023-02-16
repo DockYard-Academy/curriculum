@@ -1,0 +1,126 @@
+# Blog: Comments
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new)
+
+## Blog: Comments
+
+You're going to create a `comments` table to your existing [Blog](./blog_posts.livemd) project. You do not yet need to create the appropriate UI for creating a comment.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Comment/Post Association
+
+A comment should **belong to** a blog post and a blog post should **have_many** comments.
+
+Comments should have `:content`, and `:post_id` (foreign key) fields.
+
+```mermaid
+classDiagram
+  class Comment {
+    post_id: :id
+    content: :text
+  }
+```
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+You will need to:
+1. Create the comments resource and run migrations.
+
+```
+$ mix phx.gen.html Comments Comment comments content:text post_id:references:posts
+$ mix ecto.migrate
+```
+
+2. Define the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) relationship in the `Post` schema.
+
+3. Define the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship in the `Comment` schema.
+
+</details>
+
+Once complete use the IEx shell to do the following:
+
+* Create a new blog post.
+* Use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to create a comment associated with your created blog post.
+* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to create a new blog post and create multiple comments associated with the blog post.
+* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to add a comment to one of your existing blog posts.
+* Use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create a new blog post and create multiple comments associated with the blog post.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"blog_comments_reading\"\n    \"exercises\" -> \"blog_comments_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "blog_comments_reading"
+    "exercises" -> "blog_comments_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b blog-comments-exercise
+$ git add .
+$ git commit -m "finish blog comments exercise"
+$ git push origin blog-comments-exercise
+```
+
+Create a pull request from your `blog-comments-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                 | Next                                                         |
+| -------------------------------------------------------- | -----------------------------------------------------------: |
+| [BookSearch: Books](../reading/book_search_books.livemd) | [BookSearch: Seeding](../reading/book_search_seeding.livemd) |

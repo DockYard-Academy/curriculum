@@ -6,6 +6,8 @@ defmodule Mix.Tasks.Bc do
 
   @impl true
   def run(_) do
+    # Tasks are built with the assumption of run order based on the file name.
+    # For example, the add_git_section task must run before the add_navigation script
     tasks =
       :code.all_available()
       |> Enum.filter(&task?/1)

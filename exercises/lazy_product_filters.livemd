@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:benchee, "~> 1.1"},
@@ -181,6 +183,7 @@ defmodule StreamProducts do
 
   @doc """
   Filter products by name, category, and price.
+  The name filter should be case insensitive and handle partial matches.
 
   ## Examples
 
@@ -201,36 +204,6 @@ defmodule StreamProducts do
     [%{name: "Laptop", category: :tech, price: 100}]
 
     iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
-    []
-
-    Filter by category
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
-    [%{name: "Laptop", category: :tech, price: 100}]
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
-    []
-
-    Filter by min price.
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
-    [%{name: "Laptop", category: :tech, price: 100}]
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
-    [%{name: "Laptop", category: :tech, price: 100}]
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
-    []
-
-    Filter by max price.
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
-    [%{name: "Laptop", category: :tech, price: 100}]
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
-    [%{name: "Laptop", category: :tech, price: 100}]
-
-    iex> StreamProducts.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
     []
 
     Multiple filters.
@@ -281,102 +254,45 @@ Benchee.run(
 </details>
 
 ```elixir
-defmodule StreamProducts do
-  def filter(products, filters) do
-    name_filter = filters[:name] || ""
-    min_filter = filters[:min]
-    max_filter = filters[:max]
-    category_filter = filters[:category]
 
-    products
-    |> Stream.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
-    |> Stream.reject(fn %{price: price} -> min_filter && price < min_filter end)
-    |> Stream.reject(fn %{price: price} -> max_filter && max_filter < price end)
-    |> Stream.reject(fn %{category: category} ->
-      category_filter && category_filter != category
-    end)
-    |> Enum.to_list()
-  end
-end
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"lazy_product_filters_reading\"\n    \"exercises\" -> \"lazy_product_filters_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
-defmodule EnumProducts do
-  def check?({:min, min}, product), do: min <= product.price
-  def check?({:max, max}, product), do: product.price <= max
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
 
-  def check?({:name, name}, product),
-    do: String.contains?(String.downcase(product.name), String.downcase(name))
-
-  def check?({:category, category}, product), do: category == product.category
-
-  def filter(products, filters) do
-    Enum.filter(products, fn product ->
-      Enum.all?(filters, fn filter -> check?(filter, product) end)
-    end)
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "lazy_product_filters_reading"
+    "exercises" -> "lazy_product_filters_exercise"
   end
-end
-```
 
-```elixir
-defmodule Fibonacci do
-  def fib(0), do: 0
-  def fib(1), do: 1
-  def fib(n), do: fib(n - 1) + fib(n - 2)
-end
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
 
-Enum.map(1..40, fn int ->
-  {time, _result} = :timer.tc(fn -> Fibonacci.fib(int) end)
-  time
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
 end)
-|> IO.inspect(label: "ACTUAL")
 
-# O(n)
-Enum.map(1..40, fn n -> n end) |> IO.inspect(label: "O(n)")
-# O(n)**2
-Enum.map(1..40, fn n -> n ** 2 end) |> IO.inspect(label: "O(n)**2")
-# O(n)**n
-Enum.map(1..40, fn n -> n ** n end) |> IO.inspect(label: "O(n)**n")
-
-defmodule Factorial do
-  def of(0), do: 1
-
-  def of(n) when n > 0 do
-    Enum.reduce(1..n, &*/2)
-  end
-end
-
-Enum.map(1..40, fn n -> Factorial.of(n) end) |> IO.inspect(label: "O(n!)")
-```
-
-```elixir
-Enum.map(1..10, fn time -> time ** 2 end)
-```
-
-1. 25 seconds
-2. 5 seconds
-3. 30 seconds
-
-total = 2 mins
-
-```elixir
-names = Enum.map(1..1000, fn _ -> Faker.Food.dish() end)
-categories = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k, :l, :m, :n, :o, :p]
-
-products =
-  for name <- names,
-      category <- categories,
-      do: %{name: name, category: category, price: Enum.random(1..100)}
-
-filters = [name: "A", category: :tech, min: 25, max: 50]
-
-Benchee.run(
-  %{
-    "Enum" => fn -> EnumProducts.filter(products, filters) end,
-    "Stream" => fn -> StreamProducts.filter(products, filters) end
-  },
-  memory_time: 2
-)
+form
 ```
 
 ## Commit Your Progress
@@ -385,21 +301,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-lazy_product_filters
+$ git checkout -b lazy-product-filters-exercise
 $ git add .
 $ git commit -m "finish lazy product filters exercise"
-$ git push origin exercise-lazy_product_filters
+$ git push origin lazy-product-filters-exercise
 ```
+
+Create a pull request from your `lazy-product-filters-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                           | Next                                                 |
-| -------------------------------------------------- | ---------------------------------------------------: |
-| [Stream Drills](../exercises/stream_drills.livemd) | [Lists Vs Tuples](../reading/lists_vs_tuples.livemd) |
+| Previous                                     | Next                                                  |
+| -------------------------------------------- | ----------------------------------------------------: |
+| [Streams](../exercises/stream_drills.livemd) | [Lists and Tuples](../reading/lists_vs_tuples.livemd) |

@@ -1,10 +1,13 @@
-# RDBMS
+# Relational Database Management Systems
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:kino_db, "~> 0.1.1"}
+  {:kino_db, "~> 0.2.0"},
+  {:postgrex, "~> 0.16.3"}
 ])
 ```
 
@@ -17,11 +20,20 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
-## Relational Database Management Systems (RDBMS)
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Why use a database instead of the File system for long-term persistence?
+* What are the three relational database associations?
+
+## Relational Database Management Systems
 
 Databases store long-term information in a program. There are many kinds of databases, but in Elixir we'll focus on Relational Database Management Systems (RDBMS) with PostgreSQL.
 
 Here's a great primer by Linux Academy.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=Tk1t3WKK-ZY\")","title":"PostgreSQL"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=Tk1t3WKK-ZY")
@@ -106,13 +118,15 @@ postgres-# \q
 Unfortunately, It's common to run into issues when setting up PostgreSQL. Every student
 has a different environment, so it's difficult to anticipate issues you may encounter.
 
-If you get stuck, please speak to a classmate, speak to your teacher, or [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) on the Dockyard Academy repository. You may also attempt to debug the issue by researching the error message and finding recommendations online.
+If you get stuck, please speak to a classmate, speak to your instructor, or [raise an issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) on the Dockyard Academy repository. You may also attempt to debug the issue by researching the error message and finding recommendations online.
 
 We recommend caution when running commands found on the Internet, as they can cause further issues. We also recommend you keep a journal of everything you try. This journal can help you and others identify issues and may help if you encounter the same problem in the future.
 
 It often helps to "turn it off and on again." In this case, uninstall and re-install PostgreSQL.
 
 Here, we've provided debugging instructions for some common issues.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### PostgreSQL Not Started
 
@@ -134,7 +148,9 @@ Then test if PostgreSQL is running on your computer again.
 $ pgrep -u postgres -fa -- -D
 ```
 
-#### Role Does Not Exist
+<!-- livebook:{"break_markdown":true} -->
+
+### Role Does Not Exist
 
 PostgreSQL uses different roles to manage permissions when communicating with your PostgreSQL databases. Ensure you are using the correct `postgres` role with the following command.
 
@@ -200,6 +216,8 @@ Now that we're connected to the database. We can use a Structured Query Language
 
 For a primer on SQL syntax, here's a great video by Danielle Thé.
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=27axs9dO7AE\")","title":"SQL"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=27axs9dO7AE")
 ```
@@ -216,7 +234,7 @@ We can create a table with the `CREATE TABLE` query, which creates a table and d
 Copy and past the following into the `psql` prompt.
 
 ```sql
-CREATE TABLE USERS (
+CREATE TABLE users (
    ID    INT              NOT NULL,
    NAME  VARCHAR (255)    NOT NULL,
    EMAIL VARCHAR (255)    NOT NULL,
@@ -241,19 +259,20 @@ example=# \dt
  public | users | table | postgres
 ```
 
-Now, we'll create the entries table, which will store journal entries that belong to users.
-The entries table will have a foreign key that references the users table, because each entry belongs to one user.
+Now, we'll create the entries table, which will store journal entries that belong to users. The entries table will have a foreign key that references the users table, because each entry belongs to one user.
+
+Entry content can be any size, so we use the `TEXT` SQL type for a string of unlimited length.
 
 Copy and paste the following into the psql prompt.
 
 ```sql
-CREATE TABLE ENTRIES (
+CREATE TABLE entries (
     ID INT NOT NULL,
     TITLE VARCHAR(255) NOT NULL,
-    CONTENT VARCHAR(255) NOT NULL,
+    CONTENT TEXT NOT NULL,
     USERID INT,
     PRIMARY KEY (ID),
-    FOREIGN KEY (USERID) REFERENCES USERS(ID)
+    FOREIGN KEY (USERID) REFERENCES users(ID)
 );
 ```
 
@@ -277,13 +296,13 @@ Now that we've created these two tables let's insert some data.
 First, we'll make a single user in the users table using the `INSERT INTO` query.
 
 ```sql
-INSERT INTO USERS (ID,NAME,EMAIL) VALUES (1, 'Peter', 'peter@spider.web');
+INSERT INTO users (ID,NAME,EMAIL) VALUES (1, 'Peter', 'peter@spider.web');
 ```
 
 We'll also create an entry for this user.
 
 ```sql
-INSERT INTO ENTRIES (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Today, I Encountered Rhino.', 1);
+INSERT INTO entries (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Today, I Encountered Rhino.', 1);
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -293,7 +312,7 @@ INSERT INTO ENTRIES (ID,TITLE,CONTENT,USERID) VALUES (1, 'Rhino Encounter', 'Tod
 We can the records in our table using the `SELECT` query.
 
 ```sql
-SELECT * FROM USERS;
+SELECT * FROM users;
 ```
 
 The query above should display the following.
@@ -307,7 +326,7 @@ The query above should display the following.
 We can also see the data created in the entries table.
 
 ```sql
-SELECT * FROM ENTRIES;
+SELECT * FROM entries;
 ```
 
 The query above should display the following.
@@ -323,7 +342,7 @@ Alternatively, we can specify the fields we want to display.
 For example, here's how we could retrieve only the title and the content for each entry.
 
 ```sql
-SELECT TITLE,CONTENT from ENTRIES
+SELECT TITLE,CONTENT from entries
 ```
 
 The query above should display the following.
@@ -341,7 +360,7 @@ The query above should display the following.
 We can filter our `SELECT` results using the `WHERE` query. For example,
 
 ```sql
-SELECT * FROM USERS u WHERE u.id = 1
+SELECT * FROM users u WHERE u.id = 1
 ```
 
 The `u` before `WHERE` is conceptually similar to a variable bound to each user in the table.
@@ -353,7 +372,7 @@ We can then use [SQL Comparison Operators](https://www.sqltutorial.org/sql-compa
 
 Livebook provides [Smart Cells](https://www.youtube.com/watch?v=4hVIxyHxwK8&ab_channel=ElixirConf) which can connect to our PostgreSQL Database. For example, the following smart cell should successfully connect to your `example` database if you used the default `postgres` user.
 
-<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"database":"example","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 opts = [
@@ -361,8 +380,7 @@ opts = [
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "example",
-  socket_options: [:inet6]
+  database: "example"
 ]
 
 {:ok, conn} = Kino.start_child({Postgrex, opts})
@@ -370,15 +388,19 @@ opts = [
 
 Once connected, these smart cells can make SQL queries to our database. Here you should see your users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from USERS","result_variable":"result2","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result2 = Postgrex.query!(conn, "select * from USERS", [])
+result2 = Postgrex.query!(conn, "select * from users", [])
 ```
 
-Use the following SQL smart cell to create a new user in the users table.
+### Your Turn
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result3","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"break_markdown":true} -->
+
+Use the following SQL smart cell to create a new user in the users table. Re-evaluate the smart cell above to see the new user in the table.
+
+<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result3 = Postgrex.query!(conn, "", [])
@@ -386,7 +408,7 @@ result3 = Postgrex.query!(conn, "", [])
 
 Use the following SQL smart cell to create a new entry in the entries table, which has a foreign key to the same user you previously created.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result4","timeout":null},"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result4","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 result4 = Postgrex.query!(conn, "", [])
@@ -472,16 +494,52 @@ In this case, there would be a **many-to-many** relationship between users.
 
 ## Further Reading
 
-PostgreSQL, SQL, and Relational Database Management Systems are massive topics.
+PostgreSQL, SQL, and Relational Database Management Systems are deep topics.
 
-In addition, you'll likely find yourself using [Ecto](ecto.livemd) as a wrapper around the database rather
-than directly interacting with PostgreSQL or writing SQL queries. This lesson is a primer to prepare you to use Ecto and understand what's happening under the hood.
+In the future, you'll use [Ecto](https://hexdocs.pm/ecto/Ecto.html) as a wrapper around the database rather than interacting directly with PostgreSQL using SQL. This lesson is a primer to prepare you to use Ecto and understand what's happening under the hood.
 
-However, if you do want to dive deeper into PostgreSQL and SQL,
-you might consider the following resources.
+Consider the following resource(s) to deepen your understanding of the topic.
 
 * [SQL Tutorial Org](https://www.sqltutorial.org/)
 * [PostgreSQL Tutorial](https://www.postgresqltutorial.com/)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rdbms_reading\"\n    \"exercises\" -> \"rdbms_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "rdbms_reading"
+    "exercises" -> "rdbms_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
 
 ## Commit Your Progress
 
@@ -489,21 +547,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-rdbms
+$ git checkout -b rdbms-reading
 $ git add .
-$ git commit -m "finish rdbms section"
-$ git push origin exercise-rdbms
+$ git commit -m "finish rdbms reading"
+$ git push origin rdbms-reading
 ```
+
+Create a pull request from your `rdbms-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                       | Next                           |
-| -------------------------------------------------------------- | -----------------------------: |
-| [Portfolio Home Page](../exercises/portfolio_home_page.livemd) | [Ecto](../reading/ecto.livemd) |
+| Previous                                                      | Next                                                   |
+| ------------------------------------------------------------- | -----------------------------------------------------: |
+| [Group Project: Blog](../exercises/group_project_blog.livemd) | [Phoenix and Ecto](../reading/phoenix_and_ecto.livemd) |

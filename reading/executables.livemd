@@ -1,0 +1,226 @@
+# Executables
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you configure a project as an executable script?
+
+## Executables
+
+We can configure mix projects to run as an executable script using escript.
+
+Once configured, we can run a mix project using an executable file inside of the project folder.
+
+```
+./project_name
+```
+
+To demonstrate how to configure an executable, We're going to create a simple `greeting` executable which prints a good morning message.
+
+Create a new mix project.
+
+```
+$ mix new greeting
+```
+
+First, we need to define a module with a `main/1` function. This function will be what's triggered by the executable.
+We can modify the existing `Greeting` module in `lib/greeting.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Greeting do
+  def main(_args) do
+    IO.puts("Good morning!")
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+<div style="background-color: orange; font-weight: bold; padding: 1rem; color: black; margin: 1rem 0;">
+Remove doctests and the existing `test` macros to ensure all tests pass when you run `mix test`.
+</div>
+
+<!-- livebook:{"break_markdown":true} -->
+
+In any mix project, we can configure an executable using the `:escript` option in the `mix.exs` file.
+Add the `:escript` configuration to the existing `project/0` function.
+
+We've defined our `main/1` function in the `Greeting` module, so we provide that as our `:main_module`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def project do
+  # make sure you keep existing configuration
+  escript: [main_module: Greeting]
+end
+```
+
+Now we have to build the executable script from the `greeting` folder.
+
+```
+$ mix escript.build
+```
+
+Execute the script to see the good morning message.
+
+```
+$ ./greeting
+Good morning!
+```
+
+## Parsing Arguments
+
+We can provide arguments to executable scripts using `--arg_name` flags. A flag can be empty, or it can have a value `--arg_name=true`.
+
+Elixir provides an [OptionParser](https://hexdocs.pm/elixir/OptionParser.html) module to parse arguments provided to the script into Elixir terms.
+
+```elixir
+OptionParser.parse(["--flag=true"], switches: [flag: :boolean])
+```
+
+If the `:boolean` type is given, flags are true by default when provided.
+
+```elixir
+OptionParser.parse(["--flag=true"], switches: [flag: :boolean])
+```
+
+Or we can set them to false.
+
+```elixir
+OptionParser.parse(["--flag=false"], switches: [flag: :boolean])
+```
+
+Arguments may have different [types](https://hexdocs.pm/elixir/1.12/OptionParser.html#parse/2-types) such as `:boolean`, `:count`, `:integer`, `:float`, and `:string`.
+
+```elixir
+OptionParser.parse(["--time=hello"], switches: [time: :string])
+```
+
+```elixir
+OptionParser.parse(["--name=hello"], switches: [name: :string])
+```
+
+For example, we can use a `--time` flag to change the greeting based on the time of day.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Greeting do
+  def main(args) do
+    {opts, _word, _errors} = OptionParser.parse(args, switches: [time: :string])
+    IO.puts("Good #{opts[:time] || "morning"}!")
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now rebuild the script, and you can customize the message using the `--time` flag.
+
+```
+$ mix escript.build
+$ ./greeting --time="evening"
+Good evening!
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create an `--upcase` flag, which upcases the greeting so `"Good morning!` becomes `GOOD MORNING!`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### BONUS: GitHub Repository
+
+Connect your `greeting` project with a GitHub repository to add it to your portfolio of projects. Update the README to include a description of the project and what you learned.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"executables_reading\"\n    \"exercises\" -> \"executables_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "executables_reading"
+    "exercises" -> "executables_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b executables-reading
+$ git add .
+$ git commit -m "finish executables reading"
+$ git push origin executables-reading
+```
+
+Create a pull request from your `executables-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                                                                | Next                                          |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------: |
+| [Games: Documentation and Static Analysis](../exercises/games_documentation_and_static_analysis.livemd) | [Games: Menu](../exercises/games_menu.livemd) |

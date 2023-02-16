@@ -1,0 +1,200 @@
+# File Search
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Mastery
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
+
+## File Search
+
+Create a `FileSearch` module which can recursively search files in all nested folders.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule FileSearch do
+  def all(folder) do
+    File.ls!(folder)
+    |> Enum.map(fn file_or_folder ->
+      path = Path.join(folder, file_or_folder)
+
+      if File.dir?(path) do
+        all(path)
+      else
+        file_or_folder
+      end
+    end)
+    |> List.flatten()
+  end
+
+  def by_extension(folder) do
+    all(folder) |> Enum.reduce(%{}, fn file_name, acc ->
+      extension = Path.extname(file_name)
+      Map.update(acc, extension, [file_name], fn files -> [file_name | files] end)
+    end)
+  end
+end
+```
+
+</details>
+
+Implement the `FileSearch` module as documented.
+
+```elixir
+defmodule FileSearch do
+  @moduledoc """
+  Documentation for FileSearch
+  """
+
+  @doc """
+  Find all nested files.
+
+  For example, given the following folder structure
+  /main
+    /sub1
+      file1.txt
+    /sub2
+      file2.txt
+    /sub3
+      file3.txt
+    file4.txt
+
+  It would return:
+
+  ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
+  """
+  def all(folder) do
+  end
+
+  @doc """
+  Find all nested files and categorize them by their extension.
+
+  For example, given the following folder structure
+  /main
+    /sub1
+      file1.txt
+      file1.png
+    /sub2
+      file2.txt
+      file2.png
+    /sub3
+      file3.txt
+      file3.jpg
+    file4.txt
+
+  The exact order and return value are up to you as long as it finds all files 
+  and categorizes them by file extension.
+
+  For example, it might return the following:
+
+  %{
+    ".txt" => ["file1.txt", "file2.txt", "file3.txt", "file4.txt"],
+    ".png" => ["file1.png", "file2.png"],
+    ".jpg" => ["file3.jpg"]
+  }
+  """
+  def by_extension(folder) do
+  end
+end
+```
+
+### Configure Project As A Script
+
+Create a new mix project.
+
+```
+$ mix new file_search
+```
+
+Configure the project as a script. You should be able to run the following to list all files.
+
+```
+$ mix escript.build
+$ ./file_search
+```
+
+You should also be able to use a flag to list files by their extension.
+
+```
+$ ./file_search --by_type
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"file_search_reading\"\n    \"exercises\" -> \"file_search_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "file_search_reading"
+    "exercises" -> "file_search_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b file-search-exercise
+$ git add .
+$ git commit -m "finish file search exercise"
+$ git push origin file-search-exercise
+```
+
+Create a pull request from your `file-search-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                             | Next                                     |
+| ---------------------------------------------------- | ---------------------------------------: |
+| [Document Tools](../exercises/document_tools.livemd) | [Processes](../reading/processes.livemd) |

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:smart_animation, github: "brooklinjazz/smart_animation"},
@@ -18,6 +20,11 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+* When should we use `map` vs `filter` vs `reduce`?
+* How can we build an accumulated value using reduce?
+
 ## Overview
 
 Reduce is an incredibly powerful tool you can leverage in a wide variety of circumstances.
@@ -28,7 +35,7 @@ Reduce is an incredibly powerful tool you can leverage in a wide variety of circ
 
 If you'd like to learn more about reduce, there's an [excellent video](https://github.com/paulfioravanti/presentations/tree/master/everything_is_reduce) by Paul Fioravanti.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=OQrfedclHfk\")","title":"Everything Is Reduce"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=OQrfedclHfk\")","title":"Everything Is Reduce"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=OQrfedclHfk")
@@ -88,7 +95,7 @@ flowchart TB
 
 Let's look at a more practical example of taking a collection, and returning a non-list output.
 
-In the [Anagram](../exercises/anagram.livemd) exercise you previously completed, you built an `Anagram.anagram?2` function to determine if two strings are anagrams. One solution to the problem is to build a map storing the character counts of two strings.
+In the [Anagram](../exercises/anagram.livemd) exercise you previously completed, you built an `Anagram.anagram?/2` function to determine if two strings are anagrams. One solution to the problem is to build a map storing the character counts of two strings.
 
 For example, to determine if `"state"` and `"taste"` are anagrams of each other, we can convert them into the following maps with a count of each character, and check if they are equal. Remember that order in maps does not matter.
 
@@ -187,6 +194,24 @@ end)
 
 ```
 
+## Multiple Accumulators
+
+One trick for reduce is to use a collection data-type to simulate having multiple accumulators.
+
+Here's an example of separating a range into even and odd numbers.
+
+```elixir
+Enum.reduce(1..10, {[], []}, fn integer, {evens, odds} ->
+  if rem(integer, 2) == 0 do
+    {[integer | evens], odds}
+  else
+    {evens, [integer | odds]}
+  end
+end)
+```
+
+Technically, there is only one actual accumulator, our tuple with two lists. However, this functions as a way to track multiple values with each enumeration in the reduce operation.
+
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
@@ -195,27 +220,68 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [Enum.reduce/2](https://hexdocs.pm/elixir/Enum.html#reduce/2)
 * [Enum.reduce/3](https://hexdocs.pm/elixir/Enum.html#reduce/3)
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"reduce_reading\"\n    \"exercises\" -> \"reduce_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "reduce_reading"
+    "exercises" -> "reduce_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-reduce
+$ git checkout -b reduce-reading
 $ git add .
-$ git commit -m "finish reduce section"
-$ git push origin exercise-reduce
+$ git commit -m "finish reduce reading"
+$ git push origin reduce-reading
 ```
+
+Create a pull request from your `reduce-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                           | Next                                               |
-| ------------------------------------------------------------------ | -------------------------------------------------: |
-| [Filter Values By Type](../exercises/filter_values_by_type.livemd) | [Number Finder](../exercises/number_finder.livemd) |
+| Previous                                       | Next                                               |
+| ---------------------------------------------- | -------------------------------------------------: |
+| [Tic-tac-toe](../exercises/tic-tac-toe.livemd) | [Number Finder](../exercises/number_finder.livemd) |

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -15,6 +17,14 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* What are strings, and what kind of information are they useful for storing?
+* How do we add two strings together using string concatenation?
+* How do we interpret Elixir code inside of a string using string interpolation?
 
 ## Strings
 
@@ -59,6 +69,28 @@ programmer.
 
 ```elixir
 
+```
+
+## Multiline Strings
+
+Sometimes we want to represent a string with multiple lines. The newline `\n` character represents a new line in a string.
+
+```elixir
+string = "line 1\nline 2\nline 3"
+
+IO.puts(string)
+```
+
+To make defining multiline strings easier, Elixir allows us to use three quotes `"""` to define a multiline string.
+
+```elixir
+string = """
+line 1
+line 1
+line 1
+"""
+
+IO.puts(string)
 ```
 
 ## String Operators
@@ -140,27 +172,101 @@ In the Elixir cell below, use **string interpolation** to say `I have #{X - 1} c
 answer = nil
 ```
 
+## Escaping Characters
+
+Elixir allows you to use [Escape Characters](https://hexdocs.pm/elixir/main/String.html#module-escape-characters) to represent special values in a string. We've already seen the `\n` escape character for a newline.
+
+For example, we can use the `\` symbol to escape special characters in a string. This is handy when you want to include characters that would have alternative meaning in the string. For example, if you wanted to include double quotes in a string, you can escape the double quote `\"`.
+
+```elixir
+string = "They said \"so this is how you include double quotes in a string!\""
+
+IO.puts(string)
+```
+
+There are other special characters such as backslashes `\`, or interpolation syntax that you might want to escape.
+
+```elixir
+string = "Use \#\{\} to interpolate a value in a string"
+
+IO.puts(string)
+```
+
+```elixir
+string = "If you don't escape using backslash \\, then #{} doesn't appear"
+
+IO.puts(string)
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepend your understanding of the topic.
+
+* [Joy of Elixir: Strings](https://joyofelixir.com/book#chapter-8)
+* [Elixir-lang: binaries, strings, and charlists](https://elixir-lang.org/getting-started/binaries-strings-and-char-lists.html)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"strings_reading\"\n    \"exercises\" -> \"strings_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "strings_reading"
+    "exercises" -> "strings_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-strings
+$ git checkout -b strings-reading
 $ git add .
-$ git commit -m "finish strings section"
-$ git push origin exercise-strings
+$ git commit -m "finish strings reading"
+$ git push origin strings-reading
 ```
+
+Create a pull request from your `strings-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                   | Next                                   |
-| ------------------------------------------ | -------------------------------------: |
-| [Arithmetic](../reading/arithmetic.livemd) | [Booleans](../reading/booleans.livemd) |
+| Previous                                   | Next                       |
+| ------------------------------------------ | -------------------------: |
+| [Arithmetic](../reading/arithmetic.livemd) | [IO](../reading/io.livemd) |

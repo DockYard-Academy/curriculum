@@ -1,0 +1,243 @@
+# Bingo Winner
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Bingo Winner
+
+Bingo is a game where players are given a board of numbers.
+
+Provided a bingo board, determine if the board is a winner.
+
+Numbers are called, and players fill out the matching numbers on their board.
+
+A board is a winner if it has any row, column, or diagonal completely filled.
+
+For example, let's say we have an empty board like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  [nil, nil, nil],
+  [nil, nil, nil],
+  [nil, nil, nil],
+]
+```
+
+We'll mark matching numbers using `"X"`.
+
+A winning board would look like:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# example win on row
+[
+  ["X", "X", "X"],
+  [nil, nil, nil],
+  [nil, nil, nil]
+]
+
+# example win on column.
+[
+  ["X", nil, nil],
+  ["X", nil, nil],
+  ["X", nil, nil],
+]
+
+# example win on diagonal
+[
+  ["X", nil, nil],
+  [nil, "X", nil],
+  [nil, nil, "X"],
+]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Determine the Winner
+
+Create a `Bingo.is_winner?/1` function that accepts a board and returns `true` if the board is a winner.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+winning_board = [
+  [nil, nil, "X"],
+  [nil, "X", nil],
+  ["X", nil, nil],
+]
+
+losing_board = [
+  ["X", nil, "X"],
+  [nil, nil, nil],
+  ["X", "X", nil],
+]
+
+Bingo.is_winner?(winning_board)
+true
+
+Bingo.is_winner?(losing_board)
+false
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Play the Game
+
+Create a `Bingo.play/2` function which accepts a board of numbers and a list of called numbers.
+The board should return an output we can use with the `Bingo.is_winner?/1` function to determine if the player won.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+board = [
+  [3, 2, 5],
+  [1, 6, 7],
+  [4, 8, 9]
+]
+
+called_numbers = [1, 2, 3]
+
+completed_board = Bingo.play(board, called_numbers)
+[
+  ["X", "X", nil],
+  ["X", nil, nil],
+  [nil, nil, nil],
+]
+
+Bingo.is_winner?(completed_board)
+false
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your answer below.
+
+```elixir
+defmodule Bingo do
+  @doc """
+  Determine if a completed bingo board is a winner.
+
+  ## Examples
+
+    iex> Bingo.is_winner?([["X", "X", "X"], ["X", "X", "X"], ["X", "X", "X"]])
+    
+    Row Cases
+
+    iex> Bingo.is_winner?([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+    true
+
+    Diagonal Cases
+
+    iex> Bingo.is_winner?([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+
+    Column Cases
+
+    iex> Bingo.is_winner?([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    true
+    iex> Bingo.is_winner?([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    true
+    iex> Bingo.is_winner?([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+    true
+    
+    Losing Cases
+
+    iex> Bingo.is_winner?([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+    false
+    iex> Bingo.is_winner?([["X", nil, "X"], ["X", nil, nil], [nil, nil, "X"]])
+    false
+    iex> Bingo.is_winner?([["X", nil, "X"], [nil, nil, nil], ["X", nil, "X"]])
+    false
+  """
+  def is_winner?(completed_board) do
+  end
+
+  @doc """
+  Fill called numbers in a board with `"X"` and not called numbers with `nil`.
+
+  ## Examples
+
+    iex> Bingo.play([[1, 1, 1], [1, 1, 1], [1, 1, 1]], [])
+    [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]]
+    iex> Bingo.play([[1, 1, 1], [1, 1, 1], [1, 1, 1]], [1])
+    [["X", "X", "X"], ["X", "X", "X"], ["X", "X", "X"]]
+     iex> Bingo.play([[3, 2, 5], [1, 6, 7], [4, 8, 9]], [1, 2, 3])
+    [["X", "X", nil], ["X", nil, nil], [nil, nil, nil]]
+    iex> Bingo.play([[3, 2, 5], [1, 6, 7], [4, 8, 9]], [1, 2, 3, 6, 8, 9])
+    [["X", "X", nil], ["X", "X", nil], [nil, "X", "X"]]
+  """
+  def play(numbered_board, called_numbers) do
+  end
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b deprecated-bingo-winner-exercise
+$ git add .
+$ git commit -m "finish deprecated bingo winner exercise"
+$ git push origin deprecated-bingo-winner-exercise
+```
+
+Create a pull request from your `deprecated-bingo-winner-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

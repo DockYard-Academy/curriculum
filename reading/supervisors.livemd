@@ -2,9 +2,10 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:kino, "~> 0.7.0"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -12,6 +13,12 @@ Mix.install([
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Review Questions
+
+* What kinds of problems do supervisors solve?
+* How do we use supervisors to make our application fault-tolerant?
+* Why might we use each supervisor restart strategy (`:one_for_one`, `:one_for_all`, `:rest_for_one`)?
 
 ## Setup
 
@@ -190,7 +197,7 @@ We've seen the above `:one_for_one` strategy. This is the most common strategy, 
 
 However, sometimes we want different restart strategies such as `:one_for_all` and `:rest_for_one`.
 
-### One-to-One
+### One-For-One
 
 Restart only the worker that crashed.
 
@@ -213,7 +220,7 @@ flowchart TD
 
 In the diagram above, only P2 crashed, so only P2 will be restarted by the supervisor.
 
-### One For All
+### One-For-All
 
 Restart all of the child workers.
 
@@ -237,9 +244,9 @@ flowchart TD
 
 P2 crashed, which led to all the other child processes to be terminated, then all the child processes are restarted.
 
-### Rest For One
+### Rest-For-One
 
-Restart child workers orderer after the crashed process.
+Restart child workers in order after the crashed process.
 
 ```mermaid
 flowchart TD 
@@ -438,17 +445,49 @@ Uncomment the following code to see the crash timeline, then re-comment it.
 # Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
-## Thought Provoking Questions
-
-* Why do supervisors make our application fault-tolerant?
-* What kinds of errors to supervisors catch?
-* Why might we use each restart strategy?
-
 ## Further Reading
 
 * [HexDocs: Supervisor](https://hexdocs.pm/elixir/Supervisor.html#init/2-options)
 * [Elixir Schools: Supervisor Strategies](https://elixirschool.com/blog/supervisor-strategies)
 * [Elixir Schools: OTP Supervisors](https://elixirschool.com/en/lessons/advanced/otp_supervisors)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"supervisors_reading\"\n    \"exercises\" -> \"supervisors_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "supervisors_reading"
+    "exercises" -> "supervisors_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
 
 ## Commit Your Progress
 
@@ -456,16 +495,19 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-supervisors
+$ git checkout -b supervisors-reading
 $ git add .
-$ git commit -m "finish supervisors section"
-$ git push origin exercise-supervisors
+$ git commit -m "finish supervisors reading"
+$ git push origin supervisors-reading
 ```
+
+Create a pull request from your `supervisors-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

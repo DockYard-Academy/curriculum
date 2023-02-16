@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -30,7 +32,8 @@ Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)>
 ```
 
-We can evaluate Elixir code inside of the [IEx](https://hexdocs.pm/iex/IEx.html) shell.
+We can evaluate Elixir code inside of the [IEx](https://hexdocs.pm/iex/IEx.html) shell. [IEx](https://hexdocs.pm/iex/IEx.html) is often useful for small experiments,
+running Elixir scripts, and even as a playground environment building/running Elixir applications.
 
 ### Your Turn
 
@@ -41,6 +44,50 @@ Execute some simple arithmetic in the `iex` shell, like so.
 ```elixir
 iex > 4 + 4
 8
+```
+
+## IO
+
+We can use the [IO](https://hexdocs.pm/elixir/IO.html) module for retrieving user input and displaying output. We'll learn more about modules in later lessons.
+
+Wrap any value in `IO.inspect()` to print it.
+
+```elixir
+IO.inspect(2 + 2)
+```
+
+We can also use [IO.gets/2](https://hexdocs.pm/elixir/IO.html#gets/2) to retrieve input from the user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> input = IO.gets("Give me some input: ")
+Give me some input: sure!
+"sure!\n"
+iex> input
+"sure!\n"
+```
+
+Keep in mind, this will work when running an Elixir project or in the [IEx](https://hexdocs.pm/iex/IEx.html) shell, but will fail with an `:enotsup` (error not supported) error when we run it from Livebook.
+
+```elixir
+IO.gets("I will fail!")
+```
+
+That's because in Livebook there is no command line or other device to retrieve the user input from.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Run [IO.gets/2](https://hexdocs.pm/elixir/IO.html#gets/2) in the command line from the [IEx](https://hexdocs.pm/iex/IEx.html) shell and bind the return value to an `input` variable.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> input = IO.gets("Give me some input: ")
 ```
 
 ## Multiline Expressions
@@ -85,10 +132,7 @@ iex> Greeting.hello()
 "Hello, world!"
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-[IEx](https://hexdocs.pm/iex/IEx.html) is often useful for small experiments,
-running Elixir scripts, and even as a playground environment for an application.
+We'll learn more about modules in future lessons.
 
 ## Closing the IEx Shell
 
@@ -130,6 +174,8 @@ all?/1    all?/2    any?/1    any?/2    at/2      at/3
 The built-in [IEx.Helpers](https://hexdocs.pm/iex/IEx.Helpers.html) module provides helpers to make it
 easier to work with the IEx shell.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Help (h)
 
 The `h` helper prints the documentation for any code.
@@ -139,6 +185,8 @@ For example, execute the following in your [IEx](https://hexdocs.pm/iex/IEx.html
 ```
 iex> h Enum
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Information (i)
 
@@ -160,12 +208,16 @@ Implemented protocols
   IEx.Info, Inspect, List.Chars, String.Chars
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Compile (c)
 
 The [c](https://hexdocs.pm/iex/1.13/IEx.Helpers.html#c/2) helper can load an Elixir file into your [IEx](https://hexdocs.pm/iex/IEx.html) shell.
 
 For example, create a `hello.exs` file with your command line. Add the following contents to
 the file with your code editor.
+
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defmodule Greeting do
@@ -212,10 +264,12 @@ The [r](https://hexdocs.pm/iex/IEx.Helpers.html#r/1) helper recompiles a module 
 
 For example, change the `Greeting` module in `hello.exs` to return a different value.
 
+<!-- livebook:{"force_markdown":true} -->
+
 ```elixir
 defmodule Greeting do
   def hello do
-    "Hello!"
+    "Hello!" # changed value
   end
 end
 
@@ -231,6 +285,8 @@ iex> r Greeting
 iex> Greeting.hello()
 "Hello!"
 ```
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Value (v)
 
@@ -280,27 +336,68 @@ IEx is generally helpful for experimenting with Elixir code and exploring an exi
 * [HexDocs: IEx.Helpers](https://hexdocs.pm/iex/IEx.Helpers.html#functions) includes a full list of helper functions and their usage beyond those covered above.
 * [Elixir Schools: IEx.Helpers](https://elixirschool.com/en/lessons/basics/iex_helpers) an Elixir schools lesson on `IEx.Helpers`.
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"iex_reading\"\n    \"exercises\" -> \"iex_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "iex_reading"
+    "exercises" -> "iex_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-iex
+$ git checkout -b iex-reading
 $ git add .
-$ git commit -m "finish iex section"
-$ git push origin exercise-iex
+$ git commit -m "finish iex reading"
+$ git push origin iex-reading
 ```
+
+Create a pull request from your `iex-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                         | Next                         |
-| ---------------------------------------------------------------- | ---------------------------: |
-| [Phone Number Parsing](../exercises/phone_number_parsing.livemd) | [Mix](../reading/mix.livemd) |
+| Previous                                       | Next                                                                     |
+| ---------------------------------------------- | -----------------------------------------------------------------------: |
+| [Code Editors](../reading/code_editors.livemd) | [Command Line Family Tree](../exercises/command_line_family_tree.livemd) |
