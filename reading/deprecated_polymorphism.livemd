@@ -1,0 +1,169 @@
+# Polymorphism
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Polymorphism
+
+The word polymorphism comes from the Greek word for "many shapes".
+It means essentially the same thing for our programs.
+We often want to define a single general behavior, but apply it to different things.
+
+```mermaid
+  flowchart
+    A[Polymorphic Behavior] --- B[Specific Implementation]
+    A --- C[Specific Implementation]
+    A --- D[Specific Implementation]
+    A --- E[Specific Implementation]
+    A --- F[Specific Implementation]
+```
+
+Running is a great real-world example of polymorphism. Many different animals run,
+and they all run in different ways.
+
+```mermaid
+  flowchart
+    A[Run] --- B[Cheetahs]
+    A --- C[Cats]
+    A --- D[Dogs]
+    A --- E[Horses]
+    A --- F[Humans]
+```
+
+For a more technical example, you can think of many devices that need to implement an **off** feature.
+You can turn off your computer, your tv, your lights, and your phone. Each needs to do this differently
+under the hood, but the behavior is universal.
+
+```mermaid
+  flowchart
+    A[off] --- B[TV]
+    A --- C[Computer]
+    A --- D[Phone]
+    A --- E[Lights]
+```
+
+Anytime you have a universal behavior, but separate implementation depending on some context, it's
+an opportunity to use polymorphism to improve the clarity of your code.
+
+You've also been using the [Enum](https://hexdocs.pm/elixir/Enum.html) module which provides polymorphic
+behavior for different collection data types.
+
+```mermaid
+  flowchart
+    A[Enum] --- B[map]
+    A --- C[list]
+    A --- D[keyword-list]
+    A --- E[range]
+```
+
+You have also already learned some methods of achieving polymorphism with multi-clause functions.
+
+```elixir
+defmodule Greeter do
+  def hi(name) do
+    "Hi #{name}!"
+  end
+
+  def hi(name1, name2) do
+    "Hi #{name1} and #{name2}!"
+  end
+
+  def hi(_name1, _name2, _name3) do
+    "Hi everyone!"
+  end
+end
+```
+
+For example, multiple arity functions could be said to be polymorphic,
+They create the same generic behavior but with different implementations depending
+on the number of arguments given.
+
+```mermaid
+  flowchart
+    A[Greeter.hi] --> B[1 person]
+    A --> C[2 people]
+    A --> D[3 people]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Polymorphism can be achieved through many means. You will learn more about the tools available in
+Elixir to produce behavior as you go through the course.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+<!-- livebook:{"break_markdown":true} -->
+
+Think of an example of polymorphic behavior that you encounter in every day life. What is some
+common abstraction you often use which actually requires different specific behavior?
+
+Running is one example, can you think of others?
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b deprecated-polymorphism-reading
+$ git add .
+$ git commit -m "finish deprecated polymorphism reading"
+$ git push origin deprecated-polymorphism-reading
+```
+
+Create a pull request from your `deprecated-polymorphism-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

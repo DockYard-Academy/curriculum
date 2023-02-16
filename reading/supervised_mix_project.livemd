@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,6 +18,11 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+* What is the benefit of using a supervised mix project?
+* How do you configure a mix project with a supervisor?
+
 ## Supervised Mix Projects
 
 We can start mix projects under a supervisor.
@@ -26,6 +33,11 @@ To demonstrate, we're going to create a supervised rock paper scissors applicati
 
 ```
 $ mix new rock_paper_scissors --sup
+```
+
+Which creates the following files.
+
+```
 * creating README.md
 * creating .formatter.exs
 * creating .gitignore
@@ -236,7 +248,7 @@ defmodule RockPaperScissors do
   end
 
   def handle_info(:prompt, state) do
-    choice = "Please enter rock, paper, or scissors." |> IO.gets() |> String.trim()
+    choice = "Please enter rock, paper, or scissors.\n" |> IO.gets() |> String.trim()
     send(self(), :prompt)
     {:noreply, state}
   end
@@ -301,7 +313,7 @@ defmodule RockPaperScissors do
   end
 
   def handle_info(:prompt, state) do
-    choice = "Please enter rock, paper, or scissors." |> IO.gets() |> String.trim()
+    choice = "Please enter rock, paper, or scissors.\n" |> IO.gets() |> String.trim()
     answer = Enum.random(["rock", "paper", "scissors"])
 
     result =
@@ -357,27 +369,68 @@ Please enter rock, paper, or scissors.
 
 Notice that even though our game crashes, the supervisor restarts the `RockPaperScissors` process so we can keep playing. That's fault-tolerance in action!
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"supervised_mix_project_reading\"\n    \"exercises\" -> \"supervised_mix_project_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "supervised_mix_project_reading"
+    "exercises" -> "supervised_mix_project_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-supervised_mix_project
+$ git checkout -b supervised-mix-project-reading
 $ git add .
-$ git commit -m "finish supervised mix project section"
-$ git push origin exercise-supervised_mix_project
+$ git commit -m "finish supervised mix project reading"
+$ git push origin supervised-mix-project-reading
 ```
+
+Create a pull request from your `supervised-mix-project-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                                     | Next                                                                 |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------------------: |
-| [Games Global Score Tracker](../exercises/games_global_score_tracker.livemd) | [Games Supervisor Setup](../exercises/games_supervisor_setup.livemd) |
+| Previous                                                   | Next                                                                              |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------: |
+| [Custom Assertions](../exercises/custom_assertions.livemd) | [Supervisors and GenServers](../exercises/supervisor_and_genserver_drills.livemd) |

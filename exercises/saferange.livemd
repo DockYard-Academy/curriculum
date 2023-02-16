@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -13,6 +15,8 @@ Mix.install([
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## A Safe Range Function
+
+This is a guest post created by Quentin Crain and inspired by Jeff Helman, one of our fantastic beta-testers.
 
 In the lesson on creating a range of numbers using the `..`
 operator:
@@ -72,8 +76,7 @@ Two examples from the standard library may be referred to:
 
 [Enum.html](https://hexdocs.pm/elixir/1.14.0/Enum.html)
 
-The [Enum](https://hexdocs.pm/elixir/Enum.html) module provides two functions to retrieve an element
-from a list (`[]`) at a given index. The difference is in how
+The [Enum](https://hexdocs.pm/elixir/Enum.html) module provides two functions to retrieve an element from a list (`[]`) at a given index. The difference is in how
 they behave when the index is invalid; ex:
 
 <!-- livebook:{"force_markdown":true} -->
@@ -172,11 +175,9 @@ defmodule SafeRange do
 
     iex> SafeRange.range!(1, 5, -1)
     ** (RuntimeError) Invalid step value of: -1
-        iex: SafeRange.range!/3
 
     iex> SafeRange.range!(5, 1, 1)
     ** (RuntimeError) Invalid step value of: 1
-        iex: SafeRange.range!/3
   """
   def range!(first, last, step \\ DEFAULT) do
   end
@@ -189,24 +190,59 @@ end
 ```elixir
 defmodule SafeRange do
   def range(first, last, step \\ 1) do
-    start..finish//step
+    Enum.to_list(first..last//step)
   end
 
   def range!(first, last, step \\ 1) do
     cond do
       step < 0 and first < last ->
         raise "Invalid step value of: #{step}"
-      last < first ->
+      step > 0 and first > last ->
         raise "Invalid step value of: #{step}"
-      true -> first..last//step
-    end       
+      true -> Enum.to_list(first..last//step)
+    end
   end
 end
 ```
 </details>
 
-* Thanks to Jeff Helman for asking the question and pursuing a
-  good answer!
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"saferange_reading\"\n    \"exercises\" -> \"saferange_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "saferange_reading"
+    "exercises" -> "saferange_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
 
 ## Commit Your Progress
 
@@ -214,21 +250,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-saferange
+$ git checkout -b saferange-exercise
 $ git add .
 $ git commit -m "finish saferange exercise"
-$ git push origin exercise-saferange
+$ git push origin saferange-exercise
 ```
+
+Create a pull request from your `saferange-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                         | Next                                                 |
-| ------------------------------------------------ | ---------------------------------------------------: |
-| [Measurements](../exercises/measurements.livemd) | [Non Enumerables](../reading/non_enumerables.livemd) |
+| Previous                                         | Next                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------: |
+| [Measurements](../exercises/measurements.livemd) | [Enumerating on Non-Enumerables](../reading/non_enumerables.livemd) |

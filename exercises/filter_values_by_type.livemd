@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -45,7 +47,7 @@ defmodule Filter do
   end
 
   def numbers(list) do
-    Enum.filter(list, fn number -> is_integer(number) or is_float(number) end)
+    Enum.filter(list, fn number -> is_number(number) end)
   end
 
   def atoms(list) do
@@ -53,7 +55,7 @@ defmodule Filter do
   end
 
   def lists(list) do
-    Enum.filter(list, &is_list/1)
+    Enum.filter(list, fn item -> is_list(item) and item != [] end)
   end
 
   def maps(list) do
@@ -151,27 +153,68 @@ defmodule Filter do
 end
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"filter_values_by_type_reading\"\n    \"exercises\" -> \"filter_values_by_type_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "filter_values_by_type_reading"
+    "exercises" -> "filter_values_by_type_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-filter_values_by_type
+$ git checkout -b filter-values-by-type-exercise
 $ git add .
 $ git commit -m "finish filter values by type exercise"
-$ git push origin exercise-filter_values_by_type
+$ git push origin filter-values-by-type-exercise
 ```
+
+Create a pull request from your `filter-values-by-type-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                       | Next                               |
-| ---------------------------------------------- | ---------------------------------: |
-| [Book Search](../exercises/book_search.livemd) | [Reduce](../reading/reduce.livemd) |
+| Previous                                               | Next                                           |
+| ------------------------------------------------------ | ---------------------------------------------: |
+| [Built-In Modules](../reading/built-in_modules.livemd) | [Tic-tac-toe](../exercises/tic-tac-toe.livemd) |

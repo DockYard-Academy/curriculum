@@ -1,0 +1,201 @@
+# Advanced Score Tracker
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Mastery
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
+
+## Advanced Score Tracker
+
+Create a new supervised mix project `AdvancedScoreTracker`.
+
+```
+$ mix new advanced_score_tracker --sup
+```
+
+The `AdvancedScoreTracker` will use an [Agent](https://hexdocs.pm/elixir/Agent.html) to create a general purpose score tracker that tracks player score history across multiple different games. The `AdvancedScoreTracker` [Agent](https://hexdocs.pm/elixir/Agent.html) should start as part of the application's supervision tree.
+
+<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
+<summary>Hint</summary>
+
+Consider how you want to store your state, and how to update it.
+For example, you might consider a map.
+
+```elixir
+state = %{
+  player1: %{
+    ping_pong: [0, 20]
+  },
+  player2: %{
+    ping_pong: [0, 20]
+    rock_paper_scissors: [3, 2]
+  }
+}
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Test Cases
+
+Create a full suite of test cases for all of the features described below.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Score
+
+The `AdvancedScoreTracker` should be able to add a certain number of points given a player name and a game name. A game should start with `0` points by default.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+AdvancedScoreTracker.add(:player1, :ping_pong, 10)
+AdvancedScoreTracker.add(:player1, :ping_pong, 10)
+```
+
+It should also be able to retrieve the total number of points for the current game when provided the name of the game and the player.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = AdvancedScoreTracker.get(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### New Game
+
+When a game is finished, `AdvancedScoreTracker` should be able to start a new point total with a default score of `0`.
+The previous game total should be saved, see the **History** section below.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+AdvancedScoreTracker.new(:player1, :ping_pong)
+0 = AdvancedScoreTracker.get(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### History
+
+Retrieve a history of scores for a player and a game as a list of point totals.
+The most recent game should be at the start of the list.
+
+Each value should be the total number of points accumulated before calling `AdvancedScoreTracker.new/2` to start a new game.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[0, 20] = AdvancedScoreTracker.history(:player1, :ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### High Score
+
+Find a player's highest score from their history.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = AdvancedScoreTracker.high_score(:player1, :ping_pong)
+```
+
+Find the highest score out of all players for a game.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+20 = AdvancedScoreTracker.high_score(:ping_pong)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create A GitHub Repository
+
+Connect your `AdvancedScoreTracker` project to a GitHub repository and create a README to describe the purpose of the project and what you learned building it.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"advanced_score_tracker_reading\"\n    \"exercises\" -> \"advanced_score_tracker_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "advanced_score_tracker_reading"
+    "exercises" -> "advanced_score_tracker_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b advanced-score-tracker-exercise
+$ git add .
+$ git commit -m "finish advanced score tracker exercise"
+$ git push origin advanced-score-tracker-exercise
+```
+
+Create a pull request from your `advanced-score-tracker-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                  | Next                                         |
+| --------------------------------------------------------- | -------------------------------------------: |
+| [ETS Warehouse](../exercises/inventory_management.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |

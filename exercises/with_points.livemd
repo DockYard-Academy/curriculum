@@ -1,0 +1,177 @@
+# With Points
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## With Points
+
+You're going to create a `Points` module which determines the total score of each team in a generic game after three rounds.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+game = %{
+  team1_name: "Team Team",
+  team2_name: "Exersport",
+  round1: %{
+    team1: 10,
+    team2: 20
+  },
+  round2: %{
+    team1: 30,
+    team2: 10
+  },
+  round3: %{
+    team1: 25,
+    team2: 30
+  }
+}
+
+Points.tally(game)
+%{"Team Team" => 65, "Exersport" => 60}
+```
+
+Use `with` to ensure the following:
+
+* If the `game` provided does not have a `:team1_name` or `team2_name` keys return `{:error, :invalid}`.
+* If the `game` does not have a `round1`, `round2`, or `round3` key, each with `:team1` and `:team2` keys return `{:error, :invalid}`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Points do
+  def tally(game) do
+    with %{team1_name: team1, team2_name: team2} <- game,
+         %{round1: %{team1: t1r1, team2: t2r1}} <- game,
+         %{round2: %{team1: t1r2, team2: t2r2}} <- game,
+         %{round3: %{team1: t1r3, team2: t2r3}} <- game do
+      %{}
+      |> Map.put(team1, t1r1 + t1r2 + t1r3)
+      |> Map.put(team2, t2r1 + t2r2 + t2r3)
+    else
+      error -> 
+        IO.inspect(error)
+        {:error, :invalid}
+    end
+  end
+end
+```
+
+</details>
+
+Enter your solution below.
+
+```elixir
+defmodule Points do
+  @doc """
+  Tally points in a generic three round game.
+
+  A valid game will return the teams and their total scores in a map.
+
+      iex> game = %{team1_name: "Team Team", team2_name: "Exersport", round1: %{team1: 10, team2: 20}, round2: %{team1: 30, team2: 10}, round3: %{team1: 25, team2: 30}}
+      iex> Points.tally(game)
+      %{"Team Team" => 65, "Exersport" => 60}
+
+  The `game` must have a `team1_name` and `team2_name` keys.
+
+      iex> Points.tally(%{no_team_names: true})
+      {:error, :invalid}
+
+  The `game` must have a `round1`, `round2`, and `round3` keys.
+
+      iex> Points.tally(%{team1_name: "name1", team2_name: "name2"})
+      {:error, :invalid}
+  """
+  def tally(game) do
+    with %{team1_name: team1, team2_name: team2} <- game,
+         %{round1: %{team1: t1r1, team2: t2r1}} <- game,
+         %{round2: %{team1: t1r2, team2: t2r2}} <- game,
+         %{round3: %{team1: t1r3, team2: t2r3}} <- game do
+      %{}
+      |> Map.put(team1, t1r1 + t1r2 + t1r3)
+      |> Map.put(team2, t2r1 + t2r2 + t2r3)
+    else
+      error ->
+        {:error, :invalid}
+    end
+  end
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"with_points_reading\"\n    \"exercises\" -> \"with_points_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "with_points_reading"
+    "exercises" -> "with_points_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b with-points-exercise
+$ git add .
+$ git commit -m "finish with points exercise"
+$ git push origin with-points-exercise
+```
+
+Create a pull request from your `with-points-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                     | Next                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------: |
+| [Message Validation](../exercises/message_validation.livemd) | [Math With Guards](../exercises/math_with_guards.livemd) |

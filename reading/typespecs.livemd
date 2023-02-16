@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -28,10 +30,10 @@ For example, we could add a `@spec` for the `math` module's `add/2` function.
 by the `::` symbol.
 
 ```elixir
-defmodule Number do
+defmodule IntegerTypespecExample do
   @spec double(integer()) :: integer()
-  def double(number) do
-    number * 2
+  def double(my_int) do
+    my_int * 2
   end
 end
 ```
@@ -60,10 +62,10 @@ section of the Elixir Typespecs documentation.
 
 ### Your Turn
 
-In the `Math` module below, create an `@spec` for integers with the `add/2` function.
+In the `Adder` module below, create an `@spec` for integers with the `add/2` function.
 
 ```elixir
-defmodule Math do
+defmodule Adder do
   def add(integer1, integer2) do
     integer1 + integer2
   end
@@ -75,7 +77,7 @@ end
 The `|` symbol allows us to combine multiple types. For example we can combine `integer()` and `float()` in our `Number` module
 
 ```elixir
-defmodule Number do
+defmodule NumberTypespecExample do
   @spec double(integer() | float()) :: integer() | float()
   def double(number) do
     number * 2
@@ -85,10 +87,12 @@ end
 
 ### Custom Types
 
-We can use `@type` to define custom types. We give our custom type a name then define it's value after the `::` symbol.
+We can use `@type` to define custom types. We give our custom type a name then define it's value after the `::` symbol. Once we've defined a custom type, we can use it anywhere in our application. This way we don't have to repeatedly define the same types over and over.
+
+Below, we've defined a custom `my_number()` type for the sake of example. However, in the real-world we should use the built-in `number()` type instead.
 
 ```elixir
-defmodule Number do
+defmodule CustomTypeExample do
   @type my_number() :: integer() | float()
 
   @spec double(my_number()) :: my_number()
@@ -97,21 +101,6 @@ defmodule Number do
   end
 end
 ```
-
-We can use types defined in modules outside of that module. This way we don't have to repeatedly define the same types over and over.
-
-```elixir
-defmodule Math do
-  @spec add(Number.my_number(), Number.my_number()) :: Number.my_number()
-  def add(number, number) do
-    number + number
-  end
-end
-```
-
-We've defined a custom `my_number()` type for the sake of example. However, in the real-world we should use the built-in `number()` type instead.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
@@ -174,15 +163,7 @@ Once complete, if you include a failing example in your `Math` module like so, y
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Math do
-  @moduledoc """
-  Documentation for `Math`.
-  """
-
-  def fail_example do
-    Math.add(%{}, %{})
-  end
-end
+Math.add(%{}, %{})
 ```
 
 Run dialyzer and you should see some errors because the typespec catches that `%{}` is an invalid input.
@@ -191,22 +172,63 @@ Run dialyzer and you should see some errors because the typespec catches that `%
 $ mix dialyzer
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"typespecs_reading\"\n    \"exercises\" -> \"typespecs_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "typespecs_reading"
+    "exercises" -> "typespecs_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-typespecs
+$ git checkout -b typespecs-reading
 $ git add .
-$ git commit -m "finish typespecs section"
-$ git push origin exercise-typespecs
+$ git commit -m "finish typespecs reading"
+$ git push origin typespecs-reading
 ```
+
+Create a pull request from your `typespecs-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
@@ -214,4 +236,4 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 | Previous                               | Next                             |
 | -------------------------------------- | -------------------------------: |
-| [Doctests](../reading/doctests.livemd) | [Exdoc](../reading/exdoc.livemd) |
+| [Doctests](../reading/doctests.livemd) | [ExDoc](../reading/exdoc.livemd) |

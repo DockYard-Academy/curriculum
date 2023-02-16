@@ -2,8 +2,11 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9"}
 ])
 ```
 
@@ -12,46 +15,165 @@ Mix.install([
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
 [Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
-## Sign Up Form
+## User Changeset
 
-It's common for applications to have a sign up form that validates a user's email, password, and other information.
+Create a `User` schemaless changeset that validates a user.
 
-Create a `User` module which validates user's information.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, user} =
-  User.new(%{
-    username: "Peter Parker",
-    password: "secret_spider",
-    email: "peter@spider.web",
-    terms_and_conditions: true
-  })
-```
-
-We're going to allow any string for the recipient name, domain name, and top level domain.
+A user struct should have the following fields.
 
 * `username` (required) a 3-12 character string.
 * `password` (required) a 12-50 character string.
-* `email` (required) a string in the format `recipient_name@domain_name.top_level_domain`. i.e. `"peter@gmail.com"`.
-* `age` (optional) an integer.
-* `agreed_to_terms_and_conditions` (required) a boolean which must be `true`.
+* `age` an integer.
+* `birthdate` a date.
+* `terms_and_conditions` (required) a boolean which must be `true`.
 
-You should rely on Ecto Changesets and your own custom validation to validate the user information.
-Enter your solution below.
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule User do
-  use Ecto.Schema
-  import Ecto.Changeset
+  defstruct [:username, :password, :age, :birthdate, :terms_and_conditions]
 
-  def changeset(%User{} = user, params) do
+  @types %{
+    username: :string,
+    password: :string,
+    age: :integer,
+    birthdate: :date,
+    terms_and_conditions: :boolean
+  }
+
+  @doc """
+  Create a User changeset.
+
+  ## Examples
+
+      iex> User.changeset(%User{}, %{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true})
+      #Ecto.Changeset<action: nil, changes: %{age: 20, password: "securepassword1", terms_and_conditions: true, username: "user1"}, errors: [], data: #User<>, valid?: true>
+  """
+  def changeset(%__MODULE__{} = user, params) do
+    {user, @types}
+    |> Ecto.Changeset.cast(params, Map.keys(@types))
+    |> Ecto.Changeset.validate_required([:username, :password])
+    |> Ecto.Changeset.validate_length(:username, min: 3, max: 12)
+    |> Ecto.Changeset.validate_length(:password, min: 12, max: 50)
+    |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
   end
 
+  @doc """
+  Validate and create a User struct.
+
+  ## Examples
+
+      iex> User.new(%{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true})
+      {:ok, %User{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true}}
+
+      Terms and conditions must be signed.
+
+      User.new(%{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: false})
+      {:error, _changeset}
+  """
+  def new(params) do
+    %__MODULE__{}
+    |> changeset(params)
+    |> Ecto.Changeset.apply_action(:update)
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule User do
+  @moduledoc """
+  Documentation for `User`
+
+  Defines a schemaless changeset and `User` struct.
+
+  ## Examples
+
+      iex> %User{}
+      %User{username: nil, password: nil, age: nil, birthdate: nil, terms_and_conditions: nil}
+  """
+  defstruct []
+
+  @types %{}
+
+  @doc """
+  Create a User changeset.
+
+  ## Examples
+
+      iex> User.changeset(%User{}, %{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true})
+      #Ecto.Changeset<action: nil, changes: %{age: 20, password: "securepassword1", terms_and_conditions: true, username: "user1"}, errors: [], data: #User<>, valid?: true>
+  """
+  def changeset(%__MODULE__{} = user, params) do
+  end
+
+  @doc """
+  Validate and create a User struct.
+
+  ## Examples
+
+      iex> User.new(%{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true})
+      {:ok, %User{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: true}}
+
+      Terms and conditions must be signed.
+
+      User.new(%{username: "user1", password: "securepassword1", age: 20, terms_and_conditions: false})
+      {:error, _changeset}
+  """
   def new(params) do
   end
 end
+```
+
+## Sign Up Form
+
+You're going to create a `SignUp` application that validates user data with a sign up form.
+Create a sign up form with appropriate form fields for the `User` changeset.
+
+```
+$ mix phx.new sign_up
+```
+
+Use the `User` changeset to provide error feedback on each of the form inputs `:username`, `:password`, `:age`, `:birthdate`, and `:terms_and_conditions`.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"sign_up_form_reading\"\n    \"exercises\" -> \"sign_up_form_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "sign_up_form_reading"
+    "exercises" -> "sign_up_form_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
 ```
 
 ## Commit Your Progress
@@ -60,21 +182,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-sign_up_form
+$ git checkout -b sign-up-form-exercise
 $ git add .
 $ git commit -m "finish sign up form exercise"
-$ git push origin exercise-sign_up_form
+$ git push origin sign-up-form-exercise
 ```
+
+Create a pull request from your `sign-up-form-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                     | Next                                   |
-| -------------------------------------------- | -------------------------------------: |
-| [File Types](../exercises/file_types.livemd) | [HTML CSS](../reading/html_css.livemd) |
+| Previous                                           | Next                                                 |
+| -------------------------------------------------- | ---------------------------------------------------: |
+| [Ecto Changeset](../reading/ecto_changeset.livemd) | [Book Changeset](../exercises/book_changeset.livemd) |

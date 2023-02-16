@@ -257,12 +257,20 @@ If you fix DockYard Academy Content or submit new content, please keep the follo
 - Each major concept should have a new section. In addition, each section should try to provide at least one student interaction portion, typically using the **Your Turn** heading.
 - **Hints** and **Example Solutions** should be provided using the details component (these styles look nicer in Livebook):
 
+# Templates
+
+Use the following templates for common LiveBook elements.
+
+## Hint
+
 <details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
 <summary>Hint</summary>
 
 Have you tried turning it off and on again?
 
 </details>
+
+## Example Solution
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -274,8 +282,6 @@ initial_count + high
 
 </details>
 
-- Add Further Reading sections at the bottom of every lesson before the Commit Your Progress section when applicable. For example:
-
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
@@ -284,3 +290,50 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [Exercise: Maps](https://exercism.org/tracks/elixir/concepts/maps)
 * [Elixir Lang: Pattern Matching](https://elixir-lang.org/getting-started/pattern-matching.html)
 * [Elixir Lang: Maps](https://elixir-lang.org/getting-started/keywords-and-maps.html#maps)
+
+- Mastery exercises should have the following blub at the top of the document.
+
+## Mastery
+
+Mastery assignments are bonus projects designed to incorporate curriculum concepts at an advanced level. You have complete freedom with how you complete mastery assignments, and may change requirements as you see fit. Each mastery assignment serves as an independent project you may choose to include on your portfolio of projects.
+
+## Push To GitHub
+
+Ensure all of your tests pass.
+
+```
+mix test
+```
+
+**ONLY If you cloned the project**: remove the existing `.git` folder, and re-initialize the project.
+
+```
+$ rm -rf .git
+$ git init
+```
+
+[Create a new GitHub repository](https://github.com/new) and follow the instructions to connect your local project to your new remote project.
+
+Stage, commit, and push your changes to GitHub.
+
+```
+git add .
+git commit -m "associate books with authors"
+git push
+```
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Question 1
+* Question 2
+* Question 3
+* Question 4
+
+## (Bonus) Further Study
+
+A student who wants to do further research beyond this material may consider the following questions as inspiration. 
+
+* Question 1
+* Question 2

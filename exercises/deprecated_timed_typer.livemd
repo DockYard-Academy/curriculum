@@ -1,0 +1,200 @@
+# TimedTyper
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## TimedTyper
+
+Create a new `TimedTyper` project with a supervisor.
+
+```
+$ mix new timed_typer --sup
+```
+
+Create a `TimedTyper` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which starts as part of the application's supervision tree.
+
+When you start the application, the `TimedTyper` module should automatically prompt the user with a randomly generated word they need to type.
+
+```
+$ mix run --no-halt
+Your word: red
+You lose!
+```
+
+The player will lose if they incorrectly spell a word.
+
+```
+Your word: red
+rde
+You lose!
+```
+
+Prompt the player with another word if they correctly type the prompted word. Keep prompting the player until they lose.
+
+You may use any random list of words. For example: `["red", "blue", "green", "orange", "yellow", "pink"]`.
+
+```
+Your word: red
+red
+Your word: blue
+blue
+Your word: green
+green
+Your word: yellow
+yelow
+You lose!
+```
+
+## Bonus: End After 5 Seconds
+
+If the user does not enter the word within five seconds, print "You lose!" then crash the game so that you restart.
+
+## Bonus: Score Tracker
+
+Store the player score in memory. Increment the score every time they successfully type a word.
+Print the total score when they lose the game.
+
+```
+Your word: red
+red
+Your word: blue
+You lose!
+Score: 1
+```
+
+## Bonus: Countdown
+
+Count down from five in the console as the player enters their word.
+
+```
+Your word: red
+5
+4
+3
+2
+red
+Your word: red
+5
+4
+3
+2
+1
+You lose!
+Score: 1
+Your word: blue
+```
+
+## Bonus: Stop
+
+Stop the game and print the player score if the player types `"stop"`.
+
+```
+Your word: red
+red
+Your word: blue
+stop
+Score: 1
+```
+
+## Bonus: Try Again?
+
+Ask the user if they would like to try again or not. Prompt the user with a new word if they say yes.
+
+```
+Your word: red
+5
+4
+3
+2
+1
+You Lose!
+Score: 0
+Try Again? Y/N: Y
+Your word: blue
+```
+
+Print a thank you message and end the game if they say no.
+
+```
+Your word: red
+5
+4
+3
+2
+1
+You Lose!
+Score: 0
+Try Again? Y/N: N
+Thanks for playing!
+```
+
+## Bonus: Executable
+
+Configure the project as an [executable](../reading/executables.livemd). You should be able to build and start the escript.
+
+```
+$ mix escript.build
+$ ./timed_typer
+```
+
+## Bonus: GitHub
+
+Connect the project to a GitHub repository to build up your growing portfolio of projects.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b deprecated-timed-typer-exercise
+$ git add .
+$ git commit -m "finish deprecated timed typer exercise"
+$ git push origin deprecated-timed-typer-exercise
+```
+
+Create a pull request from your `deprecated-timed-typer-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

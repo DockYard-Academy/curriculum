@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:benchee, "~> 1.1"}
@@ -17,6 +19,13 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
 
+## Learning Outcomes
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do you use streams to avoid memory impact or executing more instructions than necessary?
+* When might you use [Enum](https://hexdocs.pm/elixir/Enum.html) vs [Stream](https://hexdocs.pm/elixir/Stream.html)?
+
 ## Enum Vs Stream
 
 Currently, we typically use the [Enum](https://hexdocs.pm/elixir/Enum.html) module to work with collections.
@@ -31,65 +40,32 @@ memory during execution.
 |> Enum.take(4)
 ```
 
-Each [Enum](https://hexdocs.pm/elixir/Enum.html) function stores a copy of the the enumerable it creates and executes sequentially as
-seen in this slide.
+Each [Enum](https://hexdocs.pm/elixir/Enum.html) function stores a copy of the the enumerable it creates and executes sequentially as seen in this diagram.
 
-<!-- livebook:{"attrs":{"source":"defmodule Boxes do\n  def space, do: box(\"\", %{background: \"none\", border: \"none\"})\n  def spaces(0), do: []\n  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)\n  def green_box(text), do: box(text, %{background: \"#D5E8D4\", border: \"#82B366\"})\n  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)\n  def grey_box(text), do: box(text, %{background: \"#F5F5F5\", border: \"#666666\"})\n  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)\n\n  def box(text, style) do\n    \"<div style=\\\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\\\">#{text}</div>\"\n  end\n\n  def row(title, items) do\n    \"<div style=\\\"height: 80px; display: flex; width: 100%; align-items: center;\\\">\n    <p style=\\\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\\\">#{title}</p>\n    <div style=\\\"display: flex; width: 90%;\\\">#{items}</div>\n  </div>\"\n  end\n\n  def sequence do\n    [\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", [])}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", [])}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", [])}\n\",\n      \"\n  #{row(\"1..10\", Enum.map(1..10, &Boxes.green_box/1))}\n  #{row(\"map\", Enum.map(2..20//2, &Boxes.green_box/1))}\n  #{row(\"filter\", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}\n  #{row(\"take\", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}\n  \"\n    ]\n  end\nend\n\nKino.animate(2000, 0, fn i ->\n  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))\n  {:cont, md, rem(i + 1, length(Boxes.sequence()))}\nend)","title":"Eager Evaluation Animation"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"box = fn value, color ->\n  \"<div style='height: 3rem; width: 3rem; background-color: #{color}; display: flex; color: white; justify-content: center; align-items: center;'>#{value}</div>\"\nend\n\nget_color = fn in_memory ->\n  if in_memory, do: \"green\", else: \"lightgray\"\nend\n\nKino.animate(1000, 1, fn _, row ->\n  md =\n    Kino.Markdown.new(\"\"\"\n    <div style=\"display: grid; grid-template-columns: max-content repeat(10, 3rem);gap: 1rem;\">\n      <p>1..10:</p>#{Enum.map(1..10, fn index -> box.(index, get_color.(row >= 0)) end)}\n      <p>Enum.map</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row >= 1)) end)}\n      <p>Enum.filter</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(index <= 5 and row >= 2)) end)}\n      <p>Enum.take</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(index <= 4 and row >= 3)) end)}\n    </div>\n\n    \"\"\")\n\n  {:cont, md, rem(row + 1, 4)}\nend)","title":"Enum Memory Usage"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-defmodule Boxes do
-  def space, do: box("", %{background: "none", border: "none"})
-  def spaces(0), do: []
-  def spaces(integer), do: Enum.map(1..integer, fn _ -> space() end)
-  def green_box(text), do: box(text, %{background: "#D5E8D4", border: "#82B366"})
-  def green_boxes(range), do: Enum.map(range, &Boxes.green_box/1)
-  def grey_box(text), do: box(text, %{background: "#F5F5F5", border: "#666666"})
-  def grey_boxes(range), do: Enum.map(range, &Boxes.grey_box/1)
-
-  def box(text, style) do
-    "<div style=\"margin: 0 10px; font-size: 24px; font-weight: bold; height: 50px; width: 50px; background-color: #{style.background}; border: #{style.border} solid 1px; display: flex;  align-items: center; justify-content: center;\">#{text}</div>"
-  end
-
-  def row(title, items) do
-    "<div style=\"height: 80px; display: flex; width: 100%; align-items: center;\">
-    <p style=\"font-weight: bold; font-size: 24px; margin: 0; width: 10%;\">#{title}</p>
-    <div style=\"display: flex; width: 90%;\">#{items}</div>
-  </div>"
-  end
-
-  def sequence do
-    [
-      "
-  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
-  #{row("map", [])}
-  #{row("filter", [])}
-  #{row("take", [])}
-",
-      "
-  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
-  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
-  #{row("filter", [])}
-  #{row("take", [])}
-",
-      "
-  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
-  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
-  #{row("filter", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}
-  #{row("take", [])}
-",
-      "
-  #{row("1..10", Enum.map(1..10, &Boxes.green_box/1))}
-  #{row("map", Enum.map(2..20//2, &Boxes.green_box/1))}
-  #{row("filter", Enum.map(2..10//2, &Boxes.green_box/1) ++ Enum.map(12..20//2, &Boxes.grey_box/1))}
-  #{row("take", Enum.map(2..8//2, &Boxes.green_box/1) ++ Enum.map(10..20//2, fn _ -> Boxes.space() end))}
-  "
-    ]
-  end
+box = fn value, color ->
+  "<div style='height: 3rem; width: 3rem; background-color: #{color}; display: flex; color: white; justify-content: center; align-items: center;'>#{value}</div>"
 end
 
-Kino.animate(2000, 0, fn i ->
-  md = Kino.Markdown.new(Enum.at(Boxes.sequence(), i))
-  {:cont, md, rem(i + 1, length(Boxes.sequence()))}
+get_color = fn in_memory ->
+  if in_memory, do: "green", else: "lightgray"
+end
+
+Kino.animate(1000, 1, fn _, row ->
+  md =
+    Kino.Markdown.new("""
+    <div style="display: grid; grid-template-columns: max-content repeat(10, 3rem);gap: 1rem;">
+      <p>1..10:</p>#{Enum.map(1..10, fn index -> box.(index, get_color.(row >= 0)) end)}
+      <p>Enum.map</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row >= 1)) end)}
+      <p>Enum.filter</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(index <= 5 and row >= 2)) end)}
+      <p>Enum.take</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(index <= 4 and row >= 3)) end)}
+    </div>
+
+    """)
+
+  {:cont, md, rem(row + 1, 4)}
 end)
 ```
 
@@ -97,30 +73,38 @@ While the operation above is a bit contrived for the sake of simplifying the exa
 
 It's a waste of resources to execute every operation on every element. It would be far more performant if we could instead build up a series of functions and run them one by one only when needed.
 
-<!-- livebook:{"attrs":{"source":"Kino.animate(500, {0, 0}, fn {current_row, current_column} ->\n  current_element = current_column + 1\n  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)\n\n  maybe_display = fn expected_row, display ->\n    if current_row === expected_row, do: display, else: []\n  end\n\n  indent = Boxes.spaces(current_column)\n\n  md =\n    Kino.Markdown.new(\"\"\"\n    #{Boxes.row(\"1..10\", range)}\n    #{Boxes.row(\"map\", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"filter\", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}\n    #{Boxes.row(\"take\", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}\n    \"\"\")\n\n  next_row = rem(current_row + 1, 4)\n  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)\n  {:cont, md, {next_row, next_column}}\nend)","title":"Lazy Evaluation Animation"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+By using Streams and Lazy evaluation, we can massively improve memory usage as seen in the animation below.
+
+<!-- livebook:{"attrs":{"source":"box = fn value, color ->\n  \"<div style='height: 3rem; width: 3rem; background-color: #{color}; display: flex; color: white; justify-content: center; align-items: center;'>#{value}</div>\"\nend\n\nget_color = fn in_memory ->\n  if in_memory, do: \"green\", else: \"lightgray\"\nend\n\nKino.animate(500, {1, 1}, fn _, {column, row} = position ->\n  md =\n    Kino.Markdown.new(\"\"\"\n    <div style=\"display: grid; grid-template-columns: max-content repeat(10, 3rem);gap: 1rem;\">\n      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index, get_color.(row == 1 and column == index)) end)}\n      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row == 2 and column == index)) end)}\n      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row == 3 and column == index)) end)}\n      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(column > index || (row == 4 and column == index))) end)}\n    </div>\n    \"\"\")\n\n  next_position =\n    case position do\n      {4, 4} -> {1, 1}\n      {column, 4} -> {column + 1, 1}\n      {column, row} -> {column, row + 1}\n    end\n\n  {:cont, md, next_position}\nend)","title":"Stream Memory Usage"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-Kino.animate(500, {0, 0}, fn {current_row, current_column} ->
-  current_element = current_column + 1
-  range = Boxes.green_boxes(1..current_element) ++ Boxes.grey_boxes((current_element + 1)..10)
+box = fn value, color ->
+  "<div style='height: 3rem; width: 3rem; background-color: #{color}; display: flex; color: white; justify-content: center; align-items: center;'>#{value}</div>"
+end
 
-  maybe_display = fn expected_row, display ->
-    if current_row === expected_row, do: display, else: []
-  end
+get_color = fn in_memory ->
+  if in_memory, do: "green", else: "lightgray"
+end
 
-  indent = Boxes.spaces(current_column)
-
+Kino.animate(500, {1, 1}, fn _, {column, row} = position ->
   md =
     Kino.Markdown.new("""
-    #{Boxes.row("1..10", range)}
-    #{Boxes.row("map", maybe_display.(1, indent ++ [Boxes.green_box(current_element * 2)]))}
-    #{Boxes.row("filter", maybe_display.(2, indent ++ [Boxes.green_box(current_element * 2)]))}
-    #{Boxes.row("take", Boxes.green_boxes(2..(current_element * 2 - 2)//2) ++ maybe_display.(3, [Boxes.green_box(current_element * 2)]))}
+    <div style="display: grid; grid-template-columns: max-content repeat(10, 3rem);gap: 1rem;">
+      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index, get_color.(row == 1 and column == index)) end)}
+      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row == 2 and column == index)) end)}
+      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(row == 3 and column == index)) end)}
+      <p>In Memory:</p>#{Enum.map(1..10, fn index -> box.(index * 2, get_color.(column > index || (row == 4 and column == index))) end)}
+    </div>
     """)
 
-  next_row = rem(current_row + 1, 4)
-  next_column = rem((current_row === 3 && current_column + 1) || current_column, 4)
-  {:cont, md, {next_row, next_column}}
+  next_position =
+    case position do
+      {4, 4} -> {1, 1}
+      {column, 4} -> {column + 1, 1}
+      {column, row} -> {column, row + 1}
+    end
+
+  {:cont, md, next_position}
 end)
 ```
 
@@ -498,27 +482,68 @@ end)
 
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"streams_reading\"\n    \"exercises\" -> \"streams_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "streams_reading"
+    "exercises" -> "streams_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-streams
+$ git checkout -b streams-reading
 $ git add .
-$ git commit -m "finish streams section"
-$ git push origin exercise-streams
+$ git commit -m "finish streams reading"
+$ git push origin streams-reading
 ```
+
+Create a pull request from your `streams-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                                     | Next                                               |
-| ---------------------------------------------------------------------------- | -------------------------------------------------: |
-| [Custom Enum With Recursion](../exercises/custom_enum_with_recursion.livemd) | [Stream Drills](../exercises/stream_drills.livemd) |
+| Previous                                                      | Next                                         |
+| ------------------------------------------------------------- | -------------------------------------------: |
+| [Custom Enum](../exercises/custom_enum_with_recursion.livemd) | [Streams](../exercises/stream_drills.livemd) |

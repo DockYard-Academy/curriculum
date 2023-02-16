@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -14,7 +16,7 @@ Mix.install([
 
 ## Rubix's Cube
 
-Together with your group, you are going to create a Rubix Cube application.
+You are going to create a Rubix Cube application.
 
 [Rubix's Cubes](https://en.wikipedia.org/wiki/Rubik%27s_Cube) are a toy with six sides. Each side has nine colored squares on it.
 Players rotate columns and rows on the cube with the goal of having each side with a single matching color.
@@ -25,21 +27,61 @@ Players rotate columns and rows on the cube with the goal of having each side wi
 
 <!-- livebook:{"break_markdown":true} -->
 
-Together with your group you will figure out how to:
+Create a `RubixCube` supervised mix project.
 
-* represent the Rubix's Cube as data.
-* horizontally rotate a row of the cube to the right and left
-* vertically rotate a column of the cube up and down.
-* determine if a Rubix's Cube is solved.
-* (bonus) Persist the state of a Rubix's Cube to a database using ecto.
-* (bonus) Create a process for each Rubix's Cube. Play with the Rubix's Cube by sending messages
-  to the process (this means multiple people can play with the same Rubix's Cube if they have the pid of the process!)
+```
+mix new rubix_cube --sup
+```
 
-If you need clarification of these instructions speak with your teacher. However, keep in mind the goal of this project is to engage your problem solving and decision skills. You should implement features how you and your group think is best. You are free to be creative and take liberties or add new features to this project.
+Your `RubixCube` project should have the following features:
 
-Have one person in your group create a new mix project called `rubix`. Add this project to GitHub and add your classmates as collaborators. All group members should clone the project and ensure they can run it.
+### Requirements
 
-You might consider using [Visual Studio Code Live Share](https://code.visualstudio.com/learn/collaboration/live-share) to collaborate. Alternatively you can screenshare, or collaborate by making pull requests to the same project.
+* Represent the Rubix's Cube as data in a process.
+* Start the Rubix's Cube process under a supervisor.
+* Horizontally rotate a row of the cube to the right and left
+* Vertically rotate a column of the cube up and down.
+* Determine if a Rubix's Cube is solved.
+* Save the state of the Rubix's Cube using the [File](https://hexdocs.pm/elixir/File.html) system.
+* Load the previous state of the Rubix' Cube using the [File](https://hexdocs.pm/elixir/File.html) system when starting the application.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rubix_cube_reading\"\n    \"exercises\" -> \"rubix_cube_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "rubix_cube_reading"
+    "exercises" -> "rubix_cube_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
 
 ## Commit Your Progress
 
@@ -47,15 +89,24 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-rubix_cube
+$ git checkout -b rubix-cube-exercise
 $ git add .
 $ git commit -m "finish rubix cube exercise"
-$ git push origin exercise-rubix_cube
+$ git push origin rubix-cube-exercise
 ```
+
+Create a pull request from your `rubix-cube-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                             | Next                                                              |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------: |
+| [Advanced Score Tracker](../exercises/advanced_score_tracker.livemd) | [Captone Project Guide](../reading/capstone_project_guide.livemd) |

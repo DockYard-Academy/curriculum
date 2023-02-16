@@ -1,0 +1,243 @@
+# Task Drills
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Task Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Tasks](../reading/task.livemd). Follow the instructions for each drill and complete them as quickly as you can.
+
+## Task.await/2
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to spawn a task process that returns any response.
+
+```elixir
+
+```
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to spawn a task process that sleeps for six seconds. It should cause a timeout error.
+
+```elixir
+
+```
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to spawn a task process that sleeps for six seconds. Provide a timeout value to [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) so that it properly awaits the response.
+
+```elixir
+
+```
+
+## Task.yield/2
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) to spawn a task process that returns any response.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Slow Operation
+
+```elixir
+# 1000 operations
+{time, _result} = :timer.tc(fn -> Enum.map(1..10, fn int -> Process.sleep(1000) end) end)
+time
+```
+
+```elixir
+{time, _result} =
+  :timer.tc(fn ->
+    # 1000 tasks
+    # 1000 operations -> parallel
+    tasks =
+      Enum.map(1..10, fn int ->
+        Task.async(fn ->
+          IO.puts("starting task #{int}")
+          Process.sleep(1000)
+        end)
+      end)
+
+    Task.await_many(tasks)
+  end)
+
+10_009_225
+1_001_494
+```
+
+### Fast Operation
+
+```elixir
+# 1000 operations
+{time, _result} = :timer.tc(fn -> Enum.map(1..10, fn int -> int * 2 end) end)
+time
+```
+
+```elixir
+{time, _result} =
+  :timer.tc(fn ->
+    # 1000 tasks
+    # 1000 operations -> parallel
+    tasks = Enum.map(1..10, fn int -> Task.async(fn -> int * 2 end) end)
+    Task.await_many(tasks)
+  end)
+```
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) to spawn a task process that sleeps for six seconds and returns any response. Notice that the yield is `nil`.
+
+```elixir
+
+```
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) to spawn a task process that sleeps for six seconds and returns any response. Provide a timeout value to [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2) so that it properly returns the response.
+
+```elixir
+
+```
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1), [Task.yield/2](https://hexdocs.pm/elixir/Task.html#yield/2), and [Task.shutdown/2](https://hexdocs.pm/elixir/Task.html#shutdown/2) to spawn a task process that sleeps for six seconds. Shutdown the task process if it does not yield any value.
+
+```elixir
+
+```
+
+## Task.await_many/2
+
+Use [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1) and [Task.await_many/2](https://hexdocs.pm/elixir/Task.html#await_many/2) to spawn two task processes that both return a random number from `1..10`.
+
+```elixir
+
+```
+
+Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1), and [Task.await_many/2](https://hexdocs.pm/elixir/Task.html#await_many/2) to spawn one hundred task processes that all return a random integer from `1..100`.
+
+```elixir
+
+```
+
+Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1), and [Task.await_many/2](https://hexdocs.pm/elixir/Task.html#await_many/2) to spawn one hundred task processes that return a list doubled numbers from one to one hundred. i.e. `[2, 4, 6, 8, ..., 198, 200]`.
+
+```elixir
+
+```
+
+Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), [Task.async/1](https://hexdocs.pm/elixir/Task.html#async/1), [String.upcase/2](https://hexdocs.pm/elixir/String.html#upcase/2), and [Task.await_many/2](https://hexdocs.pm/elixir/Task.html#await_many/2) to concurrently capitalize every string in the list `["apple", "pear", "peaches"]`
+
+```elixir
+
+```
+
+## Task.Supervisor
+
+Start a [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) with a child `Task.Supervisor` process named `MyTaskSupervisor`. You will use `MyTaskSupervisor` in all of the examples below that need a task supervisor.
+
+```elixir
+children = [
+  {Task.Supervisor, name: MyTaskSupervisor}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+Use `Task.Supervisor.async/3` and [Task.await/2](https://hexdocs.pm/elixir/Task.html#await/2) to start a supervised task process that returns a random number after sleeping for two seconds.
+
+```elixir
+
+```
+
+Use [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2), `Task.Supervisor.async/3` and [Task.await_many/2](https://hexdocs.pm/elixir/Task.html#await_many/2) to start one hundred supervised task processes that returns a list of doubled numbers from one `1..100`. i.e. `[2, 4, 6, 8, ..., 198, 200]`.
+
+```elixir
+
+```
+
+Use `Task.Supervisor.start_child/3` to start a `:temporary` task that crashes after five seconds. `:temporary` is already the default `:restart` option.
+
+Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) after six seconds to demonstrate that a `:temporary` process is not restarted.
+
+```elixir
+
+```
+
+Use `Task.Supervisor.start_child/3` with the `restart: :transient` option to start a `:transient` task that crashes after five seconds.
+
+Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) after six seconds to demonstrate that the `:transient` process is restarted.
+
+```elixir
+
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"task_drills_reading\"\n    \"exercises\" -> \"task_drills_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "task_drills_reading"
+    "exercises" -> "task_drills_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b task-drills-exercise
+$ git add .
+$ git commit -m "finish task drills exercise"
+$ git push origin task-drills-exercise
+```
+
+Create a pull request from your `task-drills-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                             | Next                                                               |
+| ---------------------------------------------------- | -----------------------------------------------------------------: |
+| [Task Supervisor](../reading/task_supervisor.livemd) | [Concurrent Word Count](../exercises/concurrent_word_count.livemd) |

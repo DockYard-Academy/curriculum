@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,62 +18,115 @@ Mix.install([
 
 With a partner, you're going to create a collaborative GitHub project.
 
-One partner will be the **CREATOR** and on partner will be the **CONTRIBUTOR**.
-Decide on your role, complete the exercise, then swap roles and complete it again.
+One partner will be the **CREATOR** and the other partner(s) will be the **CONTRIBUTORS**.
+Decide on your role and complete the exercise.
 
 * **CREATOR**: Setup a git project called `collab`.
 * **CREATOR**: Connect the git project to a public github repository.
 * **CREATOR**: [Add your partner as a contributor](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-access-to-your-personal-repositories/inviting-collaborators-to-a-personal-repository)
   to the GitHub project.
-* **CONTRIBUTOR**: Clone the github project onto your local machine.
-* **CONTRIBUTOR**: Create a new branch `bug-fix`
-* **CONTRIBUTOR**: Stage, commit, and push a new file `your_name.txt` (where your_name is your name).
-* **CONTRIBUTOR**: Create a pull request for the bug-fix branch.
+* **CONTRIBUTORS**: Clone the github project onto your local machine.
+* **CONTRIBUTORS**: Create a new branch `bug-fix`
+* **CONTRIBUTORS**: Stage, commit, and push a new file `your_name.txt` (where your_name is your name).
+* **CONTRIBUTORS**: Create a pull request for the bug-fix branch.
 * **CREATOR**: Review the pull request and accept the changes.
 * **CREATOR**: pull the main branch and see the changes on your local git project.
 
-<!-- livebook:{"break_markdown":true} -->
+## Bonus: Merge Conflicts
 
-### BONUS CHALLENGE: Merge Conflicts!
-
-Sometimes when you create a pull request, other pull requests may be accepted which create
+Sometimes when you create a pull request, other pull requests may be accepted which creates
 merge conflicts.
 
-You and your partner are going to walk through the flow of resolving a merge conflict.
-Once again decide on the **CREATOR** and **CONTRIBUTOR** roles.
+You and your partner(s) are going to walk through the flow of resolving a merge conflict.
 
 Using your existing `collab` project:
 
-* **CONTRIBUTOR**: Create a new branch `conflict-your_name` where `your_name` is the **CONTRIBUTOR**'s name.
+* **CONTRIBUTORS**: Create a new branch `conflict-your_name` where `your_name` is the **CONTRIBUTOR**'s name.
 * **CREATOR**: Create a new branch `conflict-your_name` where `your_name` is the **CREATOR**'s name.
-* **CONTRIBUTOR**: Stage, commit, and push a new file `conflict.txt`. Enter the **CONTRIBUTOR**'s name as the file's contents.
+* **CONTRIBUTORS**: Stage, commit, and push a new file `conflict.txt`. Enter the **CONTRIBUTORS**'s name as the file's contents.
 * **CREATOR**: Stage, commit, and push a new file `conflict.txt`. Enter the **CREATOR**'s name as the file's contents.
-* **CONTRIBUTOR***: Create a pull request for the `conflict-your_name` branch.
-* **CREATOR***: Create a pull request for the `conflict-your_name` branch.
+* **CONTRIBUTORS**: Create a pull request for the `conflict-your_name` branch.
+* **CREATOR**: Create a pull request for the `conflict-your_name` branch.
 * **CREATOR**: Review the **CONTRIBUTOR**'s pull request and accept the changes.
 * **CREATOR**: Notice that your `conflict-your_name` branch now has merge conflicts and cannot be merged.
 * **CREATOR**: Resolve the conflicts and merge your pull request
 
 ## Bonus: Open Source
 
-Sometimes you want a project to be open to changes from other developers, not just the allowed contributors.
-We'll use your existing `collab` project to walk through the flow for contributing to an open source project.
+Sometimes you want a project to be open to changes from other developers, not just the allowed contributors. We'll use your existing `collab` project to walk through the flow for contributing to an open source project.
 
-Find a different partner who is not a contributor on your `collab` project.
+The creator of the `collab` project will remain the **CREATOR**, and the **CONTRIBUTORS** on your current project will each find a different group to be an **OSS CONTRIBUTOR** to.
 
-One partner will be the **CREATOR** and on partner will be the **CONTRIBUTOR**.
-Decide on your role, complete the exercise, then swap roles and complete it again.
-
-* **CONTRIBUTOR**: Create a fork of the **CREATOR**'s project.
-* **CONTRIBUTOR**: Clone the fork onto your local machine.
-* **CONTRIBUTOR**: Create a new branch.
-* **CONTRIBUTOR**: Stage, commit, and push a new file `your_name.txt` (where `your_name` is your name.)
-* **CONTRIBUTOR**: Create a pull request from your fork to the **CREATOR**'s project.
+* **OSS CONTRIBUTOR**: Create a fork of the **CREATOR**'s project.
+* **OSS CONTRIBUTOR**: Clone the fork onto your local machine.
+* **OSS CONTRIBUTOR**: Create a new branch.
+* **OSS CONTRIBUTOR**: Stage, commit, and push a new file `your_name.txt` (where `your_name` is your name.)
+* **OSS CONTRIBUTOR**: Create a pull request from your fork to the **CREATOR**'s project.
 * **CREATOR**: Review and accept the pull request.
-* **CREATOR**: pull the main branch and see the changes on your local git project.
+* **OSS CONTRIBUTOR**: pull the main branch and see the changes on your local git project.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"github_collab_reading\"\n    \"exercises\" -> \"github_collab_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "github_collab_reading"
+    "exercises" -> "github_collab_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b github-collab-exercise
+$ git add .
+$ git commit -m "finish github collab exercise"
+$ git push origin github-collab-exercise
+```
+
+Create a pull request from your `github-collab-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
 | Previous                                                                     | Next                                   |
 | ---------------------------------------------------------------------------- | -------------------------------------: |
-| [Github Engineering Journal](../exercises/github_engineering_journal.livemd) | [Comments](../reading/comments.livemd) |
+| [GitHub Engineering Journal](../exercises/github_engineering_journal.livemd) | [Comments](../reading/comments.livemd) |

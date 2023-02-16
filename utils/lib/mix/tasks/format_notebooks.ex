@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Bc.FormatNotebooks do
 
       # loading the file in livebook adds a newline, so we add it when we format
       # to avoid changing the file every time a student opens a .livemd file.
-      File.write(file_name, Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n")
+      File.write(file_name, LivebookFormatter.reformat(file))
     end)
   end
 end

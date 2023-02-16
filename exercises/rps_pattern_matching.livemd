@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -14,7 +16,7 @@ Mix.install([
 
 ## Rock Paper Scissors Using Pattern Matching
 
-You're going to recreate your rock paper scissors game using pattern matching.
+You're going to recreate/refactor your rock paper scissors game using pattern matching.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -29,7 +31,21 @@ RockPaperScissors.play(:rock, :rock)
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
-Using `case`.
+Using multiple function clauses.
+
+```elixir
+defmodule RockPaperScissorsPatternMatching do
+  def play(:rock, :scissors), do: "rock beats scissors!"
+  def play(:paper, :rock), do: "paper beats rock!"
+  def play(:scissors, :paper), do: "scissors beats paper!"
+  def play(:rock, :paper), do: "paper beats rock!"
+  def play(:paper, :scissors), do: "scissors beats paper!"
+  def play(:scissors, :rock), do: "rock beats scissors!"
+  def play(_same, _same), do: "draw!"
+end
+```
+
+Here's how we might accomplish the same thing using `case`.
 
 ```elixir
 defmodule RockPaperScissorsPatternMatching do
@@ -44,20 +60,6 @@ defmodule RockPaperScissorsPatternMatching do
       {_same, _same} -> "draw!"
     end
   end
-end
-```
-
-Using multiple function clauses.
-
-```elixir
-defmodule RockPaperScissorsPatternMatching do
-  def play(:rock, :scissors), do: "rock beats scissors!"
-  def play(:paper, :rock), do: "paper beats rock!"
-  def play(:scissors, :paper), do: "scissors beats paper!"
-  def play(:rock, :paper), do: "paper beats rock!"
-  def play(:paper, :scissors), do: "scissors beats paper!"
-  def play(:scissors, :rock), do: "rock beats scissors!"
-  def play(_same, _same), do: "draw!"
 end
 ```
 
@@ -108,27 +110,68 @@ defmodule RockPaperScissorsPatternMatching do
 end
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rps_pattern_matching_reading\"\n    \"exercises\" -> \"rps_pattern_matching_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "rps_pattern_matching_reading"
+    "exercises" -> "rps_pattern_matching_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-rps_pattern_matching
+$ git checkout -b rps-pattern-matching-exercise
 $ git add .
 $ git commit -m "finish rps pattern matching exercise"
-$ git push origin exercise-rps_pattern_matching
+$ git push origin rps-pattern-matching-exercise
 ```
+
+Create a pull request from your `rps-pattern-matching-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                   | Next                                                       |
-| ---------------------------------------------------------- | ---------------------------------------------------------: |
-| [Treasure Matching](../exercises/treasure_matching.livemd) | [Metric Conversion](../exercises/metric_conversion.livemd) |
+| Previous                                                                 | Next                                                       |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------: |
+| [Replacing nils](../exercises/drill-patternmatching-replace-nils.livemd) | [Metric Conversion](../exercises/metric_conversion.livemd) |

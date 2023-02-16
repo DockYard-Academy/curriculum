@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -123,39 +125,19 @@ defmodule TrafficLightServer do
 
   @doc """
   Start a TrafficLightServer linked to the current caller process.
-
-  ## Examples
-
-      iex> TrafficLightServer.start_link([])
-      {:ok, pid}
   """
   def start_link(opts) do
   end
 
   @doc """
   Transition the `TrafficLightServer`'s state.
-
-  ## Examples
-
-      iex> {:ok, pid} = TrafficLightServer.start_link([])
-      iex> TrafficLightServer.transition(pid)
-      :yellow
-      iex> TrafficLightServer.transition(pid)
-      :red
-      iex> TrafficLightServer.transition(pid)
-      :green
+  :green -> :yellow -> :red
   """
   def transition(pid) do
   end
 
   @doc """
   Get the `TrafficLightServer`'s current state.
-
-  ## Examples
-
-      iex> {:ok, pid} = TrafficLightServer.start_link([])
-      iex> TrafficLightServer.current_light(pid)
-      :green
   """
   def current_light(pid) do
   end
@@ -228,6 +210,46 @@ style R5 fill:lightcoral
 
 <!-- livebook:{"break_markdown":true} -->
 
+`transition/1` Examples:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> {:ok, pid} = TrafficGridServer.start_link([])
+iex> TrafficGridServer.transition(pid)
+[:yellow, :green, :green, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :green, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :green, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :green]
+
+iex> TrafficGridServer.transition(pid)
+[:yellow, :yellow, :yellow, :yellow, :yellow]
+
+iex> TrafficGridServer.transition(pid)
+[:red, :yellow, :yellow, :yellow, :yellow]
+
+iex> TrafficGridServer.transition(pid)
+[:red, :red, :yellow, :yellow, :yellow]
+```
+
+`current_lights/1` Examples:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> {:ok, pid} = TrafficGridServer.start_link([])
+iex> TrafficGridServer.current_lights(pid)
+[:green, :green, :green, :green, :green]
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
@@ -287,12 +309,12 @@ Implement the `TrafficGrid` module as documented below. You will also have to de
 defmodule TrafficGridServer do
   use GenServer
 
-  @doc """
+  @doc ~S"""
   Start the `TrafficGridServer`.
 
   ## Examples
 
-      iex> TraffigGridServer.start_link([])
+      TrafficGridServer.start_link([])
       {:ok, pid}
   """
   def start_link(_opts) do
@@ -302,22 +324,9 @@ defmodule TrafficGridServer do
   transition the current light state of the next light to transition.
 
   ## Examples
-
-      iex> {:ok, pid} = TrafficGridServer.start_link([])
-      iex> TrafficGridServer.transition(pid)
+      
+      TrafficGridServer.transition(pid)
       [:yellow, :green, :green, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :green, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :green, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :yellow, :green]
-      iex> TrafficGridServer.transition(pid)
-      [:yellow, :yellow, :yellow, :yellow, :yellow]
-      iex> TrafficGridServer.transition(pid)
-      [:red, :yellow, :yellow, :yellow, :yellow]
-      iex> TrafficGridServer.transition(pid)
-      [:red, :red, :yellow, :yellow, :yellow]
   """
   def transition(grid_pid) do
   end
@@ -327,13 +336,50 @@ defmodule TrafficGridServer do
 
   ## Examples
 
-      iex> {:ok, pid} = TrafficGridServer.start_link([])
-      iex> TrafficGridServer.current_lights(pid)
+      TrafficGridServer.current_lights(pid)
       [:green, :green, :green, :green, :green]
   """
   def current_lights(grid_pid) do
   end
 end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"traffic_light_server_reading\"\n    \"exercises\" -> \"traffic_light_server_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "traffic_light_server_reading"
+    "exercises" -> "traffic_light_server_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
 ```
 
 ## Commit Your Progress
@@ -342,16 +388,19 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-traffic_light_server
+$ git checkout -b traffic-light-server-exercise
 $ git add .
 $ git commit -m "finish traffic light server exercise"
-$ git push origin exercise-traffic_light_server
+$ git push origin traffic-light-server-exercise
 ```
+
+Create a pull request from your `traffic-light-server-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

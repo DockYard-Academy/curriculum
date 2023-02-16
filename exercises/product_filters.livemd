@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -37,6 +39,30 @@ You should be able to filter by:
 1. a partial case-insensitive `:name` field.
 2. an inclusive `:min` and `:max` price.
 3. an exact `:category` field as an atom.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# No filters returns all products.
+
+iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
+[%{name: "Laptop", category: :tech, price: 100}]
+
+# Filter by name, partial and case insensitive.
+
+iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
+[%{name: "Laptop", category: :tech, price: 100}]
+
+# Multiple filters.
+
+iex> products = [
+  %{name: "Laptop", category: :tech, price: 100},
+  %{name: "NOT FOUND", category: :tech, price: 100}
+]
+
+iex> Products.filter(products, min: 50, max: 200, name: "Laptop", category: :tech)
+[%{name: "Laptop", category: :tech, price: 100}]
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -198,7 +224,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-Implement and test the `Products` module based on the provided test cases and documentation.
+Implement and test the `Products` module. We've provided some example test case names to get your started.
 
 ```elixir
 defmodule Products do
@@ -207,62 +233,8 @@ defmodule Products do
   """
 
   @doc """
-  Filter products by name, category, and price.
-
-  ## Examples
-
-  No filters returns all products.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], [])
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  Filter by name
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Laptop")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "apt")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "APT")
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], name: "Phone")
-  []
-
-  Filter by category
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :tech)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], category: :health)
-  []
-
-  Filter by min price.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 200)
-  []
-
-  Filter by max price.
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 100)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 200)
-  [%{name: "Laptop", category: :tech, price: 100}]
-
-  iex> Products.filter([%{name: "Laptop", category: :tech, price: 100}], max: 50)
-  []
-
-  Multiple filters.
-
-  Products.filter([%{name: "Laptop", category: :tech, price: 100}], min: 50, max: 200, name: "Laptop", category: :tech)
+  Filter products by :name, :min, :max, and :category.
+  The name filter should be case insensitive and handle partial matches.
   """
   def filter(products, filters) do
   end
@@ -295,22 +267,63 @@ end
 ExUnit.run()
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"product_filters_reading\"\n    \"exercises\" -> \"product_filters_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "product_filters_reading"
+    "exercises" -> "product_filters_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-product_filters
+$ git checkout -b product-filters-exercise
 $ git add .
 $ git commit -m "finish product filters exercise"
-$ git push origin exercise-product_filters
+$ git push origin product-filters-exercise
 ```
+
+Create a pull request from your `product-filters-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -67,17 +69,18 @@ Test and implement a `Games.Wordle` module in your [Games](./games_setup.livemd)
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Bonus: Random Word
+### Play
 
-Use the IEx shell to start a game of Wordle.
+Use the IEx shell to start a game of Wordle. This should prompt the user to guess a five letter word.
 
 ```
-iex> Games.Wordle.start()
+iex> Games.Wordle.play()
 Enter a five letter word:  
 ```
 
-Randomly generate a word for the wordle game. Retrieve user input and provide feedback based
-on their guess. For example, this would be the output if the word `toast` were randomly generated.
+Randomly generate a word for the wordle game. You might randomly retrieve a word from a list of words such as `["toast", "tarts", "hello", "beats"]`.
+
+Retrieve user input and provide feedback based on their guess. For example, this would be the output if the word `toast` were randomly generated.
 
 ```
 Enter a give letter word: tarts
@@ -90,22 +93,75 @@ Enter a give letter word: tarts
 
 After six guesses, the player should lose the game if they do not get the correct answer.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Color Feedback
+
+Use [IO.ANSI](https://hexdocs.pm/elixir/IO.ANSI.html) to provide actual colored feedback.
+
+```elixir
+IO.puts(IO.ANSI.green() <> "green")
+IO.puts(IO.ANSI.yellow() <> "yellow")
+IO.puts(IO.ANSI.light_black() <> "grey")
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"games_wordle_reading\"\n    \"exercises\" -> \"games_wordle_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "games_wordle_reading"
+    "exercises" -> "games_wordle_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-games_wordle
+$ git checkout -b games-wordle-exercise
 $ git add .
 $ git commit -m "finish games wordle exercise"
-$ git push origin exercise-games_wordle
+$ git push origin games-wordle-exercise
 ```
+
+Create a pull request from your `games-wordle-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -23,21 +25,21 @@ Create a `CaesarCypher.encode/1` function which shifts each letter in a string b
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz")
-"bcdefghijklmnopqrstuvwyxza"
+CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz")
+"bcdefghijklmnopqrstuvwxyza"
 ```
 
 You only need to handle **lowercase letters**.
 
-### Bonus: Any Key
+### Any Key
 
 Create a `CaesarCypher.encode/2` function which encodes the string by a provided key. For example, if the key is `2` then each letter shifts over by two, so `"a"` becomes `"c"`, `"b"` becomes `"d"` and so on.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 2)
-"cdefghijklmnopqrstuvwyxzab"
+CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
+"cdefghijklmnopqrstuvwxyzab"
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -46,12 +48,7 @@ CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 2)
 ```elixir
 defmodule CaesarCypher do
  def encode(string) do
-    String.to_charlist(string)
-    |> Enum.map(fn
-      ?z -> ?a
-      char -> char + 1
-    end)
-    |> List.to_string()
+    encode(string, 1)
   end
 
   def encode(string, key) do
@@ -59,7 +56,7 @@ defmodule CaesarCypher do
     |> Enum.map(fn char ->
       overflow = char + key > ?z
       if overflow do
-        rem(char + key, ?z) + ?a
+        ?a + rem(char + key, ?z) - 1
       else
         char + key
       end
@@ -74,70 +71,6 @@ end
 Implement the `CaesarCypher` module as documented.
 
 ```elixir
-# list -> list (same length)
-
-# Brute Force
-
-key = 2
-
-String.split("abcdefghijklmnopqrstuvwxyz", "", trim: true)
-|> Enum.map(fn char ->
-  nil
-end)
-
-## Five Ideas
-### Treat the Characters As Integers.
-### Use the Alphabet As An Index
-["a", "b", "c"]
-0
-1
-# new char
-"b"
-
-"c"
-2
-3
-nil
-
-list_of_chars = "abc" |> String.split("", trim: true)
-
-"abc"
-|> String.split("", trim: true)
-|> Enum.map(fn char ->
-  incremented_index =
-    Enum.find_index(list_of_chars, fn alphabet_char ->
-      char == alphabet_char
-    end) + 1
-
-  # circle back
-  if incremented_index == length(list_of_chars) do
-    IO.inspect(char)
-  else
-    Enum.at(list_of_chars, incremented_index)
-  end
-end)
-```
-
-```elixir
-
-```
-
-```elixir
-?x
-```
-
-```elixir
-# list of numbers
-[97, 98, 99]
-# list of char codes
-[97, 98, 99]
-```
-
-```elixir
-[97, 98, 99, 126]
-```
-
-```elixir
 defmodule CaesarCypher do
   @moduledoc """
   Documentation for `CaesarCypher`
@@ -149,12 +82,15 @@ defmodule CaesarCypher do
 
   ## Examples
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz")
-    "bcdefghijklmnopqrstuvwyxza"
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz")
+    "bcdefghijklmnopqrstuvwxyza"
+
+  Encoding should work on any string
+
+    iex> CaesarCypher.encode("hello")
+    "ifmmp"
   """
-  @spec encode(String.t()) :: String.t()
   def encode(string) do
-    2
   end
 
   @doc """
@@ -163,18 +99,61 @@ defmodule CaesarCypher do
 
   ## Examples
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 1)
-    "bcdefghijklmnopqrstuvwyxza"
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 1)
+    "bcdefghijklmnopqrstuvwxyza"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 2)
-    "cdefghijklmnopqrstuvwyxzab"
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 2)
+    "cdefghijklmnopqrstuvwxyzab"
 
-    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwyxz", 14)
+    iex> CaesarCypher.encode("abcdefghijklmnopqrstuvwxyz", 14)
     "opqrstuvwxyzabcdefghijklmn"
+
+  Encoding should work on any string.
+
+    iex> CaesarCypher.encode("hello", 1)
+    "ifmmp"
   """
   def encode(string, key) do
   end
 end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"caesar_cypher_reading\"\n    \"exercises\" -> \"caesar_cypher_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "caesar_cypher_reading"
+    "exercises" -> "caesar_cypher_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
 ```
 
 ## Commit Your Progress
@@ -183,16 +162,19 @@ Run the following in your command line from the curriculum folder to track and s
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-caesar_cypher
+$ git checkout -b caesar-cypher-exercise
 $ git add .
 $ git commit -m "finish caesar cypher exercise"
-$ git push origin exercise-caesar_cypher
+$ git push origin caesar-cypher-exercise
 ```
+
+Create a pull request from your `caesar-cypher-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

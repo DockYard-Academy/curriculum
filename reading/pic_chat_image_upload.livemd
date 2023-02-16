@@ -1,0 +1,620 @@
+# PicChat: Image Upload
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we allow image uploads in a Phoenix LiveView?
+* How do we create a file input for image/file uploads?
+* How do we consume uploaded files and save them locally or externally?
+* How can we enable drag and drop for file/image uploads?
+* How can we style a drag and drop file input?
+
+## Overview
+
+### File Input
+
+An HTML input element with a type attribute value of "file" represents a control that allows the user to select and upload one or more files to a server. It is used to select files for uploading to a server, or to select files to open with a program on the user's computer.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [allow_upload/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#allow_upload/3) and [live_file_input/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#live_file_input/1).
+
+The `allow_upload/3` function is used to enable file uploads for a particular form element. We call `allow_upload/3` on our socket in the LiveView's `mount/3` callback function to configure how to allow file uploads such as what kinds of files to accept, the max number of files, and the maximum file size.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@impl Phoenix.LiveView
+def mount(_params, _session, socket) do
+  {:ok, allow_upload(socket, :my_images, accept: ~w(.jpg .jpeg), max_entries: 2)}
+end
+```
+
+This creates assigns an `@uploads` value on the socket with a `my_images` key that stores information about image. We can use `allow_upload/3` in conjunction with the `live_file_input/1` function, which generates an HTML input element with a type attribute value of `"file"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.live_file_input @uploads.my_image />
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Max File Size
+
+By default, the maximum file size is 8 MB. We can specific a different file size in `allow_upload/3` if desired.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+allow_upload(socket, :my_images, accept: ~w(.jpg .jpeg), max_entries: 2, max_file_size: 10_000_000)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Upload Entries
+
+Uploaded files are stored on the socket as a list of entries. We can access these entries in the `@uploads` value from the socket assigns.
+
+Entries have a `client_name` field for the name of the uploaded file. We can also use [live_img_preview/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_img_preview/2) to create an image preview.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= for entry <- @uploads.picture.entries do %>
+  <p><%= entry.client_name %></p>
+  <%= live_img_preview entry, width: 75 %>
+<% end %>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Phoenix LiveView Versions
+
+At the time of writing, Phoenix 1.6 uses Phoenix LiveView 17. You can check the version of LiveView you are using in the `mix.exs` file of any Phoenix project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:phoenix_live_view, "~> 0.17.5"},
+```
+
+However, the latest version of Phoenix LiveView is 18. Phoenix LiveView 18 introduces significant changes to the syntax, so ensure you are using the correct version of the documentation for your project to avoid issues.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### JavaScript `document`.
+
+As Phoenix Web Developers, we sometimes have to rely on JavaScript to accomplish certain features. JavaScript is a programming language used heavily on the web.
+
+In JavaScript, the `document` object represents the root node of the HTML document. It is the main entry point into the web page's content, and it provides methods and properties for accessing and manipulating the content of the web page.
+
+We can write JavaScript code in our `app.js` file. It's also possible to split our JavaScript into multiple files, but that is beyond the scope of this lesson.
+
+JavaScript allows us to select an HTML element by their `id` attribute using `document.getElementById`. We can also select multiple HTML elements by class using `document.getElementsByClass`.
+
+For example if we had the following HTML element.
+
+```html
+<div id="my-id-1" class="my-class">
+<div id="my-id-2" class="my-class">
+```
+
+We could select the first element using `document.getElementById`.
+
+```javascript
+first_element = document.getElementById("my-id-1")
+```
+
+Or we could select both elements using `document.getElementsByClass`.
+
+```javascript
+elements = document.getElementsByClass("my-class")
+```
+
+We can then use element events to trigger changes to our HTML document.
+For example, we can add and remove classes when dragging a file over the HTML element.
+
+```javascript
+first_element.ondragover = function (event) {
+    dragndrop.classList.add("dragover")
+}
+
+first_element.ondragleave = function (event) {
+    dragndrop.classList.remove("dragover")
+}
+```
+
+## Follow Along: PicChat Image Uploads
+
+Over the next few lessons we're going to build a Chat Application that can also upload images called `PicChat`.
+Our application will include a global chat where users can send messages and see the feed of messages update in real-time.
+
+We'll also save messages in a database with [Ecto](https://hexdocs.pm/ecto/Ecto.html) to demonstrate how to use CRUD (Create, Read, Update, Delete) actions with LiveViews.
+
+You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat) application on the `image_uploads` branch for the sake of reference.
+
+In this lesson, we're going add image uploads to `PicChat` messages.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Setup
+
+You should have already created the `PicChat` application in the previous lesson: [PicChat: Messages](./pic_chat_messages.livemd). Complete this follow along lesson first if you have not already.
+
+You can reference the [PicChat Demonstration Project](https://github.com/DockYard-Academy/pic_chat/tree/image-uploads) on the `image_uploads` branch to see a completed project.
+
+## Create Migration
+
+In order to store pictures on each message, we'll add a `:picture` field that will store the source of the image such as a path or URL.
+
+Create a new migration.
+
+```
+mix ecto.gen.migration add_pictures_field_to_messages
+```
+
+In the generated migration file, add a `:picture` column to our existing `:messages` table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def change do
+  alter table(:messages) do
+    add(:picture, :string)
+  end
+end
+```
+
+Run migrations.
+
+```
+mix ecto.migrate
+```
+
+## Modify Schema
+
+Our schema should reflect the data in our database, so let's add a `picture` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Chat.Message do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "messages" do
+    field :content, :string
+    field :from, :string
+    # add picture field
+    field :picture, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(message, attrs) do
+    message
+    # add :picture field when casting to a changeset
+    |> cast(attrs, [:content, :from, :picture])
+    |> validate_required([:content, :from])
+  end
+end
+```
+
+### Context Test
+
+To ensure our migration and schema work, it would be wise to write a test.
+
+Modify your existing `create_message/1 with valid data creates a message` test in `chat_test.exs` to ensure we can create a message with a picture.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_message/1 with valid data creates a message" do
+  valid_attrs = %{content: "some content", from: "some from", picture: "images/picture_url"}
+
+  assert {:ok, %Message{} = message} = Chat.create_message(valid_attrs)
+  assert message.content == "some content"
+  assert message.from == "some from"
+  assert message.picture == "images/picture_url"
+end
+```
+
+## File Upload
+
+Phoenix LiveView automatically supports file [Uploads](https://hexdocs.pm/phoenix_live_view/uploads.html). To handle image uploads we need to:
+
+1. Use [allow_upload/3](https://hexdocs.pm/phoenix_live_view/0.18.1/Phoenix.LiveView.html#allow_upload/3) to store image uploads in the socket.
+2. Use [live_file_input/3](https://hexdocs.pm/phoenix_live_view/0.18.1/Phoenix.Component.html#live_file_input/1) to create a file input for uploading images.
+3. Store the images. (Using the filesystem or an external service such as [Amazon S3](https://aws.amazon.com/s3/))
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Allow the Upload
+
+Use `allow_upload/3` in the `MessageLive.Index.mount/3` callback function. This causes the LiveView to automatically store upload information in an `@uploads` field on the socket assigns.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def mount(_params, _session, socket) do
+  {:ok,
+    socket
+    |> assign(:messages, list_messages())
+    |> allow_upload(:picture, accept: ~w(.jpg .jpeg .png), max_entries: 1)}
+end
+```
+
+In the code above, we allow the upload on the :picture field. If desired, we could call `allow_upload/3` multiple times for different file/image types. We only `accept` specific upload types to ensure that uploaded files are images (jpg, jpeg, and png).  `max_entries` is 1, if desired we could change this value allow the user to upload multiple images. Even though we only have `1` entry, upload entries will always be stored as a list.
+
+We're going to use `live_file_input/3` to create a file input in our `form_component.html.heex` file. However, `live_file_input/3` requires the `@uploads` for `:picture` that is stored on the socket.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# demonstration only
+<%= live_file_input @uploads.picture %>
+```
+
+We need to provide this to our form component before we can access it. Provide the `uploads` attribute to our form component in `index.html.heex`.
+
+```
+<.live_component
+  module={PicChatWeb.MessageLive.FormComponent}
+  id={@message.id || :new}
+  title={@page_title}
+  # provide uploads to the form component
+  uploads={@uploads}
+  action={@live_action}
+  message={@message}
+  return_to={Routes.message_index_path(@socket, :index)}
+/>
+```
+
+Now we can use the `@uploads.picture` value to tell the `live_file_input/3` where to store the uploaded file.
+
+```
+<div>
+  <h2><%= @title %></h2>
+  <.form
+    let={f}
+    for={@changeset}
+    id="message-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save">
+
+    <%= label f, :content %>
+    <%= textarea f, :content %>
+    <%= error_tag f, :content %>
+
+    <%= label f, :from %>
+    <%= text_input f, :from %>
+    <%= error_tag f, :from %>
+
+    <!-- add the file input for uploading a picture -->
+    <%= if assigns[:uploads] do %>
+      <%= live_file_input @uploads.picture %>
+    <% end %>
+
+    <div>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </div>
+  </.form>
+</div>
+```
+
+We've created the file input, when we upload a file it's information is stored in the socket.
+We can use this information when we submit the form to save the file and store it's path or URL on the created message.
+
+We can use [consume_uploaded_entries](https://hexdocs.pm/phoenix_live_view/0.18.1/Phoenix.LiveView.html#consume_uploaded_entries/3) to get the image information stored on the socket. The socket stores the image files in the `tmp` folder, often used for storing temporary information.
+
+We'll take the temporary files in the `tmp` folder and copy them into our `priv/static/images/` folder for long-term storage. We'll store the relative path to the image `/images/FILE_NAME` for display purposes.
+
+Modify your `"save"` event handler in `form_component.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_event("save", %{"message" => message_params}, socket) do
+  uploaded_files =
+    consume_uploaded_entries(socket, :picture, fn %{path: path}, _entry ->
+      file_name = Path.basename(path)
+      File.cp!(path, "priv/static/images/#{file_name}")
+
+      {:ok, Routes.static_path(socket, "/images/#{file_name}")}
+    end)
+
+  message_params = Map.put(message_params, "picture", List.first(uploaded_files))
+
+  save_message(socket, socket.assigns.action, message_params)
+end
+```
+
+Add a table heading `th` and add the image to a table data cell (`td`) to our existing table in `index.html.heex` template.
+
+Table Heading:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<tr>
+  <th>Content</th>
+  <th>From</th>
+  <th>Picture</th>
+
+  <th></th>
+</tr>
+```
+
+Table Data Cell:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<td><%= message.content %></td>
+<td><%= message.from %></td>
+<td><img alt={message.picture} src={message.picture} /></td>
+```
+
+Visit http://localhost:4000 and upload an image. Submit the form and you should see your image displayed on the page.
+
+## Show Page
+
+Tests are failing because our form component always assume we're allowing image uploads, but currently our show page does not provide the `uploads` field to the form component.
+
+Fix these these tests by allowing the upload in the `MessageLive.Show.mount/3` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def mount(_params, _session, socket) do
+  {:ok, allow_upload(socket, :picture, accept: ~w(.jpg .jpeg .png), max_entries: 1)}
+end
+```
+
+Then provide `@uploads` to the form component in `show.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.live_component
+  module={PicChatWeb.MessageLive.FormComponent}
+  id={@message.id}
+  title={@page_title}
+  uploads={@uploads}
+  action={@live_action}
+  message={@message}
+  return_to={Routes.message_show_path(@socket, :show, @message)}
+/>
+```
+
+All tests should pass.
+
+```
+mix test
+```
+
+## Drag and Drop
+
+To enable drag and drop, Phoenix LiveView only requires that we set a `phx-drop-target` for some HTML element on the page. We provide this HTML element with a reference. The reference is simply a string in the format `"phx-REFERENCE_ID"` where `REFERENCE_ID` is unique identifier. Under the hood, Phoenix LiveView uses this reference to determine which drop target is for which image upload.
+
+Wrap the existing `live_file_input` with an HTML element that has a `phx-drop-target` attribute.
+
+```html
+<div phx-drop-target={@uploads.picture.ref}>
+  <.live_file_input upload={@uploads.picture} />
+</div>
+```
+
+At first, it may seem like nothing is happening. That's due to an unfortunate quirk of the file input not showing the file name when using drag and drop.
+
+To see the file being uploaded, we'll add an image preview using [live_img_preview/2](https://hexdocs.pm/phoenix_live_view/0.17.12/Phoenix.LiveView.Helpers.html#live_img_preview/2).
+
+We can access the uploaded entries using `@uploads.picture.entries`. Even though there is always only one entry, entries is always a list.
+
+```html
+<div phx-drop-target={@uploads.picture.ref}>
+  <%= live_file_input @uploads.picture %>
+</div>
+<%= for entry <- @uploads.picture.entries do %>
+  <%= live_img_preview entry, width: 100 %>
+<% end %>
+```
+
+Now the image should display when dragged onto the file input.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_new_message_drag_and_drop_image.png)
+
+## Styling File Inputs
+
+File inputs tend to be ugly, difficult to style, and inconsistent across browsers.
+
+To style a file input, one common pattern is to hide the file input and use another element such as a `<label>` for display purposes. This way we can trigger the hidden file input by clicking on the label element.
+
+Wrap your file input in a `<label>` element instead of the `<div>`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<label id="drag-n-drop"  class="drag-n-drop" phx-drop-target={@uploads.picture.ref}>
+      Click or drag and drop to upload image
+      <%= live_file_input @uploads.picture, style: "display: none;" %>
+</label>
+```
+
+We've added a `class` and an `id` so that we can apply some styles to our element. First, add the following CSS in `assets/phoenix.css`.
+
+```css
+.drag-n-drop {
+  background-color: lightgrey;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  padding: 10rem;
+  text-align: center;
+}
+
+.drag-n-drop:hover {
+  cursor: pointer;
+}
+```
+
+## Drag and Drop Styles
+
+We can use JavaScript to trigger styles while dragging a file over an element.
+
+In `app.js` use the `id` we defined earlier `"drag-n-drop"` to select our drag and drop element. Then add/remove a class when we drag a file over it.
+
+```javascript
+dragndrop = document.getElementById("drag-n-drop")
+
+dragndrop.ondragover = function (event) {
+    dragndrop.classList.add("dragover")
+}
+
+dragndrop.ondragleave = function (event) {
+    dragndrop.classList.remove("dragover")
+}
+```
+
+We'll use this class to apply some styles to our drag and drop element. Add the following CSS in `phoenix.css`.
+
+```css
+.dragover {
+  opacity: 0.5;
+}
+```
+
+Now we have a finished feature that should look like the following
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_new_message_drag_and_drop_styled.png)
+
+## Amazon S3
+
+Generally, we don't want to use the file system for storing images. It's error prone and can cause significant performance issues if you server stores too much data for it to handle.
+
+This lesson has used the file for demonstration purposes. However, it's generally advised to use an file storage service such as [Amazing S3](https://aws.amazon.com/s3/). Using Amazon S3 is beyond the scope of this lesson and will not be included in the follow-along.
+
+To use Amazon S3, we send the image data to their server, which is stored in an S3 bucket. They then provide us a URL for the image we can store on our server to reference the image.
+
+Using the Amazon S3 service, we'll create a bucket that stores image files for us.
+Follow these steps to create an Amazon S3 Bucket.
+
+1. [Create an Amazon Account](https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=header_signup&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start/email)
+2. [Create limited access IAM Amazon user](https://us-east-1.console.aws.amazon.com/iamv2/home?region=us-east-1#/users) with AmazonS3FullAccess.
+3. [Create an S3 Bucket](https://s3.console.aws.amazon.com/s3/buckets?region=us-west-2)
+   To create an Amazon S3 bucket.
+
+You then use the `ACCESS_KEY_ID` and the `SECRET_ACCESS_KEY` in your application to access the Amazon S3 bucket.
+
+The [ExAws](https://github.com/ex-aws/ex_aws) library makes it easier to interact with the Amazon Service. The documentation includes examples of how to setup dependencies and configure `:ex_aws` in your application using the `ACCESS_KEY_ID` and `SECRET_ACCESS_KEY`.
+
+For a full tutorial, see this video by [poeticoding](https://www.youtube.com/watch?v=gSGu5wXeS1c).
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=gSGu5wXeS1c\")","title":"AWS S3 in Elixir with ExAws"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=gSGu5wXeS1c")
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Sophie DeBenedetto: How to Do Live Uploads in Phoenix LiveView](https://blog.appsignal.com/2021/10/12/how-to-do-live-uploads-in-phoenix-liveview.html)
+* [HexDocs: Phoenix LiveView Uploads](https://hexdocs.pm/phoenix_live_view/uploads.html)
+* [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+* [HexDocs: Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
+* [Elixir Schools: LiveView](https://elixirschool.com/blog/phoenix-live-view/)
+* [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"pic_chat_image_upload_reading\"\n    \"exercises\" -> \"pic_chat_image_upload_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "pic_chat_image_upload_reading"
+    "exercises" -> "pic_chat_image_upload_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b pic-chat-image-upload-reading
+$ git add .
+$ git commit -m "finish pic chat image upload reading"
+$ git push origin pic-chat-image-upload-reading
+```
+
+Create a pull request from your `pic-chat-image-upload-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                 | Next                                                  |
+| -------------------------------------------------------- | ----------------------------------------------------: |
+| [PicChat: Messages](../reading/pic_chat_messages.livemd) | [PicChat: PubSub](../reading/pic_chat_pub_sub.livemd) |

@@ -1,0 +1,181 @@
+# School Grades
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Must Register
+
+Representatives from your local school system have contacted you with a problem they hope technology can solve.
+
+School administrators need to ensure that all children between the ages of 5 and 16 are registered with
+a school.
+
+They have a list of all children within the area. They need to determine based on their birthday if they
+will be between 5 and 16 by the cut off period of December 31st in the provided year.
+
+The school has provided you a list of potential students.
+You need to filter it down to only the students who must be registered with a school.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+students = [
+  %{name: "Suzy", birthday: ~D[2017-12-31]},
+  %{name: "Irina", birthday: ~D[2018-01-01]},
+  %{name: "Victor", birthday: ~D[2005-12-31]},
+  %{name: "Dina", birthday: ~D[2006-01-01]}
+]
+
+School.must_register(students, 2022)
+[
+  %{name: "Suzy", birthday: ~D[2015-03-23]},
+  %{name: "Dina", birthday: ~D[2006-01-01]}
+]
+```
+
+Enter your solution below.
+
+```elixir
+defmodule School do
+  def must_register(students, year) do
+  end
+end
+```
+
+## School Grades
+
+Happy with your work the administrators come back to you and ask if you can help them with another problem.
+
+Students in this school are organized by grade according to their birthdays.
+They are currently manually updating existing student information to determine their grade.
+They would instead like to automate this process.
+
+Given a list of students, organize them according to their grade.
+
+They are only concerned with implementing this system with the following grade cutoffs.
+
+* Grade 1: Jan 1 2016 - Dec 31 2016
+* Grade 2: Jan 1 2015 - Dec 31 2015
+* Grade 3: Jan 1 2014 - Dec 31 2014
+* Grade 4: Jan 1 2013 - Dec 31 2013
+* Grade 5: Jan 1 2014 - Dec 31 2014
+
+This assumes the current year is 2022. The cutoffs should account for the given year.
+Where grade 1 students are 6 years old and grade 5 students are 10 years old.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+students = [
+  %{name: "Name1", birthday: ~D[2016-01-01]},
+  %{name: "Name2", birthday: ~D[2016-12-31]},
+  %{name: "Name3", birthday: ~D[2015-01-01]},
+  %{name: "Name4", birthday: ~D[2015-12-31]},
+  %{name: "Name5", birthday: ~D[2014-01-01]},
+  %{name: "Name6", birthday: ~D[2014-12-31]},
+  %{name: "Name7", birthday: ~D[2013-01-01]},
+  %{name: "Name8", birthday: ~D[2013-12-31]},
+  %{name: "Name9", birthday: ~D[2012-01-01]},
+  %{name: "Name10", birthday: ~D[2012-12-31]},
+]
+
+School.grades(students, 2022)
+%{
+  grade1: [
+    %{name: "Name1", birthday: ~D[2016-01-01]},
+    %{name: "Name2", birthday: ~D[2016-12-31]}
+  ],
+  grade2: [
+    %{name: "Name3", birthday: ~D[2015-01-01]},
+    %{name: "Name4", birthday: ~D[2015-12-31]},
+  ],
+  grade3: [
+    %{name: "Name5", birthday: ~D[2014-01-01]},
+    %{name: "Name6", birthday: ~D[2014-12-31]},
+  ],
+  grade4: [
+    %{name: "Name7", birthday: ~D[2013-01-01]},
+    %{name: "Name8", birthday: ~D[2013-12-31]},
+  ],
+  grade5: [
+    %{name: "Name9", birthday: ~D[2012-01-01]},
+    %{name: "Name10", birthday: ~D[2012-12-31]},
+  ]
+}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Enter your solution below.
+
+```elixir
+defmodule School do
+  def grades(students, year) do
+  end
+end
+```
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b deprecated-school-grades-exercise
+$ git add .
+$ git commit -m "finish deprecated school grades exercise"
+$ git push origin deprecated-school-grades-exercise
+```
+
+Create a pull request from your `deprecated-school-grades-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,9 +18,22 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we scaffold an authorization system in Phoenix?
+* How do we protect a route from unauthorized access?
+
 ## Overview
 
-We implement authorization in our applications to ensure only authorized clients can perform protected actions and access protected resources.
+Authentication in software development refers to the process of verifying the identity of a user or device before allowing them access to a system or application. This is often done by requiring a user to enter a username and password, which is then checked against a list of valid credentials to ensure that the user is who they claim to be.
+
+Authentication is an important security measure that helps protect systems and applications from unauthorized access. Without proper authentication, anyone could potentially gain access to sensitive information or perform actions that they are not authorized to do.
+
+Authentication is usually implemented as part of the login process for a system or application. After a user enters their credentials, the system will check them against a list of valid credentials to determine whether the user is authorized to access the system. If the credentials are correct, the user will be granted access; if they are not, the user will be denied access and may be prompted to try again or contact an administrator for help.
+
+Overall, authentication is a crucial part of software development and helps ensure the security and integrity of systems and applications.
 
 Failure to implement authorization properly can lead to severe repercussions. We can expose confidential information and leave our users vulnerable to harmful attacks.
 
@@ -34,9 +49,11 @@ classDiagram
     user_id: :id
     title:
   }
-  User --> Entry : Has many
-  Entry --> User : Belongs to
+  User --> Entry : has many
+  Entry --> User : belongs to
 ```
+
+If you get stuck at any point in this reading, you can reference the completed [Diary](https://github.com/DockYard-Academy/diary) application example.
 
 ## Create the Diary Application
 
@@ -224,7 +241,7 @@ get "/users/register", UserRegistrationController, :new
 
 <!-- livebook:{"break_markdown":true} -->
 
-We've already walked through route -> controller -> view -> template flow in the previous [Phoenix](./phoenix.livemd) lesson. Re-read this lesson if it is not already clear how the `"users/register"` route renders the `lib/diary_web/templates/user_registration/new.html.heex` template.
+We've already walked through route -> controller -> view -> template flow in the previous [Phoenix](./phoenix_1.7.livemd) lesson. Re-read this lesson if it is not already clear how the `"users/register"` route renders the `lib/diary_web/templates/user_registration/new.html.heex` template.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -285,8 +302,6 @@ To accomplish this, the `UserRegistrationController.create/2` function calls the
 * `Accounts.deliver_user_confirmation_instructions/1`: Send a confirmation email.
 * `put_flash/2`: Attach a blue info message to the assigns to be displayed on the client.
 * `UserAuth.log_in_user/3`: Create a user token and store it on the client. The user will use this token to authenticate future requests.
-
-<!-- livebook:{"branch_parent_index":6} -->
 
 ## Creating Users
 
@@ -366,6 +381,8 @@ Hashing is a way of encrypting data using a mathematical algorithm. Hashing algo
 
 We store the hash of the password rather than the actual password to improve security. For an overview of hashing, here's a video by Seytonic.
 
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=--tnZMuoK3E\")","title":"Password Hashing"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=--tnZMuoK3E")
 ```
@@ -409,8 +426,6 @@ create table(:users) do
   timestamps()
 end
 ```
-
-<!-- livebook:{"branch_parent_index":6} -->
 
 ## Confirmation Emails
 
@@ -463,8 +478,6 @@ In development, emails are stored locally rather than sent because we don't want
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/swoosh_mailbox_preview.png)
-
-<!-- livebook:{"branch_parent_index":6} -->
 
 ## Sessions
 
@@ -727,7 +740,7 @@ Make sure to run migrations.
 $ mix ecto.migrate
 ```
 
-Everything other than `user_id:references:users` should be familiar from when we created a journal application in the previous [Phoenix](./phoenix.livemd) section.
+Everything other than `user_id:references:users` should be familiar from when we created a journal application in the previous [Phoenix](./phoenix_1.7.livemd) section.
 
 This time, we need to associate each diary entry with a user and ensure users can only access their own entries.
 
@@ -740,10 +753,10 @@ Add the following to `lib/diary_web/router.ex`.
 ```elixir
 # lib/diary_web/router.ex
 
-scope "/entries", DiaryWeb do
+scope "/", DiaryWeb do
   pipe_through [:browser, :require_authenticated_user]
 
-  resources "/", EntryController
+  resources "/entries", EntryController
 end
 ```
 
@@ -1144,27 +1157,68 @@ Consider the following resources as you continue to learn more about authorizati
 * [Authorization in Phoenix web applications using Role Based Access Control (RBAC)](https://www.youtube.com/watch?v=6TlcVk-1Tpc)
 * [HexDocs: mix phx.gen.auth](https://hexdocs.pm/phoenix/mix_phx_gen_auth.html)
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"phoenix_authentication_reading\"\n    \"exercises\" -> \"phoenix_authentication_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "phoenix_authentication_reading"
+    "exercises" -> "phoenix_authentication_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-phoenix_authentication
+$ git checkout -b phoenix-authentication-reading
 $ git add .
-$ git commit -m "finish phoenix authentication section"
-$ git push origin exercise-phoenix_authentication
+$ git commit -m "finish phoenix authentication reading"
+$ git push origin phoenix-authentication-reading
 ```
+
+Create a pull request from your `phoenix-authentication-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                                       | Next                                                                     |
-| -------------------------------------------------------------- | -----------------------------------------------------------------------: |
-| [Portfolio Blog Page](../exercises/portfolio_blog_page.livemd) | [Portfolio Auth Blog Page](../exercises/portfolio_auth_blog_page.livemd) |
+| Previous                                                    | Next                                                            |
+| ----------------------------------------------------------- | --------------------------------------------------------------: |
+| [Blog: Comment Form](../exercises/blog_comment_form.livemd) | [Blog: Authentication](../exercises/blog_authentication.livemd) |

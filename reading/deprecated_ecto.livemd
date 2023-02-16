@@ -1,0 +1,817 @@
+# Ecto
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:kino_db, "~> 0.1.1"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Ecto
+
+Ecto provides a standard API layer for communicating with the database of an Elixir application.
+
+By default, Ecto uses a [PostgreSQL](https://www.postgresql.org/) Database. Ensure you already have [PostgreSQL](https://www.postgresql.org/) installed on your computer from the [Relational Database Management Systems](rdbms.livemd) lesson.
+
+Ecto splits into four main modules.
+
+* [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html) handles all communication between the application and the database. `Ecto.Repo` reads and writes from the underlying PostgreSQL database.
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) built queries to retrieve and manipulate data with the `Ecto.Repo` repository.
+* [Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html) maps the application struct data representation to the underlying PostgreSQL database representation.
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) creates changesets for validating and applying constraints to structs.
+
+To demonstrate how to use Ecto, we're going to create a journal application where users can create private journal entries.
+
+## Configure Ecto
+
+We can follow the [Ecto Getting Started Guide](https://hexdocs.pm/ecto/getting-started.html) to add Ecto to a project.
+
+First, create a new `journal` mix application in the projects folder.
+
+```
+mix new journal --sup
+```
+
+Add `postgrex` and `ecto_sql` to your list of dependencies in `mix.exs`. [postgrex](https://github.com/elixir-ecto/postgrex) is a PostgreSQL driver
+for Elixir. Ecto uses this driver to communicate with PostgreSQL. [ecto_sql](https://github.com/elixir-ecto/ecto_sql) is a SQL adapter for Ecto and database migrations.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp deps do
+  [
+    {:ecto_sql, "~> 3.0"},
+    {:postgrex, ">= 0.0.0"}
+  ]
+end
+```
+
+Install dependencies.
+
+```
+mix deps.get
+```
+
+Ecto provides a command to automate configuration.
+
+```
+mix ecto.gen.repo -r Journal.Repo
+```
+
+Configure the Ecto Repository in `config.exs`. By default, PostgreSQL uses a `postgres` user with a `postgres` password.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :journal, Journal.Repo,
+  database: "journal_repo",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost"
+```
+
+You should also have a new `repo.ex` file that defines a `Journal.Repo` module. The `Journal.Repo` (repository) module is a wrapper around your database. We'll use the `Journal.Repo` module
+anytime you want to communicate with the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Repo do
+  use Ecto.Repo,
+    otp_app: :journal,
+    adapter: Ecto.Adapters.Postgres
+end
+```
+
+The `Journal.Repo` process runs as a supervisor within the supervision tree of your application,
+so we need to add it to the supervision tree in `application.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def start(_type, _args) do
+  children = [
+    Journal.Repo,
+  ]
+
+  ...
+```
+
+In addition, add the following to `config.exs`. We need this configuration to run the `mix ecto` commands.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :journal, ecto_repos: [Journal.Repo]
+```
+
+## Create the Database
+
+To create a local database on your computer, run the following command.
+
+```
+mix ecto.create
+```
+
+You may see an error that includes the following.
+
+```
+(invalid_password) password authentication failed for user "user"
+```
+
+If so, this means the authentication for your local PostgreSQL application is failing. Change `config.exs` with the correct username and password for PostgreSQL.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :journal, Journal.Repo,
+  database: "journal_repo",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost"
+```
+
+Now create the local database.
+
+```
+mix ecto.create
+The database for Journal.Repo has been created
+```
+
+Similar to the `createdb` command used in the RDBMS lesson, this creates a `journal_repo` database in PostgreSQL. We can verify this from the `psql` prompt.
+
+```
+sudo -i -u postgres
+postgres$ psql
+postgres-# \l
+...
+journal_repo            | postgres | UTF8     | C.UTF-8 | C.UTF-8 |
+```
+
+We can drop this database from the command line (not the psql prompt).
+This clears any data in the database.
+
+```
+mix ecto.drop
+```
+
+Use `\l` to list the locale databases again, and the `journal_repo` database should be gone.
+
+We do want the database to exist, though, so make sure to re-rerun the `mix ecto.create` command.
+
+## Tables and Migrations
+
+We use **migrations** to create tables in the database.
+
+We can create a new migration file using `mix ecto.gen.migration`.
+
+```
+mix ecto.gen.migration create_users
+```
+
+We can name the migration anything we like. However, it's best to be descriptive.
+
+This command creates a `priv/repo/migrations/20220611011557_create_users.exs` file with the current timestamp. This migration file defines the table we want to create. By default, this table is empty.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Repo.Migrations.CreateUsers do
+  use Ecto.Migration
+
+  def change do
+
+  end
+end
+```
+
+We'll modify the module to create a users table. The `create` and `table` macros create a users table. The `add` macro defines a column on that table with the desired data type. The users table stores user's name and email as a `:string`.
+
+Elixir [primitive types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-types-and-casting) map to the underlying data structure in PostgreSQL. For example, `:string` maps to `:varchar`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Repo.Migrations.CreateUsers do
+  use Ecto.Migration
+
+  def change do
+    create table(:users) do
+      add :name, :string
+      add :email, :string
+    end
+  end
+end
+```
+
+Run the following command to run all migrations.
+
+```
+mix ecto.migrate
+
+18:22:17.619 [info]  == Running 20220611011557 Journal.Repo.Migrations.CreateUsers.change/0 forward
+
+18:22:17.621 [info]  create table users
+
+18:22:17.632 [info]  == Migrated 20220611011557 in 0.0s
+```
+
+We can verify the `users` table exists in the `journal_repo` database from the PostgreSQL prompt. There is also a `schema_migrations` table used by Ecto under the hood.
+
+```
+postgres-# \c journal_repo
+journal_repo=# \dt
+               List of relations
+ Schema |       Name        | Type  |  Owner
+--------+-------------------+-------+----------
+ public | schema_migrations | table | postgres
+ public | users             | table | postgres
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+With the users table defined, we can use SQL to read and write data.
+We don't recommend doing this manually for your application, but we want to demonstrate that Ecto is simply a wrapper around PostgreSQL.
+
+<!-- livebook:{"attrs":{"database":"journal_repo","hostname":"localhost","password":"postgres","port":5432,"type":"postgres","username":"postgres","variable":"conn"},"chunks":null,"kind":"Elixir.KinoDB.ConnectionCell","livebook_object":"smart_cell"} -->
+
+```elixir
+opts = [
+  hostname: "localhost",
+  port: 5432,
+  username: "postgres",
+  password: "postgres",
+  database: "journal_repo",
+  socket_options: [:inet6]
+]
+
+{:ok, conn} = Kino.start_child({Postgrex, opts})
+```
+
+In the Elixir smart cell below, enter the following SQL query to insert a user into the users table.
+
+```sql
+INSERT INTO users (ID,NAME,EMAIL) VALUES (0, 'Peter', 'peter@spider.web');
+```
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result2 = Postgrex.query!(conn, "", [])
+```
+
+Ensure the user was created by evaluating the cell below to display all users in the users table.
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users ","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result3 = Postgrex.query!(conn, "select * from users ", [])
+```
+
+## Schemas
+
+[Schemas](https://hexdocs.pm/ecto/getting-started.html#creating-the-schema) are an Elixir representation of the data stored in our database.
+
+Create a users schema in `lib/journal/user.ex` with the following content.
+It's conventional to use a singular name for the schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+  end
+end
+```
+
+The schema defines how we want to map information from our application to our database.
+
+Under the hood, this schema defines a `Journal.User` struct with the `:name` and `:email` keys. We will use this struct when we insert data into the database and when we read data from the database.
+
+## Inserting Data
+
+Open you project in the [IEx](https://hexdocs.pm/iex/IEx.html) shell.
+
+```
+iex -S mix
+```
+
+The `Journal.User` schema automatically defines a corresponding `Journal.User` struct.
+
+Create an instance of the struct by entering the following into the shell.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> user = %Journal.User{name: "Peter", email: "peter@spider.web"}
+```
+
+We can insert a user into the users table through the `Journal.Repo` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Journal.Repo.insert(user)
+```
+
+Assuming this succeeds with an `{:ok, user}` tuple, there should be a user in our PostgreSQL database, which we'll check using a smart cell.
+
+Re-evaluate the smart cell below to ensure a new user is in the users table.
+
+<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+
+```elixir
+result = Postgrex.query!(conn, "select * from users", [])
+```
+
+### Validating Data
+
+We can use [Ecto Changesets](https://hexdocs.pm/ecto/Ecto.Changeset.html) to validate data before inserting it into the database. It's conventional to define the changeset in the schema file.
+
+Add the following `changeset/2` function to `lib/journal/users.ex`. Ensure you also import `Ecto.Changeset`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "users" do
+    field :name, :string
+    field :email, :string
+  end
+
+  def changeset(user, params \\ %{}) do
+    user
+    |> cast(params, [:name, :email])
+    |> validate_required([:name, :email])
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email)
+  end
+end
+```
+
+For additional validation functions, consult the [Ecto Changeset Functions](https://hexdocs.pm/ecto/Ecto.Changeset.html#functions) documentation.
+
+Now we can use the `changeset/2` function to pre-validate data before inserting it into the database. Ensure you `recompile()` or restart the [IEx](https://hexdocs.pm/iex/IEx.html) shell to load the recent file change, then enter the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> %Journal.User{}
+|> Journal.User.changeset(%{name: "miles", email: "miles@spider.web"})
+|> Journal.Repo.insert()
+```
+
+It should return an `{:ok, user}` tuple.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok,
+ %Journal.User{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+   email: "miles@spider.web",
+   id: 8,
+   name: "miles"
+ }}
+```
+
+Now, invalid data will not insert into the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> %Journal.User{}
+|> Journal.User.changeset(%{name: "miles", email: "invalid email"})
+|> Journal.Repo.insert()
+```
+
+It should return an `{:error, user}` tuple.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{email: "invalid email", name: "miles"},
+   errors: [email: {"has invalid format", [validation: :format]}],
+   data: #Journal.User<>,
+   valid?: false
+ >}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create an additional user from the [IEx](https://hexdocs.pm/iex/IEx.html) shell using the `Journal.Repo.insert/2` function.
+
+Re-evaluate the SQL query above and you should see another user in the users table.
+
+## Reading Data
+
+We can also use the `Journal.Repo` module to query the database. Enter the following into the [IEx](https://hexdocs.pm/iex/IEx.html) shell.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Journal.Repo.all(Journal.User)
+```
+
+The `Journal.Repo.all` function should return a list of `Journal.User` structs.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  %Journal.User{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+    email: "peter@spider.web",
+    id: 1,
+    name: "Peter"
+  },
+  %Journal.User{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+    email: "miles@spider.web",
+    id: 2,
+    name: "Miles"
+  }
+]
+```
+
+Note that using `Journal.User` is an alternative to `from u in "users"`.
+However, with `from u in "users"` we need to use `:select` to specify how to return the data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Journal.Repo.all(from u in "users", select: %Journal.User{id: u.id, name: u.name, email: u.email})
+```
+
+For this reason, we'll generally prefer using the schema module directly.
+
+## Ecto.Query
+
+With the [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) module, we can create more specific queries rather than retrieving all items in a table.
+
+We can build queries using a keyword-list syntax.
+
+For example, we can query the users table using the `:where` keyword to find users with a matching `:email` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> import Ecto.Query
+iex> query = from Journal.User, where: u.email == "miles@spider.web", select: u.name
+iex> Journal.Repo.all(query)
+```
+
+Instead of returning all users, `Journal.Repo.one/2` returns the first user that matches the query.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Journal.Repo.one(query)
+```
+
+Alternatively, we can use pipe syntax to accomplish the same behavior.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> query = from(Journal.User) |> where([u], u.email == "miles@spider.web") |> select([u], u.name)
+iex>  Journal.Repo.all(query)
+```
+
+### Your Turn
+
+Create queries to find the following.
+
+* return all users whose name is `"Peter"`.
+* return the `:email` field for user's whose name is `"Miles"`
+* return the `:name` field for user's whose email is `"peter@spider.web"`
+* (bonus) users whose name contains the letter `P` see [ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#like/2) in the documentation.
+
+## Entries
+
+We'll power through creating entries since we've already created users.
+
+Create the migration.
+
+```
+mix ecto.gen.migration create_entries
+```
+
+Modify the migration file under `priv/repo/migrations/create_entries.ex`.
+We'll use the `timestamps` macro to store when we create and update entries.
+
+We'll also use the `:text` type for the content field to allow for large content. By default, the `:string` type allows for a maximum of `255` characters, which isn't enough for the content of a journal entry.
+
+`references/2` defines the foreign key to the users table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Repo.Migrations.CreateEntries do
+  use Ecto.Migration
+
+  def change do
+    create table(:entries) do
+      add :title, :string
+      add :content, :text
+      add :user_id, references(:users)
+
+      timestamps()
+    end
+  end
+end
+```
+
+We have to migrate our database when we create a new migration.
+
+```
+mix ecto.migrate
+```
+
+Create the schema file under `lib/journal/entry.ex`.
+
+We use the `belongs_to/2` macro to define the relationship between the `Journal.Entry` and the `Journal.User`.
+
+`timestamps` creates the `:updated_at` and `:created_at` field for us.
+
+We'll also create a simple changeset function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.Entry do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "entries" do
+    field :title, :string
+    field :content, :string
+
+    belongs_to :user, Journal.User
+
+    timestamps()
+  end
+
+  def changeset(entry, params \\ %{}) do
+    entry
+    |> cast(params, [:title, :content, :user_id])
+    |> validate_required([:title, :content])
+  end
+end
+```
+
+Now we can insert entries with `Journal.Repo.insert/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> import Ecto.Query
+iex> %Journal.Entry{} |> Journal.Entry.changeset(%{title: "Rhino Encounter", content: "Today I fought the Rhino", user_id: 1}) |> Journal.Repo.insert()
+```
+
+Notice that the entry automatically includes timestamp information.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok,
+ %Journal.Entry{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
+   content: "Today I fought the Rhino",
+   id: 2,
+   inserted_at: ~N[2022-06-11 06:00:46],
+   title: "Rhino Encounter",
+   updated_at: ~N[2022-06-11 06:00:46],
+   user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+   user_id: 1
+ }}
+```
+
+We can query entries with `Journal.Repo.all/2`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Journal.Repo.all(Journal.Entry)
+[
+  %Journal.Entry{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
+    content: "Today I fought the Rhino",
+    id: 2,
+    inserted_at: ~N[2022-06-11 06:00:46],
+    title: "Rhino Encounter",
+    updated_at: ~N[2022-06-11 06:00:46],
+    user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+    user_id: 1
+  }
+]
+```
+
+We can use `:join` and `:on` keys to retrieve data from a related table in our query.
+For example, we might make a query to return the titles of journal entries with their author's name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Journal.Repo.all(from entry in Journal.Entry, join: user in Journal.User, on: entry.user_id == user.id, select: {user.name, entry.title})
+```
+
+Alternatively, we can use [Repo.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) to load associated data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Journal.Repo.all(from entry in Journal.Entry, preload: :user)
+```
+
+`preload/3` returns the same list of structs, with associated data included in the struct.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  %Journal.Entry{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
+    content: "Today I fought the Rhino",
+    id: 2,
+    inserted_at: ~N[2022-06-11 06:00:46],
+    title: "Rhino Encounter",
+    updated_at: ~N[2022-06-11 06:00:46],
+    user: %Journal.User{
+      __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+      email: "peter@spider.web",
+      entries: #Ecto.Association.NotLoaded<association :entries is not loaded>,
+      id: 1,
+      name: "Peter"
+    },
+    user_id: 1
+  }
+]
+```
+
+If we add a `has_many` association to the `Journal.User` schema, we can also query the entries related to a user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Journal.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "users" do
+    field(:name, :string)
+    field(:email, :string)
+
+    has_many :entries, Journal.Entry
+  end
+
+  def changeset(user, params \\ %{}) do
+    user
+    |> cast(params, [:name, :email])
+    |> validate_required([:name, :email])
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email)
+  end
+end
+```
+
+We'll use `:preload` to retrieve all of the entries for each user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Journal.Repo.all(from u in Journal.User, preload: [:entries])
+```
+
+Now each `Journal.User` struct should include a list in the `:entries` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  %Journal.User{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+    email: "peter@spider.web",
+    entries: [
+      %Journal.Entry{
+        __meta__: #Ecto.Schema.Metadata<:loaded, "entries">,
+        content: "Today I fought the Rhino",
+        id: 2,
+        inserted_at: ~N[2022-06-11 06:00:46],
+        title: "Rhino Encounter",
+        updated_at: ~N[2022-06-11 06:00:46],
+        user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+        user_id: 1
+      }
+    ],
+    id: 1,
+    name: "Peter"
+  },
+  %Journal.User{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+    email: "miles@spider.web",
+    entries: [],
+    id: 2,
+    name: "miles"
+  },
+  ...
+]
+```
+
+## Further Reading
+
+Ecto is a massive topic that we will cover throughout the course. For now, we're armed with the basics of Ecto.
+
+We highly recommend the [Ecto](https://hexdocs.pm/ecto/Ecto.html) documentation. More specifically, consider reading up on the four main Ecto modules.
+
+* [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html)
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
+* [Ecto.Schema](https://hexdocs.pm/ecto/Ecto.Schema.html)
+* [Ecto.Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html)
+
+We've also found a useful [Ecto Cheatsheet](https://devhints.io/phoenix-ecto).
+
+There are also several lessons by Elixir Schools you may find useful.
+
+* [Ecto Basics](https://elixirschool.com/en/lessons/ecto/basics)
+* [Ecto Changesets](https://elixirschool.com/en/lessons/ecto/changesets)
+* [Ecto Associations](https://elixirschool.com/en/lessons/ecto/associations)
+* [Ecto Querying Basics](https://elixirschool.com/en/lessons/ecto/querying_basics)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, file_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, file_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(progress_path, Jason.encode!(Map.put(existing_progress, file_name, completed)))
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout solutions
+$ git checkout -b deprecated-ecto-reading
+$ git add .
+$ git commit -m "finish deprecated ecto reading"
+$ git push origin deprecated-ecto-reading
+```
+
+Create a pull request from your `deprecated-ecto-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

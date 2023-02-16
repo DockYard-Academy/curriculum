@@ -1,5 +1,5 @@
 defmodule UtilsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Utils
   alias Utils.Notebooks
 
@@ -10,7 +10,7 @@ defmodule UtilsTest do
       file = File.read!(file_name)
       # loading the file in livebook adds a newline, so we add it when we format
       # to avoid changing the file every time a student opens a .livemd file.
-      expected = Livebook.LiveMarkdown.MarkdownHelpers.reformat(file) <> "\n"
+      expected = LivebookFormatter.reformat(file)
 
       assert file == expected,
              """
@@ -89,6 +89,52 @@ defmodule UtilsTest do
     end)
   end
 
+  test "All outline files exist" do
+    outline = File.read!("../start.livemd")
+
+    Regex.scan(~r/\[[^\]]+\]\(([^\)]+\.livemd)\)/, outline)
+    |> Enum.each(fn [_, file_name] ->
+      assert File.exists?(Path.join("../", file_name))
+    end)
+  end
+
+  test "Ensure all images are used and exist" do
+    file_and_image_paths =
+      Path.wildcard("../*/*.livemd")
+      |> Enum.map(fn file_path ->
+        content = File.read!(file_path)
+
+        Regex.scan(~r/!\[[^\]]*\]\(([^http][^\)]+)\)/, content)
+        |> Enum.map(fn [_, image_path] ->
+          {file_path, Path.join(Path.dirname(file_path), URI.decode(image_path))}
+        end)
+      end)
+      |> List.flatten()
+
+    Enum.each(file_and_image_paths, fn {file_path, image_path} ->
+      assert File.exists?(image_path), "Could not find image #{image_path} in #{file_path}"
+    end)
+  end
+
+  test "Ensure files not in outline are deprecated" do
+    outline = File.read!("../start.livemd")
+
+    all_paths = Path.wildcard("../*/*.livemd")
+    ignored_paths = Path.wildcard("../*/_*.livemd")
+    deprecated_paths = Path.wildcard("../*/deprecated*.livemd")
+
+    outline_paths =
+      Regex.scan(~r/\[[^\]]+\]\(([^\)]+\.livemd)\)/, outline)
+      |> Enum.map(fn [_, file_name] ->
+        Path.join("../", file_name)
+      end)
+
+    remaining_paths = all_paths -- ignored_paths
+    remaining_paths = remaining_paths -- deprecated_paths
+    remaining_paths = remaining_paths -- outline_paths
+    assert remaining_paths == []
+  end
+
   test "Ensure no broken / empty links in livebooks" do
     Notebooks.stream_lines(Notebooks.reading() ++ Notebooks.exercises(), fn line, file_name ->
       # Empty Links
@@ -135,6 +181,64 @@ defmodule UtilsTest do
 
              Manually resolve the issue or run mix bc.format_headings.
              """
+    end)
+  end
+
+  test "modules are only defined once" do
+    Notebooks.all_livebooks()
+    |> Enum.each(fn path ->
+      content = File.read!(path)
+
+      modules =
+        Regex.scan(~r/(?<!<\/summary>\n\n\`\`\`elixir\n)defmodule ((\w|\.)+) do/, content)
+        |> Enum.map(fn [_, module, _] -> {path, module} end)
+
+      non_duplicates = Enum.dedup(modules)
+
+      duplicates = modules -- non_duplicates
+
+      ignored_file_paths = [
+        "./exercises/product_filters.livemd",
+        "../exercises/mapset_product_filters.livemd",
+        "../exercises/product_filters.livemd",
+        "../exercises/rps_pattern_matching.livemd",
+        "../exercises/fizzbuzz.livemd",
+        "../exercises/lazy_product_filters.livemd",
+        "../exercises/custom_assertions.livemd",
+        "../exercises/supervisor_and_genserver_drills.livemd",
+        "../exercises/anagram.livemd",
+        "../exercises/tic-tac-toe.livemd",
+        "../reading/phoenix_authentication.livemd",
+        "../reading/generic_server.livemd",
+        "../reading/schemas_and_migrations.livemd",
+        "../reading/iex.livemd",
+        "../reading/agents_and_ets.livemd",
+        "../reading/newsletter.livemd",
+        "../reading/phoenix_1.7.livemd",
+        "../reading/executables.livemd",
+        "../reading/phoenix_1.6.livemd",
+        "../reading/supervised_mix_project.livemd",
+        "../reading/liveview.livemd"
+      ]
+
+      Enum.each(duplicates, fn
+        {path, module} ->
+          unless path in ignored_file_paths do
+            IO.puts("""
+            #{path} may contain duplicate module: #{module}.
+
+            Add this path to the ignored_file_paths in utils_tests.exs or resolve the issue.
+            """)
+          end
+      end)
+    end)
+  end
+
+  test "we no longer use Tested.Cell" do
+    Notebooks.all_livebooks()
+    |> Enum.each(fn path ->
+      content = File.read!(path)
+      refute content =~ "Elixir.TestedCell"
     end)
   end
 end

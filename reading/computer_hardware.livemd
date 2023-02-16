@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -15,6 +17,13 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How does the processor, memory, and storage device of a computer affect the performance of our programs?
+* How are program instructions executed on the Stack?
 
 <!-- livebook:{"branch_parent_index":0} -->
 
@@ -34,7 +43,7 @@ as you build software, those are your main performance concerns.
 It's not within the scope of the course to provide an indepth understanding of computers and computer hardware.
 Here's a great primer by Tom Scott to understand more about what your computer is doing under the hood.
 
-<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=Z5JC9Ve1sfI\")\n","title":"Tom Scott: The Fetch-Execute Cycle: What's Your Computer Actually Doing?"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=Z5JC9Ve1sfI\")\n","title":"Tom Scott: The Fetch-Execute Cycle: What's Your Computer Actually Doing?"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=Z5JC9Ve1sfI")
@@ -165,7 +174,7 @@ Generally, we are more concerned about the memory consumption of our program. Ho
 our application requires that users download large files onto their computer, it's useful
 to be aware of storage.
 
-Files can be saved to the hard drive of a computer. The hard drive is a slower (but generally larger)
+Files can be saved to the hard drive (or solid state drive in more modern computers) of a computer. The hard drive is a slower (but generally larger)
 storage device. Unlike memory, it is often used for persistent values rather than values which only
 exist during the runtime of the program.
 
@@ -208,22 +217,63 @@ Performance issues can significantly impact a program, leading to slowness or ev
 
 In addition, performance issues generally have a more significant impact on lower-quality computers. Thus, your program may be performant on your personal computer but cause problems on lower-performance hardware.
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"computer_hardware_reading\"\n    \"exercises\" -> \"computer_hardware_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "computer_hardware_reading"
+    "exercises" -> "computer_hardware_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-computer_hardware
+$ git checkout -b computer-hardware-reading
 $ git add .
-$ git commit -m "finish computer hardware section"
-$ git push origin exercise-computer_hardware
+$ git commit -m "finish computer hardware reading"
+$ git push origin computer-hardware-reading
 ```
+
+Create a pull request from your `computer-hardware-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

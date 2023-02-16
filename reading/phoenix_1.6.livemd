@@ -1,0 +1,1334 @@
+# Phoenix 1.6
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Phoenix 1.6
+
+The latest release candidate for Phoenix 1.7 makes several significant changes to Phoenix such as the removal of [Phoenix.View](https://hexdocs.pm/phoenix_view/2.0.0/Phoenix.View.html#module-replaced-by-phoenix-component) and the addition of [Tailwind](./tailwind.livemd).
+
+This course will focus on Phoenix version 1.6, as most Phoenix projects will use 1.6 or older.
+In the future we will migrate to Phoenix 1.7. If you are curious to see the changes in 1.7, you can read our [Phoenix 1.7](./phoenix_1.7.livemd) guide.
+
+## Overview
+
+The [Phoenix Framework](https://phoenixframework.org/) is the most popular web development framework for Elixir. Using Phoenix, we can build rich interactive and real-time web applications quickly.
+
+By default, Phoenix separates the application into several layers using [Model-View-Controller (MVC)](https://en.wikipedia.org/wiki/Model–view–controller) architecture.
+
+* **Model**: Manages the data and business logic of the application.
+* **View**: Represents visual information.
+* **Controller**: Handles requests and manipulates the model/view to respond to the user.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![test](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/MVC-Process.svg/300px-MVC-Process.svg.png)
+
+> source: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
+<!-- livebook:{"break_markdown":true} -->
+
+Under the hood, Phoenix uses the [Plug](https://hexdocs.pm/plug/readme.html) specification for composing a web application with functions. Plugs are functions that transform a `conn` (connection) data structure.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+subgraph Input
+  CP[conn, params]
+end
+subgraph Output
+  C[conn]
+end
+Output[conn]
+P[Plug Function]
+Input --> P --> Output
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Phoenix sets up a pipeline of plugs and uses the transformed `conn` [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct to return a response to the client.
+
+Plug uses [Cowboy](https://github.com/ninenines/cowboy), a small and fast HTTP web server. Cowboy uses [Ranch](https://github.com/ninenines/ranch) to manage the underlying TCP connections for the web server.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+P[Phoenix]
+PG[Plug]
+C[Cowboy]
+R[Ranch]
+P --> PG --> C --> R
+
+click P "https://hexdocs.pm/phoenix/overview.html"
+click PG "https://hexdocs.pm/plug/readme.html"
+click C "https://github.com/ninenines/cowboy"
+click R "https://github.com/ninenines/ranch"
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Phoenix breaks the complexity of our application into several layers with different responsibilities. Separating an application into layers makes it easier to reason about and collaborate on complex applications.
+
+* **Endpoint**: The boundary layer of the application.
+* **Router**: Routes the request to the correct controller.
+* **Controller**: Handles the request—generally, the controller delegates to the Model and View to manipulate business logic and return a response.
+* **Model**: Contains the application's business logic, often separated into the **Context** and the **Schema** if the application has a data layer.
+* **View**: Handles returning the response, may delegate to a template.
+* **Template**: Builds a response, typically using HEEx (HTML + Embedded Elixir) to programmatically build an HTML web page using both HTML and Elixir.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_application_architecture_overview.png)
+
+## Install Phoenix
+
+To use Phoenix, we need to install it and several prerequisite programs.
+At this point in the course, you should already have Erlang, Elixir, and PostgreSQL installed.
+
+You'll also need to install the Hex package manager. [Hex](https://hex.pm/) manages elixir dependencies.
+
+```sh
+$ mix local.hex
+```
+
+Install the `phx_new` dependency, which we'll use to generate a Phoenix project.
+
+```sh
+$ mix archive.install hex phx_new
+```
+
+After the release of Phoenix 1.7, you may need to specifically install Phoenix 1.6 using the following command.
+
+```sh
+$ mix archive.install hex phx_new 1.6.15
+```
+
+Phoenix projects reload the project anytime a project file changes.
+macOS and Windows users will have this feature by default, but students using GNU/Linux or Windows + WSL must install `inotify-tools` to use this feature.
+
+Consult the [inotify-tools](https://github.com/inotify-tools/inotify-tools/wiki) documentation for installation instructions.
+Installing `inotify-tools` is optional but highly recommended.
+
+If you have any issues, consult the [Phoenix Installation Guide](https://hexdocs.pm/phoenix/installation.html) or speak with
+your instructor.
+
+## Create A Phoenix App
+
+The `phx_new` dependency provides the `mix phx.new` task, which we can use to generate a new Phoenix project.
+
+We're going to create a counter project which stores an in-memory integer we can increment and display using HTTP requests.
+
+Run the following in your command line to create a new Phoenix project.
+
+```sh
+$ mix phx.new counter --no-ecto
+```
+
+This should create the following files.
+
+```sh
+* creating counter/config/config.exs
+* creating counter/config/dev.exs
+* creating counter/config/prod.exs
+* creating counter/config/runtime.exs
+* creating counter/config/test.exs
+* creating counter/lib/counter/application.ex
+* creating counter/lib/counter.ex
+* creating counter/lib/counter_web/controllers/error_json.ex
+* creating counter/lib/counter_web/endpoint.ex
+* creating counter/lib/counter_web/router.ex
+* creating counter/lib/counter_web/telemetry.ex
+* creating counter/lib/counter_web.ex
+* creating counter/mix.exs
+* creating counter/README.md
+* creating counter/.formatter.exs
+* creating counter/.gitignore
+* creating counter/test/support/conn_case.ex
+* creating counter/test/test_helper.exs
+* creating counter/test/counter_web/controllers/error_json_test.exs
+* creating counter/lib/counter/repo.ex
+* creating counter/priv/repo/migrations/.formatter.exs
+* creating counter/priv/repo/seeds.exs
+* creating counter/test/support/data_case.ex
+* creating counter/lib/counter_web/controllers/error_html.ex
+* creating counter/test/counter_web/controllers/error_html_test.exs
+* creating counter/lib/counter_web/components/core_components.ex
+* creating counter/lib/counter_web/controllers/page_controller.ex
+* creating counter/lib/counter_web/controllers/page_html.ex
+* creating counter/lib/counter_web/controllers/page_html/home.html.heex
+* creating counter/test/counter_web/controllers/page_controller_test.exs
+* creating counter/lib/counter_web/components/layouts/root.html.heex
+* creating counter/lib/counter_web/components/layouts/app.html.heex
+* creating counter/lib/counter_web/components/layouts.ex
+* creating counter/assets/vendor/topbar.js
+* creating counter/lib/counter/mailer.ex
+* creating counter/lib/counter_web/gettext.ex
+* creating counter/priv/gettext/en/LC_MESSAGES/errors.po
+* creating counter/priv/gettext/errors.pot
+* creating counter/assets/css/app.css
+* creating counter/assets/js/app.js
+* creating counter/assets/tailwind.config.js
+* creating counter/priv/static/robots.txt
+* creating counter/priv/static/images/phoenix.png
+* creating counter/priv/static/favicon.ico
+```
+
+When prompted to install dependencies, type `Y` and press enter.
+This runs `mix deps.get` and `mix deps.compile`.
+
+```
+Fetch and install dependencies? [Yn] Y
+* running mix deps.get
+* running mix deps.compile
+```
+
+## Project Structure
+
+Open the new `counter` project in your code editor.
+Phoenix projects use [Mix](./mix.livemd), so this folder structure should feel familiar minus a few extra or modified files.
+
+```
+├── _build
+├── assets
+├── config
+├── deps
+├── lib
+│   ├── counter
+│   ├── counter.ex
+│   ├── counter_web
+│   └── counter_web.ex
+├── priv
+├── test
+├── formatter.exs
+├── .gitignore
+├── mix.exs
+├── mix.lock
+└── README.md
+```
+
+For a complete overview of each file and folder, see the Phoenix Documentation on [Directory Structure](https://hexdocs.pm/phoenix/directory_structure.html).
+We'll walk through the purpose of each folder and file as they become relevant to our counter project.
+
+First, we'll focus on the `/lib` folder containing our application code.
+`/lib` is split into two subdirectories, one for the business logic of our application and one that handles the web server side of our application.
+
+For example, in the `counter` project, there should be a `/lib/counter` folder and a `lib/counter_web` folder.
+`/lib/counter` will hold our counter's business logic, such as storing and incrementing the count. The `lib/counter_web`
+folder will hold the counter's web-related logic for accepting and responding to HTTP requests from clients.
+
+## Start Phoenix
+
+We can start the Phoenix web server by running the following command from the `/counter` folder in your command line.
+
+```sh
+$ mix phx.server
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Troubleshooting
+
+It's common to encounter issues when starting Phoenix for the first time. Typically students run into issues with [Postgres](https://www.postgresql.org/).
+
+Linux users will often encounter an issue where the `postgresql` service is not running. You can solve this problem with the following command.
+
+```
+sudo service postgresql start
+```
+
+Alternatively, you may have a permissions issue where the PostgreSQL user does not have the default username and password. You can resolve this by ensuring there is a `postgres` user with a `postgres` password.
+
+While not a magic solution, the following may solve your problem.
+
+```
+$ sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+$ sudo server postgresql restart
+```
+
+These are two very common issues, however you may encounter an unexpected error. Please speak with your instructor if you encounter any issues to get support.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Phoenix Lifecycle
+
+When you start a Phoenix project, it runs the `Counter.Application.start/2` function in `lib/counter/application.ex`, which starts several workers under a supervisor.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@impl true
+def start(_type, _args) do
+  children = [
+    # Start the Telemetry supervisor
+    CounterWeb.Telemetry,
+    # Start the PubSub system
+    {Phoenix.PubSub, name: Counter.PubSub},
+    # Start the Endpoint (http/https)
+    CounterWeb.Endpoint
+    # Start a worker by calling: Counter.Worker.start_link(arg)
+    # {Counter.Worker, arg}
+  ]
+
+  # See https://hexdocs.pm/elixir/Supervisor.html
+  # for other strategies and supported options
+  opts = [strategy: :one_for_one, name: Counter.Supervisor]
+  Supervisor.start_link(children, opts)
+end
+```
+
+The `CounterWeb.Endpoint` module is the boundary where all requests to your application start. Now that the Phoenix server is running, we
+can visit http://localhost:4000 to view the Phoenix home page.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_main_page.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+A few things happen when we navigate to http://localhost:4000.
+
+1. The browser makes an HTTP GET request.
+2. The `CounterWeb.Endpoint` module in `lib/counter_web/endpoint.ex` creates an initial [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct which will be transformed in a pipeline of functions.
+3. The `CounterWeb.Router` module in `lib/counter_web/router.ex` routes the request to a controller.
+4. The `CounterWeb.PageController` module in `lib/counter_web/controllers/page_controller.ex` module handles the request and response, and delegates to a view to render the response.
+5. The `CounterWeb.PageView` module in `lib/counter_web/views/page_view.ex` renders a response using a template `.heex` file.
+6. The template in `index.html.heex` uses the Phoenix template language HEEx (HTML + Embedded Elixir) to build an HTML web page which will be the response to GET request.
+7. The HTML response is sent back to the browser.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant B as Browser
+  participant E as Endpoint
+  participant R as Router
+  participant C as Controller
+  participant V as View
+  participant T as Template
+
+  B->>E: GET Request
+  E->>R: Set Up Plug Pipeline with Conn
+  R->>C: Route Request to Controller
+  C->>V: Handle request and delegate to View
+  V->>T: Build response using template
+  T->>E: Build HTML web page
+  E->>B: HTML response sent back to browser.
+```
+
+## Router
+
+To handle an HTTP request from the client, we need to define a route.
+
+Routes accept incoming client requests provided a particular path and determine how to handle the request. Routes are defined in the `lib/counter_web/router.ex` file.
+
+The [Phoenix.Router](https://hexdocs.pm/phoenix/Phoenix.Router.html) module defines several macros for handling HTTP requests.
+
+* [post/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#post/4) handle an HTTP POST request.
+* [get/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#get/4) handle an HTTP GET request.
+* [put/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#put/4) handle an HTTP PUT request.
+* [patch/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#patch/4) handle an HTTP PATCH request.
+* [resources/2](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/2) handle a standard matrix of HTTP requests.
+
+We'll focus on `get/4` and `post/4` as they are the most common.
+
+The initial `router.ex` file has many macros such as `scope/3`, `pipeline/3`, `plug/2`, `pipe_through/1` and `get/3`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.Router do
+  use CounterWeb, :router
+
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {CounterWeb.LayoutView, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
+  scope "/", CounterWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+  end
+
+  # Other scopes may use custom stacks.
+  # scope "/api", CounterWeb do
+  #   pipe_through :api
+  # end
+
+  # Enables LiveDashboard only for development
+  #
+  # If you want to use the LiveDashboard in production, you should put
+  # it behind authentication and allow only admins to access it.
+  # If your application does not have an admins-only section yet,
+  # you can use Plug.BasicAuth to set up some basic authentication
+  # as long as you are also using SSL (which you should anyway).
+  if Mix.env() in [:dev, :test] do
+    import Phoenix.LiveDashboard.Router
+
+    scope "/" do
+      pipe_through :browser
+
+      live_dashboard "/dashboard", metrics: CounterWeb.Telemetry
+    end
+  end
+
+  # Enables the Swoosh mailbox preview in development.
+  #
+  # Note that preview only shows emails that were sent by the same
+  # node running the Phoenix server.
+  if Mix.env() == :dev do
+    scope "/dev" do
+      pipe_through :browser
+
+      forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+By default, the router defines a `:browser` pipeline for handling requests using a browser, and an `:api` pipeline for handling direct HTTP requests.
+
+Our GET request from the browser hits the following route. The `scope/3` macro defines a base url `"/"` and automatically aliases all controllers so we can use `PageController` instead of `CounterWeb.PageController`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", CounterWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+end
+```
+
+The `pipe_through :browser` macro calls all of the plugs inside of the `:browser` pipeline. These plugs handle some necessary boilerplate code, including security features and rendering a root layout in `lib/counter_web/templates/root.html.heex` shared by every page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {CounterWeb.LayoutView, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+```
+
+The `get/3` macro sets up a route `"/"` which is for http://localhost:4000/. It then delegates to the `PageController.index/2` function.
+
+For our counter application, we will set up our own `"/counter"` route, which delegates to a `CounterController` module's `:index` action to return a count response to the user. An action is a function that accepts a `conn` struct and any parameters from the client request.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", CounterWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  get "/count", CounterController, :index
+end
+```
+
+We'll define the `CounterController` in the next section. First, run the following command to see the project's routes. We should see the new `/counter` route.
+
+```
+$ mix phx.routes
+          page_path  GET  /                                      CounterWeb.PageController :index
+       counter_path  GET  /count                                 CounterWeb.CounterController :index
+live_dashboard_path  GET  /dashboard                             Phoenix.LiveDashboard.PageLive :home
+live_dashboard_path  GET  /dashboard/:page                       Phoenix.LiveDashboard.PageLive :page
+live_dashboard_path  GET  /dashboard/:node/:page                 Phoenix.LiveDashboard.PageLive :page
+                     *    /dev/mailbox                           Plug.Swoosh.MailboxPreview []
+          websocket  WS   /live/websocket                        Phoenix.LiveView.Socket
+           longpoll  GET  /live/longpoll                         Phoenix.LiveView.Socket
+           longpoll  POST  /live/longpoll                         Phoenix.LiveView.Socket
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Now when we visit http://localhost/count, we'll see the following error because the `CounterController` module does not exist.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/counter_controller_is_not_available.png)
+
+## Controllers
+
+A controller determines the response to send back to a user.
+
+The `CounterWeb.PageController` in `lib/counter_web/controllers/page_controller.ex` calls the `render/3` macro which delegates to a view to render some HTML.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.PageController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+end
+```
+
+Notice that the function name `index/2` matches the atom defined in the router.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+get "/", PageController, :index
+```
+
+To make our counter, we need to define the `CounterController` controller. Create a file `lib/counter_web/controllers/counter_controller.ex` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+
+  def index(conn, _params) do
+  end
+end
+```
+
+The router calls this `CounterController.index/2` function to handle the request and response.
+
+The first argument in the `index/2` function is the [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) being transformed by the plug pipeline.
+
+The second argument is a map of any query parameters included in the request.
+
+The [Phoenix.Controller](https://hexdocs.pm/phoenix/Phoenix.Controller.html) module provides several macros to return a response to the user. Here are a few of the most commonly used.
+
+* [html/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#html/2) return a manual HTML response.
+* [json/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#json/2) return JSON.
+* [redirect](https://hexdocs.pm/phoenix/Phoenix.Controller.html#redirect/2) redirect the client to another url.
+* [render/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#render/3) return HTML from a template file.
+* [text/2](https://hexdocs.pm/phoenix/Phoenix.Controller.html#text/2) return a text string.
+
+For example, we can use the `text/2` macro to return a text response.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    text(conn, "Hello, world!")
+  end
+end
+```
+
+Now when we visit http://localhost:4000/count we should see the `"Hello, world!"` response.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Use the `text/2`, `html/2`, `json/2`, and `redirect/2` macros to return a response from your `CounterController.index/2` function. You may copy-paste each of the following examples one at a time.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+text(conn, "Hello, world!")
+html(conn, "<h1>Hello, world!</h1>")
+json(conn, %{"key" => "value"})
+redirect(conn, to: "/")
+redirect(conn, external: "https://elixir-lang.org")
+```
+
+Feel free to experiment with these macros to understand them better.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Query Params
+
+Under the hood, Phoenix converts query params into an Elixir map before reaching the controller. For example, if you visit http://localhost:4000?message=hello the second argument to
+`index/2` will be `%{"message" => "hello"}`.
+
+Let's verify this. Now our `index/2` function will return the `"message"` query parameter if it exists, and otherwise return `"Hello, world!"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, params) do
+    message = Map.get(params, "message", "Hello, world!")
+    text(conn, message)
+  end
+end
+```
+
+Now, if you visit http://localhost:4000/count?message=hello, the page should display `"hello"`.
+
+## Views
+
+While we can return a response directly in the controller, it's conventional to use the `render/3` macro to delegate to a view to build the response.
+
+Replace `lib/counter_web/controllers/counter_countroller.ex` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, params) do
+    render(conn, "index.html")
+  end
+end
+```
+
+We'll see the following error if we visit http://localhost:4000/count.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/counter_view_is_not_available.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+By convention, a `CounterController` expects a `CounterView` to exist. The name of the view should match the name of the controller.
+
+Create a file `lib/counter_web/views/counter_view.ex` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterView do
+  use CounterWeb, :view
+end
+```
+
+Now, if we visit http://localhost:4000/count, we'll see the following error.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/could_not_render_index.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `CounterView` expects a matching template file to exist.
+
+## Templates
+
+Phoenix uses HEEx (HTML + Embedded Elixir) templates to render web pages. HEEx allows us to write HTML with embedded Elixir code.
+
+Create a `lib/counter_web/templates/counter/index.html.heex` file with the following content.
+
+```html
+<p>Hello, world!</p>
+```
+
+Now we should see the following page when we visit http://localhost:4000/count.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_hello_world.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Root Layout
+
+The Phoenix Framework header comes from `lib/counter_web/templates/layout/root.html.heex`.
+This file contains the root of our HTML document. Our content `<p>Hello, world!</p>` is rendered in the `@inner_content` value.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%= live_title_tag assigns[:page_title] || "Counter", suffix: " · Phoenix Framework" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+  </head>
+  <body>
+    <header>
+      <section class="container">
+        <nav>
+          <ul>
+            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
+            <% end %>
+          </ul>
+        </nav>
+        <a href="https://phoenixframework.org/" class="phx-logo">
+          <img src={Routes.static_path(@conn, "/images/phoenix.png")} alt="Phoenix Framework Logo"/>
+        </a>
+      </section>
+    </header>
+    <%= @inner_content %>
+  </body>
+</html>
+```
+
+The `:put_root_layout` plug in the router automatically configures this file as a wrapper to all template files, where `@inner_content` will be the HEEx defined by the template file.
+
+We can confirm this by commenting out the plug in `lib/counter_web/router.ex`.
+
+Removing the plug is for demonstration purposes only. We don't recommend you remove this in your project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    # plug :put_root_layout, {CounterWeb.LayoutView, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+```
+
+Now the response only contains our content.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/phoenix_hello_world_root_ommited.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We want to keep the root layout because it contains some helpful HTML boilerplate, so instead, we can remove the header from the `lib/counter_web/templates/layout/root.html.heex` file.
+
+Remove the `<header>` html tag, and its contents in `lib/counter_web/templates/layout/root.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%= live_title_tag assigns[:page_title] || "Counter", suffix: " · Phoenix Framework" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+  </head>
+  <body>
+    <%= @inner_content %>
+  </body>
+</html>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Styling
+
+In `lib/counter_web/templates/root.html.heex`, there is a `<link>` tag to an `assets/app.css` file.
+
+```html
+<link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+```
+
+This `app.css` is the root CSS file for styling. Here we can create our CSS styles, import other CSS styles, or modify/remove the default styles.
+
+The `app.css` file also imports the `assets/phoenix.css` file, which contains additional default styles.
+
+We'll keep these default styles for this lesson, but we have the power to remove or modify them.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### EEx
+
+We can embed Elixir in our template files using the following syntax.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= expression %>
+```
+
+Where `expression` is our Elixir code, for example, replace `lib/counter_web/templates/counter/index.html.heex` with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= 1 + 1 %>
+```
+
+We should see `2` as the new response when we visit http://localhost:4000/count.
+
+We can write essentially any Elixir expression. So, for example, we could write an `if` statement to render different HTML depending on some condition.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if DateTime.utc_now().hour > 12 do %>
+  <p>Good afternoon!</p>
+<% else %>
+  <p>Good morning!</p>
+<% end %>
+```
+
+Or a loop using the `for` comprehension. Often we use this to create multiple elements based on a collection.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= for int <- 1..10 do %>
+  <p><%= int %></p>
+<% end %>
+```
+
+Notice that all expressions which output a value must use the `=` symbol.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### View Functions
+
+The view compiles template files, so we can call functions defined in the view inside of the template.
+
+Create a `greeting/0` function in the `CounterView` module in `lib/counter_web/views/counter_view.ex`. For now it will simply return `"Hello, world!"`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterView do
+  use CounterWeb, :view
+
+  def greeting do
+    "Hello, world!"
+  end
+end
+```
+
+Then use the `greeting/0` function in the `lib/counter_web/templates/counter/index.html.heex` template file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1><%= greeting() %></h1>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Assigns
+
+Controllers can pass values in an `assigns` argument. We can display these values in the template using the `@` shortcut.
+
+Add the count value in `lib/counter_web/controllers/counter_controller.ex`. For now, it will be `0`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html", count: 0)
+  end
+end
+```
+
+And use the `@count` value in the template file `lib/counter_web/templates/counter/index.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>The current count is: <%= @count %></h1>
+```
+
+Visit http://localhost:4000/count, and you should see the following response.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/the_current_count_is_0.png)
+
+## Model (Counter Implementation)
+
+Business logic belongs in the `lib/counter` folder, not the `lib/counter_web` folder.
+
+In Phoenix, we group common behavior into a context. Contexts expose an API for a set of related behavior. How we group, the behavior may change as the business logic of an application grows. There is no strict set of rules for grouping behavior into a context, though there are many differing opinions within the Phoenix community.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Count Context
+
+For example, we can create a `Count` context responsible for retrieving and exposing the current count of the counter application.
+
+Each context has a main file under the `lib/counter` folder, which matches the name of the context, so our `Count` context module belongs in a `lib/counter/count.ex` file.
+
+The context will expose an `increment/1` and `get/0` function for returning and incrementing a count stored in memory.
+
+Create the `lib/counter/count.ex` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Counter.Count do
+  def get do
+    # implementation
+  end
+  def increment(increment_by \\ 1) do
+    # implementation
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Counter Server
+
+We group sub-modules related to a context inside a folder named after the context. We group each sub-module under the main namespace for the context.
+
+For example, we'll create a `Counter.Count.CounterServer` module in a `lib/counter/count/count_server.ex` file. This module defines the GenServer that will store the count in memory and expose handlers for retrieving and incrementing the count.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Counter.Count.CounterServer do
+  use GenServer
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, 0, name: __MODULE__)
+  end
+
+  @impl true
+  def init(count) do
+    {:ok, count}
+  end
+
+  @impl true
+  def handle_call(:get, _from, count) do
+    {:reply, count, count}
+  end
+
+  @impl true
+  def handle_call({:increment, increment_by}, _from, count) do
+    {:reply, count + increment_by, count + increment_by}
+  end
+end
+```
+
+Now we can implement the `get/0` and `increment/1` functions in the `Count` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Counter.Count do
+  def get do
+    GenServer.call(Counter.Count.CounterServer, :get)
+  end
+
+  def increment(increment_by \\ 1) do
+    GenServer.call(Counter.Count.CounterServer, {:increment, increment_by})
+  end
+end
+```
+
+## Start the Counter Server
+
+The `lib/counter/application.ex` defines our Elixir application and the services that are part of our application. We can start our workers and supervisors in this file.
+
+Add the `Counter.Count.CounterServer` module to the `start/2` function in `application.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def start(_type, _args) do
+    children = [
+      # Start the Telemetry supervisor
+      CounterWeb.Telemetry,
+      # Start the PubSub system
+      {Phoenix.PubSub, name: Counter.PubSub},
+      # Start the Endpoint (http/https)
+      CounterWeb.Endpoint,
+      # Start a worker by calling: Counter.Worker.start_link(arg)
+      # {Counter.Worker, arg}
+      {Counter.Count.CounterServer, []}
+    ]
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: Counter.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+```
+
+Stop your server with <kbd>CTRL</kbd>+<kbd>C</kbd> if it is already running, then run the following command.
+
+```sh
+$ iex -S mix phx.server
+```
+
+This command starts your server and compiles the project files into the IEx shell so we can interact with project modules manually.
+
+Call the `Counter.Count` context directly from the IEx shell and ensure it works as expected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Counter.Count.get()
+0
+iex> Counter.Count.increment()
+1
+iex> Counter.Count.get()
+1
+```
+
+## Connect the Counter
+
+Now we have a working counter. We'll retrieve the count from the `CounterWeb.CounterController` and then return the current count as the response to the client.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def index(conn, _params) do
+    count = Counter.Count.get()
+    render(conn, "index.html", count: count)
+  end
+end
+```
+
+Visit http://localhost:4000/count to see the current count in the response.
+
+## Increment the Count
+
+We'll have clients send an HTTP POST request to increment the count.
+
+First, use the `post/4` macro to create a new post `/increment` route in `lib/counter_web/router.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  scope "/", CounterWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/count", CounterController, :index
+    post "/count", CounterController, :update
+  end
+```
+
+A client will make an HTTP POST request to the `/count` router which triggers the `CounterController.update/2` function.
+
+Create an `update/2` function in `lib/counter_web`, which increments the count and redirects the user back to the `/count` page to refresh the count.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update(conn, _params) do
+  Counter.Count.increment()
+  redirect(conn, to: "/count")
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Forms
+
+We can use [HTML Forms](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form) to send HTTP POST requests from within a web page.
+
+The [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#form_for/4) module makes it easier to create HTML forms.
+
+We'll use the `form_for/3` macro to create an HTML form, and the `submit/1` macro to create a submit button for the form.
+
+Replace `lib/counter_web/templates/counter/index.html.heex` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>The current count is: <%= @count %></h1>
+<%= form_for @conn, "/count", fn _f -> %>
+  <%= submit "Increment" %>
+<% end %>
+```
+
+We'll dive deeper into forms in a later lesson. For now, know that the `form_for/3` macro generates the following HTML.
+
+```html
+<form action="/count" method="post">
+  <input name="_csrf_token" type="hidden" value="Ih1idhlzGEp6XBYAMB9jAVdZNWdpBUodrg81R8H011W2Fs3b2jD-QR2x">
+  <button type="submit">Increment</button>
+</form>
+```
+
+The [Cross-Site Request Forgery (CSRF)](https://en.wikipedia.org/wiki/Cross-site_request_forgery) security token helps prevent CSRF attacks. Otherwise, this form sends a POST request to the `/count` route.
+
+Visit http://localhost:4000/count and press the increment button. The count should increment on the page.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/increment_button_the_current_count_is_1.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Body Params
+
+We can include body parameters in the HTTP POST request by adding inputs to the form. See [Phoenix.HTML.Form Functions](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#functions) for a full list of available inputs.
+
+Let's add a number input. `counter_web/templates/count/index.html.heex` should contain the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>The current count is: <%= @count %></h1>
+<%= form_for @conn, "/count", fn f -> %>
+  <%= number_input f, :increment %>
+  <%= submit "Increment" %>
+<% end %>
+```
+
+The `:increment` atom is the key of the value associated with the input.
+We can retrieve the value in the form using `conn.body_params` in the controller.
+
+Let's inspect `conn.body_params` in the `CounterController`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update(conn, _params) do
+  IO.inspect(conn.params)
+  Counter.Count.increment()
+  redirect(conn, to: "/count")
+end
+```
+
+Enter an integer such as `2` in the number input, then click the increment button on http://localhost:4000/count.
+
+We'll see the following in the command line.
+
+```
+%{
+  "_csrf_token" => "Fh8FNgE7Pi0HIHdBLjYRJS5WAhx1ZQI1Fe_qJpnWLM6sXZAFKesVM2zP",
+  "increment" => "2"
+}
+```
+
+The `_csrf_token` comes from the hidden input to validate the request, and the `increment` comes from our form input.
+
+Notice that the `"increment"` key matches the name of the field in the form and that the value is a string, not an integer.
+
+We need to parse the integer from the string and use it to increment the count. If the string does not contain an integer, we'll increment by 1.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def update(conn, _params) do
+    increment =
+      case Integer.parse(conn.params["increment"]) do
+        {integer, _remainder_of_binary} ->
+          integer
+
+        _ ->
+          1
+      end
+
+    Counter.Count.increment(increment)
+
+    redirect(conn, to: "/count")
+  end
+```
+
+Now, if you visit http://localhost/count and enter an integer in the number input, it should increment the count by that number.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/increment_input_2_the_current_count_is_3.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Form Query Params
+
+The `form_for/3` macro provides several conveniences under the hood. For example, by using `@conn` with the form, the inputs will automatically receive default values from query params.
+
+For example, visit http://localhost:4000/count?increment=5, and the number input will have `5` as its value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/increment_input_5_the_current_count_is_3.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Currently, Submitting the form resets the number input to a blank value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/increment_input_0_the_current_count_is_8.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+To preserve this value, we can pass query params when we call the `redirect/3` macro in the `CounterController`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def update(conn, _params) do
+    increment =
+      case Integer.parse(conn.params["increment"]) do
+        {integer, _binary} ->
+          integer
+
+        _ ->
+          1
+      end
+
+    Counter.Count.increment(increment)
+
+    redirect(conn, to: "/count?increment=#{increment}")
+  end
+```
+
+Now the form's increment value will be preserved when we submit the form.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/increment_input_5_the_current_count_is_13.png)
+
+## Route Helpers
+
+We've been using static routes for demonstration purposes. However, we recommend using [Path Helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers) instead because we can change the routes of our application without causing breaking changes.
+
+Path helpers are dynamically defined functions that return the route for the corresponding controller action.
+
+For example, we can use the `Routes.counter_path(@conn, :update)` to return the `"/count"` route for the `CounterController.update/2` function.
+
+You can find the available routes (and therefore the available `Routes` functions) using the following command.
+
+```
+mix phx.routes
+```
+
+Let's replace the `"/count"` value in `lib/counter_web/templates/count/index.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1>The current count is: <%= @count %></h1>
+<%= form_for @conn, Routes.counter_path(@conn, :update), fn f -> %>
+  <%= number_input f, :increment %>
+  <%= submit "Increment" %>
+<% end %>
+```
+
+And the `"/count"` value with query parameters in `lib/counter_web/controllers/counter_controller.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update(conn, _params) do
+  increment =
+    case Integer.parse(conn.params["increment"]) do
+      {integer, _remainder_of_binary} ->
+        integer
+
+      _ ->
+        1
+    end
+
+  Counter.Count.increment(increment)
+
+  redirect(conn, to: Routes.counter_path(conn, :update, increment: increment))
+end
+```
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Phoenix HexDocs](https://hexdocs.pm/phoenix/Phoenix.html)
+* [Plug HexDocs](https://hexdocs.pm/plug/readme.html)
+* [Phoenix a Web Framework for the New Web • José Valim • GOTO 2016](https://www.youtube.com/watch?v=bk3icU8iIto&ab_channel=GOTOConferences)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"phoenix_1.6_reading\"\n    \"exercises\" -> \"phoenix_1.6_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "phoenix_1.6_reading"
+    "exercises" -> "phoenix_1.6_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b phoenix-1.6-reading
+$ git add .
+$ git commit -m "finish phoenix 1.6 reading"
+$ git push origin phoenix-1.6-reading
+```
+
+Create a pull request from your `phoenix-1.6-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.

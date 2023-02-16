@@ -1,0 +1,176 @@
+# Group Project: Blog
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Group Project: Blog
+
+You're going to build a `Blog` application with a group of 3-4 others to learn more about Phoenix and Ecto.
+
+As we move through the Phoenix and Web Development section, you'll gradually add more features to your blog.
+
+## Overview
+
+As you progress through the course, you will be prompted to complete additional features for your blog. We've going to give you a brief overview of the overall domain and the features you're going to build.
+
+Your blog project should have three main domain concepts. `Users`, `Posts`, `Comments` and `Tags`.
+
+* Users have many Posts
+* Posts have many comments
+* Posts have a many-to-many relationship with Tags.
+
+```mermaid
+flowchart
+Users --have many--> Posts
+Posts --have many--> Comments
+Posts <--many to many--> Tags
+```
+
+Users will be able to signup and manage their own blog posts that are associated with certain tags such as `tech` and `education`. They will also be able to view other user's blogs and comment on them.
+
+## Project Lead
+
+One person in your group will be the project lead. The project lead will be responsible for reviewing/merging PRs and ensuring that the project is tested and runs smoothly.
+
+## Initialize Group Project
+
+Have the project lead use `phx.new` to create a new `blog` project.
+
+```
+$ mix phx.new blog
+```
+
+Initialize the project with git.
+
+```
+$ git init
+```
+
+[Create a GitHub Repository](https://github.com/new) and invite everyone as contributors to the project.
+
+## Create Your README
+
+Edit the `README.md` file initialized in your Phoenix project.
+
+Include alteast the following information:
+
+* Project Name
+* Project Summary
+* Technologies Used (Phoenix, Elixir)
+* Contributors
+
+You may update your README as the project expands
+
+## Protect Main
+
+[Project your main branch](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule) so that no one can push directly to main without a PR review.
+
+This is a common safety mechanism used on most projects to ensure no one can accidentally write to the main branch without review by another member of the project.
+
+## Install Tailwind
+
+Follow the [Phoenix + Tailwind Installation Guide](https://tailwindcss.com/docs/guides/phoenix) to add tailwind to your project.
+
+Your team will be responsible for styling your project as you develop features. There will be no strict requirements for styling, and you are open to style your project as you like.
+
+## Requirements
+
+Here is a brief summary of the project requirements:
+
+* As a user, I can create, update, and delete my own posts.
+* As a user, I can search for and view other users posts that are published and set to visible.
+* As a user, I can visit the page for each post to see the post's information and content.
+* As a user, I can comment and see comments on other users posts.
+* As a user, I can associate tags with a post.
+
+You will be provided further requirements and instruction in the following upcoming exercises:
+
+* [Blog: Posts](blog_posts.livemd)
+* [Blog: Search](blog_search.livemd)
+* [Blog: Visibility Migration](blog_migration.livemd)
+* [Blog: Comments](blog_comments.livemd)
+* [Blog: Seeding](blog_seeding.livemd)
+* [Blog: Comment Form](blog_comment_form.livemd)
+* [Blog: Authentication](blog_authentication.livemd)
+* [Blog: Tags](blog_tags.livemd)
+* [Blog: Blog Content](blog_content.livemd)
+* [Project Deployment](deployment.livemd)
+
+You will complete the above exercises as we progress through the course. While you should still complete exercises in order, your group is welcome to progress ahead of the established pace of the course. You may also go beyond the requirements if you would like. There will also be bonus features as seen in each individual exercise.
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"group_project_blog_reading\"\n    \"exercises\" -> \"group_project_blog_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "group_project_blog_reading"
+    "exercises" -> "group_project_blog_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b group-project-blog-exercise
+$ git add .
+$ git commit -m "finish group project blog exercise"
+$ git push origin group-project-blog-exercise
+```
+
+Create a pull request from your `group-project-blog-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                             | Next                                                              |
+| ---------------------------------------------------- | ----------------------------------------------------------------: |
+| [Book Changeset](../exercises/book_changeset.livemd) | [Relational Database Management Systems](../reading/rdbms.livemd) |

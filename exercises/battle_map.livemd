@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -108,7 +110,7 @@ end
 
 </details>
 
-Create implementations for the `Character` protocol as documented below.
+Create implementations for the `Character` protocol as documented below. We've provided a full suite of tests for you.
 
 ```elixir
 defprotocol Character do
@@ -116,65 +118,65 @@ defprotocol Character do
 
   Determine if a character type can attack based on it's
   current position and target position on a grid.
+
   ## Examples
 
     iex> Character.can_attack?(%Barbarian{}, {4, 4}, {6, 6})
     true
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {2, 2})
-    true
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {2, 6})
-    true
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {6, 2})
-    true
-
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {1, 1})
-    false
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {7, 7})
-    false
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {7, 1})
-    false
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {1, 7})
-    false
-
-    iex> Character.can_attack?(%Barbarian{}, {3, 3}, {5, 5})
-    true
-    iex> Character.can_attack?(%Barbarian{}, {3, 3}, {6, 6})
-    false
 
     iex> Character.can_attack?(%Wizard{}, {4, 4}, {7, 7})
     true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {1, 1})
-    true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {1, 7})
-    true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {7, 1})
-    true
-
-    iex> Character.can_attack?(%Wizard{}, {3, 3}, {4, 4})
-    true
-    iex> Character.can_attack?(%Wizard{}, {3, 3}, {4, 2})
-    true
-
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {5, 4})
-    true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 5})
-    true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {3, 4})
-    true
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {4, 3})
-    true
-
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {6, 5})
-    false
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {2, 5})
-    false
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {3, 2})
-    false
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {6, 3})
-    false
   """
   def can_attack?(character, origin, target)
 end
+
+ExUnit.start(auto_run: false)
+
+defmodule CharacterTests do
+  use ExUnit.Case
+
+  describe "Barbarian" do
+    test "can attack within two squares of current position" do
+      for x <- 2..6, y <- 2..6 do
+        assert Character.can_attack?(%Barbarian{}, {4, 4}, {x, y})
+      end
+    end
+
+    test "cannot attack beyond two squares of current position" do
+      refute Character.can_attack?(%Barbarian{}, {4, 4}, {1, 1})
+      refute Character.can_attack?(%Barbarian{}, {4, 4}, {7, 7})
+      refute Character.can_attack?(%Barbarian{}, {4, 4}, {7, 1})
+      refute Character.can_attack?(%Barbarian{}, {4, 4}, {1, 7})
+    end
+
+    test "logic is not hardcoded to the {4, 4} position" do
+      refute Character.can_attack?(%Barbarian{}, {3, 3}, {6, 6})
+    end
+  end
+
+  describe "Wizard" do
+    test "can attack in eight directions" do
+      # up, up-right, right, down-right, down, down-left, left, up-left
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {4, 5})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {5, 5})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {5, 4})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {5, 3})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {4, 3})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {3, 3})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {3, 4})
+      assert Character.can_attack?(%Wizard{}, {4, 4}, {3, 5})
+    end
+
+    test "cannot attack invalid squares" do
+      refute Character.can_attack?(%Wizard{}, {4, 4}, {6, 5})
+      refute Character.can_attack?(%Wizard{}, {4, 4}, {2, 5})
+      refute Character.can_attack?(%Wizard{}, {4, 4}, {3, 2})
+      refute Character.can_attack?(%Wizard{}, {4, 4}, {6, 3})
+    end
+  end
+end
+
+ExUnit.run()
 ```
 
 ## Custom Character (BONUS)
@@ -199,22 +201,63 @@ Implement your custom character below.
 
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"battle_map_reading\"\n    \"exercises\" -> \"battle_map_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "battle_map_reading"
+    "exercises" -> "battle_map_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-battle_map
+$ git checkout -b battle-map-exercise
 $ git add .
 $ git commit -m "finish battle map exercise"
-$ git push origin exercise-battle_map
+$ git push origin battle-map-exercise
 ```
+
+Create a pull request from your `battle-map-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

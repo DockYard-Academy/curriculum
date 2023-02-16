@@ -47,7 +47,7 @@ In the future when working with multiple Elixir projects, there is a tool called
    - Run  `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine` in an administrator terminal in order to use `mix`.
 
 3. Install [Livebook](https://github.com/livebook-dev/livebook)
-   - `mix escript install hex livebook`
+   - `mix escript.install hex livebook`
    - After installing you will see a prompt that says you need to add `c:/Users/YOUR_USERNAME/.mix/escripts` to the system PATH. Search for `Set the system environments variables` and it will open the Control Panel section. Under the "Advanced" tab select "Environment Variables", then click on the entry for PATH and the "Edit" button. Select "New" and then enter the prompted path so that you can run `livebook` directly from the command line.
    - You may prefer to install [Livebook Desktop](https://livebook.dev/#install) instead of running Livebook with an `escript`.
 
@@ -195,69 +195,58 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Built-in Modules
 * Reduce
 * Dates and Time
-* Advanced Pattern Matching
-* Guards
 * String Manipulation
 ## Mix Projects
 * Elixir Build Tooling
 * Testing With ExUnit
 * ExUnit With Mix Projects
 * Documentation and Static Analysis
+* Executables
 ## OTP and Advanced Syntax
+* Advanced Pattern Matching
+* Guarding
 * Protocols
 * Recursion
 * Benchmarking and Performance
 * Streams
 * Performance Optimization
+* Persistence Using the File System
 * Processes
 * GenServers
 * Asynchronous Messages
 * Supervisor Basics and Fault Tolerance
 * Testing GenServers
-* Mix Projects & Processes
-* State Management With Agents
+* Metaprogramming
+* Mix Projects and Processes
 * Concurrency With Tasks
-* Erlang-Term Storage (ETS)
-* Registry
-* Files and Data Validation
-## Web Servers and Phoenix
-* HTML and CSS
-* APIs & Parsing JSON
-* Phoenix
-## Databases With Ecto
-* Relational Database Management Systems and Ecto
-* Phoenix and Ecto
-* Phoenix Authentication
-* Testing Phoenix
-* Phoenix and Ecto One-to-Many Relationships
-* Phoenix and Ecto Many-to-Many Relationships
-* Phoenix and Ecto One-to-One Relationships
-* Tailwind
-## LiveView
-* LiveView
-* Testing LiveView
-* Phoenix Forms
-* PubSub and Channels
-* GraphQL and Absinthe
+* State Management With Agents and ETS
+* Rubix Cube Project
 ## Capstone Project Preparation
 * Capstone Project
-* UX/UI Design + Accessibility
-## Quality Assurance
-* Observability
-* Factories & Mocks
-* CI/CD, Code Coverage, GitHub Actions & Hooks
-## Group Project
-* Project Management
-* Group Project
-## External Libraries
-* Emailing & Swoosh
-* Oban
-* Advanced Livebook
-## Elixir Applications in Production
-* Umbrella Projects
-* Genserver Bottlenecks
-* Worker Pools
+## Web Servers and Phoenix
+* HTML and CSS
+* APIs and Parsing JSON
+* Phoenix
+* Tailwind
+* Ecto Changesets
+* Group Project Blog
+* Phoenix and Ecto
+* Testing Phoenix
+* Schemas and Migrations
+* Phoenix and Ecto One-to-Many Associations
+* Seeding
+* Phoenix Forms
+* Phoenix Authentication
+* Phoenix and Ecto Many-to-Many Relationships
+* Phoenix and Ecto One-to-One Relationships
 * Deployment
-## Final Project
-* Demo Day
+## Group Project Presentation
+## LiveView
+* LiveView
+* LiveView and Ecto
+* LiveView Image Uploads
+* PubSub
+* LiveView JS Interoperability and Pagination
+## External Libraries
+* Emailing, Swoosh, and Oban
 <!-- course-outline-end -->

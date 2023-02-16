@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -15,6 +17,14 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* What are the parts of an HTML element?
+* What are the parts of a CSS rule?
+* How do we select elements to apply a CSS rule to?
 
 ## Overview
 
@@ -37,6 +47,8 @@ An HTML element generally includes an opening tag, content, and closing tag.
 <!-- livebook:{"break_markdown":true} -->
 
 Here is a brief overview of HTML by Fireship.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=ok-plXXHlWw\")","title":"Hidden Cell"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 YouTube.new("https://www.youtube.com/watch?v=ok-plXXHlWw")
@@ -97,7 +109,7 @@ We can create `.html` files and open them in the browser. For example, create a 
     <title>Hello!</title>
   </head>
   <body>
-    <p>Hello World!</h1>
+    <p>Hello World!</p>
   </body>
 </html>
 ```
@@ -260,10 +272,33 @@ The `>` selects all elements with the `.child` class that are direct children of
 
 ```html
 <p class="parent">
-  <p class="child">This text will be green.</p>
+  <p class="child">
+    This text will be green.
+    <p class="grandchild"> This text will NOT be green. </p>
+  </p>
 </p>
 
-<p class="child">This text will NOT be green.</p>
+<p class="child">This text will NOT be green and bold.</p>
+```
+
+```mermaid
+flowchart LR
+    classDef green fill:#9f6
+
+    subgraph parent class
+    p1(p) 
+    end
+    subgraph child class
+    
+    p1 --> p2(p):::green
+    p2 --> text1(text):::green
+    p3(p)
+    p3 --> text2(text)
+    end
+    subgraph grandchild class
+    p2 --> p4(p)
+    p4 --> text4(text)
+    end
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -282,10 +317,33 @@ The space selects all elements with the `.child` class inside the`.parent` class
 
 ```html
 <p class="parent">
-  <p class="child">This text will be green and bold.</p>
+  <p class="child">
+    This text will be green.
+    <p class="grandchild"> This text will be green. </p>
+  </p>
 </p>
 
 <p class="child">This text will NOT be green and bold.</p>
+```
+
+```mermaid
+flowchart LR
+    classDef green fill:#9f6
+
+    subgraph parent class
+    p1(p) 
+    end
+    subgraph child class
+    
+    p1 --> p2(p):::green
+    p2 --> text1(text):::green
+    p3(p)
+    p3 --> text2(text)
+    end
+    subgraph grandchild class
+    p2 --> p4(p):::green
+    p4 --> text4(text):::green
+    end
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -662,19 +720,19 @@ Replace `hello.html` with following content.
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Hello!</title>
-    <style>
-        p {
-            color: green;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <p>Hello World!</p>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <title>Hello!</title>
+        <style>
+            p {
+                color: green;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Hello World!</p>
+    </body>
 </html>
 ```
 
@@ -1157,6 +1215,24 @@ For example, we could use the [League Gothic](https://fonts.google.com/specimen/
 
 Install and use a custom font from [Google Fonts](https://fonts.google.com/) in your `hello.html` file. You may choose any freely available font you wish.
 
+## Flex and Grid
+
+Flex and Grid are two very powerful ways to create responsive layouts with CSS. As we are focused on Elixir development they are beyond the scope of this course. However, they will be very important if you want to create layouts that work on multiple device sizes.
+
+To learn more about Flexbox, we recommend you start with these two quick primers by Fireship.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=K74l26pE4YA&ab_channel=Fireship\")","title":"Flexbox"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=K74l26pE4YA&ab_channel=Fireship")
+```
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=uuOXPWCh-6o&ab_channel=Fireship\")","title":"Grid"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=uuOXPWCh-6o&ab_channel=Fireship")
+```
+
 ## Further Reading
 
 Armed with the fundamentals of HTML and CSS, we're ready to build functional and great-looking websites. However, HTML and CSS are both massive topics, and there is still much more to learn.
@@ -1168,27 +1244,68 @@ Consider the following resources as you continue your HTML and CSS learning jour
 
 For experimenting with HTML and CSS, we recommend sites such as [CodePen](https://codepen.io/) that make it easy to prototype HTML and CSS designs rapidly.
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"html_css_reading\"\n    \"exercises\" -> \"html_css_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "html_css_reading"
+    "exercises" -> "html_css_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-html_css
+$ git checkout -b html-css-reading
 $ git add .
-$ git commit -m "finish html css section"
-$ git push origin exercise-html_css
+$ git commit -m "finish html css reading"
+$ git push origin html-css-reading
 ```
+
+Create a pull request from your `html-css-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 
 ## Up Next
 
-| Previous                                         | Next                                       |
-| ------------------------------------------------ | -----------------------------------------: |
-| [Sign Up Form](../exercises/sign_up_form.livemd) | [Home Page](../exercises/home_page.livemd) |
+| Previous                                                          | Next                                                       |
+| ----------------------------------------------------------------- | ---------------------------------------------------------: |
+| [Captone Project Guide](../reading/capstone_project_guide.livemd) | [Common Components](../exercises/common_components.livemd) |

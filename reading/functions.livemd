@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:smart_animation, github: "brooklinjazz/smart_animation"}
@@ -16,6 +18,14 @@ Mix.install([
 ## Setup
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we define a function?
+* How do we call a function?
+* How do we use the pipe operator `|>` to pipe function calls into each other?
 
 ## Functions
 
@@ -190,7 +200,7 @@ Under the hood, when the function runs, the parameter is bound to the argument's
 
 Let's break down how a function executes step by step in the following slideshow.
 
-<!-- livebook:{"attrs":{"source":"frames =     [\n      \"\n  First, we define the `double` function and call it.\n  ```elixir\n  double = fn number -> number * 2 end\n  double.(3)\n  ```\n  \",\n      \"\n  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.\n  ```elixir\n  double = fn number -> number * 2 end\n  fn 3 -> 3 * 2 end\n  ```\n  \",\n      \"\n  The function evaluates the function body between the `->` and the `end`\n  ```elixir\n  double = fn number -> number * 2 end\n  3 * 2\n  ```\n  \",\n      \"\n  `3` * `2` is `6`, so the function call returns `6`.\n  ```elixir\n  double = fn number -> number * 2 end\n  6\n  ```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Function Flow"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"frames =     [\n      \"\n  First, we define the `double` function and call it.\n  ```elixir\n  double = fn number -> number * 2 end\n  double.(3)\n  ```\n  \",\n      \"\n  The `double` function executes in place of the `double.(call)` with `number` bound to `3`.\n  ```elixir\n  double = fn number -> number * 2 end\n  fn 3 -> 3 * 2 end\n  ```\n  \",\n      \"\n  The function evaluates the function body between the `->` and the `end`\n  ```elixir\n  double = fn number -> number * 2 end\n  3 * 2\n  ```\n  \",\n      \"\n  `3` * `2` is `6`, so the function call returns `6`.\n  ```elixir\n  double = fn number -> number * 2 end\n  6\n  ```\n  \"\n    ]\n\nSmartAnimation.new(0..Enum.count(frames) - 1, fn i ->\n    Enum.at(frames, i) |> Kino.Markdown.new()\nend)","title":"Function Flow"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ````elixir
 frames = [
@@ -505,7 +515,7 @@ call_with_10_and_20 = fn callback -> callback.(10, 20) end
 Enter your solution below.
 
 ```elixir
-call_with_20 = nil
+call_with_10_and_20 = nil
 ```
 
 ## Pipe Operator
@@ -621,22 +631,63 @@ Enter your solution below.
 
 ```
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"functions_reading\"\n    \"exercises\" -> \"functions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "functions_reading"
+    "exercises" -> "functions_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-functions
+$ git checkout -b functions-reading
 $ git add .
-$ git commit -m "finish functions section"
-$ git push origin exercise-functions
+$ git commit -m "finish functions reading"
+$ git push origin functions-reading
 ```
+
+Create a pull request from your `functions-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

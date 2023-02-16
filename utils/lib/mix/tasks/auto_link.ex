@@ -10,7 +10,18 @@ defmodule Mix.Tasks.Bc.Autolink do
 
   alias Utils.Notebooks
 
-  @libraries ["Kino", "ExUnit", "Benchee", "IEx", "Mix", "Poison", "HTTPoison", "Timex", "Ecto"]
+  @libraries [
+    "Kino",
+    "ExUnit",
+    "Benchee",
+    "IEx",
+    "Mix",
+    "Poison",
+    "HTTPoison",
+    "Timex",
+    "Ecto",
+    "Phoenix"
+  ]
 
   @impl Mix.Task
   def run(_) do

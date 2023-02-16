@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -17,6 +19,19 @@ Mix.install([
 In this exercise, you will create dialogue for an RPG (Role Playing Game).
 
 To generate this dialogue define a `Character` struct with a `:name`, `:class`, and `:weapon` keys. Enforce that the `:name` key must have a value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+classDiagram
+  class Character {
+    name*: string
+    class: string
+    weapon: string
+  }
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example solution</summary>
@@ -58,7 +73,16 @@ defmodule Character do
   Character
 
   Defines a character struct, and functions for creating character dialogue.
+
+  iex> %Character{name: "Frodo"}
+  %Character{name: "Frodo", weapon: nil, class: nil}
+
+  The :name key is required.
+
+  iex> %Character{name: "Frodo"}
+  ** (ArgumentError) the following keys must also be given when building struct Character: [:name]
   """
+  defstruct []
 
   @doc """
   Introduce the character by name.
@@ -69,7 +93,7 @@ defmodule Character do
     "My name is Gimli."
 
     iex> Character.introduce(%Character{name: "Aragorn"})
-     "My name is Aragorn."
+    "My name is Aragorn."
   """
   def introduce(character) do
   end
@@ -197,22 +221,63 @@ Character.attack(%Character{name: "Gimli"})
 
 You have complete creative control over how you would like to change the dialogue when fields used the the body of the functions above are `nil`.
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rpg_dialogue_reading\"\n    \"exercises\" -> \"rpg_dialogue_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "rpg_dialogue_reading"
+    "exercises" -> "rpg_dialogue_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-rpg_dialogue
+$ git checkout -b rpg-dialogue-exercise
 $ git add .
 $ git commit -m "finish rpg dialogue exercise"
-$ git push origin exercise-rpg_dialogue
+$ git push origin rpg-dialogue-exercise
 ```
+
+Create a pull request from your `rpg-dialogue-exercise` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
 

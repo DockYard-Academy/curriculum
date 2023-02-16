@@ -2,6 +2,8 @@
 
 ```elixir
 Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -16,13 +18,53 @@ Mix.install([
 
 Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively, you can evaluate the Elixir cells as you read.
 
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Given you're working with a particular data type such as an integer or map, where in the Elixir documentation should you look for relevant functionality?
+* How do you safely inspect any data type?
+* What are some common built-in functions developers use the most, and how do you use them?
+
 ## Overview
 
-Elixir provides a great deal of functionality in built-in modules.
+### Reinventing the Wheel
 
-In general, each data type or common behavior has a built-in module containing related functions for dealing with that data type.
+Rather than re-invent the wheel, we can rely upon already built tools to solve a range of common problems. Elixir provides built-in modules we can leverage to accomplish a wide variety of behavior without building our own custom solution.
 
-While it is unnecessary to memorize every function in every module, it's essential to be familiar with the built-in modules to know when to reach for them.
+<!-- livebook:{"break_markdown":true} -->
+
+### Information Overload
+
+The standard Elixir library contains a massive number of modules and functions. It's not reasonable to expect your self to memorize all of these functions.
+
+Instead, you should aspire to learn the most common modules and functions that you use everyday, and develop enough familiarity with the standard library to know where to look on [HexDocs](https://hexdocs.pm/elixir/api-reference.html) to find the appropriate tool when you need it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Kernel](https://hexdocs.pm/elixir/Kernel.html)
+
+The Elixir [Kernel](https://hexdocs.pm/elixir/Kernel.html) module is part of the standard library in the Elixir programming language. It provides a number of basic functions for working with the underlying operating system, as well as functions that are core to Elixir.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Modules For Data Types
+
+Most common data types have an associated module which contains functionality related to that data type.
+
+For example:
+
+* [Integer](https://hexdocs.pm/elixir/Integer.html)
+* [String](https://hexdocs.pm/elixir/String.html)
+* [List](https://hexdocs.pm/elixir/List.html)
+* [Map](https://hexdocs.pm/elixir/Map.html)
+* [Keyword](https://hexdocs.pm/elixir/Keyword.html)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Modules For Behavior
+
+Elixir groups many modules into related behavior. For example, we've already seen the [Enum](https://hexdocs.pm/elixir/Enum.html) module for data-agnostic enumeration.
 
 ## The Kernel Module
 
@@ -287,7 +329,7 @@ iex(1)> IO.gets("Give me a number! ")
 Give me a number! 25
 "25\n"
 iex(2)> IO.gets("Give me a number! ") |> Integer.parse()
-Give me a number!25
+Give me a number! 25
 {25, "\n"}
 ```
 
@@ -672,8 +714,7 @@ Here are a few common functions to get you started.
 * [Map.keys/1](https://hexdocs.pm/elixir/Map.html#keys/1) list the keys in a map.
 * [Map.delete/2](https://hexdocs.pm/elixir/Map.html#delete/2) remove a key and value from a map.
 * [Map.merge/2](https://hexdocs.pm/elixir/Map.html#merge/2) merge two maps together.
-* [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4) and [Map.update/4](https://hexdocs.pm/elixir/Map.html#update!
-  /4) update a map using the existing value of the updated key.
+* [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4) and [Map.update!/3](https://hexdocs.pm/elixir/Map.html#update!/3) update a map using the existing value of the updated key.
 * [Map.values/1](https://hexdocs.pm/elixir/Map.html#values/1) list the values in a map.
 
 ### Mutation
@@ -930,7 +971,7 @@ Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
   <summary>Example solution</summary>
 
-  An empty list technically counts as an empty list, because it does not have any elements
+  An empty list technically counts as a keyword list, because it does not have any elements
   that **don't** follow the `{:atom, term}` keyword list pattern.
   
   ```elixir
@@ -971,21 +1012,62 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [Hexdocs: Keyword](https://hexdocs.pm/elixir/Keyword.html)
 * [Hexdocs: Tuple](https://hexdocs.pm/elixir/Tuple.html)
 
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"built-in_modules_reading\"\n    \"exercises\" -> \"built-in_modules_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "built-in_modules_reading"
+    "exercises" -> "built-in_modules_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
 ## Commit Your Progress
 
 Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
 Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
 
 ```
-$ git checkout main
-$ git checkout -b exercise-built-in_modules
+$ git checkout -b built-in-modules-reading
 $ git add .
-$ git commit -m "finish built-in modules section"
-$ git push origin exercise-built-in_modules
+$ git commit -m "finish built-in modules reading"
+$ git push origin built-in-modules-reading
 ```
+
+Create a pull request from your `built-in-modules-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
 
 **DockYard Academy Students Only:**
 
-Create a pull request to your forked `main` branch and notify your teacher by including `@BrooklinJazz` in your PR description to get feedback.
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
