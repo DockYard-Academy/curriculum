@@ -157,72 +157,89 @@ end
 
 ```elixir
 defmodule FunctionSpecs do
+  @spec do_nothing :: nil
   def do_nothing do
     nil
   end
 
+  @spec accept_and_return_anything(any()) :: any()
   def accept_and_return_anything(anything) do
     anything
   end
 
+  @spec double(float()) :: float()
   def double(float) when is_float(float) do
     float * 2.0
   end
 
+  @spec double(integer()) :: integer()
   def double(integer) when is_integer(integer) do
     integer * 2
   end
 
+  @spec double(number()) :: number()
   def double(number) do
     number * 2
   end
 
+  @spec add(integer(), integer()) :: integer()
   def add(integer1, integer2) do
     integer1 + integer2
   end
 
+  @spec multiply(integer(), integer()) :: integer()
   def multiply(integer1, integer2) do
     integer1 * integer2
   end
 
+  @spec divide(integer(), integer()) :: float()
   def divide(integer1, integer2) do
     integer1 / integer2
   end
 
+  @spec rounded_divide(integer(), integer()) :: integer()
   def rounded_divide(integer1, integer2) do
     div(integer1, integer2)
   end
 
+  @spec concat(String.t(), String.t()) :: String.t()
   def concat(string1, string2) do
     string1 <> string2
   end
 
+  @spec to_string(integer()) :: String.t()
   def to_string(integer) do
     Integer.to_string(integer)
   end
 
+  @spec merge(map(), map()) :: map()
   def merge(map1, map2) do
     Map.merge(map1, map2)
   end
 
+  @spec get_or_empty(Keyword.t(), atom()) :: any()
   def get_or_empty(keyword_list, atom_key) do
     Keyword.get(keyword_list, atom_key, "")
   end
 
+  @spec split_and_lowercase(String.t()) :: [String.t()]
   def split_and_lowercase(string) do
     string
     |> String.downcase()
     |> String.split("", trim: true)
   end
 
+  @spec string_to_int(String.t()) :: integer()
   def string_to_int(string) do
     String.to_integer(string)
   end
 
+  @spec integers_to_strings([integer()]) :: [String.t()]
   def integers_to_strings(integers) do
     Enum.map(integers, fn int -> Integer.to_string(int) end)
   end
 
+  @spec one_to_two(1) :: 2
   def one_to_two(1) do
     2
   end
@@ -254,13 +271,13 @@ end
 ```elixir
 defmodule CustomTypes do
   # a string or number
-  @type unparsed_number
+  @type unparsed_number :: String.t() | number()
   # a list of strings
-  @type strings
+  @type strings :: [String.t()]
   # a map with :title (string) and :content (string) keys. 
-  @type book
+  @type book :: %{title: String.t(), content: String.t()}
   # A map with :name (string) and `:books` (a list of books) keys.
-  @type author
+  @type author :: %{name: String.t(), books: [book()]}
 end
 ```
 
