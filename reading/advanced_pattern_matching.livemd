@@ -88,6 +88,8 @@ We can pattern match using the match operator.
 We're able to use the match operator in more places than you might think. Anytime we have an Elixir term bound to a parameter we can use the `=` operator. This is useful for binding the entire parameter of a function while still using pattern matching to match on values within the parameter.
 
 ```elixir
+# please explain
+
 defmodule PatternParamExample do
   def inspect([a, b, c] = param1) do
     IO.inspect(a, label: "a")
@@ -174,7 +176,7 @@ defmodule Check do
       iex> Check.must_have_elements!([])
       ** (FunctionClauseError) no function clause matching in Check.must_have_elements!/1
   """
-  def must_have_elements!(list) do
+  def must_have_elements!([_head | _tail] = list) do
     true
   end
 end
