@@ -65,9 +65,44 @@ defmodule ReplaceNils do
   replace nil values in the first list with values from the second list in the same position.
   """
   def replace(input1, input2) do
-    nil
+    {_, output2} =
+      Enum.zip(input1, input2)
+      |> Enum.map(fn
+        {val, nil} -> {val, val}
+        {nil, val} -> {val, val}
+        {val1, val2} -> {val2, val1}
+      end)
+      |> Enum.unzip()
+
+    output2
   end
 end
+
+# {1, nil}
+ReplaceNils.replace(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+)
+
+ReplaceNils.replace(
+  [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil],
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+)
+
+ReplaceNils.replace(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+)
+
+ReplaceNils.replace(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+)
+
+ReplaceNils.replace(
+  [1, 2, 3, nil, nil, 6, 7, nil, 9, 10],
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+)
 ```
 
 Here are some additional test data to think about:
