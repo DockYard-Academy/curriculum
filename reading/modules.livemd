@@ -108,7 +108,7 @@ end
 Call the `MutliParamExample.call/3` function with different arguments.
 
 ```elixir
-
+MultiParamExample.call(1, "abc", [1, 2, 3])
 ```
 
 ## Internal Module Functions
@@ -306,7 +306,13 @@ end
 Enter your solution below.
 
 ```elixir
+defmodule Languages.French do
+  def greeting do
+    "Bonjour"
+  end
+end
 
+Languages.French.greeting()
 ```
 
 ### Nested Modules
@@ -504,7 +510,23 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  @moduledoc """
+  This module enables mathematical operations to be performed.
+  """
 
+  @doc """
+  Add two parameters together, and output the result
+
+  ## Examples
+
+    iex> Math.add(1, 2)
+    3
+    
+  """
+  def add(param1, param2), do: param1 + param2
+  def add(param1, param2, param3), do: param1 + param2 + param3
+end
 ```
 
 ## Default Arguments
@@ -571,7 +593,14 @@ Greeting.hello("Andrew")
 ```
 
 ```elixir
+defmodule Greeting do
+  @name "Jon"
+  def hello(name \\ @name) do
+    "Hello #{name}!"
+  end
+end
 
+Greeting.hello("Matt")
 ```
 
 ## Documentation
@@ -700,7 +729,7 @@ Uncomment the following code and evaluate the cell to see an example. Re-comment
 #     "2"
 #   """
 #   def crash do
-
+#     2
 #   end
 # end
 ```
