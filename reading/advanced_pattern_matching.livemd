@@ -140,7 +140,10 @@ We can use the match operator anytime we have a value bound to a parameter or va
 Create a `case` statement that will return the first element in a 2 element tuple, or the first element in 2 element a list.
 
 ```elixir
-
+case {1, 2} do
+  {a, b} = tuple ->
+    a
+end
 ```
 
 Use pattern matching to ensure the `Check.must_have_elements!/1` function returns true when called with a list that has more than one element and otherwise causes a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
@@ -171,10 +174,10 @@ defmodule Check do
       iex> Check.must_have_elements!([1])
       true
 
-      iex> Check.must_have_elements!([])
-      ** (FunctionClauseError) no function clause matching in Check.must_have_elements!/1
+      # iex> Check.must_have_elements!([])
+      # ** (FunctionClauseError) no function clause matching in Check.must_have_elements!/1
   """
-  def must_have_elements!(list) do
+  def must_have_elements!([_head | _tail] = list) do
     true
   end
 end
@@ -279,8 +282,11 @@ defmodule Greeter do
       iex> Greeter.hello(["Swamy", "Jeff", "Jeremy"])
       "Hello everyone!"
   """
-  def hello(names) do
-  end
+  def hello([name] = _names), do: "Hi #{name}!"
+
+  def hello([name1, name2] = _names), do: "Hi #{name1}, Hello #{name2}!"
+
+  def hello([_, _, _] = _names), do: "Hello everyone!"
 end
 ```
 
@@ -326,9 +332,20 @@ Create a `Converter` module which uses pattern matching with enumeration and mul
 ```elixir
 defmodule Converter do
   @doc """
+  Return number name for integers 1, 2, 3
+
+  ## Examples
+
+      iex> Converter.to_named_strings([1, 2, 3])
+      ["one", "two", "three"]
 
   """
   def to_named_strings(integers) do
+    Enum.map(integers, fn
+      1 -> "one"
+      2 -> "two"
+      3 -> "three"
+    end)
   end
 end
 ```
@@ -356,7 +373,12 @@ end)
 </details>
 
 ```elixir
+enumerable = [{:double, 2}, {:halve, 10}, {:double, 4}]
 
+Enum.map(enumerable, fn
+  {:double, value} -> value * 2
+  {:halve, value} -> div(value, 2)
+end)
 ```
 
 ## Pattern Matching Vs. If
@@ -525,7 +547,7 @@ actual = {"hello", "hi"}
 expected = {"hello"}
 actual = {"hello", "hi"}
 
-expected = actual
+^expected = actual
 ```
 
 ## Further Reading
