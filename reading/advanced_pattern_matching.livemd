@@ -140,7 +140,12 @@ We can use the match operator anytime we have a value bound to a parameter or va
 Create a `case` statement that will return the first element in a 2 element tuple, or the first element in 2 element a list.
 
 ```elixir
+case {a, b} do
+  {a, b} -> IO.inspect(a)
+  [a, b] -> IO.inspect(a)
+end
 
+{a, b}
 ```
 
 Use pattern matching to ensure the `Check.must_have_elements!/1` function returns true when called with a list that has more than one element and otherwise causes a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
@@ -174,7 +179,13 @@ defmodule Check do
       iex> Check.must_have_elements!([])
       ** (FunctionClauseError) no function clause matching in Check.must_have_elements!/1
   """
-  def must_have_elements!(list) do
+  # def must_have_elements!(list) do
+  #   case list do
+  #     [_head | _tail] -> :true
+  #     [] -> raise FunctionClauseError, "no function clause matching in Check.must_have_elements!/1"
+  #   end
+  # end
+  def must_have_elements!([_head | _tail] = list) do
     true
   end
 end
@@ -280,6 +291,11 @@ defmodule Greeter do
       "Hello everyone!"
   """
   def hello(names) do
+    case names do
+      [name] -> "Hi #{name}!"
+      [name1, name2] -> "Hi #{name1}, Hello #{name2}!"
+      [_name1, _name2, _name3] -> "Hello everyone!"
+    end
   end
 end
 ```
@@ -329,6 +345,18 @@ defmodule Converter do
 
   """
   def to_named_strings(integers) do
+    Enum.map(integers, fn
+      1 -> "one"
+      2 -> "two"
+      3 -> "three"
+      4 -> "four"
+      5 -> "five"
+      6 -> "six"
+      7 -> "seven"
+      8 -> "eight"
+      9 -> "nine"
+      0 -> "zero"
+    end)
   end
 end
 ```
@@ -356,7 +384,12 @@ end)
 </details>
 
 ```elixir
+enumerable = [{:double, 2}, {:halve, 10}, {:double, 4}]
 
+Enum.map(enumerable, fn
+  {:double, value} -> value * 2
+  {:halve, value} -> div(value, 2)
+end)
 ```
 
 ## Pattern Matching Vs. If
@@ -525,7 +558,7 @@ actual = {"hello", "hi"}
 expected = {"hello"}
 actual = {"hello", "hi"}
 
-expected = actual
+^expected = actual
 ```
 
 ## Further Reading
