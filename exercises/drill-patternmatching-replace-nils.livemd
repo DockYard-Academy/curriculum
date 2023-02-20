@@ -70,6 +70,18 @@ defmodule ReplaceNils do
 end
 ```
 
+```elixir
+input1 = [1, nil, 3]
+input2 = [4, 5, nil]
+
+zipped = Enum.zip(input1, input2) |> IO.inspect()
+
+Enum.map(zipped, fn
+  {nil, elem2} -> elem2
+  {elem1, _} -> elem1
+end)
+```
+
 Here are some additional test data to think about:
 
 <!-- livebook:{"force_markdown":true} -->
