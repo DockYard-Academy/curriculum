@@ -103,11 +103,100 @@ defmodule Points do
       |> Map.put(team1, t1r1 + t1r2 + t1r3)
       |> Map.put(team2, t2r1 + t2r2 + t2r3)
     else
-      error ->
+      _error ->
         {:error, :invalid}
     end
   end
 end
+```
+
+```elixir
+defmodule Game do
+  # how do we enforce nested keys?
+  # @enforce_keys [:team1_name, :team2_name, :round1, :round2, :round3]
+  defstruct [:team1_name, :team2_name, :round1, :round2, :round3]
+end
+
+defmodule Game.Round do
+  @enforce_keys [:team1, :team2]
+  defstruct @enforce_keys
+end
+
+defmodule Points do
+  @doc """
+  Tally points in a generic three round game.
+
+  A valid game will return the teams and their total scores in a map.
+
+      iex> game = %{team1_name: "Team Team", team2_name: "Exersport", round1: %{team1: 10, team2: 20}, round2: %{team1: 30, team2: 10}, round3: %{team1: 25, team2: 30}}
+      iex> Points.tally(game)
+      %{"Team Team" => 65, "Exersport" => 60}
+
+  The `game` must have a `team1_name` and `team2_name` keys.
+
+      iex> Points.tally(%{no_team_names: true})
+      {:error, :invalid}
+
+  The `game` must have a `round1`, `round2`, and `round3` keys.
+
+      iex> Points.tally(%{team1_name: "name1", team2_name: "name2"})
+      {:error, :invalid}
+  """
+
+  # def tally(game) do
+  #   with %{team1_name: team1, team2_name: team2} <- game,
+  #        %{round1: %{team1: t1r1, team2: t2r1}} <- game,
+  #        %{round2: %{team1: t1r2, team2: t2r2}} <- game,
+  #        %{round3: %{team1: t1r3, team2: t2r3}} <- game do
+  #     %{}
+  #     |> Map.put(team1, t1r1 + t1r2 + t1r3)
+  #     |> Map.put(team2, t2r1 + t2r2 + t2r3)
+  #   else
+  #     error ->
+  #       {:error, :invalid}
+  #   end
+  # end
+
+  def tally(%Game{
+        team1_name: team1,
+        team2_name: team2,
+        round1: %Game.Round{team1: t1r1, team2: t2r1},
+        round2: %Game.Round{team1: t1r2, team2: t2r2},
+        round3: %Game.Round{team1: t1r3, team2: t2r3}
+      }) do
+    if team1 do
+      %{}
+      |> Map.put(team1, t1r1 + t1r2 + t1r3)
+      |> Map.put(team2, t2r1 + t2r2 + t2r3)
+    else
+      {:error, :invalid}
+    end
+  end
+end
+```
+
+```elixir
+## returns {:error, :invalid}
+
+game = %Game{
+  team2_name: "Exersport",
+  round1: %Game.Round{team1: 10, team2: 20},
+  round2: %Game.Round{team1: 30, team2: 10},
+  round3: %Game.Round{team1: 25, team2: 30}
+}
+
+Points.tally(game)
+# %{"Team Team" => 65, "Exersport" => 60}
+
+# The `game` must have a `team1_name` and `team2_name` keys.
+
+# iex> Points.tally(%Game{no_team_names: true})
+#     {:error, :invalid}
+
+# The `game` must have a `round1`, `round2`, and `round3` keys.
+
+#     iex> Points.tally(%{team1_name: "name1", team2_name: "name2"})
+#     {:error, :invalid}
 ```
 
 ## Mark As Completed
