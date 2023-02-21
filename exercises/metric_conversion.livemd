@@ -93,6 +93,39 @@ defmodule Metric do
     1000000
   """
   def convert(from, to) do
+    case to do
+      :millimeter ->
+        case from do
+          {:millimeter, value} -> value * 1.0
+          {:centimeter, value} -> value * 10.0
+          {:meter, value} -> value * 1000.0
+          {:kilometer, value} -> value * 1_000_000.0
+        end
+
+      :centimeter ->
+        case from do
+          {:millimeter, value} -> value * 0.1
+          {:centimeter, value} -> value * 1.0
+          {:meter, value} -> value * 100.0
+          {:kilometer, value} -> value * 100_000.0
+        end
+
+      :meter ->
+        case from do
+          {:millimeter, value} -> value * 0.001
+          {:centimeter, value} -> value * 0.01
+          {:meter, value} -> value * 1.0
+          {:kilometer, value} -> value * 1000.0
+        end
+
+      :kilometer ->
+        case from do
+          {:millimeter, value} -> value * 0.000001
+          {:centimeter, value} -> value * 0.00001
+          {:meter, value} -> value * 0.001
+          {:kilometer, value} -> value * 1.0
+        end
+    end
   end
 end
 ```
