@@ -65,7 +65,12 @@ defmodule ReplaceNils do
   replace nil values in the first list with values from the second list in the same position.
   """
   def replace(input1, input2) do
-    nil
+    zipped = Enum.zip(input1, input2)
+
+    Enum.map(zipped, fn
+      {nil, elem2} -> elem2
+      {elem1, _} -> elem1
+    end)
   end
 end
 ```
