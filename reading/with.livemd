@@ -274,6 +274,11 @@ defmodule Sum do
       {:error, :invalid}
   """
   def sum_maps(map1, map2) do
+    with %{value: value1} <- map1, %{value: value2} <- map2 do
+      {:ok, value1 + value2}
+    else
+      _error -> {:error, :invalid}
+    end
   end
 end
 ```
