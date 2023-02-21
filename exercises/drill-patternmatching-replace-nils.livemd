@@ -63,9 +63,39 @@ defmodule ReplaceNils do
 
   @doc """
   replace nil values in the first list with values from the second list in the same position.
+
+  iex> input1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  iex> input2 = [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  iex> ReplaceNils.replace(input1, input2)
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  iex> input1 = [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+  iex> input2 = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  iex> ReplaceNils.replace(input1, input2)
+  [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+
+  iex> input1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  iex> input2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  iex> ReplaceNils.replace(input1, input2)
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  iex> input1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  iex> input2 = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  iex> ReplaceNils.replace(input1, input2)
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  iex> input1 = [1, 2, 3, nil, nil, 6, 7, nil, 9, 10]
+  iex> input2 = [:a, :b, :c, :d, :e, :f, :g, :h, :i, :j]
+  iex> ReplaceNils.replace(input1, input2)
+  [1, 2, 3, :d, :e, 6, 7, :h, 9, 10]
+
+
   """
   def replace(input1, input2) do
-    nil
+    Enum.zip_with(input1, input2, fn
+      nil, y -> y
+      x, _ -> x
+    end)
   end
 end
 ```

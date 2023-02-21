@@ -93,13 +93,13 @@ defmodule Message do
       iex> %Message{}
       %Message{body: nil}
   """
-  defstruct []
+  defstruct [:body]
 
   @doc """
   Send messages between users.
   Returns a string of the message if provided valid input.
 
-  ## Examples
+   ## Examples
 
     iex> Message.send("hello!")
     "hello!"
@@ -116,19 +116,31 @@ defmodule Message do
     iex> Message.send(123)
     ** (FunctionClauseError) no function clause matching in Message.send/1
 
+
     iex> Message.send(%{})
     ** (FunctionClauseError) no function clause matching in Message.send/1
+
 
     iex> Message.send({})
     ** (FunctionClauseError) no function clause matching in Message.send/1
 
+
     iex> Message.send(%Message{body: nil})
     ** (FunctionClauseError) no function clause matching in Message.send/1
-        
+    
+      
     iex> Message.send(%Message{body: {}})
     ** (FunctionClauseError) no function clause matching in Message.send/1
+
   """
-  def send(message) do
+  # sender sends message
+  def send(message) when is_binary(message) do
+    message
+  end
+
+  # receiver sends back message body
+  def send(message) when is_binary(message.body) do
+    message.body
   end
 end
 ```
