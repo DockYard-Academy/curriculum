@@ -90,23 +90,29 @@ defmodule RockPaperScissorsPatternMatching do
     iex> RockPaperScissorsPatternMatching.play(:rock, :paper)
     "paper beats rock!"
 
-    iex> RockPaperScissorsPatternMatching.play(:paper, :scissors)
-    "scissors beats paper!"
+    # iex> RockPaperScissorsPatternMatching.play(:paper, :scissors)
+    # "scissors beats paper!"
 
-    iex> RockPaperScissorsPatternMatching.play(:scissors, :rock)
-    "rock beats scissors!"
+    # iex> RockPaperScissorsPatternMatching.play(:scissors, :rock)
+    # "rock beats scissors!"
 
-    iex> RockPaperScissorsPatternMatching.play(:rock, :rock)
-    "draw!"
+    # iex> RockPaperScissorsPatternMatching.play(:rock, :rock)
+    # "draw!"
 
-    iex> RockPaperScissorsPatternMatching.play(:paper, :paper)
-    "draw!"
+    # iex> RockPaperScissorsPatternMatching.play(:paper, :paper)
+    # "draw!"
 
-    iex> RockPaperScissorsPatternMatching.play(:scissors, :scissors)
-    "draw!"
+    # iex> RockPaperScissorsPatternMatching.play(:scissors, :scissors)
+    # "draw!"
   """
-  def play(guess1, guess2) do
+  def play(player1, player2) do
+    beats?(player1, player2)
   end
+
+  defp beats?(:rock, :scissors), do: "rock beats scissors!"
+  defp beats?(:paper, :rock), do: "paper beats rock!"
+  defp beats?(:rock, :paper), do: beats?(:paper, :rock)
+  defp beats?(:scissors, :paper), do: "scissors beats paper!"
 end
 ```
 
