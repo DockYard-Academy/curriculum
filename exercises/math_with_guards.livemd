@@ -122,7 +122,16 @@ defmodule Math do
     iex> Math.add(%{}, %{})
     ** (FunctionClauseError) no function clause matching in Math.add/2
   """
-  def add(value1, value2) do
+  def add(value1, value2) when is_integer(value1) and is_integer(value2) do
+    value1 + value2
+  end
+
+  def add(value1, value2) when is_binary(value1) and is_binary(value2) do
+    value1 <> value2
+  end
+
+  def add(value1, value2) when is_list(value1) and is_list(value2) do
+    value1 ++ value2
   end
 
   @doc """
@@ -161,12 +170,26 @@ defmodule Math do
     iex> Math.subtract(%{}, %{})
     ** (FunctionClauseError) no function clause matching in Math.subtract/2
   """
-  def subtract(value1, value2) do
+  def subtract(value1, value2) when is_integer(value1) and is_integer(value2) do
+    value1 - value2
+  end
+
+  def subtract(value1, value2) when is_binary(value1) and is_binary(value2) do
+    (String.split(value1, "", trim: true) -- String.split(value2, "", trim: true))
+    |> List.to_string()
+  end
+
+  def subtract(value1, value2) when is_list(value1) and is_list(value2) do
+    value1 -- value2
   end
 end
 ```
 
-## Mark As Completed
+```elixir
+string1 = String.split("abcd", "", trim: true)
+string2 = String.split("abc", "", trim: true)
+List.to_string(string1 -- string2)
+```
 
 <!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"math_with_guards_reading\"\n    \"exercises\" -> \"math_with_guards_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
