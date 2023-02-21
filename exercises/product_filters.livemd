@@ -236,7 +236,18 @@ defmodule Products do
   Filter products by :name, :min, :max, and :category.
   The name filter should be case insensitive and handle partial matches.
   """
+  def check?({:min, min}, product), do: min <= product.price
+  def check?({:max, max}, product), do: product.price <= max
+
+  def check?({:name, name}, product),
+    do: String.contains?(String.downcase(product.name), String.downcase(name))
+
+  def check?({:category, category}, product), do: category == product.category
+
   def filter(products, filters) do
+    Enum.filter(products, fn product ->
+      Enum.all?(filters, fn filter -> check?(filter, product) end)
+    end)
   end
 end
 
@@ -250,27 +261,59 @@ defmodule ProductsTest do
   end
 
   test "filter/2 by exact matching name" do
+    found = [name: "laptop"]
+    not_found = [name: "synth"]
+    products = [found, not_found]
+    assert filter(products, name: "laptop") == [found]
   end
 
   test "filter/2 by partial matching name" do
+    found = [name: "laptop"]
+    not_found = [name: "synth"]
+    products = [found, not_found]
+    assert filter(products, name: "pto") == [found]
   end
 
   test "filter/2 by mixed case partial matching name" do
+    found = [name: "laptop"]
+    not_found = [name: "synth"]
+    products = [found, not_found]
+    assert filter(products, name: "Pto") == [found]
   end
 
   test "filter/2 by category" do
+    found = [category: :computer]
+    not_found = [category: :instrument]
+    products = [found, not_found]
+    assert filter(products, category: :computer) == [found]
   end
 
   test "filter/2 by min price" do
+    found = [price: 1000]
+    not_found = [price: 100]
+    products = [found, not_found]
+    assert filter(products, min: 200) == [found]
   end
 
   test "filter/2 by max price" do
+    found = [price: 100]
+    not_found = [price: 1000]
+    products = [found, not_found]
+    assert filter(products, max: 200) == [found]
   end
 
   test "filter/2 by max and min price" do
+    found = [price: 1000]
+    not_found = [price: 100]
+    products = [found, not_found]
+    assert filter(products, min: 200, max: 1100) == [found]
   end
 
   test "filter/2 all filters" do
+    found = [name: "synth", category: :instrument, price: 2000]
+    not_found = [name: "doll", category: :toy, price: 30]
+    products = [found, not_found]
+    assert filter(products, name: "synth", category: :instrument, min: 200, max: 2001) == [found]
   end
 end
 

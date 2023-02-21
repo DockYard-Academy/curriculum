@@ -93,7 +93,7 @@ defmodule Message do
       iex> %Message{}
       %Message{body: nil}
   """
-  defstruct []
+  defstruct [:body]
 
   @doc """
   Send messages between users.
@@ -124,11 +124,16 @@ defmodule Message do
 
     iex> Message.send(%Message{body: nil})
     ** (FunctionClauseError) no function clause matching in Message.send/1
-        
+    
     iex> Message.send(%Message{body: {}})
     ** (FunctionClauseError) no function clause matching in Message.send/1
   """
-  def send(message) do
+  def send(message) when is_binary(message) do
+    message
+  end
+
+  def send(message) when is_binary(message.body) do
+    message.body
   end
 end
 ```
