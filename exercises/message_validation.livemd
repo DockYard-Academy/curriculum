@@ -101,33 +101,34 @@ defmodule Message do
 
   ## Examples
 
-    iex> Message.send("hello!")
-    "hello!"
+  iex> Message.send("hello!")
+  "hello!"
 
-    iex> Message.send("hi!")
-    "hi!"
+  iex> Message.send("hi!")
+  "hi!"
 
-    iex> Message.send(%Message{body: "hello!"})
-    "hello!"
+  iex> Message.send(%Message{body: "hello!"})
+  "hello!"
 
-    iex> Message.send(%Message{body: "hi!"})
-    "hi!"
+  iex> Message.send(%Message{body: "hi!"})
+  "hi!"
 
-    iex> Message.send(123)
-    ** (FunctionClauseError) no function clause matching in Message.send/1
+  iex> Message.send(123)
+  ** (FunctionClauseError) no function clause matching in Message.send/1
 
-    iex> Message.send(%{})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
+  iex> Message.send(%{})
+  ** (FunctionClauseError) no function clause matching in Message.send/1
 
-    iex> Message.send({})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
+  iex> Message.send({})
+  ** (FunctionClauseError) no function clause matching in Message.send/1
 
-    iex> Message.send(%Message{body: nil})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
-    
-    iex> Message.send(%Message{body: {}})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
+  iex> Message.send(%Message{body: nil})
+  ** (FunctionClauseError) no function clause matching in Message.send/1
+
+  iex> Message.send(%Message{body: {}})
+  ** (FunctionClauseError) no function clause matching in Message.send/1
   """
+
   def send(message) when is_binary(message) do
     message
   end
@@ -135,7 +136,15 @@ defmodule Message do
   def send(message) when is_binary(message.body) do
     message.body
   end
+
+  # def send(%Message{body: message}) when is_binary(message) do
+  #   message
+  # end
 end
+```
+
+```elixir
+Message.send(%{body: "string"})
 ```
 
 ## Mark As Completed
