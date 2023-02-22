@@ -130,6 +130,25 @@ defprotocol Character do
   def can_attack?(character, origin, target)
 end
 
+defimpl Character, for: Barbarian do
+  def can_attack?(_character, origin, target) do
+    {x_origin, y_origin} = origin
+    {x_target, y_target} = target
+    abs(x_origin - x_target) <= 2 and abs(y_origin - y_target) <= 2
+  end
+end
+
+defimpl Character, for: Wizard do
+  def can_attack?(_character, origin, target) do
+    {x_origin, y_origin} = origin
+    {x_target, y_target} = target
+
+    abs(x_origin - x_target) == 0 or
+      abs(y_origin - y_target) == 0 or
+      abs(x_origin - x_target) == abs(y_origin - y_target)
+  end
+end
+
 ExUnit.start(auto_run: false)
 
 defmodule CharacterTests do
@@ -174,6 +193,18 @@ defmodule CharacterTests do
       refute Character.can_attack?(%Wizard{}, {4, 4}, {6, 3})
     end
   end
+
+  describe "Archer" do
+    test "can attack at a radius of three" do
+      assert Character.can_attack?(%Archer{}, {4, 4}, {4, 7})
+      assert Character.can_attack?(%Archer{}, {4, 4}, {1, 1})
+    end
+
+    test "cannot attack invalid squares" do
+      refute Character.can_attack?(%Archer{}, {4, 4}, {6, 5})
+      refute Character.can_attack?(%Archer{}, {4, 4}, {2, 5})
+    end
+  end
 end
 
 ExUnit.run()
@@ -198,7 +229,21 @@ true
 Implement your custom character below.
 
 ```elixir
+defmodule Archer do
+  defstruct []
+end
+```
 
+```elixir
+defimpl Character, for: Archer do
+  def can_attack?(_character, origin, target) do
+    {x_origin, y_origin} = origin
+    {x_target, y_target} = target
+
+    (abs(x_origin - x_target) <= 3 and abs(y_origin - y_target) == 3) or
+      (abs(x_origin - x_target) == 3 and abs(y_origin - y_target) <= 3)
+  end
+end
 ```
 
 ## Mark As Completed
