@@ -80,8 +80,13 @@ defmodule Votes do
     0
   """
   def count(votes, vote) do
+    Enum.count(votes, fn v -> v == vote end)
   end
 end
+```
+
+```elixir
+
 ```
 
 ## Bonus: Voter Tally
@@ -120,8 +125,13 @@ defmodule VoterTally do
     %{dog: 2, cat: 3, bird: 1}
   """
   def tally(votes) do
+    Enum.uniq(votes)
+    |> Enum.map(fn vote -> {vote, Votes.count(votes, vote)} end)
+    |> Enum.into(%{})
   end
 end
+
+VoterTally.tally([:dog, :dog, :cat, :cat, :cat, :bird])
 ```
 
 ## Mark As Completed
