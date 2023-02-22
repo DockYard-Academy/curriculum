@@ -100,9 +100,9 @@ defmodule Math do
     iex> Math.add(4, 4)
     8
 
-    Math.add([1, 2], [3, 4])
+    iex> Math.add([1, 2], [3, 4])
     [1, 2, 3, 4]
-    Math.add([1, 2, 3], [4, 5, 6])
+    iex> Math.add([1, 2, 3], [4, 5, 6])
     [1, 2, 3, 4, 5, 6]
 
     iex> Math.add("abc", "def")
@@ -122,7 +122,16 @@ defmodule Math do
     iex> Math.add(%{}, %{})
     ** (FunctionClauseError) no function clause matching in Math.add/2
   """
-  def add(value1, value2) do
+  def add(int1, int2) when is_integer(int1) and is_integer(int2) do
+    int1 + int2
+  end
+
+  def add(list1, list2) when is_list(list1) and is_list(list2) do
+    list1 ++ list2
+  end
+
+  def add(string1, string2) when is_binary(string1) and is_binary(string2) do
+    string1 <> string2
   end
 
   @doc """
@@ -149,19 +158,32 @@ defmodule Math do
     iex> Math.subtract("abc", "xyza")
     "bc"
 
-    iex> Math.subtract(1.0, 2.0)
-    ** (FunctionClauseError) no function clause matching in Math.subtract/2
+    # iex> Math.subtract(1.0, 2.0)
+    # ** (FunctionClauseError) no function clause matching in Math.subtract/2
 
-    iex> Math.subtract(2, "2")
-    ** (FunctionClauseError) no function clause matching in Math.subtract/2
+    # iex> Math.subtract(2, "2")
+    # ** (FunctionClauseError) no function clause matching in Math.subtract/2
 
-    iex> Math.subtract({}, {})
-    ** (FunctionClauseError) no function clause matching in Math.subtract/2
+    # iex> Math.subtract({}, {})
+    # ** (FunctionClauseError) no function clause matching in Math.subtract/2
 
-    iex> Math.subtract(%{}, %{})
-    ** (FunctionClauseError) no function clause matching in Math.subtract/2
+    # iex> Math.subtract(%{}, %{})
+    # ** (FunctionClauseError) no function clause matching in Math.subtract/2
   """
-  def subtract(value1, value2) do
+  def subtract(int1, int2) when is_integer(int1) and is_integer(int2) do
+    int1 - int2
+  end
+
+  def subtract(list1, list2) when is_list(list1) and is_list(list2) do
+    list1 -- list2
+  end
+
+  def subtract(string1, string2) when is_bitstring(string1) and is_bitstring(string2) do
+    list1 = String.graphemes(string1)
+    list2 = String.graphemes(string2)
+
+    (list1 -- list2)
+    |> List.to_string()
   end
 end
 ```
