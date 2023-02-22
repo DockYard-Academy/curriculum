@@ -130,6 +130,22 @@ defprotocol Character do
   def can_attack?(character, origin, target)
 end
 
+defimpl Character, for: Barbarian do
+  def can_attack?(_character, {x1, y1}, {x2, y2}) do
+    # can move +/- 2 spaces along the x axis -> horizontal
+    # can move +/- 2 spaces along the y axis -> vertical
+    # horizontal         # vertical 
+    abs(x2 - x1) <= 2 or abs(y2 - y1) <= 2
+  end
+end
+
+defimpl Character, for: Wizard do
+  def can_attack?(_character, {x1, y1}, {x2, y2}) do
+    # diagonal              # vertical and horizontal
+    x1 == x2 || y1 == y2 || abs(x2 - x1) == abs(y2 - y1)
+  end
+end
+
 ExUnit.start(auto_run: false)
 
 defmodule CharacterTests do
@@ -198,7 +214,22 @@ true
 Implement your custom character below.
 
 ```elixir
+defmodule Archer do
+  defstruct []
+end
+```
 
+```elixir
+defimpl Character, for: Archer do
+  def can_attack?(_character, {x1, y1}, {x2, y2}) do
+    # can move +/- 2 spaces along the x axis -> horizontal
+    # can move +/- 2 spaces along the y axis -> vertical
+    # horizontal         # vertical 
+    abs(x2 - x1) <= 3 or abs(y2 - y1) <= 3
+  end
+end
+
+Character.can_attack?(%Archer{}, {4, 4}, {7, 7})
 ```
 
 ## Mark As Completed
