@@ -193,7 +193,13 @@ end
 </details>
 
 ```elixir
+defimpl Adder, for: List do
+  def add(list1, list2) do
+    list1 ++ list2
+  end
+end
 
+Adder.add([1], [2])
 ```
 
 ## Protocols With Structs
@@ -245,8 +251,21 @@ Sound.say(%Cat{mood: :angry})
 
 ```elixir
 defmodule Dog do
-  defstruct []
+  defstruct [:mood]
 end
+```
+
+```elixir
+defimpl Sound, for: Dog do
+  def say(dog) do
+    case dog.mood do
+      :happy -> "Bark!"
+      :angry -> "Growl!"
+    end
+  end
+end
+
+Sound.say(%Dog{mood: :happy})
 ```
 
 Define a `Sound` implementation for the `Dog` struct above.
