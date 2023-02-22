@@ -105,6 +105,43 @@ Map.replace!(%MyStruct{}, :name, "hello")
 ```
 
 ```elixir
+defimpl Math, for: List do
+  def add(list1, list2) do
+    list1 ++ list2
+  end
+
+  def subtract(list1, list2) do
+    list1 -- list2
+  end
+end
+
+defimpl Math, for: BitString do
+  def add(string1, string2) do
+    string1 <> string2
+  end
+
+  def subtract(string1, string2) do
+    (String.graphemes(string1) -- String.graphemes(string2))
+    |> Enum.join()
+  end
+end
+
+defimpl Math, for: Integer do
+  def add(int1, int2) do
+    int1 + int2
+  end
+
+  def subtract(int1, int2) do
+    int1 - int2
+  end
+end
+```
+
+```elixir
+Math.add("abc", "def")
+```
+
+```elixir
 defprotocol Math do
   @doc """
   Add two integers, lists, or strings.
