@@ -241,11 +241,11 @@ end
 ```elixir
 defimpl Character, for: Wizard do
   def can_attack?(%Wizard{}, {cx, cy}, {tx, ty}) do
-    vertical? = fn cx, tx -> cx == tx end
-    horizontal? = fn cy, ty -> cy == ty end
-    diagonal? = fn {cx, cy}, {tx, ty} -> abs(tx - cx) == abs(ty - cy) end
+    vertical? = cx == tx
+    horizontal? = cy == ty
+    diagonal? = abs(tx - cx) == abs(ty - cy)
 
-    vertical?.(cx, tx) or horizontal?.(cy, ty) or diagonal?.({cx, cy}, {tx, ty})
+    vertical? or horizontal? or diagonal?
   end
 end
 ```
