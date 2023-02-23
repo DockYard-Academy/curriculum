@@ -67,6 +67,9 @@ defmodule Anagram do
     true
   """
   def anagram?(string1, string2) do
+    string1 = String.split(string1, "") |> Enum.sort()
+    string2 = String.split(string2, "") |> Enum.sort()
+    string1 == string2
   end
 
   @doc """
@@ -84,6 +87,7 @@ defmodule Anagram do
     []
   """
   def filter_anagrams(word_list, anagram) do
+    for string <- word_list, anagram?(string, anagram), do: string
   end
 end
 ```
@@ -113,6 +117,8 @@ defmodule AnagramSolver do
     ["abc", "acb", "bac", "bca", "cab", "cba"]
   """
   def solve(string) do
+    characters = String.split(string, "", trim: true)
+    # come back to this
   end
 end
 ```
