@@ -141,7 +141,7 @@ end
 
 defimpl Character, for: Wizard do
   def can_attack?(_character, {x1, y1}, {x2, y2}) do
-    # diagonal              # vertical and horizontal
+    # vertical/horizontal   # diagonal
     x1 == x2 || y1 == y2 || abs(x2 - x1) == abs(y2 - y1)
   end
 end
@@ -222,14 +222,14 @@ end
 ```elixir
 defimpl Character, for: Archer do
   def can_attack?(_character, {x1, y1}, {x2, y2}) do
-    # can move +/- 2 spaces along the x axis -> horizontal
-    # can move +/- 2 spaces along the y axis -> vertical
+    # can move +/- 3 spaces along the x axis -> horizontal
+    # can move +/- 3 spaces along the y axis -> vertical
     # horizontal         # vertical 
-    abs(x2 - x1) <= 3 or abs(y2 - y1) <= 3
+    abs(x2 - x1) == 3 or abs(y2 - y1) == 3
   end
 end
 
-Character.can_attack?(%Archer{}, {4, 4}, {7, 7})
+Character.can_attack?(%Archer{}, {4, 4}, {8, 8})
 ```
 
 ## Mark As Completed
