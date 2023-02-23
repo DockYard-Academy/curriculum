@@ -346,7 +346,7 @@ Use the [Integer.gcd/2](https://hexdocs.pm/elixir/Integer.html#gcd/2) function t
 positive integer that divides both 10 and 15 evenly, so the result should be `5`.
 
 ```elixir
-
+Integer.gcd(10, 15)
 ```
 
 ## The String Module
@@ -429,6 +429,7 @@ Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to ge
 
 ```elixir
 "hello"
+|> String.at(2)
 ```
 
 Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to retrieve the letter `"o"` in `"hello"`
@@ -445,6 +446,7 @@ Use the [String.at/2](https://hexdocs.pm/elixir/String.html#at/2) function to re
 
 ```elixir
 "hello"
+|> String.at(4)
 ```
 
 Use the [String.contains?/2](https://hexdocs.pm/elixir/String.html#contains?/2) function to determine if `"hello"` contains `"lo"`. The result should be `true`.
@@ -461,6 +463,7 @@ Use the [String.contains?/2](https://hexdocs.pm/elixir/String.html#contains?/2) 
 
 ```elixir
 "Hello"
+|> String.contains?("lo")
 ```
 
 Use [String.capitalize/2](https://hexdocs.pm/elixir/String.html#capitalize/2) to capitalize `"hello"` to `"Hello"`.
@@ -477,6 +480,7 @@ Use [String.capitalize/2](https://hexdocs.pm/elixir/String.html#capitalize/2) to
 
 ```elixir
 "hello"
+|> String.capitalize()
 ```
 
 Use [String.upcase/2](https://hexdocs.pm/elixir/String.html#upcase/2) to upcase `"hello"` to `"HELLO"`.
@@ -493,6 +497,7 @@ Use [String.upcase/2](https://hexdocs.pm/elixir/String.html#upcase/2) to upcase 
 
 ```elixir
 "hello"
+|> String.upcase()
 ```
 
 Use [String.downcase/2](https://hexdocs.pm/elixir/String.html#downcase/2) to dowcase `"HELLO"` to `"hello"`.
@@ -509,6 +514,7 @@ Use [String.downcase/2](https://hexdocs.pm/elixir/String.html#downcase/2) to dow
 
 ```elixir
 "HELLO"
+|> String.downcase()
 ```
 
 Use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split the following comma-separated list of strings into a list of words.
@@ -525,6 +531,7 @@ Use [String.split/3](https://hexdocs.pm/elixir/String.html#split/3) to split the
 
 ```elixir
 "have,a,great,day"
+|> String.split(",")
 ```
 
 Use [String.trim/1](https://hexdocs.pm/elixir/String.html#trim/1) to remove whitespace from the `"  hello!  "` string.
@@ -541,6 +548,7 @@ Use [String.trim/1](https://hexdocs.pm/elixir/String.html#trim/1) to remove whit
 
 ```elixir
 "  hello!  "
+|> String.trim()
 ```
 
 ## The List Module
@@ -612,6 +620,7 @@ Use [List.delete_at/2](https://hexdocs.pm/elixir/List.html#delete_at/2) to remov
 
 ```elixir
 [2, 1, 3]
+|> List.delete_at(0)
 ```
 
 Use [List.flatten/1](https://hexdocs.pm/elixir/List.html#flatten/1) to flatten the following list into `[1, 2, 3, 4, 5, 6, 7, 8, 9]`
@@ -628,6 +637,7 @@ Use [List.flatten/1](https://hexdocs.pm/elixir/List.html#flatten/1) to flatten t
 
 ```elixir
 [1, 2, [3, 4, 5], 6, [7, [8, [9]]]]
+|> List.flatten()
 ```
 
 Use [List.insert_at/3](https://hexdocs.pm/elixir/List.html#insert_at/3) to insert `2` into the following list to make `[1, 2, 3]`.
@@ -644,6 +654,7 @@ Use [List.insert_at/3](https://hexdocs.pm/elixir/List.html#insert_at/3) to inser
 
 ```elixir
 [1, 3]
+|> List.insert_at(1, 2)
 ```
 
 Use [List.last/2](https://hexdocs.pm/elixir/List.html#last/2) to retrieve the last element `10000` in a list from `1` to `10000`.
@@ -666,6 +677,7 @@ Use [List.last/2](https://hexdocs.pm/elixir/List.html#last/2) to retrieve the la
 
 ```elixir
 Enum.to_list(1..10000)
+|> List.last()
 ```
 
 Use [List.update_at/3](https://hexdocs.pm/elixir/List.html#update_at/3) to subtract `2` from `4` in the following list to make `[1, 2, 3]`.
@@ -681,7 +693,8 @@ Use [List.update_at/3](https://hexdocs.pm/elixir/List.html#update_at/3) to subtr
 </details>
 
 ```elixir
-[1, 4, 3]
+[1, 2, 3, 4, 5]
+|> List.update_at(2, &(&1 - 2))
 ```
 
 Use [List.zip/1](https://hexdocs.pm/elixir/List.html#zip/1) to combine these two lists to make `[{"a", 1}, {"b", 2}, {"c", 3}]`.
@@ -702,6 +715,7 @@ Use [List.zip/1](https://hexdocs.pm/elixir/List.html#zip/1) to combine these two
 ```elixir
 letters = ["a", "b", "c"]
 numbers = [1, 2, 3]
+List.zip([letters, numbers])
 ```
 
 ## The Map Module
@@ -758,6 +772,7 @@ Use [Map.get/3](https://hexdocs.pm/elixir/Map.html#get/3) to retrieve the `"worl
 
 ```elixir
 %{hello: "world"}
+|> Map.get(:hello)
 ```
 
 Use [Map.put/3](https://hexdocs.pm/elixir/Map.html#put/3) to add the key `:two` with the value `2` to the following map.
@@ -774,6 +789,7 @@ Use [Map.put/3](https://hexdocs.pm/elixir/Map.html#put/3) to add the key `:two` 
 
 ```elixir
 %{one: 1}
+|> Map.put(:two, 2)
 ```
 
 Use [Map.keys/1](https://hexdocs.pm/elixir/Map.html#keys/1) to retrieve the keys for the following map.
@@ -790,6 +806,7 @@ Use [Map.keys/1](https://hexdocs.pm/elixir/Map.html#keys/1) to retrieve the keys
 
 ```elixir
 %{key1: 1, key2: 2, key3: 3}
+|> Map.keys()
 ```
 
 Use [Map.delete/2](https://hexdocs.pm/elixir/Map.html#delete/2) to remove `:key1` from the following map.
@@ -806,6 +823,7 @@ Use [Map.delete/2](https://hexdocs.pm/elixir/Map.html#delete/2) to remove `:key1
 
 ```elixir
 %{key1: 1, key2: 2, key3: 3}
+|> Map.delete(:key1)
 ```
 
 Use [Map.merge/2](https://hexdocs.pm/elixir/Map.html#merge/2) to combine `%{one: 1}` and `%{two: 2}`.
@@ -821,7 +839,7 @@ Use [Map.merge/2](https://hexdocs.pm/elixir/Map.html#merge/2) to combine `%{one:
 </details>
 
 ```elixir
-
+Map.merge(%{one: 1}, %{two: 2})
 ```
 
 Use [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4) or [Map.update!/3](https://hexdocs.pm/elixir/Map.html#update!/3) to update the `:count` key in this map to be `5` plus the existing value.
@@ -838,6 +856,7 @@ Use [Map.update/4](https://hexdocs.pm/elixir/Map.html#update/4) or [Map.update!/
 
 ```elixir
 %{count: 10}
+|> Map.update(:count, 10, &(&1 + 5))
 ```
 
 Use [Map.values/1](https://hexdocs.pm/elixir/Map.html#values/1) to retrieve the values `[1, 2, 3]` in the following map.
@@ -854,6 +873,7 @@ Use [Map.values/1](https://hexdocs.pm/elixir/Map.html#values/1) to retrieve the 
 
 ```elixir
 %{key1: 1, key2: 2, key3: 3}
+|> Map.values()
 ```
 
 ## The Keyword Module
@@ -917,6 +937,7 @@ Use [Keyword.get/3](https://hexdocs.pm/elixir/Keyword.html#get/3) to access the 
 
 ```elixir
 [color: "red"]
+|> Keyword.get(:color)
 ```
 
 Use [Keyword.get/3](https://hexdocs.pm/elixir/Keyword.html#get/3) to access the value for the `:color` key in the following empty list. If the `:color` key does not exist, provide a default value of `"blue"`.
@@ -933,6 +954,7 @@ Use [Keyword.get/3](https://hexdocs.pm/elixir/Keyword.html#get/3) to access the 
 
 ```elixir
 []
+|> Keyword.get(:color, "blue")
 ```
 
 Use the [Keyword.keys/1](https://hexdocs.pm/elixir/Keyword.html#keys/1) function to list all of the keys in the following keyword list.
@@ -949,6 +971,7 @@ Use the [Keyword.keys/1](https://hexdocs.pm/elixir/Keyword.html#keys/1) function
 
 ```elixir
 [one: 1, two: 2, three: 3]
+|> Keyword.keys()
 ```
 
 Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) function to determine if the following is a keyword list.
@@ -965,6 +988,7 @@ Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) 
 
 ```elixir
 [key: "value"]
+|> Keyword.keyword?()
 ```
 
 Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) function to determine if an empty list is a keyword list.
@@ -983,6 +1007,7 @@ Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) 
 
 ```elixir
 []
+|> Keyword.keyword?()
 ```
 
 Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) function to determine if the following list is a keyword list.
@@ -999,6 +1024,7 @@ Use the [Keyword.keyword?/1](https://hexdocs.pm/elixir/Keyword.html#keyword?/1) 
 
 ```elixir
 [1, 2, 3]
+|> Keyword.keyword?()
 ```
 
 ## Further Reading
