@@ -117,7 +117,20 @@ defmodule Lucas do
     iex> Lucas.number(20)
     15127
   """
+
+  # def number(n) do
+  # end
+
+  # def number(0), do: 2
+  # def number(1), do: 1
+  # def number(n), do: number(n - 1) + number(n - 2)
+
   def number(n) do
+    cond do
+      n == 0 -> 2
+      n == 1 -> 1
+      true -> number(n - 1) + number(n - 2)
+    end
   end
 
   @doc """
@@ -141,9 +154,22 @@ defmodule Lucas do
     [2, 1, 3, 4, 7, 11, 18, 29, 47, 76]
   """
 
-  def sequence(length) do
+  def sequence(n, liszt \\ [1, 2])
+  def sequence(0, _liszt), do: []
+  def sequence(1, liszt), do: tl(liszt)
+  def sequence(2, liszt), do: Enum.reverse(liszt)
+
+  def sequence(length, liszt) do
+    liszt = [hd(liszt) + hd(tl(liszt)) | liszt]
+    sequence(length - 1, liszt)
   end
 end
+
+# case length do 
+#   1 -> acc = List.insert_at(acc, -1, 2)
+#   2 -> acc = List.insert_at([2], -1, 1)
+#   _ -> acc = List.insert_at(sequence(3), -1, number(length))
+# end
 ```
 
 ## Mark As Completed
