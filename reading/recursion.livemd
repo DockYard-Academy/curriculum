@@ -88,13 +88,13 @@ We should have some end condition, otherwise, this would run forever. You'll not
 this Elixir cell never stops running. Under the hood it's calling `Forever.run/0` over and over.
 
 ```elixir
-defmodule Forever do
-  def run do
-    run()
-  end
-end
+# defmodule Forever do
+#   def run do
+#     run()
+#   end
+# end
 
-Forever.run()
+# Forever.run()
 ```
 
 ## Stack Overflow
@@ -155,7 +155,7 @@ You may need to click the **Connect** button to reconnect the Elixir runtime.
 #   end
 # end
 
-# Body.recursion([1,2,3])
+# Body.recursion([1, 2, 3])
 ```
 
 Make sure you comment out the code above, otherwise Livebook will keep disconnecting.
@@ -323,7 +323,18 @@ end
 </details>
 
 ```elixir
+defmodule CountDown do
+  def count(0), do: IO.puts(0)
 
+  def count(n) do
+    IO.puts(n)
+    count(n - 1)
+  end
+end
+```
+
+```elixir
+CountDown.count(5)
 ```
 
 ### Your Turn
@@ -385,7 +396,23 @@ end
 </details>
 
 ```elixir
+defmodule CountBetween do
+  def count(start, finish) when start == finish, do: IO.puts(start)
 
+  def count(start, finish) when start > finish do
+    IO.inspect(start)
+    count(start - 1, finish)
+  end
+
+  def count(start, finish) when start < finish do
+    IO.inspect(start)
+    count(start + 1, finish)
+  end
+end
+```
+
+```elixir
+CountBetween.count(10, 2)
 ```
 
 ## Mark As Completed
