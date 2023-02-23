@@ -89,9 +89,62 @@ defmodule Fibonacci do
     iex> Fibonacci.of(20)
     6765
   """
-  def of(n) do
+
+  # def of(0), do: 0
+  # def of(1), do: 1
+  # def of(n), do: of(n - 1) + of(n - 2)
+
+  # def of(n) do
+  #   cond do
+  #     n == 0 -> 0
+  #     n == 1 -> 1
+  #     true -> of(n - 1) + of(n - 2)
+  #   end
+  # end 
+
+  # def of(n) when n < 1 do 0 end
+  # def of(n) when n == 1 do 1 end
+  # def of(n) do 
+  #   of(n - 1) + of(n - 2)
+  # end
+
+  # def of(n, acc \\ 0) do
+  #   cond do
+  #     n - acc == 0 -> acc 
+  #     n - acc == 1 -> of(n, acc + 1)
+  #     n - acc >= 1 -> of(n - 1, acc + 1)
+  #   end
+  # end
+end
+```
+
+```elixir
+def of(n, acc \\ n - 2) do
+  case acc do
+    0 -> 1
+    1 -> of(n - 1) + of(n - 2)
+    _ -> of(n, n - 1)
   end
 end
+
+# def of(0), do: 0
+# def of(1), do: 1
+# def of(2), do: 1
+# def of(n), do: of(n - 1) + of(n - 2)
+
+# def of(n) do
+#   cond do
+#     n == 0 -> 0
+#     n == 1 || n == 2 -> 1
+#     true -> of(n - 1) + of(n - 2)
+#   end
+# end 
+
+# def of(n) when n < 1 do 0 end
+# def of(n) when n == 1 or n == 2 do 1 end
+# def of(n) when n >= 3 do
+#   of(n - 1) + of(n - 2)
+# end
 ```
 
 ## Mark As Completed
