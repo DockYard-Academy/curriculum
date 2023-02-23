@@ -228,22 +228,24 @@ Implement your custom character below.
 
 ```elixir
 defimpl Character, for: Knight do
-  def can_attack?(%Knight{}, {cx, cy}, {tx, ty}) when abs(cx - tx) == 2 do
-    abs(cx - tx) == 2 and abs(cy - ty) == 1
+  def can_attack?(%Knight{}, {charecter_x, charecter_y}, {target_x, target_y}) do
+    two_h_one_v = abs(charecter_x - target_x) == 2 and abs(charecter_y - target_y) == 1
+    one_h_two_v = abs(charecter_x - target_x) == 1 and abs(charecter_y - target_y) == 2
+    two_h_one_v or one_h_two_v
   end
 
-  def can_attack?(%Knight{}, {cx, cy}, {tx, ty}) do
-    abs(cx - tx) == 1 and abs(cy - ty) == 2
-  end
+  # def can_attack?(%Knight{}, {cx, cy}, {tx, ty}) do
+  #   one_h_two_v = abs(cx - tx) == 1 and abs(cy - ty) == 2
+  # end
 end
 ```
 
 ```elixir
 defimpl Character, for: Wizard do
-  def can_attack?(%Wizard{}, {cx, cy}, {tx, ty}) do
-    vertical? = cx == tx
-    horizontal? = cy == ty
-    diagonal? = abs(tx - cx) == abs(ty - cy)
+  def can_attack?(%Wizard{}, {charecter_x, charecter_y}, {target_x, target_y}) do
+    vertical? = charecter_x == target_x
+    horizontal? = charecter_y == target_y
+    diagonal? = abs(target_x - charecter_x) == abs(target_y - charecter_y)
 
     vertical? or horizontal? or diagonal?
   end
@@ -252,8 +254,8 @@ end
 
 ```elixir
 defimpl Character, for: Barbarian do
-  def can_attack?(%Barbarian{}, {cx, cy}, {tx, ty}) do
-    abs(tx - cx) <= 2 and abs(ty - cy) <= 2
+  def can_attack?(%Barbarian{}, {charecter_x, charecter_y}, {target_x, target_y}) do
+    abs(target_x - charecter_x) <= 2 and abs(target_y - charecter_y) <= 2
   end
 end
 ```
