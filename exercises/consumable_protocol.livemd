@@ -46,7 +46,14 @@ end
 Enter your solution below.
 
 ```elixir
-
+defmodule Character do
+  defstruct strength: 10,
+            dexterity: 10,
+            constitution: 10,
+            wisdom: 10,
+            intelligence: 10,
+            charisma: 10
+end
 ```
 
 Our game has `Consumable` items when modify a character's base stats. For example, we'll have
@@ -110,7 +117,29 @@ end
 Enter your solution below.
 
 ```elixir
-Enum.map("abc", fn char -> char end)
+defmodule StrengthPotion do
+  defstruct level: 1
+end
+
+defmodule DexterityPotion do
+  defstruct level: 1
+end
+
+defmodule ConstitutionPotion do
+  defstruct level: 1
+end
+
+defmodule WisdomPotion do
+  defstruct level: 1
+end
+
+defmodule IntelligencePotion do
+  defstruct level: 1
+end
+
+defmodule CharismaPotion do
+  defstruct level: 1
+end
 ```
 
 To make our system extendable, we'll have a `Consumable` protocol, and separate implementations for structs such as the `StrengthPotion`.
@@ -179,7 +208,53 @@ end
 </details>
 
 ```elixir
+defprotocol Consumable do
+  def consume(item, character)
+end
 
+defimpl Consumable, for: StrengthPotion do
+  def consume(item, character) do
+    %{character | strength: character.strength + item.level}
+  end
+end
+
+defimpl Consumable, for: DexterityPotion do
+  def consume(item, character) do
+    %{character | strength: character.dexterity + item.level}
+  end
+end
+
+defimpl Consumable, for: ConstitutionPotion do
+  def consume(item, character) do
+    %{character | strength: character.constitution + item.level}
+  end
+end
+
+defimpl Consumable, for: WisdomPotion do
+  def consume(item, character) do
+    %{character | strength: character.wisdom + item.level}
+  end
+end
+
+defimpl Consumable, for: IntelligencePotion do
+  def consume(item, character) do
+    %{character | strength: character.intelligence + item.level}
+  end
+end
+
+defimpl Consumable, for: CharismaPotion do
+  def consume(item, character) do
+    %{character | strength: character.charisma + item.level}
+  end
+end
+
+# defimpl Consumable, for: CharismaPotion do
+#   def consume(item, character) do
+#     Map.update(character, :charisma, fn
+#       character.charisma -> character.charisma + item.level
+#     end)
+#   end
+# end
 ```
 
 ## Mark As Completed
