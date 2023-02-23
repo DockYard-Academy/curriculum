@@ -149,13 +149,13 @@ You'll notice the **Process** memory consumption will increase, and eventually, 
 You may need to click the **Connect** button to reconnect the Elixir runtime.
 
 ```elixir
-defmodule Body do
-  def recursion([head | tail]) do
-    recursion(tail ++ tail) ++ [head]
-  end
-end
+# defmodule Body do
+#   def recursion([head | tail]) do
+#     recursion(tail ++ tail) ++ [head]
+#   end
+# end
 
-Body.recursion([1, 2, 3])
+# Body.recursion([1, 2, 3])
 ```
 
 ```elixir
@@ -327,7 +327,16 @@ end
 </details>
 
 ```elixir
+defmodule CountDown do
+  def count(0), do: IO.puts(0)
 
+  def count(n) do
+    IO.puts(n)
+    count(n - 1)
+  end
+end
+
+CountDown.count(5)
 ```
 
 ### Your Turn
@@ -389,7 +398,21 @@ end
 </details>
 
 ```elixir
+defmodule CountMiddle do
+  def between(finish, finish), do: IO.puts(finish)
 
+  def between(start, finish) when start > finish do
+    IO.puts(start)
+    between(start - 1, finish)
+  end
+
+  def between(start, finish) when start < finish do
+    IO.puts(start)
+    between(start + 1, finish)
+  end
+end
+
+CountMiddle.between(2, 5)
 ```
 
 ## Mark As Completed
