@@ -72,13 +72,13 @@ File.dir?("drills/drills.txt")
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create a filed called `hello.txt` with the content `"world"`.
 
 ```elixir
-File.write("./drills/hello.txt", "world")
+File.write("./hello.txt", "world")
 ```
 
 Use [File.read/1](https://hexdocs.pm/elixir/File.html#read/1) to read the content of the `hello.txt` file.
 
 ```elixir
-File.read("./drills/hello.txt")
+File.read("./hello.txt")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an empty file in the `drills` folder you previously created.
@@ -160,13 +160,12 @@ end
 Use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2), [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2), and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to read the first line of `multi-line.txt`. Print the value.
 
 ```elixir
-"drills/multi-line.txt"
-|> File.open()
-
-# |> IO.binread()
+"./hello.txt"
+{:ok, file} = File.open("hello.txt")
+IO.binread(file, :line) |> IO.inspect()
 # |> IO.binread(:line)
 # |> IO.binread(:line_or_chars)
-# |> File.close()
+File.close(file)
 ```
 
 Use [File.mkdir_p/1](https://hexdocs.pm/elixir/File.html#mkdir_p/1) to create:
