@@ -2,7 +2,7 @@
 
 ```elixir
 Mix.install([
-  {:jason, "~> 1.4"},
+  # {:jason, "~> 1.4"},
   {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
@@ -60,6 +60,10 @@ end
 Implement the `CustomEnum` module according to the documentation below.
 
 ```elixir
+
+```
+
+```elixir
 defmodule CustomEnum do
   @moduledoc """
   Documentation for `CustomEnum`.
@@ -78,6 +82,8 @@ defmodule CustomEnum do
     [7, 6, 5, 4]
   """
   def reverse(list) do
+    list
+    |> Enum.reduce([], fn elem, acc -> [elem | acc] end)
   end
 
   @doc """
@@ -92,6 +98,7 @@ defmodule CustomEnum do
     [true, true, true]
   """
   def map(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc -> acc ++ [callback_function.(elem)] end)
   end
 
   @doc """
@@ -107,6 +114,13 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    Enum.reduce(list, [], fn elem, acc ->
+      if callback_function.(elem) do
+        acc ++ [elem]
+      else
+        acc
+      end
+    end)
   end
 
   @doc """
@@ -121,6 +135,7 @@ defmodule CustomEnum do
     3
   """
   def sum(list_of_integers) do
+    Enum.reduce(list_of_integers, 0, fn a, b -> a + b end)
   end
 
   @doc """
@@ -135,6 +150,7 @@ defmodule CustomEnum do
     "Hello, World!"
   """
   def join(list_of_strings) do
+    Enum.reduce(list_of_strings, "", fn a, b -> b <> a end)
   end
 end
 ```
