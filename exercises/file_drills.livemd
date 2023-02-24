@@ -25,67 +25,65 @@ This set of drills is for the [File](../reading/file.livemd) module. Follow the 
 Use [File.ls/1](https://hexdocs.pm/elixir/File.html#ls/1) to list all of the files/folders in the current path.
 
 ```elixir
-
+File.ls()
 ```
 
-Use [File.ls/1](https://hexdocs.pm/elixir/File.html#ls/1) to list all of the files/folders in the parent directory of the current path.
-
 ```elixir
-
+File.ls!()
 ```
 
 Use [File.mkdir/1](https://hexdocs.pm/elixir/File.html#mkdir/1) to create a directory called `drills`.
 
 ```elixir
-
+File.mkdir("drills")
 ```
 
 Use [File.dir?/2](https://hexdocs.pm/elixir/File.html#dir?/2) to check that `drills` is a folder.
 
 ```elixir
-
+File.dir?("curriculum/drills")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an empty file called `drills.txt`.
 
 ```elixir
-
+File.write("drills.txt", "")
 ```
 
 Use [File.exists?/2](https://hexdocs.pm/elixir/File.html#exists?/2) to check that the `drills.txt` file exists.
 
 ```elixir
-
+File.exists?("drills.txt")
 ```
 
 Use [File.dir?/2](https://hexdocs.pm/elixir/File.html#dir?/2) to check that `drills.txt` is not a folder.
 
 ```elixir
-
+File.dir?("drills.txt")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create a filed called `hello.txt` with the content `"world"`.
 
 ```elixir
-
+File.write("hello.txt", "world")
 ```
 
 Use [File.read/1](https://hexdocs.pm/elixir/File.html#read/1) to read the content of the `hello.txt` file.
 
 ```elixir
-
+File.read("hello.txt")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an empty file in the `drills` folder you previously created.
 
 ```elixir
-
+File.write("empty.txt", "")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an `error/no_entity.txt` file that should return `{:error, :enoent}` because the `error` folder does not exist.
 
 ```elixir
-
+File.write("error/no_entity.txt", "")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create a file `multi-line.txt` with a multi-line string.
@@ -103,19 +101,27 @@ line 5
 ```
 
 ```elixir
+multiline_string = """
+line 1
+line 2
+line 3
+line 4
+line 5
+"""
 
+File.write!("multi-line.txt", multiline_string)
 ```
 
 Use [File.read/1](https://hexdocs.pm/elixir/File.html#read/1) to read `multi-line.txt`.
 
 ```elixir
-
+File.read("multi-line.txt")
 ```
 
 Use [File.stream!/3](https://hexdocs.pm/elixir/File.html#stream!/3) to read each line of `multi-line.txt` and convert it to a list of lines using [Enum.to_list/1](https://hexdocs.pm/elixir/Enum.html#to_list/1).
 
 ```elixir
-
+File.stream!("multi-line.txt") |> Enum.to_list()
 ```
 
 Use [File.stream!/3](https://hexdocs.pm/elixir/File.html#stream!/3) and [Stream.filter/2](https://hexdocs.pm/elixir/Stream.html#filter/2) to filter in lines from `multi-line.txt` that contain numbers less than or equal to `3`.
@@ -133,13 +139,23 @@ line 3
 ```
 
 ```elixir
+filtered_lines =
+  File.stream!("multi-line.txt")
+  |> Enum.to_list()
+  |> Stream.filter(fn x -> Regex.match?(~r/[1-3]/, x) end)
+  |> Enum.to_list()
 
+File.write("multi-line.txt", filtered_lines)
 ```
 
 Use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2), [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2), and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to read the first line of `multi-line.txt`. Print the value.
 
 ```elixir
+{:ok, file} = File.open("multi-line.txt")
 
+IO.binread(file, :line) |> IO.inspect()
+
+File.close(file)
 ```
 
 Use [File.mkdir_p/1](https://hexdocs.pm/elixir/File.html#mkdir_p/1) to create:
@@ -149,7 +165,9 @@ Use [File.mkdir_p/1](https://hexdocs.pm/elixir/File.html#mkdir_p/1) to create:
 * `"parent/sub_c"`
 
 ```elixir
-
+File.mkdir_p("parent/sub_a")
+File.mkdir_p("parent/sub_b")
+File.mkdir_p("parent/sub_c")
 ```
 
 Use [File.write!/3](https://hexdocs.pm/elixir/File.html#write!/3) to create six empty files:
@@ -162,13 +180,21 @@ Use [File.write!/3](https://hexdocs.pm/elixir/File.html#write!/3) to create six 
 * `"parent/sub_c/file"`
 
 ```elixir
+# "/home/rolzup/Elixir/curriculum/drills"
 
+File.write!("parent/sub_a/file.txt", "")
+File.write!("parent/sub_a/file", "")
+File.write!("parent/sub_b/file.txt", "")
+File.write!("parent/sub_b/file", "")
+File.write!("parent/sub_c/file.txt", "")
+File.write!("parent/sub_c/file", "")
 ```
 
 Use [File.ls!/1](https://hexdocs.pm/elixir/File.html#ls!/1) to find all of the files/folders inside of the `parent` folder.
 
 ```elixir
-
+File.ls("./parent")
+File.ls("./parent/sub_a")
 ```
 
 ## Path
@@ -176,43 +202,43 @@ Use [File.ls!/1](https://hexdocs.pm/elixir/File.html#ls!/1) to find all of the f
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"/parent/"` and `"/child/"`
 
 ```elixir
-
+Path.join(["/parent/", "/child/"])
 ```
 
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"parent"` and `"child"`
 
 ```elixir
-
+Path.join(["parent", "child"])
 ```
 
 Use [Path.join/2](https://hexdocs.pm/elixir/Path.html#join/2) to join `"folder"` and `"file.txt"`.
 
 ```elixir
-
+Path.join(["folder", "file.txt"])
 ```
 
 Use [Path.absname/1](https://hexdocs.pm/elixir/Path.html#absname/1) to convert the current path `"."` to an absolute path.
 
 ```elixir
-
+Path.absname(".")
 ```
 
 Use [Path.dirname/1](https://hexdocs.pm/elixir/Path.html#dirname/1) to find the directory name of `"folder/subfolder/file.txt"`
 
 ```elixir
-
+Path.dirname("folder/subfolder/file.txt")
 ```
 
 Use [Path.dirname/1](https://hexdocs.pm/elixir/Path.html#dirname/1) to find the directory name of `"file.txt"`.
 
 ```elixir
-
+Path.dirname("file.txt")
 ```
 
 Use [Path.wildcard/2](https://hexdocs.pm/elixir/Path.html#wildcard/2) to find all files in a nested folder `"parent/*"` that end in a `.txt` extension. You should see your three `file.txt` files created earlier.
 
 ```elixir
-
+Path.wildcard("parent/*/*.txt")
 ```
 
 Use [File.rm_rf/1](https://hexdocs.pm/elixir/File.html#rm_rf/1) to delete all folders created by this exercise.
@@ -222,7 +248,9 @@ CAUTION: DO NOT DELETE IMPORTANT FILES ON YOUR COMPUTER.
 </div>
 
 ```elixir
+# File.cd("/home/rolzup/Elixir/curriculum")
 
+File.rm_rf("drills")
 ```
 
 Use [File.rm/1](https://hexdocs.pm/elixir/File.html#rm/1) to delete any remaining files created by this exercise.
@@ -232,7 +260,7 @@ CAUTION: DO NOT DELETE IMPORTANT FILES ON YOUR COMPUTER.
 </div>
 
 ```elixir
-
+File.ls()
 ```
 
 ## Mark As Completed
@@ -300,3 +328,7 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 | Previous                       | Next                                       |
 | ------------------------------ | -----------------------------------------: |
 | [File](../reading/file.livemd) | [Save Game](../exercises/save_game.livemd) |
+
+<!-- livebook:{"break_markdown":true} -->
+
+
