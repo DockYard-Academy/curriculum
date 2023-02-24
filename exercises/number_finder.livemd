@@ -43,6 +43,12 @@ defmodule NumberFinder do
     -3
   """
   def smallest(number_list) do
+    Enum.reduce(number_list, fn current_int, smallest_int ->
+      cond do
+        current_int < smallest_int -> current_int
+        true -> smallest_int
+      end
+    end)
   end
 
   @doc """
@@ -58,6 +64,12 @@ defmodule NumberFinder do
     20
   """
   def largest(number_list) do
+    Enum.reduce(number_list, fn current_int, largest_int ->
+      cond do
+        current_int > largest_int -> current_int
+        true -> largest_int
+      end
+    end)
   end
 end
 ```
