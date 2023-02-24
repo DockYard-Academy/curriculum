@@ -218,7 +218,11 @@ In the Elixir cell below, try refactoring this code using the [Stream](https://h
 ```
 
 ```elixir
-
+1..100
+|> Stream.map(fn each -> div(each, 2) end)
+|> Stream.map(fn each -> each * 3 end)
+|> Stream.filter(fn each -> rem(each, 2) === 0 end)
+|> Enum.to_list()
 ```
 
 ## Stream Gotchas
@@ -310,7 +314,7 @@ Here's that shown using [Stream.cycle/2](https://hexdocs.pm/elixir/Stream.html#c
 
 ```elixir
 Stream.cycle([1, 2, 3])
-|> Enum.take(10)
+|> Enum.take(111)
 ```
 
 ### Lazy Evaluation
@@ -418,7 +422,14 @@ end)
 </details>
 
 ```elixir
-
+Stream.iterate(201, fn x ->
+  if rem(x, 2) == 0 do
+    div(x, 2)
+  else
+    x * 3 + 1
+  end
+end)
+|> Enum.take_while(fn x -> x >= 4 end)
 ```
 
 ### Stream.unfold/2
@@ -479,7 +490,12 @@ end)
 </details>
 
 ```elixir
-
+Stream.unfold(1, fn x ->
+  value = x * x * x
+  next_x = x + 1
+  {value, next_x}
+end)
+|> Enum.take(20)
 ```
 
 ## Mark As Completed
