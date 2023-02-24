@@ -153,7 +153,11 @@ defmodule TicTacToe do
     iex> TicTacToe.at(board, {2, 2})
     "C"
   """
-  def at(board, coordinate) do
+  def at(board, {x, y}) do
+    board
+    |> Enum.reverse()
+    |> Enum.at(y)
+    |> Enum.at(x)
   end
 
   @doc """
@@ -177,8 +181,102 @@ defmodule TicTacToe do
   [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
   """
   def fill(board, coordinate, symbol) do
+    {x, y} = coordinate
+    board = Enum.reverse(board)
+    List.update_at(board, y, fn _ -> Enum.at(board, y) |> List.update_at(x, &(&1 = symbol)) end)
+    |> Enum.reverse()
+  end
+
+  @doc """
+  Determine if a player has won the game.
+
+  ## Examples
+
+    Row Wins:
+
+    iex> TicTacToe.winner([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+    "X"
+
+    Column Wins:
+
+    iex> TicTacToe.winner([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+    "X"
+
+    Diagonal Wins
+
+    iex> TicTacToe.winner([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+    "X"
+    iex> TicTacToe.winner([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+    "X"
+
+    No Winner
+
+    iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+    nil
+    iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, nil, nil]])
+    nil
+
+  """
+  def winner(board) do
+    # flat_board = Enum.flatten(board)
+
+  end
+
+  defp is_row(rows), do: for row <- rows, do: check(row)
+
+  defp check([symbol, symbol, symbol]), do: symbol
+  defp check(_non_matching), do: nil
   end
 end
+```
+
+```elixir
+rows = [["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]]
+cols = [["X", nil, nil], ["X", nil, nil], ["X", nil, nil]]
+diag = [["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]]
+
+board = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+]
+
+flat_board = List.flatten(board)
+```
+
+```elixir
+for row <- rows, do: IO.inspect(row)
+# list = ["X", "X", "X"] 
+# Enum.all?(list, &(&1 == Enum.at(list, 0)))
+```
+
+```elixir
+# Columns
+Enum.slice(flat_board, 0..8//3)
+# Rows
+Enum.slice(flat_board, 0..2)
+Enum.slice()
+```
+
+```elixir
+defmodule Test do
+  def winner(board) do
+    for row <- board, do: check(row)
+  end
+
+  defp check([x, x, x]), do: x
+  defp check(_list), do: nil
+end
+
+Test.winner(rows)
 ```
 
 ### Bonus: Winner
@@ -376,3 +474,9 @@ Notify your instructor by including `@BrooklinJazz` in your PR description to ge
 You (or your instructor) may merge your PR into your solutions branch after review.
 
 If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                           | Next                               |
+| ------------------------------------------------------------------ | ---------------------------------: |
+| [Filter Values By Type](../exercises/filter_values_by_type.livemd) | [Reduce](../reading/reduce.livemd) |
