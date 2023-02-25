@@ -564,8 +564,6 @@ For performance reasons, [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2)
 Notice the code below should finish very quickly because the very first element fails the condition.
 
 ```elixir
-to_find = 0
-
 Enum.all?(1..10_000_000, fn integer -> is_bitstring(integer) end)
 ```
 
@@ -574,8 +572,6 @@ If [Enum.all/2](https://hexdocs.pm/elixir/Enum.html#all/2) must traverse the ent
 Notice the code below should take awhile to finish running because every element passes the condition.
 
 ```elixir
-to_find = 0
-
 Enum.all?(1..10_000_000, fn integer -> is_integer(integer) end)
 ```
 
@@ -610,16 +606,12 @@ Enum.any?([1, "2", "3"], fn element -> is_integer(element) end)
 Notice the code below finishes very quickly, because the first element in the collection passes the condition.
 
 ```elixir
-to_find = 0
-
 Enum.any?(1..10_000_000, fn integer -> is_integer(integer) end)
 ```
 
 However, the following takes awhile to run because all elements in the collection fail the condition.
 
 ```elixir
-to_find = 0
-
 Enum.any?(1..10_000_000, fn integer -> is_bitstring(integer) end)
 ```
 
