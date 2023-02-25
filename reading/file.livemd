@@ -258,9 +258,9 @@ Now we can write an Elixir term in it's binary format, then read the file.
 ```elixir
 :ok = File.write("binary.txt", :erlang.term_to_binary([1, 2]))
 
-{:ok, binary} = File.read("binary.txt")
+{:ok, binary} = File.read("binary.txt") |> IO.inspect()
 
-[1, 2] = :erlang.binary_to_term(binary)
+[1, 2] = :erlang.binary_to_term(binary) |> IO.inspect()
 
 # cleaning up the file to avoid saving a file on your computer.
 File.rm("binary.txt")
