@@ -85,8 +85,8 @@ defmodule Document do
       3
   """
   def word_count(file_name) do
-    words = File.stream!(file_name, :line) |> IO.inspect()
-    # String.match?(words, ~r/\w+/)
+    parsed = File.read!(file_name)
+    Regex.scan(~r/[a-zA-Z]+/, parsed) |> Enum.count()
   end
 
   @doc ~S"""
@@ -99,6 +99,8 @@ defmodule Document do
       3
   """
   def line_count(file_name) do
+    parsed = File.read!(file_name)
+    Regex.scan(~r/[\n]+/, parsed) |> Enum.count()
   end
 
   @doc ~S"""
@@ -112,8 +114,53 @@ defmodule Document do
       "1. one\n2. two\n3. three"
   """
   def add_line_numbers(file_name) do
+    lines_numbered =
+      File.stream!(file_name)
+      |> Stream.with_index()
+      |> Stream.map(fn {line, index} -> "#{index + 1}. #{line}" end)
+      |> Enum.join()
+
+    File.write!(file_name, lines_numbered)
   end
 end
+```
+
+```elixir
+file_nombre = File.write("palabras.txt", "uno dos tres ( ^ \njiewo asdjklfh8 aksj")
+```
+
+```elixir
+# parsed = File.stream!("palabras.txt") |> Enum.to_list() |> List.first()
+
+# parsed = File.read!("palabras.txt")
+
+# Regex.scan(~r/[a-zA-Z]+/, parsed) |> Enum.count()
+
+Enum.reduce(["one\n", "two\n", "three"], 1, fn each, acc ->
+  Regex.replace(~r/[\n]+/, each, "\n#{acc}. ")
+end)
+
+# Regex.replace(~r/[\n]+/, "one\n", "\n#{1}. ")
+
+# File.write!()
+
+["one\n", "two\n", "three"]
+
+Enum.reduce(["one\n", "two\n", "three"], 0, fn each, acc ->
+  acc + 1
+  String.replace(each, each, "#{acc}. #{each}")
+end)
+
+# String.replace("one\n", "one\n", ~s[#{1}. one\n])
+
+parsed_and_split = File.stream!(file_name) |> Enum.to_list() |> IO.inspect()
+# |> String.split("") |> IO.inspect()
+# |> Enum.join() |> IO.inspect()
+
+Enum.reduce(parsed_and_split, 1, fn each, acc ->
+  String.replace(each, each, "#{acc}. #{each}")
+  acc = acc + 1
+end)
 ```
 
 ## Mark As Completed
