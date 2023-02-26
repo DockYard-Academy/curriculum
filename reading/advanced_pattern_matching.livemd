@@ -23,7 +23,7 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 Upon completing this lesson, a student should understand:
 
 * How to achieve polymorphism with multiple function heads and case statements.
-* How to simpify our program's control-flow using polymorphism.
+* How to simplify our program's control-flow using polymorphism.
 * How to use pattern matching with enumeration.
 
 ## Overview
@@ -129,7 +129,7 @@ case [1, 2, 3] do
 end
 ```
 
-We can use the match operator anytime we have a value bound to a parameter or variable that we want to match on. Pattern matching can also be used with control flow to trigger application behavior based if the pattern matches.
+We can use the match operator anytime we have a value bound to a parameter or variable that we want to match on. Pattern matching can also be used with control flow to trigger application behavior based on if the pattern matches.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -197,7 +197,7 @@ Coords.inspect({1, 2})
 
 ### Multi-Clause Functions
 
-We can use with pattern matching with multi-clause functions. This essentially using multi-clause functions to replicate the same behavior as a single function with a case statement.
+We can use pattern matching with multi-clause functions. This essentially uses multi-clause functions to replicate the same behavior as a single function with a case statement.
 
 ```elixir
 defmodule SingleCaseExample do
@@ -222,11 +222,11 @@ defmodule MultiClauseExample do
   end
 
   def run([_]) do
-    "1"
+    "2"
   end
 
   def run([_, _]) do
-    "1"
+    "3"
   end
 end
 
@@ -321,12 +321,24 @@ end)
 
 ### Your Turn
 
-Create a `Converter` module which uses pattern matching with enumeration and multiple function clauses in an anonymous function to convert the a list of integers into their named string representation.
+Create a `Converter` module which uses pattern matching with enumeration and multiple function clauses in an anonymous function to convert a list of integers into their named string representation.
 
 ```elixir
 defmodule Converter do
-  @doc """
+  @moduledoc """
+  Converter
+  """
 
+  @doc """
+  Convert a list of integers into their named string representation.
+
+  ## Examples
+
+      iex> Converter.to_named_strings([1, 3, 8, 0, 9, 4])
+      ["one", "three", "eight", "zero", "nine", "four"]
+
+      iex> Converter.to_named_strings([2, 3, 2, 7, 6, 5, 8, 2])
+      ["two", "three", "two", "seven", "six", "five", "eight", "two"]
   """
   def to_named_strings(integers) do
   end
@@ -399,7 +411,7 @@ end
 MessageNestedIfExample.send(%{is_admin: true}, "")
 ```
 
-Nested `if` statements are generally a cue that we should consider an alternative implementation.
+Nested `if` statements are generally a clue that we should consider an alternative implementation.
 
 Let's see how we could solve this problem with pattern matching.
 
