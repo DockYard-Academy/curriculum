@@ -25,67 +25,72 @@ This set of drills is for the [File](../reading/file.livemd) module. Follow the 
 Use [File.ls/1](https://hexdocs.pm/elixir/File.html#ls/1) to list all of the files/folders in the current path.
 
 ```elixir
-
+File.ls()
 ```
 
 Use [File.ls/1](https://hexdocs.pm/elixir/File.html#ls/1) to list all of the files/folders in the parent directory of the current path.
 
 ```elixir
-
+File.ls("../")
 ```
 
 Use [File.mkdir/1](https://hexdocs.pm/elixir/File.html#mkdir/1) to create a directory called `drills`.
 
 ```elixir
-
+File.cd("/Users/lotek/Desktop")
+File.ls()
+File.mkdir("drills")
+File.ls()
 ```
 
 Use [File.dir?/2](https://hexdocs.pm/elixir/File.html#dir?/2) to check that `drills` is a folder.
 
 ```elixir
-
+File.dir?("drills")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an empty file called `drills.txt`.
 
 ```elixir
-
+File.write("drills.txt", "")
 ```
 
 Use [File.exists?/2](https://hexdocs.pm/elixir/File.html#exists?/2) to check that the `drills.txt` file exists.
 
 ```elixir
-
+File.exists?("drills.txt")
 ```
 
 Use [File.dir?/2](https://hexdocs.pm/elixir/File.html#dir?/2) to check that `drills.txt` is not a folder.
 
 ```elixir
-
+File.dir?("drills.txt")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create a filed called `hello.txt` with the content `"world"`.
 
 ```elixir
-
+File.write("hello.txt", "world")
 ```
 
 Use [File.read/1](https://hexdocs.pm/elixir/File.html#read/1) to read the content of the `hello.txt` file.
 
 ```elixir
-
+File.read("hello.txt")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an empty file in the `drills` folder you previously created.
 
 ```elixir
-
+File.cd("drills")
+File.ls()
+File.write("empty.txt", "")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create an `error/no_entity.txt` file that should return `{:error, :enoent}` because the `error` folder does not exist.
 
 ```elixir
-
+{:error, :enoent} = File.write("error/no_entity.txt", "")
 ```
 
 Use [File.write/3](https://hexdocs.pm/elixir/File.html#write/3) to create a file `multi-line.txt` with a multi-line string.
@@ -103,19 +108,29 @@ line 5
 ```
 
 ```elixir
+multiline_string = """
+line 1
+line 2
+line 3
+line 4
+line 5
+"""
 
+File.rm("multi-line.txt")
+File.ls()
+File.write("multi-line.txt", multiline_string)
 ```
 
 Use [File.read/1](https://hexdocs.pm/elixir/File.html#read/1) to read `multi-line.txt`.
 
 ```elixir
-
+File.read("multi-line.txt")
 ```
 
 Use [File.stream!/3](https://hexdocs.pm/elixir/File.html#stream!/3) to read each line of `multi-line.txt` and convert it to a list of lines using [Enum.to_list/1](https://hexdocs.pm/elixir/Enum.html#to_list/1).
 
 ```elixir
-
+File.stream!("multi-line.txt") |> Enum.to_list()
 ```
 
 Use [File.stream!/3](https://hexdocs.pm/elixir/File.html#stream!/3) and [Stream.filter/2](https://hexdocs.pm/elixir/Stream.html#filter/2) to filter in lines from `multi-line.txt` that contain numbers less than or equal to `3`.
@@ -133,7 +148,7 @@ line 3
 ```
 
 ```elixir
-
+File.stream!("multi-line.txt") |> Stream.filter() |> Enum.to_list()
 ```
 
 Use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2), [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2), and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to read the first line of `multi-line.txt`. Print the value.
