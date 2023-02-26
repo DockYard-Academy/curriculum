@@ -148,7 +148,9 @@ line 3
 ```
 
 ```elixir
-File.stream!("multi-line.txt") |> Stream.filter() |> Enum.to_list()
+file = "multi-line.txt"
+
+File.stream!(file) |> Stream.filter(fn elem -> elem.in() <= 3 end) |> Enum.to_list()
 ```
 
 Use [File.open/2](https://hexdocs.pm/elixir/File.html#open/2), [IO.binread/2](https://hexdocs.pm/elixir/IO.html#binread/2), and [File.close/1](https://hexdocs.pm/elixir/File.html#close/1) to read the first line of `multi-line.txt`. Print the value.
