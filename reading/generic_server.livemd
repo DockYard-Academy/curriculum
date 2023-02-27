@@ -304,6 +304,15 @@ note_book = GenericServer.start(NoteBook)
 
 ```elixir
 defmodule NoteBook do
+  def init do
+    []
+  end
+
+  def handle_call({:add_note, payload}, state) do
+    new_state = [state | payload]
+    response = {:ok, new_state}
+    {response, new_state}
+  end
 end
 ```
 
@@ -442,7 +451,22 @@ end
 </details>
 
 ```elixir
+defmodule Journal do
+  use GenServer
 
+  @impl true
+  def init do
+    []
+  end
+
+  def handle_call({:add_entry, payload}, _from, list) do
+    new_list = [list | payload]
+    response = {:ok, new_list}
+    {:reply, response, new_list}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Journal, [])
 ```
 
 ## Client / Server APIs
