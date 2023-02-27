@@ -25,13 +25,21 @@ This set of drills is for the [Process](https://hexdocs.pm/elixir/Process.html) 
 Use [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) and `self()` to send the process for the Elixir cell below a `:message` message. Use [receive](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#receive/1) to receive the message in the same cell.
 
 ```elixir
+send(self(), "message")
 
+receive do
+  "message" -> "received"
+end
 ```
 
 Use [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) and `self()` to send the process for the Elixir cell below a message with a value i.e. `{:message, "value"}`. Use [receive](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#receive/1) to receive the message in the same cell and return the value.
 
 ```elixir
+send(self(), {:message, "value"})
 
+receive do
+  {:message, "value"} -> "value"
+end
 ```
 
 ## Process.spawn/2
@@ -39,19 +47,28 @@ Use [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) and `self()`
 Use [Process.spawn/2](https://hexdocs.pm/elixir/Process.html#spawn/2) to spawn a new process which adds two integers together.
 
 ```elixir
-
+spawn(fn -> 1 + 2 end)
 ```
 
 Use [Process.spawn/2](https://hexdocs.pm/elixir/Process.html#spawn/2) and [Process.sleep/1](https://hexdocs.pm/elixir/Process.html#sleep/1) to spawn a process that sleeps for five seconds, then prints "Finished!".
 
 ```elixir
-
+pid = spawn(fn -> 1 + 2 end)
+Process.sleep(5000)
+Process.alive?(pid) || IO.puts("Finished!")
 ```
 
 Use [Process.spawn/2](https://hexdocs.pm/elixir/Process.html#spawn/2) and [receive](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#receive/1) to spawn a process that receives a `:message` message. Use [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) to send the spawned process a `:message` message. The spawned process should print `"received a message!"`.
 
 ```elixir
+send(pid, :message)
 
+pid =
+  spawn(fn ->
+    receive do
+      :message -> "received a message!"
+    end
+  end)
 ```
 
 Use [Process.spawn/2](https://hexdocs.pm/elixir/Process.html#spawn/2) and [receive](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#receive/1) to spawn a process that receives a message with a value i.e. `{:message, "value"}`. Use [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) to send the spawned process a message with a value. The spawned process should print the received value.

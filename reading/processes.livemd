@@ -258,7 +258,14 @@ In the Elixir cell below, spawn a new process and send it a message `{:hello, "w
 `IO.puts` the message's payload where `"world"` is the payload.
 
 ```elixir
+pid2 =
+  spawn(fn ->
+    receive do
+      {:hello, message} -> IO.puts(message)
+    end
+  end)
 
+send(pid2, "world")
 ```
 
 ## State
@@ -363,6 +370,7 @@ defmodule Counter do
 
     receive do
       :increment -> loop(state + 1)
+      :decrement -> loop(state - 1)
     end
   end
 end
@@ -373,7 +381,7 @@ counter_process = spawn(fn -> Counter.loop() end)
 You should be able to send a `:decrement` message to a spawned `Counter`. Uncomment and evaluate the code below to test your solution.
 
 ```elixir
-# send(counter_process, :decrement)
+send(counter_process, :decrement)
 ```
 
 ## Mark As Completed
