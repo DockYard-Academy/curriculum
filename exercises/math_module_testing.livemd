@@ -78,6 +78,23 @@ Test and implement a `Math` module. Include at least two assertions for each hap
 
 ```elixir
 defmodule Math do
+  def add(x, y) do
+    cond do
+      is_integer(x) and is_integer(y) -> {:ok, x + y}
+      is_binary(x) and is_binary(y) -> {:ok, x <> y}
+      is_list(x) and is_list(y) -> {:ok, x ++ y}
+      true -> {:error, :invalid_data}
+    end
+  end
+
+  def subtract(x, y) do
+    cond do
+      is_integer(x) and is_integer(y) -> {:ok, x - y}
+      is_binary(x) and is_binary(y) -> {:ok, String.replace(x, y, "", global: false)}
+      is_list(x) and is_list(y) -> {:ok, x -- y}
+      true -> {:error, :invalid_data}
+    end
+  end
 end
 
 ExUnit.start(auto_run: false)
@@ -85,7 +102,23 @@ ExUnit.start(auto_run: false)
 defmodule MathTest do
   use ExUnit.Case
 
-  # Tests Go Here
+  describe "add/2" do
+    test "1 + 1 -> 2" do
+      assert Math.add(1, 1) == {:ok, 2}
+    end
+
+    test "2 + 7 -> 9" do
+      assert Math.add(2, 7) == {:ok, 9}
+    end
+
+    test '"abc" <> "def" -> "abcdef"' do
+      assert Math.add("abc", "def") == {:ok, "abcdef"}
+    end
+
+    test '"Matt " <> "and Caitlyn" -> "Matt and Caitlyn"' do
+      assert Math.add("Matt ", "and Caitlyn") == {:ok, "Matt and Caitlyn"}
+    end
+  end
 end
 
 ExUnit.run()
