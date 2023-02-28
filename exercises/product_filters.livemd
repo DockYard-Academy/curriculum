@@ -222,33 +222,7 @@ end
 
 </details>
 
-```elixir
-products = [
-  %{name: "Laptop", category: :tech, price: 100_000},
-  %{name: "Phone", category: :tech, price: 50000},
-  %{name: "Chocolate", category: :snacks, price: 200},
-  %{name: "Shampoo", category: :health, price: 1000}
-]
-
-filters = [min: 500, max: 50000, name: "la", category: :tech]
-name = Keyword.get(filters, :name, "")
-min = Keyword.get(filters, :min, 0)
-max = Keyword.get(filters, :max, 1_000_000)
-category = Keyword.get(filters, :category, :all)
-
-Enum.filter(products, fn map ->
-  Regex.compile!(name, [:caseless])
-  |> Regex.match?(map.name)
-end)
-
-Enum.filter(products, fn map ->
-  cond do
-    category == :all -> map
-    map.category == category -> map
-    true -> nil
-  end
-end)
-```
+<!-- livebook:{"break_markdown":true} -->
 
 Implement and test the `Products` module. We've provided some example test case names to get your started.
 
