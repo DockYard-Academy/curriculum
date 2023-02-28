@@ -93,97 +93,49 @@ Consider starting with the `handle_call/3` callback functions, then implement th
 defmodule Stack do
   use GenServer
 
-  @doc """
-  Start the `Stack` process.
-
-  ## Examples
-
-      iex> {:ok, pid} = Stack.start_link([])
-  """
-  def start_link(_opts) do
+  # Client API (Behaviour)
+  def start_link(opts) do
+    # IO.inspect("start_link", label: "Client")
+    GenServer.start_link(__MODULE__, opts)
   end
 
-  @doc """
-  Synchronously push an element onto the top of the `Stack`. Return the current stack.
-
-  ## Examples
-
-      iex> {:ok, pid} = Stack.start_link([])
-      iex> Stack.push(pid, 1)
-      [1]
-      iex> Stack.push(pid, 2)
-      [2, 1]
-      iex> Stack.push(pid, 3)
-      [3, 2, 1]
-  """
-  def push(stack_pid, element) do
+  def push(pid, element) do
+    # IO.inspect("push #{element}", label: "Client")
+    GenServer.call(pid, {:push, element})
   end
 
-  @doc """
-  Pop an element from the top of the `Stack`.
-
-  ## Examples
-
-      iex> {:ok, pid} = Stack.start_link([])
-      iex> Stack.push(pid, 1)
-      iex> Stack.push(pid, 2)
-      iex> Stack.push(pid, 3)
-      iex> Stack.pop(pid)
-      3
-      iex> Stack.pop(pid)
-      2
-      iex> Stack.pop(pid)
-      1
-  """
-  def pop(stack_pid) do
+  def pop(pid) do
+    # IO.inspect("pop", label: "Client")
+    GenServer.call(pid, :pop)
   end
 
-  @doc """
-  Necessary callback function to start the `Stack` process.
-
-  ## Examples
-
-      iex> {:ok, pid} = GenServer.start_link(Stack, []) 
-  """
-  def init(_opts) do
+  # Server API (Implementation)
+  def init(_init_arg) do
+    # IO.inspect("init", label: "Server")
+    {:ok, []}
   end
 
-  @doc """
-  Callback function to add an element onto the top of the `Stack`.
-
-  ## Examples
-
-      iex> {:ok, pid} = GenServer.start_link(Stack, [])
-      iex> GenServer.call(pid, {:push, 1})
-      [1]
-      iex> GenServer.call(pid, {:push, 2})
-      [2, 1]
-      iex> GenServer.call(pid, {:push, 3})
-      [3, 2, 1]
-  """
   def handle_call({:push, element}, _from, state) do
+    # IO.inspect("handle_call :push #{element}", label: "Server")
+    new_state = [element | state]
+    response = new_state
+    {:reply, response, new_state}
   end
 
-  @doc """
-  Callback function to pop an element off of the top of the `Stack`.
-  You do not need to handle popping when a stack is empty.
-
-  ## Examples
-
-      iex> {:ok, pid} = GenServer.start_link(Stack, [])
-      iex> GenServer.call(pid, {:push, 1})
-      iex> GenServer.call(pid, {:push, 2})
-      iex> GenServer.call(pid, {:push, 3})
-      iex> GenServer.call(pid, :pop)
-      3
-      iex> GenServer.call(pid, :pop)
-      2
-      iex> GenServer.call(pid, :pop)
-      1
-  """
   def handle_call(:pop, _from, state) do
+    # IO.inspect("handle_call :pop", label: "Server")
+    new_state = tl(state)
+    response = new_state
+    {:reply, response, new_state}
   end
 end
+
+# {:ok, pid} = Stack.start_link([])
+# Stack.push(pid, 2)
+# Stack.push(pid, 2)
+# Stack.push(pid, 2)
+# Stack.pop(pid)
+# Stack.pop(pid)
 ```
 
 ## Mark As Completed
