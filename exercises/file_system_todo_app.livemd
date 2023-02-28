@@ -20,12 +20,9 @@ Mix.install([
 File.exists?("todolist.txt")
 ```
 
-You're going to create a TodoList application with persistence using a file system.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
-
 ```elixir
+# EXAMPLE SOLUTION
+
 defmodule TodoList do
   @storage "todolist"
 
@@ -49,10 +46,6 @@ defmodule TodoList do
 end
 ```
 
-</details>
-
-Implement the `TodoList` module as documented. You may choose any file for your persistence mechanism.
-
 ```elixir
 defmodule TodoList do
   @moduledoc """
@@ -67,7 +60,12 @@ defmodule TodoList do
       []
   """
   def list do
-    []
+    if File.exists?("todolist.txt") do
+      File.stream!("todolist.txt")
+      |> Enum.to_list()
+    else
+      []
+    end
   end
 
   @doc """
@@ -85,15 +83,8 @@ defmodule TodoList do
       ["task 2", "task 1"]
   """
   def add(item) do
-    if File.exists?("todolist.txt") do
-      old =
-        File.stream!("todolist.txt")
-        |> Enum.to_list()
-
-      new = [old | item]
-    else
-      File.write!("todolist.txt", item)
-    end
+    new_list = [item | list()]
+    File.write!("todolist.txt", new_list)
   end
 
   @doc """
@@ -107,13 +98,14 @@ defmodule TodoList do
       []
   """
   def complete(item) do
-    previous =
-      File.stream!("todolist.txt")
-      |> Enum.to_list()
-
-    updated = previous -- [item]
+    updated_list = list() -- [item]
+    File.write!("todolist.txt", updated_list)
   end
 end
+```
+
+```elixir
+File.ls()
 ```
 
 ## Mark As Completed
