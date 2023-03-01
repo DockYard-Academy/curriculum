@@ -304,11 +304,12 @@ note_book = GenericServer.start(NoteBook)
 
 ```elixir
 defmodule NoteBook do
-  def init do
+  def init() do
     []
   end
 
   def handle_call({:add_note, payload}, state) do
+    # IO.inspect(payload, label: "I was called with")
     new_state = [state | payload]
     response = {:ok, new_state}
     # {:reply, response, new_state}
@@ -317,6 +318,18 @@ defmodule NoteBook do
 end
 
 # do we include :reply in the response tuple or not???
+```
+
+```elixir
+pid = GenericServer.start(NoteBook)
+```
+
+```elixir
+GenericServer.call(pid, {:add_note, "new note"})
+```
+
+```elixir
+:sys.get_state(pid)
 ```
 
 ## GenServer
