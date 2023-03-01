@@ -119,6 +119,16 @@ defmodule MathTest do
       assert Math.add("Matt ", "and Caitlyn") == {:ok, "Matt and Caitlyn"}
     end
   end
+
+  describe "subtract/2" do
+    test "3 - 4 -> -1" do
+      assert Math.subtract(4, 3) == {:ok, -1}
+    end
+
+    test "abcdef - abc -> def" do
+      assert Math.subtract("abcdef", "abc") == {:ok, "def"}
+    end
+  end
 end
 
 ExUnit.run()
