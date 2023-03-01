@@ -141,6 +141,21 @@ Bracket notation will return `nil` if the key doesn't exist rather than throwing
 We can access deeply nested values with both dot notation and bracket notation.
 
 ```elixir
+my_map = %{
+  full_name: %{
+    first: "thomas",
+    last: %{
+      mom: "f",
+      dad: "n"
+    }
+  },
+  age: 30
+}
+
+my_map.full_name.last
+```
+
+```elixir
 %{key1: %{key2: %{key3: "value"}}}.key1.key2.key3
 ```
 
@@ -253,7 +268,8 @@ todo = %{title: "finish maps exercise", completed: false}
 </details>
 
 ```elixir
-
+todo = %{title: "finish map ex", completed: false}
+completed = %{todo | completed: true}
 ```
 
 ## Pattern Matching
@@ -268,8 +284,8 @@ my_variable
 Unlike with keyword lists, we don't have to match on every key/value pair when pattern matching with maps.
 
 ```elixir
-%{one: one} = %{one: 1, two: 2}
-one
+%{two: two} = %{one: 1, two: 2}
+two
 ```
 
 This also works with non-atom key maps.
@@ -332,7 +348,8 @@ Bind `2` and `4` in the following map to variables `two` and `four`.
 Enter your solution below.
 
 ```elixir
-%{one: 1, two: 2, three: 3, four: 4}
+%{two: two, four: four} = %{one: 1, two: 2, three: 3, four: 4}
+two
 ```
 
 ## Further Reading

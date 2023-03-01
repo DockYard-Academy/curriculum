@@ -165,7 +165,7 @@ In the Elixir cell below, create a keyword list of your favourite super hero. In
 Enter your solution below.
 
 ```elixir
-
+[name: "spiderman", secret_identity: "petey"]
 ```
 
 ## Accessing A Key
@@ -184,6 +184,7 @@ Access the `:hello` key in the following keyword list.
 
 ```elixir
 keyword_list = [hello: "world"]
+keyword_list[:hello]
 ```
 
 ## Keyword List Operators
@@ -206,13 +207,13 @@ evaluate as a tuple again. Remember that keyword lists are simply lists of tuple
 In the Elixir cell below, use `++` to add `[one: 1]` to `[two: 2]` to make `[one: 1, two: 2]`.
 
 ```elixir
-
+[one: 1] ++ [two: 2]
 ```
 
 Remove `[two: 2]` from `[one: 1, two: 2]` to make `[one: 1]`.
 
 ```elixir
-
+[one: 1, two: 2] -- [two: 2]
 ```
 
 ## Pattern Matching
@@ -228,7 +229,8 @@ my_variable
 Much like a list, we must match on the entire keyword list, otherwise we'll cause a [MatchError](https://hexdocs.pm/elixir/MatchError.html).
 
 ```elixir
-[one: one] = [one: 1, two: 2]
+[one] = [one: 1]
+one
 ```
 
 So long as we have a match for every element in the keyword list, we can use pattern matching.
@@ -274,7 +276,8 @@ Bind `1` in the following keyword list to a variable `one`.
 Enter your solution below.
 
 ```elixir
-[one: 1, two: 2, three: 3, four: 4]
+[{:one, one} | _t] = [one: 1, two: 2, three: 3, four: 4]
+one
 ```
 
 ## Further Reading
