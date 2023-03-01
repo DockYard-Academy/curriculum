@@ -1,25 +1,3 @@
-defmodule Math do
-
-  def add(x, y) do
-    cond do
-      is_integer(x) and is_integer(y) -> {:ok, x + y}
-      is_binary(x) and is_binary(y) -> {:ok, x <> y }
-      is_list(x) and is_list(y) -> {:ok, x ++ y}
-      true -> {:error, :invalid_data}
-    end
-  end
-
-  def subtract(x, y) do
-    cond do
-      is_integer(x) and is_integer(y) -> {:ok, x - y}
-      is_binary(x) and is_binary(y) -> {:ok, String.replace(x, y, "", global: false)}
-      is_list(x) and is_list(y) -> {:ok, x -- y}
-      true -> {:error, :invalid_data}
-    end
-  end
-
-end
-
 ExUnit.start(auto_run: false)
 
 defmodule MathTest do
