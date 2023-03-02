@@ -96,7 +96,8 @@ defmodule Mailbox do
       iex> :sys.get_state(pid)
       ["Welcome to your mailbox!"]
   """
-  def start_link(_opts) do
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @doc """
@@ -111,6 +112,7 @@ defmodule Mailbox do
       ["Message 2", "Message 1"]
   """
   def send(mailbox_pid, message) do
+    GenServer.cast(mailbox_pid, {:mail, message})
   end
 
   @doc """
@@ -122,7 +124,9 @@ defmodule Mailbox do
       iex> Mailbox.all_messages(pid)
       []
   """
+
   def all_messages(mailbox_pid) do
+    GenServer.call(mailbox_pid, :all_messages)
   end
 
   @doc """
@@ -133,7 +137,8 @@ defmodule Mailbox do
       iex> {:ok, _pid} = GenServer.start_link(Mailbox, [])
   """
   @impl true
-  def init(state) do
+  def init(opts) do
+    {:ok, opts}
   end
 
   @doc """
@@ -147,6 +152,7 @@ defmodule Mailbox do
   """
   @impl true
   def handle_call(:all_messages, _from, state) do
+    {:reply, state, state}
   end
 
   @doc """
@@ -161,11 +167,13 @@ defmodule Mailbox do
       ["Message 2", "Message 1"]
   """
   @impl true
-  def handle_cast({:mail, mail}, state) do
+  def handle_cast({:mail, message}, state) do
+    state = [message | state]
+    {:noreply, state}
   end
 
   @doc """
-  Callback for receiving "regular" messages and storing them in the `Mailbox`'s state.
+  Callback for receiving "regular" messages and storing them in the `messagebox`'s state.
 
   ## Examples
 
@@ -176,9 +184,19 @@ defmodule Mailbox do
       ["Message 2", "Message 1"]
   """
   @impl true
-  def handle_info({:mail, mail}, state) do
+  def handle_info({:mail, message}, state) do
+    state = [message | state]
+    {:noreply, state}
   end
 end
+
+{:ok, pid} = Mailbox.start_link(["Welcome to your mailbox!"])
+# :sys.get_state(pid)
+
+Mailbox.send(pid, "Oh yes it did Einar!")
+Mailbox.all_messages(pid)
+Process.send(pid, {:mail, "Some other stuff?"}, [])
+Mailbox.all_messages(pid)
 ```
 
 ## `handle_info` Vs `handle_cast`/`handle_call`
