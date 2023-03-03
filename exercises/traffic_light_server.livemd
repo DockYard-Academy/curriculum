@@ -126,7 +126,8 @@ defmodule TrafficLightServer do
   @doc """
   Start a TrafficLightServer linked to the current caller process.
   """
-  def start_link(opts) do
+  def start_link(opts \\ :green) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @doc """
@@ -134,14 +135,47 @@ defmodule TrafficLightServer do
   :green -> :yellow -> :red
   """
   def transition(pid) do
+    GenServer.call(pid, :transition)
   end
 
   @doc """
   Get the `TrafficLightServer`'s current state.
   """
   def current_light(pid) do
+    GenServer.call(pid, :current_light)
+  end
+
+  @impl true
+  def init(opts) do
+    {:ok, opts}
+  end
+
+  @impl true
+  def handle_call(:transition, _from, state) do
+    IO.inspect(state)
+
+    new_state =
+      case state do
+        :green -> :yellow
+        :yellow -> :red
+        :red -> :green
+      end
+
+    response = new_state
+    {:reply, response, new_state}
+  end
+
+  @impl true
+  def handle_call(:current_light, _from, state) do
+    response = state
+    {:reply, response, state}
   end
 end
+
+# {:ok, pid} = TrafficLightServer.start_link()
+# TrafficLightServer.transition(pid)
+# TrafficLightServer.current_light(pid)
+# :sys.get_state(pid)
 ```
 
 ## Bonus: TrafficGrid
@@ -317,7 +351,8 @@ defmodule TrafficGridServer do
       TrafficGridServer.start_link([])
       {:ok, pid}
   """
-  def start_link(_opts) do
+  def start_link(opts \\ [:green, :green, :green, :green, :green]) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @doc """
@@ -329,6 +364,7 @@ defmodule TrafficGridServer do
       [:yellow, :green, :green, :green, :green]
   """
   def transition(grid_pid) do
+    GenServer.call(grid_pid, :transition)
   end
 
   @doc """
@@ -340,6 +376,19 @@ defmodule TrafficGridServer do
       [:green, :green, :green, :green, :green]
   """
   def current_lights(grid_pid) do
+  end
+
+  def init(opts) do
+    {:ok, opts}
+  end
+
+  def handle_call(:transition, _from, state) do
+    new_state = 
+        Enum.reduce(state, )
+  end
+
+  def handle_call() do
+    
   end
 end
 ```

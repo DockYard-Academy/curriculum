@@ -152,7 +152,8 @@ defmodule Mailbox do
   """
   @impl true
   def handle_call(:all_messages, _from, state) do
-    {:reply, state, state}
+    response = state
+    {:reply, response, state}
   end
 
   @doc """
@@ -191,12 +192,12 @@ defmodule Mailbox do
 end
 
 {:ok, pid} = Mailbox.start_link(["Welcome to your mailbox!"])
-# :sys.get_state(pid)
 
-Mailbox.send(pid, "Oh yes it did Einar!")
-Mailbox.all_messages(pid)
-Process.send(pid, {:mail, "Some other stuff?"}, [])
-Mailbox.all_messages(pid)
+# Mailbox.send(pid, "Oh yes it did Einar!")
+# :sys.get_state(pid)
+# Mailbox.all_messages(pid)
+# Process.send(pid, {:mail, "Some other stuff?"}, [])
+# Mailbox.all_messages(pid)
 ```
 
 ## `handle_info` Vs `handle_cast`/`handle_call`
