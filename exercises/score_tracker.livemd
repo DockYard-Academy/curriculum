@@ -184,6 +184,7 @@ defmodule MultiplayerScoreTracker do
       iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
   """
   def start_link(_opts) do
+    GenServer.start_link(__MODULE__, opts, [])
   end
 
   @doc """
@@ -200,6 +201,7 @@ defmodule MultiplayerScoreTracker do
       :ok
   """
   def score(multiplayer_score_tracker_pid, player_name, amount) do
+    GenServer.cast(multiplayer_score_tracker_pid, amount)
   end
 
   @doc """
@@ -230,6 +232,7 @@ defmodule MultiplayerScoreTracker do
       %{player1: 10, player2: 10}
   """
   def all_scores(multiplayer_score_tracker_pid) do
+    GenServer.call(multiplayer_score_tracker_pid)
   end
 
   @doc """
