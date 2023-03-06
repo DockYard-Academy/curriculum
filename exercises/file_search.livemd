@@ -78,6 +78,7 @@ defmodule FileSearch do
   ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
   """
   def all(folder) do
+    Path.wildcard("/main/*/*.txt")
   end
 
   @doc """
@@ -108,8 +109,21 @@ defmodule FileSearch do
   }
   """
   def by_extension(folder) do
+    txt = Path.wildcard("/main/*/*.txt")
+    png = Path.wildcard("/main/*/*.png")
+    jpg = Path.wildcard("/main/*/*.jpg")
+
+    IO.puts(~s[".txt" => #{txt}])
+    IO.puts(~s[".png" => #{png}])
+    IO.puts(~s[".jpg" => #{jpg}])
   end
 end
+```
+
+```elixir
+# File.cwd!()
+
+Path.wildcard("*/*.txt")
 ```
 
 ### Configure Project As A Script

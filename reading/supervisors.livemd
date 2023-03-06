@@ -427,7 +427,7 @@ So the timeline of crashes would be:
 Start **four** `Bomb` processes under a supervisor with different bomb times. Try each restart strategy `:one_for_one`, `one_for_all`, and `:rest_for_one`. Predict the crash timeline then evaluate your code. Did the result match your prediction?
 
 ```elixir
-defmodule Bombas do
+defmodule Zhadan do
   use GenServer
 
   def start_link(opts) do
@@ -445,24 +445,26 @@ defmodule Bombas do
 
   @impl true
   def handle_info(:explode, name) do
-    raise "#{name} Exploded!"
+    raise "#{name} zha diao le!"
   end
 end
+
+# Process.exit(self(), :exit)
 ```
 
 ```elixir
-chiquitos = [
+dandan = [
   %{
     id: :bomb1,
-    start: {Bombas, :start_link, [[name: "Bomba1", bomb_time: 5000]]}
+    start: {Zhadan, :start_link, [[name: "Bomba1", bomb_time: 5000]]}
   },
   %{
     id: :bomb2,
-    start: {Bombas, :start_link, [[name: "Bomba2", bomb_time: 3000]]}
+    start: {Zhadan, :start_link, [[name: "Bomba2", bomb_time: 3000]]}
   },
   %{
     id: :bomb3,
-    start: {Bombas, :start_link, [[name: "Bomba3", bomb_time: 2000]]}
+    start: {Zhadan, :start_link, [[name: "Bomba3", bomb_time: 2000]]}
   }
 ]
 ```
