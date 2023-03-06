@@ -186,7 +186,8 @@ Process.exit(pid, :exit)
 Re-evaluate the diagram above and you should see a new `Worker` process started with a different pid. Repeat this process to kill each process under the supervisor and see them restarted.
 
 ```elixir
-
+pid = :c.pid(0, 278, 0)
+Process.exit(pid, :exit)
 ```
 
 ## Restart Strategies
@@ -418,12 +419,53 @@ So the timeline of crashes would be:
 * 9 seconds: `Bomb1` crashes (`Bomb2` restarted)
 
 ```elixir
-# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
 ```
 
 ### Your Turn
 
 Start **four** `Bomb` processes under a supervisor with different bomb times. Try each restart strategy `:one_for_one`, `one_for_all`, and `:rest_for_one`. Predict the crash timeline then evaluate your code. Did the result match your prediction?
+
+```elixir
+defmodule Bombas do
+  use GenServer
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
+  end
+
+  @impl true
+  def init(opts) do
+    bomb_time = Keyword.get(opts, :bomb_time, 2000)
+    name = Keyword.get(opts, :name, 2000)
+
+    Process.send_after(self(), :explode, bomb_time)
+    {:ok, name}
+  end
+
+  @impl true
+  def handle_info(:explode, name) do
+    raise "#{name} Exploded!"
+  end
+end
+```
+
+```elixir
+chiquitos = [
+  %{
+    id: :bomb1,
+    start: {Bombas, :start_link, [[name: "Bomba1", bomb_time: 5000]]}
+  },
+  %{
+    id: :bomb2,
+    start: {Bombas, :start_link, [[name: "Bomba2", bomb_time: 3000]]}
+  },
+  %{
+    id: :bomb3,
+    start: {Bombas, :start_link, [[name: "Bomba3", bomb_time: 2000]]}
+  }
+]
+```
 
 ```elixir
 
@@ -442,7 +484,7 @@ children = [
 Uncomment the following code to see the crash timeline, then re-comment it.
 
 ```elixir
-# Supervisor.start_link(children, strategy: :one_for_one)
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 ## Further Reading

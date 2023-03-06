@@ -88,6 +88,7 @@ defmodule ScoreTracker do
     iex> {:ok, pid} = ScoreTracker.start_link([])
   """
   def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
   end
 
   @doc """
@@ -100,6 +101,7 @@ defmodule ScoreTracker do
       :ok
   """
   def score(score_tracker_pid, amount) do
+    GenServer.cast(score_tracker_pid, {:score, amount})
   end
 
   @doc """
@@ -112,6 +114,22 @@ defmodule ScoreTracker do
       0
   """
   def get_score(score_tracker_pid) do
+    GenServer.call(score_tracker_pid, :get_score)
+  end
+
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  def handle_cast({:score, amount}, score) do
+    new_score = score + amount
+    response = new_score
+    {:noreply, response, new_score}
+  end
+
+  def handle_call(:get_score, _from, score) do
+    response = score
+    {:reply, response, score}
   end
 end
 ```
@@ -184,7 +202,19 @@ defmodule MultiplayerScoreTracker do
       iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
   """
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, opts, [])
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def init(_opts) do
+    {:ok, pid1} = GenServer.start_link(__MODULE__, [])
+    {:ok, pid2} = GenServer.start_link(__MODULE__, [])
+    {:ok, pid3} = GenServer.start_link(__MODULE__, [])
+
+    # pid1 = %{haggerty: 0}
+    # pid2 = %{petchmorakot: 0}
+    # pid3 = %{ngbo: 0}
+
+    {:ok, %{players: [pid1, pid2, pid3]}}
   end
 
   @doc """
@@ -201,7 +231,13 @@ defmodule MultiplayerScoreTracker do
       :ok
   """
   def score(multiplayer_score_tracker_pid, player_name, amount) do
-    GenServer.cast(multiplayer_score_tracker_pid, amount)
+    # GenServer.cast(multiplayer_score_tracker_pid, {:player_name, amount})
+  end
+
+  def handle_cast({:player_name, amount}, amount) do
+    # new_score = {:player_name, score + amount}
+    # response = new_score
+    # {:noreply, response, new_score}
   end
 
   @doc """
@@ -232,7 +268,17 @@ defmodule MultiplayerScoreTracker do
       %{player1: 10, player2: 10}
   """
   def all_scores(multiplayer_score_tracker_pid) do
-    GenServer.call(multiplayer_score_tracker_pid)
+    # GenServer.call(multiplayer_score_tracker_pid, :all_scores)
+  end
+
+  def handle_call(:all_scores, _from, amount) do
+    # scores = 
+    #   Enum.map(state.players, fn pid -> 
+    #     ScoreTracker.get_score(pid) 
+    #   end)
+
+    # response = scores
+    # {:reply, response, scores}
   end
 
   @doc """
@@ -253,9 +299,15 @@ defmodule MultiplayerScoreTracker do
     iex> MultiplayerScoreTracker.get_score(pid, :abc)
     10
   """
-  def get_score(multiplayer_score_tracker_pid, player_name) do
+  def get_score(:get_score, multiplayer_score_tracker_pid, player_name) do
+    # response = scores
+    # {:reply, response, scores}
   end
 end
+```
+
+```elixir
+# {:ok, pid} = MultiplayerScoreTracker.start_link([])
 ```
 
 ## Mark As Completed
