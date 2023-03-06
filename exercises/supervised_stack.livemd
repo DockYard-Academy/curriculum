@@ -61,7 +61,7 @@ GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 
 # the final state is empty.
-:sys.get_state(stack_pid)
+# :sys.get_state(stack_pid)
 ```
 
 However, there's a bug. If we try to `pop/1` an item off of an empty stack, the process
@@ -104,7 +104,14 @@ children = [
 Keep in mind, if you have already started a supervisor with the `Stack` process, your livebook may crash. You can resolve this issue by simply re-running the cell below to start the supervisor again.
 
 ```elixir
+children = [
+  %{
+    id: Stack,
+    start: {Stack, :start_link, [[]]}
+  }
+]
 
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 You should be able to send a `:pop` message to the `Stack` process and the [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) will restart the `Stack` process.
@@ -112,7 +119,7 @@ You should be able to send a `:pop` message to the `Stack` process and the [Supe
 Uncomment and evaluate the code below to test your supervisor.
 
 ```elixir
-# GenServer.call(Stack, :pop)
+GenServer.call(Stack, :pop)
 ```
 
 ## Mark As Completed

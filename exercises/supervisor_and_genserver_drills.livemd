@@ -52,7 +52,23 @@ end
 </details>
 
 ```elixir
+defmodule Zero do
+  use GenServer
 
+  def start_link(opts \\ []) do
+    state = Keyword.get(opts, :state)
+    name = Keyword.get(opts, :name)
+    GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(opts) do
+    {:ok, opts}
+  end
+end
+
+{:ok, pid} = Zero.start_link(state: 1, name: :zero_two)
+
+:sys.get_state(pid)
 ```
 
 Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start your `Zero` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as a named process.
@@ -67,7 +83,7 @@ GenServer.start_link(Zero, "init_arg", [name: :my_name])
 </details>
 
 ```elixir
-
+# GenServer.start_link(Zero, [], [name: :zero_sum])
 ```
 
 Create a `SimpleCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose state starts as `0`. Implement a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.

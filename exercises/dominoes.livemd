@@ -41,6 +41,10 @@ defmodule Domino do
 end
 ```
 
+```elixir
+{:ok, pid} = Domino.start_link([])
+```
+
 You're going to start three `Domino` processes under a supervisor. When one crashes, they should restart sequentially in the order they are defined.
 
 <!-- livebook:{"break_markdown":true} -->
@@ -97,7 +101,24 @@ Supervisor.start_link(children, strategy: :rest_for_one)
 Keep in mind, if you have already started a named process, the supervisor might crash when you attempt to start it again. Re-evaluate the cell after the livebook crashes to resolve this issue.
 
 ```elixir
+children = [
+  %{
+    id: Domino1,
+    start: {Domino, :start_link, [[name: Domino1]]}
+  },
+  %{
+    id: Domino2,
+    start: {Domino, :start_link, [[name: Domino2]]}
+  },
+  %{
+    id: Domino3,
+    start: {Domino, :start_link, [[name: Domino3]]}
+  }
+]
+```
 
+```elixir
+{:ok, pid} = Supervisor.start_link(children, strategy: :rest_for_one)
 ```
 
 Send your dominos messages to ensure they are crashing in the correct order. They will log a message that demonstrates the `Domino.start_link/1` function was called again.
@@ -116,7 +137,7 @@ Process.send(:domino_name, :fall, [])
 Test sending each `Domino` process a message individually.
 
 ```elixir
-
+Process.send(Domino3, :fall, [])
 ```
 
 ## Mark As Completed
