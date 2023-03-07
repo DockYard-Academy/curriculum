@@ -83,15 +83,25 @@ Task.await(task)
 We can spawn many tasks under the supervisor.
 
 ```elixir
+# tasks =
+#   Enum.map(1..5, fn int ->
+#     # task =
+#     Task.Supervisor.async(MyTaskSupervisor, fn ->
+#       IO.puts("Task Started")
+#       Process.sleep(30000)
+#       IO.puts("Task Finished")
+#       int * 2
+#     end)
+#   end)
+
 tasks =
   Enum.map(1..5, fn int ->
-    task =
-      Task.Supervisor.async(MyTaskSupervisor, fn ->
-        IO.puts("Task Started")
-        Process.sleep(30000)
-        IO.puts("Task Finished")
-        int * 2
-      end)
+    Task.Supervisor.async(MyTaskSupervisor, fn ->
+      IO.puts("Task Started")
+      Process.sleep(1000)
+      IO.puts("Task Finished")
+      int * 2
+    end)
   end)
 ```
 
