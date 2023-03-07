@@ -179,7 +179,7 @@ Try changing `number` to `2`, `3`, and `4`. Notice how it creates more lists, wi
 elements for each increase in number.
 
 ```elixir
-number = 1
+number = 4
 
 Enum.map(1..number, fn _ ->
   Enum.to_list(1..number)
@@ -323,7 +323,7 @@ C13 --> C133
 Try changing `number` to `2`, `3`, and `4`. Notice how it creates $n^3$ elements.
 
 ```elixir
-number = 3
+number = 4
 
 Enum.map(1..number, fn _ ->
   Enum.map(1..number, fn _ ->
@@ -523,9 +523,14 @@ Kino.VegaLite.push_many(widget, factorial)
 widget
 ```
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: each ** each, equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"defmodule Calculate do\n  def factorial(1), do: 1\n  def factorial(n), do: n * factorial(n - 1)\nend\n\nEnum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: Calculate.factorial(each), equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
+defmodule Calculate do
+  def factorial(1), do: 1
+  def factorial(n), do: n * factorial(n - 1)
+end
+
 Enum.map(1..10, fn each ->
   equation =
     Enum.map_join(each..1, fn
@@ -533,7 +538,7 @@ Enum.map(1..10, fn each ->
       n -> " * #{n}"
     end)
 
-  %{"# of elements": each, result: each ** each, equation: equation}
+  %{"# of elements": each, result: Calculate.factorial(each), equation: equation}
 end)
 |> Kino.DataTable.new()
 ```
