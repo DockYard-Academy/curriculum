@@ -189,7 +189,7 @@ end)
 * With 1 element it creates 1 element
 * With 2 elements it creates 4 elements
 * With 3 elements it creates 9 elements
-* With 4 elements it creates 12 elements
+* With 4 elements it creates 16 elements
 
 In other words, it creates $n^2$ elements. We can see how this grows in the following table.
 
@@ -523,9 +523,14 @@ Kino.VegaLite.push_many(widget, factorial)
 widget
 ```
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: each ** each, equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"defmodule Calculate do\n  def factorial(1), do: 1\n  def factorial(n), do: n * factorial(n - 1)\nend\n\nEnum.map(1..10, fn each ->\n  equation =\n    Enum.map_join(each..1, fn\n      ^each -> \"#{each}\"\n      n -> \" * #{n}\"\n    end)\n\n  %{\"# of elements\": each, result: Calculate.factorial(each), equation: equation}\nend)  |> Kino.DataTable.new()","title":"Factorial Complexity Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
+defmodule Calculate do
+  def factorial(1), do: 1
+  def factorial(n), do: n * factorial(n - 1)
+end
+
 Enum.map(1..10, fn each ->
   equation =
     Enum.map_join(each..1, fn
@@ -533,7 +538,7 @@ Enum.map(1..10, fn each ->
       n -> " * #{n}"
     end)
 
-  %{"# of elements": each, result: each ** each, equation: equation}
+  %{"# of elements": each, result: Calculate.factorial(each), equation: equation}
 end)
 |> Kino.DataTable.new()
 ```
