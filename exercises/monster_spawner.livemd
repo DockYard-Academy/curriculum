@@ -5,7 +5,7 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -114,6 +114,7 @@ defmodule Monster do
   def start_link(opts) do
     # IO.inspect/2 to observe when a `Monster` process starts.
     IO.inspect(opts, label: "Monster Started")
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
   end
 
   @doc """
@@ -128,7 +129,8 @@ defmodule Monster do
       iex> :sys.get_state(pid)
       %{health: 70}
   """
-  def attack(monster_pid, amount) do
+  def attack(monster_pid, damage) do
+    GenServer.cast(monster_pid, {:attack, damage})
   end
 
   @doc """
@@ -141,6 +143,7 @@ defmodule Monster do
       100
   """
   def health(monster_pid) do
+    GenServer.call(monster_pid, :health)
   end
 
   @doc """
@@ -155,6 +158,7 @@ defmodule Monster do
   """
   @impl true
   def init(_opts) do
+    {:ok, %{health: 100}}
   end
 
   @doc """
@@ -175,6 +179,17 @@ defmodule Monster do
   """
   @impl true
   def handle_cast({:attack, damage}, state) do
+    # old_health = Map.get(state, :health)
+    # health = %{state | health: old_health - damage}
+    # response = health
+    # new_health = Map.get(health, :health)
+    new_health = state.health - damage
+
+    if new_health <= 0 do
+      raise "dying!"
+    else
+      {:noreply, %{state | health: new_health}}
+    end
   end
 
   @doc """
@@ -188,6 +203,9 @@ defmodule Monster do
   """
   @impl true
   def handle_call(:health, _from, state) do
+    # response = Map.get(state, :health)
+    # {:reply, response, state}
+    {:reply, state.health, state}
   end
 end
 ```
@@ -241,7 +259,28 @@ Supervisor.start_link(children, strategy: :one_for_one)
 Enter your solution below.
 
 ```elixir
+monsters = [
+  %{
+    id: :monster1,
+    start: {Monster, :start_link, [[name: Monster1]]}
+  },
+  %{
+    id: :monster2,
+    start: {Monster, :start_link, [[name: Monster2]]}
+  },
+  %{
+    id: :monster3,
+    start: {Monster, :start_link, [[name: Monster3]]}
+  }
+]
+```
 
+```elixir
+{:ok, supervisor_pid} = Supervisor.start_link(monsters, strategy: :one_for_one)
+```
+
+```elixir
+Kino.Process.sup_tree(supervisor_pid)
 ```
 
 Call `Monster.attack/1` on your monster processes to ensure they are restarted.
@@ -257,7 +296,7 @@ Monster.attack(:monster1, 110)
 </details>
 
 ```elixir
-
+Monster.attack(:monster3, 110)
 ```
 
 ## Bonus: Hero
@@ -298,7 +337,33 @@ end
 </details>
 
 ```elixir
+defmodule Hero do
+  use GenServer
 
+  def start_link(opts) do
+    IO.inspect(opts, label: "Hero Started")
+    GenServer.start_link(__MODULE__, opts, name: opts[:name])
+  end
+
+  def hero_attack(monster_pid, damage) do
+    Process.sleep(1000)
+    GenServer.cast([:monster1, :monster2, :monster3], {:attack, Enum.random(1..10)})
+  end
+
+  def init(opts) do
+    {:ok, opts}
+  end
+
+  def handle_cast({:attack, damage}, state) do
+    new_health = state.health - damage
+    {:noreply, %{state | health: new_health}}
+  end
+end
+
+# %{
+#     id: :hero,
+#     start: {Monster, :hero_attack, [[name: Hero]]}
+#   }
 ```
 
 Start the `Hero` process with three other `Monster` processes in the same supervisor. Make the supervisor a named supervisor so you can find all of its child processes with [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1).
@@ -332,7 +397,26 @@ children = [
 </details>
 
 ```elixir
+monsters = [
+  %{
+    id: :monster1,
+    start: {Monster, :start_link, [[name: Monster1]]}
+  },
+  %{
+    id: :monster2,
+    start: {Monster, :start_link, [[name: Monster2]]}
+  },
+  %{
+    id: :monster3,
+    start: {Monster, :start_link, [[name: Monster3]]}
+  },
+  %{
+    id: :hero,
+    start: {Hero, :start_link, [[name: Harry]]}
+  }
+]
 
+{:ok, warmonger_pid} = Supervisor.start_link(monsters, strategy: :one_for_one, name: :spawner)
 ```
 
 Use [Kino.Process.sup_tree/2](https://hexdocs.pm/kino/Kino.Process.html#sup_tree/2) to visualize the processes under your named supervisor.
