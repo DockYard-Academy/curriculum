@@ -26,6 +26,8 @@ This is my document document
 """
 
 String.split(document, " ", trim: true)
+|> IO.inspect()
+|> Enum.count()
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -69,6 +71,15 @@ defmodule WordCount do
       [2, 2]
   """
   def individual_count(documents) do
+    counts =
+      Enum.map(documents, fn each ->
+        Task.async(fn ->
+          String.split(each, " ", trim: true)
+          |> Enum.count()
+        end)
+      end)
+
+    Task.await_many(counts)
   end
 
   @doc """
@@ -79,6 +90,8 @@ defmodule WordCount do
   4
   """
   def total_count(documents) do
+    individual_count(documents)
+    |> Enum.sum()
   end
 end
 ```

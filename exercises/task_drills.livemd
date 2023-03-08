@@ -239,12 +239,17 @@ Use `Task.Supervisor.start_child/3` to start a `:temporary` task that crashes af
 Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) after six seconds to demonstrate that a `:temporary` process is not restarted.
 
 ```elixir
-# Task.Supervisor.start_child(MyTaskSupervisor, fn -> 
-#   Process.sleep(5000)
-#   raise "error"
-# end)
+Task.Supervisor.start_child(MyTaskSupervisor, fn ->
+  Process.sleep(5000)
+  raise "error"
+end)
 
-Supervisor.which_children(MyTaskSupervisor)
+# check = fn -> 
+#   Process.sleep(6000)
+#   Supervisor.which_children(MyTaskSupervisor)
+# end
+
+# check.()
 ```
 
 Use `Task.Supervisor.start_child/3` with the `restart: :transient` option to start a `:transient` task that crashes after five seconds.
