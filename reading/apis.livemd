@@ -214,7 +214,7 @@ an Elixir map.
 
 ```elixir
 response =
-  case HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json") do
+  case HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&category=Programming&format=json") do
     {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
       Jason.decode!(body)
   end
@@ -236,6 +236,7 @@ Use [Jason.decode!/2](https://hexdocs.pm/jason/Jason.html#encode!/2) to decode t
 
 ```elixir
 json = "{\"hello\"\: \"world\"}"
+Jason.decode!(json)
 ```
 
 ## Poison
