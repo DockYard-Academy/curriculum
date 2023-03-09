@@ -50,10 +50,16 @@ end
 Implement the `TodoList` module as documented. You may choose any file for your persistence mechanism.
 
 ```elixir
+content = :erlang.term_to_binary([])
+File.write("todo", content)
+```
+
+```elixir
 defmodule TodoList do
   @moduledoc """
   Documentation for `TodoList`
   """
+  @storage "todo"
   @doc """
   Retrieve the persistent todo list.
 
@@ -62,7 +68,11 @@ defmodule TodoList do
       iex> TodoList.list()
       []
   """
-  def list do
+  def list() do
+    case File.read(@storage) do
+      {:ok, todo} -> :erlang.binary_to_term(todo)
+      _ -> []
+    end
   end
 
   @doc """
@@ -77,9 +87,11 @@ defmodule TodoList do
       iex> TodoList.add("task 1")
       iex> TodoList.add("task 2")
       iex> TodoList.list()
-      ["task 2", "task 1"]
+      ["task 2", "task 1", "finish homework"]
   """
   def add(item) do
+    update_list = [item] ++ list()
+    File.write(@storage, :erlang.term_to_binary(update_list))
   end
 
   @doc """
@@ -87,12 +99,13 @@ defmodule TodoList do
 
   ## Examples
 
-      iex> TodoList.add("finish homework")
       iex> TodoList.complete("finish homework")
       iex> TodoList.list()
-      []
+      ["task 2", "task 1"]
   """
   def complete(item) do
+    update_list = list() -- [item]
+    File.write(@storage, :erlang.term_to_binary(update_list))
   end
 end
 ```

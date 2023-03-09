@@ -58,12 +58,16 @@ defmodule Game do
   Save an elixir term into a given file name.
   """
   def save(data, filename) do
+    binary_data = :erlang.term_to_binary(data)
+    File.write(filename, binary_data)
   end
 
   @doc """
   Retrieve an elixir term from a given file name.
   """
   def load(filename) do
+    {:ok, binary_data} = File.read(filename)
+    :erlang.binary_to_term(binary_data)
   end
 end
 ```
