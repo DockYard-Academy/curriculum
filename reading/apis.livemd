@@ -269,6 +269,15 @@ Below we send a POST request to http://httparrot.herokuapp.com/post. The body is
 `Content-Type` header specifies that the data being sent is JSON.
 
 ```elixir
+query =
+  HTTPoison.get(
+    "https://web.archive.org/web/20040920232805/http://mx.geocities.com:80/blue_dolphin_and_friends2002/garfieldpescando.gif"
+  )
+
+query
+```
+
+```elixir
 HTTPoison.post("http://httparrot.herokuapp.com/post", Poison.encode!(%{body: "test"}), [
   {"Content-Type", "application/json"}
 ])
@@ -313,12 +322,10 @@ Use your API key and valid latitude/longitude coordinates to make a successful r
 ```elixir
 lat = 35
 lon = 139
-api_key = ""
+api_key = "3a482808475581fa0fcd2c1c4038ff2d"
 
 {:ok, response} =
-  HTTPoison.get(
-    "https://api.openweathermap.org/data/2.5/weather?lat=#{lat}&lon=#{lon}&appid=#{api_key}"
-  )
+  HTTPoison.get("http://api.openweathermap.org/data/2.5/forecast?id=524901&appid=#{api_key}")
 ```
 
 Once you are sure the above works correctly, use [Poison.decode/2](https://hexdocs.pm/poison/Poison.html#decode/2) to decode the `response` into an Elixir map.
