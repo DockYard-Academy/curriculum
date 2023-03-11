@@ -234,14 +234,7 @@ defmodule Pokemon do
   @impl true
   def handle_call({:attack, [type, attack]}, _from, defender) do
     multiplier = do_multiplier(type, defender.type)
-
-    new_health =
-      case defender.health - attack * multiplier do
-        health when health > 0 -> health
-        _ -> 0
-      end
-
-    update_defender = %Pokemon{defender | health: new_health}
+    update_defender = %Pokemon{defender | health: max(defender.health - attack * multiplier, 0)}
     {:reply, update_defender, update_defender}
   end
 
