@@ -155,15 +155,23 @@ defmodule Pokemon do
     iex> %Pokemon{name: "Charmander", type: :fire}
     %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5}
   """
+  defstruct [:name, :type, health: 20, attack: 5]
   use GenServer
+
+  @type_adv %{
+    grass: :water,
+    water: :fire,
+    fire: :grass
+  }
 
   @doc """
   Start the Pokemon GenServer.
 
   ## Examples
-      iex> {:ok, pokemon} = Pokemon.start_link([pokemon: %Pokemon{name: "Charmander", type: :fire}])
+      iex> {:ok, _pokemon} = Pokemon.start_link([pokemon: %Pokemon{name: "Charmander", type: :fire}])
   """
-  def start_link(opts \\ []) do
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @doc """
@@ -206,7 +214,43 @@ defmodule Pokemon do
       iex> Pokemon.attack(attacker, defender)
       %Pokemon{name: "Bulbasaur2", type: :grass, health: 25, attack: 5}
   """
-  def attack(attacker, defender) do
+  def attack(attacker_pid, defender_pid) do
+    [type, attack] = GenServer.call(attacker_pid, :get_attack)
+    GenServer.call(defender_pid, {:attack, [type, attack]})
+  end
+
+  # Server callback functions
+
+  @impl true
+  def init([{:pokemon, pokemon}]) do
+    {:ok, pokemon}
+  end
+
+  @impl true
+  def handle_call(:get_attack, _from, attacker) do
+    {:reply, [attacker.type, attacker.attack], attacker}
+  end
+
+  @impl true
+  def handle_call({:attack, [type, attack]}, _from, defender) do
+    multiplier = do_multiplier(type, defender.type)
+
+    new_health =
+      case defender.health - attack * multiplier do
+        health when health > 0 -> health
+        _ -> 0
+      end
+
+    update_defender = %Pokemon{defender | health: new_health}
+    {:reply, update_defender, update_defender}
+  end
+
+  defp do_multiplier(att_type, def_type) do
+    cond do
+      att_type == def_type -> 1
+      @type_adv[att_type] == def_type -> 2
+      @type_adv[def_type] == att_type -> 0.5
+    end
   end
 end
 ```
