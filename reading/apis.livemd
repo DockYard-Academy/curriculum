@@ -141,6 +141,24 @@ For a simple example, here's how we can request a joke from the same API you vis
 HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
 ```
 
+```elixir
+query = HTTPoison.get("https://gifcities.archive.org/api/v1/gifsearch?q=dance&limit=20")
+
+case query do
+  {:ok, %HTTPoison.Response{status_code: 200}} ->
+    query
+
+  {:ok, %HTTPoison.Response{status_code: 404}} ->
+    IO.puts("dance not found. Search another term!")
+
+  {:error, %HTTPoison.Error{reason: reason}} ->
+    IO.inspect(reason)
+
+  {:timeout, %HTTPoison.Response{status_code: 408}} ->
+    IO.puts("aslkjd")
+end
+```
+
 We use the [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
 
 The `:body` is the JSON response you saw previously in the browser, and `:headers` provide additional context and meta-data about the response. The `:status_code` specifies the response's status, where `200` indicates a successful response. The `:request_url` is simply the URL.
@@ -326,6 +344,8 @@ api_key = "3a482808475581fa0fcd2c1c4038ff2d"
 
 {:ok, response} =
   HTTPoison.get("http://api.openweathermap.org/data/2.5/forecast?id=524901&appid=#{api_key}")
+
+HTTPoison.response("body")
 ```
 
 Once you are sure the above works correctly, use [Poison.decode/2](https://hexdocs.pm/poison/Poison.html#decode/2) to decode the `response` into an Elixir map.
