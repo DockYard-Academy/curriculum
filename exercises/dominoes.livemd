@@ -97,7 +97,22 @@ Supervisor.start_link(children, strategy: :rest_for_one)
 Keep in mind, if you have already started a named process, the supervisor might crash when you attempt to start it again. Re-evaluate the cell after the livebook crashes to resolve this issue.
 
 ```elixir
+children = [
+  %{
+    id: :domino1,
+    start: {Domino, :start_link, [[name: :domino1]]}
+  },
+  %{
+    id: :domino2,
+    start: {Domino, :start_link, [[name: :domino2]]}
+  },
+  %{
+    id: :domino3,
+    start: {Domino, :start_link, [[name: :domino3]]}
+  }
+]
 
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one)
 ```
 
 Send your dominos messages to ensure they are crashing in the correct order. They will log a message that demonstrates the `Domino.start_link/1` function was called again.
@@ -116,7 +131,7 @@ Process.send(:domino_name, :fall, [])
 Test sending each `Domino` process a message individually.
 
 ```elixir
-
+Process.send(:domino2, :fall, [])
 ```
 
 ## Mark As Completed
