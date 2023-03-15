@@ -373,7 +373,30 @@ end
 </details>
 
 ```elixir
+defmodule Book do
+  defstruct [:title, :content, :authro, :is_licenced, :is_published]
 
+  @types %{
+    title: :string,
+    content: :string,
+    author: :string,
+    is_licenced: true,
+    is_published: :boolean
+  }
+
+  def changeset(%Book{} = book, params) do
+    Ecto.Changeset.cast({book, @types}, params, Map.keys(@types))
+    |> Ecto.Changeset.validate_required([:title, :content])
+    |> Ecto.Changeset.validate_length(:title, min: 3, max: 100)
+    |> Ecto.Changeset.validate_acceptance(:is_licenced)
+  end
+
+  def new(params) do
+    %Book{}
+    |> changeset(params)
+    |> Ecto.Changeset.apply_action(:update)
+  end
+end
 ```
 
 ## Mark As Completed

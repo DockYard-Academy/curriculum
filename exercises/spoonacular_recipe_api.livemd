@@ -49,7 +49,8 @@ gifff =
 case gifff do
   {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
     data = Poison.decode!(body)
-    Kernel.get_in(data, ["data", "embed_url"])
+    images = Kernel.get_in(data, ["data", "images"])
+    # Kernel.get_in(images, ["downsized", "url"])
 end
 
 # case HTTPoison.get("https://pokeapi.co/api/v2/pokemon/#{name}") do
