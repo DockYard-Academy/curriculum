@@ -40,6 +40,37 @@ response =
   end
 ```
 
+```elixir
+gifff =
+  HTTPoison.get(
+    "https://api.giphy.com/v1/gifs/random?api_key=bRHycByRUEEdN80uNt0eQEsIsudz47i2&tag=&rating=g"
+  )
+
+case gifff do
+  {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+    data = Poison.decode!(body)
+    Kernel.get_in(data, ["data", "embed_url"])
+end
+
+# case HTTPoison.get("https://pokeapi.co/api/v2/pokemon/#{name}") do
+#       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+#         response = Poison.decode!(body)
+#         stats = response["stats"]
+#         [head | _tail] = stats
+
+#         stat_map =
+#           Enum.reduce(stats, %{}, fn each, acc ->
+#             base_stat = Map.get(each, "base_stat")
+#             key = Kernel.get_in(each, ["stat", "name"])
+#             Map.put(acc, key, base_stat)
+#           end)
+
+#         types = response["types"]
+#         [first_type, second_type] = types
+#         type_name1 = Kernel.get_in(first_type, ["type", "name"])
+#         type_name2 = Kernel.get_in(second_type, ["type", "name"])
+```
+
 ## Mark As Completed
 
 <!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"spoonacular_recipe_api_reading\"\n    \"exercises\" -> \"spoonacular_recipe_api_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
