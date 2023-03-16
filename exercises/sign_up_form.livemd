@@ -96,7 +96,13 @@ defmodule User do
   """
   defstruct [:username, :password, :age, :birthdate, :terms_and_conditions]
 
-  @types %{username: :string, password: :string, age: :integer, birthdate: :date, terms_and_conditions: :boolean}
+  @types %{
+    username: :string,
+    password: :string,
+    age: :integer,
+    birthdate: :date,
+    terms_and_conditions: :boolean
+  }
 
   @doc """
   Create a User changeset.
@@ -109,11 +115,12 @@ defmodule User do
   def changeset(%__MODULE__{} = user, params) do
     Ecto.Changeset.cast({user, @types}, params, Map.keys(@types))
     |> Ecto.Changeset.validate_required([:username, :password])
-    |> Ecto.Changeset.validate_length(:username, min: 3, max: 12))
-    |> Ecto.Changeset.validate_required([:username, :password])
-    |> Ecto.Changeset.validate_number(:age)
-    |> Ecto.Changeset.validate_format(:birthdate, :date)
-    |> Ecto.Changeset.validate_format(:terms_and_conditions, :boolean)
+    |> Ecto.Changeset.validate_length(:username, min: 3, max: 12)
+    |> Ecto.Changeset.validate_length(:password, min: 12, max: 50)
+    # |> Ecto.Changeset.validate_number(:age, greater_than: 0)
+    # |> Ecto.Changeset.validate_format(:age, :integer)
+    # |> Ecto.Changeset.validate_format(:birthdate, :date)
+    |> Ecto.Changeset.validate_acceptance(:terms_and_conditions)
   end
 
   @doc """
