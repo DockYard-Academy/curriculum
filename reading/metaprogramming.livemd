@@ -179,7 +179,7 @@ Use the `quote` macro to discover the AST representation of the following expres
 ```
 
 ```elixir
-
+quote do: Map.merge(%{}, %{a: 2})
 ```
 
 ## Unquote
@@ -265,7 +265,7 @@ Macro.to_string(ast)
 We can evaluate a string as Elixir code using the [Code.eval_string/3](https://hexdocs.pm/elixir/Code.html#eval_string/3) function.
 
 ```elixir
-Code.eval_string("2 + 5")
+Code.eval_string("2 + 5 * 3")
 ```
 
 Variables in the string can be provided by providing a keyword list of bindings as the second argument to the function.
@@ -594,9 +594,15 @@ Create a `Usage` module that uses the `use` keyword to call the `__using__` macr
 
 ```elixir
 defmodule Greetings do
+  defmacro __using__(_opts) do
+    quote do
+      def hello(), do: "hello"
+    end
+  end
 end
 
 defmodule Usage do
+  use Greetings
 end
 ```
 
