@@ -52,7 +52,21 @@ end
 </details>
 
 ```elixir
+defmodule Zero do
+  use GenServer
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], name: opts[:name])
+  end
+
+  @impl true
+  def init(_args) do
+    {:ok, 0}
+  end
+end
+
+{:ok, pid} = Zero.start_link([])
+:sys.get_state(pid)
 ```
 
 Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start your `Zero` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as a named process.
@@ -67,7 +81,7 @@ GenServer.start_link(Zero, "init_arg", [name: :my_name])
 </details>
 
 ```elixir
-
+GenServer.start_link(Zero, [], name: :zero)
 ```
 
 Create a `SimpleCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose state starts as `0`. Implement a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.
@@ -100,7 +114,27 @@ GenServer.call(pid, :increment)
 </details>
 
 ```elixir
+defmodule SimpleCounter do
+  use GenServer
 
+  def add(pid) do
+    GenServer.call(pid, :increment)
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_call(:increment, _from, state) do
+    {:reply, state + 1, state + 1}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(SimpleCounter, [])
+SimpleCounter.add(pid)
+:sys.get_state(pid)
 ```
 
 Create an `InitialState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose initial state can be configured. Call [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to spawn a `State` GenServer with an initial state. Use `:sys.get_state/1` to confirm the state matches your configured state.
@@ -126,7 +160,17 @@ end
 </details>
 
 ```elixir
+defmodule InitialState do
+  use GenServer
 
+  @impl true
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(InitialState, %{a: 1})
+:sys.get_state(pid)
 ```
 
 Create a `State` module.
@@ -185,7 +229,43 @@ State.set(pid, "updated state")
 </details>
 
 ```elixir
+defmodule State do
+  use GenServer
 
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts)
+  end
+
+  def get(pid) do
+    GenServer.call(pid, :get)
+  end
+
+  def set(pid, new_state) do
+    GenServer.cast(pid, {:set, new_state})
+  end
+
+  @impl true
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+
+  @impl true
+  def handle_call(:get, _from, state) do
+    {:reply, state, state}
+  end
+
+  @impl true
+  def handle_cast({:set, new_state}, _state) do
+    {:noreply, new_state}
+  end
+end
+
+{:ok, pid} = State.start_link(10)
+:sys.get_state(pid) |> IO.puts()
+State.get(pid)
+:sys.get_state(pid) |> IO.puts()
+State.set(pid, "mango")
+:sys.get_state(pid) |> IO.puts()
 ```
 
 Create a minimal `Named` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process using `Named.start_link/1`. Start a `Named` process and use [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
@@ -214,7 +294,25 @@ Process.whereis(:my_configured_name)
 </details>
 
 ```elixir
+defmodule Named do
+  use GenServer
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, [], name: opts[:name])
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, []}
+  end
+end
+
+{:ok, pid} = Named.start_link(name: :bob)
+```
+
+```elixir
+# GenServer.whereis(:bob)
+Process.whereis(:bob)
 ```
 
 Create a minimal `NamedState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process with a configurable state using `NamedState.start_link`. Use `:sys.get_state/1` to confirm the initial state is as expected and [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
@@ -269,7 +367,25 @@ Process.whereis(:keyword_list_example)
 </details>
 
 ```elixir
+defmodule NamedState do
+  use GenServer
 
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, name: opts[:name])
+  end
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+NamedState.start_link(10, name: :test)
+Process.whereis(:test)
+```
+
+```elixir
+:sys.get_state(:test)
 ```
 
 ## Supervisor
@@ -312,7 +428,9 @@ Supervisor.start_link([], strategy: :one_for_one)
 </details>
 
 ```elixir
-
+children = []
+{:ok, supervisor} = Supervisor.start_link(children, strategy: :one_for_one)
+Supervisor.which_children(supervisor)
 ```
 
 Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax.
@@ -334,7 +452,14 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 ```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, [1]}
+  }
+]
 
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor three `Worker` children using the **map** syntax.
@@ -364,7 +489,22 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 ```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, [1]}
+  },
+  %{
+    id: :worker2,
+    start: {Worker, :start_link, [2]}
+  },
+  %{
+    id: :worker3,
+    start: {Worker, :start_link, [3]}
+  }
+]
 
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **tuple** syntax.
@@ -383,7 +523,11 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 ```elixir
+children = [
+  {Worker, []}
+]
 
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax to start the `Worker` process as a named process.
@@ -405,7 +549,14 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 ```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, [name: :worker_one]}
+  }
+]
 
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Usually worker GenServers should define a `start_link/1` function to start under a supervision tree. However, this is idiomatic and we can (but usually shouldn't) break this rule.
@@ -440,6 +591,15 @@ defmodule NonIdiomatic do
     {:ok, "initial state"}
   end
 end
+
+children = [
+  %{
+    id: :worker,
+    start: {NonIdiomatic, :starter, [1, 2, 3]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with three `Worker` children using the **tuple** syntax.
@@ -464,7 +624,13 @@ Supervisor.start_link(children, strategy: :one_for_one)
 </details>
 
 ```elixir
+children = [
+  {Worker, []},
+  {Worker, []},
+  {Worker, []}
+]
 
+# Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 ## Mix Projects
@@ -477,23 +643,23 @@ Supervisor.start_link(children, strategy: :one_for_one)
   <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule MyApp.Application do
-  use Application
+# defmodule MyApp.Application do
+#   use Application
 
-  def start(_type, _args) do
-    children = []
-    Supervisor.start_link(children, strategy: :one_for_one)
-  end
-end
+#   def start(_type, _args) do
+#     children = []
+#     Supervisor.start_link(children, strategy: :one_for_one)
+#   end
+# end
 ```
 
 * Configure the mix project in `mix.exs` to use the application module.
 
 ```elixir
-def application do
-  # make sure to keep the existing options and add the following:
-  [mod: {MyApp.Application, []}]
-end
+# def application do
+#   # make sure to keep the existing options and add the following:
+#   [mod: {MyApp.Application, []}]
+# end
 ```
 
 ## Mark As Completed
