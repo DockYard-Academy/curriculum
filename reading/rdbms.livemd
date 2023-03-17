@@ -388,10 +388,10 @@ opts = [
 
 Once connected, these smart cells can make SQL queries to our database. Here you should see your users table.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"select * from users","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"select * from entries","result_variable":"result2","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result2 = Postgrex.query!(conn, "select * from users", [])
+result2 = Postgrex.query!(conn, "select * from entries", [])
 ```
 
 ### Your Turn
@@ -400,18 +400,28 @@ result2 = Postgrex.query!(conn, "select * from users", [])
 
 Use the following SQL smart cell to create a new user in the users table. Re-evaluate the smart cell above to see the new user in the table.
 
-<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"insert into users (id,name,email) values (2, 'Karl', 'okkarl@karlok.whatever');","result_variable":"result3","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result3 = Postgrex.query!(conn, "", [])
+result3 =
+  Postgrex.query!(
+    conn,
+    "insert into users (id,name,email) values (2, 'Karl', 'okkarl@karlok.whatever');",
+    []
+  )
 ```
 
 Use the following SQL smart cell to create a new entry in the entries table, which has a foreign key to the same user you previously created.
 
-<!-- livebook:{"attrs":{"connection":{"type":"postgres","variable":"conn"},"query":"","result_variable":"result4","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"cache_query":true,"connection":{"type":"postgres","variable":"conn"},"query":"insert into entries (id,title,content,userid) values (2, 'Think patterns', 'It aint easy to think, Pat', 2);","result_variable":"result4","timeout":null},"chunks":null,"kind":"Elixir.KinoDB.SQLCell","livebook_object":"smart_cell"} -->
 
 ```elixir
-result4 = Postgrex.query!(conn, "", [])
+result4 =
+  Postgrex.query!(
+    conn,
+    "insert into entries (id,title,content,userid) values (2, 'Think patterns', 'It aint easy to think, Pat', 2);",
+    []
+  )
 ```
 
 ## Relationships
