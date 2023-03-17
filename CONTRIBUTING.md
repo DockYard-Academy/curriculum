@@ -27,7 +27,7 @@ F[Forked Repository]
 DY --fork--> F
 ```
 
-You can create a fork by pressing the fork button in the top right corner of the GitHub repository or [click this link to create a fork]([fork](https://github.com/DockYard-Academy/beta_curriculum/fork))
+You can create a fork by pressing the fork button in the top right corner of the GitHub repository or [click this link to create a fork](https://github.com/DockYard-Academy/beta_curriculum/fork)
 
 ## Clone the Repository
 
