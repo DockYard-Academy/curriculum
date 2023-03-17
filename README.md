@@ -1,29 +1,29 @@
 # DockYard Academy
 
 The DockYard Academy curriculum is an open source curriculum to help students learn Elixir.
-The `beta_curriculum` is a work in progress effort available for feedback and contribution.
+The `curriculum` is a work in progress effort available for feedback and contribution.
 When launched, this curriculum will be used as the primary teaching material in [DockYard Academy](https://dockyard.com/blog/2022/07/26/what-to-expect-from-the-dockyard-academy-q-a-with-instructor-brooklin-myers).
 
 Contact Brooklin (brooklin.myers@dockyard.com) or DM at [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
 
 ## Want To Get Involved?
 
-Contributors and beta testers are welcome to go through the course, raise issues, and make PRs. See the [Contributor Guide](https://github.com/DockYard-Academy/beta_curriculum/blob/main/CONTRIBUTING.md).
+Contributors and beta testers are welcome to go through the course, raise issues, and make PRs. See the [Contributor Guide](https://github.com/DockYard-Academy/curriculum/blob/main/CONTRIBUTING.md).
 
-See our list of [Open Issues](https://github.com/DockYard-Academy/beta_curriculum/issues). You can raise an issue to get support.
+See our list of [Open Issues](https://github.com/DockYard-Academy/curriculum/issues). You can raise an issue to get support.
 
 ## QuickStart
 
-The following QuickStart Guide will let you quickly try the course. For a long-term setup, follow our [Student Setup Guide](https://github.com/DockYard-Academy/beta_curriculum/wiki/Student-Setup-Guide).
+The following QuickStart Guide will let you quickly try the course. For a long-term setup, follow our [Student Setup Guide](https://github.com/DockYard-Academy/curriculum/wiki/Student-Setup-Guide).
 
 The recommended installation methods for this course are from the Elixir language [website](https://elixir-lang.org/install.html#gnulinux). If you cannot see [mermaid.js](https://github.com/mermaid-js/mermaid) graphs, please ensure your Livebook version is correct. 
 
-In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/beta_curriculum/blob/main/.tool-versions) file in a project.
+In the future when working with multiple Elixir projects, there is a tool called [`asdf`](https://github.com/asdf-vm/asdf) that can be used to install different versions of Erlang/Elixir as defined by the [.tool-versions](https://github.com/DockYard-Academy/curriculum/blob/main/.tool-versions) file in a project.
 
 ### MacOS
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
+   - `git clone https://github.com/DockYard-Academy/curriculum.git`
 
 2. Install Elixir
    - `brew install elixir`
@@ -38,7 +38,7 @@ In the future when working with multiple Elixir projects, there is a tool called
 ### Windows
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
+   - `git clone https://github.com/DockYard-Academy/curriculum.git`
 
 2. Install Elixir
    - Download the installer [here](https://github.com/elixir-lang/elixir-windows-setup/releases/download/v2.2/elixir-websetup.exe) and run it. You will get a Windows Defender notice (don't worry) and select "More info" and "Run anyways" then follow the instructions with the default settings.
@@ -63,7 +63,7 @@ In the future when working with multiple Elixir projects, there is a tool called
 ### Linux (Ubuntu)
 
 1. Clone the project
-   - `git clone https://github.com/DockYard-Academy/beta_curriculum.git`
+   - `git clone https://github.com/DockYard-Academy/curriculum.git`
 
 2. Install Elixir
       - Add the Erlang Solutions repository
@@ -181,7 +181,7 @@ They will also have the researching and problem-solving skills necessary to expa
 throughout their career. Students will be capable of delivering high-quality, well-tested features to a production complexity codebase.
 
 ## Curriculum Outline
-The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/beta_curriculum/blob/main/start.livemd) for a full breakdown.
+The curriculum is still a rough outline subject to change and feedback. see [start.livemd](https://github.com/DockYard-Academy/curriculum/blob/main/start.livemd) for a full breakdown.
 
 <!-- course-outline-start -->
 ## Core Syntax
