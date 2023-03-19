@@ -24,13 +24,13 @@ Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before s
 * What are the **front** and **back** of a queue?
 * What is $O(1)$ performance vs $O(n)$ performance?
 * What is the ideal vs worst-case performance of an amortized queue? When does the worst-case condition occur?
-* How do queues vs double-ended queues (DEQs) differ in how they re-balance a queue?
+* How do queues vs double-ended queues (DEQs) differ in how they rebalance a queue?
 
 ## Overview
 
 ### FIFO Queues
 
-A FIFO (First-In-First-Out) queue is a type of data structure that stores elements in the order they were added, and retrieves them in the same order. In a FIFO queue, the first element added to the queue is the first element to be removed. It works like a line of people in a store, where the first person to arrive is the first person to be served.
+A FIFO (First-In-First-Out) queue is a type of data structure that stores elements in the order they were added and retrieves them in the same order. In a FIFO queue, the first element added to the queue is the first element to be removed. It works like a line of people in a store, where the first person to arrive is the first person to be served.
 
 Elements in a queue are inserted (enqueued) to the **back** (also called the rear) and elements are removed (dequeued) from the **front**.
 
@@ -42,9 +42,7 @@ Elements in a queue are inserted (enqueued) to the **back** (also called the rea
 
 ### Double Ended Queues
 
-A Double Ended Queue (Deque) is a type of data structure that allows insertion and removal of elements from both ends, front and rear, of the queue. Elements can be added or removed from both ends.
-
-Dequeues are useful when we need to access elements from both ends, or when we need to perform operations on both ends of the queue efficiently.
+A Double-Ended Queue (Deque) is a type of data structure that allows the performant insertion and removal of elements from both ends of the queue.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -54,27 +52,25 @@ Dequeues are useful when we need to access elements from both ends, or when we n
 
 ### Amortized $O(1)$
 
-We use Big O Notation to describe the performance of an algorithm as data grows. $O(1)$ means the algorithm runs in constant time regardless of the number of elements and $O(n)$ means the algorithm grows linearly as data grows.
+We use Big O Notation to describe how the performance of an algorithm changes as the data set grows. $O(1)$ means the algorithm's execution time remains constant, regardless of the size of the data set. $O(n)$ means the algorithm's execution time grows proportionally to the size of the data set.
 
-In the case of our Queue and Double Ended Queue they both have *amortized* $O(1)$ performance. This means that on average they have $O(1)$ performance, but the worst case scenario may have $O(n)$ performance.
+Both our Queue and Double-Ended Queue have an amortized $O(1)$ performance. On average, their performance is constant, but they may have a $O(n)$ performance in the worst-case scenario.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Naive Implementation
 
-Implementing a naive algorithm means implementing a solution to a problem that is simple and straightforward, but not necessarily the most efficient or optimal solution. A naive algorithm is usually the first algorithm that comes to mind when we think about a problem, and it is often the simplest to understand and implement. However, it may not always be the most efficient, especially for larger or more complex input sizes.
-
-This is also sometimes referred to as a brute-force algorithm.
+Implementing a naive algorithm involves developing a straightforward solution to a problem, which may not necessarily be the most efficient or optimal solution. A naive algorithm is usually the first algorithm that comes to mind when thinking about a problem, and it is often easy to comprehend and execute. Nevertheless, it may not be the most effective solution for larger or more complex input sizes, especially when compared to other more sophisticated algorithms. Naive solutions are also sometimes referred to as a brute-force algorithm.
 
 ## Naive Queue
 
-To implement a naive queue, we can represent our queue as a list.
+For our naive solution, we can represent our queue as a list.
 
 ```elixir
 queue = []
 ```
 
-When we want to insert elements we can simply prepend them into the list. This has $O(1)$ performance.
+We can simply prepend elements into the list when we want to insert elements. This has $O(1)$ performance.
 
 ```elixir
 queue = [1 | queue]
@@ -88,7 +84,7 @@ queue = [2 | queue]
 queue = [3 | queue]
 ```
 
-However, to remove the first element that was inserted (`1`) we need to reverse the list. We also need to re-reverse the remaining elements. This has $O(n)$ performance, which isn't ideal.
+However, we must reverse the list to remove the first element in our queue. Then, we also need to re-reverse the remaining elements to put the queue back in order. Reversing a list has $O(n)$ performance, which isn't ideal.
 
 ```elixir
 [value | reversed_queue] = Enum.reverse(queue)
@@ -114,7 +110,7 @@ defmodule NaiveQueue do
 end
 ```
 
-We can performantly insert (enqueue) items to our queue.
+We can performantly insert (enqueue) items into our queue.
 
 ```elixir
 queue =
@@ -124,7 +120,7 @@ queue =
   |> NaiveQueue.enqueue(3)
 ```
 
-We can also remove (dequeue) and element from our queue, however this always has $O(n)$ performance which isn't ideal.
+We can also remove (dequeue) elements from our queue, but this has $O(n)$ performance.
 
 ```elixir
 {value, queue} = NaiveQueue.dequeue(queue)
@@ -146,7 +142,9 @@ We've handled having an empty queue by returning `nil`.
 
 ## Amortized Queue
 
-To optimize our queue, we can think of our queue as a list with the **front** elements and the **back** elements.
+We can model our queue as a list with the **front** elements and the **back** elements, allowing us to optimize our queue by having two separate list heads.
+
+Elements are prepended to the **back** list, and removed from the **front** list.
 
 ```mermaid
 flowchart
@@ -155,7 +153,7 @@ subgraph back
 end
 ```
 
-When we attempt to remove (dequeue) an element, we can reverse the elements in the **back** list and store them in the **front** list.
+When we remove (dequeue) an element, we can reverse the elements in the **back** list and store them in the **front** list. Reversing the list causes our worst-case performance of $O(n)$. However, future removals will have $O(1)$ performance.
 
 ```mermaid
 flowchart
@@ -165,13 +163,9 @@ flowchart
   end
 ```
 
-Now when we remove further elements, it will be an $O(1)$ operations while there are elements in the **front** list.
-
-<!-- livebook:{"break_markdown":true} -->
-
 ### Implementation
 
-To implement our **front** and **back** list, we'll store each list in a tuple.
+We can store each list in a tuple to implement our **front** and **back** lists.
 
 ```elixir
 # {back, front}
@@ -185,7 +179,7 @@ When we insert elements, we prepend them to the **back** list.
 {[3, 2, 1], []}
 ```
 
-When we remove elements we grab the head of the **front** list. When there are no elements in the **front** list, we'll reverse our **back** list to make the **front** list. This is our worst-case $O(n)$ performance scenario.
+When we remove elements, we grab the head of the **front** list. When the **front** list is empty, we'll reverse our **back** list to make the **front** list. This is our worst-case $O(n)$ performance scenario.
 
 ```elixir
 # dequeue
@@ -202,7 +196,7 @@ After reversing the **back** list, it's an $O(1)$ operation to grab elements fro
 {removed, front}
 ```
 
-Here's that put into a module.
+Here's that put into a module. We've handled the best and worst-case scenarios. We've also handled returning `nil` when the queue is empty.
 
 ```elixir
 defmodule AmortizedQueue do
@@ -213,8 +207,10 @@ defmodule AmortizedQueue do
   end
 
   def dequeue({[], []} = queue), do: {nil, queue}
+  # best-case scenario O(1)
   def dequeue({back, [el | front]}), do: {el, {back, front}}
 
+  # worst-case scenario O(n)
   def dequeue({back, []}) do
     [removed | front] = Enum.reverse(back)
     {removed, {[], front}}
@@ -232,13 +228,13 @@ queue =
   |> AmortizedQueue.enqueue(3)
 ```
 
-Then if there are no elements in the **front** list we reverse the back list. While this still has $O(n)$ performance, we only have to do it when the **front** list is empty.
+Then if there are no elements in the **front** list we reverse the back list. While this has $O(n)$ performance, we only have to do it when the **front** list is empty.
 
 ```elixir
 {value, queue} = AmortizedQueue.dequeue(queue)
 ```
 
-Subsequent operations will be $O(1)$
+Subsequent operations will be $O(1)$.
 
 ```elixir
 {value, queue} = AmortizedQueue.dequeue(queue)
@@ -248,7 +244,7 @@ Subsequent operations will be $O(1)$
 {value, queue} = AmortizedQueue.dequeue(queue)
 ```
 
-We've handled the case where the queue is empty by simply returning `nil`.
+If the entire queue is empty, we simply return `nil`.
 
 ```elixir
 {value, queue} = AmortizedQueue.dequeue(queue)
@@ -258,15 +254,18 @@ We've handled the case where the queue is empty by simply returning `nil`.
 
 Similar to our amortized queue, we can represent a double-ended queue with both a **back** list and a **front** list.
 
-However, we need to optimize for removing/inserting from both the **back** and **front** of our DEQ. This means it would be unwise to reverse the entirety of either list like we did with our amortized queue.
+Since we can perform operations on either end, we need to optimize for removing/inserting from both the **back** and the **front** of our DEQ. Therefore, it would be unwise to reverse the entirety of either list as we did with our amortized queue.
 
-Instead, a performant approach when either the **back** or the **front** list is empty is to split our remaining list in half.
+Instead, a performant approach when either the **back** or the **front** list is empty is to balance our queue into two halves.
 
-For example, if we have inserted six elements to our **back** list:
+For example, if we insert six elements to our **back** list:
 
 ```mermaid
-flowchart RL
-1 --> 2 --> 3 --> 4 --> 5 --> 6
+flowchart
+subgraph back
+  direction RL
+  1 --> 2 --> 3 --> 4 --> 5 --> 6
+end
 ```
 
 We would split the list in half to make the **back** `[6, 5, 4]` and our **front** `[1, 2, 3]`.
@@ -284,7 +283,7 @@ flowchart
   end
 ```
 
-This means we have access to the head of our **back** and our **front** list so inserting/removing operations will have $O(1)$ on either side of the queue.
+By splitting our queue, we'll have access to the head of our **back** and our **front** list, so inserting/removing operations will have $O(1)$ on either side of the queue.
 
 Here's that put into a module.
 
@@ -298,6 +297,10 @@ defmodule DoubleEndedQueue do
 
   def remove_back({[], []} = queue), do: {nil, queue}
 
+  # best-case scenario O(1)
+  def remove_back({[removed | back], front}), do: {removed, {back, front}}
+
+  # worse-case scenario O(n)
   def remove_back({[], front}) do
     middle_index = div(length(front), 2)
     {half_front, reversed_back} = Enum.split(front, middle_index)
@@ -305,26 +308,22 @@ defmodule DoubleEndedQueue do
     {removed, {back, half_front}}
   end
 
-  def remove_back({[removed | back], front}), do: {removed, {back, front}}
-
   def remove_front({[], []} = queue), do: {nil, queue}
 
+  # best-case scenario O(1)
+  def remove_front({back, [removed | front]}), do: {removed, {back, front}}
+
+  # worst-case scenario O(n)
   def remove_front({back, []}) do
     middle_index = div(length(back), 2)
     {half_back, reversed_front} = Enum.split(back, middle_index)
     [removed | front] = Enum.reverse(reversed_front)
     {removed, {half_back, front}}
   end
-
-  def remove_front({back, [removed | front]}), do: {removed, {back, front}}
 end
 ```
 
-```elixir
-deq = DoubleEndedQueue.new()
-```
-
-Now we can insert/remove elements to the **back** or the **front**.
+Now we can performantly insert/remove elements to the **back** or the **front**.
 
 ```elixir
 deq =
@@ -354,7 +353,7 @@ deq =
 {value, deq} = DoubleEndedQueue.remove_front(deq)
 ```
 
-When we attempt to remove an element from the **front** when it is empty, we split the **back** in half and re-balance our DEQ.
+We rebalance the queue when we remove an element from an empty **front** list.
 
 ```elixir
 deq =
@@ -370,7 +369,7 @@ deq =
 DoubleEndedQueue.remove_front(deq)
 ```
 
-The same is true when we try to remove elements from the **back** when it is empty. We split the **front** to re-balance our queue.
+The same applies when we remove elements from an empty **back** list. We split the **front** to rebalance our queue.
 
 ```elixir
 deq =
@@ -400,11 +399,13 @@ DoubleEndedQueue.new()
 
 ## Double Ended Queue (Tracking Size)
 
-In order to split our DEQ, we need to calculate the size of the queue. This is a fairly expensive operation.
+To split our DEQ, we need to calculate the queue size. Unfortunately, calculating the length of a list is an expensive operation $O(n)$.
 
-Instead of computing the size of the queue, we can keep track of it whenever we add or remove an element.
+To avoid this operation, instead of computing the size of the queue, we can keep track of it whenever we add or remove an element.
 
 Here's an alternative DEQ implementation using a struct that tracks the **right** list, the **left** list, and the total **size** of the DEQ.
+
+The worst-case scenario is still $O(n)$. However, it's overall more performant because it requires fewer traversals through the list.
 
 ```elixir
 defmodule DoubleEndedQueueStruct do
@@ -451,7 +452,7 @@ defmodule DoubleEndedQueueStruct do
 end
 ```
 
-While the structure used to represent the queue has changed to optimize performance, the behavior remains the same.
+While the structure representing the queue has changed to optimize performance, the behavior remains the same.
 
 ```elixir
 deq =
@@ -485,10 +486,11 @@ Then there are "reversed" versions which perform the opposite operations of a no
 q = :queue.new()
 ```
 
-The erlang `:queue` module inserts element to the **front** when it's empty. This is an small optimization so we don't have to reverse the **front** list the first time we remove from it.
+The erlang `:queue` module inserts an element to the **front** when it's empty. This is a small optimization, so we don't have to reverse the **front** list the first time we remove elements from it.
 
 ```elixir
 q = :queue.in(1, q) |> IO.inspect()
+# notice 1 is moved to the front of the queue.
 q = :queue.in(2, q) |> IO.inspect()
 q = :queue.in(3, q) |> IO.inspect()
 q = :queue.in(4, q) |> IO.inspect()
@@ -499,22 +501,34 @@ q = :queue.in(6, q) |> IO.inspect()
 It similarly rebalances the lists when either is empty.
 
 ```elixir
-:queue.out(q)
+{value, q} = :queue.out(q)
+```
+
+After rebalancing, elements are removed from the front, which has $O(1)$ performance.
+
+```elixir
+{value, q} = :queue.out(q)
+```
+
+```elixir
+{value, q} = :queue.out(q)
 ```
 
 ## Concurrent Queues
 
-The `:queue` erlang module is notorious for having a difficult to read interface.
+The `:queue` erlang module is notorious for having a difficult-to-read interface. This quote is taken directly from the `:queue` documentation.
 
 > The "Okasaki API" is inspired by "Purely Functional Data Structures" by Chris Okasaki. It regards queues as lists. This API is by many regarded as strange and avoidable. For example, many reverse operations have lexically reversed names, some with more readable but perhaps less understandable aliases.
 
 So folks have created libraries for queues and DEQs that improve the interface and leverage the power of concurrency.
 
-For example, the [OPQ](https://github.com/fredwu/opq) library by fredwu leverages both the `:queue` module and [GenStage](https://github.com/elixir-lang/gen_stage) to enable worker pools to concurrently handle work in a queue.
+For example, the [OPQ](https://github.com/fredwu/opq) library by fredwu leverages both the `:queue` module and [GenStage](https://github.com/elixir-lang/gen_stage) to enable worker pools to handle work in a queue concurrently.
 
-You can think of this like a shared lineup, where there are multiple workers to handle customers.
+This is like a shared lineup, where multiple workers handle a single line of customers.
 
 The number of workers determines the number of jobs in the queue that can be handled concurrently.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 flowchart LR
@@ -522,18 +536,50 @@ subgraph Queue
   1
   2
   3
-  4[4 Waiting]
+  4[4]
 end
-
-1 --> Worker1
+subgraph Worker Pool
+1 -->  W1[Worker1] 
 2 --> Worker2
 3 --> Worker3
-
+end
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+When the worker finishes, it becomes available for the next job in the queue.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+subgraph Queue
+  4
+end
+
+subgraph Worker Pool
+4 --> W1[Worker1] 
+Worker2
+Worker3
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Diving into this library is beyond the scope of this material. Still, knowing how to scale queues to handle thousands (if not millions) of concurrent actions is useful. For example, many applications such as ticket-purchasing or streaming sites experience the **thundering herd** problem, where many interactions occur simultaneously.
+
+The thundering herd problem happens when a lot of computer processes or threads are waiting for the same thing causing a big surge of activity that can slow down or even crash the system.
+
+It's called the thundering herd problem because it's like a stampede of animals reacting to a sudden disturbance. Avoiding this problem requires techniques like load balancing, caching, and queuing to manage the flow of requests and prevent the system from becoming overwhelmed.
 
 ## Further Reading
 
-[Chris Okasaki's Purely Functional Data Structures](https://www.cs.cmu.edu/~rwh/students/okasaki.pdf)
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Chris Okasaki's Purely Functional Data Structures](https://www.cs.cmu.edu/~rwh/students/okasaki.pdf)
+* [Thundering Herd Problem](https://en.wikipedia.org/wiki/Thundering_herd_problem)
+* [erlang: queue](https://www.erlang.org/doc/man/queue.html)
+* [OPQ](https://github.com/fredwu/opq)
 
 ## Mark As Completed
 
