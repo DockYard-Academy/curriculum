@@ -207,20 +207,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * Guarding
 * Protocols
 * Recursion
-* Benchmarking and Performance
-* Streams
-* Performance Optimization
 * Persistence Using the File System
 * Processes
 * GenServers
 * Asynchronous Messages
 * Supervisor Basics and Fault Tolerance
-* Testing GenServers
-* Metaprogramming
 * Mix Projects and Processes
 * Concurrency With Tasks
-* State Management With Agents and ETS
-* Rubix Cube Project
 ## Capstone Project Preparation
 * Capstone Project
 ## Web Servers and Phoenix
@@ -247,6 +240,13 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * LiveView Image Uploads
 * PubSub
 * LiveView JS Interoperability and Pagination
-## External Libraries
 * Emailing, Swoosh, and Oban
+## Bonus Topics
+* Performance Optimization
+* Benchmarking and Performance
+* Streams
+* State Management With Agents and ETS
+* Metaprogramming
+* Double-Ended Queues
+* Rubix Cube Project
 <!-- course-outline-end -->
