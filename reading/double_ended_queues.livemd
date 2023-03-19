@@ -1,0 +1,602 @@
+# Double Ended Queues
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.8.0", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:benchee, "~> 1.1"}
+])
+```
+
+## Navigation
+
+[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
+[Report An Issue](https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+
+## Setup
+
+Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+
+## Review Questions
+
+* What are the **front** and **back** of a queue?
+* What is $O(1)$ performance vs $O(n)$ performance?
+* What is the ideal vs worst-case performance of an amortized queue? When does the worst-case condition occur?
+* How do queues vs double-ended queues (DEQs) differ in how they re-balance a queue?
+
+## Overview
+
+### FIFO Queues
+
+A FIFO (First-In-First-Out) queue is a type of data structure that stores elements in the order they were added, and retrieves them in the same order. In a FIFO queue, the first element added to the queue is the first element to be removed. It works like a line of people in a store, where the first person to arrive is the first person to be served.
+
+Elements in a queue are inserted (enqueued) to the **back** (also called the rear) and elements are removed (dequeued) from the **front**.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/FIFO%20Queue.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Double Ended Queues
+
+A Double Ended Queue (Deque) is a type of data structure that allows insertion and removal of elements from both ends, front and rear, of the queue. Elements can be added or removed from both ends.
+
+Dequeues are useful when we need to access elements from both ends, or when we need to perform operations on both ends of the queue efficiently.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/FIFO%20Double%20Ended%20Queue.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Amortized $O(1)$
+
+We use Big O Notation to describe the performance of an algorithm as data grows. $O(1)$ means the algorithm runs in constant time regardless of the number of elements and $O(n)$ means the algorythm grows linearly as data grows.
+
+In the case of our Queue and Double Ended Queue they both have *amortized* $O(1)$ performance. This means that on average they have $O(1)$ performance, but the worst case scenario may have $O(n)$ performance.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Naive Implementation
+
+Implementing a naive algorithm means implementing a solution to a problem that is simple and straightforward, but not necessarily the most efficient or optimal solution. A naive algorithm is usually the first algorithm that comes to mind when we think about a problem, and it is often the simplest to understand and implement. However, it may not always be the most efficient, especially for larger or more complex input sizes.
+
+This is also sometimes refered to as a brute-force algorithm.
+
+## Naive Queue
+
+To implement a naive queue, we can represent our queue as a list.
+
+```elixir
+queue = []
+```
+
+When we want to insert elements we can simply prepend them into the list. This has $O(1)$ performance.
+
+```elixir
+queue = [1 | queue]
+```
+
+```elixir
+queue = [2 | queue]
+```
+
+```elixir
+queue = [3 | queue]
+```
+
+However, to remove the first element that was inserted (`1`) we need to reverse the list. We also need to re-reverse the remaining elements. This has $O(n)$ performance, which isn't ideal.
+
+```elixir
+[value | reversed_queue] = Enum.reverse(queue)
+{value, Enum.reverse(reversed_queue)}
+```
+
+Here's that made into a `NaiveQueue` module.
+
+```elixir
+defmodule NaiveQueue do
+  def new, do: []
+
+  def enqueue(queue, el) do
+    [el | queue]
+  end
+
+  def dequeue([]), do: {nil, []}
+
+  def dequeue(queue) do
+    [value | reversed_queue] = Enum.reverse(queue)
+    {value, Enum.reverse(reversed_queue)}
+  end
+end
+```
+
+We can performantly insert (enqueue) items to our queue.
+
+```elixir
+queue =
+  NaiveQueue.new()
+  |> NaiveQueue.enqueue(1)
+  |> NaiveQueue.enqueue(2)
+  |> NaiveQueue.enqueue(3)
+```
+
+We can also remove (dequeue) and element from our queue, however this always has $O(n)$ performance which isn't ideal.
+
+```elixir
+{value, queue} = NaiveQueue.dequeue(queue)
+```
+
+```elixir
+{value, queue} = NaiveQueue.dequeue(queue)
+```
+
+```elixir
+{value, queue} = NaiveQueue.dequeue(queue)
+```
+
+We've handled having an empty queue by returning `nil`.
+
+```elixir
+{value, queue} = NaiveQueue.dequeue(queue)
+```
+
+## Amortized Queue
+
+To optimize our queue, we can think of our queue as a list with the **front** elements and the **back** elements.
+
+```mermaid
+flowchart
+subgraph back
+  6 --> 5 --> 4 --> 3 --> 2 --> 1
+end
+```
+
+When we attempt to remove (dequeue) an element, we can reverse the elements in the **back** list and store them in the **front** list.
+
+```mermaid
+flowchart
+  subgraph front
+    direction LR
+    1 --> 2 --> 3 --> 4 --> 5 --> 6
+  end
+```
+
+Now when we remove further elements, it will be an $O(1)$ operations while there are elements in the **front** list.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Implementation
+
+To implement our **front** and **back** list, we'll store each list in a tuple.
+
+```elixir
+# {back, front}
+{[], []}
+```
+
+When we insert elements, we prepend them to the **back** list.
+
+```elixir
+# enqueue 1, 2, 3
+{[3, 2, 1], []}
+```
+
+When we remove elements we grab the head of the **front** list. When there are no elements in the **front** list, we'll reverse our **back** list to make the **front** list. This is our worst-case $O(n)$ performance scenario.
+
+```elixir
+# dequeue
+{[], [1, 2, 3]}
+```
+
+After reversing the **back** list, it's an $O(1)$ operation to grab elements from the **front** of our queue.
+
+```elixir
+{back, front} = {[], [1, 2, 3]}
+
+[removed | front] = front
+
+{removed, front}
+```
+
+Here's that put into a module.
+
+```elixir
+defmodule AmortizedQueue do
+  def new, do: {[], []}
+
+  def enqueue({back, front}, el) do
+    {[el | back], front}
+  end
+
+  def dequeue({[], []} = queue), do: {nil, queue}
+  def dequeue({back, [el | front]}), do: {el, {back, front}}
+
+  def dequeue({back, []}) do
+    [removed | front] = Enum.reverse(back)
+    {removed, {[], front}}
+  end
+end
+```
+
+We enqueue items on the **back** list.
+
+```elixir
+queue =
+  AmortizedQueue.new()
+  |> AmortizedQueue.enqueue(1)
+  |> AmortizedQueue.enqueue(2)
+  |> AmortizedQueue.enqueue(3)
+```
+
+Then if there are no elements in the **front** list we reverse the back list. While this still has $O(n)$ performance, we only have to do it when the **front** list is empty.
+
+```elixir
+{value, queue} = AmortizedQueue.dequeue(queue)
+```
+
+Subsequent operations will be $O(1)$
+
+```elixir
+{value, queue} = AmortizedQueue.dequeue(queue)
+```
+
+```elixir
+{value, queue} = AmortizedQueue.dequeue(queue)
+```
+
+We've handled the case where the queue is empty by simply returning `nil`.
+
+```elixir
+{value, queue} = AmortizedQueue.dequeue(queue)
+```
+
+## Double Ended Queue
+
+Similar to our amortized queue, we can represent a double-ended queue with both a **back** list and a **front** list.
+
+However, we need to optimize for removing/inserting from both the **back** and **front** of our DEQ. This means it would be unwise to reverse the entirety of either list like we did with our amortized queue.
+
+Instead, a performant approach when either the **back** or the **front** list is empty is to split our remaining list in half.
+
+For example, if we have inserted six elements to our **back** list:
+
+```mermaid
+flowchart RL
+1 --> 2 --> 3 --> 4 --> 5 --> 6
+```
+
+We would split the list in half to make the **back** `[6, 5, 4]` and our **front** `[1, 2, 3]`.
+
+```mermaid
+flowchart
+  subgraph front
+    direction LR
+    1 --> 2 --> 3
+  end
+
+  subgraph back
+    direction LR
+    6 --> 5 --> 4
+  end
+```
+
+This means we have access to the head of our **back** and our **front** list so inserting/removing operations will have $O(1)$ on either side of the queue.
+
+Here's that put into a module.
+
+```elixir
+defmodule DoubleEndedQueue do
+  def new, do: {[], []}
+
+  def insert_back({back, front}, el), do: {[el | back], front}
+
+  def insert_front({back, front}, el), do: {back, [el | front]}
+
+  def remove_back({[], []} = queue), do: {nil, queue}
+
+  def remove_back({[], front}) do
+    middle_index = div(length(front), 2)
+    {half_front, reversed_back} = Enum.split(front, middle_index)
+    [removed | back] = Enum.reverse(reversed_back)
+    {removed, {back, half_front}}
+  end
+
+  def remove_back({[removed | back], front}), do: {removed, {back, front}}
+
+  def remove_front({[], []} = queue), do: {nil, queue}
+
+  def remove_front({back, []}) do
+    middle_index = div(length(back), 2)
+    {half_back, reversed_front} = Enum.split(back, middle_index)
+    [removed | front] = Enum.reverse(reversed_front)
+    {removed, {half_back, front}}
+  end
+
+  def remove_front({back, [removed | front]}), do: {removed, {back, front}}
+end
+```
+
+```elixir
+deq = DoubleEndedQueue.new()
+```
+
+Now we can insert/remove elements to the **back** or the **front**.
+
+```elixir
+deq =
+  DoubleEndedQueue.new()
+  |> DoubleEndedQueue.insert_back(1)
+  |> DoubleEndedQueue.insert_back(2)
+  |> DoubleEndedQueue.insert_back(3)
+  |> IO.inspect()
+
+{value, deq} = DoubleEndedQueue.remove_back(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_back(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_back(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_back(deq)
+```
+
+```elixir
+deq =
+  DoubleEndedQueue.new()
+  |> DoubleEndedQueue.insert_front(1)
+  |> DoubleEndedQueue.insert_front(2)
+  |> DoubleEndedQueue.insert_front(3)
+  |> IO.inspect()
+
+{value, deq} = DoubleEndedQueue.remove_front(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_front(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_front(deq) |> IO.inspect()
+{value, deq} = DoubleEndedQueue.remove_front(deq)
+```
+
+When we attempt to remove an element from the **front** when it is empty, we split the **back** in half and re-balance our DEQ.
+
+```elixir
+deq =
+  DoubleEndedQueue.new()
+  |> DoubleEndedQueue.insert_back(1)
+  |> DoubleEndedQueue.insert_back(2)
+  |> DoubleEndedQueue.insert_back(3)
+  |> DoubleEndedQueue.insert_back(4)
+  |> DoubleEndedQueue.insert_back(5)
+  |> DoubleEndedQueue.insert_back(6)
+  |> IO.inspect()
+
+DoubleEndedQueue.remove_front(deq)
+```
+
+The same is true when we try to remove elements from the **back** when it is empty. We split the **front** to re-balance our queue.
+
+```elixir
+deq =
+  DoubleEndedQueue.new()
+  |> DoubleEndedQueue.insert_front(6)
+  |> DoubleEndedQueue.insert_front(5)
+  |> DoubleEndedQueue.insert_front(4)
+  |> DoubleEndedQueue.insert_front(3)
+  |> DoubleEndedQueue.insert_front(2)
+  |> DoubleEndedQueue.insert_front(1)
+  |> IO.inspect()
+
+DoubleEndedQueue.remove_back(deq)
+```
+
+We've also handled removing elements from either end when both the **back** and the **front** are empty by returning `nil` and an empty DEQ.
+
+```elixir
+DoubleEndedQueue.new()
+|> DoubleEndedQueue.remove_back()
+```
+
+```elixir
+DoubleEndedQueue.new()
+|> DoubleEndedQueue.remove_front()
+```
+
+## Double Ended Queue (Tracking Size)
+
+In order to split our DEQ, we need to calculate the size of the queue. This is a fairly expensive operation.
+
+Instead of computing the size of the queue, we can keep track of it whenever we add or remove an element.
+
+Here's an alternative DEQ implementation using a struct that tracks the **right** list, the **left** list, and the total **size** of the DEQ.
+
+```elixir
+defmodule DoubleEndedQueueStruct do
+  defstruct back: [], front: [], size: 0
+  def new, do: %__MODULE__{}
+
+  def insert_back(queue, el) do
+    %{queue | back: [el | queue.back], size: queue.size + 1}
+  end
+
+  def insert_front(queue, el) do
+    %{queue | front: [el | queue.front], size: queue.size + 1}
+  end
+
+  def remove_back(%__MODULE__{back: [], front: []} = queue) do
+    {nil, queue}
+  end
+
+  def remove_back(%__MODULE__{back: [], front: front} = queue) do
+    mid = div(queue.size, 2)
+    {half_front, reversed_back} = Enum.split(front, mid)
+    [removed | back] = Enum.reverse(reversed_back)
+    {removed, %{queue | back: back, front: half_front, size: queue.size - 1}}
+  end
+
+  def remove_back(%__MODULE__{back: [removed | back]} = queue) do
+    {removed, %{queue | back: back, size: queue.size - 1}}
+  end
+
+  def remove_front(%__MODULE__{front: [], back: []} = queue) do
+    {nil, queue}
+  end
+
+  def remove_front(%__MODULE__{front: []} = queue) do
+    mid = div(queue.size, 2)
+    {back_half, reversed_front} = Enum.split(queue.back, mid)
+    [removed | front] = Enum.reverse(reversed_front)
+    {removed, %{queue | front: front, back: back_half, size: queue.size - 1}}
+  end
+
+  def remove_front(%__MODULE__{front: [removed | front]} = queue) do
+    {removed, %{queue | front: front, size: queue.size - 1}}
+  end
+end
+```
+
+While the structure used to represent the queue has changed to optimize performance, the behavior remains the same.
+
+```elixir
+deq =
+  DoubleEndedQueueStruct.new()
+  |> DoubleEndedQueueStruct.insert_front(6)
+  |> DoubleEndedQueueStruct.insert_front(5)
+  |> DoubleEndedQueueStruct.insert_front(4)
+  |> DoubleEndedQueueStruct.insert_front(3)
+  |> DoubleEndedQueueStruct.insert_front(2)
+  |> DoubleEndedQueueStruct.insert_front(1)
+  |> IO.inspect()
+
+DoubleEndedQueueStruct.remove_back(deq)
+```
+
+## Erlang Queue
+
+Erlang provides a [:queue](https://www.erlang.org/doc/man/queue.html) module with further performance optimizations for a DEQ.
+
+It provides the following functions for inserting and removing elements.
+
+* [in/2](https://www.erlang.org/doc/man/queue.html#in-2) insert an element to the **back** of the queue.
+* [out/2](https://www.erlang.org/doc/man/queue.html#out-2) removes an element from the **front** of the queue.
+
+Then there are "reversed" versions which perform the opposite operations of a normal queue.
+
+* [in_r/2](https://www.erlang.org/doc/man/queue.html#in_r-2) insert an element to the **front** of the queue.
+* [out_r/1](https://www.erlang.org/doc/man/queue.html#out_r-1) remove an element from the **back** of the queue.
+
+```elixir
+q = :queue.new()
+```
+
+The erlang `:queue` module inserts element to the **front** when it's empty. This is an small optimization so we don't have to reverse the **front** list the first time we remove from it.
+
+```elixir
+q = :queue.in(1, q) |> IO.inspect()
+q = :queue.in(2, q) |> IO.inspect()
+q = :queue.in(3, q) |> IO.inspect()
+q = :queue.in(4, q) |> IO.inspect()
+q = :queue.in(5, q) |> IO.inspect()
+q = :queue.in(6, q) |> IO.inspect()
+```
+
+It similarly rebalances the lists when either is empty.
+
+```elixir
+:queue.out(q)
+```
+
+## Concurrent Queues
+
+The `:queue` erlang module is notorious for having a difficult to read interface.
+
+> The "Okasaki API" is inspired by "Purely Functional Data Structures" by Chris Okasaki. It regards queues as lists. This API is by many regarded as strange and avoidable. For example, many reverse operations have lexically reversed names, some with more readable but perhaps less understandable aliases.
+
+So folks have created libraries for queues and DEQs that improve the interface and leverage the power of concurrency.
+
+For example, the [OPQ](https://github.com/fredwu/opq) library by fredwu leverages both the `:queue` module and [GenStage](https://github.com/elixir-lang/gen_stage) to enable worker pools to concurrently handle work in a queue.
+
+You can think of this like a shared lineup, where there are multiple workers to handle customers.
+
+The number of workers determines the number of jobs in the queue that can be handled concurrently.
+
+```mermaid
+flowchart LR
+subgraph Queue
+  1
+  2
+  3
+  4[4 Waiting]
+end
+
+1 --> Worker1
+2 --> Worker2
+3 --> Worker3
+
+```
+
+## Further Reading
+
+[Chris Okasaki's Purely Functional Data Structures](https://www.cs.cmu.edu/~rwh/students/okasaki.pdf)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"advanced_pattern_matching_reading\"\n    \"exercises\" -> \"advanced_pattern_matching_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "advanced_pattern_matching_reading"
+    "exercises" -> "advanced_pattern_matching_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b advanced-pattern-matching-reading
+$ git add .
+$ git commit -m "finish advanced pattern matching reading"
+$ git push origin advanced-pattern-matching-reading
+```
+
+Create a pull request from your `advanced-pattern-matching-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                      | Next                                                       |
+| --------------------------------------------- | ---------------------------------------------------------: |
+| [Games: Menu](../exercises/games_menu.livemd) | [Treasure Matching](../exercises/treasure_matching.livemd) |
