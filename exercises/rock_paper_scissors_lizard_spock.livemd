@@ -60,6 +60,37 @@ RockPaperScissorsLizardSpock.play(:lizard, :rock) # "Player 1 Wins!"
 RockPaperScissorsLizardSpock.play(:lizard, :lizard) # "Draw!"
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+  def beats?(guess1, guess2) do
+    case {guess1, guess2} do
+      {:paper, :rock} -> true
+      {:scissors, :paper} -> true
+      {:rock, :scissors} -> true
+      {:rock, :lizard} -> true
+      {:lizard, :spock} -> true
+      {:spock, :scissors} -> true
+      {:scissors, :lizard} -> true
+      {:lizard, :paper} -> true
+      {:paper, :spock} -> true
+      {:spock, :rock} -> true
+      _answer -> false
+    end
+  end
+
+  def play(player1, player2) do
+    cond do
+      player1 == player2 -> "Draw"
+      beats?(player1, player2) -> "Player 1 Wins!"
+      beats?(player2, player1) -> "Player 2 Wins!"
+    end
+  end
+```
+
+</details>
+
 Implement the `RockPaperScissorsLizardSpock` module as documented.
 
 ```elixir
