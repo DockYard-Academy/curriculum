@@ -19,7 +19,7 @@ Mix.install([
 
 ### Process Bottlenecks
 
-Process bottlenecks occur when too many messages are sent to a process. For example, if we have a single GenServer in our application each message is handled sychronously. This makes it easier to reason about the behavior of a GenServer, but limits the concurrency in our system.
+Process bottlenecks occur when too many messages are sent to a process. For example, if we have a single GenServer in our application each message is handled synchronously. This makes it easier to reason about the behavior of a GenServer, but limits the concurrency in our system.
 
 For example, if we had an expensive operation that takes 500ms, and three clients made simultaneous requests, the last client would have to wait 1.5 seconds. This clearly isn't scalable.
 
@@ -106,7 +106,7 @@ To avoid confusion, It's important to be aware that module names are just syntax
 MyModule == :"Elixir.MyModule"
 ```
 
-Modules even work with `Atom` functions.
+Modules even work with [Atom](https://hexdocs.pm/elixir/Atom.html) functions.
 
 ```elixir
 Atom.to_string(MyModule)
@@ -129,7 +129,7 @@ end)
 
 ## Registry
 
-`Registry` is a built-in module that provides a way to register and look up named processes in a distributed system. Think of it as a directory service that allows you to associate a process with a name, making it easier to locate and communicate with that process throughout your application.
+[Registry](https://hexdocs.pm/elixir/Registry.html) is a built-in module that provides a way to register and look up named processes in a distributed system. Think of it as a directory service that allows you to associate a process with a name, making it easier to locate and communicate with that process throughout your application.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -172,7 +172,7 @@ R --> K3 --> P3
 {:ok, _} = Registry.start_link(keys: :unique, name: :my_unique_registry)
 ```
 
-We can start a process under the Registry by calling `Registry.register/3`. We'll start a simple Agent process.
+We can start a process under the Registry by calling [Registry.register/3](https://hexdocs.pm/elixir/Registry.html#register/3). We'll start a simple Agent process.
 
 ```elixir
 {:ok, agent_pid} =
@@ -182,7 +182,7 @@ We can start a process under the Registry by calling `Registry.register/3`. We'l
   end)
 ```
 
-Then we can find the `:agent1` process in the registry using `Registry.lookup/2`.
+Then we can find the `:agent1` process in the registry using [Registry.lookup/2](https://hexdocs.pm/elixir/Registry.html#lookup/2).
 
 ```elixir
 Registry.lookup(:my_unique_registry, :agent1)
@@ -190,14 +190,14 @@ Registry.lookup(:my_unique_registry, :agent1)
 
 ### Via
 
-For a unique Registry, we can also start a registered process without calling `Registry.register/3` by using a [:via tuple](https://hexdocs.pm/elixir/Registry.html#module-using-in-via) in the format `{:via, Registry, {registry, key}}`.
+For a unique Registry, we can also start a registered process without calling [Registry.register/3](https://hexdocs.pm/elixir/Registry.html#register/3) by using a [:via tuple](https://hexdocs.pm/elixir/Registry.html#module-using-in-via) in the format `{:via, Registry, {registry, key}}`.
 
 ```elixir
 name = {:via, Registry, {:my_unique_registry, :agent2}}
 {:ok, agent_pid} = Agent.start_link(fn -> 0 end, name: name)
 ```
 
-Our `Registry` contains both `:agent1`, and `:agent2` now.
+Our [Registry](https://hexdocs.pm/elixir/Registry.html) contains both `:agent1`, and `:agent2` now.
 
 ```elixir
 [{agent1, _}] = Registry.lookup(:my_unique_registry, :agent1)
@@ -261,9 +261,9 @@ Registry.lookup(:my_duplicate_registry, :my_key)
 
 ## Building Our Own Worker Pool
 
-Now that we understand `Registry`, we can use it to build our own worker pool.
+Now that we understand [Registry](https://hexdocs.pm/elixir/Registry.html), we can use it to build our own worker pool.
 
-Our `Worker` is going to be a simple `GenServer` that performs a job that waits a second and returns a response.
+Our `Worker` is going to be a simple [GenServer](https://hexdocs.pm/elixir/GenServer.html) that performs a job that waits a second and returns a response.
 
 When this `Worker` process starts, it will register itself under a `PoolManager` registry.
 
@@ -324,7 +324,7 @@ end
 
 We'll use `Kino.Process.render_seq_trace/2` for demonstration purposes to visualize how the `PoolManager` starts the three registered `Worker` processes.
 
-The `PoolManager.PIDPartition0` process is used under the hood by `Registry`. See [Registry.start_link/1](https://hexdocs.pm/elixir/Registry.html#start_link/1) for more.
+The `PoolManager.PIDPartition0` process is used under the hood by [Registry](https://hexdocs.pm/elixir/Registry.html). See [Registry.start_link/1](https://hexdocs.pm/elixir/Registry.html#start_link/1) for more.
 
 ```elixir
 Kino.Process.render_seq_trace(fn ->
@@ -373,17 +373,17 @@ task2 = Task.async(fn -> PoolManager.schedule_job() end)
 Task.await_many([task1, task2])
 ```
 
-While randomly selecting a worker is usually fine since large workloads will be evenly distributed accross workers, there are more complicated scheduling techniques such as **round-robin** where we schedule workers in order.
+While randomly selecting a worker is usually fine since large workloads will be evenly distributed across workers, there are more complicated scheduling techniques such as **round-robin** where we schedule workers in order.
 
 ## Supervising Our Registry
 
-To supervisor our Registry, we simply need to put our `Registry` process and `Worker` pool processes under a supervisor.
+To supervisor our Registry, we simply need to put our [Registry](https://hexdocs.pm/elixir/Registry.html) process and `Worker` pool processes under a supervisor.
 
 Here is an extremely minimal example to demonstrate the concept.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Next, we start a `Registry` called `SupervisedPoolManager` under a `Supervisor`. We also manually start three `SupervisedWorker` processes for our worker pool.
+Next, we start a [Registry](https://hexdocs.pm/elixir/Registry.html) called `SupervisedPoolManager` under a [Supervisor](https://hexdocs.pm/elixir/Supervisor.html). We also manually start three `SupervisedWorker` processes for our worker pool.
 
 ```elixir
 children = [
@@ -460,7 +460,7 @@ This module starts a number of workers equal to the number of available schedule
 System.schedulers_online()
 ```
 
-We'll start the SupervisedPool and visualize it in a `Kino` supervision tree diagram. You'll see the same number of processes under the `SupervisedPool` as you have schedulers online.
+We'll start the SupervisedPool and visualize it in a [Kino](https://hexdocs.pm/kino/Kino.html) supervision tree diagram. You'll see the same number of processes under the `SupervisedPool` as you have schedulers online.
 
 ```elixir
 {:ok, supervisor_pid} = SupervisedPool.start_link([])
@@ -563,3 +563,69 @@ Add the Poolboy dependency to a mix project and start a worker pool under your a
 Consider the following resource(s) to deepen your understanding of the topic.
 
 * [Process pools with Elixir's Registry by Andrea Leopardi](https://andrealeopardi.com/posts/process-pools-with-elixirs-registry/)
+
+## Mark As Completed
+
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"worker_pools_reading\"\n    \"exercises\" -> \"worker_pools_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
+
+save_name =
+  case Path.basename(__DIR__) do
+    "reading" -> "worker_pools_reading"
+    "exercises" -> "worker_pools_exercise"
+  end
+
+progress_path = __DIR__ <> "/../progress.json"
+existing_progress = File.read!(progress_path) |> Jason.decode!()
+
+default = Map.get(existing_progress, save_name, false)
+
+form =
+  Kino.Control.form(
+    [
+      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
+    ],
+    report_changes: true
+  )
+
+Task.async(fn ->
+  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
+    File.write!(
+      progress_path,
+      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
+    )
+  end
+end)
+
+form
+```
+
+## Commit Your Progress
+
+Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
+Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+
+```
+$ git checkout -b worker-pools-reading
+$ git add .
+$ git commit -m "finish worker pools reading"
+$ git push origin worker-pools-reading
+```
+
+Create a pull request from your `worker-pools-reading` branch to your `solutions` branch.
+Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+
+**DockYard Academy Students Only:**
+
+Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
+You (or your instructor) may merge your PR into your solutions branch after review.
+
+If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
+
+## Up Next
+
+| Previous                                                     | Next                                         |
+| ------------------------------------------------------------ | -------------------------------------------: |
+| [Double Ended Queues](../reading/double_ended_queues.livemd) | [Rubix Cube](../exercises/rubix_cube.livemd) |

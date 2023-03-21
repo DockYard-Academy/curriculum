@@ -248,5 +248,6 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * State Management With Agents and ETS
 * Metaprogramming
 * Double-Ended Queues
+* Worker Pools
 * Rubix Cube Project
 <!-- course-outline-end -->
