@@ -1,6 +1,6 @@
 # Contributing
 
-DockYard Academy aspires to create a supportive and inclusive environment. We welcome pull requests from everyone and from all experience levels. If you encounter any issues please [Raise An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=) and describe your problem to get help.
+DockYard Academy aspires to create a supportive and inclusive environment. We welcome pull requests from everyone and from all experience levels. If you encounter any issues please [Raise An Issue](https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=) and describe your problem to get help.
 
 ## Set Up A Code Editor (Recommended)
 
@@ -27,7 +27,7 @@ F[Forked Repository]
 DY --fork--> F
 ```
 
-You can create a fork by pressing the fork button in the top right corner of the GitHub repository or [click this link to create a fork]([fork](https://github.com/DockYard-Academy/beta_curriculum/fork))
+You can create a fork by pressing the fork button in the top right corner of the GitHub repository or [click this link to create a fork](https://github.com/DockYard-Academy/curriculum/fork)
 
 ## Clone the Repository
 
@@ -45,7 +45,7 @@ To do this, press the green **CODE** button on your forked repository and copy t
 
 ![GitHub Clone URL](./images//fork_curriculum_clone.png)
 
-Then run the following command in the command line from the folder you want to create your `beta_curriculum` folder in.
+Then run the following command in the command line from the folder you want to create your `curriculum` folder in.
 <div style="background-color: lightcoral; font-weight: bold; padding: 1rem; color: black; margin: 1rem 0;">Ensure you replace URL with the copied URL</div>
 
 ```
@@ -89,13 +89,13 @@ L[Local Repository]
 R --pull changes--> L
 ```
 
-Changes must be pulled to your `main` branch on your local repository, so ensure you are on this branch by running the following from your command line in the `beta_curriculum` folder.
+Changes must be pulled to your `main` branch on your local repository, so ensure you are on this branch by running the following from your command line in the `curriculum` folder.
 
 ```
 git checkout main
 ```
 
-Then run the following command from your command line in the `beta_curriculum` folder to pull the latest changes.
+Then run the following command from your command line in the `curriculum` folder to pull the latest changes.
 
 ```
 git pull
@@ -110,7 +110,7 @@ If you are running the project with Livebook, make sure you completely stop the 
 ## Create A Solutions Branch
 
 If you are interested in completing DockYard Academy content, create a solutions branch.
-To create a new solutions branch, run the following from the `beta_curriculum` folder in your command line. You may replace `2022-10-1` with any branch name.
+To create a new solutions branch, run the following from the `curriculum` folder in your command line. You may replace `2022-10-1` with any branch name.
 
 ```
 git checkout -B 2022-10-1
@@ -142,7 +142,7 @@ git checkout -b feature-branch-name
 
 ## Run Tests
 
-From the `beta_curriculum/utils` folder, run the following command to run all tests.
+From the `curriculum/utils` folder, run the following command to run all tests.
 
 ```
 mix test
@@ -154,7 +154,7 @@ Ensure all tests pass before submitting any Pull Request. Tests should provide y
 
 We have several [Mix Tasks](https://elixirschool.com/en/lessons/intermediate/mix_tasks) which handle automated tasks such as adding navigation, formatting lessons, and spellchecking.
 
-Before submitting any Pull Request, run the following command from the `beta_curriculum/utils` folder.
+Before submitting any Pull Request, run the following command from the `curriculum/utils` folder.
 
 ```
 mix bc
@@ -240,7 +240,7 @@ Ensure that all GitHub Actions Pass after submitting your Pull Request.
 
 We recommend reading through your code changes after submitting your Pull Request.
 
-First, find your Pull Request in the [DockYard Academy Pull Requests](https://github.com/DockYard-Academy/beta_curriculum/pulls) tab. Then click on the **Files Changed** tab to view your changed files. Ensure there are no issues and that you are happy with your changes.
+First, find your Pull Request in the [DockYard Academy Pull Requests](https://github.com/DockYard-Academy/curriculum/pulls) tab. Then click on the **Files Changed** tab to view your changed files. Ensure there are no issues and that you are happy with your changes.
 
 ## Receive a Pull Request Review
 
