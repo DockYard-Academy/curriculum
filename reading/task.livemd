@@ -233,7 +233,11 @@ will not wait forever. By default, [Task.await/1](https://hexdocs.pm/elixir/Task
 the task to complete. If the task does not finish, it will raise an error.
 
 ```elixir
-task = Task.async(fn -> Process.sleep(6000) end)
+task =
+  Task.async(fn ->
+    Process.sleep(6000)
+    IO.puts("testing")
+  end)
 
 Task.await(task)
 ```
