@@ -19,9 +19,9 @@ Mix.install([
 
 ### Process Bottlenecks
 
-Process bottlenecks occur when too many messages are sent to a process. For example, if we have a single GenServer in our application each message is handled synchronously. This makes it easier to reason about the behavior of a GenServer, but limits the concurrency in our system.
+Process bottlenecks occur when we send too many messages to a process. For example, if we have a single GenServer in our application, each message is handled synchronously. Synchronous message handling makes it easier to reason about the behavior of a GenServer but limits the concurrency in our system.
 
-For example, if we had an expensive operation that takes 500ms, and three clients made simultaneous requests, the last client would have to wait 1.5 seconds. This clearly isn't scalable.
+For example, if we had an expensive operation that takes 500ms, and three clients made simultaneous requests, the last client would have to wait 1.5 seconds.
 
 ```mermaid
 sequenceDiagram
@@ -41,7 +41,7 @@ sequenceDiagram
 
 ### Worker Pools
 
-A worker pool is a group of processes that are ready to handle incoming tasks. When a new task arrives, one of the idle worker processes is assigned to handle it. This allows the workload to be distributed evenly among the worker processes, increasing the efficiency and scalability of the system.
+A worker pool is a group of processes that handle incoming tasks. When a new task arrives, one of the idle worker processes is assigned to handle it. This allows the workload to be distributed evenly among the worker processes, increasing the efficiency and scalability of the system.
 
 ```mermaid
 flowchart LR
@@ -63,7 +63,7 @@ end
 
 ### Concurrency Constraints
 
-Worker pools typically have a finite number of workers. A finite worker pool helps prevent overloading our system with too many concurrent tasks. In addition, once we have enough workers to ensure our CPU cores are busy with work, there are fewer benefits to additional concurrency.
+Worker pools typically have a finite number of workers. A limited worker pool helps prevent **unbounded concurrency**, which can overload our system with too many concurrent tasks. In addition, once we have enough workers to ensure our CPU cores are busy with work, additional concurrency has few benefits.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -84,7 +84,7 @@ To resolve this issue, reconnect the current runtime.
 
 ### Module Names Are Atoms
 
-Throughout this reading you will see several examples of module names being used without ever defining a module.
+Throughout this reading, you will see several examples of module names without a module definition.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -92,7 +92,7 @@ Throughout this reading you will see several examples of module names being used
 Registry.start_link(name: ModuleName, keys: :duplicate)
 ```
 
-Modules may also be used interchangeably with atoms.
+Keep in mind that module names are just atoms. For these examples, we can use atoms and module names interchangeably. We often see this when providing the name for a process.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -100,7 +100,7 @@ Modules may also be used interchangeably with atoms.
 Registry.start_link(name: :my_module_name, keys: :duplicate)
 ```
 
-To avoid confusion, It's important to be aware that module names are just syntax sugar for atoms prefaced with `:Elixir.<atom>`.
+Module names are just syntax sugar for atoms prefaced with `:Elixir.<atom>`.
 
 ```elixir
 MyModule == :"Elixir.MyModule"
@@ -114,7 +114,7 @@ Atom.to_string(MyModule)
 
 ### Kino.Process
 
-We use `Kino.Process` in this material to provide sequence diagrams of processes. Any process messages inside of the `Kino.Process.render_sequence_trace/1` function are displayed in a diagram.
+We use `Kino.Process` in this material to provide sequence diagrams of processes. We'll often use the `Kino.Process.render_sequence_trace/1` function to display process messages in a diagram.
 
 ```elixir
 Kino.Process.render_seq_trace(fn ->
@@ -182,7 +182,7 @@ We can start a process under the Registry by calling [Registry.register/3](https
   end)
 ```
 
-Then we can find the `:agent1` process in the registry using [Registry.lookup/2](https://hexdocs.pm/elixir/Registry.html#lookup/2).
+Then we can find the `:agent1` process in the Registry using [Registry.lookup/2](https://hexdocs.pm/elixir/Registry.html#lookup/2).
 
 ```elixir
 Registry.lookup(:my_unique_registry, :agent1)
@@ -208,7 +208,7 @@ Our [Registry](https://hexdocs.pm/elixir/Registry.html) contains both `:agent1`,
 
 ## Duplicate Registry
 
-Instead of using a unique key for each process, we can instead group many processes under a single key.
+Instead of using a unique key for each process, we can group many processes under a single key.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -238,7 +238,7 @@ K2 --> P6
 ```elixir
 {:ok, _} = Registry.start_link(keys: :duplicate, name: :my_duplicate_registry)
 
-# Register multiple processes under the same key in the registry
+# Register multiple processes under the same key in the Registry
 
 Agent.start_link(fn ->
   Registry.register(:my_duplicate_registry, :my_key, nil)
@@ -263,21 +263,21 @@ Registry.lookup(:my_duplicate_registry, :my_key)
 
 Now that we understand [Registry](https://hexdocs.pm/elixir/Registry.html), we can use it to build our own worker pool.
 
-Our `Worker` is going to be a simple [GenServer](https://hexdocs.pm/elixir/GenServer.html) that performs a job that waits a second and returns a response.
+Our `Worker` will be a simple [GenServer](https://hexdocs.pm/elixir/GenServer.html) that performs a job that waits for a second and returns a response.
 
-When this `Worker` process starts, it will register itself under a `PoolManager` registry.
+When this `Worker` process starts, it will register itself under a `PoolManager` registry. While not strictly necessary, we pass in the Registry through the `opts` so we can use the same `Worker` process with multiple registry examples.
 
 ```elixir
 defmodule Worker do
   use GenServer
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, [], opts)
+    GenServer.start_link(__MODULE__, opts, opts)
   end
 
   def init(opts) do
     # Register the Worker under the PoolManager
-    # We've made the :registry configurable.
+    # We've made the : Registry configurable.
     # While not necessary, this makes our worker re-usable throughout our registry examples.
     registry = opts[:registry] || PoolManager
     Registry.register(registry, :workers, nil)
@@ -298,14 +298,14 @@ defmodule Worker do
 end
 ```
 
-We'll also create a `PoolManager` which starts a registry and three `Worker` processes.
+We'll also create a `PoolManager`, which starts a Registry and three `Worker` processes.
 
 ```elixir
 defmodule PoolManager do
   def start_link(_opts) do
     {:ok, _} = Registry.start_link(name: __MODULE__, keys: :duplicate)
 
-    # Start three workers, we've given them names for the sake of the diagrams below.
+    # Start three workers. We've given them names for the diagrams below.
     for n <- 1..3 do
       {:ok, pid} = Worker.start_link(name: :"worker#{n}")
     end
@@ -322,7 +322,7 @@ defmodule PoolManager do
 end
 ```
 
-We'll use `Kino.Process.render_seq_trace/2` for demonstration purposes to visualize how the `PoolManager` starts the three registered `Worker` processes.
+We'll use `Kino.Process.render_seq_trace/2` to demonstrate how the `PoolManager` starts the three registered `Worker` processes.
 
 The `PoolManager.PIDPartition0` process is used under the hood by [Registry](https://hexdocs.pm/elixir/Registry.html). See [Registry.start_link/1](https://hexdocs.pm/elixir/Registry.html#start_link/1) for more.
 
@@ -340,7 +340,7 @@ Kino.Process.render_seq_trace(fn ->
 end)
 ```
 
-The code is synchronous for the Caller process, but if we have multiple Caller processes (such as when you have many clients in a Phoenix server) then we'll see the full Benefits of the worker pool.
+The code is synchronous for the Caller process, but if we have multiple Caller processes (such as when you have many clients in a Phoenix server), we'll see the full Benefits of the worker pool.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -364,7 +364,7 @@ flowchart LR
 
 <!-- livebook:{"break_markdown":true} -->
 
-To simulate multiple callers, we'll use two tasks. Most of the time this will take only `1` second to run. However, if we get unlucky and select the same worker twice then it will take `2` seconds.
+To simulate multiple callers, we'll use two tasks. This will take only a second to run most of the time. However, it will take two seconds if we get unlucky and select the same worker for both tasks.
 
 ```elixir
 task1 = Task.async(fn -> PoolManager.schedule_job() end)
@@ -373,13 +373,13 @@ task2 = Task.async(fn -> PoolManager.schedule_job() end)
 Task.await_many([task1, task2])
 ```
 
-While randomly selecting a worker is usually fine since large workloads will be evenly distributed across workers, there are more complicated scheduling techniques such as **round-robin** where we schedule workers in order.
+While randomly selecting a worker is usually fine since large workloads will be evenly distributed across workers, there are more complicated scheduling techniques such as **round-robin**, where we schedule workers in order.
 
 ## Supervising Our Registry
 
-To supervisor our Registry, we simply need to put our [Registry](https://hexdocs.pm/elixir/Registry.html) process and `Worker` pool processes under a supervisor.
+To supervise our Registry, we simply need to put our [Registry](https://hexdocs.pm/elixir/Registry.html) process and `Worker` pool processes under a supervisor.
 
-Here is an extremely minimal example to demonstrate the concept.
+Here is a minimal example to demonstrate the concept.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -407,13 +407,13 @@ opts = [strategy: :one_for_one, name: :registry_supervisor]
 {:ok, supervisor_pid} = Supervisor.start_link(children, opts)
 ```
 
-We can lookup our three `SupervisedWorker` processes registered by the `SupervisedPoolManager` to ensure they have been started an registered properly.
+We can look up our three `SupervisedWorker` processes registered by the `SupervisedPoolManager` to ensure they have started.
 
 ```elixir
 Registry.lookup(SupervisedPoolManager, :workers)
 ```
 
-For demonstration purposes, we'll use `Kino.Process.sup_tree/2` to visualize the supervisor tree above.
+We'll use `Kino.Process.sup_tree/2` to visualize the supervisor tree above for demonstration purposes.
 
 ```elixir
 Kino.Process.sup_tree(supervisor_pid)
@@ -421,7 +421,7 @@ Kino.Process.sup_tree(supervisor_pid)
 
 ## Supervised Worker Pool Module
 
-Now that we've seen a minimal example, we'll make a more complete implementation using a [Module Based Supervisors](https://hexdocs.pm/elixir/1.12/Supervisor.html#module-module-based-supervisors) to encapsulate our supervised registry.
+Now that we've seen a minimal example, we'll make a more complete implementation using a [Module Based Supervisors](https://hexdocs.pm/elixir/1.12/Supervisor.html#module-module-based-supervisors) to encapsulate our supervised Registry.
 
 ```elixir
 defmodule SupervisedPool do
@@ -468,9 +468,9 @@ We'll start the SupervisedPool and visualize it in a [Kino](https://hexdocs.pm/k
 Kino.Process.sup_tree(supervisor_pid)
 ```
 
-Worker pools help applications run better by managing worker processes, making it easier to handle many tasks and scale our system without running into infinite concurrency issues.
+Worker pools help applications run better by managing worker processes, making it easier to handle many tasks and scale our system without running into unbounded concurrency issues.
 
-Keep in mind there are many ways to implement worker pools. The code we've written to create our custom worker pool from scratch is only one possible implementation, not the ideal implementation.
+It's important to note that there exist numerous approaches to designing and implementing worker pools. While the code we've developed to construct our custom worker pool from scratch is one viable solution, there are certainly better options.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -490,9 +490,11 @@ Start the supervised worker pool as a child of your application supervisor.
 
 ## Poolboy
 
-Poolboy is an alternative to implementing our own process pool. We can specify the following configuration for the process pool.
+Poolboy is a reliable alternative to implementing a custom process pool that saves us time and effort.
 
-* `:name`: The name of the pool, which can be either `:local`, `:global`, or `:via`.
+We can specify the following configuration for the process pool.
+
+* `:name`: The name of the pool. The scope can be either `:local`, `:global`, or `:via`.
 * `:worker_module`: The module used to create workers for the pool.
 * `:size`: The maximum number of workers allowed in the pool.
 * `:max_overflow` (optional): The maximum number of temporary workers that can be created when the pool is empty.
@@ -518,13 +520,13 @@ opts = [strategy: :one_for_one, name: :my_pool_supervisor]
 {:ok, supervisor_pid} = Supervisor.start_link(children, opts)
 ```
 
-The we can use the `:poolboy.transaction/3` function to access one of the workers in our worker pool and perform a job.
+We can use the `:poolboy.transaction/3` function to access one of the workers in our worker pool and perform a job.
 
 ```elixir
 :poolboy.transaction(:worker, fn pid -> Worker.perform_job(pid) end, 5000)
 ```
 
-Due to the `size: 4` configuration above, `4` workers will perform jobs concurrently in the worker pool. Notice that despite triggering `10` tasks, only `4` jobs occur at the same time.
+Due to the `size: 4` configuration above, `4` workers will perform jobs concurrently in the worker pool. Notice that despite triggering `10` tasks, only `4` jobs occur simultaneously.
 
 ```elixir
 tasks =
@@ -539,7 +541,7 @@ Task.await_many(tasks)
 
 Here, we'll use `Kino.Process.seq_trace/2` to visualize the Poolboy pool manager starting three worker processes.
 
-Notice there are three `perform_job` messages. There's also several processes being used under the hood in Poolboy but we don't need to worry about these implementation details.
+Notice there are three `perform_job` messages. There are also several processes being used under the hood in Poolboy.
 
 ```elixir
 Kino.Process.render_seq_trace(fn ->
