@@ -5,14 +5,15 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.8.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:benchee, "~> 1.1"}
 ])
 ```
 
 ## Navigation
 
 [Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
+[Report An Issue](https://github.com/DockYard-Academy/beta_curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
 
 ## Setup
 
@@ -45,7 +46,7 @@ Agent.update(counter_pid, fn state -> state + 1 end)
 ```
 
 ```elixir
-Agent.get(counter_pid, fn state -> state end)
+Agent.get(counter_pid, fn state -> state + 1 end)
 ```
 
 Often, we'll put Agent functions into a module to abstract how state is stored and manipulated and only expose the desired functionality.
@@ -106,6 +107,8 @@ Livebook allows us to view the `:ets` process as a table. Let's start a new `:et
 
 ```elixir
 table = :ets.new(:example_table, [])
+:ets.insert(table, {:location, "Prevelly"})
+table
 ```
 
 We can then insert values into the table with `:ets.insert/2`. We insert
@@ -119,13 +122,13 @@ Try changing the `:key` and `value` to see that the `:ets` table will store any 
 However, the `:ets` table will only store one value for a given key.
 
 ```elixir
-:ets.insert(table, {:hello, "hi"})
+:ets.insert(table, {:location, "Perth"})
 ```
 
 ```elixir
-kw_list = :ets.lookup(table, :key)
-
-value = kw_list[:key]
+key = :location
+kw_list = :ets.lookup(table, key)
+value = kw_list[key]
 ```
 
 ### Named Tables
@@ -163,7 +166,8 @@ secret identities.
 ```
 
 ```elixir
-
+:ets.new(:super_heros, [:named_table])
+:ets.insert(:super_heros, {"Spider Man", "Peter Parker"})
 ```
 
 ## ETS Configuration
@@ -286,7 +290,16 @@ end)
 </details>
 
 ```elixir
+table = :ets.new(:mynamedtable, [:ordered_set, :private])
+:ets.insert(table, {:c, 3})
+:ets.insert(table, {:a, 1})
+:ets.insert(table, {:b, 2})
+```
 
+```elixir
+Task.start(fn ->
+  :ets.lookup(table, :a) |> IO.inspect(label: "Lookup Table")
+end)
 ```
 
 ## Race Conditions
@@ -309,9 +322,7 @@ ETS Table->>ETS Table: sets count = 0
     ETS Table->>Task 2: reads count (0)
     Task 1->>ETS Table: sets count = 1
     Task 2->>ETS Table: sets count = 1
-```
 
-```
 activate Child Process
 Child Process-->>Parent Process: pid
 deactivate Child Process
@@ -478,7 +489,11 @@ Depending on your computer, we recommend you don't use `SlowFib` with a value la
 However, `CachedFib` should handle larger numbers.
 
 ```elixir
+{slow, _result} = :timer.tc(fn -> SlowFib.of(25) end)
+{cached, _result} = :timer.tc(fn -> CachedFib.of(25) end)
 
+(slow / 1_000_000) |> IO.inspect(label: "Slow")
+(cached / 1_000_000) |> IO.inspect(label: "Cached")
 ```
 
 ### Your Turn
@@ -525,7 +540,43 @@ end
 ```elixir
 defmodule GenServerCache do
   use GenServer
+
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts)
+  end
+
+  def get(pid, key) do
+    GenServer.call(pid, {:get, key})
+  end
+
+  def update(pid, key, value) do
+    GenServer.cast(pid, {:update, key, value})
+  end
+
+  # Server callback functions
+
+  @impl true
+  def init(_init_arg) do
+    {:ok, %{}}
+  end
+
+  @impl true
+  def handle_call({:get, key}, _from, state) do
+    {:reply, state[key], state}
+  end
+
+  @impl true
+  def handle_cast({:update, key, value}, state) do
+    {:noreply, Map.put(state, key, value)}
+  end
 end
+```
+
+```elixir
+{:ok, pid} = GenServerCache.start_link([])
+GenServerCache.update(pid, :loc, "Prevelly")
+GenServerCache.update(pid, :home, "Leederville")
+GenServerCache.get(pid, :loc)
 ```
 
 ### Your Turn
@@ -558,6 +609,20 @@ end
 
 ```elixir
 defmodule ETSCache do
+  def start(opts \\ []) do
+    :ets.new(:cache, opts)
+  end
+
+  def get(cache, key) do
+    case :ets.lookup(cache, key) do
+      [{key, value}] -> value
+      _ -> nil
+    end
+  end
+
+  def update(cache, key, value) do
+    :ets.insert(cache, {key, value})
+  end
 end
 ```
 
@@ -632,6 +697,6 @@ If you are interested in joining the next academy cohort, [sign up here](https:/
 
 ## Up Next
 
-| Previous                                                         | Next                                               |
-| ---------------------------------------------------------------- | -------------------------------------------------: |
-| [Lazy Product Filters](../exercises/lazy_product_filters.livemd) | [Agent Journal](../exercises/agent_journal.livemd) |
+| Previous                                                           | Next                                               |
+| ------------------------------------------------------------------ | -------------------------------------------------: |
+| [Concurrent Word Count](../exercises/concurrent_word_count.livemd) | [Agent Journal](../exercises/agent_journal.livemd) |
