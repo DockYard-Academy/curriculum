@@ -130,7 +130,7 @@ Atom.to_string(MyModule)
 
 ### Kino.Process
 
-We use `Kino.Process` in this material to provide sequence diagrams of processes. We'll often use the `Kino.Process.render_sequence_trace/1` function to display process messages in a diagram.
+We use `Kino.Process` in this material to provide sequence diagrams of processes. We'll often use the [Kino.Process.render_sequence_trace/2](https://hexdocs.pm/kino/Kino.Process.html#render_sequence_trace/2) function to display process messages in a diagram.
 
 ```elixir
 Kino.Process.render_seq_trace(fn ->
@@ -338,7 +338,7 @@ defmodule PoolManager do
 end
 ```
 
-We'll use `Kino.Process.render_seq_trace/2` to demonstrate how the `PoolManager` starts the three registered `Worker` processes.
+We'll use [Kino.Process.render_seq_trace/2](https://hexdocs.pm/kino/Kino.Process.html#render_seq_trace/2) to demonstrate how the `PoolManager` starts the three registered `Worker` processes.
 
 The `PoolManager.PIDPartition0` process is used under the hood by [Registry](https://hexdocs.pm/elixir/Registry.html). See [Registry.start_link/1](https://hexdocs.pm/elixir/Registry.html#start_link/1) for more.
 
@@ -429,7 +429,7 @@ We can look up our three `SupervisedWorker` processes registered by the `Supervi
 Registry.lookup(SupervisedPoolManager, :workers)
 ```
 
-We'll use `Kino.Process.sup_tree/2` to visualize the supervisor tree above for demonstration purposes.
+We'll use [Kino.Process.sup_tree/2](https://hexdocs.pm/kino/Kino.Process.html#sup_tree/2) to visualize the supervisor tree above for demonstration purposes.
 
 ```elixir
 Kino.Process.sup_tree(supervisor_pid)
@@ -555,7 +555,7 @@ tasks =
 Task.await_many(tasks)
 ```
 
-Here, we'll use `Kino.Process.seq_trace/2` to visualize the Poolboy pool manager starting three worker processes.
+Here, we'll use [Kino.Process.seq_trace/2](https://hexdocs.pm/kino/Kino.Process.html#seq_trace/2) to visualize the Poolboy pool manager starting three worker processes.
 
 Notice there are three `perform_job` messages. There are also several processes being used under the hood in Poolboy.
 
