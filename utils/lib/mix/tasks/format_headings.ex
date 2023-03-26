@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Bc.FormatHeadings do
+defmodule Mix.Tasks.FormatHeadings do
   @moduledoc "Format headings of Livebook notebooks."
   @shortdoc @moduledoc
 
@@ -8,6 +8,8 @@ defmodule Mix.Tasks.Bc.FormatHeadings do
 
   @impl Mix.Task
   def run(_) do
+    IO.puts("Running: mix format_headings")
+
     Notebooks.all_livebooks()
     |> Enum.each(fn file_name ->
       file = File.read!(file_name)

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Bc.UpdateReadmeOutlineTest do
   use ExUnit.Case
-  doctest Mix.Tasks.Bc.UpdateReadmeOutline
-  alias Mix.Tasks.Bc.UpdateReadmeOutline
+  doctest Mix.Tasks.UpdateReadmeOutline
+  alias Mix.Tasks.UpdateReadmeOutline
 
   test "split_on_outline/1" do
     readme = """

@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Bc.DeprecateUnusedFiles do
+defmodule Mix.Tasks.DeprecateUnusedFiles do
   @moduledoc "Add Git section to selected pages."
   @shortdoc @moduledoc
 
@@ -6,6 +6,7 @@ defmodule Mix.Tasks.Bc.DeprecateUnusedFiles do
 
   @impl Mix.Task
   def run(_) do
+    IO.puts("Running: mix deprecate_unused_files")
     outline = File.read!("../start.livemd")
 
     all_paths = Path.wildcard("../*/*.livemd")

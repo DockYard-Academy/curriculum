@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
+defmodule Mix.Tasks.UpdateReadmeOutline do
   @moduledoc "Update outline for README.md."
   @shortdoc @moduledoc
 
@@ -12,6 +12,8 @@ defmodule Mix.Tasks.Bc.UpdateReadmeOutline do
   @ignored_sections ["## Overview", "### Welcome"]
 
   def run(_args) do
+    IO.puts("Running: mix update_readme_outline")
+
     course_outline = File.read!(@course_outline_path)
     readme = File.read!(@readme_path)
     [start, _outline, finish] = split_on_outline(readme)

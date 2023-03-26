@@ -1,5 +1,22 @@
 defmodule Utils.Notebooks do
+  alias Utils.Notebooks.Notebook
   @minor_words ["and", "the", "in", "to", "of"]
+
+  @outline_notebooks Regex.scan(
+                       ~r/(?:reading|exercises)\/[^\/]+.livemd/,
+                       File.read!("../start.livemd")
+                     )
+                     |> Enum.with_index()
+                     |> Enum.map(fn {[path], index} ->
+                       Notebook.new(%{
+                         relative_path: Path.join("../", path),
+                         index: index
+                       })
+                     end)
+
+  def outline_notebooks do
+    @outline_notebooks
+  end
 
   def stream_lines(file_names, function) do
     arity = :erlang.fun_info(function)[:arity]
@@ -101,19 +118,6 @@ defmodule Utils.Notebooks do
     |> Enum.join(" ")
   end
 
-  def student_progress_map(outline) do
-    Regex.scan(~r/\[[^\]]+\]\((reading|exercises)\/([^\)]+)\.livemd\)/, outline)
-    |> Enum.reduce(%{}, fn [_, type, name], acc ->
-      key =
-        case type do
-          "reading" -> "#{name}_reading"
-          "exercises" -> "#{name}_exercise"
-        end
-
-      Map.put(acc, key, false)
-    end)
-  end
-
   def navigation_blocks(outline) do
     files =
       Regex.scan(~r/\[([^\]]+)\]\((\w+\/[^\)]+\.livemd)\)/, outline)
@@ -132,13 +136,110 @@ defmodule Utils.Notebooks do
     end)
   end
 
-  def navigation(navigation_map, file_name) do
+  def load(notebook) do
+    content = File.read!(notebook.relative_path)
+    %Notebook{notebook | content: content}
+  end
+
+  def save(notebook) do
+    File.write(notebook.relative_path, notebook.content)
+  end
+
+  def commit_your_progress_section(notebook) do
+    # adds section to the end of the file.
+    top_of_footer_expression = ~r/(## (Mark As Completed|Commit Your Progress)(\n|.)+)/
+
+    cleared_content =
+      Regex.replace(
+        top_of_footer_expression,
+        notebook.content,
+        ""
+      )
+
+    content = cleared_content <> commit_your_progress_snippet(notebook)
+
+    %Notebook{notebook | content: content}
+  end
+
+  def navigation_section(notebook) do
+    top_of_navigation_expression = ~r/## Up Next(\n|.)+/
+
+    cleared_content =
+      Regex.replace(
+        top_of_navigation_expression,
+        notebook.content,
+        ""
+      )
+
+    content = cleared_content <> navigation_snippet(notebook)
+
+    %Notebook{notebook | content: content}
+  end
+
+  def navigation_snippet(notebook) do
+    prev_notebook = prev(notebook)
+    next_notebook = next(notebook)
+
+    prev_name = (prev_notebook && prev_notebook.title) || ""
+    prev_relative_path = (prev_notebook && prev_notebook.relative_path) || ""
+    next_name = (next_notebook && next_notebook.title) || ""
+    next_relative_path = (next_notebook && next_notebook.relative_path) || ""
+
+    # indenting results in Livebook misformatting the code.
     """
     ## Up Next
 
-    | Previous | Next |
-    | :------- | ----:|
-    | #{navigation_map[file_name].prev} | #{navigation_map[file_name].next} |
+    <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+    <div style="display: flex;">
+    <i class="ri-home-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/start.livemd">Home</a>
+    </div>
+    <div style="display: flex;">
+    <i class="ri-bug-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=#{notebook.title}">Report An Issue</a>
+    </div>
+    <div style="display: flex;">
+    <i #{unless prev_notebook, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{prev_relative_path}">#{prev_name}</a>
+    </div>
+    <div style="display: flex;">
+    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{next_relative_path}">#{next_name}</a>
+    <i #{unless next_notebook, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
+    </div>
+    </div>
+    """
+  end
+
+  def prev(%{index: 0}), do: nil
+
+  def prev(notebook) do
+    Enum.at(outline_notebooks(), notebook.index - 1)
+  end
+
+  def next(notebook) when length(@outline_notebooks) == notebook.index + 1, do: nil
+
+  def next(notebook) do
+    Enum.at(outline_notebooks(), notebook.index + 1)
+  end
+
+  def commit_your_progress_snippet(notebook) do
+    """
+    ## Commit Your Progress
+
+    DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+    Run `git status` to ensure there are no undesirable changes.
+    Then run the following in your command line from the `curriculum` folder to commit your progress.
+    ```
+    $ git add .
+    $ git commit -m "finish #{notebook.title} #{notebook.type}"
+    $ git push
+    ```
+
+    We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+    We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+    [Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
     """
   end
 end

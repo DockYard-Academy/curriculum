@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Bc.Autolink do
+defmodule Mix.Tasks.AutoLink do
   @moduledoc """
   Autolink backtick function like `Enum.map/2` to HexDocs, like
   [Enum.map/2](https://hexdocs.pm/elixir/Enum.html#map/2).
@@ -25,6 +25,7 @@ defmodule Mix.Tasks.Bc.Autolink do
 
   @impl Mix.Task
   def run(_) do
+    IO.puts("Running: mix auto_link")
     Notebooks.all_livebooks()
     |> Enum.map(fn file_name ->
       file = File.read!(file_name)
