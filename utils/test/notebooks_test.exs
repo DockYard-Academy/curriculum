@@ -4,13 +4,29 @@ defmodule Utils.NotebooksTest do
   alias Utils.Notebooks.Notebook
   doctest Utils.Notebooks
 
-  test "footer regex" do
-    """
-    ## Navigation
+  test "format_headings/1" do
+    notebook = %Notebook{
+      content: """
+      # my awesome heading is great
 
-    """
+      ## capitalize minors words like and the in to of
+      ### but do capitalize other words
+      #### and the first word no matter what
+      """
+    }
+
+    assert %Notebook{
+             content: """
+             # My Awesome Heading Is Great
+
+             ## Capitalize Minors Words Like And The In To Of
+             ### But Do Capitalize Other Words
+             #### And The First Word No Matter What
+             """
+           } = Notebooks.format_headings(notebook)
   end
-  test "navigation_snippet/2 first notebook" do
+
+  test "navigation_snippet/1 first notebook" do
     notebook = Notebooks.outline_notebooks() |> Enum.at(0)
     next = Notebooks.outline_notebooks() |> Enum.at(1)
 
@@ -40,7 +56,7 @@ defmodule Utils.NotebooksTest do
     assert Notebooks.navigation_snippet(notebook) == expected
   end
 
-  test "navigation_snippet/2 middle notebook" do
+  test "navigation_snippet/1 middle notebook" do
     prev = Notebooks.outline_notebooks() |> Enum.at(4)
     notebook = Notebooks.outline_notebooks() |> Enum.at(5)
     next = Notebooks.outline_notebooks() |> Enum.at(6)
@@ -71,7 +87,7 @@ defmodule Utils.NotebooksTest do
     assert Notebooks.navigation_snippet(notebook) == expected
   end
 
-  test "navigation_snippet/2 last notebook" do
+  test "navigation_snippet/1 last notebook" do
     notebook = Notebooks.outline_notebooks() |> Enum.at(-1)
     prev = Notebooks.outline_notebooks() |> Enum.at(-2)
 

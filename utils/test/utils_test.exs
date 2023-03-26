@@ -179,7 +179,7 @@ defmodule UtilsTest do
           _ -> ""
         end
 
-      expected = Notebooks.to_title_case(heading)
+      expected = Notebooks.title_case(heading)
 
       assert heading =~ expected,
              """

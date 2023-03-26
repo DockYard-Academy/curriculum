@@ -15,9 +15,16 @@ defmodule Utils.Notebooks.Notebook do
   Create a new Notebook struct
 
   iex> Utils.Notebooks.Notebook.new(%{index: 0, relative_path: "../reading/strings_and_binaries.livemd"})
-  %Utils.Notebooks.Notebook{index: 0, relative_path: "../reading/strings_and_binaries.livemd", name: "strings_and_binaries", title: "Strings and Binaries", type: :reading}
+  %Utils.Notebooks.Notebook{index: 0, relative_path: "../reading/strings_and_binaries.livemd", name: "strings_and_binaries", title: "Strings And Binaries", type: :reading}
   """
   require Logger
+
+  def new(%{relative_path: "../start.livemd"} = attrs) do
+    struct!(
+      __MODULE__,
+      Map.merge(attrs, %{name: "Home", type: :outline, title: "Curriculum Outline"})
+    )
+  end
 
   def new(attrs) do
     "# " <> title = File.stream!(attrs.relative_path) |> Enum.take(1) |> hd() |> String.trim()
