@@ -257,7 +257,7 @@ Phoenix applications generate a `ConnCase` test module that simulates building t
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/support/conn_case.ex
+# Test/support/conn_case.ex
 
 defmodule BookSearchWeb.ConnCase do
   @moduledoc """
@@ -382,7 +382,7 @@ For example, let's look at the `"index"` test in `test/book_search/controllers/a
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller.ex
+# Test/book_search_web/controllers/author_controller.ex
 
 describe "index" do
   test "lists all authors", %{conn: conn} do
@@ -404,14 +404,14 @@ The [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3) function acc
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Modifying Assertions and Behavior
+### Modifying Assertions And Behavior
 
 Under the hood, `get(conn, Routes.author_path(conn, :index))` triggers the `AuthorsController.index/2` action.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/controllers/author_controller.ex
+# Lib/book_search_web/controllers/author_controller.ex
 
 def index(conn, _params) do
   authors = Authors.list_authors()
@@ -424,7 +424,7 @@ The `AuthorController` renders the template file.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/templates/authors/index.html.heex
+# Lib/book_search_web/templates/authors/index.html.heex
 
 <h1>Listing Authors</h1>
 
@@ -459,7 +459,7 @@ The `AuthorController` renders the template file.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/templates/authors/index.html.heex
+# Lib/book_search_web/templates/authors/index.html.heex
 
 <h1>Search Authors</h1>
 ```
@@ -538,7 +538,7 @@ To fix this test, we need to change our assertion to find `"Search Authors"` on 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 describe "index" do
   test "lists all authors", %{conn: conn} do
@@ -561,7 +561,7 @@ Replace `AuthorController.index/2` with the following and run `mix test`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/controllers/author_controller.ex
+# Lib/book_search_web/controllers/author_controller.ex
 
 def index(conn, _params) do
   # authors = Authors.list_authors()
@@ -576,7 +576,7 @@ Replace the `"index"` test with the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.ex
+# Test/book_search_web/controllers/author_controller_test.ex
 
 describe "index" do
   setup [:create_author]
@@ -597,7 +597,7 @@ The `setup [:create_author]` function calls the `create_author/1` function to bi
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.ex
+# Test/book_search_web/controllers/author_controller_test.ex
 
 defp create_author(_) do
   author = author_fixture()
@@ -610,7 +610,7 @@ The `create_author/1` function calls the `author_fixture/1` function imported fr
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.ex
+# Test/book_search_web/controllers/author_controller_test.ex
 
 defmodule BookSearchWeb.AuthorControllerTest do
   use BookSearchWeb.ConnCase
@@ -627,7 +627,7 @@ The `author_fixture/1` function creates an author with some default arguments us
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/support/fixtures/authors_fixture.ex
+# Test/support/fixtures/authors_fixture.ex
 
 def author_fixture(attrs \\ %{}) do
   {:ok, author} =
@@ -662,7 +662,7 @@ This fixture function is merely an abstraction around calling `BookSearch.Author
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.ex
+# Test/book_search_web/controllers/author_controller_test.ex
 
 describe "index" do
   test "lists all authors", %{conn: conn} do
@@ -680,7 +680,7 @@ Revert the `"index"` test to use the test fixture.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.ex
+# Test/book_search_web/controllers/author_controller_test.ex
 
 describe "index" do
   setup [:create_author]
@@ -697,7 +697,7 @@ Revert `AuthorController` to what it was before we broke it, and the test should
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/controllers/author_controller.ex
+# Lib/book_search_web/controllers/author_controller.ex
 
 def index(conn, _params) do
   authors = Authors.list_authors()
@@ -712,7 +712,7 @@ The `"create author"` tests handle both the successful creation of an author and
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 describe "create author" do
   test "redirects to show when data is valid", %{conn: conn} do
@@ -739,7 +739,7 @@ The `"redirects to show when data is valid"` test checks that when the client se
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 test "redirects to show when data is valid", %{conn: conn} do
   conn = post(conn, Routes.author_path(conn, :create), author: @create_attrs)
@@ -795,7 +795,7 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/templates/authors/new.html.heex
+# Lib/book_search_web/templates/authors/new.html.heex
 
 <h1>New Author</h1>
 
@@ -844,7 +844,7 @@ To display the message, we call the [get_flash/2](https://hexdocs.pm/phoenix/Pho
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/layout/app.html.heex
+# Lib/book_search_web/layout/app.html.heex
 
 <main class="container">
   <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
@@ -1008,7 +1008,7 @@ We'll need a new `"index"` test specifically for query params as we still want t
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 describe "index" do
   setup [:create_author]
@@ -1030,7 +1030,7 @@ Let's refactor the `"lists all authors"` test to use the `author_fixture/1` func
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 describe "index" do
   test "lists all authors", %{conn: conn} do
@@ -1050,7 +1050,7 @@ We can trigger a request to http://localhost:4000/authors?name=Patrick+Rothfus b
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 test "lists all authors _ matching search query", %{conn: conn} do
   author = author_fixture(name: "Patrick Rothfus")
@@ -1072,7 +1072,7 @@ Unfortunately, that's because we're not filtering at all! We'll have to write an
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search_web/controllers/author_controller_test.exs
+# Test/book_search_web/controllers/author_controller_test.exs
 
 test "lists all authors _ not matching search query", %{conn: conn} do
   author = author_fixture(name: "Patrick Rothfus")
@@ -1090,7 +1090,7 @@ We can pass the name to the `Authors.list_authors/1` function, which will handle
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/controllers/author_controller.ex
+# Lib/book_search_web/controllers/author_controller.ex
 
 def index(conn, %{"name" => name}) do
   authors = Authors.list_authors(name)
@@ -1114,11 +1114,11 @@ We could implement this function right away. However, this is a great time to wr
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search/authors_test.exs
+# Test/book_search/authors_test.exs
 
 describe "authors" do
 ...
-# Add the list_authors/1 tests inside the "authors" describe block.
+# Add The List_authors/1 Tests Inside The "authors" Describe Block.
 
 test "list_authors/1 _ matching name" do
   author = author_fixture(name: "Andrew Rowe")
@@ -1139,7 +1139,7 @@ Now we need to implement the `Authors.list_authors/1` function. We'll create ano
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search/authors.ex
+# Lib/book_search/authors.ex
 
 def list_authors do
   Repo.all(Author)
@@ -1199,7 +1199,7 @@ For example, let's add the following test where we search by a partial name.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search/authors_test.exs
+# Test/book_search/authors_test.exs
 
 test "list_authors/1 _ partially matching name" do
   author = author_fixture(name: "Dennis E Taylor")
@@ -1212,7 +1212,7 @@ This test fails because the `list_authors/1` function checks for an exact match.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search/authors.ex
+# Lib/book_search/authors.ex
 
 def list_authors(name) do
   Author
@@ -1226,7 +1226,7 @@ We can use [like/2](https://hexdocs.pm/ecto/Ecto.Query.API.html#like/2) from `Ec
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search/authors.ex
+# Lib/book_search/authors.ex
 
 def list_authors(name) do
   search = "#{name}%"
@@ -1243,7 +1243,7 @@ Let's expand the test to check. We'll check that we can find authors by a partia
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/book_search/authors_test.exs
+# Test/book_search/authors_test.exs
 
 test "list_authors/1 _ partially matching name" do
   author = author_fixture(name: "Dennis E Taylor")
@@ -1258,7 +1258,7 @@ To make this pass, we need to use the `%` character at the start and end of the 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search/authors.ex
+# Lib/book_search/authors.ex
 
 def list_authors(name) do
   search = "%#{name}%"
@@ -1285,7 +1285,7 @@ To make this test pass, we can use [ilike/2](https://hexdocs.pm/ecto/Ecto.Query.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search/authors.ex
+# Lib/book_search/authors.ex
 
 def list_authors(name) do
   search = "%#{name}%"

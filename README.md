@@ -187,65 +187,65 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 ## Core Syntax
 * Course Tools
 * Basics
-* Data Structures and Intro to Pattern Matching
-* Control Flow and Abstraction
-* Modules and Structs
+* Data Structures And Intro To Pattern Matching
+* Control Flow And Abstraction
+* Modules And Structs
 * Enumeration
-* Comprehensions and Non-Enumerable Data Types
+* Comprehensions And Non-Enumerable Data Types
 * Built-in Modules
 * Reduce
-* Dates and Time
+* Dates And Time
 * String Manipulation
 ## Mix Projects
 * Elixir Build Tooling
 * Testing With ExUnit
 * ExUnit With Mix Projects
-* Documentation and Static Analysis
+* Documentation And Static Analysis
 * Executables
-## OTP and Advanced Syntax
+## OTP And Advanced Syntax
 * Advanced Pattern Matching
 * Guarding
 * Protocols
 * Recursion
-* Persistence Using the File System
+* Persistence Using The File System
 * Processes
 * GenServers
 * Asynchronous Messages
-* Supervisor Basics and Fault Tolerance
-* Mix Projects and Processes
+* Supervisor Basics And Fault Tolerance
+* Mix Projects And Processes
 * Concurrency With Tasks
 ## Capstone Project Preparation
 * Capstone Project
-## Web Servers and Phoenix
-* HTML and CSS
-* APIs and Parsing JSON
+## Web Servers And Phoenix
+* HTML And CSS
+* APIs And Parsing JSON
 * Phoenix
 * Tailwind
 * Ecto Changesets
 * Group Project Blog
-* Phoenix and Ecto
+* Phoenix And Ecto
 * Testing Phoenix
-* Schemas and Migrations
-* Phoenix and Ecto One-to-Many Associations
+* Schemas And Migrations
+* Phoenix And Ecto One-to-Many Associations
 * Seeding
 * Phoenix Forms
 * Phoenix Authentication
-* Phoenix and Ecto Many-to-Many Relationships
-* Phoenix and Ecto One-to-One Relationships
+* Phoenix And Ecto Many-to-Many Relationships
+* Phoenix And Ecto One-to-One Relationships
 * Deployment
 ## Group Project Presentation
 ## LiveView
 * LiveView
-* LiveView and Ecto
+* LiveView And Ecto
 * LiveView Image Uploads
 * PubSub
-* LiveView JS Interoperability and Pagination
-* Emailing, Swoosh, and Oban
+* LiveView JS Interoperability And Pagination
+* Emailing, Swoosh, And Oban
 ## Bonus Topics
 * Performance Optimization
-* Benchmarking and Performance
+* Benchmarking And Performance
 * Streams
-* State Management With Agents and ETS
+* State Management With Agents And ETS
 * Metaprogramming
 * Double-Ended Queues
 * Worker Pools

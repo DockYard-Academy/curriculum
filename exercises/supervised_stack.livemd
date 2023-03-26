@@ -76,7 +76,7 @@ GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 
-# the final state is empty.
+# The Final State Is Empty.
 :sys.get_state(stack_pid)
 ```
 
@@ -86,7 +86,7 @@ will crash due to a function clause error because the `handle_call/2` function e
 Uncomment the following code to watch the `Stack` crash.
 
 ```elixir
-# {:ok, pid} = GenServer.start_link(Stack, [])
+# {:ok, Pid} = GenServer.start_link(Stack, [])
 # GenServer.call(stack_pid, :pop)
 ```
 
@@ -95,7 +95,7 @@ Normally, we could handle this by using control flow. For example, we could make
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# return `nil` when the stack is empty.
+# Return `nil` When The Stack Is Empty.
 @impl true
 def handle_call(:pop, _from, []) do
   {:reply, nil, []}

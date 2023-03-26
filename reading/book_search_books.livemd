@@ -51,7 +51,7 @@ Overall, one-to-many relationships are an important part of database design and 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### `has_many` and `belongs_to`
+### `has_many` And `belongs_to`
 
 In the context of one-to-many relationships, "has many" is used to describe the relationship between the one side of the relationship and the many side. For example, in a instructor-student relationship, the instructor "has many" students.
 
@@ -152,7 +152,7 @@ We've generated the following migration for books.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# priv/repo/migrations/_create_books.exs
+# Priv/repo/migrations/_create_books.exs
 
 defmodule BookSearch.Repo.Migrations.CreateBooks do
   use Ecto.Migration
@@ -277,7 +277,7 @@ You should see the `author_id` on the created book.
  }
 ```
 
-## Books and Authors Schema Association
+## Books And Authors Schema Association
 
 Instead of including the `author_id` manually, it's more idiomatic to build the association using one of three functions provided by [Ecto](https://hexdocs.pm/ecto/Ecto.html).
 
@@ -289,7 +289,7 @@ In order to use these functions, we need to define the [has_many/3](https://hexd
 
 <!-- livebook:{"break_markdown":true} -->
 
-### has_many/3
+### Has_many/3
 
 We can use the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) macro to indicate a one-to-many association with another schema.
 
@@ -320,7 +320,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### belongs_to/3
+### Belongs_to/3
 
 To indicate our books belong to a single author, we need to add the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship.
 Replace `field :author_id, :id` with the `belongs_to/3` macro.
@@ -362,7 +362,7 @@ iex> recompile()
 
 <!-- livebook:{"break_markdown":true} -->
 
-### build_assoc/3
+### Build_assoc/3
 
 [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) is a function in the Elixir programming language that is used to create a new record in a related table and associate it with an existing record in the current table. It is part of the Ecto framework, which is a domain-specific language for writing queries and interacting with databases in Elixir.
 
@@ -439,7 +439,7 @@ iex> |> Repo.preload([:author])
 
 <!-- livebook:{"break_markdown":true} -->
 
-### put_assoc/4
+### Put_assoc/4
 
 [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) puts the given association entry or entries as a change in the changeset. This allows us to work with associations as a whole.
 
@@ -576,7 +576,7 @@ iex> BookSearch.Authors.get_author!(2) |> Repo.preload([:books])
 ```elixir
 iex> BookSearch.Authors.get_author!(2)
 iex> |> Repo.preload([:books])
-# we aren't going to update any fields on the author, so we leave the attrs map empty.
+# We Aren't Going To Update Any Fields On The Author, So We Leave The Attrs Map Empty.
 iex> |> Author.changeset(%{})
 iex> |> Ecto.Changeset.put_assoc(:books, [%Book{title: "All These Worlds"}])
 iex> |> Repo.insert!()
@@ -597,7 +597,7 @@ If we want to replace associations, we would need modify or write a new migratio
 
 <!-- livebook:{"break_markdown":true} -->
 
-### cast_assoc/3
+### Cast_assoc/3
 
 [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) works similarly to `put_assoc/4` as it works with the entire association at once, however it's best used with external data we need to cast/validate with a changeset.
 
@@ -671,14 +671,14 @@ iex> |> Repo.insert!()
  >}
 ```
 
-## Push to GitHub
+## Push To GitHub
 
 Add the routes for `BookController` to your router.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Set up a scope for the BookSearchWeb web application
+# Set Up A Scope For The BookSearchWeb Web Application
 scope "/", BookSearchWeb do
   # Use the :browser pipeline for all routes within this scope
   pipe_through :browser

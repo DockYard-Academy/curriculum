@@ -56,7 +56,7 @@ Overall, seeding a database with initial data can help to improve the reliabilit
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Seeding With Phoenix and Ecto
+### Seeding With Phoenix And Ecto
 
 By default, Phoenix creates a `priv/repo/seeds.exs` file which will seed our database.
 
@@ -65,17 +65,17 @@ By default, Phoenix creates a `priv/repo/seeds.exs` file which will seed our dat
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Script for populating the database. You can run it as:
+# Script For Populating The Database. You Can Run It As:
 #
-#     mix run priv/repo/seeds.exs
+# Mix Run Priv/repo/seeds.exs
 #
-# Inside the script, you can read and write to any of your
-# repositories directly:
+# Inside The Script, You Can Read And Write To Any Of Your
+# Repositories Directly:
 #
-#     MyApp.Repo.insert!(%MyApp.SomeSchema{})
+# MyApp.Repo.insert!(%MyApp.SomeSchema{})
 #
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+# We Recommend Using The Bang Functions (`insert!`, `update!`
+# And So On) As They Will Fail If Something Goes Wrong.
 ```
 
 We can run this file from our project folder with the following command. This is the same way we run any `.exs` file in our mix project.
@@ -138,7 +138,7 @@ If you need clarification during this reading, you can reference the completed [
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Run the BookSearch Project
+### Run The BookSearch Project
 
 Ensure your `BookSearch` project is up to date with [BookSearch: Books](./book_search_books.livemd) from the previous lesson. If not, you can clone the [BookSearch/books](https://github.com/DockYard-Academy/book_search/tree/books) project.
 
@@ -179,7 +179,7 @@ Add the following to `priv/repo/seeds.exs`.
 ```elixir
 alias BookSearch.Authors
 
-# Create an author without any books.
+# Create An Author Without Any Books.
 Authors.create_author(%{name: "Andrew Rowe"})
 ```
 
@@ -220,10 +220,10 @@ Add the following to `seeds.exs` to create a book when we seed the database.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Add with your existing aliases
+# Add With Your Existing Aliases
 alias BookSearch.Books
 
-# Create a book without an author.
+# Create A Book Without An Author.
 Books.create_book(%{title: "Beowulf"})
 ```
 
@@ -252,7 +252,7 @@ iex> BookSearch.Books.list_books()
 ]
 ```
 
-## Create A Book and An Associated Author
+## Create A Book And An Associated Author
 
 Now we're going to create a book with an associated author.
 
@@ -263,11 +263,11 @@ For now, we can manually create the associated data by creating a changeset and 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Add with your existing aliases
+# Add With Your Existing Aliases
 alias BookSearch.Books.Book
 alias BookSearch.Repo
 
-# Create an author and a book.
+# Create An Author And A Book.
 {:ok, author} = Authors.create_author(%{name: "Patrick Rothfus"})
 
 %Book{}
@@ -509,13 +509,13 @@ alias BookSearch.Books
 alias BookSearch.Books.Book
 alias BookSearch.Repo
 
-# Create an author without any books
+# Create An Author Without Any Books
 Authors.create_author(%{name: "Andrew Rowe"})
 
-# Create a book without an author.
+# Create A Book Without An Author.
 Books.create_book(%{title: "Beowulf"})
 
-# Create an author with a book.
+# Create An Author With A Book.
 {:ok, author} = Authors.create_author(%{name: "Patrick Rothfus"})
 
 %Book{}
@@ -587,7 +587,7 @@ iex> BookSearch.Authors.list_authors()
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Refactoring Our Seeds to Be Idempotent
+### Refactoring Our Seeds To Be Idempotent
 
 If we want to achieve idempotency, which often makes our scripts more reliable, we could first check if the data exists. Replace your existing `seeds.exs` file with this idompotent version.
 
@@ -600,7 +600,7 @@ alias BookSearch.Books
 alias BookSearch.Books.Book
 alias BookSearch.Repo
 
-# Create an author without any books
+# Create An Author Without Any Books
 case Repo.get_by(Author, name: "Andrew Rowe") do
   %Author{} = author ->
     IO.inspect(author.name, label: "Author Already Created")
@@ -609,7 +609,7 @@ case Repo.get_by(Author, name: "Andrew Rowe") do
     Authors.create_author(%{name: "Andrew Rowe"})
 end
 
-# Create a book without an author.
+# Create A Book Without An Author.
 case Repo.get_by(Book, title: "Beowulf") do
   %Book{} = book ->
     IO.inspect(book.title, label: "Book Already Created")
@@ -618,7 +618,7 @@ case Repo.get_by(Book, title: "Beowulf") do
     Books.create_book(%{title: "Beowulf"})
 end
 
-# Create an author with a book.
+# Create An Author With A Book.
 {:ok, author} =
   case Repo.get_by(Author, name: "Patrick Rothfuss") do
     %Author{} = author ->
@@ -748,12 +748,12 @@ alias BookSearch.Books
 alias BookSearch.Books.Book
 alias BookSearch.Repo
 
-# authors without books
+# Authors Without Books
 Enum.each(1..10, fn _ ->
   Authors.create_author(%{name: Faker.Person.name()})
 end)
 
-# books without authors
+# Books Without Authors
 Enum.each(1..10, fn _ ->
   Books.create_book(%{title: Faker.Lorem.sentence()})
 end)
@@ -805,13 +805,13 @@ alias BookSearch.Books
 alias BookSearch.Books.Book
 alias BookSearch.Repo
 
-# author without books
+# Author Without Books
 Authors.create_author(%{name: Faker.Lorem.sentence(10)})
 
-# book without author
+# Book Without Author
 Books.create_book(%{title: Faker.Lorem.sentence(10)})
 
-# author with a book
+# Author With A Book
 {:ok, author} = Authors.create_author(%{name: Faker.Lorem.sentence(10)})
 
 Enum.each(1..10, fn _ ->
@@ -844,7 +844,7 @@ Visit http://localhost:4000/books to see how our UI handles large text content.
 
 Looking good!
 
-## Push to GitHub
+## Push To GitHub
 
 Ensure all of your tests continue to pass.
 

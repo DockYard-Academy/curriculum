@@ -67,7 +67,7 @@ classDiagram
 
 If you get stuck at any point in this reading, you can reference the completed [Diary](https://github.com/DockYard-Academy/diary) application example.
 
-## Create the Diary Application
+## Create The Diary Application
 
 Create a new phoenix diary project.
 
@@ -218,7 +218,7 @@ Notice there are now register and log-in links which we can find in the  `lib/di
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/templates/layout/_user_menu.html.heex
+# Lib/diary_web/templates/layout/_user_menu.html.heex
 <ul>
 <%= if @current_user do %>
   <li><%= @current_user.email %></li>
@@ -246,7 +246,7 @@ This triggers the `"users/register"` route.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/router.ex
+# Lib/diary_web/router.ex
 
 get "/users/register", UserRegistrationController, :new
 ```
@@ -276,7 +276,7 @@ This form triggers an HTTP POST request to `"/users/registration"` to create a n
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/router.ex
+# Lib/diary_web/router.ex
 post "/users/register", UserRegistrationController, :create
 ```
 
@@ -285,7 +285,7 @@ The `UserRegistrationController.create/2` function creates a new user in the Dat
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/user_registration_controller.ex
+# Lib/diary_web/controllers/user_registration_controller.ex
 
 def create(conn, %{"user" => user_params}) do
   case Accounts.register_user(user_params) do
@@ -322,7 +322,7 @@ The `Accounts.register_user(user_params)` function call above creates a user wit
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts.ex
+# Lib/diary/accounts.ex
 
 def register_user(attrs) do
   %User{}
@@ -336,7 +336,7 @@ The `User.registration_changeset(attrs)` function call uses Ecto changesets to v
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts/user.ex
+# Lib/diary/accounts/user.ex
 
 def registration_changeset(user, attrs, opts \\ []) do
   user
@@ -351,7 +351,7 @@ The `validate_password(opts)` function call validates the password. There are se
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts/user.ex
+# Lib/diary/accounts/user.ex
 
 defp validate_password(changeset, opts) do
   changeset
@@ -404,7 +404,7 @@ The user schema includes a `:password` and a `:hashed_password` field.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts/user.ex
+# Lib/diary/accounts/user.ex
 
 defmodule Diary.Accounts.User do
   use Ecto.Schema
@@ -429,7 +429,7 @@ For security reasons, the users table only stores the `:hashed_password`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# priv/repo/migrations/_create_users_auth_tables.exs
+# Priv/repo/migrations/_create_users_auth_tables.exs
 
 create table(:users) do
   add :email, :citext, null: false
@@ -446,7 +446,7 @@ The `deliver_user_confirmation_instructions/2` function sends a confirmation ema
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts.ex
+# Lib/diary/accounts.ex
 
 def deliver_user_confirmation_instructions(%User{} = user, confirmation_url_fun)
     when is_function(confirmation_url_fun, 1) do
@@ -465,7 +465,7 @@ The `UserNotifier` module in `lib/diary/accounts/user_notifier.ex` uses [Swoosh]
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/accounts/user_notifier.ex
+# Lib/diary/accounts/user_notifier.ex
 
 def deliver_confirmation_instructions(user, url) do
   deliver(user.email, "Confirmation instructions", """
@@ -512,7 +512,7 @@ The `UserAuth.log_in_user/3` function generates a user token and puts it on the 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/user_auth.ex
+# Lib/diary_web/controllers/user_auth.ex
 
 def log_in_user(conn, user, params \\ %{}) do
   token = Accounts.generate_user_session_token(user)
@@ -563,7 +563,7 @@ The `:browser` pipeline now uses the `:fetch_current_user` plug to fetch the cur
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/journal_web/router.ex
+# Lib/journal_web/router.ex
 
 pipeline :browser do
   ...
@@ -576,7 +576,7 @@ The `:redirect_if_user_is_authenticated` plug prevents an already signed-in user
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/journal_web/router.ex
+# Lib/journal_web/router.ex
 
 scope "/", DiaryWeb do
   pipe_through [:browser, :redirect_if_user_is_authenticated]
@@ -597,7 +597,7 @@ The `:require_authenticated_user` plug requires an authenticated user. We can us
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/journal_web/router.ex
+# Lib/journal_web/router.ex
 
 scope "/", DiaryWeb do
   pipe_through [:browser, :require_authenticated_user]
@@ -613,7 +613,7 @@ Publicly available routes simply omit both plugs.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/journal_web/router.ex
+# Lib/journal_web/router.ex
 
 scope "/", DiaryWeb do
   pipe_through [:browser]
@@ -633,7 +633,7 @@ The `:redirect_if_user_is_authenticated` plug checks if there is a current user,
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/user_auth.ex
+# Lib/diary_web/controllers/user_auth.ex
 
 @doc """
 Used for routes that require the user to not be authenticated.
@@ -654,7 +654,7 @@ The `:require_authenticated_user` plug checks if there is a current user and red
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/user_auth.ex
+# Lib/diary_web/controllers/user_auth.ex
 
 @doc """
 Used for routes that require the user to be authenticated.
@@ -682,7 +682,7 @@ As previously mentioned, Phoenix uses the user token stored on the session to re
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/user_auth.ex
+# Lib/diary_web/controllers/user_auth.ex
 
 def fetch_current_user(conn, _opts) do
   {user_token, conn} = ensure_user_token(conn)
@@ -763,7 +763,7 @@ Add the following to `lib/diary_web/router.ex`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/router.ex
+# Lib/diary_web/router.ex
 
 scope "/", DiaryWeb do
   pipe_through [:browser, :require_authenticated_user]
@@ -789,7 +789,7 @@ To fix this issue, add the `:register_and_login_user` setup function to the `Ent
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/diary_web/controllers/entry_controller_test.ex
+# Test/diary_web/controllers/entry_controller_test.ex
 defmodule DiaryWeb.EntryControllerTest do
   use DiaryWeb.ConnCase
 
@@ -820,7 +820,7 @@ Modify the `EntryController.create/2` function to include the user id in the `en
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/entry_controller.ex
+# Lib/diary_web/controllers/entry_controller.ex
 
 def create(conn, %{"entry" => entry_params}) do
   entry_params = Map.put(entry_params, "user_id", conn.assigns[:current_user].id)
@@ -842,7 +842,7 @@ Modify the `Entry.changeset/2` to include the `:user_id`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/entries/entry.ex
+# Lib/diary/entries/entry.ex
 
 def changeset(entry, attrs) do
   entry
@@ -856,7 +856,7 @@ Modify the `EntryController.index/2` function to use the current user in the `En
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/entry_controller.ex
+# Lib/diary_web/controllers/entry_controller.ex
 
 def index(conn, _params) do
   entries = Entries.list_entries(conn.assigns[:current_user].id)
@@ -869,7 +869,7 @@ Finally, create a new `Entries.list_entries/1` function to accept the `user_id` 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary/entries.ex
+# Lib/diary/entries.ex
 
 def list_entries(user_id) do
   Entry
@@ -895,7 +895,7 @@ We can define and execute a custom plug to run on the `:show`, `:edit`, `:update
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/entry_controller.ex
+# Lib/diary_web/controllers/entry_controller.ex
 
 plug :require_user_owns_entry when action in [:show, :edit, :update, :delete]
 ```
@@ -909,7 +909,7 @@ If the entry belongs to the current user, it simply returns the current connecti
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/diary_web/controllers/entry_controller.ex
+# Lib/diary_web/controllers/entry_controller.ex
 
 def require_user_owns_entry(conn, _opts) do
   entry_id = String.to_integer(conn.path_params["id"])
@@ -930,7 +930,7 @@ Now users can only show, edit, update, and delete entries that belong to them.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Adding User Authentication to Tests
+### Adding User Authentication To Tests
 
 By adding the `:require_user_owns_entry` plug we've broken several tests in the `EntryControllerTest` module.
 
@@ -984,7 +984,7 @@ The current tests do not log in a user, so they fail on the `:show`, `:edit`, `:
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# tests/diary_web/controllers/entry_controller_test.exs
+# Tests/diary_web/controllers/entry_controller_test.exs
 
 describe "edit entry" do
   setup [:create_entry]
@@ -1034,7 +1034,7 @@ It's conventional for imports to be grouped together and sorted in alphanumerica
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/diary_web/controllers/entry_controller_test.exs
+# Test/diary_web/controllers/entry_controller_test.exs
 
 import Diary.AccountsFixtures
 import Diary.EntriesFixtures
@@ -1047,7 +1047,7 @@ Then put the following in each failing test to create a user, associate it with 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/diary_web/controllers/entry_controller_test.exs
+# Test/diary_web/controllers/entry_controller_test.exs
 
 user = user_fixture()
 entry = entry_fixture(user_id: user.id)

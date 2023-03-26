@@ -1,4 +1,4 @@
-# State: Agent and ETS
+# State: Agent And ETS
 
 ```elixir
 Mix.install([
@@ -18,7 +18,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=State: Agent and ETS">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=State: Agent And ETS">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
@@ -201,7 +201,7 @@ By default, `:ets` tables use the `:set` and `:protected` configuration values. 
 default_table = :ets.new(:default_table, [:set, :protected])
 :ets.insert(default_table, {:key, "value"})
 
-# We return the default table to display the table in livebook.
+# We Return The Default Table To Display The Table In Livebook.
 default_table
 ```
 
@@ -211,8 +211,8 @@ Uncomment and execute this code. Notice that the child process crashes.
 
 ```elixir
 # Task.start(fn ->
-#   :ets.insert(default_table, {:new_key, "new value"})
-# end)
+# :ets.insert(default_table, {:new_key, "new Value"})
+# End)
 ```
 
 However, reading from other processes is allowed.
@@ -234,7 +234,7 @@ Task.start(fn ->
   :ets.insert(public, {:key, "value"})
 end)
 
-# We return the public table to display it in livebook.
+# We Return The Public Table To Display It In Livebook.
 public
 ```
 
@@ -249,7 +249,7 @@ bag = :ets.new(:bag_example, [:bag])
 :ets.insert(bag, {:key, "duplicate value"})
 :ets.insert(bag, {:key, "non-duplicate value"})
 
-# We return the bag table to display it in livebook.
+# We Return The Bag Table To Display It In Livebook.
 bag
 ```
 
@@ -268,7 +268,7 @@ bag = :ets.new(:bag_example, [:duplicate_bag])
 :ets.insert(bag, {:key, "duplicate value"})
 :ets.insert(bag, {:key, "non-duplicate value"})
 
-# We return the bag table to display it in livebook.
+# We Return The Bag Table To Display It In Livebook.
 bag
 ```
 
@@ -286,10 +286,10 @@ from another process.
 ```elixir
 table = :ets.new(:example, [:private, :ordered_set])
 
-# Writing from the owner process is allowed.
+# Writing From The Owner Process Is Allowed.
 :ets.insert(table, {:key, "value"})
 
-# The following will cause a crash.
+# The Following Will Cause A Crash.
 spawn(fn ->
   :ets.insert(table, {:key, "value"})
 end)
@@ -455,9 +455,9 @@ end
 We can use this cache to store values during the runtime of our application. For example, here's how we can use this cache with our `Fib` module. Notice we no longer re-compute already cached values.
 
 ```elixir
-# Named process simplifies accessing the cache.
+# Named Process Simplifies Accessing The Cache.
 AgentCache.start_link(name: :fib_cache)
-# Resetting cache to preserve the example.
+# Resetting Cache To Preserve The Example.
 Agent.update(:fib_cache, fn state -> %{} end)
 
 defmodule CachedFib do
@@ -591,7 +591,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish State: Agent and ETS reading"
+$ git commit -m "finish State: Agent And ETS reading"
 $ git push
 ```
 
@@ -609,7 +609,7 @@ We also offer a paid course where you can learn from an instructor alongside a c
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=State: Agent and ETS">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=State: Agent And ETS">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>

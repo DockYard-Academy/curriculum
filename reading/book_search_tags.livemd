@@ -150,7 +150,7 @@ Then add the `"/tags"` resources to our router.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Set up a scope for the BookSearchWeb web application
+# Set Up A Scope For The BookSearchWeb Web Application
 scope "/", BookSearchWeb do
   # Use the :browser pipeline for all routes within this scope
   pipe_through :browser
@@ -297,12 +297,12 @@ The `multiple_select/4` input accepts a list of tuples with a label and a value 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/templates/book/form.html.heex
+# Lib/book_search_web/templates/book/form.html.heex
 
-# Using Keyword lists
+# Using Keyword Lists
 <%= multiple_select f, :tags, ["label": "value"] %>
 
-# Using Lists of Tuples
+# Using Lists Of Tuples
 <%= multiple_select f, :tags, [{"label", "value"}] %>
 ```
 
@@ -316,7 +316,7 @@ Create a `tag_options/0` function in the `BookView` module.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/views/book_view.ex
+# Lib/book_search_web/views/book_view.ex
 
 defmodule BookSearchWeb.BookView do
   use BookSearchWeb, :view
@@ -332,7 +332,7 @@ Provide `tag_options/0` to the `multiple_select/4` input.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/book_search_web/templates/book/form.html.heex
+# Lib/book_search_web/templates/book/form.html.heex
 
 <%= multiple_select f, :tags, tag_options() %>
 ```
@@ -350,11 +350,11 @@ To accomplish this, add the following content to `priv/repo/seeds.exs`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Add aliases to your existing aliases
+# Add Aliases To Your Existing Aliases
 alias BookSearch.Tags
 alias BookSearch.Tags.Tag
 
-# Create tags
+# Create Tags
 ["fiction", "fantasy", "history", "sci-fi"]
 |> Enum.each(fn tag_name ->
   case Repo.get_by(Tag, name: tag_name) do
@@ -887,7 +887,7 @@ Import the `BookSearch.TagsFixtures` into the `book_controller_test.exs` and `bo
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# add with your existing imports
+# Add With Your Existing Imports
 import BookSearch.AuthorsFixtures
 import BookSearch.BooksFixtures
 import BookSearch.TagsFixtures
@@ -900,7 +900,7 @@ import BookSearch.TagsFixtures
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Test the 'create' action of the 'BookController' with a request that includes tags.
+# Test The 'create' Action Of The 'BookController' With A Request That Includes Tags.
 test "create a book with tags", %{conn: conn} do
   # Create two tags.
   tag1 = tag_fixture(name: "tag1")
@@ -934,7 +934,7 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Test the 'update' action of the 'BookController' with a request that includes tags.
+# Test The 'update' Action Of The 'BookController' With A Request That Includes Tags.
 test "update a book with tags", %{conn: conn, book: book} do
   # Create two tags.
   tag1 = tag_fixture(name: "tag1")
@@ -965,7 +965,7 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Test the 'create_book/2' function with a request that includes tags.
+# Test The 'create_book/2' Function With A Request That Includes Tags.
 test "create_book/1 with tags" do
   # Create two tags.
   tag1 = tag_fixture(name: "tag1")
@@ -990,7 +990,7 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Test the 'update_book/3' function with a request that includes tags.
+# Test The 'update_book/3' Function With A Request That Includes Tags.
 test "update_book/3 with tags" do
   # Create two tags.
   tag1 = tag_fixture()
@@ -1017,7 +1017,7 @@ end
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Test the 'show' action of the 'TagController'.
+# Test The 'show' Action Of The 'TagController'.
 describe "show" do
   # Test the 'show' action with a tag fixture that has an associated book.
   test "tag with associated book", %{conn: conn} do
@@ -1057,7 +1057,7 @@ def book_fixture(attrs \\ %{}, tags \\ []) do
 end
 ```
 
-## Push to GitHub
+## Push To GitHub
 
 Ensure all of your tests continue to pass.
 

@@ -184,13 +184,13 @@ We can mount a LiveView in a test using the [live/2](https://hexdocs.pm/phoenix_
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Make a request with `live/2` to mount the LiveView and get the resulting html
+# Make A Request With `live/2` To Mount The LiveView And Get The Resulting Html
 {:ok, view, html} = live(conn, "/hello")
 
-# Assert that the module of `view` is `MyLiveViewModule`.
+# Assert That The Module Of `view` Is `MyLiveViewModule`.
 assert view.module == MyLiveViewModule
 
-# Assert that "Hello, World!" is contained in the html.
+# Assert That "Hello, World!" Is Contained In The Html.
 assert html =~ "Hello, World!"
 ```
 
@@ -201,14 +201,14 @@ We can then use [render/1](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Make a request with `live/2` to mount the LiveView and get the resulting html
+# Make A Request With `live/2` To Mount The LiveView And Get The Resulting Html
 {:ok, view, html} = live(conn, "/count")
 
-# The rendered view should start at count `0`.
+# The Rendered View Should Start At Count `0`.
 assert view
        |> render() =~ "0"
 
-# The rendered view should incremement the count to `1` after clicking the increment button
+# The Rendered View Should Incremement The Count To `1` After Clicking The Increment Button
 assert view
        |> element("button", "increment")
        |> render_click() =~ "1"
@@ -219,20 +219,20 @@ There's also [form/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Make a request with `live/2`.
+# Make A Request With `live/2`.
 {:ok, view, _html} = live(conn, Routes.message_index_path(conn, :index))
 
-# select the form, submit the form, and follow the redirect to "/". Bind the resulting html.
+# Select The Form, Submit The Form, And Follow The Redirect To "/". Bind The Resulting Html.
 {:ok, _, html} =
   view
   |> form("#message-form", message: %{content: "some content", from: "some user"})
   |> render_submit()
   |> follow_redirect(conn, "/")
 
-# Assert that "Message created successfully" is contained in `html`.
+# Assert That "Message Created Successfully" Is Contained In `html`.
 assert html =~ "Message created successfully"
 
-# Assert that "some content" is contained in `html`.
+# Assert That "some Content" Is Contained In `html`.
 assert html =~ "some content"
 ```
 
@@ -249,7 +249,7 @@ You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat
 
 In this lesson, we're going to create the initial feed of messages without images. Follow along with each step of the instruction to build your own `PicChat` application.
 
-## Create the Phoenix Project
+## Create The Phoenix Project
 
 Create the Phoenix project
 
@@ -263,7 +263,7 @@ Make sure to create the Ecto database.
 $ mix ecto.create
 ```
 
-## Create the Chat Context.
+## Create The Chat Context.
 
 We're going to create a `Chat` context with a `Message` resource in a `messages` table.
 Messages will have a `:content` and `:from` field.
@@ -341,21 +341,21 @@ def handle_params(params, _url, socket) do
   {:noreply, apply_action(socket, socket.assigns.live_action, params)}
 end
 
-# Assigns values to the socket for the `:edit` action.
+# Assigns Values To The Socket For The `:edit` Action.
 defp apply_action(socket, :edit, %{"id" => id}) do
   socket
   |> assign(:page_title, "Edit Message")
   |> assign(:message, Chat.get_message!(id))
 end
 
-# Assigns values to the socket for the `:new` action.
+# Assigns Values To The Socket For The `:new` Action.
 defp apply_action(socket, :new, _params) do
   socket
   |> assign(:page_title, "New Message")
   |> assign(:message, %Message{})
 end
 
-# Assigns values to the socket for the `:index` action.
+# Assigns Values To The Socket For The `:index` Action.
 defp apply_action(socket, :index, _params) do
   socket
   |> assign(:page_title, "Listing Messages")
