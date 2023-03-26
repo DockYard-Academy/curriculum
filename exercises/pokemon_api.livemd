@@ -245,6 +245,12 @@ response = Poison.decode!(response.body)
 
 </details>
 
+```elixir
+{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/?limit=1154")
+parsed = Poison.decode!(response.body)
+Enum.map(parsed["results"], fn map -> map["name"] end)
+```
+
 ## GitHub Repository
 
 Connect your `Pokelixir` project to a GitHub repository and create a README to describe the purpose of the project and what you learned building it.
