@@ -3,6 +3,16 @@ defmodule UtilsTest do
   doctest Utils
   alias Utils.Notebooks
 
+  test "all outline files have header and footer navigation" do
+    Notebooks.outline_notebooks()
+    |> Enum.each(fn notebook ->
+      content = File.read!(notebook.relative_path)
+      navigation_sections = Regex.scan(~r/\n## Navigation\n/, content)
+
+      assert length(navigation_sections) == 2, "missing navigation in #{notebook.relative_path}"
+    end)
+  end
+
   @tag :skip_ci
   test "Ensure all .livemd files are formatted." do
     Notebooks.all_livebooks()

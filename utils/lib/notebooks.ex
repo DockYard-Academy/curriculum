@@ -145,9 +145,20 @@ defmodule Utils.Notebooks do
     File.write(notebook.relative_path, notebook.content)
   end
 
+  def remove_setup_section(notebook) do
+    cleared_content =
+      Regex.replace(
+        ~r/## Setup\n(\n|.)+##/U,
+        notebook.content,
+        "##"
+      )
+
+    %Notebook{notebook | content: cleared_content}
+  end
+
   def commit_your_progress_section(notebook) do
     # adds section to the end of the file.
-    top_of_footer_expression = ~r/(## (Mark As Completed|Commit Your Progress)(\n|.)+)/
+    top_of_footer_expression = ~r/(## (:?Mark As Completed|Commit Your Progress)(\n|.)+)/
 
     cleared_content =
       Regex.replace(
@@ -161,12 +172,21 @@ defmodule Utils.Notebooks do
     %Notebook{notebook | content: content}
   end
 
-  def navigation_section(notebook) do
-    top_of_navigation_expression = ~r/## Up Next(\n|.)+/
+  def header_navigation_section(notebook) do
+    content =
+      Regex.replace(
+        ~r/## (:?Up Next|Navigation)\n(\n|.)+(?=##)/U,
+        notebook.content,
+        navigation_snippet(notebook)
+      )
 
+    %Notebook{notebook | content: content}
+  end
+
+  def footer_navigation_section(notebook) do
     cleared_content =
       Regex.replace(
-        top_of_navigation_expression,
+        ~r/## (:?Up Next|Navigation)(\n|.(?!#))+\z/,
         notebook.content,
         ""
       )
@@ -187,12 +207,12 @@ defmodule Utils.Notebooks do
 
     # indenting results in Livebook misformatting the code.
     """
-    ## Up Next
+    ## Navigation
 
     <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
     <div style="display: flex;">
     <i class="ri-home-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/start.livemd">Home</a>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
     </div>
     <div style="display: flex;">
     <i class="ri-bug-fill"></i>

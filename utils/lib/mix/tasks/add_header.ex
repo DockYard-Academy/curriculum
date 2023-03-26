@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.AddFooter do
+defmodule Mix.Tasks.AddHeader do
   @moduledoc "Add Git section to selected pages."
   @shortdoc @moduledoc
 
@@ -7,13 +7,13 @@ defmodule Mix.Tasks.AddFooter do
 
   @impl Mix.Task
   def run(_) do
-    IO.puts("Running: mix add_footer")
+    IO.puts("Running: mix add_header")
 
     Notebooks.outline_notebooks()
     |> Enum.each(fn notebook ->
       Notebooks.load(notebook)
-      |> Notebooks.commit_your_progress_section()
-      |> Notebooks.footer_navigation_section()
+      # |> Notebooks.commit_your_progress_section()
+      # |> Notebooks.footer_navigation_section()
       |> Notebooks.save()
     end)
   end

@@ -4,17 +4,23 @@ defmodule Utils.NotebooksTest do
   alias Utils.Notebooks.Notebook
   doctest Utils.Notebooks
 
+  test "footer regex" do
+    """
+    ## Navigation
+
+    """
+  end
   test "navigation_snippet/2 first notebook" do
     notebook = Notebooks.outline_notebooks() |> Enum.at(0)
     next = Notebooks.outline_notebooks() |> Enum.at(1)
 
     expected = """
-    ## Up Next
+    ## Navigation
 
     <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
     <div style="display: flex;">
     <i class="ri-home-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/start.livemd">Home</a>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
     </div>
     <div style="display: flex;">
     <i class="ri-bug-fill"></i>
@@ -40,12 +46,12 @@ defmodule Utils.NotebooksTest do
     next = Notebooks.outline_notebooks() |> Enum.at(6)
 
     expected = """
-    ## Up Next
+    ## Navigation
 
     <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
     <div style="display: flex;">
     <i class="ri-home-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/start.livemd">Home</a>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
     </div>
     <div style="display: flex;">
     <i class="ri-bug-fill"></i>
@@ -70,12 +76,12 @@ defmodule Utils.NotebooksTest do
     prev = Notebooks.outline_notebooks() |> Enum.at(-2)
 
     expected = """
-    ## Up Next
+    ## Navigation
 
     <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
     <div style="display: flex;">
     <i class="ri-home-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/start.livemd">Home</a>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
     </div>
     <div style="display: flex;">
     <i class="ri-bug-fill"></i>
