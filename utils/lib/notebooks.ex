@@ -100,18 +100,19 @@ defmodule Utils.Notebooks do
   ]
 
   def link_to_docs(notebook) do
-    Enum.reduce(
-      @documented_libraries,
-      notebook.content,
-      fn {module, version}, content ->
-        "Elixir." <> module_name = to_string(module)
+    content =
+      Enum.reduce(
+        @documented_libraries,
+        notebook.content,
+        fn {module, version}, content ->
+          "Elixir." <> module_name = to_string(module)
 
-        content =
-          Regex.replace(~r/`#{module_name}`/, content, fn _ ->
-            "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
-          end)
+          content =
+            Regex.replace(~r/`#{module_name}`/, content, fn _ ->
+              "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
+            end)
 
-        module_regex = ~r/
+          module_regex = ~r/
         \`                                   # backtick
         (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
         \.                                   # period
@@ -121,11 +122,13 @@ defmodule Utils.Notebooks do
         \`                                   # backtick
         /x
 
-        Regex.replace(module_regex, content, fn match, nested_module, function, arity ->
-          "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
-        end)
-      end
-    )
+          Regex.replace(module_regex, content, fn match, nested_module, function, arity ->
+            "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
+          end)
+        end
+      )
+
+    %Notebook{notebook | content: content}
   end
 
   def module_url(module_name) do
