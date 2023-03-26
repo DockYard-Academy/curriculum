@@ -12,7 +12,9 @@ defmodule Mix.Tasks.FormatNotebooks do
 
     Notebooks.all_notebooks()
     |> Enum.each(fn notebook ->
-      Notebooks.load(notebook)
+      notebook
+      |> Notebooks.load()
+      |> Notebooks.link_to_docs()
       |> Notebooks.format_headings()
       |> Notebooks.livebook_formatter()
       |> Notebooks.save()

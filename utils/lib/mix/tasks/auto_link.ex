@@ -26,34 +26,38 @@ defmodule Mix.Tasks.AutoLink do
   @impl Mix.Task
   def run(_) do
     IO.puts("Running: mix auto_link")
-    Notebooks.all_livebooks()
-    |> Enum.map(fn file_name ->
-      file = File.read!(file_name)
-      livebook_link_regex = ~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*\?*)\/([1-9])\`/
+    # Notebooks.all_notebooks()
+    # |> Enum.each(fn notebook ->
+    #   Notebooks.auto_link_to_documentation()
+    # end)
+    # Notebooks.all_livebooks()
+    # |> Enum.map(fn file_name ->
+    #   file = File.read!(file_name)
+    #   livebook_link_regex = ~r/\`([A-Z]\w+)\`|\`(\w+)\.(\w+!*\?*)\/([1-9])\`/
 
-      file =
-        Regex.replace(livebook_link_regex, file, fn
-          full, module, "", "", "" ->
-            if is_documented_module?(module) do
-              doc_link = doc_link_from_module(module)
+    #   file =
+    #     Regex.replace(livebook_link_regex, file, fn
+    #       full, module, "", "", "" ->
+    #         if is_documented_module?(module) do
+    #           doc_link = doc_link_from_module(module)
 
-              "[#{module}](https://hexdocs.pm/#{doc_link}/#{module}.html)"
-            else
-              full
-            end
+    #           "[#{module}](https://hexdocs.pm/#{doc_link}/#{module}.html)"
+    #         else
+    #           full
+    #         end
 
-          full, _, module, function, arity ->
-            if is_documented_module?(module) do
-              doc_link = doc_link_from_module(module)
+    #       full, _, module, function, arity ->
+    #         if is_documented_module?(module) do
+    #           doc_link = doc_link_from_module(module)
 
-              "[#{module}.#{function}/#{arity}](https://hexdocs.pm/#{doc_link}/#{module}.html##{function}/#{arity})"
-            else
-              full
-            end
-        end)
+    #           "[#{module}.#{function}/#{arity}](https://hexdocs.pm/#{doc_link}/#{module}.html##{function}/#{arity})"
+    #         else
+    #           full
+    #         end
+    #     end)
 
-      File.write!(file_name, file)
-    end)
+    #   File.write!(file_name, file)
+    # end)
   end
 
   defp doc_link_from_module(module) do

@@ -75,79 +75,6 @@ defmodule Utils.Notebooks do
     |> Enum.reject(fn file_name -> String.contains?(String.downcase(file_name), "deprecated") end)
   end
 
-  @doc """
-  Capitalize first letter of string without downcasing rest of string.
-
-    ## Examples
-
-      iex> Utils.Notebooks.capitalize_first("hello")
-      "Hello"
-
-      iex> Utils.Notebooks.capitalize_first("genServer")
-      "GenServer"
-  """
-  def capitalize_first(str) do
-    {first, rest} = String.split_at(str, 1)
-    String.capitalize(first) <> rest
-  end
-
-  @doc """
-  Convert string to title case downcasing minor words and capitalizing first letter of major words.
-
-    ## Examples
-
-    iex> Utils.Notebooks.to_title_case("bottles of soda")
-    "Bottles of Soda"
-
-    iex> Utils.Notebooks.to_title_case("my_function/1")
-    "my_function/1"
-
-    iex> Utils.Notebooks.to_title_case(":atom")
-    ":atom"
-
-    iex> Utils.Notebooks.to_title_case("Bottles Of Soda")
-    "Bottles of Soda"
-  """
-  def to_title_case(str) do
-    String.split(str)
-    |> Enum.with_index()
-    |> Enum.map(fn
-      {word, index} ->
-        cond do
-          String.contains?(word, "/") ->
-            word
-
-          index == 0 ->
-            capitalize_first(word)
-
-          String.downcase(word) in @minor_words ->
-            String.downcase(word)
-
-          true ->
-            capitalize_first(word)
-        end
-    end)
-    |> Enum.join(" ")
-  end
-
-  def navigation_blocks(outline) do
-    files =
-      Regex.scan(~r/\[([^\]]+)\]\((\w+\/[^\)]+\.livemd)\)/, outline)
-      |> Enum.map(fn [_, lesson_name, file_name] ->
-        {file_name, "[#{lesson_name}](../#{file_name})"}
-      end)
-
-    Enum.reduce(Enum.with_index(files), %{}, fn {{file_name, _}, index}, acc ->
-      prev = index > 0 && Enum.at(files, index - 1)
-      next = Enum.at(files, index + 1)
-
-      Map.put(acc, file_name, %{
-        prev: (prev && elem(prev, 1)) || "-",
-        next: (next && elem(next, 1)) || "-"
-      })
-    end)
-  end
-
   def load(notebook) do
     content = File.read!(notebook.relative_path)
     %Notebook{notebook | content: content}
@@ -155,6 +82,63 @@ defmodule Utils.Notebooks do
 
   def save(notebook) do
     File.write(notebook.relative_path, notebook.content)
+  end
+
+  @documented_libraries [
+    {Kino, "0.9.0"},
+    {ExUnit, "1.14.3"},
+    {Benchee, "1.1.0"},
+    {IEx, "1.14.3"},
+    {Mix, "1.14.3"},
+    {Poison, "5.0.0"},
+    {HTTPoison, "2.1.0"},
+    {Finch, "0.15.0"},
+    {Timex, "3.7.11"},
+    {Ecto, "3.9.5"},
+    {Phoenix.HTML, "3.3.1"},
+    {Phoenix, "1.7.2"}
+  ]
+
+  def link_to_docs(notebook) do
+    Enum.reduce(
+      @documented_libraries,
+      notebook.content,
+      fn {module, version}, content ->
+        "Elixir." <> module_name = to_string(module)
+
+        content =
+          Regex.replace(~r/`#{module_name}`/, content, fn _ ->
+            "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
+          end)
+
+        module_regex = ~r/
+        \`                                   # backtick
+        (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
+        \.                                   # period
+        (\w+)                                # function
+        \/                                   # slash
+        (\d)                                 # arity
+        \`                                   # backtick
+        /x
+
+        Regex.replace(module_regex, content, fn match, nested_module, function, arity ->
+          "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
+        end)
+      end
+    )
+  end
+
+  def module_url(module_name) do
+    case module_name do
+      "Phoenix.HTML" ->
+        "phoenix_html"
+
+      _ ->
+        Regex.scan(~r/[A-Z]+[a-z]+/, module_name)
+        |> List.flatten()
+        |> Enum.map(&String.downcase/1)
+        |> Enum.join("_")
+    end
   end
 
   def format_headings(notebook) do

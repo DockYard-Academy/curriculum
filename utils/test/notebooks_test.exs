@@ -26,6 +26,56 @@ defmodule Utils.NotebooksTest do
            } = Notebooks.format_headings(notebook)
   end
 
+  test "link_to_docs/1" do
+    # [#{module}](https://hexdocs.pm/#{doc_link}/#{module}.html)
+    # https://hexdocs.pm/#{doc_link}/#{module}.html##{function}/#{arity})
+    # [
+    #   {:kino, "0.9.0"},
+    #   {:phoenix, "1.7.2"},
+    #   {:benchee, "1.1.0"},
+    #   {:poison, "5.0.0"},
+    #   {:finch, "0.15.0"},
+    #   {:timex, "3.7.11"},
+    #   {:ecto, "3.9.5"}
+    # ]
+
+    notebook = %Notebook{
+      content: """
+      `ExUnit`
+      `Kino`
+      `Benchee`
+      `IEx`
+      `Mix`
+      `Poison`
+      `HTTPoison`
+      `Finch`
+      `Timex`
+      `Ecto`
+      `Phoenix`
+      `ExUnit.run/1`
+      `Phoenix.Flash.get_flash/2`
+      `Phoenix.HTML.Form.checkbox/3`
+      """
+    }
+
+    assert Notebooks.link_to_docs(notebook) == """
+           [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html)
+           [Kino](https://hexdocs.pm/kino/Kino.html)
+           [Benchee](https://hexdocs.pm/benchee/Benchee.html)
+           [IEx](https://hexdocs.pm/iex/IEx.html)
+           [Mix](https://hexdocs.pm/mix/Mix.html)
+           [Poison](https://hexdocs.pm/poison/Poison.html)
+           [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html)
+           [Finch](https://hexdocs.pm/finch/Finch.html)
+           [Timex](https://hexdocs.pm/timex/Timex.html)
+           [Ecto](https://hexdocs.pm/ecto/Ecto.html)
+           [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html)
+           [ExUnit.run/1](https://hexdocs.pm/ex_unit/ExUnit.html#run/1)
+           [Phoenix.Flash.get_flash/2](https://hexdocs.pm/phoenix/Phoenix.Flash.html#get_flash/2)
+           [Phoenix.HTML.Form.checkbox/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#checkbox/3)
+           """
+  end
+
   test "navigation_snippet/1 first notebook" do
     notebook = Notebooks.outline_notebooks() |> Enum.at(0)
     next = Notebooks.outline_notebooks() |> Enum.at(1)
