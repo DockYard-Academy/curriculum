@@ -14,7 +14,7 @@ defmodule Mix.Tasks.UpdateDeps do
     |> Enum.each(fn notebook ->
       notebook
       |> Notebooks.load()
-      |> Notebooks.update_deps()
+      |> Notebooks.update_dependencies()
       |> Notebooks.save()
     end)
   end
