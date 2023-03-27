@@ -4,6 +4,32 @@ defmodule Utils.NotebooksTest do
   alias Utils.Notebooks.Notebook
   doctest Utils.Notebooks
 
+  test "deprecate/1" do
+    file_path = "../reading/unused_example.livemd"
+    deprecated_file_path = "../reading/deprecated_unused_example.livemd"
+    File.write(file_path, "## Title")
+
+    Notebooks.deprecate(%Notebook{relative_path: file_path})
+
+    assert File.exists?(deprecated_file_path)
+    refute File.exists?(file_path)
+
+    on_exit(fn ->
+      IO.inspect("EXIT")
+      IO.inspect(File.cwd())
+      File.rm(deprecated_file_path)
+      File.rm(file_path)
+    end)
+  end
+
+  test "unused_notebooks/0" do
+    assert Enum.all?(Notebooks.unused_notebooks(), fn notebook -> is_nil(notebook.index) end)
+  end
+
+  test "outline_notebooks/0" do
+    assert Enum.all?(Notebooks.outline_notebooks(), fn notebook -> notebook.index end)
+  end
+
   test "format_headings/1" do
     notebook = %Notebook{
       content: """

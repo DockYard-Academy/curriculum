@@ -1,28 +1,42 @@
 defmodule Utils.Notebooks do
   alias Utils.Notebooks.Notebook
-  @minor_words ["and", "the", "in", "to", "of"]
+  require Logger
 
-  @outline_notebooks Regex.scan(
-                       ~r/(?:reading|exercises)\/[^\/]+.livemd/,
-                       File.read!("../start.livemd")
-                     )
+  @outline_relative_paths Regex.scan(
+                            ~r/(?:reading|exercises)\/[^\/]+.livemd/,
+                            File.read!("../start.livemd")
+                          )
+                          |> Enum.map(fn name -> Path.join("../", name) end)
+
+  @outline_notebooks @outline_relative_paths
                      |> Enum.with_index()
-                     |> Enum.map(fn {[path], index} ->
+                     |> Enum.map(fn {relative_path, index} ->
                        Notebook.new(%{
-                         relative_path: Path.join("../", path),
+                         relative_path: relative_path,
                          index: index
                        })
                      end)
 
+  @unused_notebooks Path.wildcard("../*/*.livemd")
+                    |> Kernel.--(@outline_relative_paths)
+                    |> Enum.map(fn relative_path ->
+                      Notebook.new(%{relative_path: relative_path})
+                    end)
+
+  @all_notebooks [
+    Notebook.new(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
+  ]
+
   def all_notebooks do
-    ["../start.livemd" | Path.wildcard("../*/*.livemd")]
-    |> Enum.map(fn relative_path ->
-      Notebook.new(%{relative_path: relative_path})
-    end)
+    @all_notebooks
   end
 
   def outline_notebooks do
     @outline_notebooks
+  end
+
+  def unused_notebooks do
+    @unused_notebooks
   end
 
   def stream_lines(file_names, function) do
@@ -49,6 +63,25 @@ defmodule Utils.Notebooks do
   def livebook_formatter(notebook) do
     formatted_content = LivebookFormatter.reformat(notebook.content)
     %Notebook{notebook | content: formatted_content}
+  end
+
+  def deprecate(notebook) do
+    case notebook.name do
+      "deprecated_" <> _ ->
+        :ignore
+
+      "_template" <> _ ->
+        :ignore
+
+      _ ->
+        deprecated_name =
+          Path.join([
+            Path.dirname(notebook.relative_path),
+            "deprecated_" <> Path.basename(notebook.relative_path)
+          ])
+
+        File.rename(notebook.relative_path, deprecated_name)
+    end
   end
 
   def all_livebooks do
@@ -104,7 +137,7 @@ defmodule Utils.Notebooks do
       Enum.reduce(
         @documented_libraries,
         notebook.content,
-        fn {module, version}, content ->
+        fn {module, _version}, content ->
           "Elixir." <> module_name = to_string(module)
 
           content =
@@ -122,7 +155,7 @@ defmodule Utils.Notebooks do
         \`                                   # backtick
         /x
 
-          Regex.replace(module_regex, content, fn match, nested_module, function, arity ->
+          Regex.replace(module_regex, content, fn _match, nested_module, function, arity ->
             "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
           end)
         end
