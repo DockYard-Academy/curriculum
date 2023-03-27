@@ -84,7 +84,7 @@ See [start.livemd](https://github.com/DockYard-Academy/curriculum/blob/main/star
 * Phoenix And Ecto Many-to-Many Relationships
 * Phoenix And Ecto One-to-One Relationships
 * Deployment
-## Group Project Presentation
+* Group Project Presentation
 ## LiveView
 * LiveView
 * LiveView And Ecto
@@ -101,4 +101,5 @@ See [start.livemd](https://github.com/DockYard-Academy/curriculum/blob/main/star
 * Double-Ended Queues
 * Worker Pools
 * Rubix Cube Project
-<!-- course-outline-end -->
+
+<!-- course-outline-start -->

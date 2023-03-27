@@ -4,42 +4,39 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
 
   use Mix.Task
 
-  @root_path Path.expand("../")
-  @readme_path Path.join([@root_path, "README.md"])
-  @course_outline_path Path.join([@root_path, "start.livemd"])
-  @outline_start_comment "<!-- course-outline-start -->"
-  @outline_end_comment "<!-- course-outline-end -->"
+  @readme_path "../README.md"
+  @course_outline_path "../start.livemd"
   @ignored_sections ["## Overview", "### Welcome"]
 
   def run(_args) do
     IO.puts("Running: mix update_readme_outline")
 
-    course_outline = File.read!(@course_outline_path)
     readme = File.read!(@readme_path)
-    [start, _outline, finish] = split_on_outline(readme)
-    simplified_outline = sections(course_outline)
 
-    File.write!(
-      @readme_path,
-      start <>
-        @outline_start_comment <> "\n" <> simplified_outline <> @outline_end_comment <> finish
-    )
+    content =
+      Regex.replace(
+        ~r/<!-- course-outline-start -->(?:.|\n)*<!-- course-outline-end -->/,
+        readme,
+        """
+        <!-- course-outline-start -->
+        #{outline_snippet()}
+        <!-- course-outline-start -->
+        """
+      )
+
+    File.write!(@readme_path, content)
   end
 
-  @spec split_on_outline(String.t()) :: [String.t()]
-  def split_on_outline(content) do
-    String.split(content, ~r/(<!-- course-outline-start -->)|(<!-- course-outline-end -->)/,
-      trim: true
-    )
-  end
+  @spec outline_snippet() :: String.t()
+  def outline_snippet do
+    outline = File.read!(@course_outline_path)
 
-  @spec sections(String.t()) :: String.t()
-  def sections(outline) do
     Regex.scan(~r/(\#{2,3})(.+)/, outline)
     |> Enum.reject(fn [full, _, _] -> full in @ignored_sections end)
-    |> Enum.map_join(fn
+    |> Enum.map(fn
       [full, "##", _heading] -> full <> "\n"
       [_, "###", subheading] -> "*#{subheading}\n"
     end)
+    |> Enum.join()
   end
 end
