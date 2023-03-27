@@ -67,8 +67,6 @@ defmodule Utils.NotebooksTest do
     refute File.exists?(file_path)
 
     on_exit(fn ->
-      IO.inspect("EXIT")
-      IO.inspect(File.cwd())
       File.rm(deprecated_file_path)
       File.rm(file_path)
     end)
