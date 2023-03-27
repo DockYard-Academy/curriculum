@@ -4,19 +4,6 @@ defmodule UtilsTest do
   alias Utils.Notebooks
   alias Utils.Notebooks.Notebook
 
-  test "library versions are up to date" do
-    %Notebook{
-      content: """
-      {:jason, "~> 1.4"},
-      {:kino, "~> 0.8.0", override: true},
-      {:youtube, github: "brooklinjazz/youtube"},
-      {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-      {:httpoison, "~> 1.8"},
-      {:poison, "~> 5.0"}
-      """
-    }
-  end
-
   test "all outline files have header and footer navigation" do
     Notebooks.outline_notebooks()
     |> Enum.each(fn notebook ->
