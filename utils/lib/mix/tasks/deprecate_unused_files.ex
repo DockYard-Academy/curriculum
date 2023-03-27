@@ -7,6 +7,8 @@ defmodule Mix.Tasks.DeprecateUnusedFiles do
 
   @impl Mix.Task
   def run(_) do
+    IO.puts("Running: mix deprecate_unused_files")
+
     Notebooks.unused_notebooks()
     |> Enum.each(fn notebook ->
       Notebooks.deprecate(notebook)
