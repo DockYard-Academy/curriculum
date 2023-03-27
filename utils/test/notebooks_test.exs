@@ -4,6 +4,58 @@ defmodule Utils.NotebooksTest do
   alias Utils.Notebooks.Notebook
   doctest Utils.Notebooks
 
+  test "update_dependencies" do
+    notebook = %Notebook{
+      content: """
+      Mix.install([
+        {:jason, "~> 1.2"},
+        {:kino, "~> 0.8.0", override: true},
+        {:youtube, github: "brooklinjazz/youtube"},
+        {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+        {:benchee, "~> 1.0"},
+        {:poison, "~> 4.0.0"},
+        {:httpoison, "~> 2.0.0"},
+        {:finch, "~> 0.14.0"},
+        {:timex, "~> 3.6"},
+        {:ecto, "~> 3.9"},
+        {:faker, "~> 0.16.0"},
+        {:vega_lite, "~> 0.1.5"},
+        {:kino_vega_lite, "~> 0.1.7"},
+        {:hackney, "~> 1.17"},
+        {:oban, "~> 2.13"},
+        {:kino_db, "~> 0.2.0"},
+        {:postgrex, "~> 0.16.4"},
+        {:poolboy, "~> 1.4"}
+      ])
+      """
+    }
+
+    assert Notebooks.update_dependencies(notebook) == %Notebook{
+             content: """
+             Mix.install([
+               {:jason, "~> 1.4"},
+               {:kino, "~> 0.9", override: true},
+               {:youtube, github: "brooklinjazz/youtube"},
+               {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+               {:benchee, "~> 1.1"},
+               {:poison, "~> 5.0.0"},
+               {:httpoison, "~> 2.1.0"},
+               {:finch, "~> 0.15.0"},
+               {:timex, "~> 3.7.11"},
+               {:ecto, "~> 3.9.5"},
+               {:faker, "~> 0.17.0"},
+               {:vega_lite, "~> 0.1.6"},
+               {:kino_vega_lite, "~> 0.1.8"},
+               {:hackney, "~> 1.18"},
+               {:oban, "~> 2.14"},
+               {:kino_db, "~> 0.2.1"},
+               {:postgrex, "~> 0.16.5"},
+               {:poolboy, "~> 1.5"}
+             ])
+             """
+           }
+  end
+
   test "deprecate/1" do
     file_path = "../reading/unused_example.livemd"
     deprecated_file_path = "../reading/deprecated_unused_example.livemd"

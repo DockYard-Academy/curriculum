@@ -27,17 +27,45 @@ defmodule Utils.Notebooks do
     Notebook.new(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
   ]
 
-  def all_notebooks do
-    @all_notebooks
-  end
+  @notebook_dependencies [
+    {:kino, "0.9"},
+    {:benchee, "1.1"},
+    {:poison, "5.0.0"},
+    {:httpoison, "2.1.0"},
+    {:finch, "0.15.0"},
+    {:timex, "3.7.11"},
+    {:ecto, "3.9.5"},
+    {:jason, "1.4"},
+    {:faker, "0.17.0"},
+    {:vega_lite, "0.1.6"},
+    {:kino_vega_lite, "0.1.8"},
+    {:hackney, "1.18"},
+    {:oban, "2.14"},
+    {:kino_db, "0.2.1"},
+    {:postgrex, "0.16.5"},
+    {:poolboy, "1.5"}
+  ]
 
-  def outline_notebooks do
-    @outline_notebooks
-  end
+  @documented_libraries [
+    Kino,
+    ExUnit,
+    Benchee,
+    IEx,
+    Mix,
+    Poison,
+    HTTPoison,
+    Finch,
+    Timex,
+    Ecto,
+    Phoenix.HTML,
+    Phoenix
+  ]
 
-  def unused_notebooks do
-    @unused_notebooks
-  end
+  def all_notebooks, do: @all_notebooks
+  def outline_notebooks, do: @outline_notebooks
+  def unused_notebooks, do: @unused_notebooks
+  def documented_libraries, do: @documented_libraries
+  def notebook_dependencies, do: @notebook_dependencies
 
   def stream_lines(file_names, function) do
     arity = :erlang.fun_info(function)[:arity]
@@ -84,6 +112,15 @@ defmodule Utils.Notebooks do
     end
   end
 
+  def update_dependencies(notebook) do
+    content =
+      Enum.reduce(notebook_dependencies(), notebook.content, fn {dependency, version}, acc ->
+        Regex.replace(~r/#{dependency}, \"~> .+\"/, acc, "#{dependency}, \"~> #{version}\"")
+      end)
+
+    %Notebook{notebook | content: content}
+  end
+
   def all_livebooks do
     reading() ++ exercises() ++ ["../start.livemd"]
   end
@@ -117,43 +154,28 @@ defmodule Utils.Notebooks do
     File.write(notebook.relative_path, notebook.content)
   end
 
-  @documented_libraries [
-    {Kino, "0.9.0"},
-    {ExUnit, "1.14.3"},
-    {Benchee, "1.1.0"},
-    {IEx, "1.14.3"},
-    {Mix, "1.14.3"},
-    {Poison, "5.0.0"},
-    {HTTPoison, "2.1.0"},
-    {Finch, "0.15.0"},
-    {Timex, "3.7.11"},
-    {Ecto, "3.9.5"},
-    {Phoenix.HTML, "3.3.1"},
-    {Phoenix, "1.7.2"}
-  ]
-
   def link_to_docs(notebook) do
     content =
       Enum.reduce(
         @documented_libraries,
         notebook.content,
-        fn {module, _version}, content ->
+        fn module, acc ->
           "Elixir." <> module_name = to_string(module)
 
           content =
-            Regex.replace(~r/`#{module_name}`/, content, fn _ ->
+            Regex.replace(~r/`#{module_name}`/, acc, fn _ ->
               "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
             end)
 
           module_regex = ~r/
-        \`                                   # backtick
-        (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
-        \.                                   # period
-        (\w+)                                # function
-        \/                                   # slash
-        (\d)                                 # arity
-        \`                                   # backtick
-        /x
+          \`                                   # backtick
+          (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
+          \.                                   # period
+          (\w+)                                # function
+          \/                                   # slash
+          (\d)                                 # arity
+          \`                                   # backtick
+          /x
 
           Regex.replace(module_regex, content, fn _match, nested_module, function, arity ->
             "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"

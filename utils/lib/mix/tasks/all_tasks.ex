@@ -7,6 +7,7 @@ defmodule Mix.Tasks.AllTasks do
   @requirements [
     "deprecate_unused_files",
     "add_notebook_boilerplate",
+    "update_deps",
     "format_notebooks",
     "update_readme_outline"
   ]
