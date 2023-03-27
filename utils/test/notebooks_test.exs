@@ -103,18 +103,6 @@ defmodule Utils.NotebooksTest do
   end
 
   test "link_to_docs/1" do
-    # [#{module}](https://hexdocs.pm/#{doc_link}/#{module}.html)
-    # https://hexdocs.pm/#{doc_link}/#{module}.html##{function}/#{arity})
-    # [
-    #   {:kino, "0.9.0"},
-    #   {:phoenix, "1.7.2"},
-    #   {:benchee, "1.1.0"},
-    #   {:poison, "5.0.0"},
-    #   {:finch, "0.15.0"},
-    #   {:timex, "3.7.11"},
-    #   {:ecto, "3.9.5"}
-    # ]
-
     notebook = %Notebook{
       content: """
       `ExUnit`

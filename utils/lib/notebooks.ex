@@ -1,4 +1,9 @@
 defmodule Utils.Notebooks do
+  @moduledoc """
+  Documentation for the Notebooks module.
+
+  The Notebooks module contains functions for working with curriculum .livemd notebooks as Notebook structs.
+  """
   alias Utils.Notebooks.Notebook
   require Logger
 
@@ -27,6 +32,8 @@ defmodule Utils.Notebooks do
     Notebook.new(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
   ]
 
+  @number_of_notebooks length(@outline_notebooks)
+
   @notebook_dependencies [
     {:kino, "0.9"},
     {:benchee, "1.1"},
@@ -44,6 +51,11 @@ defmodule Utils.Notebooks do
     {:kino_db, "0.2.1"},
     {:postgrex, "0.16.5"},
     {:poolboy, "1.5"}
+    # dependencies without versions are not included
+    # {:youtube, github: "brooklinjazz/youtube"},
+    # {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+    # {:visual, github: "brooklinjazz/visual"},
+    # {:smart_animation, github: "brooklinjazz/smart_animation"}
   ]
 
   @documented_libraries [
@@ -67,27 +79,6 @@ defmodule Utils.Notebooks do
   def documented_libraries, do: @documented_libraries
   def notebook_dependencies, do: @notebook_dependencies
 
-  def stream_lines(file_names, function) do
-    arity = :erlang.fun_info(function)[:arity]
-
-    Stream.each(file_names, fn file_name ->
-      file_name
-      |> File.stream!([], :line)
-      |> Stream.with_index()
-      |> Stream.map(fn {line, index} ->
-        line_number = index + 1
-
-        case arity do
-          1 -> function.(line)
-          2 -> function.(line, file_name)
-          3 -> function.(line, file_name, line_number)
-        end
-      end)
-      |> Stream.run()
-    end)
-    |> Stream.run()
-  end
-
   def livebook_formatter(notebook) do
     formatted_content = LivebookFormatter.reformat(notebook.content)
     %Notebook{notebook | content: formatted_content}
@@ -96,10 +87,10 @@ defmodule Utils.Notebooks do
   def deprecate(notebook) do
     case notebook.name do
       "deprecated_" <> _ ->
-        :ignore
+        :ignored
 
       "_template" <> _ ->
-        :ignore
+        :ignored
 
       _ ->
         deprecated_name =
@@ -109,6 +100,7 @@ defmodule Utils.Notebooks do
           ])
 
         File.rename(notebook.relative_path, deprecated_name)
+        deprecated_name
     end
   end
 
@@ -119,30 +111,6 @@ defmodule Utils.Notebooks do
       end)
 
     %Notebook{notebook | content: content}
-  end
-
-  def all_livebooks do
-    reading() ++ exercises() ++ ["../start.livemd"]
-  end
-
-  def reading do
-    fetch_livebooks("../reading/")
-  end
-
-  def exercises do
-    fetch_livebooks("../exercises/")
-    |> Enum.reject(&(Path.basename(&1) in exercises_exceptions()))
-  end
-
-  def exercises_exceptions do
-    ["_template.livemd"]
-  end
-
-  defp fetch_livebooks(path) do
-    File.ls!(path)
-    |> Stream.filter(&String.ends_with?(&1, ".livemd"))
-    |> Enum.map(&(path <> &1))
-    |> Enum.reject(fn file_name -> String.contains?(String.downcase(file_name), "deprecated") end)
   end
 
   def load(notebook) do
@@ -194,8 +162,7 @@ defmodule Utils.Notebooks do
       _ ->
         Regex.scan(~r/[A-Z]+[a-z]+/, module_name)
         |> List.flatten()
-        |> Enum.map(&String.downcase/1)
-        |> Enum.join("_")
+        |> Enum.map_join("_", &String.downcase/1)
     end
   end
 
@@ -207,8 +174,7 @@ defmodule Utils.Notebooks do
 
   def title_case(heading) do
     String.split(heading)
-    |> Enum.map(&:string.titlecase/1)
-    |> Enum.join(" ")
+    |> Enum.map_join(" ", &:string.titlecase/1)
   end
 
   def remove_setup_section(notebook) do
@@ -236,6 +202,27 @@ defmodule Utils.Notebooks do
     content = cleared_content <> commit_your_progress_snippet(notebook)
 
     %Notebook{notebook | content: content}
+  end
+
+  def commit_your_progress_snippet(notebook) do
+    """
+    ## Commit Your Progress
+
+    DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+    Run `git status` to ensure there are no undesirable changes.
+    Then run the following in your command line from the `curriculum` folder to commit your progress.
+    ```
+    $ git add .
+    $ git commit -m "finish #{notebook.title} #{notebook.type}"
+    $ git push
+    ```
+
+    We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+    We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+    [Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
+    """
   end
 
   def header_navigation_section(notebook) do
@@ -266,11 +253,6 @@ defmodule Utils.Notebooks do
     prev_notebook = prev(notebook)
     next_notebook = next(notebook)
 
-    prev_name = (prev_notebook && prev_notebook.title) || ""
-    prev_relative_path = (prev_notebook && prev_notebook.relative_path) || ""
-    next_name = (next_notebook && next_notebook.title) || ""
-    next_relative_path = (next_notebook && next_notebook.relative_path) || ""
-
     # indenting results in Livebook misformatting the code.
     """
     ## Navigation
@@ -285,47 +267,26 @@ defmodule Utils.Notebooks do
     <a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=#{notebook.title}">Report An Issue</a>
     </div>
     <div style="display: flex;">
-    <i #{unless prev_notebook, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{prev_relative_path}">#{prev_name}</a>
+    <i #{if prev_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{Map.get(prev_notebook, :relative_path, "")}">#{Map.get(prev_notebook, :title, "")}</a>
     </div>
     <div style="display: flex;">
-    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{next_relative_path}">#{next_name}</a>
-    <i #{unless next_notebook, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
+    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{Map.get(next_notebook, :relative_path, "")}">#{Map.get(next_notebook, :title, "")}</a>
+    <i #{if next_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
     </div>
     </div>
     """
   end
 
-  def prev(%{index: 0}), do: nil
+  def prev(%{index: 0}), do: %{}
 
   def prev(notebook) do
     Enum.at(outline_notebooks(), notebook.index - 1)
   end
 
-  def next(notebook) when length(@outline_notebooks) == notebook.index + 1, do: nil
+  def next(notebook) when @number_of_notebooks == notebook.index + 1, do: %{}
 
   def next(notebook) do
     Enum.at(outline_notebooks(), notebook.index + 1)
-  end
-
-  def commit_your_progress_snippet(notebook) do
-    """
-    ## Commit Your Progress
-
-    DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
-
-    Run `git status` to ensure there are no undesirable changes.
-    Then run the following in your command line from the `curriculum` folder to commit your progress.
-    ```
-    $ git add .
-    $ git commit -m "finish #{notebook.title} #{notebook.type}"
-    $ git push
-    ```
-
-    We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
-
-    We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
-    [Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
-    """
   end
 end

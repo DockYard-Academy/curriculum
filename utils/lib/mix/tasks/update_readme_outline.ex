@@ -37,10 +37,9 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
   def sections(outline) do
     Regex.scan(~r/(\#{2,3})(.+)/, outline)
     |> Enum.reject(fn [full, _, _] -> full in @ignored_sections end)
-    |> Enum.map(fn
+    |> Enum.map_join(fn
       [full, "##", _heading] -> full <> "\n"
       [_, "###", subheading] -> "*#{subheading}\n"
     end)
-    |> Enum.join()
   end
 end

@@ -8,6 +8,7 @@ defmodule Utils.Notebooks.Notebook do
     :name,
     :relative_path,
     :title,
+    :folder,
     :type
   ]
 
@@ -15,7 +16,7 @@ defmodule Utils.Notebooks.Notebook do
   Create a new Notebook struct
 
   iex> Utils.Notebooks.Notebook.new(%{index: 0, relative_path: "../reading/strings_and_binaries.livemd"})
-  %Utils.Notebooks.Notebook{index: 0, relative_path: "../reading/strings_and_binaries.livemd", name: "strings_and_binaries", title: "Strings And Binaries", type: :reading}
+  %Utils.Notebooks.Notebook{index: 0, relative_path: "../reading/strings_and_binaries.livemd", name: "strings_and_binaries", title: "Strings And Binaries", folder: "reading", type: :reading}
   """
   require Logger
 
@@ -31,12 +32,14 @@ defmodule Utils.Notebooks.Notebook do
 
     name = Path.basename(attrs.relative_path, ".livemd")
 
+    [[folder]] = Regex.scan(~r/(?:reading|exercises)/, attrs.relative_path)
+
     type =
-      case Regex.scan(~r/(?:reading|exercise)/, attrs.relative_path) do
-        [["reading"]] -> :reading
-        [["exercise"]] -> :exercise
+      case folder do
+        "reading" -> :reading
+        "exercises" -> :exercise
       end
 
-    struct!(__MODULE__, Map.merge(attrs, %{name: name, type: type, title: title}))
+    struct!(__MODULE__, Map.merge(attrs, %{name: name, folder: folder, type: type, title: title}))
   end
 end
