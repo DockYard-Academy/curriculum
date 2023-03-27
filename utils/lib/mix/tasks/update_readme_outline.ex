@@ -12,6 +12,7 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
     IO.puts("Running: mix update_readme_outline")
 
     readme = File.read!(@readme_path)
+    outline = File.read!(@course_outline_path)
 
     content =
       Regex.replace(
@@ -19,7 +20,7 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
         readme,
         """
         <!-- course-outline-start -->
-        #{outline_snippet()}
+        #{outline_snippet(outline)}
         <!-- course-outline-start -->
         """
       )
@@ -27,10 +28,8 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
     File.write!(@readme_path, content)
   end
 
-  @spec outline_snippet() :: String.t()
-  def outline_snippet do
-    outline = File.read!(@course_outline_path)
-
+  @spec outline_snippet(String.t()) :: String.t()
+  def outline_snippet(outline) do
     Regex.scan(~r/(\#{2,3})(.+)/, outline)
     |> Enum.reject(fn [full, _, _] -> full in @ignored_sections end)
     |> Enum.map(fn
