@@ -1,0 +1,21 @@
+defmodule Mix.Tasks.AllTasks do
+  @moduledoc "Run all Mix tasks."
+  @shortdoc @moduledoc
+
+  use Mix.Task
+
+  @requirements [
+    "add_notebook_boilerplate",
+    "update_deps",
+    "format_notebooks",
+    "update_readme_outline",
+    "deprecate_unused_files"
+  ]
+
+  @impl true
+  def run(_) do
+    # runs tasks in requirements, then prints:
+    IO.puts("Finished All Tasks")
+    S
+  end
+end

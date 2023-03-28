@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Bc.FormatNotebooks do
+defmodule Mix.Tasks.FormatNotebooks do
   @moduledoc "Format Livebook notebooks."
   @shortdoc @moduledoc
 
@@ -8,13 +8,16 @@ defmodule Mix.Tasks.Bc.FormatNotebooks do
 
   @impl Mix.Task
   def run(_) do
-    Notebooks.all_livebooks()
-    |> Enum.each(fn file_name ->
-      file = File.read!(file_name)
+    IO.puts("Running: mix format_notebooks")
 
-      # loading the file in livebook adds a newline, so we add it when we format
-      # to avoid changing the file every time a student opens a .livemd file.
-      File.write(file_name, LivebookFormatter.reformat(file))
+    Notebooks.all_notebooks()
+    |> Enum.each(fn notebook ->
+      notebook
+      |> Notebooks.load!()
+      |> Notebooks.link_to_docs()
+      |> Notebooks.format_headings()
+      |> Notebooks.livebook_formatter()
+      |> Notebooks.save()
     end)
   end
 end

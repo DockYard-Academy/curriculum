@@ -3,7 +3,7 @@
 ```elixir
 Mix.install([
   {:jason, "~> 1.4"},
-  {:kino, "~> 0.8.0", override: true},
+  {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -11,12 +11,24 @@ Mix.install([
 
 ## Navigation
 
-[Return Home](../start.livemd)<span style="padding: 0 30px"></span>
-[Report An Issue](https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=)
-
-## Setup
-
-Ensure you type the `ea` keyboard shortcut to evaluate all Elixir cells before starting. Alternatively you can evaluate the Elixir cells as you read.
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Newsletter">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
 
 ## Review Questions
 
@@ -110,7 +122,7 @@ Install [Hackney](https://hex.pm/packages/hackney), which is a required dependen
 
 ## Send A Development Email
 
-### Build the Email
+### Build The Email
 
 We're going to use the IEx shell to send an email. First, create a `newsletter/emails.ex` file with the following content. This will build our email.
 
@@ -185,10 +197,10 @@ You can find the following code in `router.ex`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# Enables the Swoosh mailbox preview in development.
+# Enables The Swoosh Mailbox Preview In Development.
 #
-# Note that preview only shows emails that were sent by the same
-# node running the Phoenix server.
+# Note That Preview Only Shows Emails That Were Sent By The Same
+# Node Running The Phoenix Server.
 if Mix.env() == :dev do
   scope "/dev" do
     pipe_through :browser
@@ -198,18 +210,18 @@ if Mix.env() == :dev do
 end
 ```
 
-## Configure the Email Adapter
+## Configure The Email Adapter
 
 By default, our application uses a local development-only adapter that does not actually send emails, but instead displays them in the development mailbox for debugging purposes.You can find this configuration in `config.exs`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
+# For Production It's Recommended To Configure A Different Adapter
+# At The `config/runtime.exs`.
 config :newsletter, Newsletter.Mailer, adapter: Swoosh.Adapters.Local
 
-# Swoosh API client is needed for adapters other than SMTP.
+# Swoosh API Client Is Needed For Adapters Other Than SMTP.
 config :swoosh, :api_client, false
 ```
 
@@ -220,23 +232,23 @@ Normally we would configure this in `runtime.ex` to only run in the `:prod` envi
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# ## Configuring the Mailer
+# ## Configuring The Mailer
 #
-# In production you need to configure the mailer to use a different adapter.
-# Also, you may need to configure the Swoosh API client of your choice if you
-# are not using SMTP. Here is an example of the configuration:
+# In Production You Need To Configure The Mailer To Use A Different Adapter.
+# Also, You May Need To Configure The Swoosh API Client Of Your Choice If You
+# Are Not Using SMTP. Here Is An Example Of The Configuration:
 #
-#     config :newsletter, Newsletter.Mailer,
-#       adapter: Swoosh.Adapters.Mailgun,
-#       api_key: System.get_env("MAILGUN_API_KEY"),
-#       domain: System.get_env("MAILGUN_DOMAIN")
+# Config :newsletter, Newsletter.Mailer,
+# Adapter: Swoosh.Adapters.Mailgun,
+# Api_key: System.get_env("MAILGUN_API_KEY"),
+# Domain: System.get_env("MAILGUN_DOMAIN")
 #
-# For this example you need include a HTTP client required by Swoosh API client.
-# Swoosh supports Hackney and Finch out of the box:
+# For This Example You Need Include A HTTP Client Required By Swoosh API Client.
+# Swoosh Supports Hackney And Finch Out Of The Box:
 #
-#     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+# Config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 #
-# See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+# See Https://hexdocs.pm/swoosh/Swoosh.html#module-installation For Details.
 ```
 
 For demonstration purposes only, we're going to add the configuration to `config.ex` so that we can manually test sending emails. You should not do this in real systems, as you risk sending production emails in your development environment.
@@ -248,12 +260,12 @@ We should always protect API keys, so we'll use the `SENDGRID_API_KEY` environme
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-# config :newsletter, Newsletter.Mailer, adapter: Swoosh.Adapters.Local
+# For Production It's Recommended To Configure A Different Adapter
+# At The `config/runtime.exs`.
+# Config :newsletter, Newsletter.Mailer, Adapter: Swoosh.Adapters.Local
 
-# Swoosh API client is needed for adapters other than SMTP.
-# config :swoosh, :api_client, false
+# Swoosh API Client Is Needed For Adapters Other Than SMTP.
+# Config :swoosh, :api_client, False
 
 config :newsletter, Newsletter.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
@@ -395,7 +407,7 @@ First, add oban to your list of dependencies in `mix.exs`. Make sure your versio
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:oban, "~> 2.13"}
+{:oban, "~> 2.14"}
 ```
 
 Configure Oban in `config.exs`.
@@ -592,11 +604,11 @@ We don't want to send emails in development, so revert back to using the Local S
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
+# For Production It's Recommended To Configure A Different Adapter
+# At The `config/runtime.exs`.
 config :newsletter, Newsletter.Mailer, adapter: Swoosh.Adapters.Local
 
-# Swoosh API client is needed for adapters other than SMTP.
+# Swoosh API Client Is Needed For Adapters Other Than SMTP.
 config :swoosh, :api_client, false
 ```
 
@@ -605,23 +617,23 @@ Then configure Swoosh with SendGrid in `runtime.exs`. It should be towards the b
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# ## Configuring the Mailer
+# ## Configuring The Mailer
 #
-# In production you need to configure the mailer to use a different adapter.
-# Also, you may need to configure the Swoosh API client of your choice if you
-# are not using SMTP. Here is an example of the configuration:
+# In Production You Need To Configure The Mailer To Use A Different Adapter.
+# Also, You May Need To Configure The Swoosh API Client Of Your Choice If You
+# Are Not Using SMTP. Here Is An Example Of The Configuration:
 #
-#     config :newsletter, Newsletter.Mailer,
-#       adapter: Swoosh.Adapters.Mailgun,
-#       api_key: System.get_env("MAILGUN_API_KEY"),
-#       domain: System.get_env("MAILGUN_DOMAIN")
+# Config :newsletter, Newsletter.Mailer,
+# Adapter: Swoosh.Adapters.Mailgun,
+# Api_key: System.get_env("MAILGUN_API_KEY"),
+# Domain: System.get_env("MAILGUN_DOMAIN")
 #
-# For this example you need include a HTTP client required by Swoosh API client.
-# Swoosh supports Hackney and Finch out of the box:
+# For This Example You Need Include A HTTP Client Required By Swoosh API Client.
+# Swoosh Supports Hackney And Finch Out Of The Box:
 #
-#     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+# Config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 #
-# See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+# See Https://hexdocs.pm/swoosh/Swoosh.html#module-installation For Details.
 config :newsletter, Newsletter.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: System.get_env("SENDGRID_API_KEY")
@@ -641,7 +653,7 @@ Clean up the project code and ensure all tests pass.
 mix test
 ```
 
-## Connect to GitHub
+## Connect To GitHub
 
 This newsletter can serve as a project for your future portfolio.
 
@@ -654,68 +666,41 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [HexDocs: Oban](https://hexdocs.pm/oban/Oban.html)
 * [HexDocs: Swoosh](https://hexdocs.pm/swoosh/Swoosh.html)
 
-## Mark As Completed
-
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"newsletter_reading\"\n    \"exercises\" -> \"newsletter_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-```elixir
-file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
-
-save_name =
-  case Path.basename(__DIR__) do
-    "reading" -> "newsletter_reading"
-    "exercises" -> "newsletter_exercise"
-  end
-
-progress_path = __DIR__ <> "/../progress.json"
-existing_progress = File.read!(progress_path) |> Jason.decode!()
-
-default = Map.get(existing_progress, save_name, false)
-
-form =
-  Kino.Control.form(
-    [
-      completed: input = Kino.Input.checkbox("Mark As Completed", default: default)
-    ],
-    report_changes: true
-  )
-
-Task.async(fn ->
-  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do
-    File.write!(
-      progress_path,
-      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)
-    )
-  end
-end)
-
-form
-```
-
 ## Commit Your Progress
 
-Run the following in your command line from the curriculum folder to track and save your progress in a Git commit.
-Ensure that you do not already have undesired or unrelated changes by running `git status` or by checking the source control tab in Visual Studio Code.
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
 
 ```
-$ git checkout -b newsletter-reading
 $ git add .
-$ git commit -m "finish newsletter reading"
-$ git push origin newsletter-reading
+$ git commit -m "finish Newsletter reading"
+$ git push
 ```
 
-Create a pull request from your `newsletter-reading` branch to your `solutions` branch.
-Please do not create a pull request to the DockYard Academy repository as this will spam our PR tracker.
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
 
-**DockYard Academy Students Only:**
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+[Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
 
-Notify your instructor by including `@BrooklinJazz` in your PR description to get feedback.
-You (or your instructor) may merge your PR into your solutions branch after review.
+## Navigation
 
-If you are interested in joining the next academy cohort, [sign up here](https://academy.dockyard.com/) to receive more news when it is available.
-
-## Up Next
-
-| Previous                                                               | Next                                                  |
-| ---------------------------------------------------------------------- | ----------------------------------------------------: |
-| [PicChat: Infinite Scroll](../reading/pic_chat_infinite_scroll.livemd) | [Lists and Tuples](../reading/lists_vs_tuples.livemd) |
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Newsletter">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

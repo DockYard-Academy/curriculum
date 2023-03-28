@@ -3,7 +3,7 @@
 ```elixir
 Mix.install([
   {:jason, "~> 1.4"},
-  {:kino, "~> 0.8.0", override: true},
+  {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -39,7 +39,7 @@ Using the command line, create a new project in the `projects` folder called `jo
 mix new journal
 ```
 
-## Configure the Project For the Command Line
+## Configure The Project For The Command Line
 
 We want to be able to use the command line to execute this project.
 
@@ -115,7 +115,7 @@ With no arguments provided, the `./journal` command should create a markdown fil
 The files contents should be blank except for a title matching todays date.
 
 ```md
-# yyyy-mm-dd
+# Yyyy-mm-dd
 ```
 
 Implement the `Journal.main/1` function when given no arguments.
@@ -128,12 +128,12 @@ Once complete, run the following from the command line.
 And ensure it generated a `entries/yyyy-mm-dd.md` file with the following content.
 
 ```
-# yyyy-mm-dd
+# Yyyy-mm-dd
 ```
 
 Where `yyyy-mm-dd` is the current date. i.e. `2022-05-25`.
 
-## Add the --folder Switch
+## Add The --folder Switch
 
 Command line applications use **switches** to alter functionality.
 You've already used a switch whenever you make a git commit.
@@ -163,7 +163,7 @@ Specify the `:switches` in a keyword list with their values. For example, a `--f
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# journal.ex
+# Journal.ex
 def main(args) do
   options = [switches: [folder: :string]]
   {opts, _, _} = OptionParser.parse(args, options)
@@ -182,7 +182,7 @@ Now `opts` for the following command would be: `[folder: "example"]`.
 Implement the `--folder` switch to store journal entries in a different folder.
 Continue to use `test_entries` if the `--folder` switch is not provided.
 
-## Add the --file Switch
+## Add The --file Switch
 
 Implement the `--file` switch, which should override the default file name.
 
@@ -192,7 +192,7 @@ So the following would create a new file `test.md`.
 ./journal --file test
 ```
 
-## Add the --title Switch
+## Add The --title Switch
 
 Implement the `--title` switch, which should override the default file title.
 
@@ -208,7 +208,7 @@ With the following content:
 # My Title
 ```
 
-## Use the --template Switch
+## Use The --template Switch
 
 Test and implement the `--template` switch.
 
@@ -244,7 +244,7 @@ $ ./journal
 Error, daily journal already exists. Open test_entries/yyyy-mm-dd.md to see todays journal.
 ```
 
-## (BONUS) Provide Custom Values in Templates
+## (BONUS) Provide Custom Values In Templates
 
 If a template defines some content in the format `{DATE}`,
 replace that content with todays date.

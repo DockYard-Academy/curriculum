@@ -1,9 +1,9 @@
-# Phoenix and Ecto Relationships
+# Phoenix And Ecto Relationships
 
 ```elixir
 Mix.install([
   {:jason, "~> 1.4"},
-  {:kino, "~> 0.8.0", override: true},
+  {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -124,7 +124,7 @@ This generates a migration for principals.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# priv/repo/migrations/_create_principals
+# Priv/repo/migrations/_create_principals
 
 defmodule FacultyManager.Repo.Migrations.CreatePrincipals do
   use Ecto.Migration
@@ -222,7 +222,7 @@ classDiagram
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Belongs to
+### Belongs To
 
 To declare that our principals belong to a single school, we need to add `belongs_to/3` to the `Principal` schema.
 
@@ -286,7 +286,7 @@ Let's fix these tests, starting with the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager/principals_test.exs
+# Test/faculty_manager/principals_test.exs
    
 test "list_principals/0 returns all principals" do
    principal = principal_fixture()
@@ -474,7 +474,7 @@ First, add a new test. This test will ensure we list principals by the provided 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager/principals_test.exs
+# Test/faculty_manager/principals_test.exs
 
 test "list_principals/1 returns all principals by school" do
   # create schools
@@ -530,7 +530,7 @@ We can use the [preload](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3) func
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager/principals.ex
+# Lib/faculty_manager/principals.ex
 
 def list_principals(school_id) do
   school =
@@ -550,7 +550,7 @@ Preloading is a fantastic way to retrieve associated data from a table. However,
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Join and Select
+### Join And Select
 
 We can [join/5](https://hexdocs.pm/ecto/Ecto.Query.html#join/5) two associated tables together.
 Then use [select](https://hexdocs.pm/ecto/Ecto.Query.html#select/3) to return the nested principals field.
@@ -558,7 +558,7 @@ Then use [select](https://hexdocs.pm/ecto/Ecto.Query.html#select/3) to return th
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager/principals.ex
+# Lib/faculty_manager/principals.ex
 
 def list_principals(school_id) do
   FacultyManager.Schools.School
@@ -663,7 +663,7 @@ Modify our router to include the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/router.ex
+# Lib/faculty_manager_web/router.ex
 
 scope "/", FacultyManagerWeb do
   pipe_through :browser
@@ -737,7 +737,7 @@ To resolve the error above, we need to fix the `"index"` test in our controller 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "index" do
   test "lists all principals", %{conn: conn} do
@@ -783,7 +783,7 @@ Replace the index page with the following content.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/templates/principals/index.html.heex
+# Lib/faculty_manager_web/templates/principals/index.html.heex
 
 <h1>Listing Principals</h1>
 
@@ -850,7 +850,7 @@ To solve this, we need to fix the `"new principal, renders form"` test.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "new principal" do
   test "renders form", %{conn: conn} do
@@ -865,7 +865,7 @@ Replace the test with the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "new principal" do
   test "renders form", %{conn: conn} do
@@ -881,7 +881,7 @@ Replace the `PrincipalController.new/2` function with the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/controllers/principal_controller
+# Lib/faculty_manager_web/controllers/principal_controller
 
 def new(conn, %{"school_id" => school_id}) do
   changeset = Principals.change_principal(%Principal{})
@@ -894,7 +894,7 @@ Then replace the template file to remove calls to `Routes.principal_path/2`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/templates/principal/new.html.heex
+# Lib/faculty_manager_web/templates/principal/new.html.heex
 
 <h1>New Principal</h1>
 
@@ -930,7 +930,7 @@ To resolve this, we need to fix the tests for `"create principal"`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "create principal" do
   test "redirects to show when data is valid", %{conn: conn} do
@@ -955,7 +955,7 @@ Replace these tests with the following.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "create principal" do
   test "redirects to show when data is valid", %{conn: conn} do
@@ -991,7 +991,7 @@ Update the `PrincipalController.create/2` function to use the `school_id`. We ne
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/controllers/principal_controller
+# Lib/faculty_manager_web/controllers/principal_controller
 
 def create(conn, %{"principal" => principal_params, "school_id" => school_id}) do
   school = FacultyManager.Schools.get_school!(school_id)
@@ -1016,7 +1016,7 @@ Since `PrincipalController.create/2` redirects the use using `:show`, we also ne
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/controllers/principal_controller
+# Lib/faculty_manager_web/controllers/principal_controller
 
 def show(conn, %{"id" => id, "school_id" => school_id}) do
   principal = Principals.get_principal!(id)
@@ -1029,7 +1029,7 @@ Then replace the show template with the following content to replace all instanc
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/templates/principal/show.html.heex
+# Lib/faculty_manager_web/templates/principal/show.html.heex
 
 <h1>Show Principal</h1>
 
@@ -1073,7 +1073,7 @@ To resolve this issue, we need to fix the `"edit principal"` test.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "edit principal" do
   setup [:create_principal]
@@ -1090,7 +1090,7 @@ Replace the test with the following. We're going to opt out of using the `:creat
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "edit principal" do
   test "renders form for editing chosen principal", %{conn: conn} do
@@ -1110,7 +1110,7 @@ Update the `PrincipalController.edit/2` function to use the `school_id` in the a
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_web/controllers/principal_controller.ex
+# Lib/faculty_web/controllers/principal_controller.ex
 
 def edit(conn, %{"id" => id, "school_id" => school_id}) do
   principal = Principals.get_principal!(id)
@@ -1124,7 +1124,7 @@ Fix the principal edit page to replace `Routes.principal_path` with `Routes.scho
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_web/templates/principal/edit.html.heex
+# Lib/faculty_web/templates/principal/edit.html.heex
 
 <h1>Edit Principal</h1>
 
@@ -1160,7 +1160,7 @@ To resolve this issue we need to fix the `"update principal"` tests.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "update principal" do
   setup [:create_principal]
@@ -1185,7 +1185,7 @@ Replace the tests with the following. We're manually creating the school and pri
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# test/faculty_manager_web/controllers/principal_controller_test.exs
+# Test/faculty_manager_web/controllers/principal_controller_test.exs
 
 describe "update principal" do
   test "redirects when data is valid", %{conn: conn} do
@@ -1223,7 +1223,7 @@ Modify the `PrincipalController.update/2` function to use the `school_id`.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# lib/faculty_manager_web/controllers/principal_controller.ex
+# Lib/faculty_manager_web/controllers/principal_controller.ex
 
 def update(conn, %{"id" => id, "principal" => principal_params, "school_id" => school_id}) do
   principal = Principals.get_principal!(id)
