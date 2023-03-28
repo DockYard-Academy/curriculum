@@ -4,56 +4,27 @@ defmodule Utils.NotebooksTest do
   alias Utils.Notebooks.Notebook
   doctest Utils.Notebooks
 
-  test "update_dependencies" do
-    notebook = %Notebook{
-      content: """
-      Mix.install([
-        {:jason, "~> 1.2"},
-        {:kino, "~> 0.8.0", override: true},
-        {:youtube, github: "brooklinjazz/youtube"},
-        {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-        {:benchee, "~> 1.0"},
-        {:poison, "~> 4.0.0"},
-        {:httpoison, "~> 2.0.0"},
-        {:finch, "~> 0.14.0"},
-        {:timex, "~> 3.6"},
-        {:ecto, "~> 3.9"},
-        {:faker, "~> 0.16.0"},
-        {:vega_lite, "~> 0.1.5"},
-        {:kino_vega_lite, "~> 0.1.7"},
-        {:hackney, "~> 1.17"},
-        {:oban, "~> 2.13"},
-        {:kino_db, "~> 0.2.0"},
-        {:postgrex, "~> 0.16.4"},
-        {:poolboy, "~> 1.4"}
-      ])
-      """
-    }
+  test "commit_your_progress_snippet/1" do
+    notebook = %Notebook{title: "My Notebook", type: :reading}
 
-    assert Notebooks.update_dependencies(notebook) == %Notebook{
-             content: """
-             Mix.install([
-               {:jason, "~> 1.4"},
-               {:kino, "~> 0.9", override: true},
-               {:youtube, github: "brooklinjazz/youtube"},
-               {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-               {:benchee, "~> 1.1"},
-               {:poison, "~> 5.0.0"},
-               {:httpoison, "~> 2.1.0"},
-               {:finch, "~> 0.15.0"},
-               {:timex, "~> 3.7.11"},
-               {:ecto, "~> 3.9.5"},
-               {:faker, "~> 0.17.0"},
-               {:vega_lite, "~> 0.1.6"},
-               {:kino_vega_lite, "~> 0.1.8"},
-               {:hackney, "~> 1.18"},
-               {:oban, "~> 2.14"},
-               {:kino_db, "~> 0.2.1"},
-               {:postgrex, "~> 0.16.5"},
-               {:poolboy, "~> 1.5"}
-             ])
-             """
-           }
+    assert Notebooks.commit_your_progress_snippet(notebook) == """
+           ## Commit Your Progress
+
+           DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+           Run `git status` to ensure there are no undesirable changes.
+           Then run the following in your command line from the `curriculum` folder to commit your progress.
+           ```
+           $ git add .
+           $ git commit -m "finish My Notebook reading"
+           $ git push
+           ```
+
+           We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+           We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+           [Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
+           """
   end
 
   test "deprecate/1" do
@@ -70,14 +41,6 @@ defmodule Utils.NotebooksTest do
       File.rm(deprecated_file_path)
       File.rm(file_path)
     end)
-  end
-
-  test "unused_notebooks/0" do
-    assert Enum.all?(Notebooks.unused_notebooks(), fn notebook -> is_nil(notebook.index) end)
-  end
-
-  test "outline_notebooks/0" do
-    assert Enum.all?(Notebooks.outline_notebooks(), fn notebook -> notebook.index end)
   end
 
   test "format_headings/1" do
@@ -140,6 +103,31 @@ defmodule Utils.NotebooksTest do
              [Phoenix.HTML.Form.checkbox/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#checkbox/3)
              """
            }
+  end
+
+  test "load!/1 loads the notebook content" do
+    File.write!("test.livemd", "some content")
+
+    notebook = %Notebook{relative_path: "test.livemd"}
+    assert %Notebook{content: nil} = notebook
+    assert %Notebook{content: "some content"} = Notebooks.load!(notebook)
+
+    on_exit(fn ->
+      File.rm!("test.livemd")
+    end)
+  end
+
+  test "load!/1 raises a useful message if it cannot load." do
+    notebook = %Notebook{relative_path: "./file_does_not_exist"}
+
+    message = """
+    ./file_does_not_exist does not exist.
+    Try running mix compile --force to ensure the notebook has been compiled.
+    """
+
+    assert_raise RuntimeError, message, fn ->
+      Notebooks.load!(notebook)
+    end
   end
 
   test "navigation_snippet/1 first notebook" do
@@ -233,26 +221,63 @@ defmodule Utils.NotebooksTest do
     assert Notebooks.navigation_snippet(notebook) == expected
   end
 
-  test "commit_your_progress_snippet/1" do
-    notebook = %Notebook{title: "My Notebook", type: :reading}
+  test "outline_notebooks/0" do
+    assert Enum.all?(Notebooks.outline_notebooks(), fn notebook -> notebook.index end)
+  end
 
-    assert Notebooks.commit_your_progress_snippet(notebook) == """
-           ## Commit Your Progress
+  test "unused_notebooks/0" do
+    assert Enum.all?(Notebooks.unused_notebooks(), fn notebook -> is_nil(notebook.index) end)
+  end
 
-           DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+  test "update_dependencies" do
+    notebook = %Notebook{
+      content: """
+      Mix.install([
+        {:jason, "~> 1.2"},
+        {:kino, "~> 0.8.0", override: true},
+        {:youtube, github: "brooklinjazz/youtube"},
+        {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+        {:benchee, "~> 1.0"},
+        {:poison, "~> 4.0.0"},
+        {:httpoison, "~> 2.0.0"},
+        {:finch, "~> 0.14.0"},
+        {:timex, "~> 3.6"},
+        {:ecto, "~> 3.9"},
+        {:faker, "~> 0.16.0"},
+        {:vega_lite, "~> 0.1.5"},
+        {:kino_vega_lite, "~> 0.1.7"},
+        {:hackney, "~> 1.17"},
+        {:oban, "~> 2.13"},
+        {:kino_db, "~> 0.2.0"},
+        {:postgrex, "~> 0.16.4"},
+        {:poolboy, "~> 1.4"}
+      ])
+      """
+    }
 
-           Run `git status` to ensure there are no undesirable changes.
-           Then run the following in your command line from the `curriculum` folder to commit your progress.
-           ```
-           $ git add .
-           $ git commit -m "finish My Notebook reading"
-           $ git push
-           ```
-
-           We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
-
-           We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
-           [Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
-           """
+    assert Notebooks.update_dependencies(notebook) == %Notebook{
+             content: """
+             Mix.install([
+               {:jason, "~> 1.4"},
+               {:kino, "~> 0.9", override: true},
+               {:youtube, github: "brooklinjazz/youtube"},
+               {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+               {:benchee, "~> 1.1"},
+               {:poison, "~> 5.0.0"},
+               {:httpoison, "~> 2.1.0"},
+               {:finch, "~> 0.15.0"},
+               {:timex, "~> 3.7.11"},
+               {:ecto, "~> 3.9.5"},
+               {:faker, "~> 0.17.0"},
+               {:vega_lite, "~> 0.1.6"},
+               {:kino_vega_lite, "~> 0.1.8"},
+               {:hackney, "~> 1.18"},
+               {:oban, "~> 2.14"},
+               {:kino_db, "~> 0.2.1"},
+               {:postgrex, "~> 0.16.5"},
+               {:poolboy, "~> 1.5"}
+             ])
+             """
+           }
   end
 end

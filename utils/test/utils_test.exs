@@ -3,38 +3,7 @@ defmodule UtilsTest do
   doctest Utils
   alias Utils.Notebooks
 
-  test "all outline files have header and footer navigation" do
-    Notebooks.outline_notebooks()
-    |> Enum.each(fn notebook ->
-      content = File.read!(notebook.relative_path)
-      navigation_sections = Regex.scan(~r/\n## Navigation\n/, content)
-
-      assert length(navigation_sections) == 2, "missing navigation in #{notebook.relative_path}"
-    end)
-  end
-
-  @tag :skip_ci
-  test "Ensure all .livemd files are formatted." do
-    Notebooks.all_notebooks()
-    |> Enum.each(fn notebook ->
-      %{content: content} = Notebooks.load(notebook)
-
-      assert content == LivebookFormatter.reformat(content),
-             "run mix all_tasks to resolve this issue."
-    end)
-  end
-
-  test "Prefer links to documentation over backticks" do
-    regex = ~r/`(?:#{Enum.join(Notebooks.documented_libraries(), "|")})`/
-
-    Notebooks.all_notebooks()
-    |> Enum.each(fn notebook ->
-      notebook = Notebooks.load(notebook)
-      refute Regex.match?(regex, notebook.content), "run mix all_tasks to resolve this issue."
-    end)
-  end
-
-  test "Ensure all external libraries are installed if used" do
+  test "External libraries are installed if used in a notebook" do
     # dependency install name, and usage indicator
     used_deps = [
       {:kino, "Kino"},
@@ -60,7 +29,7 @@ defmodule UtilsTest do
 
     Notebooks.outline_notebooks()
     |> Enum.each(fn notebook ->
-      %{content: content} = Notebooks.load(notebook)
+      %{content: content} = Notebooks.load!(notebook)
 
       assert Enum.each(used_deps, fn {dep, module} ->
                # regex attempts to avoids false negatives.
@@ -72,17 +41,36 @@ defmodule UtilsTest do
     end)
   end
 
-  test "All outline files exist" do
+  test "headings use title case" do
     Notebooks.outline_notebooks()
-    |> Enum.all?(fn notebook ->
-      assert File.exists?(notebook.relative_path)
+    |> Enum.each(fn notebook ->
+      %{content: content} = Notebooks.load!(notebook)
+
+      Regex.scan(~r/^\#{1,3} .+/, content)
+      |> List.flatten()
+      |> Enum.each(fn title ->
+        expected_title = Notebooks.title_case(title)
+
+        assert title == expected_title,
+               "title #{title} in #{notebook.relative_path} should be #{expected_title}. Run mix all_tasks to resolve this issue."
+      end)
     end)
   end
 
-  test "Ensure all images are used and exist" do
+  test ".livemd files are formatted" do
+    Notebooks.all_notebooks()
+    |> Enum.each(fn notebook ->
+      %{content: content} = Notebooks.load!(notebook)
+
+      assert content == LivebookFormatter.reformat(content),
+             "run mix all_tasks to resolve this issue."
+    end)
+  end
+
+  test "local images exist" do
     Notebooks.outline_notebooks()
     |> Enum.flat_map(fn notebook ->
-      %{content: content} = Notebooks.load(notebook)
+      %{content: content} = Notebooks.load!(notebook)
 
       Regex.scan(~r/!\[[^\]]*\]\(([^http][^\)]+)\)/, content)
       |> Enum.map(fn [_, image_path] ->
@@ -95,10 +83,37 @@ defmodule UtilsTest do
     end)
   end
 
-  test "Ensure no broken / empty links in livebooks" do
+  test "outline files exist" do
+    Notebooks.outline_notebooks()
+    |> Enum.all?(fn notebook ->
+      assert File.exists?(notebook.relative_path)
+    end)
+  end
+
+  test "outline files have header and footer navigation" do
     Notebooks.outline_notebooks()
     |> Enum.each(fn notebook ->
-      %{content: content} = Notebooks.load(notebook)
+      content = File.read!(notebook.relative_path)
+      navigation_sections = Regex.scan(~r/\n## Navigation\n/, content)
+
+      assert length(navigation_sections) == 2, "missing navigation in #{notebook.relative_path}"
+    end)
+  end
+
+  test "Prefer links to documentation over backticks" do
+    regex = ~r/`(?:#{Enum.join(Notebooks.documented_libraries(), "|")})`/
+
+    Notebooks.all_notebooks()
+    |> Enum.each(fn notebook ->
+      notebook = Notebooks.load!(notebook)
+      refute Regex.match?(regex, notebook.content), "run mix all_tasks to resolve this issue."
+    end)
+  end
+
+  test "referenced notebooks exist" do
+    Notebooks.outline_notebooks()
+    |> Enum.each(fn notebook ->
+      %{content: content} = Notebooks.load!(notebook)
 
       links =
         Regex.scan(
@@ -112,22 +127,6 @@ defmodule UtilsTest do
 
         assert File.exists?(link_path_relative_to_notebook),
                "The link: #{link} in #{notebook.relative_path} does not exist."
-      end)
-    end)
-  end
-
-  test "Headings should be in title case" do
-    Notebooks.outline_notebooks()
-    |> Enum.each(fn notebook ->
-      %{content: content} = Notebooks.load(notebook)
-
-      Regex.scan(~r/^\#{1,3} .+/, content)
-      |> List.flatten()
-      |> Enum.each(fn title ->
-        expected_title = Notebooks.title_case(title)
-
-        assert title == expected_title,
-               "title #{title} in #{notebook.relative_path} should be #{expected_title}. Run mix all_tasks to resolve this issue."
       end)
     end)
   end

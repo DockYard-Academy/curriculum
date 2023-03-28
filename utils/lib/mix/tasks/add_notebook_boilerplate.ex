@@ -12,7 +12,7 @@ defmodule Mix.Tasks.AddNotebookBoilerplate do
     Notebooks.outline_notebooks()
     |> Enum.each(fn notebook ->
       notebook
-      |> Notebooks.load()
+      |> Notebooks.load!()
       # as we no longer have setup sections this is not needed.
       |> Notebooks.remove_setup_section()
       |> Notebooks.header_navigation_section()

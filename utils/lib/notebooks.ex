@@ -16,7 +16,7 @@ defmodule Utils.Notebooks do
   @outline_notebooks @outline_relative_paths
                      |> Enum.with_index()
                      |> Enum.map(fn {relative_path, index} ->
-                       Notebook.new(%{
+                       Notebook.new!(%{
                          relative_path: relative_path,
                          index: index
                        })
@@ -25,11 +25,11 @@ defmodule Utils.Notebooks do
   @unused_notebooks Path.wildcard("../*/*.livemd")
                     |> Kernel.--(@outline_relative_paths)
                     |> Enum.map(fn relative_path ->
-                      Notebook.new(%{relative_path: relative_path})
+                      Notebook.new!(%{relative_path: relative_path})
                     end)
 
   @all_notebooks [
-    Notebook.new(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
+    Notebook.new!(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
   ]
 
   @number_of_notebooks length(@outline_notebooks)
@@ -113,9 +113,17 @@ defmodule Utils.Notebooks do
     %Notebook{notebook | content: content}
   end
 
-  def load(notebook) do
-    content = File.read!(notebook.relative_path)
-    %Notebook{notebook | content: content}
+  def load!(notebook) do
+    case File.read(notebook.relative_path) do
+      {:ok, content} ->
+        %Notebook{notebook | content: content}
+
+      {:error, _} ->
+        raise """
+        #{notebook.relative_path} does not exist.
+        Try running mix compile --force to ensure the notebook has been compiled.
+        """
+    end
   end
 
   def save(notebook) do
