@@ -3,8 +3,7 @@
 The DockYard Academy curriculum is an open source Elixir curriculum built with Livebook.
 We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
 
-We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
-[Apply to the DockYard Academy June-August 2023 Cohort Now](https://docs.google.com/forms/d/1RwqHc1wUoY0jS440sBJHHl3gyQlw2xhz2Dt1ZbRaXEc/edit?ts=641e1aachttps://academy.dockyard.com/).
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers. Applications will be accepted soon.
 
 Email the instructor Brooklin at brooklin.myers@dockyard.com or direct message [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
 
