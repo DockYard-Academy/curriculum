@@ -5,7 +5,7 @@ Mix.install([
   {:jason, "~> 1.4"},
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
 ```
 
@@ -121,11 +121,12 @@ defmodule Monster do
 
   ## Examples
 
-      iex> {:ok, pid} = Monster.start_link([])
+      iex> {:ok, _pid} = Monster.start_link([])
   """
-  def start_link(opts) do
+  def start_link(opts \\ []) do
     # IO.inspect/2 to observe when a `Monster` process starts.
     IO.inspect(opts, label: "Monster Started")
+    GenServer.start_link(__MODULE__, [], name: opts[:name])
   end
 
   @doc """
@@ -141,6 +142,7 @@ defmodule Monster do
       %{health: 70}
   """
   def attack(monster_pid, amount) do
+    GenServer.cast(monster_pid, {:attack, amount})
   end
 
   @doc """
@@ -153,6 +155,7 @@ defmodule Monster do
       100
   """
   def health(monster_pid) do
+    GenServer.call(monster_pid, :health)
   end
 
   @doc """
@@ -167,6 +170,7 @@ defmodule Monster do
   """
   @impl true
   def init(_opts) do
+    {:ok, %{health: 100}}
   end
 
   @doc """
@@ -182,11 +186,18 @@ defmodule Monster do
       iex> GenServer.cast(pid, {:attack, 20})
       iex> :sys.get_state(pid)
       %{health: 80}
-      iex> GenServer.cast(pid, {:attack, 80})
-      ** (RuntimeError) dying!
+
+    #   iex> GenServer.cast(pid, {:attack, 80})
+    #   ** (RuntimeError) dying!
   """
   @impl true
   def handle_cast({:attack, damage}, state) do
+    new_health = state.health - damage
+
+    cond do
+      new_health > 0 -> {:noreply, %{state | health: new_health}}
+      true -> raise "dying!"
+    end
   end
 
   @doc """
@@ -200,6 +211,7 @@ defmodule Monster do
   """
   @impl true
   def handle_call(:health, _from, state) do
+    {:reply, state.health, state}
   end
 end
 ```
@@ -253,7 +265,22 @@ Supervisor.start_link(children, strategy: :one_for_one)
 Enter your solution below.
 
 ```elixir
+children = [
+  %{
+    id: :monster1,
+    start: {Monster, :start_link, [[name: :monster1]]}
+  },
+  %{
+    id: :monster2,
+    start: {Monster, :start_link, [[name: :monster2]]}
+  },
+  %{
+    id: :monster3,
+    start: {Monster, :start_link, [[name: :monster3]]}
+  }
+]
 
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Call `Monster.attack/1` on your monster processes to ensure they are restarted.
@@ -269,7 +296,8 @@ Monster.attack(:monster1, 110)
 </details>
 
 ```elixir
-
+Monster.attack(:monster1, 33)
+Monster.health(:monster1)
 ```
 
 ## Bonus: Hero
@@ -310,7 +338,36 @@ end
 </details>
 
 ```elixir
+defmodule Hero do
+  use GenServer
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts[:supervisor_pid], name: opts[:name])
+  end
+
+  defp schedule_attack() do
+    Process.send_after(self(), :attack, 1000)
+  end
+
+  @impl true
+  def init(supervisor_pid) do
+    schedule_attack()
+    {:ok, supervisor_pid}
+  end
+
+  @impl true
+  def handle_info(:attack, state) do
+    schedule_attack()
+
+    Supervisor.which_children(state)
+    |> Enum.map(fn {name, monster_pid, :worker, [Monster]} ->
+      Monster.attack(monster_pid, Enum.random(1..10))
+      Monster.health(monster_pid) |> IO.inspect(label: name)
+    end)
+
+    {:noreply, state}
+  end
+end
 ```
 
 Start the `Hero` process with three other `Monster` processes in the same supervisor. Make the supervisor a named supervisor so you can find all of its child processes with [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1).
@@ -344,7 +401,7 @@ children = [
 </details>
 
 ```elixir
-
+{:ok, hero_pid} = Hero.start_link(name: :hero, supervisor_pid: supervisor_pid)
 ```
 
 Use [Kino.Process.sup_tree/2](https://hexdocs.pm/kino/Kino.Process.html#sup_tree/2) to visualize the processes under your named supervisor.
@@ -359,7 +416,7 @@ Kino.Process.sup_tree(supervisor)
 </details>
 
 ```elixir
-
+Kino.Process.sup_tree(supervisor_pid)
 ```
 
 For improved observability, create a function that will print the health value for each `Monster` process under the named supervisor.

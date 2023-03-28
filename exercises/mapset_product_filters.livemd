@@ -215,6 +215,16 @@ defmodule MapSetProducts do
       MapSet.new([%{name: "Laptop", category: :tech, price: 100}])
   """
   def filter(products, filters \\ []) do
+    name_filter = filters[:name] || ""
+    min_filter = filters[:min]
+    max_filter = filters[:max]
+    cat_filter = filters[:category]
+
+    products
+    |> MapSet.filter(fn %{name: name} -> Regex.match?(~r/#{name_filter}/i, name) end)
+    |> MapSet.reject(fn %{price: price} -> min_filter && price < min_filter end)
+    |> MapSet.reject(fn %{price: price} -> max_filter && max_filter < price end)
+    |> MapSet.reject(fn %{category: category} -> cat_filter && category != cat_filter end)
   end
 end
 
@@ -223,23 +233,102 @@ ExUnit.start(auto_run: false)
 defmodule MapSetProductsTest do
   use ExUnit.Case
 
-  test "filter/2 empty filters"
+  @products MapSet.new([
+              %{name: "Laptop", category: :tech, price: 100_000},
+              %{name: "Phone", category: :tech, price: 50000},
+              %{name: "Chocolate", category: :snacks, price: 200},
+              %{name: "Shampoo", category: :health, price: 1000}
+            ])
 
-  test "filter/2 by exact matching name"
+  test "filter/2 empty filters" do
+    assert MapSetProducts.filter(@products, []) == @products
+  end
 
-  test "filter/2 by partial matching name"
+  test "filter/2 by exact matching name" do
+    assert MapSetProducts.filter(@products, name: "Phone") ==
+             MapSet.new([
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
 
-  test "filter/2 by mixed case partial matching name"
+    assert MapSetProducts.filter(@products, name: "Shampoo") ==
+             MapSet.new([
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+  end
 
-  test "filter/2 by category"
+  test "filter/2 by partial matching name" do
+    assert MapSetProducts.filter(@products, name: "hon") ==
+             MapSet.new([
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
 
-  test "filter/2 by min price"
+    assert MapSetProducts.filter(@products, name: "amp") ==
+             MapSet.new([
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+  end
 
-  test "filter/2 by max price"
+  test "filter/2 by mixed case partial matching name" do
+    assert MapSetProducts.filter(@products, name: "hOn") ==
+             MapSet.new([
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
 
-  test "filter/2 by max and min price"
+    assert MapSetProducts.filter(@products, name: "AmP") ==
+             MapSet.new([
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+  end
 
-  test "filter/2 all filters"
+  test "filter/2 by category" do
+    assert MapSetProducts.filter(@products, category: :tech) ==
+             MapSet.new([
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
+
+    assert MapSetProducts.filter(@products, category: :health) ==
+             MapSet.new([
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+  end
+
+  test "filter/2 by min price" do
+    assert MapSetProducts.filter(@products, min: 1200) ==
+             MapSet.new([
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
+
+    assert MapSetProducts.filter(@products, min: 200) == @products
+  end
+
+  test "filter/2 by max price" do
+    assert MapSetProducts.filter(@products, max: 1200) ==
+             MapSet.new([
+               %{name: "Chocolate", category: :snacks, price: 200},
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+
+    assert MapSetProducts.filter(@products, max: 100) == MapSet.new([])
+  end
+
+  test "filter/2 by max and min price" do
+    assert MapSetProducts.filter(@products, min: 200, max: 60_000) ==
+             MapSet.new([
+               %{name: "Phone", category: :tech, price: 50000},
+               %{name: "Chocolate", category: :snacks, price: 200},
+               %{name: "Shampoo", category: :health, price: 1000}
+             ])
+  end
+
+  test "filter/2 all filters" do
+    assert MapSetProducts.filter(@products, name: "P", category: :tech, min: 500, max: 100_000) ==
+             MapSet.new([
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ])
+  end
 end
 
 ExUnit.run()
@@ -290,7 +379,62 @@ Benchee.run(
 You may create your solution below, or consider creating a `product_filters` mix project with all of your solutions and benchmarks as a GitHub project for your future resume!
 
 ```elixir
+defmodule Products do
+  @moduledoc """
+  Documentation for `Products`
+  """
 
+  @doc """
+  Filter products by :name, :min, :max, and :category.
+  The name filter should be case insensitive and handle partial matches.
+  """
+  def filter(products, filters) do
+    name = Keyword.get(filters, :name, "")
+    min = Keyword.get(filters, :min, 0)
+    max = Keyword.get(filters, :max, 1_000_000)
+    category = Keyword.get(filters, :category, :all)
+
+    products
+    |> Enum.filter(fn map ->
+      Regex.compile!(name, [:caseless])
+      |> Regex.match?(map.name)
+    end)
+    |> Enum.filter(fn map ->
+      map.price >= min and map.price <= max
+    end)
+    |> Enum.filter(fn map ->
+      cond do
+        category == :all -> map
+        category == map.category -> map
+        true -> nil
+      end
+    end)
+  end
+end
+```
+
+```elixir
+dataset_size = 1_000
+
+names = Enum.map(1..dataset_size, fn _ -> Faker.Food.dish() end)
+categories = [:tech, :health, :snacks, :random, :food]
+
+products =
+  for name <- names,
+      category <- categories,
+      do: %{name: name, category: category, price: Enum.random(1..100)}
+
+mapset_products = MapSet.new(products)
+
+filters = [name: "er", category: :health, min: 25, max: 60]
+
+Benchee.run(
+  %{
+    "MapSet" => fn -> MapSetProducts.filter(mapset_products, filters) end,
+    "Enum" => fn -> Products.filter(mapset_products, filters) end
+  },
+  memory_time: 2
+)
 ```
 
 ## Commit Your Progress

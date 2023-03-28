@@ -327,7 +327,8 @@ Regex.run(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111")
 Now we can use these capture groups in [Regex.replace/3](https://hexdocs.pm/elixir/Regex.html#replace/3).
 
 ```elixir
-Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111", fn full_match, capture_group ->
+Regex.replace(~r/\d{3}-(\d{3}-\d{4})/, "111-111-1111 222-222-2222", fn full_match,
+                                                                       capture_group ->
   IO.inspect(full_match, label: "match")
   IO.inspect(capture_group, label: "capture group")
   "XXX-" <> capture_group
@@ -361,7 +362,9 @@ end)
 </details>
 
 ```elixir
-
+Regex.replace(~r/(\d{3})-\d{3}-\d{4}/, "999-999-9999", fn _match, start ->
+  start <> "-XXX-XXXX"
+end)
 ```
 
 ## Lookaround
@@ -441,7 +444,13 @@ end)
 </details>
 
 ```elixir
-
+Regex.replace(~r/#(\d{3})(\d{3})(\d{4})/, "#1234567890", fn _match, a, b, c ->
+  # IO.inspect(match, label: "match")
+  # IO.inspect(a, label: "a")
+  # IO.inspect(b, label: "b")
+  # IO.inspect(c, label: "c")
+  "#{a}-#{b}-#{c}"
+end)
 ```
 
 ## Further Reading

@@ -81,8 +81,8 @@ defmodule CustomEnum do
     iex> CustomEnum.reverse([4, 5, 6, 7])
     [7, 6, 5, 4]
   """
-  def reverse(list) do
-  end
+  def reverse([]), do: []
+  def reverse([head | tail]), do: reverse(tail) ++ [head]
 
   @doc """
   Map over a list
@@ -95,7 +95,10 @@ defmodule CustomEnum do
     iex> CustomEnum.map([5, 4, 3], fn integer -> is_integer(integer) end)
     [true, true, true]
   """
-  def map(list, callback_function) do
+  def map([], _), do: []
+
+  def map([h | t], callback_function) do
+    [callback_function.(h) | map(t, callback_function)]
   end
 
   @doc """
@@ -111,6 +114,17 @@ defmodule CustomEnum do
     ["2", "3"]
   """
   def filter(list, callback_function) do
+    do_filter(list, callback_function, [])
+  end
+
+  defp do_filter([], _, acc), do: acc
+
+  defp do_filter([h | t], callback_function, acc) do
+    if callback_function.(h) do
+      do_filter(t, callback_function, acc ++ [h])
+    else
+      do_filter(t, callback_function, acc)
+    end
   end
 
   @doc """
@@ -125,7 +139,11 @@ defmodule CustomEnum do
     3
   """
   def sum(list_of_integers) do
+    do_sum(list_of_integers, 0)
   end
+
+  defp do_sum([], acc), do: acc
+  defp do_sum([h | t], acc), do: do_sum(t, acc + h)
 
   @doc """
   Join a list of strings together.
@@ -139,7 +157,11 @@ defmodule CustomEnum do
     "Hello, World!"
   """
   def join(list_of_strings) do
+    do_join(list_of_strings, "")
   end
+
+  defp do_join([], acc), do: acc
+  defp do_join([h | t], acc), do: do_join(t, acc <> h)
 end
 ```
 
@@ -150,7 +172,15 @@ We've installed the [Benchee](https://github.com/bencheeorg/benchee) project in 
 Benchmark your solution against the existing [Enum](https://hexdocs.pm/elixir/Enum.html) module. Is yours faster or slower? Keep in mind that the [Enum](https://hexdocs.pm/elixir/Enum.html) module contains implementations for all enumerables, not just lists.
 
 ```elixir
+list = [1, 2, 3, 4, 5]
+map_func = fn x -> x ** 2 end
 
+Benchee.run(%{
+  "&CustomEnum.reverse/1" => fn -> CustomEnum.reverse(list) end,
+  "&Enum.reverse/1" => fn -> Enum.reverse(list) end,
+  "CustomEnum.map/2" => fn -> Enum.map(list, map_func) end,
+  "Enum.map/2" => fn -> Enum.map(list, map_func) end
+})
 ```
 
 ## Commit Your Progress

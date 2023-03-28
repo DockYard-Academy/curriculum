@@ -253,6 +253,26 @@ defmodule Products do
   The name filter should be case insensitive and handle partial matches.
   """
   def filter(products, filters) do
+    name = Keyword.get(filters, :name, "")
+    min = Keyword.get(filters, :min, 0)
+    max = Keyword.get(filters, :max, 1_000_000)
+    category = Keyword.get(filters, :category, :all)
+
+    products
+    |> Enum.filter(fn map ->
+      Regex.compile!(name, [:caseless])
+      |> Regex.match?(map.name)
+    end)
+    |> Enum.filter(fn map ->
+      map.price >= min and map.price <= max
+    end)
+    |> Enum.filter(fn map ->
+      cond do
+        category == :all -> map
+        category == map.category -> map
+        true -> nil
+      end
+    end)
   end
 end
 
@@ -261,23 +281,95 @@ ExUnit.start(auto_run: false)
 defmodule ProductsTest do
   use ExUnit.Case
 
-  test "filter/2 empty filters"
+  @products [
+    %{name: "Laptop", category: :tech, price: 100_000},
+    %{name: "Phone", category: :tech, price: 50000},
+    %{name: "Chocolate", category: :snacks, price: 200},
+    %{name: "Shampoo", category: :health, price: 1000}
+  ]
 
-  test "filter/2 by exact matching name"
+  test "filter/2 empty filters" do
+    assert Products.filter(@products, []) == @products
+  end
 
-  test "filter/2 by partial matching name"
+  test "filter/2 by exact matching name" do
+    assert Products.filter(@products, name: "Phone") == [
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
 
-  test "filter/2 by mixed case partial matching name"
+    assert Products.filter(@products, name: "Shampoo") == [
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
 
-  test "filter/2 by category"
+  test "filter/2 by partial matching name" do
+    assert Products.filter(@products, name: "hon") == [
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
 
-  test "filter/2 by min price"
+    assert Products.filter(@products, name: "amp") == [
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
 
-  test "filter/2 by max price"
+  test "filter/2 by mixed case partial matching name" do
+    assert Products.filter(@products, name: "hOn") == [
+             %{name: "Phone", category: :tech, price: 50000}
+           ]
 
-  test "filter/2 by max and min price"
+    assert Products.filter(@products, name: "AmP") == [
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
 
-  test "filter/2 all filters"
+  test "filter/2 by category" do
+    assert Products.filter(@products, category: :tech) ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ]
+
+    assert Products.filter(@products, category: :health) == [
+             %{name: "Shampoo", category: :health, price: 1000}
+           ]
+  end
+
+  test "filter/2 by min price" do
+    assert Products.filter(@products, min: 1200) ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ]
+
+    assert Products.filter(@products, min: 200) == @products
+  end
+
+  test "filter/2 by max price" do
+    assert Products.filter(@products, max: 1200) ==
+             [
+               %{name: "Chocolate", category: :snacks, price: 200},
+               %{name: "Shampoo", category: :health, price: 1000}
+             ]
+
+    assert Products.filter(@products, max: 100) == []
+  end
+
+  test "filter/2 by max and min price" do
+    assert Products.filter(@products, min: 200, max: 60_000) ==
+             [
+               %{name: "Phone", category: :tech, price: 50000},
+               %{name: "Chocolate", category: :snacks, price: 200},
+               %{name: "Shampoo", category: :health, price: 1000}
+             ]
+  end
+
+  test "filter/2 all filters" do
+    assert Products.filter(@products, name: "P", category: :tech, min: 500, max: 100_000) ==
+             [
+               %{name: "Laptop", category: :tech, price: 100_000},
+               %{name: "Phone", category: :tech, price: 50000}
+             ]
+  end
 end
 
 ExUnit.run()

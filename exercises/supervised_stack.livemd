@@ -73,7 +73,7 @@ GenServer.call(stack_pid, {:push, 2}) |> IO.inspect(label: "push")
 GenServer.call(stack_pid, {:push, 3}) |> IO.inspect(label: "push")
 
 GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
-GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
+# GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 GenServer.call(stack_pid, :pop) |> IO.inspect(label: "pop")
 
 # The Final State Is Empty.
@@ -120,7 +120,17 @@ children = [
 Keep in mind, if you have already started a supervisor with the `Stack` process, your livebook may crash. You can resolve this issue by simply re-running the cell below to start the supervisor again.
 
 ```elixir
+# children = [
+#   %{
+#     id: :stack,
+#     start: {Stack, :start_link, [[]]}
+#   }
+# ]
+children = [
+  {Stack, []}
+]
 
+{:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 You should be able to send a `:pop` message to the `Stack` process and the [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) will restart the `Stack` process.
@@ -128,7 +138,12 @@ You should be able to send a `:pop` message to the `Stack` process and the [Supe
 Uncomment and evaluate the code below to test your supervisor.
 
 ```elixir
-# GenServer.call(Stack, :pop)
+# GenServer.call(Stack, {:push, 1})
+GenServer.call(Stack, :pop)
+```
+
+```elixir
+GenServer.call(Stack, {:push, 1})
 ```
 
 ## Commit Your Progress

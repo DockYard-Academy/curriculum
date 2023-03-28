@@ -83,7 +83,7 @@ Here's how you can pass in a value for a given key.
 We can pass in values for any or all of our keys.
 
 ```elixir
-%StructName{key1: "value 1", key2: "value 2", key2: "value 2"}
+%StructName{key1: "value 1", key2: "value 2", key2: "value 3ea"}
 ```
 
 If we provide an invalid value, our struct instance will raise a [KeyError](https://hexdocs.pm/elixir/KeyError.html).
@@ -158,7 +158,7 @@ To avoid repetition, we can use the `@enforce_keys` module attribute in the `def
 
 ```elixir
 defmodule EnforcedNamePersonWithAge do
-  @enforce_keys [:name]
+  @enforce_keys [:name, :birthday]
   defstruct @enforce_keys ++ [:age]
 end
 ```
@@ -182,7 +182,10 @@ end
 Enter your solution below.
 
 ```elixir
-
+defmodule Coordinate do
+  @enforce_keys [:x, :y]
+  defstruct @enforce_keys
+end
 ```
 
 ## Module Functions
@@ -259,25 +262,44 @@ end
 Enter your solution below.
 
 ```elixir
+defmodule Hero do
+  @enforce_keys [:name, :secret_identity]
+  defstruct @enforce_keys ++ [:nemesis]
 
+  def greeting(hero) do
+    "I am #{hero.name}."
+  end
+
+  def reveal(hero) do
+    "I am #{hero.secret_identity}."
+  end
+
+  def enemy(hero) do
+    "I am here to defeat #{hero.nemesis}."
+  end
+end
 ```
 
 When finished create bind a variable `hero` to an instance of your `Hero` struct.
 
 ```elixir
-
+hero = %Hero{
+  name: "Spiderman",
+  secret_identity: "Peter Parker",
+  nemesis: "Green Goblin"
+}
 ```
 
 Use the `Hero.greeting/1` function on `hero` to ensure it works correctly.
 
 ```elixir
-
+Hero.greeting(hero)
 ```
 
 Use the `Hero.reveal/1` function on `hero` to ensure it works correctly.
 
 ```elixir
-
+Hero.reveal(hero)
 ```
 
 ## Manipulating Structs

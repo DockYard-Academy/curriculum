@@ -90,6 +90,17 @@ end
 Implement the `WeightedVoting` module as documented below.
 
 ```elixir
+ii = [cats: 10, dogs: 20, dogs: 10, cats: 30]
+
+test = fn
+  {vote_to_count, vote_count}, total_votes -> total_votes + vote_count
+  _, total_votes -> total_votes
+end
+
+[{:cats, 10}] == [cats: 10]
+```
+
+```elixir
 defmodule WeightedVoting do
   @doc """
   Count the total number of votes for some key in a keyword list.
@@ -104,6 +115,14 @@ defmodule WeightedVoting do
     40
   """
   def count(votes, vote_to_count) do
+    votes
+    |> Enum.reduce(0, fn {key, value}, total ->
+      if key == vote_to_count do
+        value + total
+      else
+        total
+      end
+    end)
   end
 
   @doc """
@@ -122,6 +141,31 @@ defmodule WeightedVoting do
     [birds: 20, cats: 30, dogs: 30]
   """
   def tally(votes) do
+    votes
+    |> Enum.reduce([], fn {animal, votes}, tally ->
+      Keyword.update(tally, animal, votes, fn total -> total + votes end)
+    end)
+    |> Enum.sort()
+  end
+
+  @doc """
+  Tally the total number of votes in a keyword list, and return
+  the results as a map.
+
+  ## Examples
+
+    iex> WeightedVoting.tally_map([dogs: 20, dogs: 10])
+    %{dogs: 30}
+    iex> WeightedVoting.tally_map([cats: 10, dogs: 20, dogs: 10])
+    %{cats: 10, dogs: 30}
+    iex> WeightedVoting.tally_map([cats: 10, dogs: 20, cats: 20, dogs: 10, birds: 20])
+    %{birds: 20, cats: 30, dogs: 30}
+  """
+  def tally_map(votes) do
+    votes
+    |> Enum.reduce(%{}, fn {animal, votes}, map ->
+      Map.update(map, animal, votes, fn total -> total + votes end)
+    end)
   end
 end
 ```

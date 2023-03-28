@@ -82,6 +82,10 @@ defmodule Document do
   @moduledoc """
   Documentation for `Document` module.
   """
+  def read(file_name) do
+    {:ok, file} = File.open(file_name)
+    IO.read(file, :eof)
+  end
 
   @doc ~S"""
   Count the number of words in a document.
@@ -101,6 +105,8 @@ defmodule Document do
       3
   """
   def word_count(file_name) do
+    content = read(file_name)
+    length(Regex.split(~r/\s/, content, trim: true))
   end
 
   @doc ~S"""
@@ -113,6 +119,8 @@ defmodule Document do
       3
   """
   def line_count(file_name) do
+    content = read(file_name)
+    length(Regex.split(~r/\n/, content, trim: true))
   end
 
   @doc ~S"""
@@ -122,10 +130,17 @@ defmodule Document do
 
       iex> File.write("add_line_numbers.txt", "one\ntwo\nthree")
       iex> Document.add_line_numbers("add_line_numbers.txt")
-      iex> File.read!("add_line_numbers.txt")
+      iex> File.read!("add_line_numbers.txt") 
       "1. one\n2. two\n3. three"
   """
   def add_line_numbers(file_name) do
+    content =
+      File.stream!(file_name)
+      |> Stream.with_index(1)
+      |> Stream.map(fn {line, index} -> "#{index}. " <> line end)
+      |> Enum.join()
+
+    File.write(file_name, content)
   end
 end
 ```

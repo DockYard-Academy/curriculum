@@ -94,6 +94,10 @@ defmodule FileSearch do
   ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
   """
   def all(folder) do
+    Path.wildcard("#{folder}/**")
+    |> Stream.reject(&File.dir?/1)
+    |> Stream.map(&Path.basename/1)
+    |> Enum.to_list()
   end
 
   @doc """
@@ -112,18 +116,20 @@ defmodule FileSearch do
       file3.jpg
     file4.txt
 
-  The exact order and return value are up to you as long as it finds all files 
-  and categorizes them by file extension.
-
-  For example, it might return the following:
+  It would return:
 
   %{
-    ".txt" => ["file1.txt", "file2.txt", "file3.txt", "file4.txt"],
-    ".png" => ["file1.png", "file2.png"],
-    ".jpg" => ["file3.jpg"]
+    "txt" => ["file1.txt", "file2.txt", "file3.txt", "file4.txt"],
+    "png" => ["file1.png", "file2.png"],
+    "jpg" => ["file3.jpg"]
   }
   """
   def by_extension(folder) do
+    all(folder)
+    |> Enum.reduce(%{}, fn file, acc ->
+      [_, file_extension] = String.split(file, ".")
+      Map.update(acc, file_extension, [file], fn list -> [file | list] end)
+    end)
   end
 end
 ```

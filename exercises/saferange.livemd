@@ -149,6 +149,10 @@ iex> raise "Houston, we have a problem."
 ```
 
 ```elixir
+Enum.map(1..5//2, & &1)
+```
+
+```elixir
 defmodule SafeRange do
   @doc """
   Generate a sequences of integers from 'first' to 'last' with an
@@ -171,7 +175,8 @@ defmodule SafeRange do
     iex> SafeRange.range(5, 1, 1)
     []
   """
-  def range(first, last, step \\ DEFAULT) do
+  def range(first, last, step \\ 1) do
+    Enum.to_list(first..last//step)
   end
 
   @doc """
@@ -195,7 +200,12 @@ defmodule SafeRange do
     iex> SafeRange.range!(5, 1, 1)
     ** (RuntimeError) Invalid step value of: 1
   """
-  def range!(first, last, step \\ DEFAULT) do
+  def range!(first, last, step \\ 1) do
+    if step >= first and step < last do
+      range(first, last, step)
+    else
+      raise "Invalid step value of: #{step}"
+    end
   end
 end
 ```

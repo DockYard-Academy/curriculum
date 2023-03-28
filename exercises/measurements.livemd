@@ -69,6 +69,14 @@ end
 Implement the `Measurements` module according to the documented function examples.
 
 ```elixir
+measurements = [1, 1, 2, 3, 1]
+
+measurements
+|> Enum.chunk_every(2, 1, :discard)
+|> Enum.map(fn [x, y] -> x < y end)
+```
+
+```elixir
 defmodule Measurements do
   @doc """
   Given a list of measurements as integers, determine the increment between each integer.
@@ -100,6 +108,27 @@ defmodule Measurements do
     1
   """
   def increased(measurements) do
+    measurements
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.map(fn [x, y] -> y > x end)
+    |> Enum.count(&(&1 == true))
+  end
+
+  @doc """
+  Given a list of measurements as integers, determine the increment between each integer.
+
+  ## Examples
+
+    iex> Measurements.increments([100, 150, 120, 130])
+    [50, -30, 10]
+
+    iex> Measurements.increments([10, 20, 10, 40])
+    [10, -10, 30]
+  """
+  def increments(measurements) do
+    measurements
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.map(fn [x, y] -> y - x end)
   end
 
   @doc """
@@ -115,6 +144,10 @@ defmodule Measurements do
     40
   """
   def increased_by(measurements) do
+    measurements
+    |> increments()
+    |> Enum.filter(&(&1 > 0))
+    |> Enum.sum()
   end
 
   @doc """
@@ -130,6 +163,7 @@ defmodule Measurements do
     6.0
   """
   def average(measurements) do
+    div(Enum.sum(measurements), Enum.count(measurements))
   end
 end
 ```

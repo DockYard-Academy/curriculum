@@ -101,9 +101,10 @@ defmodule ScoreTracker do
 
   ## Examples
 
-    iex> {:ok, pid} = ScoreTracker.start_link([])
+    iex> {:ok, _pid} = ScoreTracker.start_link([])
   """
   def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
   end
 
   @doc """
@@ -116,6 +117,7 @@ defmodule ScoreTracker do
       :ok
   """
   def score(score_tracker_pid, amount) do
+    GenServer.cast(score_tracker_pid, {:score, amount})
   end
 
   @doc """
@@ -128,6 +130,22 @@ defmodule ScoreTracker do
       0
   """
   def get_score(score_tracker_pid) do
+    GenServer.call(score_tracker_pid, :get_score)
+  end
+
+  # Server callback functions
+
+  @impl true
+  def init(_opts), do: {:ok, 0}
+
+  @impl true
+  def handle_cast({:score, amount}, state) do
+    {:noreply, state + amount}
+  end
+
+  @impl true
+  def handle_call(:get_score, _from, state) do
+    {:reply, state, state}
   end
 end
 ```
@@ -200,6 +218,7 @@ defmodule MultiplayerScoreTracker do
       iex> {:ok, _pid} = MultiplayerScoreTracker.start_link([])
   """
   def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
   end
 
   @doc """
@@ -216,6 +235,7 @@ defmodule MultiplayerScoreTracker do
       :ok
   """
   def score(multiplayer_score_tracker_pid, player_name, amount) do
+    GenServer.cast(multiplayer_score_tracker_pid, {:add, player_name, amount})
   end
 
   @doc """
@@ -246,6 +266,7 @@ defmodule MultiplayerScoreTracker do
       %{player1: 10, player2: 10}
   """
   def all_scores(multiplayer_score_tracker_pid) do
+    GenServer.call(multiplayer_score_tracker_pid, :scores)
   end
 
   @doc """
@@ -267,6 +288,29 @@ defmodule MultiplayerScoreTracker do
     10
   """
   def get_score(multiplayer_score_tracker_pid, player_name) do
+    GenServer.call(multiplayer_score_tracker_pid, {:player, player_name})
+  end
+
+  # Server callback functions
+
+  @impl true
+  def init(_opts) do
+    {:ok, %{}}
+  end
+
+  @impl true
+  def handle_cast({:add, player, amount}, state) do
+    {:noreply, Map.update(state, player, amount, fn score -> score + amount end)}
+  end
+
+  @impl true
+  def handle_call(:scores, _from, state) do
+    {:reply, state, state}
+  end
+
+  @impl true
+  def handle_call({:player, player}, _from, state) do
+    {:reply, Map.get(state, player), state}
   end
 end
 ```

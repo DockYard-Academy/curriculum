@@ -188,7 +188,10 @@ Generally, `[head | tail]` is more idiomatic.
 </details>
 
 ```elixir
+list = Enum.to_list(1..50_000)
+{list_time, _result} = :timer.tc(fn -> List.insert_at(list, 0, 0) end)
 
+list_time
 ```
 
 In the Elixir cell below, use the `:timer.tc/1` function to time how long it takes to prepend a value to a **tuple** with `50000` elements.
@@ -204,7 +207,10 @@ tuple = Enum.to_list(1..50000) |> List.to_tuple()
 </details>
 
 ```elixir
+tuple = List.to_tuple(list)
+{tuple_time, _result} = :timer.tc(fn -> Tuple.insert_at(tuple, 0, 0) end)
 
+tuple_time
 ```
 
 ## Accessing
@@ -270,7 +276,13 @@ to access the first element, and last element of a list with `5000` elements.
 Then do the same for tuples.
 
 ```elixir
+list = Enum.to_list(1..5_000)
+tuple = List.to_tuple(list)
 
+{list_time, _} = :timer.tc(fn -> Enum.at(list, 4_999) end)
+{tuple_time, _} = :timer.tc(fn -> elem(tuple, 4_999) end)
+
+%{tuple: tuple_time, list: list_time}
 ```
 
 ## Concatenation
@@ -329,7 +341,13 @@ to concatenate a list with one element and a list with 5000 elements.
 Then try to concatenate a list with 5000 elements to a list with 1 element. Notice how it takes longer.
 
 ```elixir
+small_list = [1]
+large_list = Enum.to_list(2..5000)
 
+{small_time, _} = :timer.tc(fn -> small_list ++ large_list end)
+{large_time, _} = :timer.tc(fn -> large_list ++ small_list end)
+
+{small_time, large_time}
 ```
 
 ## Updating (Replacing)
@@ -367,6 +385,11 @@ put_elem(tuple, 2, 7)
 Let's compare the time it takes to update the first element of a list and tuple of equal size.
 
 ```elixir
+large_list = Enum.to_list(1..10_000_000)
+large_tuple = List.to_tuple(large_list)
+```
+
+```elixir
 {tuple_time, _result} = :timer.tc(fn -> put_elem(large_tuple, 0, 7) end)
 {list_time, _result} = :timer.tc(fn -> List.replace_at(large_list, 0, 7) end)
 
@@ -394,14 +417,26 @@ In the Elixir cell below, use `:timer.tc/1` to compare updating the **first** el
 and tuple with `5000` elements.
 
 ```elixir
+list = Enum.to_list(1..5_000)
+tuple = List.to_tuple(list)
 
+{tuple_time, _} = :timer.tc(fn -> put_elem(tuple, 0, 0) end)
+{list_time, _} = :timer.tc(fn -> List.replace_at(list, 0, 0) end)
+
+%{tuple: tuple_time, list: list_time}
 ```
 
 In the Elixir cell below, use `:timer.tc/1` to compare updating the **last** element of a list and tuple
 with `5000` elements.
 
 ```elixir
+list = Enum.to_list(1..5_000)
+tuple = List.to_tuple(list)
 
+{tuple_time, _} = :timer.tc(fn -> put_elem(tuple, 4_999, 0) end)
+{list_time, _} = :timer.tc(fn -> List.replace_at(list, 4_999, 0) end)
+
+%{tuple: tuple_time, list: list_time}
 ```
 
 ## Inserting
@@ -447,7 +482,13 @@ prove that inserting at the end of both a list and a tuple has $O(n)$ time compl
 In the Elixir cell below, use `:timer.tc` to insert to the end of a large `50000` element list and tuple.
 
 ```elixir
+list = Enum.to_list(1..50_000)
+tuple = List.to_tuple(list)
 
+{tuple_time, _result} = :timer.tc(fn -> Tuple.insert_at(tuple, 50_000, 1) end)
+{list_time, _result} = :timer.tc(fn -> List.insert_at(list, 50_000, 1) end)
+
+%{tuple: tuple_time, list: list_time}
 ```
 
 ## Deleting

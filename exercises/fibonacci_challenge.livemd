@@ -57,8 +57,9 @@ defmodule Fibonacci do
 
     iex> 
   """
-  def sequence(length) do
-  end
+  def sequence(0), do: 0
+  def sequence(1), do: 1
+  def sequence(n), do: sequence(n - 1) + sequence(n - 2)
 end
 ```
 
@@ -68,8 +69,25 @@ In the Elixir cell below, create a `FastFib` module. The `FastFib` module should
 
 ```elixir
 defmodule FastFib do
-  def sequence(length) do
-  end
+  def sequence(0), do: 0
+  def sequence(1), do: 1
+  def sequence(n), do: sequence(n - 1) + sequence(n - 2)
+end
+
+defmodule FastFib2 do
+  def sequence(0), do: 0
+  def sequence(n), do: do_sequence(n, [1, 0])
+
+  defp do_sequence(1, [a, _]), do: a
+  defp do_sequence(n, [a, b]), do: do_sequence(n - 1, [a + b, a])
+end
+
+defmodule FastFib3 do
+  def sequence(0), do: 0
+  def sequence(n), do: do_sequence(n, {1, 0})
+
+  defp do_sequence(1, {a, _}), do: a
+  defp do_sequence(n, {a, b}), do: do_sequence(n - 1, {a + b, a})
 end
 ```
 
@@ -78,17 +96,19 @@ Use [Benchee](https://hexdocs.pm/benchee/Benchee.html) to benchmark the performa
 ```elixir
 Benchee.run(
   %{
-    fast_fib: fn n -> FastFib.sequence(n) end
+    # "Multiple Function Heads" => fn n -> FastFib.sequence(n) end,
+    "Lists" => fn n -> FastFib2.sequence(n) end
+    # "Tuples" => fn n -> FastFib3.sequence(n) end
   },
   inputs: %{
-    "1: small" => 10,
-    "2: medium" => 30
+    # "1: small" => 10
+    # "2: medium" => 30
     # Uncomment the following if your solution can handle it! 
     # Make sure to add a comma above.
-    # "3: large" => 100,
-    # "4: xl" => 1000,
-    # "6: 2xl" => 10000,
-    # "7: 3xl" => 100_000
+    # "3: large" => 100
+    # "4: xl" => 1000
+    # "6: 2xl" => 10000
+    "7: 3xl" => 100_000
   },
   memory_time: 2
 )

@@ -110,10 +110,38 @@ RockPaperScissorsLizardSpock.play(:lizard, :lizard) # "Draw!"
 Implement the `RockPaperScissorsLizardSpock` module as documented.
 
 ```elixir
+guess1 = :rock
+guess2 = :scissors
+
+defmodule Test do
+  def beats?(guess1, guess2) do
+    beats = %{
+      rock: [:scissors, :lizard],
+      scissors: [:paper, :lizard],
+      paper: [:rock, :spock],
+      lizard: [:paper, :spock],
+      spock: [:rock, :scissors]
+    }
+
+    guess2 in beats[guess1]
+  end
+end
+
+Test.beats?(guess1, guess2)
+```
+
+```elixir
 defmodule RockPaperScissorsLizardSpock do
   @moduledoc """
   Rock Paper Scissors Lizard Spock Game
   """
+  @beats %{
+    rock: [:scissors, :lizard],
+    scissors: [:paper, :lizard],
+    paper: [:rock, :spock],
+    lizard: [:paper, :spock],
+    spock: [:rock, :scissors]
+  }
 
   @doc """
   Returns `true` if the first guess beats the second, and `false` otherwise.
@@ -130,6 +158,7 @@ defmodule RockPaperScissorsLizardSpock do
     false
   """
   def beats?(guess1, guess2) do
+    guess2 in @beats[guess1]
   end
 
   @doc """
@@ -147,6 +176,11 @@ defmodule RockPaperScissorsLizardSpock do
     "Draw"
   """
   def play(player1, player2) do
+    cond do
+      player2 in @beats[player1] -> "Player 1 Wins!"
+      player2 == player1 -> "Draw"
+      true -> "Player 2 Wins!"
+    end
   end
 end
 ```

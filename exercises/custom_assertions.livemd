@@ -83,6 +83,77 @@ end
 ```elixir
 defmodule CustomAssertion do
   defmacro assert({operator, _meta, [left, right]}) do
+    quote bind_quoted: [operator: operator, left: left, right: right] do
+      AssertionTests.assert(operator, left, right)
+    end
+  end
+end
+
+defmodule AssertionTests do
+  def assert(:==, left, right) when left == right, do: "Success!"
+
+  def assert(:==, left, right) do
+    """
+    Assertion with `==` failed.
+
+    left: #{left}
+    right: #{right}
+    """
+  end
+
+  def assert(:>, left, right) when left > right, do: "Success!"
+
+  def assert(:>, left, right) do
+    """
+    Assertion with `>` failed.
+
+    left: #{left}
+    right: #{right}
+    """
+  end
+
+  def assert(:<, left, right) when left < right, do: "Success!"
+
+  def assert(:<, left, right) do
+    """
+    Assertion with `<` failed.
+
+    left: #{left}
+    right: #{right}
+    """
+  end
+
+  def assert(:>=, left, right) when left >= right, do: "Success!"
+
+  def assert(:>=, left, right) do
+    """
+    Assertion with `>=` failed.
+
+    left: #{left}
+    right: #{right}
+    """
+  end
+
+  def assert(:<=, left, right) when left <= right, do: "Success!"
+
+  def assert(:<=, left, right) do
+    """
+    Assertion with `<=` failed.
+
+    left: #{left}
+    right: #{right}
+    """
+  end
+
+  def assert(:===, left, right) when left === right, do: "Success!"
+
+  def assert(:===, left, right) do
+    """
+    Assertion with `===` failed.
+
+    left: #{left}
+    right: #{right}
+    """
   end
 end
 ```

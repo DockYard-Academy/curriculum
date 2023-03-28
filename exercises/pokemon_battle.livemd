@@ -102,6 +102,8 @@ defmodule Pokemon do
     iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
     %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
   """
+  @enforce_keys [:name, :type, :speed]
+  defstruct @enforce_keys ++ [health: 20, attack: 5]
 
   @doc """
   subtract the attack damage of an attacker from the defender's health.
@@ -130,7 +132,16 @@ defmodule Pokemon do
     iex> Pokemon.attack(attacker, defender)
     %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
   """
+  @type_advantage %{fire: :grass, grass: :water, water: :fire}
   def attack(attacker, defender) do
+    damage =
+      cond do
+        defender.type == @type_advantage[attacker.type] -> attacker.attack * 2
+        attacker.type == @type_advantage[defender.type] -> attacker.attack / 2
+        attacker.type == defender.type -> attacker.attack
+      end
+
+    %{defender | health: defender.health - damage}
   end
 end
 ```
@@ -138,7 +149,10 @@ end
 Consider using the following Elixir cell to test your solution.
 
 ```elixir
+attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
 
+Pokemon.attack(attacker, defender)
 ```
 
 ### Pokemon Instances
@@ -189,7 +203,11 @@ Pokemon.attack(charmander, bulbasaur)
 Enter your solution below.
 
 ```elixir
+charmander = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+bulbasaur = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+squirtle = %Pokemon{name: "Squirtle", type: :water, health: 20, attack: 5, speed: 20}
 
+Pokemon.attack(squirtle, charmander)
 ```
 
 ## Commit Your Progress
