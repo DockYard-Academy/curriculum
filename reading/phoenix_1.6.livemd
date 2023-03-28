@@ -477,7 +477,7 @@ live_dashboard_path  GET  /dashboard/:node/:page                 Phoenix.LiveDas
 
 <!-- livebook:{"break_markdown":true} -->
 
-Now when we visit http://localhost/count, we'll see the following error because the `CounterController` module does not exist.
+Now when we visit http://localhost:4000/count, we'll see the following error because the `CounterController` module does not exist.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -501,12 +501,20 @@ defmodule CounterWeb.PageController do
 end
 ```
 
-Notice that the function name `index/2` matches the atom defined in the router.
+Notice that the function name `index/2` matches the atom defined in `counter/lib/counter_web/router.ex`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 get "/", PageController, :index
+```
+
+Make sure to add the following line to your router file.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+get "/count", CounterController, :index
 ```
 
 To make our counter, we need to define the `CounterController` controller. Create a file `lib/counter_web/controllers/counter_controller.ex` with the following content.
