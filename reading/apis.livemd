@@ -257,6 +257,43 @@ json = "{\"hello\"\: \"world\"}"
 Jason.decode!(json)
 ```
 
+```elixir
+case HTTPoison.get!("https://datafruits.streampusher.com/api/wiki_pages.json/?q/=cheese") do
+  %HTTPoison.Response{status_code: 200, body: body} ->
+    Jason.decode!(body)
+
+  %HTTPoison.Response{status_code: 404} ->
+    IO.puts("Not found")
+
+  %HTTPoison.Error{reason: reason} ->
+    IO.inspect(reason)
+end
+
+# data = repose["data"]
+# title = Kernel.get_in(data, ["attributes", "title"])
+# host = Kernel.get_in(data, ["attributes", "hosted_by"])
+# description = Kernel.get_in(data, ["attributes", "description"])
+# IO.puts("Next show is #{title}, hosted by #{host}! Description: #{description}.")
+
+# repose =
+#   case HTTPoison.get!("https://datafruits.streampusher.com/scheduled_shows/next.json") do
+#     %HTTPoison.Response{status_code: 200, body: body} ->
+#       Jason.decode!(body)
+
+#     %HTTPoison.Response{status_code: 404} ->
+#       IO.puts("Not found")
+
+#     %HTTPoison.Error{reason: reason} ->
+#       IO.inspect(reason)
+#   end
+
+# data = repose["data"]
+# title = Kernel.get_in(data, ["attributes", "title"])
+# host = Kernel.get_in(data, ["attributes", "hosted_by"])
+# description = Kernel.get_in(data, ["attributes", "description"])
+# IO.puts("Next show is #{title}, hosted by #{host}! Description: #{description}.")
+```
+
 ## Poison
 
 One popular alternative to [Jason](https://hexdocs.pm/jason/Jason.html) is the [Poison](https://hexdocs.pm/poison/Poison.html) library.
@@ -352,6 +389,22 @@ Once you are sure the above works correctly, use [Poison.decode/2](https://hexdo
 
 ```elixir
 response
+```
+
+```elixir
+rpons = HTTPoison.get!("https://datafruits.streampusher.com/api/wiki_pages.json/?q/=#{query}")
+
+# response =
+#       case HTTPoison.get!("https://datafruits.streampusher.com/api/wiki_pages.json/?q/=#{query}") do
+#         %HTTPoison.Response{status_code: 200, body: body} ->
+#           Jason.decode!(body)
+#         %HTTPoison.Response{status_code: 404} ->
+#           IO.puts("Not found")
+#         %HTTPoison.Error{reason: reason} ->
+#           IO.inspect(reason)
+#       end
+
+# IO.inspect(response)
 ```
 
 ## Mark As Completed
