@@ -1,4 +1,4 @@
-# Double Ended Queues
+# Queues
 
 ```elixir
 Mix.install([
@@ -52,6 +52,18 @@ Elements in a queue are inserted (enqueued) to the **back** (also called the rea
 
 <!-- livebook:{"break_markdown":true} -->
 
+### LIFO Queues
+
+A LIFO Queue (Last-In-First-Out) is a type of data structure that stores elements and retrieves the most recently stored element. It is also known as a **Stack**.
+
+We **push** elements onto the top of the stack and **pop** them off of the top of the stack.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/Stack.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
 ### Double Ended Queues
 
 A Double-Ended Queue (Deque) is a type of data structure that allows the performant insertion and removal of elements from both ends of the queue.
@@ -59,6 +71,20 @@ A Double-Ended Queue (Deque) is a type of data structure that allows the perform
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/FIFO%20Double%20Ended%20Queue.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Priority Queue
+
+A Priority queue stores elements with an associated priority level. Elements are removed in order of priority.
+
+A minimum priority queue retrieves elements with the lowest priority level, and a maximum priority queue retrieves elements with the highest priority level.
+
+For example, a doctors office might be considered a priority queue, as patients with more severe issues are treated first.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/Priority_Queue.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -583,6 +609,89 @@ Diving into this library is beyond the scope of this material. Still, knowing ho
 The thundering herd problem happens when a lot of computer processes or threads are waiting for the same thing causing a big surge of activity that can slow down or even crash the system.
 
 It's called the thundering herd problem because it's like a stampede of animals reacting to a sudden disturbance. Avoiding this problem requires techniques like load balancing, caching, and queuing to manage the flow of requests and prevent the system from becoming overwhelmed.
+
+## Naive Priority Queue
+
+Typically priority queues are implemented using a tree structure. However, for our naive solution we'll use a list.
+
+Elements in our priority queue will be a tuple with the associated priority.
+
+```elixir
+priority_queue = [{"critical injury", 1}, {"moderate injury", 2}, {"minor illness", 3}]
+```
+
+There are two main ways to implement a priority queue using a single list.
+
+1. Store the elements in an unsorted order and retrieve the priority element.
+2. Store the elements in a sorted order and retrieve the first element.
+
+Solution 1 optimizes for storing elements, because we can insert elements at the head of the list and retrieving them is more difficult.
+
+Solution 2 optimizes for retrieving elements because we can remove elements at the head of the list and storing them is more difficult.
+
+We'll choose solution 2, because we want to opimize for retrieving elements, rather than storing them.
+
+We've also chosen to implement this as a minumum priority queue, where lower values are prioritized.
+
+```elixir
+defmodule PriorityQueue do
+  def new do
+    []
+  end
+
+  def add([], new_element), do: [new_element]
+
+  def add(queue, new_element) do
+    # find the index of the first element with a greater priority value.
+    index =
+      Enum.find_index(queue, fn current_element ->
+        priority_of(new_element) < priority_of(current_element)
+      end)
+
+    # insert at the back of the list if there is no index.
+    List.insert_at(queue, index || -1, new_element)
+  end
+
+  def next(queue) do
+    hd(queue)
+  end
+
+  def remove(queue) do
+    tl(queue)
+  end
+
+  defp priority_of(element) do
+    elem(element, 1)
+  end
+end
+```
+
+Elements will be added in order of priority (low -> high).
+
+```elixir
+# 4231 -> 1234
+
+priority_queue =
+  PriorityQueue.new()
+  |> PriorityQueue.add({"minor illness", 4})
+  |> PriorityQueue.add({"moderate sprain", 2})
+  |> PriorityQueue.add({"severe injury", 3})
+  |> PriorityQueue.add({"critical injury", 1})
+```
+
+We can view the next element to be removed.
+
+```elixir
+priority_queue
+|> PriorityQueue.next()
+```
+
+Then remove that element to return the rest of the priority queue.
+
+```elixir
+priority_queue
+|> PriorityQueue.remove()
+```
 
 ## Further Reading
 
