@@ -100,6 +100,42 @@ Both our Queue and Double-Ended Queue have an amortized $O(1)$ performance. On a
 
 Implementing a naive algorithm involves developing a straightforward solution to a problem, which may not necessarily be the most efficient or optimal solution. A naive algorithm is usually the first algorithm that comes to mind when thinking about a problem, and it is often easy to comprehend and execute. Nevertheless, it may not be the most effective solution for larger or more complex input sizes, especially when compared to other more sophisticated algorithms. Naive solutions are also sometimes referred to as a brute-force algorithm.
 
+## Stack
+
+A stack is a fairly simple data structure to implement, as we can implement a highly performance version of a stack using only a list.
+
+```elixir
+defmodule Stack do
+  def new do
+    []
+  end
+
+  def push(stack, element) do
+    [element | stack]
+  end
+
+  def pop(stack) do
+    {hd(stack), tl(stack)}
+  end
+end
+```
+
+The head of the list is the top of the stack.
+
+Elements are pushed onto the top of the stack and removed from the top of the stack.
+
+```elixir
+stack =
+  Stack.new()
+  |> Stack.push(1)
+  |> Stack.push(2)
+  |> Stack.push(3)
+```
+
+```elixir
+Stack.pop(stack)
+```
+
 ## Naive Queue
 
 For our naive solution, we can represent our queue as a list.
@@ -682,15 +718,13 @@ priority_queue =
 We can view the next element to be removed.
 
 ```elixir
-priority_queue
-|> PriorityQueue.next()
+PriorityQueue.next(priority_queue)
 ```
 
 Then remove that element to return the rest of the priority queue.
 
 ```elixir
-priority_queue
-|> PriorityQueue.remove()
+PriorityQueue.remove(priority_queue)
 ```
 
 ## Further Reading
