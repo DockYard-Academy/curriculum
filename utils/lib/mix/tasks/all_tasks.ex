@@ -9,13 +9,13 @@ defmodule Mix.Tasks.AllTasks do
     "update_deps",
     "format_notebooks",
     "update_readme_outline",
-    "deprecate_unused_files"
+    "deprecate_unused_files",
+    "spell_check"
   ]
 
   @impl true
   def run(_) do
     # runs tasks in requirements, then prints:
     IO.puts("Finished All Tasks")
-    S
   end
 end

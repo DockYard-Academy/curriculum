@@ -1,4 +1,4 @@
-# Double Ended Queues
+# Queues
 
 ```elixir
 Mix.install([
@@ -19,7 +19,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Double Ended Queues">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Queues">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
@@ -52,6 +52,18 @@ Elements in a queue are inserted (enqueued) to the **back** (also called the rea
 
 <!-- livebook:{"break_markdown":true} -->
 
+### LIFO Queues
+
+A LIFO Queue (Last-In-First-Out) is a type of data structure that stores elements and retrieves the most recently stored element. It is also known as a **Stack**.
+
+We **push** elements onto the top of the stack and **pop** them off of the top of the stack.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/Stack.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
 ### Double Ended Queues
 
 A Double-Ended Queue (Deque) is a type of data structure that allows the performant insertion and removal of elements from both ends of the queue.
@@ -59,6 +71,20 @@ A Double-Ended Queue (Deque) is a type of data structure that allows the perform
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/FIFO%20Double%20Ended%20Queue.drawio.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Priority Queue
+
+A Priority queue stores elements with an associated priority level. Elements are removed in order of priority.
+
+A minimum priority queue retrieves elements with the lowest priority level, and a maximum priority queue retrieves elements with the highest priority level.
+
+For example, a doctors office might be considered a priority queue, as patients with more severe issues are treated first.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/Priority_Queue.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -73,6 +99,42 @@ Both our Queue and Double-Ended Queue have an amortized $O(1)$ performance. On a
 ### Naive Implementation
 
 Implementing a naive algorithm involves developing a straightforward solution to a problem, which may not necessarily be the most efficient or optimal solution. A naive algorithm is usually the first algorithm that comes to mind when thinking about a problem, and it is often easy to comprehend and execute. Nevertheless, it may not be the most effective solution for larger or more complex input sizes, especially when compared to other more sophisticated algorithms. Naive solutions are also sometimes referred to as a brute-force algorithm.
+
+## Stack
+
+A stack is a fairly simple data structure to implement, as we can implement a highly performance version of a stack using only a list.
+
+```elixir
+defmodule Stack do
+  def new do
+    []
+  end
+
+  def push(stack, element) do
+    [element | stack]
+  end
+
+  def pop(stack) do
+    {hd(stack), tl(stack)}
+  end
+end
+```
+
+The head of the list is the top of the stack.
+
+Elements are pushed onto the top of the stack and removed from the top of the stack.
+
+```elixir
+stack =
+  Stack.new()
+  |> Stack.push(1)
+  |> Stack.push(2)
+  |> Stack.push(3)
+```
+
+```elixir
+Stack.pop(stack)
+```
 
 ## Naive Queue
 
@@ -584,6 +646,87 @@ The thundering herd problem happens when a lot of computer processes or threads 
 
 It's called the thundering herd problem because it's like a stampede of animals reacting to a sudden disturbance. Avoiding this problem requires techniques like load balancing, caching, and queuing to manage the flow of requests and prevent the system from becoming overwhelmed.
 
+## Naive Priority Queue
+
+Typically priority queues are implemented using a tree structure. However, for our naive solution we'll use a list.
+
+Elements in our priority queue will be a tuple with the associated priority.
+
+```elixir
+priority_queue = [{"critical injury", 1}, {"moderate injury", 2}, {"minor illness", 3}]
+```
+
+There are two main ways to implement a priority queue using a single list.
+
+1. Store the elements in an unsorted order and retrieve the priority element.
+2. Store the elements in a sorted order and retrieve the first element.
+
+Solution 1 optimizes for storing elements, because we can insert elements at the head of the list and retrieving them is more difficult.
+
+Solution 2 optimizes for retrieving elements because we can remove elements at the head of the list and storing them is more difficult.
+
+We'll choose solution 2, because we want to opimize for retrieving elements, rather than storing them.
+
+We've also chosen to implement this as a minimum priority queue, where lower values are prioritized.
+
+```elixir
+defmodule PriorityQueue do
+  def new do
+    []
+  end
+
+  def add([], new_element), do: [new_element]
+
+  def add(queue, new_element) do
+    # find the index of the first element with a greater priority value.
+    index =
+      Enum.find_index(queue, fn current_element ->
+        priority_of(new_element) < priority_of(current_element)
+      end)
+
+    # insert at the back of the list if there is no index.
+    List.insert_at(queue, index || -1, new_element)
+  end
+
+  def next(queue) do
+    hd(queue)
+  end
+
+  def remove(queue) do
+    tl(queue)
+  end
+
+  defp priority_of(element) do
+    elem(element, 1)
+  end
+end
+```
+
+Elements will be added in order of priority (low -> high).
+
+```elixir
+# 4231 -> 1234
+
+priority_queue =
+  PriorityQueue.new()
+  |> PriorityQueue.add({"minor illness", 4})
+  |> PriorityQueue.add({"moderate sprain", 2})
+  |> PriorityQueue.add({"severe injury", 3})
+  |> PriorityQueue.add({"critical injury", 1})
+```
+
+We can view the next element to be removed.
+
+```elixir
+PriorityQueue.next(priority_queue)
+```
+
+Then remove that element to return the rest of the priority queue.
+
+```elixir
+PriorityQueue.remove(priority_queue)
+```
+
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
@@ -602,7 +745,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish Double Ended Queues reading"
+$ git commit -m "finish Queues reading"
 $ git push
 ```
 
@@ -620,7 +763,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Double Ended Queues">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Queues">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
