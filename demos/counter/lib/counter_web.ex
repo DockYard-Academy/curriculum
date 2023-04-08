@@ -100,7 +100,7 @@ defmodule CounterWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: CounterWeb.Endpoint,
         router: CounterWeb.Router,
-        statics: CounterWeb.static_paths()
+        statistics: CounterWeb.static_paths()
     end
   end
 
