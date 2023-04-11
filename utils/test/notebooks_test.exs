@@ -122,7 +122,7 @@ defmodule Utils.NotebooksTest do
 
     message = """
     ./file_does_not_exist does not exist.
-    Try running mix compile --force to ensure the notebook has been compiled.
+    Try running mix compile --force in the test environment to ensure the notebook has been compiled.
     """
 
     assert_raise RuntimeError, message, fn ->

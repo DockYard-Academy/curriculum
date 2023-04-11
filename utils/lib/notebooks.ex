@@ -121,7 +121,7 @@ defmodule Utils.Notebooks do
       {:error, _} ->
         raise """
         #{notebook.relative_path} does not exist.
-        Try running mix compile --force to ensure the notebook has been compiled.
+        Try running mix compile --force in the #{Mix.env()} environment to ensure the notebook has been compiled.
         """
     end
   end
