@@ -26,7 +26,7 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/home_page.livemd">Home Page</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -137,7 +137,7 @@ We use web APIs to communicate with servers on the internet. These APIs provide 
 * [JokeAPI](https://sv443.net/jokeapi/v2/#getting-started) returns a random joke.
 * [OpenAI API](https://platform.openai.com/docs/api-reference) generate text, images, and perform other AI related tasks.
 
-## cURL
+## CURL
 
 cURL (pronounced like "curl") stands for "client for URL". cURL is a command-line tool used to transfer data to or from a server.
 
@@ -157,7 +157,7 @@ Here, we use the `System` module to simulate running a curl request from your co
 IO.puts(response)
 ```
 
-### cURL options
+### CURL Options
 
 cURL options are used to customize and modify the behavior of curl commands. Here are some commonly used curl options:
 
@@ -332,7 +332,7 @@ Now we can work with the decoded body like any Elixir map. For example we can ac
 decoded_body["joke"]
 ```
 
-## Building a Finch Request
+## Building A Finch Request
 
 We can build a more complex request using [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5). It's an important skill to read documentation in cURL and convert it into an HTTP request using an HTTP client. For sake of example, we're going to convert our previous Open AI API request into a Finch request.
 
@@ -357,7 +357,7 @@ There are a few key details we can gather from this request.
   * **Authorization**: Includes authentication information in the request, proving the client has been authenticated and is authorized to access the resource.
 * **data (body)**: Contains the JSON data to be sent in the request body.
 
-We need to take the information from the cURL request and provide it to `Finch.build/5`. Here's the full spec for `Finch.build/5` that we need to provide.
+We need to take the information from the cURL request and provide it to [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5). Here's the full spec for [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5) that we need to provide.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -367,7 +367,7 @@ Finch.build(method, url, headers \\ [], body \\ nil, opts \\ [])
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Converting our cURL request into Elixir terms
+### Converting Our CURL Request Into Elixir Terms
 
 Here's the cURL request broken down into valid Elixir terms in the format the Finch expects.
 
@@ -380,8 +380,8 @@ method = :post
 
 url = "https://api.openai.com/v1/images/generations"
 
-# Replace the $OPEN_API_TOKEN with your token.
-# Make sure to revoke the token later to avoid publicly exposing it.
+# Replace The $OPEN_API_TOKEN With Your Token.
+# Make Sure To Revoke The Token Later To Avoid Publicly Exposing It.
 
 headers = [
   {"Content-Type", "application/json"},
@@ -396,7 +396,7 @@ body =
   })
 ```
 
-### How do we know it's a post request?
+### How Do We Know It's A Post Request?
 
 Most of this information is taken directly from the cURL request. However, the **Method** can be assumed as a POST request, even though it isn't specified. That's because the cURL request includes the `-d` option. a GET request cannot be sent with data, so cURL inferes that it's a post request. It also says so on the [Open AI API Reference](https://platform.openai.com/docs/api-reference/images) for image generation.
 
@@ -509,7 +509,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/home_page.livemd">Home Page</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

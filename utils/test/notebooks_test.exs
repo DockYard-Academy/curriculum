@@ -265,7 +265,7 @@ defmodule Utils.NotebooksTest do
                {:benchee, "~> 1.1"},
                {:poison, "~> 5.0.0"},
                {:httpoison, "~> 2.1.0"},
-               {:finch, "~> 0.15.0"},
+               {:finch, "~> 0.16.0"},
                {:timex, "~> 3.7.11"},
                {:ecto, "~> 3.9.5"},
                {:faker, "~> 0.17.0"},

@@ -8,6 +8,8 @@ Mix.install([
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
   {:finch, "~> 0.16.0"}
 ])
+
+Finch.start_link(name: MyApp.Finch)
 ```
 
 ## Navigation
@@ -96,7 +98,7 @@ C--> S: close connection
 
 <!-- livebook:{"break_markdown":true} -->
 
-Below, we simulate a web server that accepts only a single request, and returns `"Hello, world!"` to the client. We then send the web server a [HTTPoison.get!/3](https://hexdocs.pm/httpoison/HTTPoison.html#get!/3) request and receive a response from the server.
+Below, we simulate a web server that accepts only a single request, and returns `"Hello, world!"` to the client. We then send the web server a request and receive a response.
 
 ```elixir
 port = 4000
@@ -125,7 +127,7 @@ spawn(fn ->
 end)
 
 # Send Request
-HTTPoison.get!("http://localhost:#{port}")
+Finch.build(:get, "http://localhost:#{port}") |> Finch.request!(MyApp.Finch)
 ```
 
 The code above is purely for demonstration purposes. We won't need to write our own webserver, instead we'll rely on frameworks like [Phoenix](https://www.phoenixframework.org/) that do all of this for us.
