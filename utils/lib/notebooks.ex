@@ -183,8 +183,8 @@ defmodule Utils.Notebooks do
   def title_case(heading) do
     String.split(heading)
     |> Enum.map_join(" ", fn
-      word -> :string.titlecase(word)
       "cURL" -> "cURL"
+      word -> :string.titlecase(word)
     end)
   end
 
