@@ -1,4 +1,4 @@
-# Spoonacular Recipe API
+# OpenAI Chat API
 
 ```elixir
 Mix.install([
@@ -6,8 +6,7 @@ Mix.install([
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:httpoison, "~> 2.1.0"},
-  {:poison, "~> 5.0.0"}
+  {:finch, "~> 0.16.0"}
 ])
 ```
 
@@ -20,7 +19,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Spoonacular Recipe API">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=OpenAI Chat API">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
@@ -32,19 +31,56 @@ Mix.install([
 </div>
 </div>
 
-## Spoonacular Recipe API
+## cURL Request
 
-[Spoonacular](https://spoonacular.com/) is a popular food API.
+Make the following cURL request to the Open AI Chat API. This comes from the [Open AI API Reference](https://platform.openai.com/docs/api-reference/chat/create).
 
-Create a free Spoonacular to get your API key. You can view your API key in the [Spoonacular Console](https://spoonacular.com/food-api/console#Dashboard).
+Make sure to replace $OPENAI_API_KEY with your Bearer token. After creating an OpenAI account, you can find or create an API key here: https://platform.openai.com/account/api-keys.
 
-### Browser Request
+```
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
 
-Use your API to visit the `https://api.spoonacular.com/recipes/complexSearch?apiKey=API_KEY` URL where API_KEY should be your API key from the console.
+## Finch Request
 
-### HTTPoison Request
+Make a Finch request to create a chat completion. You can base the request on the cURL request above.
 
-Use [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) to retrieve the same JSON data from the `https://api.spoonacular.com/recipes/complexSearch?apiKey=API_KEY` URL you visited in the browser. Then use [Poison](https://hexdocs.pm/poison/Poison.html) to decode the JSON response into an Elixir data structure.
+Decode the response using Jason and print the response string from the Chat API using `IO.puts/2`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We've used the fake token `sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x` to demonstrate how to replace `$OPENAI_API_TOKEN` with your bearer token.
+
+```elixir
+request =
+  Finch.build(
+    :post,
+    "https://api.openai.com/v1/chat/completions",
+    [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x"}
+    ],
+    Jason.encode!(%{
+      model: "gpt-3.5-turbo",
+      messages: [%{role: "user", content: "Hello!"}]
+    })
+  )
+  |> Finch.request!(MyApp.Finch)
+
+decoded_body = Jason.decode!(request.body)
+
+[%{"message" => %{"content" => message}}] = decoded_body["choices"]
+
+IO.puts(message)
+```
+</details>
 
 ```elixir
 
@@ -59,7 +95,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish Spoonacular Recipe API exercise"
+$ git commit -m "finish OpenAI Chat API exercise"
 $ git push
 ```
 
@@ -77,7 +113,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Spoonacular Recipe API">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=OpenAI Chat API">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>

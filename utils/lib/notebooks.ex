@@ -39,7 +39,7 @@ defmodule Utils.Notebooks do
     {:benchee, "1.1"},
     {:poison, "5.0.0"},
     {:httpoison, "2.1.0"},
-    {:finch, "0.15.0"},
+    {:finch, "0.16.0"},
     {:timex, "3.7.11"},
     {:ecto, "3.9.5"},
     {:jason, "1.4"},
@@ -182,7 +182,10 @@ defmodule Utils.Notebooks do
 
   def title_case(heading) do
     String.split(heading)
-    |> Enum.map_join(" ", &:string.titlecase/1)
+    |> Enum.map_join(" ", fn
+      "cURL" -> "cURL"
+      word -> :string.titlecase(word)
+    end)
   end
 
   def remove_setup_section(notebook) do

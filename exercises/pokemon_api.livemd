@@ -6,8 +6,7 @@ Mix.install([
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:httpoison, "~> 2.1.0"},
-  {:poison, "~> 5.0.0"}
+  {:finch, "~> 0.16.0"}
 ])
 ```
 
@@ -24,7 +23,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/tailwind.livemd">Tailwind</a>
@@ -46,17 +45,19 @@ Often, certain APIs will have a language-specific implementation that makes it e
 
 You're going to create a `Pokelixir` project which uses the [Pokemon API](https://pokeapi.co/) to return Elixir-friendly `Pokemon` structs.
 
+## Initialize The Mix Project
+
 Create a new `Pokelixir` mix project.
 
 ```
 mix new pokelixir
 ```
 
-Ensure you add [HTTPoison](https://github.com/edgurgel/httpoison) and [Poison](https://github.com/devinus/poison) as dependencies.
+Add [Finch](https://github.com/sneako/finch) and [Jason](https://github.com/michalmuskala/jason) as dependencies. Ensure you add Finch to your application's supervision tree as documented on the Finch GitHub.
 
-## Pokemon Structs
+## Define A Pokemon Struct
 
-A `Pokemon` struct should have the following (required) keys. You do not need to implement data validation.
+A `Pokemon` struct should have the following (required) keys. We've included the types for clarity, you do not need to implement data validation.
 
 ```mermaid
 classDiagram
@@ -97,9 +98,7 @@ Here's that data represented as a `Pokemon` struct.
 
 ## Get A Pokemon
 
-We can request information about Pokemon using the [Pokemon API](https://pokeapi.co/).
-
-You can retrieve information with the following URL where `name` is the name of the pokemon.
+Using the [Pokemon API](https://pokeapi.co/), you can retrieve information about a pokemon using the following URL where `name` is the name of the pokemon.
 
 ```
 https://pokeapi.co/api/v2/pokemon/name
@@ -118,18 +117,6 @@ You should be able to retrieve the data for a pokemon and return it as a `Pokemo
 ```elixir
 Pokelixir.get("charizard")
 ```
-
-<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
-<summary>Hint</summary>
-
-You can retrieve and decode the response using [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Poison](https://hexdocs.pm/poison/Poison.html).
-
-```elixir
-{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/charizard")
-response = Poison.decode!(response.body)
-```
-
-</details>
 
 ## Get All Pokemon
 
@@ -254,11 +241,6 @@ Pokemon.all()
 You can either recursively retrieve the next `20` pokemon using the `"next"` url, or
 you can make a request using the `limit` query parameter with a larger value than the number of pokemon.
 
-```elixir
-{:ok, response} = HTTPoison.get("https://pokeapi.co/api/v2/pokemon/?limit=1154")
-response = Poison.decode!(response.body)
-```
-
 </details>
 
 ## GitHub Repository
@@ -307,7 +289,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/tailwind.livemd">Tailwind</a>

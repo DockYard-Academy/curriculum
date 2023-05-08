@@ -6,8 +6,7 @@ Mix.install([
   {:kino, "~> 0.9", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"},
-  {:httpoison, "~> 2.1.0"},
-  {:poison, "~> 5.0.0"}
+  {:finch, "~> 0.16.0"}
 ])
 ```
 
@@ -27,21 +26,23 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/home_page.livemd">Home Page</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Review Questions
 
-Upon completing this lesson, a student should be able to answer the following questions.
+Upon completing this lesson, a student should be able to answer the following questions:
 
 * What are the common HTTP request methods and what do they do?
-* What is a web API, and how can we communcate with one using [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html)?
-* What is JSON, and how can we parse it from an API response using [Jason](https://hexdocs.pm/jason/Jason.html)?
-* How can we authorize requests for a private API?
+* How do we send a cURL request?
+* How do we send an HTTP request with an HTTP client such as Finch?
+* What is JSON and how can we parse it into an Elixir term?
+* What are Bearer Tokens and how can we use them to authenticate and authorize a request?
+* Why is it bad to expose access tokens and how can we prevent or recover from doing so?
 
-## What Is An API?
+## Overview
 
 API stands for Application Programming Interface. In broad terms,
 an API is a way to communicate between pieces of software.
@@ -68,57 +69,27 @@ You use APIs every time you open your browser (Chrome, Safari, Firefox, Edge, et
 
 ### URL (Uniform Resource Locator)
 
-The client uses a [URL](https://en.wikipedia.org/wiki/URL) (Uniform Resource Locator) to locate the server on the internet.
+A URL (Uniform Resource Locator) is a string of characters that specifies the address of a resource on the internet. A URL consists of different parts, each with its own meaning:
 
-For example, you can visit the URL https://v2.jokeapi.dev/joke/Any?safe-mode&format=json. This URL locates the server(s) powering the Joke API that returns a random joke.
+* **Protocol**: The protocol specifies how the client and server communicate, for example, HTTP, HTTPS, FTP, etc.
 
-The Joke API returns a JSON response. [JSON (JavaScript Object Notation)](https://en.wikipedia.org/wiki/Json) is a key-value format conceptually similar to a map in Elixir.
+* **Domain name**: The domain name is the address of the server that hosts the resource. For example, in the URL "https://www.example.com", "www.example.com" is the domain name.
 
-```javascript
-{
-    "error": false,
-    "category": "Programming",
-    "type": "twopart",
-    "setup": "Why did the functional programmer get thrown out of school?",
-    "delivery": "Because he refused to take classes.",
-    "flags": {
-        "nsfw": false,
-        "religious": false,
-        "political": false,
-        "racist": false,
-        "sexist": false,
-        "explicit": false
-    },
-    "id": 48,
-    "safe": true,
-    "lang": "en"
-}
-```
+* **Path**: The path specifies the location of the resource on the server. It comes after the domain name and starts with a forward slash ("/"). For example, in the URL "https://www.example.com/path/to/resource.html", "/path/to/resource.html" is the path.
 
-**A URL contains the following information**
+* **Query string**: The query string contains additional parameters that modify the request or provide data to the server. It starts with a question mark ("?") and includes one or more key-value pairs separated by ampersands ("&"). For example, in the URL "https://www.example.com/search?name=example&sort=date", "name=example" and "sort=date" are query string parameters.
 
-* The communication protocol: `https`
-* The domain name: `v2.jokeapi.dev`
-* Path (optional): `joke/Any`
-* Query parameters (optional): `?safe-mode&format=json`
+<!-- livebook:{"break_markdown":true} -->
 
-**The communication protocol** specifies how to communicate with the server. [HTTP (Hypertext Transfer Protocol)](https://en.wikipedia.org/wiki/Http) and [HTTPS (Hypertext Transfer Protocol Secure)](https://en.wikipedia.org/wiki/Https) are communication protocols used to send and receive data between the client and the server.
+### Your Turn
 
-**The domain name** is a convenient label that maps to the underlying IP (Internet Protocol) address. For example, you can use http://142.250.217.68 instead of https://www.google.com to request the Google home page from a Google server.
+Identify the Protocol, Domain Name, Path, and Query string (separated into separate query parameters and their values) in the following url:
 
-**The path** specifies the resource we want from the server. In this case, we use the `/joke/Any` path to get a random joke.
+https://www.fakedomaindoesnotexist.com/fake/domain?greeting=hello&fake=true
 
-**Query parameters** contain additional options and information to send to the server. A URL may include many query parameters to send to the server. Query parameters start with a question mark `?` and are each split by an ampersand `&`. For example, `?safe-mode&format-json` specifies that we want to use safe-mode and return the joke in a JSON format.
+<!-- livebook:{"break_markdown":true} -->
 
-## Web APIs
-
-We use web APIs to communicate with servers on the internet. These APIs provide useful functionality that would otherwise be difficult to build on our own. Here are a few example APIs.
-
-* The [Stripe API](https://stripe.com/docs/api) handles Stripe payments.
-* The [OpenWeatherAPI](https://openweathermap.org/) provides live weather information.
-* The [JokeAPI](https://sv443.net/jokeapi/v2/#getting-started) returns a random joke.
-
-## HTTP Request Methods
+### HTTP Request Methods
 
 [HTTP (Hypertext Transfer Protocol)](https://developer.mozilla.org/en-US/docs/Web/HTTP) is the protocol used for transferring data on the web. [The HTTP request methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods), also known as verbs, indicate the desired action to be performed on the identified resource.
 
@@ -141,23 +112,9 @@ When you use a browser, you're actually using HTTP under the hood. The browser h
 
 As developers, we want to interact with web APIs directly using the HTTP protocol to request and send information.
 
-## HTTPoison
+<!-- livebook:{"break_markdown":true} -->
 
-In Elixir, we use an HTTP client to make HTTP requests. There are many libraries, but for our purpose we've chosen install the popular [HTTPoison](https://github.com/edgurgel/httpoison) HTTP client library for you in this livebook.
-
-We're going to use [HTTPoison](https://github.com/edgurgel/httpoison) to demonstrate how to make HTTP requests.
-
-For a simple example, here's how we can request a joke from the same API you visited earlier in the browser.
-
-```elixir
-HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
-```
-
-We use the [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) function to make a GET request. The response from the server includes the `:body`, `:headers`, `:status_code`, and `:request_url`.
-
-The `:body` is the JSON response you saw previously in the browser, and `:headers` provide additional context and meta-data about the response. The `:status_code` specifies the response's status, where `200` indicates a successful response. The `:request_url` is simply the URL.
-
-## Response Codes
+### Response Codes
 
 APIs use various response codes to communicate the status of a request. These are generally called [response codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) and are grouped into five classes.
 
@@ -167,16 +124,168 @@ APIs use various response codes to communicate the status of a request. These ar
 4. Client error responses (400–499)
 5. Server error responses (500–599)
 
-You've already seen that a successful request returns a `200` response. You might also be familiar with the `404` not found response code.
+For example, you might be familiar with seeing the `404` not found response code.
 
-```elixir
-{:ok, response} = HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
-response.status_code
+<!-- livebook:{"break_markdown":true} -->
+
+### Web APIs
+
+We use web APIs to communicate with servers on the internet. These APIs provide useful functionality that would otherwise be difficult to build on our own. Here are a few example APIs.
+
+* [Stripe API](https://stripe.com/docs/api) handles Stripe payments.
+* [OpenWeatherAPI](https://openweathermap.org/) provides live weather information.
+* [JokeAPI](https://sv443.net/jokeapi/v2/#getting-started) returns a random joke.
+* [OpenAI API](https://platform.openai.com/docs/api-reference) generate text, images, and perform other AI related tasks.
+
+## cURL
+
+cURL (pronounced like "curl") stands for "client for URL". cURL is a command-line tool used to transfer data to or from a server.
+
+You can make a simple cURL request by typing the following in your command line.
+
+```
+curl https://www.example.com
 ```
 
-## JSON With Jason
+It's important to understand cURL because most APIs include documentation using cURL requests examples and we can use these simple curl requests to test an API or know how to send a request in our chosen Elixir API Client.
 
-As mentioned, JSON is a format for storing information in a key-value structure.
+Here, we use the `System` module to simulate running a curl request from your command line and print the response for the sake of example. Notice it returns the HTML document of https://www.example.com.
+
+```elixir
+{response, _exit_status} = System.cmd("curl", ["https://www.example.com"])
+
+IO.puts(response)
+```
+
+### cURL Options
+
+cURL options are used to customize and modify the behavior of curl commands. Here are some commonly used curl options:
+
+* -X: Specifies the HTTP method to be used, such as GET, POST, PUT, or DELETE.
+* -H: Specifies an HTTP header to include in the request, such as Content-Type or Authorization.
+* -d: Specifies data to include in the request body, such as form data or JSON data.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Run the following fake curl request in your command line. The `\` character allows us to split up a command into multiple lines.
+
+```
+curl -X POST \
+-H "Content-Type: application/json" \
+-d '{"username":"johndoe","password":"password123"}' https://www.example.com/login
+```
+
+You should see a response similar to the following:
+
+```html
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+        <head>
+                <title>404 - Not Found</title>
+        </head>
+        <body>
+                <h1>404 - Not Found</h1>
+                <script type="text/javascript" src="//obj.ac.bcon.ecdns.net/ec_tpm_bcon.js"></script>
+        </body>
+</html>
+```
+
+## Authentication
+
+APIs use different forms of authentication to check if a user is authorized to access certain resources. Typically most forms auth authentication use some kind of access token to identify the user accessing the resource. Public APIs will not require any kind of access token, while private APIs will.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bearer Tokens
+
+Bearer Tokens are a type of access token used to authenticate and authorize requests to access protected resources in APIs.
+
+Typically APIs allow you to create an account and receive an API key. We use this key as a bearer token that allows us to access API resources.
+
+For example, here's an example API request to the [Open AI API](https://platform.openai.com/docs/guides/images/usage) that requires a bearer token to create an image of a siamese cat. `$OPENAI_API_KEY` would be replaced with the actual bearer token to make the request.
+
+```
+curl https://api.openai.com/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "prompt": "a white siamese cat",
+    "n": 1,
+    "size": "1024x1024"
+  }'
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+First, try copy/pasting the curl request above into your command line. You should see the following error:
+
+```
+{
+  "error": {
+    "code": null,
+    "message": "Invalid authorization header",
+    "param": null,
+    "type": "server_error"
+  }
+}
+```
+
+Then, follow these steps to create a bearer token and make an authenticated request to generate an AI image.
+
+1. Create a free Open AI Account: https://auth0.openai.com/u/signup/
+2. Find or create an API key: https://platform.openai.com/account/api-keys
+3. Send the cURL request above in your command line. Make sure to replace `$OPENAI_API_KEY` with the api key you created.
+
+You should see a response that looks something like this:
+
+```js
+{
+  "created": 1683498991,
+  "data": [
+    {
+      "url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-xZKFBB8qReE9rPvITFyOR6WR/user-bOWL7A3HQkffCs8ssJEx4gsI/img-nCmoC73zliZ9YuUCAxQ3043K.png?st=2023-05-07T21%3A36%3A31Z&se=2023-05-07T23%3A36%3A31Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-05-07T17%3A44%3A05Z&ske=2023-05-08T17%3A44%3A05Z&sks=b&skv=2021-08-06&sig=ovkn87xw2l981zy62Aio3GErj7bfRF7zUL8HJulfL5s%3D"
+    }
+  ]
+}
+```
+
+Go to the URL created in your browser to see the generated image.
+
+You will use this Bearer token later on in this lesson. If you run out of free credits or have any other issues, request a bearer token to use from your teacher.
+
+## Finch
+
+Finch is one of many HTTP clients that allow us to send HTTP requests in Elixir.
+
+We've chosen to teach [Finch](https://github.com/sneako/finch) instead of other popular libraries such as [HTTPoison](https://github.com/edgurgel/httpoison) or [Req](https://github.com/wojtekmach/req) because it's included by default with Phoenix 1.7 projects.
+
+To send a request with Finch we need to start the Finch process. This is typically done in the application's supervision tree, but we'll do it here for demonstration purposes. Finch starts under a named process. We've chosen `MyApp.Finch` but this name is arbitrary and typically done for you in a Phoenix project.
+
+```elixir
+Finch.start_link(name: MyApp.Finch)
+```
+
+Once the Finch process has started, to make a request we build the request information in a `Finch.Request` struct using [Finch.build/5](https://hexdocs.pm/finch/0.16.0/Finch.html#build/5).
+
+```elixir
+request = Finch.build(:get, "https://www.example.com")
+```
+
+Then we provide this struct to the [Finch.request/3](https://hexdocs.pm/finch/0.16.0/Finch.html#request/3) function using the name of the Finch process to send the request.
+
+```elixir
+Finch.request!(request, MyApp.Finch)
+```
+
+## Jason
+
+JSON is a popular format for storing information in a key-value structure.
 
 ```javascript
 {
@@ -185,7 +294,7 @@ As mentioned, JSON is a format for storing information in a key-value structure.
 }
 ```
 
-Elixir represents JASON as a string, not a key-value structure. For example, the above in Elixir would be:
+Elixir represents JSON as a string, not a key-value structure. For example, the above in Elixir would be:
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -193,149 +302,177 @@ Elixir represents JASON as a string, not a key-value structure. For example, the
 "{\"key1\":\"value1\",\"key2\":\"value2\"}"
 ```
 
-APIs commonly return a JSON response. For example, here's the JSON response in the body of the request we've made to the JOKE API.
+We can use the popular [Jason](https://github.com/michalmuskala/jason) to encode an Elixir term into JSON and decode JSON into an Elixir term such as a map.
 
 ```elixir
-{:ok, request} = HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
-
-request.body
-```
-
-When it's printed as a string, it has pretty formatting.
-
-```elixir
-IO.puts(request.body)
-```
-
-However, as a string, it's a difficult structure to work with if we want to access specific keys and values. There is no internal representation of JSON in Elixir, so to make it more convenient to work with, we need to **decode** it in to a key-value data structure such as a map.
-
-Similarly, if we need to send JSON to an API, then we need to **encode** a map into a JSON string.
-
-We can use the [Jason](https://hexdocs.pm/jason/Jason.html) library to make it easier to encode and decode JSON.
-
-```elixir
-Jason.encode!(%{key: "value"})
+Jason.decode!("{\"key1\":\"value1\",\"key2\":\"value2\"}")
 ```
 
 ```elixir
-Jason.decode!("{\"key\"\: \"value\"}")
+Jason.encode!(%{"key1" => "value1", "key2" => "value2"})
 ```
 
-By combining [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Jason](https://hexdocs.pm/jason/Jason.html) we can retrieve the JSON from the Joke API and return
-an Elixir map.
+APIs commonly return a JSON response. For example, here we make a request to a JokeAPI that returns a JSON response.
 
 ```elixir
 response =
-  case HTTPoison.get("https://v2.jokeapi.dev/joke/Any?safe-mode&format=json") do
-    {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-      Jason.decode!(body)
-  end
+  Finch.build(:get, "https://v2.jokeapi.dev/joke/Any?safe-mode&format=json")
+  |> Finch.request!(MyApp.Finch)
 ```
 
-Now we could use this response in our program.
+The response body is a JSON string that we need to decode. We can get the body out of the response and then use Jason to decode it into a map.
 
 ```elixir
-IO.puts("""
-#{response["setup"]}
+decoded_body = Jason.decode!(response.body)
+```
 
-#{response["delivery"]}
-""")
+Now we can work with the decoded body like any Elixir map. For example we can access the "joke" field.
+
+```elixir
+decoded_body["joke"]
+```
+
+## Building A Finch Request
+
+We can build a more complex request using [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5). It's an important skill to read documentation in cURL and convert it into an HTTP request using an HTTP client. For sake of example, we're going to convert our previous Open AI API request into a Finch request.
+
+Take the following cURL request from the Open AI documentation.
+
+```
+curl https://api.openai.com/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_TOKEN" \
+  -d '{
+    "prompt": "a white siamese cat",
+    "n": 1,
+    "size": "1024x1024"
+  }'
+```
+
+There are a few key details we can gather from this request.
+
+* **Method**: The HTTP method of the request. Typically GET, POST, PATCH, PUT, or DELETE.
+* **Headers**: HTTP headers provide additional information about a request or response, such as the content type or authentication and are transmitted as key-value pairs.
+  * **Content-Type**: Specifies the format of the data being sent in the request body.
+  * **Authorization**: Includes authentication information in the request, proving the client has been authenticated and is authorized to access the resource.
+* **data (body)**: Contains the JSON data to be sent in the request body.
+
+We need to take the information from the cURL request and provide it to [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5). Here's the full spec for [Finch.build/5](https://hexdocs.pm/finch/Finch.html#build/5) that we need to provide.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Finch.build(method, url, headers \\ [], body \\ nil, opts \\ [])
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Converting Our cURL Request Into Elixir Terms
+
+Here's the cURL request broken down into valid Elixir terms in the format the Finch expects.
+
+You may replace the `$OPENAI_API_TOKEN` with a valid token to see the actual API response if you like. However, you should **never** expose your API tokens, which would happen if you store this Livebook on GitHub.
+
+To avoid exposing your token, make sure to create a new token and revoke the token you used for this lesson: https://platform.openai.com/account/api-keys
+
+```elixir
+method = :post
+
+url = "https://api.openai.com/v1/images/generations"
+
+# Replace The $OPEN_API_TOKEN With Your Token.
+# Make Sure To Revoke The Token Later To Avoid Publicly Exposing It.
+
+headers = [
+  {"Content-Type", "application/json"},
+  {"Authorization", "Bearer $OPENAI_API_TOKEN"}
+]
+
+body =
+  Jason.encode!(%{
+    prompt: "a white siamese cat",
+    n: 1,
+    size: "1024x1024"
+  })
+```
+
+### How Do We Know It's A Post Request?
+
+Most of this information is taken directly from the cURL request. However, the **Method** can be assumed as a POST request, even though it isn't specified. That's because the cURL request includes the `-d` option. a GET request cannot be sent with data, so cURL inferes that it's a post request. It also says so on the [Open AI API Reference](https://platform.openai.com/docs/api-reference/images) for image generation.
+
+If we wanted to make this cURL request more explicit, it could be written with the `-X` option, but that's not necessary and not how many APIs will be documented.
+
+```
+curl https://api.openai.com/v1/images/generations \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_TOKEN" \
+  -d '{
+    "prompt": "a white siamese cat",
+    "n": 1,
+    "size": "1024x1024"
+  }'
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### The Request
+
+Putting all of this together, we get the following Finch request, which we can decode using Jason.
+
+```elixir
+request = Finch.build(method, url, headers, body) |> Finch.request!(MyApp.Finch)
+
+Jason.decode!(request.body)
 ```
 
 ### Your Turn
 
-Use [Jason.decode!/2](https://hexdocs.pm/jason/Jason.html#encode!/2) to decode the following JSON string.
+Make a Finch request for the following curl request from the [Open AI API Reference](https://platform.openai.com/docs/api-reference/chat/create).
+
+```
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+Decode the response using Jason and print the response string from the Chat API using `IO.puts/2`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We've used the fake token `sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x` to demonstrate how to replace `$OPENAI_API_TOKEN` with your bearer token.
 
 ```elixir
-json = "{\"hello\"\: \"world\"}"
-```
-
-## Poison
-
-One popular alternative to [Jason](https://hexdocs.pm/jason/Jason.html) is the [Poison](https://hexdocs.pm/poison/Poison.html) library.
-
-It comes with similar functionality. We've chosen to use Jason in Livebook lessons as it has a faster compilation time.
-
-[Jason](https://hexdocs.pm/jason/Jason.html) and [Poison](https://hexdocs.pm/poison/Poison.html) must be installed as a project dependency to use them. We've already installed [Jason](https://hexdocs.pm/jason/Jason.html) in all Livebooks, but not [Poison](https://hexdocs.pm/poison/Poison.html).
-
-```elixir
-Poison.decode!("{\"key\"\: \"value\"}")
-```
-
-```elixir
-Poison.encode!(%{key: "value"})
-```
-
-## HTTP POST
-
-HTTP GET requests retrieve data from a server and HTTP POST requests send data to a server.
-
-We've already seen how we can use [HTTPoison.get/3](https://hexdocs.pm/httpoison/HTTPoison.html#get/3) to make an HTTP GET request.
-We can also use the [HTTPoison.post/4](https://hexdocs.pm/httpoison/HTTPoison.html#post/4) function to make an HTTP POST request.
-
-POST requests include **body** and **headers**. The body contains the data to send to the server. The headers contain context and metadata about the body of data being sent, which is the data to send to the server. The POST request also includes **headers** which
-contain context and metadata about the data. For example, the `Content-Type` header tells the server the format of data being sent.
-
-Below we send a POST request to http://httparrot.herokuapp.com/post. The body is a JSON string `"{\"body\": \"test\"}"` and the
-`Content-Type` header specifies that the data being sent is JSON.
-
-```elixir
-HTTPoison.post("http://httparrot.herokuapp.com/post", Poison.encode!(%{body: "test"}), [
-  {"Content-Type", "application/json"}
-])
-```
-
-## Private APIs
-
-So far, we've seen how to use [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html) and [Poison](https://hexdocs.pm/poison/Poison.html) to retrieve information from a public API. However, some APIs are private.
-
-Private APIs require an API key to communicate with them. This key is then included in the HTTP request to authenticate the request.
-
-For example, the [Open Weather API](https://openweathermap.org/) requires an API key when making a GET request. The server returns a `401` unauthorized response without the correct API key.
-
-```elixir
-api_key = ""
-
-HTTPoison.get("https://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=#{api_key}")
-```
-
-Generally, you want to keep your API key a secret because bad actors could use it to maliciously access private information or attack the server with too many requests.
-
-### Your Turn
-
-The [Open Weather API](https://openweathermap.org/) exposes the following URL to provide weather data.
-
-```
-https://api.openweathermap.org/data/2.5/weather?lat=LATITUDE&lon=LONGITUDE&appid=API_KEY
-```
-
-`lat`, `lon`, and `appid` are all query parameters, where we replace **LATITUDE**, **LONGITUDE**, and **API_KEY** with the correct values.
-
-Create a free account on the [Open Weather API](https://openweathermap.org/) and then get your API key from [Open Weather API Keys](https://home.openweathermap.org/api_keys) page.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/open%20weather%20api%20key.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Use your API key and valid latitude/longitude coordinates to make a successful request to their API. Ensure the `:status_code` is `200` rather than `401`.
-
-```elixir
-lat = 35
-lon = 139
-api_key = ""
-
-{:ok, response} =
-  HTTPoison.get(
-    "https://api.openweathermap.org/data/2.5/weather?lat=#{lat}&lon=#{lon}&appid=#{api_key}"
+request =
+  Finch.build(
+    :post,
+    "https://api.openai.com/v1/chat/completions",
+    [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x"}
+    ],
+    Jason.encode!(%{
+      model: "gpt-3.5-turbo",
+      messages: [%{role: "user", content: "Hello!"}]
+    })
   )
-```
+  |> Finch.request!(MyApp.Finch)
 
-Once you are sure the above works correctly, use [Poison.decode/2](https://hexdocs.pm/poison/Poison.html#decode/2) to decode the `response` into an Elixir map.
+decoded_body = Jason.decode!(request.body)
+
+[%{"message" => %{"content" => message}}] = decoded_body["choices"]
+
+IO.puts(message)
+```
+</details>
 
 ```elixir
-response
+
 ```
 
 ## Commit Your Progress
@@ -372,7 +509,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/home_page.livemd">Home Page</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/spoonacular_recipe_api.livemd">Spoonacular Recipe API</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/open_ai_chat.livemd">OpenAI Chat API</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
