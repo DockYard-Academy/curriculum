@@ -88,6 +88,8 @@ The command above would to the following:
 
 It also generates boilerplate for the web layer of our application including the controller, component, and template. It does not generate routes for our router though, as these have to be manually inserted.
 
+See [mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html) for a complete list of phoenix generators.
+
 ## Context
 
 Phoenix contexts are a way of organizing related functionality in a Phoenix application. Each context represents a coherent set of operations that relate to a specific domain or aspect of the application's functionality.
@@ -133,6 +135,42 @@ defmodule Blog.Posts do
 end
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Ecto.Query
+
+`Ecto.Query` is imported in the example above. Contexts often work with `Ecto.Query` when writing queries for retrieving and manipulating data in a database.
+
+Here's an example query that allows us to filter a list of posts query by a case insensitive and partially matching `title` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_posts(title) do
+  search = "%#{title}%"
+  query = from p in Post, where: ilike(p.title, ^search)
+
+  Repo.all(query)
+end
+```
+
+[ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2) allows us to search a case insensitive string. The `%` symbol acts as a wildcard to find partially matching searches.
+
+[from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2) selects the table to query, and [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) filters the list of results.
+
+Ecto allows for a pipeable syntax that some developers prefer. For example, the above could also be written as:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def list_posts(title) do
+    search = "%#{title}%"
+    Post
+    |> where([p], ilike(p.title, ^search))
+    |> Repo.all()
+  end
+```
+
 ## Schema
 
 In Ecto, a schema is a module that defines the structure and properties of a database table. The schema maps the fields of the table to the fields of the struct in the module, and it also defines any constraints or validations on those fields.
@@ -164,6 +202,27 @@ end
 ```
 
 The [Ecto.schema/2](https://hexdocs.pm/ecto/Ecto.Schema.html#schema/2) and [field/3](https://hexdocs.pm/ecto/Ecto.Schema.html#field/3) macros define the fields and the data types of those fields. The Schema maps the fields of the PostgreSQL table into valid Elixir terms in a `Post` struct to make records in the database elixir-friendly when we work with them. You can find the full list of valid field types at [Ecto.Schema: Types and casting](https://hexdocs.pm/ecto/Ecto.Schema.html#module-types-and-casting).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Validations and Constraints
+
+Validations ensure data is valid before entering the database. Constraints are rules enforced by the database.
+
+For example, the [validate_required/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_required/3) validates that a field exists before inserting it into the database.
+
+However, we might add a [unique_constraint](https://hexdocs.pm/ecto/Ecto.Changeset.html#unique_constraint/3) that ensures a title is unique when compared with other posts in the database. This requires querying the database under the hood.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:title, :subtitle, :content])
+    |> validate_required([:title, :subtitle, :content])
+    |> unique_constraint(:title)
+  end
+```
 
 ## Migration
 
@@ -230,6 +289,54 @@ You can also rollback migrations with [mix ecto.rollback](https://hexdocs.pm/ect
 ```
 $ mix ecto.rollback
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Manipulating Tables
+
+Ecto provides functions for manipulating tables in a database. Here are a few common functions:
+
+* [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2): creates a new table in the database
+* [alter/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#alter/2): modifies an existing table in the database
+* [rename/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#rename/2): renames an existing table in the database
+* [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2): removes an existing table from the database
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Manipulating Fields
+
+[Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) provides functions for manipulating fields in a table. Here are a few to get you started.
+
+* [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new field to the table.
+* [modify/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#modify/3) modifies an existing field in the table.
+* [remove/2](https://hexdocs.pm/ecto/Ecto.Migration.html#remove/1) removes an existing field from the table.
+
+Here is an example migration that uses some of these Ecto functions to manipulate fields on a table:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Repo.Migrations.AlterUsersTable do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      add :phone, :string
+
+      modify :email, :string, unique: true
+      modify :name, :string, null: false
+
+      remove :age
+    end
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Schemas Reflect Migrations
+
+The schema maps the fields of our database table into Elixir data. A migration may involve changing the data type or structure of an existing column, which would in turn require updating the schema to reflect these changes. Always ensure the schema reflects the latest version of a table in the database.
 
 ## Repo
 

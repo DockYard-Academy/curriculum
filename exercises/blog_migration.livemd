@@ -36,60 +36,23 @@ Your existing [Blog](./group_project_blog.livemd) application should already hav
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Blog Post Migration
+### Requirements
 
-You're going to create a migration or many migrations to modify the blog posts table with the following changes:
-
-* Remove the `subtitle` field
-* Add a `published_on` `:date` field.
-* Add a `visible` `:boolean` field which defaults to `true`.
-
-Ensure your `Post` schema reflects these changes, and ensure all tests pass. Modify existing tests to include the new fields.
-
-Ensure all features of your application such as creating, reading, updating, and deleting posts continue to work. You will likely need to modify any pages using old fields that are no longer valid.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Form Fields
-
-Add a date input for the `published_on` field, and a checkbox input for the `visible` field.
-
-Use the IEx shell to view all `Post` records to ensure your form correctly creates a blog post.
-
-```
-iex -S mix
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Visibility
-
-When displaying a list of blog posts, hide any blog posts whose `visible` field is `false` or whose `published_on` field is after the current UTC date.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Push To GitHub
-
-From the `blog` folder run the following commands.
-
-First, ensure that all tests pass.
-
-```
-mix test
-```
-
-Then create a pull request, review it, and merge it into your main branch.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Bonus: Constraints
-
-Create another migration to add the following constraints:
-
-* Modify the title field to be unique.
-* Modify the `title` so it must be between `3` and `100` characters.
-
-Ensure your `Post` schema reflects these constraints and validations.
+* Migration & Schema
+  * Remove the `subtitle` field on posts
+  * Add a published_on `:date` field on posts.
+  * Add a `visible` `:boolean` field with a default value of `true` on posts.
+  * (optional) Add a unique constraint to post titles.
+* Functionality
+  * Update all post pages to account for the new and removed fields. For example, you will need to add the `visible` and `published_on` fields to the post form and remove the `subtitle` field.
+  * Display the list of posts from newest -> oldest.
+  * Hide posts if `visible` is `false`.
+  * Hide posts if their `published_on` date is in the future.
+* Tests
+  * Write Context and Controller tests to ensure posts with `visible: false` are filtered from the list of posts.
+  * Write Context and Controller tests to ensure posts with a published date in the future are filtered from the list of posts.
+  * Write Context and Controller tests to ensure posts are displayed from newest -> oldest.
+  * All tests should pass. You may need to modify old tests to ensure they continue to pass.
 
 ## Commit Your Progress
 
