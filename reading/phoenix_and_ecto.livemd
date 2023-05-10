@@ -366,6 +366,38 @@ For example, here's an example of how we use a `Post` struct to create a changes
 |> Repo.insert()
 ```
 
+## Entity Relationship Diagrams
+
+Projects often use Entity Relationship Diagrams or UML (Unified Modelling Language) diagrams of some kind to represent the data layer of the application.
+
+Livebook let's us write Entity Relationship Diagrams directly. See [Mermaid: Entity Relationship Diagrams](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) for an overview of the syntax.
+
+It's important to be able to read these diagrams. Here's an example:
+
+```mermaid
+erDiagram
+
+Comment {
+  id post_id
+  text content
+}
+
+Post {
+  string title
+  text content
+  date published_on
+  boolean visibility
+}
+
+Post ||--O{ Comment : "has many"
+```
+
+The above diagram describes both the fields and types of the data, as well as the associations between data.
+
+The pipe `||` in the line between `Post` and `Comment` represents **one** and the triple-lined-arrow with a circle represents **zero or more**. This describes the **one to many** relationship between posts and comments.
+
+The `post_id` field isn't strictly necessary given the diagram arrow implies the child contains a foreign key id but we've included it for sake of clarity.
+
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
