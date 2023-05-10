@@ -32,48 +32,31 @@ Mix.install([
 
 ## Blog: Comments
 
-You're going to create a `comments` table to your existing [Blog](./blog_posts.livemd) project. You do not yet need to create the appropriate UI for creating a comment.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Comment/Post Association
-
-A comment should **belong to** a blog post and a blog post should **have_many** comments.
-
-Comments should have `:content`, and `:post_id` (foreign key) fields.
+You're going to create a `comments` for blog posts on your existing [Blog](./group_project_blog.livemd) project.
 
 ```mermaid
-classDiagram
-  class Comment {
-    post_id: :id
-    content: :text
-  }
+erDiagram
+
+Comment {
+  text content
+  id post_id
+}
 ```
 
-<details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
-<summary>Hint</summary>
+### Requirements
 
-You will need to:
-1. Create the comments resource and run migrations.
-
-```
-$ mix phx.gen.html Comments Comment comments content:text post_id:references:posts
-$ mix ecto.migrate
-```
-
-2. Define the [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) relationship in the `Post` schema.
-
-3. Define the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) relationship in the `Comment` schema.
-
-</details>
-
-Once complete use the IEx shell to do the following:
-
-* Create a new blog post.
-* Use [build_assoc/3](https://hexdocs.pm/ecto/Ecto.html#build_assoc/3) to create a comment associated with your created blog post.
-* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to create a new blog post and create multiple comments associated with the blog post.
-* Use [put_assoc/4](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) to add a comment to one of your existing blog posts.
-* Use [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to create a new blog post and create multiple comments associated with the blog post.
+* Migration & Schema
+  * Create a comments table with a `content` field of type `:text`.
+  * Posts should **have many** comments (one-to-many), and comments should **belong to** a post.
+* Functionality
+  * Display comments on each post
+  * Create a comment for a post through a form on the post show page.
+  * (Bonus): Delete Comments
+  * (Bonus): Edit Comments
+* Tests
+  * Write Context and Controller tests to ensure the post page displays comments on the post.
+  * Write Context and Controller tests to ensure a comment can be created for a given post.
+  * All tests should pass. You may need to modify old tests to ensure they continue to pass.
 
 ## Commit Your Progress
 
