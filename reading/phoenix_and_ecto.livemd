@@ -342,6 +342,49 @@ end
 
 The schema maps the fields of our database table into Elixir data. A migration may involve changing the data type or structure of an existing column, which would in turn require updating the schema to reflect these changes. Always ensure the schema reflects the latest version of a table in the database.
 
+## Query
+
+The [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) module defines functions for creating database queries. Queryies themselves do not manipulate data in the database, but are instead a set of instructions to perform some operation in the database typically provided the [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) that performs the actual work on the Database.
+
+Here are some common functions:
+
+* [from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2): Defines the table or tables to query
+* [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3): Specifies a condition that records must meet to be included in the query results.
+* [order_by/3](https://hexdocs.pm/ecto/Ecto.Query.html#order_by/3): Sorts the query results by one or more fields.
+* [select/3](https://hexdocs.pm/ecto/Ecto.Query.html#select/3): Specifies which fields to include in the query results.
+* [type](https://hexdocs.pm/ecto/Ecto.Query.API.html#type/2): Returns a new query object with a specific type. Often useful when providing Elixir terms in queries to convert them into a database type.
+
+Here's an example query using keyword list syntax. The `^` symbol is used to inject Elixir terms into a database query. Elixir terms must be bound to a variable to inject them.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+search = "%#{title}%"
+
+today = DateTime.utc_now()
+
+query =
+  from(p in Post,
+    where: ilike(p.title, ^search),
+    where: p.visible,
+    where: p.published_on <= type(^today, :utc_datetime),
+    order_by: [desc: p.published_on]
+  )
+```
+
+The same query could be written using an alternative [pipe-based syntax](https://hexdocs.pm/ecto/Ecto.Query.html#module-macro-api) like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+query =
+  Post
+  |> where([p], ilike(p.title, ^search))
+  |> where([p], p.visible)
+  |> where([p], p.published_on <= type(^today, :utc_datetime))
+  |> order_by([p], desc: p.published_on)
+```
+
 ## Repo
 
 The [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) module defines functions for working with the database. Anytime we need to manipulate records in the database we work with the `Repo` module.

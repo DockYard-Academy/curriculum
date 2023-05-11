@@ -1,0 +1,38 @@
+<.header>
+  Listing Posts
+  <:actions>
+    <%= if assigns[:current_user] do %>
+      <.link href={~p"/posts/new"}>
+        <.button>New Post</.button>
+      </.link>
+    <% end %>
+  </:actions>
+</.header>
+
+<.simple_form :let={f} for={%{}} method="get" action={~p"/posts"}>
+  <.input field={f[:title]} type="text" label="Search Posts" />
+  <:actions>
+    <.button>Search</.button>
+  </:actions>
+</.simple_form>
+
+<.table id="posts" rows={@posts} row_click={&JS.navigate(~p"/posts/#{&1}")}>
+  <:col :let={post} label="Title"><%= post.title %></:col>
+  <:col :let={post} label="Content"><%= post.content %></:col>
+  <:col :let={post} label="Published On"><%= Calendar.strftime(post.published_on, "%c") %></:col>
+  <:action :let={post}>
+    <div class="sr-only">
+      <.link navigate={~p"/posts/#{post}"}>Show</.link>
+    </div>
+    <%= if assigns[:current_user] && post.user_id == assigns[:current_user].id do %>
+      <.link navigate={~p"/posts/#{post}/edit"}>Edit</.link>
+    <% end %>
+  </:action>
+  <:action :let={post}>
+    <%= if assigns[:current_user] && post.user_id == assigns[:current_user].id do %>
+      <.link href={~p"/posts/#{post}"} method="delete" data-confirm="Are you sure?">
+        Delete
+      </.link>
+    <% end %>
+  </:action>
+</.table>
