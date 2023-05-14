@@ -441,6 +441,42 @@ The pipe `||` in the line between `Post` and `Comment` represents **one** and th
 
 The `post_id` field isn't strictly necessary given the diagram arrow implies the child contains a foreign key id but we've included it for sake of clarity.
 
+## Seeding
+
+Phoenix projects include a `priv/repo/seeds.exs` file for creating data (seeding) the database.
+
+The `seed.exs` file can be run with the following command from the project folder:
+
+```
+mix run priv/repo/seeds.exs
+```
+
+Typically seed files work with the `Repo` module or functions in contexts to create data for manual testing purposes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Blog.Repo.insert!(%Blog.Posts.Post{
+  title: "Some Title",
+  subtitle: "Some Subtitle",
+  content: "Some Content",
+})
+
+Blog.Posts.create_post(%{
+  title: "Some Title",
+  subtitle: "Some Subtitle",
+  content: "Some Content",
+})
+```
+
+Seed files should not be run in the test environment, as they can interfere with test assertions.
+
+Seeds files are automatically run when resetting the database.
+
+```
+mix ecto.reset
+```
+
 ## Further Reading
 
 Consider the following resource(s) to deepen your understanding of the topic.
