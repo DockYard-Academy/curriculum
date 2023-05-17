@@ -1,9 +1,12 @@
 defmodule BlogWeb.PostControllerTest do
   use BlogWeb.ConnCase
 
+  alias Blog.Posts
+
   import Blog.AccountsFixtures
   import Blog.CommentsFixtures
   import Blog.PostsFixtures
+  import Blog.TagsFixtures
 
   @update_attrs %{
     content: "some updated content",
@@ -55,7 +58,13 @@ defmodule BlogWeb.PostControllerTest do
       post_user = user_fixture()
       comment_user = user_fixture()
       post = post_fixture(user_id: post_user.id)
-      comment = comment_fixture(content: "some comment content", user_id: comment_user.id, post_id: post.id)
+
+      comment =
+        comment_fixture(
+          content: "some comment content",
+          user_id: comment_user.id,
+          post_id: post.id
+        )
 
       conn = conn |> get(~p"/posts/#{post}/")
       response = html_response(conn, 200)
@@ -77,7 +86,15 @@ defmodule BlogWeb.PostControllerTest do
     test "redirects to show when data is valid", %{conn: conn} do
       user = user_fixture()
       conn = log_in_user(conn, user)
-      create_attrs = %{content: "some content", title: "some title", visible: true, published_on: DateTime.utc_now(), user_id: user.id}
+
+      create_attrs = %{
+        content: "some content",
+        title: "some title",
+        visible: true,
+        published_on: DateTime.utc_now(),
+        user_id: user.id
+      }
+
       conn = post(conn, ~p"/posts", post: create_attrs)
 
       assert %{id: id} = redirected_params(conn)
@@ -85,6 +102,30 @@ defmodule BlogWeb.PostControllerTest do
 
       conn = get(conn, ~p"/posts/#{id}")
       assert html_response(conn, 200) =~ "Post #{id}"
+    end
+
+    test "create post with tags", %{conn: conn} do
+      user = user_fixture()
+      conn = log_in_user(conn, user)
+
+      tag1 = tag_fixture(name: "tag 1 name")
+      tag2 = tag_fixture(name: "tag 2 name")
+
+      create_attrs = %{
+        content: "some content",
+        title: "some title",
+        visible: true,
+        published_on: DateTime.utc_now(),
+        user_id: user.id,
+        tag_ids: [tag1.id, tag2.id]
+      }
+
+      conn = post(conn, ~p"/posts", post: create_attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == ~p"/posts/#{id}"
+
+      assert Posts.get_post!(id).tags == [tag1, tag2]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -108,7 +149,10 @@ defmodule BlogWeb.PostControllerTest do
       other_user = user_fixture()
       post = post_fixture(user_id: post_user.id)
       conn = conn |> log_in_user(other_user) |> get(~p"/posts/#{post}/edit")
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You can only edit or delete your own posts."
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "You can only edit or delete your own posts."
+
       assert redirected_to(conn) == ~p"/posts/#{post}"
     end
   end
@@ -125,6 +169,20 @@ defmodule BlogWeb.PostControllerTest do
       assert html_response(conn, 200) =~ "some updated content"
     end
 
+    test "update post with tags", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+      tag1 = tag_fixture(name: "tag 1 name")
+      tag2 = tag_fixture(name: "tag 2 name")
+
+      conn = log_in_user(conn, user)
+
+      conn = put(conn, ~p"/posts/#{post}", post: %{tag_ids: [tag1.id, tag2.id]})
+      assert redirected_to(conn) == ~p"/posts/#{post}"
+
+      assert Blog.Repo.preload(post, :tags, force: true).tags == [tag1, tag2]
+    end
+
     test "renders errors when data is invalid", %{conn: conn} do
       user = user_fixture()
       post = post_fixture(user_id: user.id)
@@ -137,7 +195,10 @@ defmodule BlogWeb.PostControllerTest do
       other_user = user_fixture()
       post = post_fixture(user_id: post_user.id)
       conn = conn |> log_in_user(other_user) |> put(~p"/posts/#{post}", post: @update_attrs)
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You can only edit or delete your own posts."
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "You can only edit or delete your own posts."
+
       assert redirected_to(conn) == ~p"/posts/#{post}"
     end
   end
@@ -159,7 +220,10 @@ defmodule BlogWeb.PostControllerTest do
       other_user = user_fixture()
       post = post_fixture(user_id: post_user.id)
       conn = conn |> log_in_user(other_user) |> delete(~p"/posts/#{post}")
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You can only edit or delete your own posts."
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "You can only edit or delete your own posts."
+
       assert redirected_to(conn) == ~p"/posts/#{post}"
     end
   end

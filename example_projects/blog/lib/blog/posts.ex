@@ -51,7 +51,7 @@ defmodule Blog.Posts do
   def get_post!(id) do
     comments_query = from c in Comment, order_by: [desc: c.inserted_at, desc: c.id], preload: :user
 
-    post_query = from p in Post, preload: [:user, comments: ^comments_query]
+    post_query = from p in Post, preload: [:user, :tags, comments: ^comments_query]
 
     Repo.get!(post_query, id)
   end
@@ -68,9 +68,9 @@ defmodule Blog.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_post(attrs \\ %{}) do
+  def create_post(attrs \\ %{}, tags \\ []) do
     %Post{}
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, tags)
     |> Repo.insert()
   end
 
@@ -86,9 +86,9 @@ defmodule Blog.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_post(%Post{} = post, attrs) do
+  def update_post(%Post{} = post, attrs, tags \\ []) do
     post
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, tags)
     |> Repo.update()
   end
 

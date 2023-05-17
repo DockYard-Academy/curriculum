@@ -253,6 +253,7 @@ defmodule BlogWeb.CoreComponents do
   attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :selected, :list, doc: "the selected values to pass to Phoenix.HTML.Form.options_for_select/2", default: []
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
 
   attr :rest, :global,
@@ -306,7 +307,7 @@ defmodule BlogWeb.CoreComponents do
         {@rest}
       >
         <option :if={@prompt} value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+        <%= Phoenix.HTML.Form.options_for_select(@options, @value || @selected) %>
       </select>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
