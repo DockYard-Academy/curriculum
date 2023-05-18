@@ -58,7 +58,10 @@ defmodule BlogWeb.CommentControllerTest do
       conn = log_in_user(conn, other_user)
 
       conn = put(conn, ~p"/comments/#{comment}", comment: update_attrs)
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You can only edit or delete your own comments"
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "You can only edit or delete your own comments"
+
       assert redirected_to(conn) == ~p"/posts/#{post.id}"
     end
   end
@@ -86,11 +89,18 @@ defmodule BlogWeb.CommentControllerTest do
       post = post_fixture(user_id: comment_user.id)
 
       comment =
-        comment_fixture(content: "some comment content", post_id: post.id, user_id: comment_user.id)
+        comment_fixture(
+          content: "some comment content",
+          post_id: post.id,
+          user_id: comment_user.id
+        )
 
       conn = log_in_user(conn, other_user)
       conn = delete(conn, ~p"/comments/#{comment}")
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "You can only edit or delete your own comments"
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~
+               "You can only edit or delete your own comments"
+
       assert redirected_to(conn) == ~p"/posts/#{post.id}"
     end
   end

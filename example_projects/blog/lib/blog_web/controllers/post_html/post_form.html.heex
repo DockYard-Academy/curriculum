@@ -5,17 +5,14 @@
   <.input field={f[:user_id]} type="hidden" value={@current_user.id} />
   <.input field={f[:title]} type="text" label="Title" />
   <.input field={f[:content]} type="text" label="Content" />
-  <.input field={f[:published_on]} type="datetime-local" label="Publish On" value={DateTime.utc_now()} />
-  <.input field={f[:visible]} type="checkbox" label="Visible" />
-  <.input 
-    field={f[:tag_ids]} 
-    type="select" 
-    label="Tags" 
-    multiple={true} 
-    options={@tag_options}
-    selected={@tag_ids}
+  <.input
+    field={f[:published_on]}
+    type="datetime-local"
+    label="Publish On"
+    value={DateTime.utc_now()}
   />
-
+  <.input field={f[:visible]} type="checkbox" label="Visible" />
+  <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
 
   <:actions>
     <.button>Save Post</.button>

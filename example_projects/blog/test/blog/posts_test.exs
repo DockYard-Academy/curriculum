@@ -51,7 +51,10 @@ defmodule Blog.PostsTest do
       # comparing ids to avoid issues with comparing associations
       assert Posts.list_posts() |> Enum.map(& &1.id) == [present_post.id, past_post.id]
 
-      assert Posts.list_posts("some title") |> Enum.map(& &1.id) == [present_post.id, past_post.id]
+      assert Posts.list_posts("some title") |> Enum.map(& &1.id) == [
+               present_post.id,
+               past_post.id
+             ]
     end
 
     test "list_posts/1 filters posts by title" do

@@ -8,6 +8,7 @@ defmodule BlogWeb.PostController do
   alias Blog.Tags
 
   plug(:require_user_owns_post when action in [:edit, :update, :delete])
+  plug :page_title
 
   def index(conn, %{"title" => title}) do
     posts = Posts.list_posts(title)
@@ -21,8 +22,7 @@ defmodule BlogWeb.PostController do
 
   def new(conn, _params) do
     changeset = Posts.change_post(%Post{tags: []})
-    tag_options = Tags.list_tags() |> Enum.map(fn tag -> {tag.name, tag.id} end)
-    render(conn, :new, changeset: changeset, tag_options: tag_options, tag_ids: [])
+    render(conn, :new, changeset: changeset, tag_options: tag_options())
   end
 
   def create(conn, %{"post" => post_params}) do
@@ -35,12 +35,9 @@ defmodule BlogWeb.PostController do
         |> redirect(to: ~p"/posts/#{post}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        tag_options = Tags.list_tags() |> Enum.map(fn tag -> {tag.name, tag.id} end)
-
         render(conn, :new,
           changeset: changeset,
-          tag_options: tag_options,
-          tag_ids: post_params["tag_ids"]
+          tag_options: tag_options(Enum.map(tags, & &1.id))
         )
     end
   end
@@ -54,14 +51,12 @@ defmodule BlogWeb.PostController do
 
   def edit(conn, %{"id" => id}) do
     post = Posts.get_post!(id)
-    tag_options = Tags.list_tags() |> Enum.map(fn tag -> {tag.name, tag.id} end)
     changeset = Posts.change_post(post)
 
     render(conn, :edit,
       post: post,
       changeset: changeset,
-      tag_options: tag_options,
-      tag_ids: post.tags |> Enum.map(& &1.id)
+      tag_options: tag_options(Enum.map(post.tags, & &1.id))
     )
   end
 
@@ -76,13 +71,10 @@ defmodule BlogWeb.PostController do
         |> redirect(to: ~p"/posts/#{post}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        tag_options = Tags.list_tags() |> Enum.map(fn tag -> {tag.name, tag.id} end)
-
         render(conn, :edit,
           post: post,
           changeset: changeset,
-          tag_options: tag_options,
-          tag_ids: post_params["tags"]
+          tag_options: tag_options(Enum.map(tags, & &1.id))
         )
     end
   end
@@ -109,4 +101,14 @@ defmodule BlogWeb.PostController do
       |> halt()
     end
   end
+
+  defp tag_options(selected_ids \\ []) do
+    Tags.list_tags()
+    |> Enum.map(fn tag ->
+      [key: tag.name, value: tag.id, selected: tag.id in selected_ids]
+    end)
+  end
+
+
+  defp page_title(conn, _params), do: assign(conn, :page_title, "Posts")
 end

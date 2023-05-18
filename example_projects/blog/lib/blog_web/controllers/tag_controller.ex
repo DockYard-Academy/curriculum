@@ -4,6 +4,8 @@ defmodule BlogWeb.TagController do
   alias Blog.Tags
   alias Blog.Tags.Tag
 
+  plug :page_title
+
   def index(conn, _params) do
     tags = Tags.list_tags()
     render(conn, :index, tags: tags)
@@ -59,4 +61,6 @@ defmodule BlogWeb.TagController do
     |> put_flash(:info, "Tag deleted successfully.")
     |> redirect(to: ~p"/tags")
   end
+
+  defp page_title(conn, _params), do: assign(conn, :page_title, "Tags")
 end

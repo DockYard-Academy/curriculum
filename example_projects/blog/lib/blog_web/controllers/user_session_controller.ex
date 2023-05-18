@@ -4,6 +4,8 @@ defmodule BlogWeb.UserSessionController do
   alias Blog.Accounts
   alias BlogWeb.UserAuth
 
+  plug :page_title
+
   def new(conn, _params) do
     render(conn, :new, error_message: nil)
   end
@@ -26,4 +28,6 @@ defmodule BlogWeb.UserSessionController do
     |> put_flash(:info, "Logged out successfully.")
     |> UserAuth.log_out_user()
   end
+
+  defp page_title(conn, _params), do: assign(conn, :page_title, "Account")
 end

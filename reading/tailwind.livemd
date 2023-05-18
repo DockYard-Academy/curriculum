@@ -1,12 +1,16 @@
 # Tailwind
 
 ```elixir
-Mix.install([
-  {:jason, "~> 1.4"},
-  {:kino, "~> 0.9", override: true},
-  {:youtube, github: "brooklinjazz/youtube"},
-  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
-])
+Mix.install(
+  [
+    {:jason, "~> 1.4"},
+    {:kino, "~> 0.9", override: true},
+    {:youtube, github: "brooklinjazz/youtube"},
+    {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+    {:kino_tailwind_playground, github: "BrooklinJazz/kino_tailwind_playground"}
+  ],
+  force: true
+)
 ```
 
 ## Navigation
@@ -80,11 +84,19 @@ To experiment with Tailwind, we can use the Tailwind CDN (Content Delivery Netwo
 </html>
 ```
 
-## Tailwind Play
+We've also created a [Livebook Tailwind Playground](https://github.com/BrooklinJazz/kino_tailwind_playground) for the purposes of demonstration. All tailwind examples are editable and render live.
 
-Alternatively, we can use the [Tailwind Play](https://play.tailwindcss.com/) playground to experiment with Tailwind classes.
+<!-- livebook:{"attrs":{"html":"<div class=\"flex items-center justify-center h-screen w-full bg-green-200\">\n  <h1 class=\"text-3xl font-bold underline text-center\">\n    Go Ahead And Change This Text!\n  </h1>\n</div>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
 
-For example, go to [Tailwind Play](https://play.tailwindcss.com/) and enter the following HTML to create an HTML heading 3 element with bold font, an underline, and a triple extra large font size.
+```elixir
+Kino.nothing()
+```
+
+### Your Turn
+
+Tailwind provides the [Tailwind Play](https://play.tailwindcss.com/) playground to experiment with Tailwind classes.
+
+Go to [Tailwind Play](https://play.tailwindcss.com/) and enter the following HTML to create an HTML heading 3 element with bold font, an underline, and a triple extra large font size.
 
 ```html
 <h1 class="font-bold underline text-3xl">
@@ -114,8 +126,6 @@ h1 {
 }
 ```
 
-We're going to use [Tailwind Play](https://play.tailwindcss.com/) instead of a local HTML file for the sake of this lesson.
-
 ## Documentation
 
 We can find all available Tailwind utility classes from the [Tailwind Documentation](https://tailwindcss.com/docs/installation). They have a handy Quick Search for finding Tailwind classes.
@@ -128,19 +138,19 @@ We can find all available Tailwind utility classes from the [Tailwind Documentat
 
 ### Your Turn (BONUS)
 
-Use the [Tailwind Documentation](https://tailwindcss.com/docs/installation) and the [Tailwind Play](https://play.tailwindcss.com/) playground to create the following button. This is a challenge of your resourcefulness at reading documentation and problem solving.
+Use the [Tailwind Documentation](https://tailwindcss.com/docs/installation) to create the following button.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/tailwind_button_example.png)
 
-<!-- livebook:{"break_markdown":true} -->
+<!-- livebook:{"attrs":{"html":"<!-- Add tailwind utility classes to style the button as you see above -->\n<button class=\"\">Click Me!</button>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
 
-If you can't figure it out, don't worry, and don't spend too much time on this. Hopefully it will become clear after the rest of the reading.
+```elixir
+Kino.nothing()
+```
 
-## Background
-
-We're able to set the background color using the `bg-{color}-{shade}` class.
+## Colors
 
 Tailwind comes with a [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette). Each color has a base name such as `red` then a number to indicate the shade of color.
 
@@ -148,19 +158,21 @@ The default colors are `slate`, `gray`, `zinc`, `neutral`, `stone`, `red`, `oran
 
 The default shades are `50`, `100`, `200`, `300`, `400`, `500`, `600`, `700`, `800`, and `900`.
 
-So we can apply a background color to an HTML element like so.
+This color pallet works with a variety of utility classes such as [text-color](https://tailwindcss.com/docs/text-color) and [background-color](https://tailwindcss.com/docs/background-color).
 
-```html
-<h1 class="bg-orange-500"></h1>
+So we can apply a background color and text color to an HTML element like so.
+
+<!-- livebook:{"attrs":{"html":"<p class=\"text-red-600 bg-blue-200\">I have a blue background and red text!</p>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
+
+```elixir
+Kino.nothing()
 ```
-
-Try using the `bg-{color}-{shade}` utility class in the [Tailwind Play](https://play.tailwindcss.com/) playground.
 
 ## Text
 
 ### [Font Size](https://tailwindcss.com/docs/font-size)
 
-We've already seen we can change font size using `text-{size}` utilities.
+We can change font size using `text-{size}` utilities.
 
 ```html
 <p class="text-3xl">
@@ -170,54 +182,30 @@ We have access to the following sizes: `xs`, `sm`, `base`, `lg`, `xl`, `2xl`, `3
 
 With Tailwind, `<p>`, `h1`, `h2`, `h3`, `h4`, `h5`, and `h6` are purely semantic and do not apply any styles by default.
 
-Try putting the following HTML into the [Tailwind Play](https://play.tailwindcss.com/) playground and notice there is no difference between each element.
+<!-- livebook:{"attrs":{"html":"<!-- Notice that elements are semantic, and have no default styles/sizes -->\n<p>paragraph</p>\n<h1>h1</h1>\n<h2>h2</h2>\n<h3>h3</h3>\n<h4>h4</h4>\n<h5>h5</h5>\n<h6>h6</h6>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
 
-```html
-<p>paragraph</p>
-<h1>h1</h1>
-<h2>h2</h2>
-<h3>h3</h3>
-<h4>h4</h4>
-<h5>h5</h5>
-<h6>h6</h6>
+```elixir
+Kino.nothing()
 ```
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### [Font Weight](https://tailwindcss.com/docs/font-weight)
 
 `font-{weight}` sets the font weight of text. The `weight` can be `thin`, `extralight`, `light`, `normal`, `medium`, `semibold`, `bold`, `extrabold`, and `black`.
 
-```html
-<p class="thin">100</p>
-<p class="extralight">200</p>
-<p class="light">300</p>
-<p class="normal">400</p>
-<p class="medium">500</p>
-<p class="semibold">600</p>
-<p class="bold">700</p>
-<p class="extrabold">800</p>
-<p class="black">900</p>
+<!-- livebook:{"attrs":{"html":"<section class=\"text-3xl\">\n  <p class=\"font-thin\">100</p>\n  <p class=\"font-extralight\">200</p>\n  <p class=\"font-light\">300</p>\n  <p class=\"font-normal\">400</p>\n  <p class=\"font-medium\">500</p>\n  <p class=\"font-semibold\">600</p>\n  <p class=\"font-bold\">700</p>\n  <p class=\"font-extrabold\">800</p>\n  <p class=\"font-black\">900</p>\n</section>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
+
+```elixir
+Kino.nothing()
 ```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### [Text Color](https://tailwindcss.com/docs/text-color)
-
-We can use `text-{color}` with the [default color palette](https://tailwindcss.com/docs/customizing-colors#default-color-palette) to set the color of the text.
-
-```html
-<p class="text-red-500">red text</p>
-```
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### [Text Align](https://tailwindcss.com/docs/text-align)
 
 We can use `text-left`, `text-center`, and `text-right` as well as other [text-align](https://tailwindcss.com/docs/text-align) classes to align text inside its container.
 
-```html
-<p class="text-center">centered text</p>
+<!-- livebook:{"attrs":{"html":"<p class=\"text-center\">centered text</p>"},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
+
+```elixir
+Kino.nothing()
 ```
 
 ## Height And Width
@@ -295,11 +283,17 @@ We can set the max/min or height/width using the `max-h-{size}`, `min-h-{size}`,
 
 ### Your Turn
 
-In the [Tailwind Play](https://play.tailwindcss.com/) playground, create a paragraph tag that will wrap text on a new line when wider than 10rem.
+Create a paragraph tag that will wrap text on a new line when wider than 10rem.
 
 <p style="width: 10rem; background-color: lightgrey">
 For example, this paragraph will wrap words when the text is wider than 10rem.<p>
 </p>
+
+<!-- livebook:{"attrs":{},"chunks":null,"kind":"Elixir.Kino.TailwindPlayground","livebook_object":"smart_cell"} -->
+
+```elixir
+Kino.nothing()
+```
 
 ## Padding And Margin
 
@@ -335,6 +329,16 @@ We're also able to set margin and padding to automatically fill the available sp
 ```html
 <p class="mx-auto w-fit">centered paragraph</p>
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create a castle using `<span>` tags.
+
+<span>
+M/span>
+</span>
 
 ## Border
 
