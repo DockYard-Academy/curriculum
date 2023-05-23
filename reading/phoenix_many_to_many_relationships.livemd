@@ -229,9 +229,9 @@ defmodule Blog.Posts.Post do
 end
 ```
 
-## Associating Records
+## Putting Associating Records
 
-To insert associated records, we can use the [put_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) function which puts the associated data in a changeset.
+To insert associated existing records, we can use the [put_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) function which puts the associated data in a changeset.
 
 Here's an example of associating Tags with a post changeset.
 
@@ -316,12 +316,12 @@ def update_post(%Post{} = post, attrs, tags \\ []) do
 end
 ```
 
-## Sending Associated Data In A Form
+## Form Association Data
 
 We've already seen how to send associated data in a form. However many-to-many relationships are more complex than other relationships, and there are many different ways to create the data.
 
 * Create the associated data
-* associate the existing data
+* Associate existing data
 
 In the case of posts and tags, we might enforce that users only select from a list of existing tags. Alternatively, we might instead allow users to create their own tags when creating a post.
 
@@ -331,7 +331,7 @@ Regardless of how our specific implementation works, there are only 3 ways to se
 * url params
 * body params
 
-The can submit the required data for the association through a form. For example, to associate a post with certain tags, we might submit a list of tag ids.
+We can submit the required data for the association through a form. For example, to associate a post with certain tags, we might submit a list of tag ids.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -461,7 +461,7 @@ For more advanced use-cases, the [inputs_for/1](https://hexdocs.pm/phoenix_live_
 
 Ecto also provides [Ecto.Multi](https://hexdocs.pm/ecto/Ecto.Multi.html) for grouping such database operations.
 
-## Handling Associated Data In The Controller
+## Controller Association Data
 
 Often we have to load the associated data when performing the create or update actions on some associated resource.
 

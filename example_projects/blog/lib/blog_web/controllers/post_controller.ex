@@ -27,7 +27,6 @@ defmodule BlogWeb.PostController do
 
   def create(conn, %{"post" => post_params}) do
     tags = Map.get(post_params, "tag_ids", []) |> Enum.map(&Tags.get_tag!/1)
-
     case Posts.create_post(post_params, tags) do
       {:ok, post} ->
         conn

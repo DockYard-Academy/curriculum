@@ -52,7 +52,7 @@ defmodule Blog.Posts do
     comments_query =
       from c in Comment, order_by: [desc: c.inserted_at, desc: c.id], preload: :user
 
-    post_query = from p in Post, preload: [:user, :tags, comments: ^comments_query]
+    post_query = from p in Post, preload: [:cover_image, :tags, :user, comments: ^comments_query]
 
     Repo.get!(post_query, id)
   end
@@ -89,6 +89,7 @@ defmodule Blog.Posts do
   """
   def update_post(%Post{} = post, attrs, tags \\ []) do
     post
+    |> Repo.preload(:cover_image)
     |> Post.changeset(attrs, tags)
     |> Repo.update()
   end

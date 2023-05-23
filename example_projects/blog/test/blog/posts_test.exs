@@ -3,16 +3,16 @@ defmodule Blog.PostsTest do
 
   alias Blog.Comments
   alias Blog.Posts
+  alias Blog.Posts.CoverImage
+  alias Blog.Posts.Post
   alias Blog.Tags
 
+  import Blog.AccountsFixtures
+  import Blog.CommentsFixtures
+  import Blog.PostsFixtures
+  import Blog.TagsFixtures
+
   describe "posts" do
-    alias Blog.Posts.Post
-
-    import Blog.AccountsFixtures
-    import Blog.CommentsFixtures
-    import Blog.PostsFixtures
-    import Blog.TagsFixtures
-
     @invalid_attrs %{content: nil, title: nil}
 
     test "list_posts/1 with no filter returns all posts" do
@@ -85,6 +85,12 @@ defmodule Blog.PostsTest do
       assert Posts.get_post!(post.id).user == user
     end
 
+    test "get_post!/1 loads the cover_image association" do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id, cover_image: %{url: "http://www.example.com/image.png"})
+      assert %CoverImage{url: "http://www.example.com/image.png"} = Posts.get_post!(post.id).cover_image
+    end
+
     test "get_post!/1 loads the tags association" do
       user = user_fixture()
       tag = tag_fixture()
@@ -127,6 +133,22 @@ defmodule Blog.PostsTest do
       assert post.user_id == user.id
       # convert to unix to avoid issues with :utc_datetime vs :utc_datetime_usec
       assert DateTime.to_unix(post.published_on) == DateTime.to_unix(now)
+    end
+
+    test "create_post/1 with image" do
+      valid_attrs = %{
+        content: "some content",
+        title: "some title",
+        cover_image: %{
+          url: "https://www.example.com/image.png"
+        },
+        visible: true,
+        published_on: DateTime.utc_now(),
+        user_id: user_fixture().id
+      }
+
+      assert {:ok, %Post{} = post} = Posts.create_post(valid_attrs)
+      assert %CoverImage{url: "https://www.example.com/image.png"} = Repo.preload(post, :cover_image).cover_image
     end
 
     test "create_post/1 with tags" do
@@ -180,6 +202,23 @@ defmodule Blog.PostsTest do
       assert DateTime.to_unix(post.published_on) == DateTime.to_unix(update_attrs.published_on)
     end
 
+    test "update_post/1 add an image" do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+
+      assert {:ok, %Post{} = post} = Posts.update_post(post, %{cover_image: %{url: "https://www.example.com/image2.png"}})
+      assert post.cover_image.url == "https://www.example.com/image2.png"
+    end
+
+    test "update_post/1 update existing image" do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
+      IO.inspect(post)
+
+      assert {:ok, %Post{} = post} = Posts.update_post(post, %{cover_image: %{url: "https://www.example.com/image2.png"}})
+      assert post.cover_image.url == "https://www.example.com/image2.png"
+    end
+
     test "update_post/1 with tags" do
       user = user_fixture()
       tag1 = tag_fixture()
@@ -204,6 +243,14 @@ defmodule Blog.PostsTest do
       post = post_fixture(user_id: user.id)
       assert {:ok, %Post{}} = Posts.delete_post(post)
       assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+    end
+
+    test "delete_post/1 deletes post and cover image" do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
+      assert {:ok, %Post{}} = Posts.delete_post(post)
+      assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+      assert_raise Ecto.NoResultsError, fn -> Repo.get!(CoverImage, post.cover_image.id) end
     end
 
     test "delete_post/1 deletes the post and associated comments" do

@@ -2,6 +2,7 @@ defmodule BlogWeb.PostControllerTest do
   use BlogWeb.ConnCase
 
   alias Blog.Posts
+  alias Blog.Posts.CoverImage
 
   import Blog.AccountsFixtures
   import Blog.CommentsFixtures
@@ -104,7 +105,32 @@ defmodule BlogWeb.PostControllerTest do
       assert html_response(conn, 200) =~ "Post #{id}"
     end
 
-    test "create post with tags", %{conn: conn} do
+    test "with cover image", %{conn: conn} do
+      user = user_fixture()
+      conn = log_in_user(conn, user)
+
+      create_attrs = %{
+        content: "some content",
+        title: "some title",
+        visible: true,
+        published_on: DateTime.utc_now(),
+        user_id: user.id,
+        cover_image: %{
+          url: "https://www.example.com/image.png"
+        }
+      }
+
+      conn = post(conn, ~p"/posts", post: create_attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == ~p"/posts/#{id}"
+
+      conn = get(conn, ~p"/posts/#{id}")
+      assert %CoverImage{url: "https://www.example.com/image.png"} = Posts.get_post!(id).cover_image
+      assert html_response(conn, 200) =~ "https://www.example.com/image.png"
+    end
+
+    test "with tags", %{conn: conn} do
       user = user_fixture()
       conn = log_in_user(conn, user)
 
@@ -169,7 +195,20 @@ defmodule BlogWeb.PostControllerTest do
       assert html_response(conn, 200) =~ "some updated content"
     end
 
-    test "update post with tags", %{conn: conn} do
+    test "with cover image", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+      conn = put(conn, ~p"/posts/#{post}", post: %{cover_image: %{url: "https://www.example.com/image.png"}})
+      assert redirected_to(conn) == ~p"/posts/#{post}"
+
+      conn = get(conn, ~p"/posts/#{post}")
+      assert %CoverImage{url: "https://www.example.com/image.png"} = Posts.get_post!(post.id).cover_image
+      assert html_response(conn, 200) =~ "https://www.example.com/image.png"
+    end
+
+
+    test "with tags", %{conn: conn} do
       user = user_fixture()
       post = post_fixture(user_id: user.id)
       tag1 = tag_fixture(name: "tag 1 name")
@@ -207,6 +246,17 @@ defmodule BlogWeb.PostControllerTest do
     test "deletes chosen post", %{conn: conn} do
       user = user_fixture()
       post = post_fixture(user_id: user.id)
+      conn = conn |> log_in_user(user) |> delete(~p"/posts/#{post}")
+      assert redirected_to(conn) == ~p"/posts"
+
+      assert_error_sent 404, fn ->
+        get(conn, ~p"/posts/#{post}")
+      end
+    end
+
+    test "deletes chosen post with cover image", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
       conn = conn |> log_in_user(user) |> delete(~p"/posts/#{post}")
       assert redirected_to(conn) == ~p"/posts"
 
