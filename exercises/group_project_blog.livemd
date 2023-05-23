@@ -36,6 +36,76 @@ You're going to build a `Blog` application with a group of 3-4 others to learn m
 
 As we move through the Phoenix and Web Development section, you'll gradually add more features to your blog.
 
+## Requirements
+
+### Features
+
+Your blog application should have the following features.
+
+* Posts with a CoverImage
+* Users
+* Tags
+* Comments
+* Authentication and Authorization
+
+As you progress through the Phoenix section you'll complete the following exercises that further clarify these features.
+
+* [Blog: Posts](../exercises/blog_posts.livemd)
+* [Blog: Search](../exercises/blog_search.livemd)
+* [Blog: Visibility Migration](../exercises/blog_migration.livemd)
+* [Blog: Comments](../exercises/blog_comments.livemd)
+* [Blog: Authentication](exercises/blog_authentication.livemd)
+* [Blog: Tags](../exercises/blog_tags.livemd)
+* [Blog: Cover Image](exercises/blog_cover_image.livemd)
+* [Blog: Project Polish and Deployment](exercises/blog_deployment.livemd)
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Features
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Entity Relationship Diagram
+
+Here's an Entity-Relationship Diagram that describes the data and associations in the blog project.
+
+```mermaid
+erDiagram
+User {
+  string username
+  string email
+  string password
+  string hashed_password
+  naive_datetime confirmed_at
+}
+
+Post {
+    string title
+    text content
+    date published_on
+    boolean visibility
+}
+
+CoverImage {
+    text url
+    id post_id
+}
+
+Comment {
+  text content
+  id post_id
+}
+
+Tag {
+    string name
+}
+
+User |O--O{ Post: ""
+Post }O--O{ Tag: ""
+Post ||--O{ Comment: ""
+Post ||--|| CoverImage: ""
+```
+
 ## Overview
 
 As you progress through the course, you will be prompted to complete additional features for your blog. We've going to give you a brief overview of the overall domain and the features you're going to build.
