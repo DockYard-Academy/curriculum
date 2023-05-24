@@ -10,7 +10,7 @@ defmodule LiveViewCounterWeb.CounterLive do
     <h1>Counter</h1>
     <p>Count: <%= @count %></p>
     <.button id="increment-button" phx-click="increment">Increment</.button>
-    <.simple_form id="increment-form" for={@form} phx-change="change" phx-submit="increment_by">
+    <.simple_form id="increment-form" for={@form} phx-change="validate" phx-submit="increment_by">
       <.input type="number" field={@form[:increment_by]} label="Increment Count"/>
       <:actions>
         <.button>Increment</.button>
@@ -23,7 +23,7 @@ defmodule LiveViewCounterWeb.CounterLive do
     {:noreply, assign(socket, count: socket.assigns.count + 1)}
   end
 
-  def handle_event("change", params, socket) do
+  def handle_event("validate", params, socket) do
     socket =
       case Integer.parse(params["increment_by"]) do
         :error ->
