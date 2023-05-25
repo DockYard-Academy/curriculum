@@ -1,4 +1,4 @@
-# Capstone Project Guide
+# Capstone Project: Entity-Relationship Diagram
 
 ```elixir
 Mix.install([
@@ -30,35 +30,55 @@ Mix.install([
 </div>
 </div>
 
-## Capstone Project
+## Capstone Project: Entity Relationship Diagram
 
-The capstone project is the final project for the DockYard Academy Course. This project is an opportunity to apply the skills and knowledge you have learned throughout this course to a real-world problem of your choosing.
+In the `README.md` of your capstone project, create an entity-relationship diagram with mermaid.
 
-<!-- livebook:{"break_markdown":true} -->
+Here's an example Entity-Relationship Diagram that describes the data and associations in the blog project.
+
+```mermaid
+erDiagram
+User {
+  string username
+  string email
+  string password
+  string hashed_password
+  naive_datetime confirmed_at
+}
+
+Post {
+    string title
+    text content
+    date published_on
+    boolean visibility
+}
+
+CoverImage {
+    text url
+    id post_id
+}
+
+Comment {
+  text content
+  id post_id
+}
+
+Tag {
+    string name
+}
+
+User |O--O{ Post: ""
+Post }O--O{ Tag: ""
+Post ||--O{ Comment: ""
+Post ||--|| CoverImage: ""
+```
+
+See https://mermaid.js.org/syntax/entityRelationshipDiagram.html for the syntax.
 
 ### Requirements
 
-Your capstone project should incorporate the following features:
-
-* Use Phoenix LiveView and PubSub to build a real-time distributed feature.
-* Use Ecto to connect to a database and manage one or more associations (one-to-one, one-to-many, many-to-many).
-* Interact with an external API, library, or service.
-* Use authentication to authorize users.
-
-If you have a project idea that deviates from these requirements but still adequately demonstrates what you have learned in this course, then speak with your instructor to request approval.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Presentation
-
-Students will present their capstone project publicly to the Elixir community. During your presentation, we recommend you:
-
-* Summarize the technologies (languages, frameworks, APIs, services, etc.) used in the project.
-* Demonstrate the main features of your project.
-* Share a particularly challenging or compelling piece of code.
-* Any features you would like to add to the project if you were to expand it after the academy.
-
-You will have ten minutes to present your project and five minutes to answer audience questions. Consider timing yourself and practice your transitions from feature to feature to prepare.
+* Document the entities and their fields.
+* Document the associations (many-to-one, many-to-many, one-to-one) in your capstone project
 
 ## Commit Your Progress
 
