@@ -135,6 +135,15 @@ scope "/", AppWeb do
 end
 ```
 
+Unlike Controller actions which often correspond to a single URL, A single LiveView might handle many different urls with different live_actions that alter how the LiveView renders UI in some meaningfully way.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+live "/new", ExampleLive.Index, :new
+live "/:id/edit", ExampleLive.Index, :edit
+```
+
 ## Creating a LiveView
 
 Phoenix LiveViews define a [mount/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#c:mount/3)  callback that initializes the LiveView.
