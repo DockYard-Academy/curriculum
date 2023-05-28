@@ -201,9 +201,46 @@ def mount(_params, _session, socket) do
 end
 ```
 
+Elements are inserted into or removed from the stream.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@impl true
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
+  {:noreply, stream_insert(socket, :messages, message)}
+end
+
+@impl true
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+  {:ok, _} = Chat.delete_message(message)
+
+  {:noreply, stream_delete(socket, :messages, message)}
+end
+```
+
 <!-- livebook:{"break_markdown":true} -->
 
 ### Rendering Messages
+
+Streams are rendered in the template using a key in the `@streams` field from the assigns.
+The `phx-update="stream"` attribute configures the parent container to support stream operations. Elements in the stream are typically rendered using a comprehension.
+
+Here's a simplified example.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<section id="messages" phx-update="stream">
+  <article
+    :for={{dom_id, message} <- @streams.messages}
+    id={dom_id}
+  >
+    <%= message.content %>
+  </article>
+</section>
+```
 
 A table of messages is rendered in the corresponding template file `index.html.heex`. This table relies on [Phoenix.LiveView.JS](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html) for various actions such as navigation and pushing events to the server.
 

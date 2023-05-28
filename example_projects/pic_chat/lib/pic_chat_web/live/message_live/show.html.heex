@@ -2,9 +2,11 @@
   Message <%= @message.id %>
   <:subtitle>This is a message record from your database.</:subtitle>
   <:actions>
-    <.link patch={~p"/messages/#{@message}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit message</.button>
-    </.link>
+    <%= if assigns[:current_user] && @current_user.id == @message.user_id do %>
+      <.link navigate={~p"/messages/#{@message}/show/edit"} phx-click={JS.push_focus()}>
+        <.button>Edit message</.button>
+      </.link>
+    <% end %>
   </:actions>
 </.header>
 
@@ -14,7 +16,12 @@
 
 <.back navigate={~p"/messages"}>Back to messages</.back>
 
-<.modal :if={@live_action == :edit} id="message-modal" show on_cancel={JS.patch(~p"/messages/#{@message}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="message-modal"
+  show
+  on_cancel={JS.patch(~p"/messages/#{@message}")}
+>
   <.live_component
     module={PicChatWeb.MessageLive.FormComponent}
     id={@message.id}
@@ -22,5 +29,6 @@
     action={@live_action}
     message={@message}
     patch={~p"/messages/#{@message}"}
+    current_user={@current_user}
   />
 </.modal>

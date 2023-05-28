@@ -1,9 +1,11 @@
 <.header>
   Listing Messages
   <:actions>
-    <.link patch={~p"/messages/new"}>
-      <.button>New Message</.button>
-    </.link>
+    <%= if assigns[:current_user] do %>
+      <.link navigate={~p"/messages/new"}>
+        <.button>New Message</.button>
+      </.link>
+    <% end %>
   </:actions>
 </.header>
 
@@ -17,19 +19,28 @@
     <div class="sr-only">
       <.link navigate={~p"/messages/#{message}"}>Show</.link>
     </div>
-    <.link patch={~p"/messages/#{message}/edit"}>Edit</.link>
+    <%= if assigns[:current_user] && @current_user.id == message.user_id do %>
+      <.link navigate={~p"/messages/#{message}/edit"}>Edit</.link>
+    <% end %>
   </:action>
   <:action :let={{id, message}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
+    <%= if assigns[:current_user] && @current_user.id == message.user_id do %>
+      <.link
+        phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+    <% end %>
   </:action>
 </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="message-modal" show on_cancel={JS.patch(~p"/messages")}>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="message-modal"
+  show
+  on_cancel={JS.patch(~p"/messages")}
+>
   <.live_component
     module={PicChatWeb.MessageLive.FormComponent}
     id={@message.id || :new}
@@ -37,5 +48,6 @@
     action={@live_action}
     message={@message}
     patch={~p"/messages"}
+    current_user={@current_user}
   />
 </.modal>
