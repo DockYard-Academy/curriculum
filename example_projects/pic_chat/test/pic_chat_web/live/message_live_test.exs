@@ -125,4 +125,45 @@ defmodule PicChatWeb.MessageLiveTest do
       assert html =~ "some updated content"
     end
   end
+
+  describe "PubSub" do
+    test "creating a message updates subscribers", %{conn: conn} do
+      user = user_fixture()
+      conn = log_in_user(conn, user)
+      {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+      {:ok, publisher_live, _html} = live(conn, ~p"/messages/new")
+
+      assert publisher_live
+             |> form("#message-form", message: @create_attrs)
+             |> render_submit()
+
+      assert render(subscriber_live) =~ "some content"
+    end
+
+    test "updating a message updates subscribers", %{conn: conn} do
+      user = user_fixture()
+      conn = log_in_user(conn, user)
+      message = message_fixture(user_id: user.id)
+      {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+      {:ok, publisher_live, _html} = live(conn, ~p"/messages/#{message}/edit")
+
+      assert publisher_live
+             |> form("#message-form", message: @update_attrs)
+             |> render_submit()
+
+      assert render(subscriber_live) =~ "some updated content"
+    end
+
+    test "deleting a message updates subscribers", %{conn: conn} do
+      user = user_fixture()
+      conn = log_in_user(conn, user)
+      message = message_fixture(user_id: user.id)
+      {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+      {:ok, publisher_live, _html} = live(conn, ~p"/messages/#{message}/edit")
+
+      assert publisher_live |> element("#messages-#{message.id} a", "Delete") |> render_click()
+
+      refute render(subscriber_live) =~ "some content"
+    end
+  end
 end

@@ -1,0 +1,172 @@
+# Observer
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: PubSub">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* What is the PubSub (Publisher/Subscriber pattern) and how does it enable real-time features?
+* How do we subscribe a LiveView process to a topic?
+* How do we broadcast to a topic?
+* How do we handle a broadcasted message in a LiveView process?
+
+## Observer
+
+Elixir comes with an [:observer](https://elixir-lang.org/getting-started/debugging.html#observer) program that makes it easier to observe processes in our Application.
+
+Start your `PicChat` phoenix server in the IEx shell.
+
+```
+$ iex -S mix phx.server
+```
+
+Then start the `:observer`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> :observer.start()
+```
+
+You should see a Graphical User Interface (GUI) appear. Open up the `Applications` panel to view the supervision tree of your application processes.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_pub_sub_observer.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+For the sake of learning how to use the observer, let's find a `MessageLive.Index` process in our supervision tree.
+
+First, inspect the pid of the current `MessageLive.Index` process in the `MessageLive.mount/3` callback.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def mount(_params, _session, socket) do
+  IO.inspect(self(), label: "LiveView Process ID")
+
+  # ...
+end
+```
+
+Visit http://localhost:4000 to mount a `MessageLive.Index` process. Observe the PID in your terminal. The PID will be unique.
+
+```
+LiveView Process ID: #PID<0.111.0>
+```
+
+Each LiveView runs in a separate process. Open multiple tabs on http://localhost:4000 and you'll notice each has a different PID.
+
+```
+LiveView Process ID: #PID<0.9424.0>
+LiveView Process ID: #PID<0.9479.0>
+LiveView Process ID: #PID<0.9530.0>
+```
+
+We can use the Observer to manually kill processes. Find the PID of a LiveView process in your Observer. Click on [File](https://hexdocs.pm/elixir/File.html) then `Kill process`. Observe the LiveView as it crashes.
+
+We can also use the Observer to manually send processes messages. Define a `handle_info/2` callback in `MessageLive.Index`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_info(message, socket) do
+  IO.inspect(message, label: "Received Message")
+  {:noreply, socket}
+end
+```
+
+Select the process in the observer, then click [File](https://hexdocs.pm/elixir/File.html) -> `Send Msg`. Enter any Elixir term such as `"hello"` to send the LiveView process a message.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/pic_chat_pub_sub_observer_sending_message.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Observe the message printed to the terminal.
+
+```
+Received Message: 'hello'
+```
+
+Remove the `handle_info/2` callback and any `IO.inspect` calls as we are finished with the demonstration.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Elixir Schools: LiveView with PubSub](https://elixirschool.com/blog/live-view-with-pub-sub/)
+* [Elixir Schools: LiveView with Channels](https://elixirschool.com/blog/live-view-with-channels)
+* [HexDocs: Phoenix Channels](https://hexdocs.pm/phoenix/channels.html#overview)
+* [HexDocs: Phoenix PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html#content)
+* [HexDocs: Phoenix Endpoint](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish PicChat: PubSub reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: PubSub">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

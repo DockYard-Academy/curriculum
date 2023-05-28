@@ -63,25 +63,72 @@ Use the [LiveView Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Live.
 mix phx.gen.live Messages Message messsages content:text
 ```
 
-Add the routes for the generated resource in `router.ex`.
+Add the routes for the generated resource.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  scope "/", PicChatWeb do
-    pipe_through :browser
+# router.ex
+scope "/", PicChatWeb do
+  pipe_through :browser
 
-    get "/", PageController, :home
-    live "/messages", MessageLive.Index, :index
-    live "/messages/new", MessageLive.Index, :new
-    live "/messages/:id/edit", MessageLive.Index, :edit
+  get "/", PageController, :home
+  live "/messages", MessageLive.Index, :index
+  live "/messages/new", MessageLive.Index, :new
+  live "/messages/:id/edit", MessageLive.Index, :edit
 
-    live "/messages/:id", MessageLive.Show, :show
-    live "/messages/:id/show/edit", MessageLive.Show, :edit
-  end
+  live "/messages/:id", MessageLive.Show, :show
+  live "/messages/:id/show/edit", MessageLive.Show, :edit
+end
 ```
 
-That's it! The rest of this lesson will focus on understanding what the generators built for us.
+Ensure messages are ordered from newest -> oldest.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# chat.ex
+def list_messages do
+  Message
+  |> from(order_by: [desc: :inserted_at])
+  |> Repo.all()
+end
+```
+
+We'll also have to modify how we notify the parent LiveView when we save a message, as streams will append messages by default, but we want to prepend them. See []
+
+Change the calls to `notify_parent` in `form_component.ex` to handle `:edit` and `:new` separately rather than using the `:saved` event for both.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# save_message :edit
+notify_parent({:edit, message})
+
+# save_message :new
+notify_parent({:new, message})
+```
+
+Then add a separate handler for each in the parent LiveView.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# index.ex
+@impl true
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
+  # prepends the new message
+  {:noreply, stream_insert(socket, :messages, message, at: 0)}
+end
+
+@impl true
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:edit, message}}, socket) do
+  # updates the new message in its current position
+  {:noreply, stream_insert(socket, :messages, message)}
+end
+```
+
+That's it! The rest of this lesson will focus on understanding what the generators built for us and the changes we've added.
 
 ## Building Understanding
 
@@ -156,7 +203,12 @@ defmodule PicChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_info({PicChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
+  def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
+    {:noreply, stream_insert(socket, :messages, message, at: 0)}
+  end
+
+  @impl true
+  def handle_info({PicChatWeb.MessageLive.FormComponent, {:edit, message}}, socket) do
     {:noreply, stream_insert(socket, :messages, message)}
   end
 
@@ -372,7 +424,7 @@ defmodule PicChatWeb.MessageLive.FormComponent do
   defp save_message(socket, :edit, message_params) do
     case Chat.update_message(socket.assigns.message, message_params) do
       {:ok, message} ->
-        notify_parent({:saved, message})
+        notify_parent({:edit, message})
 
         {:noreply,
          socket
@@ -387,7 +439,7 @@ defmodule PicChatWeb.MessageLive.FormComponent do
   defp save_message(socket, :new, message_params) do
     case Chat.create_message(message_params) do
       {:ok, message} ->
-        notify_parent({:saved, message})
+        notify_parent({:new, message})
 
         {:noreply,
          socket
@@ -486,7 +538,12 @@ This is handled in the parent LiveView to update the stream of `Message` structs
 
 ```elixir
 @impl true
-def handle_info({PicChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
+  {:noreply, stream_insert(socket, :messages, message, at: 0)}
+end
+
+@impl true
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:edit, message}}, socket) do
   {:noreply, stream_insert(socket, :messages, message)}
 end
 ```
@@ -513,7 +570,7 @@ This form is used to initialize form data and display errors. Observe the `:erro
 defp save_message(socket, :new, message_params) do
   case Chat.create_message(message_params) do
     {:ok, message} ->
-      notify_parent({:saved, message})
+      notify_parent({:new, message})
 
       {:noreply,
         socket

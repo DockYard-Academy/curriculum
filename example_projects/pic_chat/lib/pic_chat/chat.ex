@@ -18,7 +18,9 @@ defmodule PicChat.Chat do
 
   """
   def list_messages do
-    Repo.all(Message)
+    Message
+    |> from(order_by: [desc: :inserted_at])
+    |> Repo.all()
   end
 
   @doc """

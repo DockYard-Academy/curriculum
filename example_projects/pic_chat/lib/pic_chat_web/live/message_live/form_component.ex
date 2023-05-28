@@ -71,7 +71,8 @@ defmodule PicChatWeb.MessageLive.FormComponent do
   defp save_message(socket, :edit, message_params) do
     case Chat.update_message(socket.assigns.message, message_params) do
       {:ok, message} ->
-        notify_parent({:saved, message})
+        notify_parent({:edit, message})
+        PicChatWeb.Endpoint.broadcast_from(self(), "messages", "edit", message)
 
         {:noreply,
          socket
@@ -86,7 +87,8 @@ defmodule PicChatWeb.MessageLive.FormComponent do
   defp save_message(socket, :new, message_params) do
     case Chat.create_message(message_params) do
       {:ok, message} ->
-        notify_parent({:saved, message})
+        notify_parent({:new, message})
+        PicChatWeb.Endpoint.broadcast_from(self(), "messages", "new", message)
 
         {:noreply,
          socket

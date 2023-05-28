@@ -213,7 +213,6 @@ defmodule Blog.PostsTest do
     test "update_post/1 update existing image" do
       user = user_fixture()
       post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
-      IO.inspect(post)
 
       assert {:ok, %Post{} = post} = Posts.update_post(post, %{cover_image: %{url: "https://www.example.com/image2.png"}})
       assert post.cover_image.url == "https://www.example.com/image2.png"
