@@ -21,10 +21,11 @@ defmodule PicChatWeb.MessageLiveTest do
 
     test "saves new message", %{conn: conn} do
       user = user_fixture()
-       conn = conn |> log_in_user(user)
+      conn = conn |> log_in_user(user)
       {:ok, index_live, _html} = live(conn, ~p"/messages")
 
-      {:ok, new_live, html} = index_live |> element("a", "New Message") |> render_click() |> follow_redirect(conn)
+      {:ok, new_live, html} =
+        index_live |> element("a", "New Message") |> render_click() |> follow_redirect(conn)
 
       assert_redirected(index_live, ~p"/messages/new")
       assert html =~ "New Message"
@@ -50,7 +51,12 @@ defmodule PicChatWeb.MessageLiveTest do
       conn = log_in_user(conn, user)
       {:ok, index_live, _html} = live(conn, ~p"/messages")
 
-      {:ok, edit_live, html} = index_live |> element("#messages-#{message.id} a", "Edit") |> render_click() |> follow_redirect(conn)
+      {:ok, edit_live, html} =
+        index_live
+        |> element("#messages-#{message.id} a", "Edit")
+        |> render_click()
+        |> follow_redirect(conn)
+
       assert html =~ "Edit Message"
       assert_redirect(index_live, ~p"/messages/#{message}/edit")
 
@@ -98,7 +104,8 @@ defmodule PicChatWeb.MessageLiveTest do
 
       {:ok, show_live, _html} = live(conn, ~p"/messages/#{message}")
 
-      {:ok, edit_live, html} = show_live |> element("a", "Edit") |> render_click() |> follow_redirect(conn)
+      {:ok, edit_live, html} =
+        show_live |> element("a", "Edit") |> render_click() |> follow_redirect(conn)
 
       assert html =~ "Edit Message"
       assert_redirected(show_live, ~p"/messages/#{message}/show/edit")

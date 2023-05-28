@@ -39,7 +39,7 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 ## PicChat: Messages
 
-Over the next several lessons, we're going to build a `PicChat` application where users can create messages with uploaded pictures. This lesson will focus on adding authentication and authorization to the `Messages` resource.
+Over the next several lessons, we're going to build a `PicChat` application where users can create messages with uploaded pictures. This lesson will focus on adding authentication and authorization for messages.
 
 Use the [mix phx.gen.auth](https://hexdocs.pm/phoenix/1.6.15/Mix.Tasks.Phx.Gen.Auth.html) to generate all of the LiveView boilerplate needed to manage a `Messages` resource.
 Ensure you select the LiveView option for authentication
@@ -435,6 +435,7 @@ defmodule PicChat.ChatTest do
 
       assert {:ok, %Message{} = message} = Chat.create_message(valid_attrs)
       assert message.content == "some content"
+      assert message.user_id == user.id
     end
 
     test "create_message/1 with invalid data returns error changeset" do
