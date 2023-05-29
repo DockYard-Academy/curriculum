@@ -41,6 +41,10 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 Over the next several lessons, we're going to build a `PicChat` application where users can create messages with uploaded pictures. This lesson will focus on creating the `Messages` resource with just text content.
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Initialize The Project
+
 Initialize the `pic_chat` phoenix project.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -63,6 +67,10 @@ Use the [LiveView Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Live.
 mix phx.gen.live Messages Message messsages content:text
 ```
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Routes
+
 Add the routes for the generated resource.
 
 <!-- livebook:{"force_markdown":true} -->
@@ -82,7 +90,11 @@ scope "/", PicChatWeb do
 end
 ```
 
-Ensure messages are ordered from newest -> oldest.
+<!-- livebook:{"break_markdown":true} -->
+
+### Order Messages
+
+Ensure messages are ordered from newest -> oldest. We order by both the `inserted_at` and the `id` fields to ensure consistent ordering for messages created at the same time.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -90,10 +102,14 @@ Ensure messages are ordered from newest -> oldest.
 # chat.ex
 def list_messages do
   Message
-  |> from(order_by: [desc: :inserted_at])
+  |> from(order_by: [desc: :inserted_at, desc: :id])
   |> Repo.all()
 end
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Notify Parent
 
 We'll also have to modify how we notify the parent LiveView when we save a message, as streams will append messages by default, but we want to prepend them. See []
 
@@ -583,11 +599,11 @@ defp save_message(socket, :new, message_params) do
 end
 ```
 
-## Your Turn: LiveView Testing
+## LiveView Testing
 
 The `MessageLiveTest` module found in `test/pic_chat_web/live/message_live_test.ex` demonstrates how to mount a LiveView, simulate user interactions, and assert on the behavior and response of the LiveView.
 
-Read through the `MessageLiveTest` module to better understand how to test LiveViews.
+Read through the `MessageLiveTest` module to better understand patterns for testing LiveViews.
 
 <!-- livebook:{"force_markdown":true} -->
 

@@ -17,6 +17,20 @@ defmodule PicChat.ChatTest do
       assert Chat.list_messages() == [message]
     end
 
+    test "list_messages/0 returns ordered messages" do
+      user = user_fixture()
+      old = message_fixture(user_id: user.id)
+      new = message_fixture(user_id: user.id)
+      assert Chat.list_messages() == [new, old]
+    end
+
+    test "list_messages/1 returns paginated messages" do
+      user = user_fixture()
+      message1 = message_fixture(user_id: user.id)
+      _message2 = message_fixture(user_id: user.id)
+      assert Chat.list_messages(limit: 1, offset: 1) == [message1]
+    end
+
     test "get_message!/1 returns the message with given id" do
       user = user_fixture()
       message = message_fixture(user_id: user.id)
