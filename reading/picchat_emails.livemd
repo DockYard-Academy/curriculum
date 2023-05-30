@@ -18,11 +18,11 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Newsletter">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Emails">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>
@@ -78,13 +78,13 @@ This is the final feature we're going to add to the `PicChat` application we've 
 
 ## Example Email
 
-We're going to demonstrate how to send an email in the `IEx` shell. First, start the server.
+We're going to demonstrate how to send an email in the [IEx](https://hexdocs.pm/iex/IEx.html) shell. First, start the server.
 
 ```el
 iex -S mix phx.server
 ```
 
-Run the following in the `IEx` shell to build a [Swoosh.Email](https://hexdocs.pm/swoosh/Swoosh.Email.html) struct, then pass that struct to the [Mailer.deliver/2](https://hexdocs.pm/swoosh/Swoosh.Mailer.html#deliver/2) function to send the email.
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to build a [Swoosh.Email](https://hexdocs.pm/swoosh/Swoosh.Email.html) struct, then pass that struct to the [Mailer.deliver/2](https://hexdocs.pm/swoosh/Swoosh.Mailer.html#deliver/2) function to send the email.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -141,7 +141,7 @@ Add the following to the `User` schema.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# user.ex inside the `schema` macro.
+# User.ex Inside The `schema` Macro.
 field :subscribed, :boolean, default: false
 ```
 
@@ -150,7 +150,7 @@ Modify the `registration_changeset` to add the `:subscribed` field.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# user.ex
+# User.ex
 def registration_changeset(user, attrs, opts \\ []) do
   user
   |> cast(attrs, [:email, :password, :username, :subscribed])
@@ -169,7 +169,7 @@ Add a checkbox when registering a user so that they can opt-in to email notifica
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# user_registration_live inside of the existing form.
+# User_registration_live Inside Of The Existing Form.
 <.input field={@form[:subscribed]} type="checkbox" label="Receive email updates" />
 ```
 
@@ -186,7 +186,7 @@ Create the following function to find the list of all messages created today. [f
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# chat.ex
+# Chat.ex
 def todays_messages do
   today = Date.utc_today()
 
@@ -209,7 +209,7 @@ Add the following function to get a list of subscribed user emails from the data
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# accounts.ex
+# Accounts.ex
 def subscriber_emails() do
   from(u in User, where: u.subscribed == true, select: u.email)
   |> Repo.all()
@@ -218,7 +218,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Build and Send Summary Emails
+### Build And Send Summary Emails
 
 Create a `lib/pic_chat/summary_emails.ex` context that sends every subscriber an email with a summary of all of todays messages.
 
@@ -277,7 +277,7 @@ First, add oban to your list of dependencies in `mix.exs`. Make sure your versio
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:oban, "~> 2.15"}
+{:oban, "~> 2.14"}
 ```
 
 Configure Oban in `config.exs`.
@@ -351,7 +351,7 @@ defmodule PicChat.Workers.DailySummaryEmail do
 end
 ```
 
-Run the following in the `IEx` shell to schedule the job after five seconds.
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to schedule the job after five seconds.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -391,7 +391,7 @@ Testing time can be tricky. However, it's possible to override the `inserted_at`
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# chat_test.exs
+# Chat_test.exs
 test "todays_messages/0" do
   user = user_fixture()
   today_message = message_fixture(user_id: user.id)
@@ -480,7 +480,7 @@ Upon completing the above, [review your sender](https://app.sendgrid.com/setting
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Set the API key in the Environment
+### Set The API Key In The Environment
 
 Create a `.env` file with the following content. Replace KEY with your API key.
 
@@ -507,14 +507,14 @@ $ source .env
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Alter `@sender_name` and `@sender_email`.
+### Alter `@sender_name` And `@sender_email`.
 
 Make the sender name and sender email match the sender you created on SendGrid.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# summary_email.ex
+# Summary_email.ex
 @sender_name "YOUR_SENDER_NAME"
 @sender_email "YOUR_SENDER_EMAIL"
 ```
@@ -528,7 +528,7 @@ Replace the existing mailer config with the following in `config.exs` to setup S
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# config :pic_chat, PicChat.Mailer, adapter: Swoosh.Adapters.Local
+# Config :pic_chat, PicChat.Mailer, Adapter: Swoosh.Adapters.Local
 config :pic_chat, PicChat.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: System.get_env("SENDGRID_API_KEY")
@@ -538,7 +538,7 @@ config :pic_chat, PicChat.Mailer,
 
 ### Prod Adapter Config
 
-By default, `prod.exs` should already be configured to use `Finch` for sending HTTP requests.
+By default, `prod.exs` should already be configured to use [Finch](https://hexdocs.pm/finch/Finch.html) for sending HTTP requests.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -566,11 +566,11 @@ However, we're going to briefly configure the application to send real emails fo
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# config :swoosh, :api_client, false
+# Config :swoosh, :api_client, False
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
 ```
 
-Run the following in the `IEx` shell to send a real email. Replace `YOUR_EMAIL`, `SENDER_NAME`, and `SENDER_EMAIL` with your own information from SendGrid and your own email.
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to send a real email. Replace `YOUR_EMAIL`, `SENDER_NAME`, and `SENDER_EMAIL` with your own information from SendGrid and your own email.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -593,9 +593,9 @@ Once verified, make sure you change the development configuration back.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# dev.exs
+# Dev.exs
 config :swoosh, :api_client, false
-# config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
+# Config :swoosh, Api_client: Swoosh.ApiClient.Finch, Finch_name: PicChat.Finch
 ```
 
 ## Further Reading
@@ -614,7 +614,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish Newsletter reading"
+$ git commit -m "finish PicChat: Emails reading"
 $ git push
 ```
 
@@ -632,11 +632,11 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Newsletter">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Emails">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>

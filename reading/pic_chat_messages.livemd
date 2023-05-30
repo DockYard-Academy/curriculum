@@ -25,7 +25,7 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_authentication.livemd">PicChat: Authentication</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -64,7 +64,7 @@ Use the [LiveView Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Live.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-mix phx.gen.live Messages Message messsages content:text
+mix phx.gen.live Messages Message messages content:text
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -76,7 +76,7 @@ Add the routes for the generated resource.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# router.ex
+# Router.ex
 scope "/", PicChatWeb do
   pipe_through :browser
 
@@ -99,7 +99,7 @@ Ensure messages are ordered from newest -> oldest. We order by both the `inserte
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# chat.ex
+# Chat.ex
 def list_messages do
   Message
   |> from(order_by: [desc: :inserted_at, desc: :id])
@@ -118,10 +118,10 @@ Change the calls to `notify_parent` in `form_component.ex` to handle `:edit` and
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# save_message :edit
+# Save_message :edit
 notify_parent({:edit, message})
 
-# save_message :new
+# Save_message :new
 notify_parent({:new, message})
 ```
 
@@ -130,7 +130,7 @@ Then add a separate handler for each in the parent LiveView.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 @impl true
 def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
   # prepends the new message
@@ -566,7 +566,7 @@ end
 
 <!-- livebook:{"break_markdown":true} -->
 
-### assign_form
+### Assign_form
 
 The `FormComponent` uses an `assign_form/2` helper function to assign the `Phoenix.HTML.Form` struct in the socket.
 
@@ -766,7 +766,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_authentication.livemd">PicChat: Authentication</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

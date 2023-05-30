@@ -18,14 +18,14 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Infinite Scroll">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Pagination">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_pub_sub.livemd">PicChat: PubSub</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/newsletter.livemd">Newsletter</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/picchat_emails.livemd">PicChat: Emails</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -190,7 +190,7 @@ Over the next several lessons, we're going to build a `PicChat` application wher
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Pagination: Limit and Offset
+### Pagination: Limit And Offset
 
 [Ecto.Query.limit/3](https://hexdocs.pm/ecto/Ecto.Query.html#limit/3) and [Ecto.Query.offset/3](https://hexdocs.pm/ecto/Ecto.Query.html#offset/3) allow us to paginate data.
 
@@ -264,7 +264,7 @@ Modify the `mount/3` function to retrieve the first page of data. We're also goi
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 @limit 10
 
 @impl true
@@ -291,7 +291,7 @@ Define an event handler that will load more data and insert them into the stream
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 @impl true
 def handle_event("load-more", _params, socket) do
   offset =  socket.assigns.page * @limit
@@ -319,7 +319,7 @@ Seeding makes it easier to test situations that would be difficult to reproduce 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# seeds.ex
+# Seeds.ex
 {:ok, user} =
   PicChat.Accounts.register_user(%{
     email: "test@test.test",
@@ -347,7 +347,7 @@ Here's a simple button to trigger loading more messages. Add this below the tabl
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 <.button phx-click="load-more">Load More</.button>
 ```
 
@@ -417,10 +417,10 @@ Modify the `table` component to include a `@rest` attribute that allows us to pr
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# add alphabetically to the other `attr` for the table in core_components.ex
+# Add Alphabetically To The Other `attr` For The Table In Core_components.ex
 attr :rest, :global, doc: "the arbitrary HTML attributes to add to the table"
 
-# add `@rest` to the table body element in core_components.ex
+# Add `@rest` To The Table Body Element In Core_components.ex
 <tbody
   id={@id}
   phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
@@ -431,14 +431,14 @@ attr :rest, :global, doc: "the arbitrary HTML attributes to add to the table"
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Attach the hook
+### Attach The Hook
 
 Add the `phx-hook` binding to the table element. We also need the `data-page` attribute used in the `InfiniteScroll` hook to access which page of data was last loaded.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# add phx-hook and data-page attributes to the table element in `index.ex`
+# Add Phx-hook And Data-page Attributes To The Table Element In `index.ex`
 <.table 
   id="messages" 
   rows={@streams.messages} 
@@ -456,7 +456,7 @@ To demonstrate this feature we're going to highlight messages whenever they are 
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Push the "highlight" event from the Server
+### Push The "highlight" Event From The Server
 
 Add [push_event/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#push_event/3) to your handlers for the `"new"` and `"edit"` actions.
 
@@ -595,7 +595,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish PicChat: Infinite Scroll reading"
+$ git commit -m "finish PicChat: Pagination reading"
 $ git push
 ```
 
@@ -613,14 +613,14 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Infinite Scroll">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Pagination">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_pub_sub.livemd">PicChat: PubSub</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/newsletter.livemd">Newsletter</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/picchat_emails.livemd">PicChat: Emails</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

@@ -25,7 +25,7 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -146,7 +146,7 @@ We display the list of messages on the `MessageLive.Index` LiveView. We're going
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 def mount(_params, session, socket) do
   if connected?(socket) do
     PicChatWeb.Endpoint.subscribe("messages")
@@ -173,7 +173,7 @@ To save time so that the broadcasted message doesn't have to go through the PubS
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# form_component.ex
+# Form_component.ex
 defp save_message(socket, :edit, message_params) do
   case Chat.update_message(socket.assigns.message, message_params) do
     {:ok, message} ->
@@ -216,7 +216,7 @@ Broadcast a `"delete"` event on the `"messages"` topic when we create or update 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 def handle_event("delete", %{"id" => id}, socket) do
   message = Chat.get_message!(id)
 
@@ -263,7 +263,7 @@ We can pattern match on this struct to create event handlers. Add `handle_info/2
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 def handle_info(%Phoenix.Socket.Broadcast{topic: "messages", event: "new", payload: message}, socket) do
   {:noreply, stream_insert(socket, :messages, message, at: 0)}
 end
@@ -372,7 +372,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

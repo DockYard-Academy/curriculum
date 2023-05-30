@@ -22,7 +22,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_comment_form.livemd">Blog: Comment</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_comments.livemd">Blog: Comments</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_authentication.livemd">Blog: Authentication</a>
@@ -77,7 +77,7 @@ Passwords are encrypted in databases to ensure the even if there were a database
 
 By default, the Phoenix authentication system uses [bcrypt_elixir](https://hex.pm/packages/bcrypt_elixir) to hash passwords.
 
-Computerphile has a great overview video on hashing algorythms and security.
+Computerphile has a great overview video on hashing algorithms and security.
 
 <!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=b4b8ktEV4Bg&ab_channel=Computerphile\")","title":"Hashing Algorithms and Security - Computerphile"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
@@ -269,7 +269,7 @@ end
 
 Sometimes we want to protect a route based on whether or not a user owns the particular resource. For example, we probably only wnat to let users edit their own posts.
 
-There are mutliple ways to require that a user owns a resource. Here are a few options:
+There are multiple ways to require that a user owns a resource. Here are a few options:
 
 * Individually protect the specific controller actions (handle auth for one action.)
 * Holistically protect several controller actions (handle auth for an entire controller.)
@@ -280,10 +280,10 @@ Here's an example of creating a plug function in a controller that can be select
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# typically goes above controller actions and below imports/aliases
+# Typically Goes Above Controller Actions And Below Imports/aliases
 plug :require_user_owns_post when action in [:edit, :update, :delete]
 
-# typically goes at the bottom of the file
+# Typically Goes At The Bottom Of The File
 defp require_user_owns_post(conn, _params) do
   post_id = String.to_integer(conn.path_params["id"])
   post = Posts.get_post!(post_id)
@@ -485,9 +485,9 @@ Here's an example of hiding an element based on if the user owns a particular re
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# It's important to verify a map exists before accessing fields such as `id`.
-# Otherwise if the assigns[:current_user] map is `nil`, accessing `id` of nil 
-# would cause the page to crash.
+# It's Important To Verify A Map Exists Before Accessing Fields Such As `id`.
+# Otherwise If The Assigns[:current_user] Map Is `nil`, Accessing `id` Of Nil
+# Would Cause The Page To Crash.
 <%= if assigns[:current_user] && comment.user_id == assigns[:current_user].id do %>
   <.link href={~p"/comments/#{comment.id}"} method="delete" data-confirm="Are you sure?">
     Delete
@@ -568,7 +568,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_comment_form.livemd">Blog: Comment</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_comments.livemd">Blog: Comments</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_authentication.livemd">Blog: Authentication</a>

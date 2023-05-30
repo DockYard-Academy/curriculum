@@ -22,7 +22,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_authentication.livemd">PicChat: Authentication</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_pub_sub.livemd">PicChat: PubSub</a>
@@ -51,9 +51,9 @@ Phoenix LiveView supports [File Uploads](https://hexdocs.pm/phoenix_live_view/up
 
 We'll also modify the messages table/schema to store the path of the picture in a `:picture` field and display the picture on the index and show pages.
 
-## Migration and Schema
+## Migration And Schema
 
-### Create a Migration
+### Create A Migration
 
 In order to store pictures on each message, we'll add a `:picture` field that will store the source of the image such as a path or URL.
 
@@ -120,7 +120,7 @@ Use [allow_upload/3](https://hexdocs.pm/phoenix_live_view/0.18.1/Phoenix.LiveVie
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# form_component.ex
+# Form_component.ex
 @impl true
 def update(%{message: message} = assigns, socket) do
   changeset = Chat.change_message(message)
@@ -143,7 +143,7 @@ We've added the optional attribute `phx-drop-target` supports drag and drop for 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# form.html.heex
+# Form.html.heex
 <.simple_form
   for={@form}
   id="message-form"
@@ -166,12 +166,12 @@ We've added the optional attribute `phx-drop-target` supports drag and drop for 
 
 ## Consume Upload Entries
 
-Consume the uploaded entries when we save a message and copy them to the filesystem for long term persistance. Note that is is not an ideal solution. Ideally we would upload these files to a storage system such as [Amazon S3](https://aws.amazon.com/s3/) but that is beyond the scope of this lesson.
+Consume the uploaded entries when we save a message and copy them to the filesystem for long term persistence. Note that is is not an ideal solution. Ideally we would upload these files to a storage system such as [Amazon S3](https://aws.amazon.com/s3/) but that is beyond the scope of this lesson.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# form_component.ex
+# Form_component.ex
 @impl true
 def handle_event("save", %{"message" => message_params}, socket) do
   file_uploads =
@@ -217,7 +217,7 @@ We can add an image preview with [live_image_preview]
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# added to form_component.ex
+# Added To Form_component.ex
 <.live_file_input upload={@uploads.picture} />
 <%= for entry <- @uploads.picture.entries do %>
   <.live_img_preview entry={entry} width="75" />
@@ -282,7 +282,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_authentication.livemd">PicChat: Authentication</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_pub_sub.livemd">PicChat: PubSub</a>

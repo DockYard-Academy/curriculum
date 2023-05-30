@@ -18,11 +18,11 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Messages">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Authentication">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
@@ -61,7 +61,7 @@ $ mix deps.get
 $ mix ecto.migrate
 ```
 
-## Associate Messages and Users
+## Associate Messages And Users
 
 Create a new migration to add a `user_id` foreign key to messages. Make it required.
 
@@ -123,7 +123,7 @@ Send the `user_id` when using the message form to create a message. You'll need 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.html.heex
+# Index.html.heex
 <.live_component
   module={PicChatWeb.MessageLive.FormComponent}
   id={@message.id || :new}
@@ -140,7 +140,7 @@ Do the same for updating the message.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# show.html.heex
+# Show.html.heex
 <.live_component
   module={PicChatWeb.MessageLive.FormComponent}
   id={@message.id}
@@ -157,7 +157,7 @@ Then provide `user_id` as a hidden input in the form.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# form_component.ex
+# Form_component.ex
 <.simple_form
   for={@form}
   id="message-form"
@@ -261,7 +261,7 @@ def on_mount(:require_user_owns_message, %{"id" => message_id}, _session, socket
   end
 end
 
-# automatically continues for routes that are not for a specific message.
+# Automatically Continues For Routes That Are Not For A Specific Message.
 def on_mount(:require_user_owns_message, _params, _session, socket), do: {:cont, socket}
 ```
 
@@ -286,7 +286,7 @@ scope "/", PicChatWeb do
 end
 ```
 
-## Protected Event Handlers and Elements
+## Protected Event Handlers And Elements
 
 LiveView event handlers are also a security concern, as a user who has mounted the LiveView might be able to trigger event handlers they aren't authorized to use.
 
@@ -313,7 +313,7 @@ For now, we'll implement a very simple solution. Hide the delete button if the m
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.html.heex
+# Index.html.heex
 <%= if assigns[:current_user] && @current_user == message.user_id do %>
   <.link
     phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
@@ -331,7 +331,7 @@ Here's a very lightweight solution for protecting the event handler to give you 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.ex
+# Index.ex
 @impl true
 def handle_event("delete", %{"id" => id}, socket) do
   message = Chat.get_message!(id)
@@ -360,7 +360,7 @@ Here's how we can hide that button by checking if the user owns the message.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.html.heex
+# Index.html.heex
 <%= if assigns[:current_user] && @current_user.id == message.user_id do %>
   <.link navigate={~p"/messages/#{message}/edit"}>Edit</.link>
 <% end %>
@@ -387,7 +387,7 @@ Hide the new button for users that aren't logged in.
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-# index.heex.html
+# Index.heex.html
 <%= if assigns[:current_user] do %>
   <.link navigate={~p"/messages/new"}>
     <.button>New Message</.button>
@@ -638,7 +638,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish PicChat: Messages reading"
+$ git commit -m "finish PicChat: Authentication reading"
 $ git push
 ```
 
@@ -656,11 +656,11 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Messages">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Authentication">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
