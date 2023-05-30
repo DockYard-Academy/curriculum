@@ -87,7 +87,6 @@ defmodule Utils.Notebooks do
   def notebook_dependencies, do: @notebook_dependencies
 
   def word_count do
-
     Enum.reduce(@outline_notebooks, 0, fn each, acc ->
       each = load!(each)
 
