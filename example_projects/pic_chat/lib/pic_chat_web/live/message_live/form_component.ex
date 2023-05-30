@@ -60,9 +60,9 @@ defmodule PicChatWeb.MessageLive.FormComponent do
     file_uploads =
       consume_uploaded_entries(socket, :picture, fn %{path: path}, entry ->
         ext = "." <> get_entry_extension(entry)
-        dest = Path.join("priv/static/images", Path.basename(path <> ext))
+        dest = Path.join("priv/static/uploads", Path.basename(path <> ext))
         File.cp!(path, dest)
-        {:ok, ~p"/images/#{Path.basename(dest)}"}
+        {:ok, ~p"/uploads/#{Path.basename(dest)}"}
       end)
 
     message_params = Map.put(message_params, "picture", List.first(file_uploads))
