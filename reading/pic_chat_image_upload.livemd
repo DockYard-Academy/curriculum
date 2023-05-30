@@ -177,9 +177,11 @@ def handle_event("save", %{"message" => message_params}, socket) do
   file_uploads =
     consume_uploaded_entries(socket, :picture, fn %{path: path}, entry ->
       ext = "." <> get_entry_extension(entry)
-      dest = Path.join("priv/static/images", Path.basename(path <> ext))
+      # The `static/uploads` directory must exist for `File.cp!/2`
+      # and PicChat.static_paths/0 should contain uploads to work,.
+      dest = Path.join("priv/static/uploads", Path.basename(path <> ext))
       File.cp!(path, dest)
-      {:ok, ~p"/images/#{Path.basename(dest)}"}
+      {:ok, ~p"/uploads/#{Path.basename(dest)}"}
     end)
 
   message_params = Map.put(message_params, "picture", List.first(file_uploads))
@@ -190,6 +192,15 @@ defp get_entry_extension(entry) do
   [ext | _] = MIME.extensions(entry.client_type)
   ext
 end
+```
+
+Make sure to create a `priv/static/uploads` folder, and add `uploads` to `PicChat.static_paths/0` in `pic_chat_web.ex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# pic_chat_web.ex
+def static_paths, do: ~w(assets uploads fonts images favicon.ico robots.txt)
 ```
 
 ## Display Images
