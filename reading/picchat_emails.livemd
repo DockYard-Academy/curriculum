@@ -1,0 +1,645 @@
+# PicChat: Emails
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Emails">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we use Swoosh and SendGrid to send emails?
+* How do we configure environment variables?
+* How do we use Oban to schedule jobs?
+
+## Overview
+
+### [SendGrid](https://sendgrid.com/)
+
+SendGrid is an email provider that allows businesses to send email communications to customers and prospects. It provides a platform for email delivery, which includes a web-based interface for managing contacts and creating and sending email campaigns, as well as APIs for integrating email functionality into applications.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Swoosh](https://hexdocs.pm/swoosh/Swoosh.html)
+
+Swoosh is an Elixir library for sending emails.The library allows you to send emails using various email providers such as Sendgrid, SMTP, Mailgun and [more](https://hexdocs.pm/swoosh/Swoosh.html#module-adapters).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Oban](https://hexdocs.pm/oban/Oban.html)
+
+Oban is an Elixir library for running background jobs. It is a powerful and flexible job queue built on top of OTP. Oban allows you to enqueue jobs and process them in the background, which can be useful for tasks that are time-consuming or need to be run independently of the application's main process. The jobs can be executed concurrently and can be scheduled to run at a specific time.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### [Mailer](https://hexdocs.pm/swoosh/Swoosh.Mailer.html)
+
+By default, Phoenix defines a `App.Mailer` (where `App` is the app name) module in `app/mailer.ex`, which uses the `Swoosh.Mailer` module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule App.Mailer do
+  use Swoosh.Mailer, otp_app: :app
+end
+```
+
+The `Mailer` module is configured with some adapter for sending emails with Swoosh and some email provider such as SendGrid.
+
+## PicChat: Emails
+
+This is the final feature we're going to add to the `PicChat` application we've spent the last few lessons building. This lesson will focus on sending and scheduling emails with Oban and Swoosh.
+
+## Example Email
+
+We're going to demonstrate how to send an email in the [IEx](https://hexdocs.pm/iex/IEx.html) shell. First, start the server.
+
+```el
+iex -S mix phx.server
+```
+
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to build a [Swoosh.Email](https://hexdocs.pm/swoosh/Swoosh.Email.html) struct, then pass that struct to the [Mailer.deliver/2](https://hexdocs.pm/swoosh/Swoosh.Mailer.html#deliver/2) function to send the email.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+import Swoosh.Email
+
+new()
+|> to("test@test.com")
+|> from({"sender", "sender@sender_domain.com"})
+|> subject("Test Email Subject")
+|> html_body("<h1>Test Email</h1>")
+|> text_body("Test Email")
+|> PicChat.Mailer.deliver()
+```
+
+Visit http://localhost:4000/dev/mailbox to see the sent email.
+
+## Subscribe Users
+
+Users should always be able to opt-in and out of notifications. We're going to add a `subscribed` field to every user and only send emails to subscribed users.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create Migration
+
+Run the following to create the migration.
+
+```
+$ mix ecto.gen.migration add_subscribed_to_users
+```
+
+Add the following to the migration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Repo.Migrations.AddSubscribedToUsers do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      add :subscribed, :boolean, default: false
+    end
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Modify Schema
+
+Add the following to the `User` schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# User.ex Inside The `schema` Macro.
+field :subscribed, :boolean, default: false
+```
+
+Modify the `registration_changeset` to add the `:subscribed` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# User.ex
+def registration_changeset(user, attrs, opts \\ []) do
+  user
+  |> cast(attrs, [:email, :password, :username, :subscribed])
+  |> validate_email(opts)
+  |> validate_password(opts)
+  |> validate_username()
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Add Subscribed Checkbox
+
+Add a checkbox when registering a user so that they can opt-in to email notifications.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# User_registration_live Inside Of The Existing Form.
+<.input field={@form[:subscribed]} type="checkbox" label="Receive email updates" />
+```
+
+## Daily Summary Email
+
+We're going to send all of our users a daily email containing a summary of the messages sent that day.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Find Todays Messages
+
+Create the following function to find the list of all messages created today. [fragment/1](https://hexdocs.pm/ecto/Ecto.Query.API.html#fragment/1) lets us inject SQL directly into a query. Here we use it to convert the `inserted_at` value to a date to compare it with todays date.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Chat.ex
+def todays_messages do
+  today = Date.utc_today()
+
+  from(m in Message,
+    where: fragment("date(inserted_at) = ?", ^today),
+    order_by: [desc: :inserted_at, desc: :id]
+  )
+  |> Repo.all()
+end
+```
+
+> This implementation could result sending too many messages in the email, or missing messages depending on when we send the daily email. A more complex and reliable implementation could be to have a flag on every message to store whether or not they were sent in the previous daily summary email.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Find All Subscribed User Emails
+
+Add the following function to get a list of subscribed user emails from the database.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Accounts.ex
+def subscriber_emails() do
+  from(u in User, where: u.subscribed == true, select: u.email)
+  |> Repo.all()
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Build And Send Summary Emails
+
+Create a `lib/pic_chat/summary_emails.ex` context that sends every subscriber an email with a summary of all of todays messages.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.SummaryEmail do
+  import Swoosh.Email
+
+  @sender_name "PicChat"
+  @sender_email "info@picchat.com"
+
+  def send_to_subscribers do
+    messages = PicChat.Chat.todays_messages()
+    subscribers = PicChat.Accounts.subscriber_emails()
+
+    for subscriber <- subscribers do
+      PicChat.Mailer.deliver(build(subscriber, messages))
+    end
+  end
+
+  def build(receiver_email, messages) do
+    new()
+    |> to(receiver_email)
+    |> from({@sender_name, @sender_email})
+    |> subject("PicChat Summary Report")
+    |> html_body("""
+    <h1>Summary Report</h1>
+    #{Enum.map(messages, &render_message/1)}
+    """)
+    |> text_body("""
+    Summary Report
+    #{messages |> Enum.map(&(&1.content)) |> Enum.join("\n")}
+    """)
+  end
+
+  defp render_message(message) do
+    """
+    <p>#{message.content}</p>
+    """
+  end
+end
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Configure Oban
+
+Follow the [Oban Installation Instructions](https://hexdocs.pm/oban/installation.html) to add Oban to your project.
+
+We'll outline the steps here.
+
+First, add oban to your list of dependencies in `mix.exs`. Make sure your version is up to date.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:oban, "~> 2.14"}
+```
+
+Configure Oban in `config.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :pic_chat, Oban,
+  repo: Newsletter.Repo,
+  plugins: [Oban.Plugins.Pruner],
+  queues: [default: 10]
+```
+
+Add Oban testing configuration in `test.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Oban
+config :pic_chat, Oban, testing: :inline
+```
+
+Add Oban to your application's supervision tree.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def start(_type, _args) do
+  children = [
+    # Start the Ecto repository
+    PicChat.Repo,
+    # Start the Telemetry supervisor
+    PicChatWeb.Telemetry,
+    # Start the PubSub system
+    {Phoenix.PubSub, name: PicChat.PubSub},
+    # Start the Endpoint (http/https)
+    PicChatWeb.Endpoint,
+    # Start a worker by calling: Newsletter.Worker.start_link(arg)
+    # {Newsletter.Worker, arg},
+    {Oban, Application.fetch_env!(:pic_chat, Oban)} # Added Oban
+  ]
+
+  # See https://hexdocs.pm/elixir/Supervisor.html
+  # for other strategies and supported options
+  opts = [strategy: :one_for_one, name: PicChat.Supervisor]
+  Supervisor.start_link(children, opts)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### DailySummaryEmail Worker
+
+Oban can schedule workers to perform a job in a certain amount of time, or at a specific time. See [Oban: Scheduling Jobs](https://hexdocs.pm/oban/Oban.html#module-scheduling-jobs) for more information.
+
+Create a `lib/pic_chat/workers/daily_summary_email.ex` worker with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Workers.DailySummaryEmail do
+  # We've made max_attempts: 1 to avoid re-sending users the same email. 
+  use Oban.Worker, queue: :default, max_attempts: 1
+
+  @impl true
+  def perform(_params) do
+    PicChat.SummaryEmail.send_to_subscribers()
+
+    :ok
+  end
+end
+```
+
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to schedule the job after five seconds.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> PicChat.Workers.DailySummaryEmail.new(%{}, schedule_in: 5) |> Oban.insert!()
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Daily Cron Job
+
+Oban allows us to configure [Cron](https://hexdocs.pm/oban/Oban.Plugins.Cron.html) based scheduling.
+
+Modify the oban config in `config.exs` to add a daily CRON job that runs at 8am every day.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :pic_chat, Oban,
+  repo: PicChat.Repo,
+  plugins: [
+    Oban.Plugins.Pruner
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"0 8 * * *", PicChat.Workers.DailySummaryEmail}
+     ]}
+  ],
+  queues: [default: 10]
+```
+
+## Tests
+
+### Todays Messages
+
+Testing time can be tricky. However, it's possible to override the `inserted_at` field in a record. The following test demonstrates how to ensure that the `Chat.todays_messages/0` function only finds messages created today.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Chat_test.exs
+test "todays_messages/0" do
+  user = user_fixture()
+  today_message = message_fixture(user_id: user.id)
+
+  yesterday =
+    NaiveDateTime.add(NaiveDateTime.utc_now(), -1, :day) |> NaiveDateTime.truncate(:second)
+
+  yesterday_message =
+    PicChat.Repo.insert!(%Message{
+      content: "some content",
+      user_id: user.id,
+      inserted_at: yesterday
+    })
+
+  assert Chat.todays_messages() == [today_message]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Testing Oban
+
+We can test the `perform/1` function directly if desired.
+
+For example, create a test file `pic_chat/workers/daily_summary_email_test.exs` with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Workers.DailySummaryEmailTest do
+  use PicChat.DataCase
+  use Oban.Testing, repo: PicChat.Repo
+
+  alias PicChat.Workers.DailySummaryEmail
+  alias PicChat.SummaryEmail
+
+  import Swoosh.TestAssertions
+  import PicChat.AccountsFixtures
+  import PicChat.ChatFixtures
+
+  test "perform/1 sends daily summary emails" do
+    user = user_fixture(email: "test@test.test", subscribed: true)
+    message1 = message_fixture(user_id: user.id)
+    message2 = message_fixture(user_id: user.id)
+
+    assert :ok = DailySummaryEmail.perform(%{})
+
+    assert_email_sent SummaryEmail.build(user.email, [message2, message1])
+  end
+end
+```
+
+Oban also provides the [Oban.Testing.assert_enqueued/2](https://hexdocs.pm/oban/Oban.Testing.html#assert_enqueued/2) function for testing if a job is enqueued.
+
+Here's a fantastic video that you may watch if you'd like to learn more about testing Oban.
+
+<!-- livebook:{"attrs":{"source":"YouTube.new(\"https://www.youtube.com/watch?v=PZ48omi0NKU&ab_channel=ElixirConf\")","title":"ElixirConf 2021 - Parker Selbert - Testing Oban Jobs From the Inside Out"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+
+```elixir
+YouTube.new("https://www.youtube.com/watch?v=PZ48omi0NKU&ab_channel=ElixirConf")
+```
+
+## Production Emails
+
+So far, we've only sent emails to the development mailbox. We have not actually configured our email system to send real emails.
+
+Now, we're going to configure the `SendGrid` to send actual emails when in a production environment.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create SendGrid Account
+
+To use SendGrid with Swoosh, we'll need a SendGrid API Token.
+
+To get a SendGrid API Token, complete the following steps.
+
+1. Sign up for a [Free SendGrid Account](https://signup.sendgrid.com/).
+2. [Create a Single Sender](https://app.sendgrid.com/settings/sender_auth/senders/new). This will be the configuration used for sending emails and receiving replies.
+3. Verify your sender identity through the confirmation email.
+4. [Set up MFA](https://app.sendgrid.com/settings/auth) (Multi-Factor Authentication)
+5. [Create an API key](https://app.sendgrid.com/settings/api_keys). You can create a Full Access key if you would like, but it's safer to create a Restricted Access key with the "Mail Send" permission. Make sure to save your API key someplace safe where others will not be able to view it.
+
+Upon completing the above, [review your sender](https://app.sendgrid.com/settings/sender_auth) to ensure they have been successfully set up.
+
+> Unfortunately SendGrid can take some time to verify the account and you may not be allowed to send emails right away. If this is the case, your teacher can provide you with a temporary key to use.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Set The API Key In The Environment
+
+Create a `.env` file with the following content. Replace KEY with your API key.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+export SENDGRID_API_KEY="KEY"
+```
+
+Add the `.env` file to `.gitignore` to prevent putting API keys in GitHub.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# .gitignore
+.env
+```
+
+Make sure to source the `.env` file into the environment.
+
+```
+$ source .env
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Alter `@sender_name` And `@sender_email`.
+
+Make the sender name and sender email match the sender you created on SendGrid.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Summary_email.ex
+@sender_name "YOUR_SENDER_NAME"
+@sender_email "YOUR_SENDER_EMAIL"
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### SendGrid Config
+
+Replace the existing mailer config with the following in `config.exs` to setup SendGrid.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Config :pic_chat, PicChat.Mailer, Adapter: Swoosh.Adapters.Local
+config :pic_chat, PicChat.Mailer,
+  adapter: Swoosh.Adapters.Sendgrid,
+  api_key: System.get_env("SENDGRID_API_KEY")
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Prod Adapter Config
+
+By default, `prod.exs` should already be configured to use [Finch](https://hexdocs.pm/finch/Finch.html) for sending HTTP requests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Configures Swoosh API Client
+config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
+```
+
+That's everything we need to send emails in the production environment.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Send Email In Development
+
+Generally, it's unwise to send real emails while in the dev environment as it's possible to accidentally send users development emails. That's why `dev.exs` configures `:swoosh` so that it can't send any emails.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+config :swoosh, :api_client, false
+```
+
+However, we're going to briefly configure the application to send real emails for testing purposes. Replace the `dev.exs` config that overwrites the `:swoosh` adapter with the following.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Config :swoosh, :api_client, False
+config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: PicChat.Finch
+```
+
+Run the following in the [IEx](https://hexdocs.pm/iex/IEx.html) shell to send a real email. Replace `YOUR_EMAIL`, `SENDER_NAME`, and `SENDER_EMAIL` with your own information from SendGrid and your own email.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+import Swoosh.Email
+
+new()
+|> to("YOUR_EMAIL")
+|> from({"SENDER_NAME", "SENDER_EMAIL"})
+|> subject("Test Email Subject")
+|> html_body("<h1>Test Email</h1>")
+|> text_body("Test Email")
+|> PicChat.Mailer.deliver()
+```
+
+Check your email or SendGrid to verify the email was sent. It may be in the Spam folder. You can view sent emails on the [SendGrid activity feed](https://app.sendgrid.com/email_activity?filters=%5B%7B%22val%22%3A%5B%22%22%5D%2C%22selectedFieldName%22%3A%22to_email%22%2C%22comparisonType%22%3A%22Contains%22%7D%2C%7B%22val%22%3A%5B%222023%2F01%2F12%20-%202023%2F01%2F15%22%5D%2C%22selectedFieldName%22%3A%22last_event_time%22%2C%22comparisonType%22%3A%22Between%22%7D%5D&isAndOperator=true&page=1).
+
+Once verified, make sure you change the development configuration back.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Dev.exs
+config :swoosh, :api_client, false
+# Config :swoosh, Api_client: Swoosh.ApiClient.Finch, Finch_name: PicChat.Finch
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: Oban](https://hexdocs.pm/oban/Oban.html)
+* [HexDocs: Swoosh](https://hexdocs.pm/swoosh/Swoosh.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish PicChat: Emails reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Emails">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/lists_vs_tuples.livemd">Lists Vs Tuples</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

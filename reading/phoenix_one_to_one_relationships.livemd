@@ -1,0 +1,384 @@
+# One-to-One Relationships
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=One-to-One Relationships">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_tags.livemd">Blog: Tags</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_cover_image.livemd">Blog: Cover Image</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* Why might you use a one-to-one relationship instead of adding an additional field in a table?
+* How do you add an associated data structure to the form for a resource?
+
+## Overview
+
+This is a companion reading for the [Blog: Cover Image](../exercises/blog_cover_image.livemd) exercise. This lesson is an overview of how to work with one-to-one associations in a Phoenix application. See the `example_projects/blog` project folder to contextualize the examples found throughout this lesson.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### One-to-one Relationships
+
+A one-to-one relationship is a relationship between two database tables where a single record in one table is related to a single record in the other table.
+
+Here some of the reasons we might choose to use a one-to-one relationship instead of simply storing the data in an additional field in the same table.
+
+* **Performance**: A one-to-one relationship can improve database performance by storing rarely used or expensive to retrieve data in a separate table.
+* **Domain Design**: It may make semantic sense to separate data, like a `PhoneNumber` with separate fields, into its own table. Creating an association can also ensure consistency between tables using a common resource.
+* **Flexibility**: A one-to-one relationship allows for flexibility in changing the structure of related data without affecting the rest of the database. For example, storing user `Profile` data in a separate table allows you to add or remove profile fields without changing the structure of the main `User` table.
+
+One-to-one relationships may add complexity to your database schema and may not always be the best choice, so consider trade-offs and choose the best design for your specific needs.
+
+We use the terms **belongs to** and **has one** to describe the nature of a one-to-one relationship. Typically one resource will own another. For example a blog `Post` might have one `CoverImage`, and the `CoverImage` belongs to the `Post`.
+
+In this case, the resource that **belongs_to** some resource stores the foreign key to the resource.
+
+```mermaid
+erDiagram
+
+Post {
+    string title
+    string subtitle
+    text content
+}
+
+CoverImage {
+    string url
+    id post_id
+}
+
+Post ||--O| CoverImage: "has one/belongs to"
+```
+
+## Migration
+
+One-to-one relationships use a foreign key to associate one resource with another. The resource that **belongs_to** the parent resource in the relationship stores the foreign key.
+
+Here's an example of a migration that creates a`cover_images` with a `post_id` foreign key.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Repo.Migrations.CreateCoverImages do
+  use Ecto.Migration
+
+  def change do
+    create table(:cover_images) do
+      add :url, :text
+      add :post_id, references(:posts, on_delete: :delete_all), null: false
+
+      timestamps()
+    end
+
+    create index(:cover_images, [:post_id])
+  end
+end
+```
+
+## Schema
+
+The Schema defines the direction of the one-to-one relationship using [has_one/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_one/3) and [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3).
+
+The record that stores the foreign key should [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) to the associated parent record.
+
+Here's an example of a `Post` schema that [has_one/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_one/3) `CoverImage` record.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+has_one :cover_image, Blog.Posts.CoverImage, on_replace: :update
+```
+
+We set the `on_replace: :update` above to update the associated `cover_image` rather than `:raise` an error (the default behavior) or `:delete` and recreate the cover image.
+
+See [the on_replace option](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-the-on_replace-option) for a deeper explanation.
+
+Here's an example of a `CoverImage` schema that [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) a `Post` record.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+belongs_to :post, Blog.Posts.Post
+```
+
+## Context: Replacing Associations
+
+When updating an association, we need to set the `on_replace` behavior. In a one-to-one relationship, we might consider using the `:update` behavior to simply update the associated record rather than deleting it and creating a new one. This necessitates preloading the association before updating it.
+
+Here's an example of preloading the association in the context.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update_post(%Post{} = post, attrs, tags \\ []) do
+  post
+  |> Repo.preload(:cover_image)
+  |> Post.changeset(attrs, tags)
+  |> Repo.update()
+end
+```
+
+## Form Data
+
+When creating associated data at the same time as creating the parent data, we can use [inputs_for/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#inputs_for/1) to embed the associated data in the same form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.inputs_for :let={cover_image} field={f[:cover_image]}>
+  <.input type="text" field={cover_image[:url]} label="Cover Image URL" />
+</.inputs_for>
+```
+
+Here's an example form using a cover image field in a post form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:user_id]} type="hidden" value={@current_user.id} />
+  <.input field={f[:title]} type="text" label="Title" />
+  <.input field={f[:content]} type="text" label="Content" />
+  <.inputs_for :let={cover_image} field={f[:cover_image]}>
+    <.input type="text" field={cover_image[:url]} label="Cover Image URL" />
+  </.inputs_for>
+  <.input field={f[:published_on]} type="datetime-local" label="Publish On" value={DateTime.utc_now()} />
+  <.input field={f[:visible]} type="checkbox" label="Visible" />
+  <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
+
+  <:actions>
+    <.button>Save Post</.button>
+  </:actions>
+</.simple_form>
+```
+
+Submitting the form will send the associated data inside of a nested map.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{
+  "content" => "some content",
+  # nested cover image data
+  "cover_image" => %{"url" => "https://www.example.com/image.png"},
+  "published_on" => "2023-05-23T19:36",
+  "title" => "some title",
+  "user_id" => "1",
+  "visible" => "true"
+}
+```
+
+## Cast Associated Data
+
+When creating both the parent and child record at the same time, we can use the [cast_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#cast_assoc/3) to cast the associated data (typically from a form) into the structure the `Repo` needs to insert the associated record into the database.
+
+Here's an example changeset in a `Post` schema that casts the associated cover image data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@doc false
+def changeset(post, attrs, tags \\ []) do
+  post
+  |> cast(attrs, [:title, :content, :visible, :published_on, :user_id])
+  |> cast_assoc(:cover_image)
+  |> validate_required([:title, :content, :visible, :user_id])
+  |> unique_constraint(:title)
+  |> foreign_key_constraint(:user_id)
+  |> put_assoc(:tags, tags)
+end
+```
+
+## Context Tests
+
+Generally a context should (at minimum) test the create, update, and delete behavior of a resource.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create
+
+Here's an example context test for creating a post with an associated cover image.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_post/1 with image" do
+  valid_attrs = %{
+    content: "some content",
+    title: "some title",
+    cover_image: %{
+      url: "https://www.example.com/image.png"
+    },
+    visible: true,
+    published_on: DateTime.utc_now(),
+    user_id: user_fixture().id
+  }
+
+  assert {:ok, %Post{} = post} = Posts.create_post(valid_attrs)
+  assert %CoverImage{url: "https://www.example.com/image.png"} = Repo.preload(post, :cover_image).cover_image
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Update
+
+Here's an example context tests for updating a post image. It's important to test the replacement behavior of associated data to ensure it behaves as expected. For example, the following test above would fail unless you've set the `on_replace` behavior of the association in the schema.
+
+Here's a test for creating a new image when updating. This ensures the `:cover_image` data is preloaded as seen in [Context: Replacing Associations](#context:-replacing-associations).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update_post/1 add an image" do
+  user = user_fixture()
+  post = post_fixture(user_id: user.id)
+
+  assert {:ok, %Post{} = post} = Posts.update_post(post, %{cover_image: %{url: "https://www.example.com/image2.png"}})
+  assert post.cover_image.url == "https://www.example.com/image2.png"
+end
+```
+
+Here's a test that updates an existing image.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "update_post/1 update existing image" do
+  user = user_fixture()
+  post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
+
+  assert {:ok, %Post{} = post} = Posts.update_post(post, %{cover_image: %{url: "https://www.example.com/image2.png"}})
+  assert post.cover_image.url == "https://www.example.com/image2.png"
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Delete
+
+Here's an example test for deleting a post with a cover image. Since there's likely no context functions for working with cover images directly, we've used `Repo` to test the cover image.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "delete_post/1 deletes post and cover image" do
+  user = user_fixture()
+  post = post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
+  assert {:ok, %Post{}} = Posts.delete_post(post)
+  assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+  assert_raise Ecto.NoResultsError, fn -> Repo.get!(CoverImage, post.cover_image.id) end
+end
+```
+
+## Controller Tests
+
+Here's an example test of testing a one-to-one relationship in a controller. This example creates a post with a cover image, and tests that the post's cover image is found on the post show page.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create post with cover image", %{conn: conn} do
+  user = user_fixture()
+  conn = log_in_user(conn, user)
+
+  create_attrs = %{
+    content: "some content",
+    title: "some title",
+    visible: true,
+    published_on: DateTime.utc_now(),
+    user_id: user.id,
+    cover_image: %{
+      url: "https://www.example.com/image.png"
+    }
+  }
+
+  conn = post(conn, ~p"/posts", post: create_attrs)
+
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == ~p"/posts/#{id}"
+
+  conn = get(conn, ~p"/posts/#{id}")
+  post = Posts.get_post!(id) 
+  # post was created with cover image
+  assert %CoverImage{url: "https://www.example.com/image.png"} = post.cover_image
+  # post cover image is displayed on show page
+  assert html_response(conn, 200) =~ "https://www.example.com/image.png"
+end
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Ecto: One-to-one relationshipos](https://hexdocs.pm/ecto/associations.html#has-one-belongs-to)
+* [Pragmatic Bookshelf: Programming Ecto](https://pragprog.com/titles/wmecto/programming-ecto/)
+* [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish One-to-One Relationships reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=One-to-One Relationships">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_tags.livemd">Blog: Tags</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_cover_image.livemd">Blog: Cover Image</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

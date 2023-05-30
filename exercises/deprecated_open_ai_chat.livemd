@@ -1,0 +1,136 @@
+# OpenAI Chat API
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:finch, "~> 0.16.0"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=OpenAI Chat API">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/apis.livemd">APIs</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/pokemon_api.livemd">Pokemon API</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## cURL Request
+
+Make the following cURL request to the Open AI Chat API. This comes from the [Open AI API Reference](https://platform.openai.com/docs/api-reference/chat/create).
+
+Make sure to replace $OPENAI_API_KEY with your Bearer token. After creating an OpenAI account, you can find or create an API key here: https://platform.openai.com/account/api-keys.
+
+```
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+## ChatGPT Project
+
+Make a mix project for ChatGPT.
+
+```
+mix new chat_gpt
+```
+
+Install [Finch](https://github.com/sneako/finch) in the mix project. Then create a function
+
+## Finch Request
+
+Make a Finch request to create a chat completion. You can base the request on the cURL request above.
+
+Decode the response using Jason and print the response string from the Chat API using `IO.puts/2`.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We've used the fake token `sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x` to demonstrate how to replace `$OPENAI_API_TOKEN` with your bearer token.
+
+```elixir
+request =
+  Finch.build(
+    :post,
+    "https://api.openai.com/v1/chat/completions",
+    [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer sk-1WHDb0NwRkq3mfyRVparT3BlbkFJ500axJFd8pZ2RKxGJ0x"}
+    ],
+    Jason.encode!(%{
+      model: "gpt-3.5-turbo",
+      messages: [%{role: "user", content: "Hello!"}]
+    })
+  )
+  |> Finch.request!(MyApp.Finch)
+
+decoded_body = Jason.decode!(request.body)
+
+[%{"message" => %{"content" => message}}] = decoded_body["choices"]
+
+IO.puts(message)
+```
+</details>
+
+```elixir
+
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish OpenAI Chat API exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=OpenAI Chat API">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/apis.livemd">APIs</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/pokemon_api.livemd">Pokemon API</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

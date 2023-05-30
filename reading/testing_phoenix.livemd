@@ -1,0 +1,442 @@
+# Testing Phoenix
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Testing Phoenix">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_posts.livemd">Blog: Posts</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_search.livemd">Blog: Search</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we generate a resource in a Phoenix application?
+* Explain Contexts, Schemas, Migrations, and Repo.
+
+## Overview
+
+This is a companion reading for the [Blog: Search](../exercises/blog_search.livemd) exercise. This lesson is an overview of how to write tests in a Phoenix application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Phoenix Test Organization
+
+Phoenix comes with a built-in testing framework, which includes ExUnit and other testing-related libraries.
+
+Tests are typically organized into different modules, depending on what you want to test. There are two primary test folders `tests/app` and `tests/app_web` where `app` is the name of our application.
+
+For example, if we want to test a `Blog.PostController` module, we would define a `Blog.PostControllerTest` module in `tests/app_web/post_controller_test.exs`.
+
+Or if we wanted to test a `Blog.Posts` context, we would define a `Blog.PostsTest` module in `tests/app/posts_test.exs`.
+
+```mermaid
+flowchart
+
+tests --> app --> Blog.PostsTest
+tests --> app_web --> BlogWeb.PostControllerTest
+```
+
+The `mix test` command automatically runs all `*_test.exs` files in the `tests` folder.
+
+By default, the Phoenix generator creates default tests for us, but they often have to be modified and updated as application behavior changes, or when working with associated data structures.
+
+## Context Tests With DataCase
+
+Phoenix defines a `DataCase` module in `tests/support/data_case.ex`. DataCase is a test case that sets up a test database and provides helper functions for creating and manipulating data.
+
+This test case is typically used for contexts tests. Here's an example test suite for a `Posts` context. Without the `DataCase` there wouldn't be a sandbox database for these context functions to act upon.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.PostsTest do
+  use Blog.DataCase
+
+  alias Blog.Posts
+
+  describe "posts" do
+    alias Blog.Posts.Post
+
+    import Blog.PostsFixtures
+
+    @invalid_attrs %{content: nil, subtitle: nil, title: nil}
+
+    test "list_posts/0 returns all posts" do
+      post = post_fixture()
+      assert Posts.list_posts() == [post]
+    end
+
+    test "get_post!/1 returns the post with given id" do
+      post = post_fixture()
+      assert Posts.get_post!(post.id) == post
+    end
+
+    test "create_post/1 with valid data creates a post" do
+      valid_attrs = %{content: "some content", subtitle: "some subtitle", title: "some title"}
+
+      assert {:ok, %Post{} = post} = Posts.create_post(valid_attrs)
+      assert post.content == "some content"
+      assert post.subtitle == "some subtitle"
+      assert post.title == "some title"
+    end
+
+    test "create_post/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Posts.create_post(@invalid_attrs)
+    end
+
+    test "update_post/2 with valid data updates the post" do
+      post = post_fixture()
+      update_attrs = %{content: "some updated content", subtitle: "some updated subtitle", title: "some updated title"}
+
+      assert {:ok, %Post{} = post} = Posts.update_post(post, update_attrs)
+      assert post.content == "some updated content"
+      assert post.subtitle == "some updated subtitle"
+      assert post.title == "some updated title"
+    end
+
+    test "update_post/2 with invalid data returns error changeset" do
+      post = post_fixture()
+      assert {:error, %Ecto.Changeset{}} = Posts.update_post(post, @invalid_attrs)
+      assert post == Posts.get_post!(post.id)
+    end
+
+    test "delete_post/1 deletes the post" do
+      post = post_fixture()
+      assert {:ok, %Post{}} = Posts.delete_post(post)
+      assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+    end
+
+    test "change_post/1 returns a post changeset" do
+      post = post_fixture()
+      assert %Ecto.Changeset{} = Posts.change_post(post)
+    end
+  end
+end
+
+```
+
+## Controller Tests With ConnCase
+
+`ConnCase` is a test case that sets up an HTTP connection and provides helper functions for making HTTP requests and inspecting responses. This test case is typically used for testing controllers.
+
+Here's an example test suite for a `PostController`. `ConnCase` sets up the `conn` [Plug.Conn](https://hexdocs.pm/plug/Plug.Conn.html) struct used when making requests. `ConnCase` also gives us access to functions defined in the [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#functions) module such as [get/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#get/3), [post/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#post/3), [put/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#put/3) and [delete/3](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html#delete/3) used to simulate HTTP requests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BlogWeb.PostControllerTest do
+  use BlogWeb.ConnCase
+
+  import Blog.PostsFixtures
+
+  @create_attrs %{content: "some content", subtitle: "some subtitle", title: "some title"}
+  @update_attrs %{content: "some updated content", subtitle: "some updated subtitle", title: "some updated title"}
+  @invalid_attrs %{content: nil, subtitle: nil, title: nil}
+
+  describe "index" do
+    test "lists all posts", %{conn: conn} do
+      conn = get(conn, ~p"/posts")
+      assert html_response(conn, 200) =~ "Listing Posts"
+    end
+  end
+
+  describe "new post" do
+    test "renders form", %{conn: conn} do
+      conn = get(conn, ~p"/posts/new")
+      assert html_response(conn, 200) =~ "New Post"
+    end
+  end
+
+  describe "create post" do
+    test "redirects to show when data is valid", %{conn: conn} do
+      conn = post(conn, ~p"/posts", post: @create_attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == ~p"/posts/#{id}"
+
+      conn = get(conn, ~p"/posts/#{id}")
+      assert html_response(conn, 200) =~ "Post #{id}"
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, ~p"/posts", post: @invalid_attrs)
+      assert html_response(conn, 200) =~ "New Post"
+    end
+  end
+
+  describe "edit post" do
+    setup [:create_post]
+
+    test "renders form for editing chosen post", %{conn: conn, post: post} do
+      conn = get(conn, ~p"/posts/#{post}/edit")
+      assert html_response(conn, 200) =~ "Edit Post"
+    end
+  end
+
+  describe "update post" do
+    setup [:create_post]
+
+    test "redirects when data is valid", %{conn: conn, post: post} do
+      conn = put(conn, ~p"/posts/#{post}", post: @update_attrs)
+      assert redirected_to(conn) == ~p"/posts/#{post}"
+
+      conn = get(conn, ~p"/posts/#{post}")
+      assert html_response(conn, 200) =~ "some updated content"
+    end
+
+    test "renders errors when data is invalid", %{conn: conn, post: post} do
+      conn = put(conn, ~p"/posts/#{post}", post: @invalid_attrs)
+      assert html_response(conn, 200) =~ "Edit Post"
+    end
+  end
+
+  describe "delete post" do
+    setup [:create_post]
+
+    test "deletes chosen post", %{conn: conn, post: post} do
+      conn = delete(conn, ~p"/posts/#{post}")
+      assert redirected_to(conn) == ~p"/posts"
+
+      assert_error_sent 404, fn ->
+        get(conn, ~p"/posts/#{post}")
+      end
+    end
+  end
+
+  defp create_post(_) do
+    post = post_fixture()
+    %{post: post}
+  end
+end
+```
+
+The `setup [:create_post]` section sometimes used in tests calls the `create_post/1` function.
+
+## Fixtures
+
+By default, Phoenix sets up test fixtures that are used to create data. You may notice the `post_fixture/1` function in the example above.
+
+These are merely convenience functions that allow us to create data in a test with or without supplying field values manually. Many projects choose to omit these and use context functions directly, or define their own fixtures using libraries such as [ExMachina](https://github.com/thoughtbot/ex_machina).
+
+Here's an example `PostsFixture` module that is imported in the `Blog.PostControllerTest` test example above.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.PostsFixtures do
+  def post_fixture(attrs \\ %{}) do
+    {:ok, post} =
+      attrs
+      |> Enum.into(%{
+        content: "some content",
+        subtitle: "some subtitle",
+        title: "some title"
+      })
+      |> Blog.Posts.create_post()
+
+    post
+  end
+end
+
+```
+
+The `post_fixture/1` function uses `Enum.into/2` to merge default field values with overridden `attrs`.
+
+```elixir
+attrs = [title: "overridden title"]
+
+Enum.into(attrs, %{
+  content: "some content",
+  subtitle: "some subtitle",
+  title: "some title"
+})
+```
+
+## What Should Be Tested?
+
+In software testing, it is important to ensure that the system works as expected and meets the user's requirements. Here are some areas that should be considered when deciding what to test:
+
+* **Core Functionality**: Ensure the main functionality for the application works as expected. For example the generated tests above cover the main CRUD actions for the system, and important features such as error handling.
+* **Previously Caught Bugs**: If possible, when fixing bugs in an application, write a test that reproduces the bug. This prevents bugs from re-emerging in a system like a game of whack-a-mole where you fix a bug and cause another by doing so.
+* **The Context**: Contexts are the interface to a resource. They allow you to focus on testing the functions in isolation, without worrying about the HTTP request/response cycle and avoid the overhead of setting up a full HTTP request/response cycle. They are generally more performant and therefore great for covering a wide variety of test cases.
+* **The Controller**: Controllers are the interface to an entire web application. They require more setup and overhead, but are therefore more comprehensive when testing a system. They are fantastic for ensuring an entire feature works as expected from the client's perspective rather than a single internal piece of an application.
+
+## Feature Example: Search
+
+To make testing more practical, let's consider how we might test a search feature. The search will filter a list of blog posts by title in a partial and case-insensitive fashion.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Context Tests
+
+We want to consider the **happy path** and the **edge cases** of a feature when testing.
+
+* happy path: filter is exact match
+* happy path: filter does not match
+* edge case: filter is partial match
+* edge case: filter is case-insensitive
+* edge case: filter is partial match and case-insensitive
+* edge case: filter is empty
+
+Here's an example test that successfully captures the above. It also further breaks down some of these edge cases for the sake of catching specific failures that might occur.
+
+<!-- livebook:{"force_markdown":true} -->
+
+`````elixir
+test "list_posts/1 filters posts by partial and case-insensitive title" do
+  post = post_fixture(title: "Title")
+
+  # non-matching
+  assert Posts.list_posts("Non-Matching") == []
+  # exact match
+  assert Posts.list_posts("Title") == [post]
+  # partial match end
+  assert Posts.list_posts("tle") == [post]
+  # partial match front
+  assert Posts.list_posts("Titl") == [post]
+  # partial match middle
+  assert Posts.list_posts("itl") == [post]
+  # case insensitive lower
+  assert Posts.list_posts("title") == [post]
+  # case insensitive upper
+  assert Posts.list_posts("TITLE") == [post]
+  # case insensitive and partial match
+  assert Posts.list_posts("ITL") == [post]
+  # empty
+  assert Posts.list_posts("") == [post]
+end
+````
+`````
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller Tests
+
+Controller tests allow use to test how our application handles HTTP actions. In this case, we might test that our application filters the list of posts when a user visits the post page http://localhost:4000/posts?title=Title with a `title` query parameter.
+
+Here's an example Controller test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "search for posts - non-matching", %{conn: conn} do
+  post = post_fixture(title: "some title")
+  conn = get(conn, ~p"/posts", title: "Non-Matching")
+  refute html_response(conn, 200) =~ post.title
+end
+
+test "search for posts - exact match", %{conn: conn} do
+  post = post_fixture(title: "some title")
+  conn = get(conn, ~p"/posts", title: "some title")
+  assert html_response(conn, 200) =~ post.title
+end
+```
+
+We've only included cases for the exact match and non-matching filter, but you could expand this test suite to include other edge cases.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "search for posts - partial match", %{conn: conn} do
+  post = post_fixture(title: "some title")
+  conn = get(conn, ~p"/posts", title: "itl")
+  assert html_response(conn, 200) =~ post.title
+end
+```
+
+Notice each test requires more setup, so it's more verbose to cover a wider number of edge cases. In many cases, if we comprehensively unit test the context, we can be satisfied with fewer integration tests in the controller.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### What About The Form?
+
+Controller tests only cover HTTP actions. In the example above, we could write a controller that filters the list of posts without ever writing a form with a search input that lets the user search for posts.
+
+Controller tests **cannot** tests UI interactions such as submitting a form. However they can test the HTTP actions that we expect the form to trigger.
+
+Testing UI interactions such as submitting a form or clicking a button is best done using E2E (End-To-End) libraries such as [Wallaby](https://github.com/elixir-wallaby/wallaby).
+
+Here's an example form that user can use to make the GET request to search for posts.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={%{}} method={"get"} action={~p"/posts"}>
+  <.input field={f[:title]} type="text" label="Search Posts" />
+  <:actions>
+    <.button>Search</.button>
+  </:actions>
+</.simple_form>
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Phoenix: Introduction to Testing](https://hexdocs.pm/phoenix/testing.html)
+* [Phoenix: Testing Contexts](https://hexdocs.pm/phoenix/testing_contexts.html)
+* [Phoenix: Testing Controllers](https://hexdocs.pm/phoenix/testing_controllers.html)
+* [Phoenix: ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Testing Phoenix reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Testing Phoenix">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_posts.livemd">Blog: Posts</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_search.livemd">Blog: Search</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

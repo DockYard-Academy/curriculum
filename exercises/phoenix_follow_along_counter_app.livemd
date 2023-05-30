@@ -1,0 +1,308 @@
+# Follow Along: Phoenix Counter App
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Follow Along: Phoenix Counter App">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/web_servers.livemd">Web Servers</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/phoenix_drills.livemd">Phoenix Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Follow Along Tutorial: Build A Counter Application
+
+We're going to build a `Counter` application to learn the basics of phoenix. Users will click a button that increments a count on the page.
+
+If you have not already, ensure you follow the [Phoenix Installation Guide](https://hexdocs.pm/phoenix/installation.html) to setup Phoenix 1.7 onto your system.
+
+For reference, see the completed `curriculum/demos/counter` application.
+
+## Initialize The Phoenix Project
+
+### Create A Phoenix Project
+
+Run the following in the `curriculum/projects/` folder to create a mix project without Ecto using the `--no-ecto` flag.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix phx.new counter --no-ecto
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Start The Server
+
+Start the server, which you can visit on http://localhost:4000.
+
+```
+$ mix phx.server
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Troubleshooting
+
+It's common to encounter issues when starting Phoenix for the first time. For example, typically, students run into problems with [Postgres](https://www.postgresql.org/).
+
+Linux users will often encounter an issue where the `postgresql` service is not running. You can solve this problem with the following command.
+
+```
+$ sudo service postgresql start
+```
+
+Alternatively, you may have a permissions issue where the PostgreSQL user does not have the default username and password. You can resolve this by ensuring there is a `postgres` user with a `postgres` password.
+
+While not a magic solution, the following may solve your problem.
+
+```
+$ sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+$ sudo server postgresql restart
+```
+
+These are two very common issues, however you may encounter an unexpected error. Please speak with your instructor if you encounter any issues to get support.
+
+## Returning A Response
+
+To return a response when the user visits a page, we need to do the following.
+
+1. Create the route.
+2. Create the controller.
+3. Create the component.
+4. Create the template.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Route.
+
+In `lib/counter_web/router.ex` modify the existing scope with the following. We're going to replace the `PageController` boilerplate that Phoenix generates.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", CounterWeb do
+  pipe_through :browser
+
+  get "/", CounterController, :home
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Controller
+
+Create a `lib/counter_web/controllers/counter_controller.ex` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def count(conn, _params) do
+    render(conn, :count, count: 0)
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Component
+
+Create a `lib/counter_web/controllers/counter_html.ex` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterHTML do
+  use CounterWeb, :html
+
+  embed_templates "counter_html/*"
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Template
+
+Create a `lib/counter_web/controllers/counter_html/count.html.heex` file with the following content.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1 class="text-4xl">The current count is: <%= @count %></h1>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Visit http://localhost:4000 and you should see our counter initialized to `0`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/counter_count_page.png)
+
+## Connect The Counter
+
+We can use [query parameters](https://en.wikipedia.org/wiki/Query_string) to control the counter's value.
+
+Modify the controller in `counter_web/controllers/counter_controller.ex` to use the `params` parameter to set the count.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule CounterWeb.CounterController do
+  use CounterWeb, :controller
+
+  def count(conn, params) do
+    render(conn, :count, count: params["count"] || 0)
+  end
+end
+```
+
+Visit http://localhost:4000?count=1 and the count should be set by the query parameter.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Increment The Count
+
+Now to increment the count, we have to send a get request with the incremented count as part of the url.
+
+To send a get request from the browser, we can use the [Phoenix.Component.link/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#link/1) component.
+
+Add the link to the template in `counter_web/controllers/counter_html/count.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<h1 class="text-4xl">The current count is: <%= @count %></h1>
+
+<.link
+  navigate={~p"/?count=#{@count + 1}"}
+  class="bg-cyan-500 hover:bg-cyan-400 text-2xl p-4 mt-4 rounded-full inline-block"
+>
+  Increment
+</.link>
+```
+
+## Count Form
+
+Let's connect the counter to a form. We're going to enter a value in a number input, and increment the count by that value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Form
+
+Create the form in `counter_web/controllers/counter_html/count.html.heex`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.form :let={f} for={%{}} action={~p"/"}>
+  <.input type="number" field={f[:increment_by]} value={1} />
+  <.input type="hidden" field={f[:count]} value={@count} />
+  <.button class="mt-2">Increment</.button>
+</.form>
+```
+
+This form sends a POST request to the `"/"` route with the count and the increment by value.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The `post` Route
+
+Modify the scope in our `router.ex` file to handle the POST request sent by the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", CounterWeb do
+  pipe_through :browser
+
+  get "/", CounterController, :count
+  post "/", CounterController, :increment
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Create The Controller `increment/2` Action
+
+Add an `increment/2` action in the `counter_web/controllers/counter_controller.ex` controller file. We'll need to send the current count and the value to increment by in the params.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def increment(conn, params) do
+  current_count = String.to_integer(params["count"])
+  increment_by = String.to_integer(params["increment_by"])
+  render(conn, :count, count: current_count + increment_by)
+end
+```
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Phoenix HexDocs](https://hexdocs.pm/phoenix/Phoenix.html)
+* [Plug HexDocs](https://hexdocs.pm/plug/readme.html)
+* [Phoenix a Web Framework for the New Web • José Valim • GOTO 2016](https://www.youtube.com/watch?v=bk3icU8iIto&ab_channel=GOTOConferences)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Follow Along: Phoenix Counter App exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Follow Along: Phoenix Counter App">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/web_servers.livemd">Web Servers</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/phoenix_drills.livemd">Phoenix Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

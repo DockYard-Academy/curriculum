@@ -22,10 +22,10 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/book_search_tags.livemd">Book Search: Tags</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_many_to_many_relationships.livemd">Many-To-Many Relationships</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_book_content.livemd">Book Search: Book Content</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/phoenix_one_to_one_relationships.livemd">One-to-One Relationships</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -38,40 +38,37 @@ Each blog post has a many-to-many association with tags.
 
 Tags should have `:name` field describing the type of tag such as `"tutorial"`, `"elixir"`, `"testing"`, etc.
 
-```mermaid
-classDiagram
-  class Tag {
-    name: :string
-  }
-```
-
-Blogs and tags should be associated through a **join** table `blog_tags`.
+Blogs and tags should be associated through a **join** table such as `posts_tags`.
 
 ```mermaid
-classDiagram
-  class BlogTag {
-    blog_id: :id
-    tag_id: :id
-  }
+erDiagram
+
+Post {
+}
+
+Tag {
+    string name
+}
+
+Post }O--O{ Tag: "posts_tags"
 ```
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Tag Requirements
 
-Ensure you:
-
-* Can perform standard CRUD operations for tags.
-* Can associate a blog with a tag using a multiple select when you create or update a blog.
-* Include a list of a blog's tags on the blog show page.
-
-## Bonus: Search By Tag
-
-Add the ability to see posts for a particular tag.
-
-For example, you might include a show blogs by tag page which displays all blogs that belong to a specified tag on the `"/blogs/tags/:id` route where `:id` is the id of a tag.
-
-Alternatively, you might create a form on the book index page to search for blogs by tag.
+* Migration and Schema:
+  * Create a join table for tags and posts
+  * Associate the `Post` and `Tag` schema through a many to many association
+* Functionality
+  * Users can create tags (or seed a pre-existing set of tags).
+  * Create, update, and delete posts with tags.
+  * **(bonus)**: Search and/or display posts by tag
+  * **(bonus)**: Allow a user to create tags when creating a post
+* Tests
+  * Write context and controller tests to ensure a user can create, update, and delete a post with tags
+  * All tests should pass. You may need to modify old tests and pages to ensure they continue to pass.
+  * **(bonus)** Write test(s) to ensure a user can search for posts by tag.
 
 ## Commit Your Progress
 
@@ -104,10 +101,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/book_search_tags.livemd">Book Search: Tags</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_many_to_many_relationships.livemd">Many-To-Many Relationships</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_book_content.livemd">Book Search: Book Content</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/phoenix_one_to_one_relationships.livemd">One-to-One Relationships</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

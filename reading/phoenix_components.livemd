@@ -1,0 +1,384 @@
+# Phoenix Components
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"},
+  {:ecto, "~> 3.9.5"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix Components">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_search.livemd">Blog: Search</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_migration.livemd">Blog: Visibility Migration</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we create a form in a Phoenix application?
+* What is a form action and how is it triggered?
+* How do we validate data and display errors in a form using changesets?
+
+## Overview
+
+This is a companion reading for the [Blog: Visibility Migration](../exercises/blog_migration.livemd) exercise. This lesson is an overview of how to work with [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) and the core components provided in Phoenix 1.7 applications.
+
+## Phoenix.Component
+
+The [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#module-attributes) module allows us to define reusable function components.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyComponent do
+  use Phoenix.Component
+
+  def greeting(assigns) do
+    ~H"""
+    <p>hello</p>
+    """
+  end
+end
+```
+
+Custom components can be used in any HEEx template.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.MyComponent.greeting />
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Attr
+
+The [attr/3](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#attr/3) macro defines typed attributes for the component.
+
+Attributes are accessible through the assigns using `@` or `assigns.`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyComponent do
+  use Phoenix.Component
+
+  attr :name, :string
+  def greeting(assigns) do
+    ~H"""
+    <p><%= @name %></p>
+    """
+  end
+end
+```
+
+Attributes can be configured with default values, requirements, and more. See [attr/3 options](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#attr/3-options) for more.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Slots
+
+The [slot/3] macro defines function component slots. This makes it easier to provide re-usable parts of a component.
+
+[render_slot/2](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#render_slot/2) renders a given slot entry.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyComponent do
+  use Phoenix.Component
+
+  slot :header
+  slot :inner_block, required: true
+  slot :footer
+  def page(assigns) do
+    ~H"""
+    <h1>
+      <%= render_slot(@header) %>
+    </h1>
+
+    <p>
+      <%= render_slot(@inner_block) %>
+    </p>
+
+    <section>
+      <%= render_slot(@footer) %>
+    </section>
+    """
+  end
+end
+```
+
+Slots are provided using a colon `:` in the html element name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.page>
+  My Inner Block
+  <:header>My Header</:header>
+  <:footer>My Header</:footer>
+</.page>
+```
+
+`inner_block` is the default slot name for direct children in a component. Any HTML elements not contained in other slots will be contained in the `inner_block` slot.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Global Attributes
+
+HTML elements take a large number of optional attributes that we might want to be able to pass in without explicitly defining them.
+
+We can use global attributes to collect these attributes. By default, the attributes accepted are those that are common to all standard HTML tags. You can find a comprehensive list of these attributes in the the [Global attributes MDN docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+attr :rest, :global
+
+def hello(assigns) do
+  ~H"""
+  <p {@rest}>Hello</p>
+  """
+end
+```
+
+## Core Components
+
+Components defined in the `core_components.ex` file in a Phoenix application are automatically imported, so they can be used without a module name.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.header>
+  Listing Posts
+  <:actions>
+    <.link href={~p"/posts/new"}>
+      <.button>New Post</.button>
+    </.link>
+  </:actions>
+</.header>
+```
+
+Here are the main components you'll often use:
+
+* modal
+* simple_form
+* button
+* input
+* label
+* error
+* header
+* table
+* list
+* back
+* icon
+
+These components are not documented in the Phoenix docs, because they are defined inside of your application when you generate a Phoenix 1.7 application.
+
+See the `core_components.ex` file in any Phoenix 1.7 application for documentation and the internal implementation details of these functions.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Simple Form
+
+The `simple_form/1` component in `core_components.ex` defines a form we can use in a HEEx template to let the user send HTTP requests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+attr :for, :any, required: true, doc: "the datastructure for the form"
+attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+
+attr :rest, :global,
+  include: ~w(autocomplete name rel action enctype method novalidate target),
+  doc: "the arbitrary HTML attributes to apply to the form tag"
+
+slot :inner_block, required: true
+slot :actions, doc: "the slot for form actions, such as a submit button"
+
+def simple_form(assigns) do
+  ~H"""
+  <.form :let={f} for={@for} as={@as} {@rest}>
+    <div class="mt-10 space-y-8 bg-white">
+      <%= render_slot(@inner_block, f) %>
+      <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+        <%= render_slot(action, f) %>
+      </div>
+    </div>
+  </.form>
+  """
+end
+```
+
+Forms take a changeset and an action. The action is the URL to submit the HTTP POST request to.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:title]} type="text" label="Title" />
+  <.input field={f[:subtitle]} type="text" label="Subtitle" />
+  <.input field={f[:content]} type="text" label="Content" />
+  <:actions>
+    <.button>Save Post</.button>
+  </:actions>
+</.simple_form>
+```
+
+Forms can be created without a changeset by providing an empty map. It's also possible to change the type of request to send.
+
+Here's an example of a form without a changeset that sends a GET request to the `/posts` route.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={%{}} method={"get"} action={~p"/posts"}>
+  <.input field={f[:title]} type="text" label="Search Posts" />
+  <:actions>
+    <.button>Search</.button>
+  </:actions>
+</.simple_form>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Internal Components
+
+[Pheonix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) also defines several internal components.
+
+For example, the `simple_form/1` component in `core_components.ex` relies on the [form/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1) component.
+
+Here are some useful components to be aware of:
+
+* [form/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1)
+* [link/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#link/1)
+
+See [components](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#components) for more.
+
+## Phoenix.LiveView.JS
+
+[Phoenix.LiveView.JS](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html) provides JavaScript commands that allow you to perform common client-side tasks, such as adding or removing CSS classes, modifying tag attributes, and showing or hiding content. Unlike client-side hooks, JS commands are aware of changes to the web page made by the server, ensuring that updates are retained even after patches from the server.
+
+For example, we can hide and show an element when clicking a button.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<button phx-click={JS.toggle(to: "#toggleable")}>TEST</button>
+<div id="toggleable">Hide and Show Me</div>
+```
+
+These JS commands can be bound to phoenix events such as `phx-click`, `phx-mounted`, and more. See [Bindings](https://hexdocs.pm/phoenix_live_view/bindings.html) for more information on these events.
+
+While this module belongs to `LiveView`, much of its functionality can also be used in traditional controller view.
+
+## Phoenix *HTML Modules
+
+Phoenix 1.7 replaced [Views](https://hexdocs.pm/phoenix/1.6.16/views.html) with unified function components.
+
+The `*HTML` modules in a Phoenix application use [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) under the hood.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule BlogWeb.PostHTML do
+  use BlogWeb, :html
+
+  embed_templates "post_html/*"
+
+  @doc """
+  Renders a post form.
+  """
+  attr :changeset, Ecto.Changeset, required: true
+  attr :action, :string, required: true
+
+  def post_form(assigns)
+end
+```
+
+Therefore, function components can be defined inside of `*HTML` modules. These function components can return HEEx using sigil `~H` in the body of the function.
+
+Alternatively, functions can omit the body to automatically delegate to a corresponding `*.html.heex` file, as seen above in `post_form/1` which would delegate to a `post_form.html.heex` file.
+
+## Phoenix.HTML
+
+The [Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html) project also defines html elements which use embedded Elixir syntax for elements. It's useful to be aware of this as many Phoenix projects still use this syntax, especially with Phoenix 1.6 or older.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
+  Name: <%= text_input f, :name %>
+<% end %>
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html)
+* [Phoenix.LiveView.JS](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.JS.html)
+* [Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Phoenix Components reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix Components">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_search.livemd">Blog: Search</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_migration.livemd">Blog: Visibility Migration</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

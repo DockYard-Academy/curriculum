@@ -32,7 +32,12 @@ defmodule Utils.Notebooks do
     Notebook.new!(%{relative_path: "../start.livemd"}) | @unused_notebooks ++ @outline_notebooks
   ]
 
+  @lessons Enum.filter(@outline_notebooks, fn each -> each.type == :reading end)
+
+  @exercises Enum.filter(@outline_notebooks, fn each -> each.type == :exercise end)
+
   @number_of_notebooks length(@outline_notebooks)
+  @notebook_boilerplate_word_count 245
 
   @notebook_dependencies [
     {:kino, "0.9"},
@@ -74,10 +79,21 @@ defmodule Utils.Notebooks do
   ]
 
   def all_notebooks, do: @all_notebooks
+  def lessons, do: @lessons
+  def exercises, do: @exercises
   def outline_notebooks, do: @outline_notebooks
   def unused_notebooks, do: @unused_notebooks
   def documented_libraries, do: @documented_libraries
   def notebook_dependencies, do: @notebook_dependencies
+
+  def word_count do
+    Enum.reduce(@outline_notebooks, 0, fn each, acc ->
+      each = load!(each)
+
+      count = String.split(each.content, " ") |> Enum.count()
+      acc + count - @notebook_boilerplate_word_count
+    end)
+  end
 
   def livebook_formatter(notebook) do
     formatted_content = LivebookFormatter.reformat(notebook.content)

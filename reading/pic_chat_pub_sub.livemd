@@ -25,7 +25,7 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -109,59 +109,11 @@ def start(_type, _args) do
 end
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+## PicChat: Pub Sub
 
-### [Phoenix.Endpoint](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html)
+Over the next several lessons, we're going to build a `PicChat` application where users can create messages with uploaded pictures. This lesson will focus adding a pub-sub system that enables a real-time feed of messages.
 
-The `Phoenix.Endpoint` module is the boundary for your Phoenix web application where all of your HTTP requests start.
-
-`Pheonix.Endpoint` contains the API functions such as [subscribe/2](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:subscribe/2), [broadcast/3](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast/3), and [broadcast_from/4](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast_from/4) for working with our Phoenix PubSub service.
-
-[subscribe/2](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:subscribe/2) subscribes a process to a particular topic. We usually call this function in the `mount/2` function of a LiveView. We use `connected?/1` to avoid calling the `subscribe/2` function twice.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  @impl true
-  def mount(_params, _session, socket) do
-    if connected?(socket) do
-      AppWeb.Endpoint.subscribe("topic_name")
-    end
-
-    {:ok, socket}
-  end
-```
-
-[broadcast/3](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast/3) sends a message to all subscribers of a particular topic. It takes a topic, and event name, and a payload of data to send with the message
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-payload = "payload" # some elixir term
-AppWeb.Endpoint.broadcast("topic_name", "event_name", payload)
-```
-
-[broadcast_from/4](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast_from/4) works similarly to [broadcast/3](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast/3) except it doesn't send the message to the broadcaster, even if it's also subscribed to the topic.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-payload = "payload" # some elixir term
-AppWeb.Endpoint.broadcast_from(self(), "topic_name", "event_name", payload)
-```
-
-These functions often wrap a `Phoenix.PubSub` function and automatically pass the name of our PubSub service `App.PubSub` as well as provide some other conveniences such as an improved API.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-payload = "payload" # some elixir term
-Phoenix.PubSub.broadcast(App.PubSub, "topic_name", {:event_name, payload})
-```
-
-## Follow Along: PicChat PubSub
-
-To learn more about PubSub, we're going to add real-time features to our existing `PicChat` application. Whenever a user creates, updates, or deletes a message, we'll update every LiveView with the new list of messages.
+Whenever a LiveView process triggers a relevant event such as adding, creating, or updating a message, we'll broadcast a message in the pubsub that causes other LiveView processes to update their chat feed.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -181,90 +133,11 @@ PS --broadcast event--> S3
 
 <!-- livebook:{"break_markdown":true} -->
 
-You can see the completed [PicChat](https://github.com/DockYard-Academy/pic_chat) application on the `pubsub` branch for the sake of reference.
+There are three main steps to implement a simple PubSub system.
 
-## Observer
-
-Elixir comes with an [:observer](https://elixir-lang.org/getting-started/debugging.html#observer) program that makes it easier to observe processes in our Application.
-
-Start your `PicChat` phoenix server in the IEx shell.
-
-```
-$ iex -S mix phx.server
-```
-
-Then start the `:observer`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-iex> :observer.start()
-```
-
-You should see a Graphical User Interface (GUI) appear. Open up the `Applications` panel to view the supervision tree of your application processes.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/pic_chat_pub_sub_observer.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-For the sake of learning how to use the observer, let's find a `MessageLive.Index` process in our supervision tree.
-
-First, inspect the pid of the current `MessageLive.Index` process in the `MessageLive.mount/3` callback.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def mount(_params, _session, socket) do
-  IO.inspect(self(), label: "LiveView Process ID")
-
-  # ...
-end
-```
-
-Visit http://localhost:4000 to mount a `MessageLive.Index` process. Observe the PID in your terminal. The PID will be unique.
-
-```
-LiveView Process ID: #PID<0.111.0>
-```
-
-Each LiveView runs in a separate process. Open multiple tabs on http://localhost:4000 and you'll notice each has a different PID.
-
-```
-LiveView Process ID: #PID<0.9424.0>
-LiveView Process ID: #PID<0.9479.0>
-LiveView Process ID: #PID<0.9530.0>
-```
-
-We can use the Observer to manually kill processes. Find the PID of a LiveView process in your Observer. Click on [File](https://hexdocs.pm/elixir/File.html) then `Kill process`. Observe the LiveView as it crashes.
-
-We can also use the Observer to manually send processes messages. Define a `handle_info/2` callback in `MessageLive.Index`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def handle_info(message, socket) do
-  IO.inspect(message, label: "Received Message")
-  {:noreply, socket}
-end
-```
-
-Select the process in the observer, then click [File](https://hexdocs.pm/elixir/File.html) -> `Send Msg`. Enter any Elixir term such as `"hello"` to send the LiveView process a message.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/pic_chat_pub_sub_observer_sending_message.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Observe the message printed to the terminal.
-
-```
-Received Message: 'hello'
-```
-
-Remove the `handle_info/2` callback and any `IO.inspect` calls as we are finished with the demonstration.
+1. Use [Endpoint.subscribe/2](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:subscribe/2) which calls [Phoenix.PubSuber.subscribe/3](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html#subscribe/3) to subscribe the relevant processes to a topic.
+2. Broadcast a message to all subscribers of a topic using a broadcast function such as [Endpoint.broadcast/3](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast/3) or [Endpoint.broadcast_from/4](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html#c:broadcast_from/4) (does not send a message to the caller)
+3. Handle the broadcasted message in the subscriber processes with a [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) callback.
 
 ## Subscribe
 
@@ -273,156 +146,187 @@ We display the list of messages on the `MessageLive.Index` LiveView. We're going
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def mount(_params, _session, socket) do
+# Index.ex
+def mount(_params, session, socket) do
   if connected?(socket) do
     PicChatWeb.Endpoint.subscribe("messages")
   end
 
-  {:ok,
-    socket
-    |> assign(:messages, list_messages())
-    |> allow_upload(:picture, accept: ~w(.jpg .jpeg .png), max_entries: 1)}
+  {:ok, stream(socket, :messages, Chat.list_messages())}
 end
 ```
 
-That's it. Our subscribed `MessageLive.Index` LiveView processes will receive any messages broadcast to the `"messages` topic.
+Now our subscribed `MessageLive.Index` LiveView processes will receive any messages broadcast to the `"messages"` topic.
 
-## Publish
+## Broadcast
 
-We want to broadcast an event on the `"messages"` topic that will tell our `MessageLive.Index` processes to update their list of messages.
+We want to broadcast messages to our PubSub system whenever an event occurs on the `"messages"` topic that is relevant to providing real-time updates. We'll broadcast a message anytime we create, update, or delete a `Message` record.
 
-Call `broadcast/4` in the `save_message/3` function in `form_component.ex` to broadcast a message to all subscribed processes.
+<!-- livebook:{"break_markdown":true} -->
+
+### Save Message
+
+Broadcast a `"new"` or `"edit"` event on the `"messages"` topic whenever we create or update a new message.
+
+To save time so that the broadcasted message doesn't have to go through the PubSub system, we've opted to use `broadcast_from/4` instead of `broadcast/3` and let the sender notify the parent LiveView of the saved message directly.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
+# Form_component.ex
+defp save_message(socket, :edit, message_params) do
+  case Chat.update_message(socket.assigns.message, message_params) do
+    {:ok, message} ->
+      notify_parent({:edit, message})
+      PicChatWeb.Endpoint.broadcast_from(self(), "messages", "edit", message)
+
+      {:noreply,
+        socket
+        |> put_flash(:info, "Message updated successfully")
+        |> push_patch(to: socket.assigns.patch)}
+
+    {:error, %Ecto.Changeset{} = changeset} ->
+      {:noreply, assign_form(socket, changeset)}
+  end
+end
+
 defp save_message(socket, :new, message_params) do
   case Chat.create_message(message_params) do
     {:ok, message} ->
-      # broadcast the "create_message" event to the "messages" topic
-      PicChatWeb.Endpoint.broadcast("messages", "create_message", message)
+      notify_parent({:new, message})
+      PicChatWeb.Endpoint.broadcast_from(self(), "messages", "new", message)
 
       {:noreply,
         socket
         |> put_flash(:info, "Message created successfully")
-        |> push_redirect(to: socket.assigns.return_to)}
+        |> push_patch(to: socket.assigns.patch)}
 
     {:error, %Ecto.Changeset{} = changeset} ->
-      {:noreply, assign(socket, changeset: changeset)}
+      {:noreply, assign_form(socket, changeset)}
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Delete
+
+Broadcast a `"delete"` event on the `"messages"` topic when we create or update a new message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.ex
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+
+  if message.user_id == socket.assigns.current_user.id do
+    {:ok, _} = Chat.delete_message(message)
+    PicChatWeb.Endpoint.broadcast_from(self(), "messages", "delete", message)
+    {:noreply, stream_delete(socket, :messages, message)}
+  else
+    {:noreply,
+      Phoenix.LiveView.put_flash(
+        socket,
+        :error,
+        "You are not authorized to delete this message."
+      )}
   end
 end
 ```
 
 ## Handle Received Event
 
-Processes can handle the received message using the `handle_info/2` callback. Let's start by defining a generic handler to inspect the message sent to the `MessageLive.Index` LiveView.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-@impl true
-def handle_info(message, socket) do
-  IO.inspect(message, label: "Received Message")
-  {:noreply, socket}
-end
-```
-
-Visit http:localhost/4000/new and create a new message in the chat application. See the printed message in the terminal.
+The `handle_info/2` callback in subscribed LiveView processes will receive a [Phoenix.Socket.Broadcast](https://hexdocs.pm/phoenix/Phoenix.Socket.Broadcast.html) broadcast struct.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 %Phoenix.Socket.Broadcast{
   topic: "messages",
-  event: "create_message",
+  event: "new",
   payload: %PicChat.Chat.Message{
     __meta__: #Ecto.Schema.Metadata<:loaded, "messages">,
-    id: 1,
-    content: "Example Content",
-    from: "Example From",
+    id: 4,
+    content: "some content",
     picture: nil,
-    inserted_at: ~N[2023-01-08 08:14:52],
-    updated_at: ~N[2023-01-08 08:14:52]
+    user_id: 1,
+    user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+    inserted_at: ~N[2023-05-28 21:26:18],
+    updated_at: ~N[2023-05-28 21:26:18]
   }
 }
 ```
 
-We're given a [Phoenix.Socket.Broadcast](https://hexdocs.pm/phoenix/Phoenix.Socket.Broadcast.html) struct. This includes the `topic`, the `event`, and the `payload`. Topics often have multiple events. This allows us to handle different events separately without having to subscribe to every different type of event.
-
-For example, we might have a `"create_message"`, `"delete_message"`, and `"update_message` event all under the `"messages"` topic.
-
-To handle this event, modify the `handle_info/2` function in `MessageLive.Index` to get the full list of messages and assign it to the socket to render an updated list.
+We can pattern match on this struct to create event handlers. Add `handle_info/2` callback functions for creating, updating, and deleting a `Message` in the stream of messages.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def handle_info(%{topic: "messages"}, socket) do
-  {:noreply, assign(socket, :messages, list_messages())}
+# Index.ex
+def handle_info(%Phoenix.Socket.Broadcast{topic: "messages", event: "new", payload: message}, socket) do
+  {:noreply, stream_insert(socket, :messages, message, at: 0)}
+end
+
+def handle_info(%Phoenix.Socket.Broadcast{topic: "messages", event: "edit", payload: message}, socket) do
+  {:noreply, stream_insert(socket, :messages, message)}
+end
+
+def handle_info(%Phoenix.Socket.Broadcast{topic: "messages", event: "delete", payload: message}, socket) do
+  {:noreply, stream_delete(socket, :messages, message)}
 end
 ```
 
-Open http://localhost:4000 in two different browser tabs. Create a message and notice that it appears in real-time on both tabs.
+## Testing PubSub
 
-<!-- livebook:{"break_markdown":true} -->
+We can test PubSub interactions by mounting multiple LiveViews and triggering events.
 
-### Your Turn: Broadcast "update_message" And "delete_message" Events
+Here are some tests we can add to `message_live_test.ex` to ensure the create, update, and delete PubSub functionality works as expected.
 
-You're going to broadcast a message every time you update or delete a chat message. Your list of messages displayed on http://localhost:4000 should update in real time.
-
-See [PicChat](https://github.com/DockYard-Academy/pic_chat) on the `pubsub` branch for reference.
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
-
-Broadcast after successfully editing a message in `form_component.ex`.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defp save_message(socket, :edit, message_params) do
-  case Chat.update_message(socket.assigns.message, message_params) do
-    {:ok, message} ->
-      PicChatWeb.Endpoint.broadcast("messages", "update_message", message)
+describe "PubSub" do
+  test "creating a message updates subscribers", %{conn: conn} do
+    user = user_fixture()
+    conn = log_in_user(conn, user)
+    {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+    {:ok, publisher_live, _html} = live(conn, ~p"/messages/new")
 
-      {:noreply,
-        socket
-        |> put_flash(:info, "Message updated successfully")
-        |> push_redirect(to: socket.assigns.return_to)}
+    assert publisher_live
+            |> form("#message-form", message: @create_attrs)
+            |> render_submit()
 
-    {:error, %Ecto.Changeset{} = changeset} ->
-      {:noreply, assign(socket, :changeset, changeset)}
+    assert render(subscriber_live) =~ "some content"
+  end
+
+  test "updating a message updates subscribers", %{conn: conn} do
+    user = user_fixture()
+    conn = log_in_user(conn, user)
+    message = message_fixture(user_id: user.id)
+    {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+    {:ok, publisher_live, _html} = live(conn, ~p"/messages/#{message}/edit")
+
+    assert publisher_live
+            |> form("#message-form", message: @update_attrs)
+            |> render_submit()
+
+    assert render(subscriber_live) =~ "some updated content"
+  end
+
+  test "deleting a message updates subscribers", %{conn: conn} do
+    user = user_fixture()
+    conn = log_in_user(conn, user)
+    message = message_fixture(user_id: user.id)
+    {:ok, subscriber_live, _html} = live(conn, ~p"/messages")
+    {:ok, publisher_live, _html} = live(conn, ~p"/messages/#{message}/edit")
+
+    assert publisher_live |> element("#messages-#{message.id} a", "Delete") |> render_click()
+
+    refute render(subscriber_live) =~ "some content"
   end
 end
 ```
-
-Broadcast when deleting a message with the `"delete"` event in `index.ex`.
-Either you can omit the assigning of `:messages` to the socket (this is our preferred solution to avoid issues in the next infinite-scroll lesson)
-
-```elixir
-@impl true
-def handle_event("delete", %{"id" => id}, socket) do
-  message = Chat.get_message!(id)
-  {:ok, _} = Chat.delete_message(message)
-
-  PicChatWeb.Endpoint.broadcast("messages", "delete_message", id)
-
-  # assigning :messages is no longer necessary, as the `"messages"` event handler retrieves the new list of messages.
-  {:noreply, socket}
-end
-```
-
-Alternatively, you could use `broadcast_from/4`, then handle the current LiveView individually.
-
-```elixir
-def handle_event("delete", %{"id" => id}, socket) do
-  message = Chat.get_message!(id)
-  {:ok, _} = Chat.delete_message(message)
-
-  PicChatWeb.Endpoint.broadcast_from(self(), "messages", "delete_message", id)
-
-  {:noreply, assign(socket, :messages, list_messages())}
-end
-```
-
-</details>
 
 ## Further Reading
 
@@ -468,7 +372,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Infinite Scroll</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_infinite_scroll.livemd">PicChat: Pagination</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

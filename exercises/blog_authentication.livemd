@@ -25,20 +25,72 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_authentication.livemd">Phoenix Authentication</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_tags.livemd">Book Search: Tags</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/phoenix_many_to_many_relationships.livemd">Many-To-Many Relationships</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Blog: Authentication
 
-You're going to add authentication and authorization to your existing [Blog](./group_project_blog.livemd) project.
+You're going to add authentication and authorization to your existing [Blog](./group_project_blog.livemd) project, and modify posts and comments so that they belong to a single user.
 
 Use the `mix phx.gen.auth` command to generate the initial authentication system.
 
 ```
 mix phx.gen.auth Accounts User users
 ```
+
+### Requirements
+
+```mermaid
+erDiagram
+
+Post {
+  string title
+  text content
+  date published_on
+  boolean visibility
+  id user_id
+}
+
+Comment {
+  text content
+  id post_id
+  id user_id
+}
+
+User {
+  string username
+  string email
+  string password
+  string hashed_password
+  naive_datetime confirmed_at
+}
+
+User ||--O{ Post : "owns"
+User ||--O{ Comment : "owns"
+Post ||--O{ Comment : "has many"
+```
+
+### Requirements
+
+* Migration & Schema
+  * Add a `username` field to the user that is between `4-20` characters.
+  * Associate a user with posts and comments. Enforce that a post or comment **must** belong to a user. A post or comment cannot exist without an associated user.
+* Functionality
+  * Associate comments with the currently signed in user upon creation.
+  * Associate posts with the currently signed in user upon creation.
+  * Display user's username on each post.
+  * Display user's username on each comment.
+* Authorization
+  * Ensure Users can only edit and delete their own posts
+  * Ensure Users can only edit and delete their own comments
+  * Ensure only signed in users can create posts
+  * Ensure only signed in users can create comments
+* Tests
+  * Write Context and Controller tests to ensure posts are created with a user.
+  * Write Context and Controller tests to ensure comments are created with a user.
+  * All tests should pass. You may need to modify old tests to ensure they continue to pass.
 
 All users should be able to view all blogs, however only authorized users should be able to create, edit, and update their own blogs.
 
@@ -100,7 +152,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_authentication.livemd">Phoenix Authentication</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_tags.livemd">Book Search: Tags</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/phoenix_many_to_many_relationships.livemd">Many-To-Many Relationships</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

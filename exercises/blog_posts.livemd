@@ -22,10 +22,10 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_and_ecto.livemd">Phoenix And Ecto</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_authors.livemd">BookSearch: Authors</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/testing_phoenix.livemd">Testing Phoenix</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -34,18 +34,24 @@ Mix.install([
 
 You're going to create the `Posts` resource in your [Blog](./group_project_blog.livemd) project.
 
-Blog posts should have a `title`, `subtitle`, and `content`. It should also have relevant timestamp information.
+Blog posts should have a `title`, `subtitle`, and `content`. It should also have relevant `timestamp` information.
 
 ```mermaid
-classDiagram
-  class Post {
-    title: :string
-    subtitle: :string
-    content: :text
-  }
+erDiagram
+
+Post {
+    string title
+    string subtitle
+    text content
+}
 ```
 
-You may use [Phoenix Generators](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Html.html) or create the Controller, Context, and other infrastructure for the post resource or you may create it all from scratch.
+<!-- livebook:{"break_markdown":true} -->
+
+### Generate The Posts Resource
+
+Use Phoenix Generators to scaffold all of the necessary boilerplate.
+Make sure to also define the post routes in the router.
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -88,6 +94,160 @@ end
 
 </details>
 
+<!-- livebook:{"break_markdown":true} -->
+
+### Context Functions
+
+Now that you've generated the `Posts` resource, start your project in the IEx shell to interact with the context programmatically.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ iex -S mix phx.server
+```
+
+Visit http://localhost:4000/posts to see the changes you make in the IEx shell reflected on the list of posts. Make sure to refresh the page to see updated changes.
+
+Now, use the `Blog.Posts` context module to do the following in the IEx shell:
+
+1. Create a blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+iex> Blog.Posts.create_post(%{title: "title", subtitle: "subtitle", content: "content"})
+```
+
+</details>
+
+1. Retrieve the blog post by it's id.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`1` will be the id of any valid post.
+
+```elixir
+iex> Blog.Posts.get_post!(1)
+```
+
+</details>
+
+1. Edit the blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`1` will be the id of any valid post.
+
+```elixir
+iex> Blog.Posts.get_post!(1) |> Blog.Posts.update_post(%{title: "updated title"})
+```
+
+</details>
+
+1. List all blog posts
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+iex> Blog.Posts.list_posts()
+```
+
+</details>
+
+1. Delete the blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`1` will be the id of any valid post.
+
+```elixir
+iex> Blog.Posts.get_post!(1) |> Blog.Posts.delete_post()
+```
+
+</details>
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Repo Functions
+
+In the IEx shell, use the `Blog.Posts.Post` schema and `Blog.Repo` module directly to do the following:
+
+> Note that the example solutions assume that you alias both modules.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> alias Blog.Posts.Post
+iex> alias Blog.Repo 
+```
+
+1. Create a blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+iex>  changeset = Post.changeset(%Post{}, %{title: "title", subtitle: "subtitle", content: "content"})
+iex>  post = Repo.insert(changeset)
+```
+
+</details>
+
+1. Retrieve the blog post by it's id.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`2` will be the id of any valid post.
+
+```elixir
+iex> Repo.get!(Post, 2)
+```
+
+</details>
+
+1. Edit the blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`2` will be the id of any valid post.
+
+```elixir
+iex> Repo.get!(Post, 2) |> Post.changeset(%{title: "updated title"}) |> Repo.update()
+```
+
+</details>
+
+1. List all blog posts
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+iex> Blog.Repo.all(Blog.Posts.Post)
+```
+
+</details>
+
+1. Delete the blog post
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+`1` will be the id of any valid post.
+
+```elixir
+iex> Repo.get!(Post, 2) |> Repo.delete()
+```
+
+</details>
+
 ## Commit Your Progress
 
 DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
@@ -119,10 +279,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/phoenix_and_ecto.livemd">Phoenix And Ecto</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/book_search_authors.livemd">BookSearch: Authors</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/testing_phoenix.livemd">Testing Phoenix</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

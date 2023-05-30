@@ -1,0 +1,669 @@
+# PicChat: Authentication
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Authentication">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we get the current user in a LiveView?
+* How do we protect a collection of live routes using [live_session/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Router.html#live_session/3)?
+
+## PicChat: Messages
+
+Over the next several lessons, we're going to build a `PicChat` application where users can create messages with uploaded pictures. This lesson will focus on adding authentication and authorization for messages.
+
+Use the [mix phx.gen.auth](https://hexdocs.pm/phoenix/1.6.15/Mix.Tasks.Phx.Gen.Auth.html) to generate all of the LiveView boilerplate needed to manage a `Messages` resource.
+Ensure you select the LiveView option for authentication
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix phx.gen.auth Accounts User users
+An authentication system can be created in two different ways:
+- Using Phoenix.LiveView (default)
+- Using Phoenix.Controller only
+Do you want to create a LiveView based authentication system? [Yn] Y
+```
+
+Migrate the database and install deps.
+
+```
+$ mix deps.get
+$ mix ecto.migrate
+```
+
+## Associate Messages And Users
+
+Create a new migration to add a `user_id` foreign key to messages. Make it required.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+mix ecto.gen.migration add_user_id_to_messages
+```
+
+Add the following content to the migration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Repo.Migrations.AddUserIdToMessages do
+  use Ecto.Migration
+
+  def change do
+    alter table(:messages) do
+      add :user_id, references(:users, on_delete: :delete_all), null: false
+    end
+  end
+end
+```
+
+Reset the database.
+
+```
+$ mix ecto.reset
+```
+
+Add the association in the `Message` schema.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.Chat.Message do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "messages" do
+    field :content, :string
+    belongs_to :user, PicChat.Accounts.User
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(message, attrs) do
+    message
+    |> cast(attrs, [:content, :user_id])
+    |> validate_required([:content])
+  end
+end
+```
+
+Send the `user_id` when using the message form to create a message. You'll need to provide the current user to the `form_component`. `@current_user` is already assigned by the `fetch_current_user/2` plug.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.html.heex
+<.live_component
+  module={PicChatWeb.MessageLive.FormComponent}
+  id={@message.id || :new}
+  title={@page_title}
+  action={@live_action}
+  message={@message}
+  patch={~p"/messages"}
+  current_user={@current_user}
+/>
+```
+
+Do the same for updating the message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Show.html.heex
+<.live_component
+  module={PicChatWeb.MessageLive.FormComponent}
+  id={@message.id}
+  title={@page_title}
+  action={@live_action}
+  message={@message}
+  patch={~p"/messages/#{@message}"}
+  current_user={@current_user}
+/>
+```
+
+Then provide `user_id` as a hidden input in the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Form_component.ex
+<.simple_form
+  for={@form}
+  id="message-form"
+  phx-target={@myself}
+  phx-change="validate"
+  phx-submit="save"
+>
+  <.input field={@form[:content]} type="text" label="Content" />
+  <!-- Add the hidden user_id field -->
+  <.input field={@form[:user_id]} type="hidden" value={@current_user.id} />
+  <:actions>
+    <.button phx-disable-with="Saving...">Save Message</.button>
+  </:actions>
+</.simple_form>
+```
+
+## Protect Routes
+
+### Authentication
+
+LiveViews cannot be protected using the usual `pipe_through [:browser, :require_authenticated_user]` macro because If we use a WebSocket connection, we won't send a new HTTP request, and we won't go through the defined `require_authenticated_user` plug in our router.
+
+Instead, we can protect routes using [live_session/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Router.html#live_session/3) to group routes together and run a common `on_mount/4` callback function whenever a LiveView mounts.
+
+The generated `UserAuth` module already defines a few useful `on_mount/4` callbacks:
+
+* `:ensure_authenticated`.
+* `:mount_current_user`.
+* `:redirect_if_user_is_authenticated`
+
+We're also going to create our own: `:require_user_owns_message`.
+
+Replace your `messages` routes with the following:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  scope "/", PicChatWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :protected_messages,
+      on_mount: [
+        {PicChatWeb.UserAuth, :ensure_authenticated},
+        {PicChatWeb.UserAuth, :require_user_owns_message}
+      ] do
+      live "/messages/new", MessageLive.Index, :new
+      live "/messages/:id/edit", MessageLive.Index, :edit
+      live "/messages/:id/show/edit", MessageLive.Show, :edit
+    end
+  end
+
+  scope "/", PicChatWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+
+    # We mount the current user as we'll need it to conditionally display elements later.
+    live_session :messages, on_mount: [{PicChatWeb.UserAuth, :mount_current_user}] do
+      live "/messages", MessageLive.Index, :index
+      live "/messages/:id", MessageLive.Show, :show
+    end
+  end
+```
+
+This introduces a security risk if we trigger a `patch` navigation event because it bypasses mounting a LiveView, so we need to ensure we use `navigate` instead.
+
+Change **all** of the `patch` events to `navigate` for pages that require an authenticated user.
+
+For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.link navigate={~p"/messages/new"}>
+  <.button>New Message</.button>
+</.link>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Authorization
+
+Currently any user can access any user's messages and delete or update them. To resolve this problem, we can create a custom `on_mount` callback function to restrict certain pages to only the user that owns them.
+
+First, define a `:require_user_owns_message` function clause for `on_mount/4` in `UserAuth`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def on_mount(:require_user_owns_message, %{"id" => message_id}, _session, socket) do
+  message = PicChat.Chat.get_message!(message_id)
+  if socket.assigns.current_user.id == message.user_id do
+    {:cont, socket}
+  else
+    socket =
+      socket
+      |> Phoenix.LiveView.put_flash(:error, "You must own this resource to access this page.")
+      |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
+
+    {:halt, socket}
+  end
+end
+
+# Automatically Continues For Routes That Are Not For A Specific Message.
+def on_mount(:require_user_owns_message, _params, _session, socket), do: {:cont, socket}
+```
+
+Then protect the routes in the existing `live_session/3` for `:messages`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+scope "/", PicChatWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  live_session :messages,
+    on_mount: [
+      {PicChatWeb.UserAuth, :ensure_authenticated},
+      # added :require_user_owns_message to the `on_mount` callbacks in `router.ex
+      {PicChatWeb.UserAuth, :require_user_owns_message}
+    ] do
+    live "/messages/new", MessageLive.Index, :new
+    live "/messages/:id/edit", MessageLive.Index, :edit
+    live "/messages/:id/show/edit", MessageLive.Show, :edit
+  end
+end
+```
+
+## Protected Event Handlers And Elements
+
+LiveView event handlers are also a security concern, as a user who has mounted the LiveView might be able to trigger event handlers they aren't authorized to use.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Delete Button
+
+For example, we currently have a problem. Users can delete any other user's message by triggering the `"delete"` event in the `MessageLive.Index` LiveView.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@impl true
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+  {:ok, _} = Chat.delete_message(message)
+
+  {:noreply, stream_delete(socket, :messages, message)}
+end
+```
+
+For now, we'll implement a very simple solution. Hide the delete button if the message doesn't belong to the user.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.html.heex
+<%= if assigns[:current_user] && @current_user == message.user_id do %>
+  <.link
+    phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
+    data-confirm="Are you sure?"
+  >
+    Delete
+  </.link>
+<% end %>
+```
+
+This is not an ideal solution, as the event handler is still exposed and unprotected if a user found a way to send an event to the server.
+
+Here's a very lightweight solution for protecting the event handler to give you an idea of how to implement authorization.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.ex
+@impl true
+def handle_event("delete", %{"id" => id}, socket) do
+  message = Chat.get_message!(id)
+
+  if message.user_id == socket.assigns.current_user.id do
+    {:ok, _} = Chat.delete_message(message)
+    {:noreply, stream_delete(socket, :messages, message)}
+  else
+    {:noreply, Phoenix.LiveView.put_flash(socket, :error, "You are not authorized to delete this message.")}
+  end
+end
+```
+
+Some systems will implement a separate authorization system for determining if an action is valid.
+
+See the DockYard blog post [Authorization For Phoenix Contexts](https://dockyard.com/blog/2017/08/01/authorization-for-phoenix-contexts) by Chris McChord for more information. He talks about authorization using controllers, but the same concepts can be applied in LiveView.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Edit Button
+
+We also have an exposed Edit button. Fortunately, we've protected the edit route so it's not a security concern, but it might be a UI issue to have a button that the user can't interact with.
+
+Here's how we can hide that button by checking if the user owns the message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.html.heex
+<%= if assigns[:current_user] && @current_user.id == message.user_id do %>
+  <.link navigate={~p"/messages/#{message}/edit"}>Edit</.link>
+<% end %>
+```
+
+We have the same problem on the `MessageLive.Show` page. We can fix it the same way.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<%= if assigns[:current_user] && @current_user.id == @message.user_id do %>
+  <.link navigate={~p"/messages/#{@message}/show/edit"} phx-click={JS.push_focus()}>
+    <.button>Edit message</.button>
+  </.link>
+<% end %>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### New Button
+
+Hide the new button for users that aren't logged in.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Index.heex.html
+<%= if assigns[:current_user] do %>
+  <.link navigate={~p"/messages/new"}>
+    <.button>New Message</.button>
+  </.link>
+<% end %>
+```
+
+## Fix Tests
+
+### Context Tests
+
+Fix the context tests in `chat_test.ex` by adding the `user_id` field whenever creating a message.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChat.ChatTest do
+  use PicChat.DataCase
+
+  alias PicChat.Chat
+
+  describe "messages" do
+    alias PicChat.Chat.Message
+
+    import PicChat.ChatFixtures
+    import PicChat.AccountsFixtures
+
+    @invalid_attrs %{content: nil}
+
+    test "list_messages/0 returns all messages" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      assert Chat.list_messages() == [message]
+    end
+
+    test "get_message!/1 returns the message with given id" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      assert Chat.get_message!(message.id) == message
+    end
+
+    test "create_message/1 with valid data creates a message" do
+      user = user_fixture()
+      valid_attrs = %{content: "some content", user_id: user.id}
+
+      assert {:ok, %Message{} = message} = Chat.create_message(valid_attrs)
+      assert message.content == "some content"
+      assert message.user_id == user.id
+    end
+
+    test "create_message/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Chat.create_message(@invalid_attrs)
+    end
+
+    test "update_message/2 with valid data updates the message" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      update_attrs = %{content: "some updated content"}
+
+      assert {:ok, %Message{} = message} = Chat.update_message(message, update_attrs)
+      assert message.content == "some updated content"
+    end
+
+    test "update_message/2 with invalid data returns error changeset" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      assert {:error, %Ecto.Changeset{}} = Chat.update_message(message, @invalid_attrs)
+      assert message == Chat.get_message!(message.id)
+    end
+
+    test "delete_message/1 deletes the message" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      assert {:ok, %Message{}} = Chat.delete_message(message)
+      assert_raise Ecto.NoResultsError, fn -> Chat.get_message!(message.id) end
+    end
+
+    test "change_message/1 returns a message changeset" do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      assert %Ecto.Changeset{} = Chat.change_message(message)
+    end
+  end
+end
+
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller Tests
+
+<!-- livebook:{"break_markdown":true} -->
+
+Our controller tests need to be modified in a few ways:
+
+* `UserAuth.log_in_user/3` when necessary to log in a user before mounting the LiveView.
+* Replace [assert_patch/3](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html#assert_patch/3) for links we changed from `patch` to `navigate`.
+* Add the `user_id` field when creating a message.
+
+Here's a full suite of fixed tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule PicChatWeb.MessageLiveTest do
+  use PicChatWeb.ConnCase
+
+  import Phoenix.LiveViewTest
+  import PicChat.ChatFixtures
+  import PicChat.AccountsFixtures
+
+  @create_attrs %{content: "some content"}
+  @update_attrs %{content: "some updated content"}
+  @invalid_attrs %{content: nil}
+
+  describe "Index" do
+    test "lists all messages", %{conn: conn} do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      {:ok, _index_live, html} = live(conn, ~p"/messages")
+
+      assert html =~ "Listing Messages"
+      assert html =~ message.content
+    end
+
+    test "saves new message", %{conn: conn} do
+      user = user_fixture()
+       conn = conn |> log_in_user(user)
+      {:ok, index_live, _html} = live(conn, ~p"/messages")
+
+      {:ok, new_live, html} = index_live |> element("a", "New Message") |> render_click() |> follow_redirect(conn)
+
+      assert_redirected(index_live, ~p"/messages/new")
+      assert html =~ "New Message"
+
+      assert new_live
+             |> form("#message-form", message: @invalid_attrs)
+             |> render_change() =~ "can&#39;t be blank"
+
+      assert new_live
+             |> form("#message-form", message: @create_attrs)
+             |> render_submit()
+
+      assert_patch(new_live, ~p"/messages")
+
+      html = render(new_live)
+      assert html =~ "Message created successfully"
+      assert html =~ "some content"
+    end
+
+    test "updates message in listing", %{conn: conn} do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+      {:ok, index_live, _html} = live(conn, ~p"/messages")
+
+      {:ok, edit_live, html} = index_live |> element("#messages-#{message.id} a", "Edit") |> render_click() |> follow_redirect(conn)
+      assert html =~ "Edit Message"
+      assert_redirect(index_live, ~p"/messages/#{message}/edit")
+
+      assert edit_live
+             |> form("#message-form", message: @invalid_attrs)
+             |> render_change() =~ "can&#39;t be blank"
+
+      assert edit_live
+             |> form("#message-form", message: @update_attrs)
+             |> render_submit()
+
+      assert_patch(edit_live, ~p"/messages")
+
+      html = render(edit_live)
+      assert html =~ "Message updated successfully"
+      assert html =~ "some updated content"
+    end
+
+    test "deletes message in listing", %{conn: conn} do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+      {:ok, index_live, _html} = live(conn, ~p"/messages")
+
+      assert index_live |> element("#messages-#{message.id} a", "Delete") |> render_click()
+      refute has_element?(index_live, "#messages-#{message.id}")
+    end
+  end
+
+  describe "Show" do
+    test "displays message", %{conn: conn} do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+
+      {:ok, _show_live, html} = live(conn, ~p"/messages/#{message}")
+
+      assert html =~ "Show Message"
+      assert html =~ message.content
+    end
+
+    test "updates message within modal", %{conn: conn} do
+      user = user_fixture()
+      message = message_fixture(user_id: user.id)
+      conn = log_in_user(conn, user)
+
+      {:ok, show_live, _html} = live(conn, ~p"/messages/#{message}")
+
+      {:ok, edit_live, html} = show_live |> element("a", "Edit") |> render_click() |> follow_redirect(conn)
+
+      assert html =~ "Edit Message"
+      assert_redirected(show_live, ~p"/messages/#{message}/show/edit")
+
+      assert edit_live
+             |> form("#message-form", message: @invalid_attrs)
+             |> render_change() =~ "can&#39;t be blank"
+
+      assert edit_live
+             |> form("#message-form", message: @update_attrs)
+             |> render_submit()
+
+      assert_patch(edit_live, ~p"/messages/#{message}")
+
+      html = render(edit_live)
+      assert html =~ "Message updated successfully"
+      assert html =~ "some updated content"
+    end
+  end
+end
+```
+
+## Your Turn: Username
+
+Add a `username` string field to the `users` table. Display the username in each chat message.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Chris McChord: Authorization For Phoenix Contexts](https://dockyard.com/blog/2017/08/01/authorization-for-phoenix-contexts)
+* [Sophie DeBenedetto: Securing Your Phoenix LiveView Apps](https://blog.appsignal.com/2022/01/25/securing-your-phoenix-liveview-apps.html)
+* [HexDocs: LiveView Security Model](https://hexdocs.pm/phoenix_live_view/security-model.html)
+* [HexDocs: mix phx.gen.auth](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Auth.html)
+* [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish PicChat: Authentication reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=PicChat: Authentication">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/pic_chat_messages.livemd">PicChat: Messages</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/pic_chat_image_upload.livemd">PicChat: Image Upload</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

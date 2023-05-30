@@ -1,0 +1,63 @@
+<.header>
+  Listing Messages
+  <:actions>
+    <%= if assigns[:current_user] do %>
+      <.link navigate={~p"/messages/new"}>
+        <.button>New Message</.button>
+      </.link>
+    <% end %>
+  </:actions>
+</.header>
+<.table
+  id="messages"
+  rows={@streams.messages}
+  phx-hook="InfiniteScroll"
+  data-page={@page}
+  row_click={
+    fn {_id, message} ->
+      JS.navigate(~p"/messages/#{message}")
+    end
+  }
+>
+  <:col :let={{_id, message}} label="Content">
+    <%= message.content %>
+  </:col>
+  <:col :let={{_id, message}} label="Picture"><img src={message.picture} /></:col>
+  <:action :let={{_id, message}}>
+    <div class="sr-only">
+      <.link navigate={~p"/messages/#{message}"}>Show</.link>
+    </div>
+    <%= if assigns[:current_user] && @current_user.id==message.user_id do %>
+      <.link navigate={~p"/messages/#{message}/edit"}>Edit</.link>
+    <% end %>
+  </:action>
+  <:action :let={{id, message}}>
+    <%= if assigns[:current_user] && @current_user.id==message.user_id do %>
+      <.link
+        phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        Delete
+      </.link>
+    <% end %>
+  </:action>
+</.table>
+
+<.button phx-click="load-more">Load More</.button>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="message-modal"
+  show
+  on_cancel={JS.patch(~p"/messages")}
+>
+  <.live_component
+    module={PicChatWeb.MessageLive.FormComponent}
+    id={@message.id || :new}
+    title={@page_title}
+    action={@live_action}
+    message={@message}
+    patch={~p"/messages"}
+    current_user={@current_user}
+  />
+</.modal>

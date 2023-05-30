@@ -427,6 +427,8 @@ defmodule CounterWeb.CoreComponents do
   attr :row_item, :any,
     default: &Function.identity/1,
     doc: "the function for mapping each row before calling the :col and :action slots"
+    
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the table"
 
   slot :col, required: true do
     attr :label, :string
@@ -442,7 +444,7 @@ defmodule CounterWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-[40rem] mt-11 sm:w-full">
+      <table class="w-[40rem] mt-11 sm:w-full" {@rest}>
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pr-6 pb-4 font-normal"><%= col[:label] %></th>

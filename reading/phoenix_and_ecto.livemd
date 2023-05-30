@@ -22,10 +22,10 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/rdbms.livemd">Relational Database Management Systems</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/group_project_blog.livemd">Group Project: Blog</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_posts.livemd">Blog: Posts</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -35,13 +35,19 @@ Mix.install([
 Upon completing this lesson, a student should be able to answer the following questions.
 
 * How do we generate a resource in a Phoenix application?
-* What is the router, and how do we define routes in a Phoenix application?
+* Explain Contexts, Schemas, Migrations, and Repo.
 
 ## Overview
 
+This is a companion reading for the [Blog: Posts](../exercises/blog_posts.livemd) exercise. This lesson is an overview of how to work with a database using Ecto in a Phoenix application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Ecto
+
 [Ecto](https://hexdocs.pm/ecto/Ecto.html) provides a standard API layer for communicating with the database of an Elixir application.
 
-By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https://www.postgresql.org/) Database. Ensure you already have [PostgreSQL](https://www.postgresql.org/) installed on your computer from the [Relational Database Management Systems](rdbms.livemd) lesson.
+By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https://www.postgresql.org/) Database. Ensure you already have [PostgreSQL](https://www.postgresql.org/) installed on your computer.
 
 [Ecto](https://hexdocs.pm/ecto/Ecto.html) splits into four main modules.
 
@@ -52,569 +58,190 @@ By default, [Ecto](https://hexdocs.pm/ecto/Ecto.html) uses a [PostgreSQL](https:
 
 [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) uses [Ecto](https://hexdocs.pm/ecto/Ecto.html) to handle the data layer of a web application.
 
-## Create A Journal Project
-
-We're going to build a journal application to learn how to use [Phoenix](https://hexdocs.pm/phoenix/Phoenix.html) with [Ecto](https://hexdocs.pm/ecto/Ecto.html).
-
-You can reference the DockYard Academy [Journal](https://github.com/DockYard-Academy/journal) project example if you want to see the completed project.
-
-Our journal will store journal entries that have a title and content.
-
-```mermaid
-classDiagram
-  class Entry {
-    title: :string
-    content: :text 
-  }
-```
-
-We will be able to create, read, update, and delete journal entries.
-
-The four CRUD actions (create, read, update, and delete) form the basis of most applications.
-
-First, create a new journal project.
-
-```
-$ mix phx.new journal
-```
-
-Install project dependencies from the project folder.
-
-```
-$ mix deps.get
-```
-
-Create and migrate the database from the project folder.
-
-```
-$ mix ecto.setup
-```
-
 <!-- livebook:{"break_markdown":true} -->
 
-Next, we can use generators provided by phoenix to create the controllers, views, and context for the journal `Entries`.
+### Domain
+
+In a Phoenix application, by default, there are four main modules responsible for managing business logic and the domain of our application. They are:
+
+* **Contexts**: They encapsulate specific domain areas, define the business logic and data access functions, and provide an API to expose functionality to other parts of the application.
+
+* **Schemas**: They define the structure of the data entities in the domain, including fields, types, and constraints.
+
+* **Repo**: It provides an abstraction layer for interacting with the database, encapsulating queries, and providing a clean interface to perform CRUD operations on the entities defined in **Schema** modules.
+
+* **Migrations**: They define changes to the database schema over time, such as creating or updating tables and columns.
+
+Together, these modules provide a way to model the business logic and data entities in the application and work with a database. Note that we are not limited to these modules, but this is how Phoenix organizes an application by default.
+
+## Generators
+
+We can define all of the necessary modules and boilerplate for part of our domain using the phoenix generators.
+
+For example, we could generate posts in a blog project with the following command.
 
 ```
-$ mix phx.gen.html Entries Entry entries title:string content:text
+mix phx.gen.html Posts Post posts title:string body:text
 ```
 
-The `mix phx.gen.html` command accepts several arguments.
+The command above would to the following:
 
-* The context: `Entries`.
-* The schema module: `Entry`.
-* The table name and an optional list of attributes and their types: `entries title:string content:text`
+* Create a **Posts** context.
+* Create a **Post** schema
+* Creates a **posts** table in the database with the `title:string` and `body:text` fields. See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes) documentation for a complete list of attribute types.
 
-This command creates several modules and files.
+It also generates boilerplate for the web layer of our application including the controller, component, and template. It does not generate routes for our router though, as these have to be manually inserted.
 
-* The `JournalWeb.EntryController` controller module.
-* The `JournalWeb.EntryView` view module.
-* The `Journal.Entries` context file.
-* Templates for the entry CRUD actions.
-* A migration file that creates the entries table in PostgreSQL.
-* Several test files.
-
-We can see the exact files created in the output.
-
-```
-* creating lib/journal_web/controllers/entry_controller.ex
-* creating lib/journal_web/templates/entry/edit.html.heex
-* creating lib/journal_web/templates/entry/form.html.heex
-* creating lib/journal_web/templates/entry/index.html.heex
-* creating lib/journal_web/templates/entry/new.html.heex
-* creating lib/journal_web/templates/entry/show.html.heex
-* creating lib/journal_web/views/entry_view.ex
-* creating test/journal_web/controllers/entry_controller_test.exs
-* creating lib/journal/entries/entry.ex
-* creating priv/repo/migrations/20220710205852_create_entries.exs
-* creating lib/journal/entries.ex
-* injecting lib/journal/entries.ex
-* creating test/journal/entries_test.exs
-* injecting test/journal/entries_test.exs
-* creating test/support/fixtures/entries_fixtures.ex
-* injecting test/support/fixtures/entries_fixtures.ex
-```
-
-## Phoenix Pipeline
-
-In the Phoenix web framework, HTTP requests flow through a pipeline of components before being processed and returned to the client.
-
-The first component in the pipeline is the Endpoint, which is responsible for receiving the incoming HTTP request and passing it on to the Router. The Router uses the request's path and method to determine which controller should handle the request.
-
-Once the appropriate controller has been identified, the request is passed to the controller, which is responsible for handling the request. The controller may perform various tasks, such as querying a database or calling other services, in order to generate a response to the request.
-
-The controller delegates to the context, which provides access to the business logic of our application. The controller might use the context to read or write data to the database as part of handling the request.
-
-Next, controller delegates to the view, which is responsible for rendering the response for our request. Typically, the view uses data provided by the controller to populate the template, and returns the resulting HTML to the client.
-
-Finally, the response is returned to the client, completing the flow of the HTTP request through the Phoenix pipeline.
-
-Overall, the Phoenix pipeline is designed to provide a modular, flexible way to process HTTP requests and generate responses in a web application. The pipeline allows developers to customize and extend the behavior of their application at each stage of the request-response cycle.
-
-Here's a diagram with an overview of that process.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/phoenix_application_architecture_overview.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Now that we're adding Ecto, we're expanding the layers for the `Model` portion of the diagram.
-
-The context is the entry point to the business logic of our application. Each context module  provides access to various resources that may be needed by the controller to handle an HTTP request, for example our `mix phx.gen.html` command generated an `Entries` context in our Journal application.
-
-To better understand the context, we'll provide a high-level overview of how data flows through our database from the context.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Writing Data
-
-When writing data to the database, our context will typically build up a `Changeset` using the `Schema` module for a resource.
-
-```mermaid
-flowchart
-  subgraph Context
-    attrs --> Schema --> Changeset --validated data--> Repo --SQL--> DB[Write To Database]
-  end
-```
-
-Here's an example of this flow using the `Entries.create_entry/2` context function in `entries.ex` from our `Journal` application.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def create_entry(attrs \\ %{}) do
-    # Create Changeset 
-    %Entry{}
-    |> Entry.changeset(attrs)
-    # Provide Changeset to Repo to generate the SQL to insert an entry into the database
-    |> Repo.insert()
-  end
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Reading Data
-
-When reading data from the database, we use the `Ecto.Query` module to build up a query, then pass the query to the `Repo` to retrieve data from the database.
-
-```mermaid
-flowchart
-  subgraph Context
-    attrs --> Schema --> Ecto.Query --> Repo
-  end
-```
-
-Here's an example using the `Entries.list_entries/0` function from our `Journal` application.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def list_entries do
-  Repo.all(Entry)
-end
-```
-
-It may not immediately be clear what the `Ecto.Query` portion is, because `Repo` understands we want to retrieve all data from the entries table when we pass it the `Entry` schema.
-
-This is shorthand for the following query which retrieves all journal entries from the `entries` table using the [Ecto.Query.from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2) macro.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def list_entries do
-  from(entry in Entry)
-  |> Repo.all()
-end
-```
-
-`Ecto.Query` is smart enough to understand to use the `"entries"` table from the `Entry` schema and transform the data into an `Entry` struct.
-
-For demonstration purposes, we can use the table name and perform this transformation manually.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def list_entries do
-  from(entry in "entries",
-    select: %Entry{
-      id: entry.id,
-      title: entry.title,
-      content: entry.content,
-      inserted_at: entry.inserted_at,
-      updated_at: entry.updated_at
-    }
-  )
-  |> Repo.all()
-end
-```
-
-Clearly this is more verbose than using the schema, so we'll revert back to using the `Entry` schema.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def list_entries do
-  Repo.all(Entry)
-end
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Here's a visual diagram of all the components in our Phoenix application and how they connect.
-
-```mermaid
-flowchart
-  direction BT
-  subgraph app
-    direction LR
-    Context --> Database
-    subgraph Database
-      subgraph Read
-        Ecto.Schema --> Ecto.Query --> Ecto.Repo
-      end
-      subgraph Write
-        direction TB
-        ES1[Ecto.Schema] --> Ecto.Changeset --> ER1[Ecto.Repo]
-      end
-      Ecto.Migration
-    end
-  end
-  subgraph app_web
-    direction LR
-    Endpoint --> Router --> Controller --> View --> Template
-  end
-  app_web --Controller Delegates To--> app
-```
-
-## Router
-
-We need to add a route for entries. We'll replace the page controller and use the `"/"` route with the `resources/4` macro.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-scope "/", JournalWeb do
-  pipe_through :browser
-
-  resources "/", EntryController
-end
-```
-
-The `resources/4` macro creates a standard matrix of HTTP actions. The `resources/4` macro is for convenience, so we don't need to define individual routes. For example, we can replace `resources/4` with the following and the application will still have the same behavior.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-scope "/", JournalWeb do
-  pipe_through :browser
-
-  get "/", EntryController, :index
-  get "/:id/edit", EntryController, :edit
-  get "/new", EntryController, :new
-  get "/:id", EntryController, :show
-  post "/", EntryController, :create
-  patch "/:id", EntryController, :update
-  put "/:id", EntryController, :update
-  delete "/:id", EntryController, :delete
-end
-```
-
-See [Phoenix.Router.resources/4](https://hexdocs.pm/phoenix/Phoenix.Router.html#resources/4) for more configuration options.
-
-The main HTTP actions are GET, POST, PATCH, PUT, and DELETE. They generally refer to different intentions for manipulating a resource, such as our journal entries.
-
-* GET: retrieve a resource.
-* POST: submit a resource.
-* PATCH: partially modify a resource.
-* PUT: completely replace a resource.
-* DELETE: delete a resource.
-
-We can see the generated routes by running the following command.
-
-```
-$ mix phx.routes
-```
-
-Observe the following in the output.
-
-```
-entries_path  GET     /                                     JournalWeb.EntryController :index
-entries_path  GET     /:id/edit                             JournalWeb.EntryController :edit
-entries_path  GET     /new                                  JournalWeb.EntryController :new
-entries_path  GET     /:id                                  JournalWeb.EntryController :show
-entries_path  POST    /                                     JournalWeb.EntryController :create
-entries_path  PATCH   /:id                                  JournalWeb.EntryController :update
-              PUT     /:id                                  JournalWeb.EntryController :update
-entries_path  DELETE  /:id                                  JournalWeb.EntryController :delete
-```
-
-These routes correspond to our controller actions.
-
-## Controllers
-
-When the client triggers one of these HTTP actions, the server executes the corresponding action in the `JournalWeb.EntryController`, either `:index`, `:edit`, `:new`, `:show`, `:create`, `:update`, or `:delete`.
-
-We can see these functions in `lib/journal_web/controllers/entry_controller.ex`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule JournalWeb.EntryController do
-  use JournalWeb, :controller
-
-  alias Journal.Entries
-  alias Journal.Entries.Entry
-
-  def index(conn, _params) do
-    entries = Entries.list_entries()
-    render(conn, "index.html", entries: entries)
-  end
-
-  def new(conn, _params) do
-    changeset = Entries.change_entry(%Entry{})
-    render(conn, "new.html", changeset: changeset)
-  end
-
-  def create(conn, %{"entry" => entry_params}) do
-    case Entries.create_entry(entry_params) do
-      {:ok, entry} ->
-        conn
-        |> put_flash(:info, "Entry created successfully.")
-        |> redirect(to: Routes.entry_path(conn, :show, entry))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
-    end
-  end
-
-  def show(conn, %{"id" => id}) do
-    entry = Entries.get_entry!(id)
-    render(conn, "show.html", entry: entry)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    entry = Entries.get_entry!(id)
-    changeset = Entries.change_entry(entry)
-    render(conn, "edit.html", entry: entry, changeset: changeset)
-  end
-
-  def update(conn, %{"id" => id, "entry" => entry_params}) do
-    entry = Entries.get_entry!(id)
-
-    case Entries.update_entry(entry, entry_params) do
-      {:ok, entry} ->
-        conn
-        |> put_flash(:info, "Entry updated successfully.")
-        |> redirect(to: Routes.entry_path(conn, :show, entry))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", entry: entry, changeset: changeset)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    entry = Entries.get_entry!(id)
-    {:ok, _entry} = Entries.delete_entry(entry)
-
-    conn
-    |> put_flash(:info, "Entry deleted successfully.")
-    |> redirect(to: Routes.entry_path(conn, :index))
-  end
-end
-```
-
-Many of our controller actions delegate to functions defined in the context.
+See [mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html) for a complete list of phoenix generators.
 
 ## Context
 
-Our `EntryController` uses the `Entries` context. Contexts are modules that group related functionality. In this case, the `Entries` context contains functions for working with entries in the database.
+Phoenix contexts are a way of organizing related functionality in a Phoenix application. Each context represents a coherent set of operations that relate to a specific domain or aspect of the application's functionality.
 
-Here's our `Entries` module.
+For example, we might have a `Blog` application with a `Posts` context that manages all operations for creating, editing, and deleting blog posts.
+
+Here's an example context module for a `Posts` context. We can see functions work with the `Post` context and the `Repo` module to retrieve, create, edit, and delete posts in the database.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Journal.Entries do
-  @moduledoc """
-  The Entries context.
-  """
-
+defmodule Blog.Posts do
   import Ecto.Query, warn: false
-  alias Journal.Repo
+  alias Blog.Repo
 
-  alias Journal.Entries.Entry
+  alias Blog.Posts.Post
 
-  @doc """
-  Returns the list of entries.
-
-  ## Examples
-
-      iex> list_entries()
-      [%Entry{}, ...]
-
-  """
-  def list_entries do
-    Repo.all(Entry)
+  def list_posts do
+    Repo.all(Post)
   end
 
-  @doc """
-  Gets a single entry.
+  def get_post!(id), do: Repo.get!(Post, id)
 
-  Raises `Ecto.NoResultsError` if the Entry does not exist.
-
-  ## Examples
-
-      iex> get_entry!(123)
-      %Entry{}
-
-      iex> get_entry!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_entry!(id), do: Repo.get!(Entry, id)
-
-  @doc """
-  Creates a entry.
-
-  ## Examples
-
-      iex> create_entry(%{field: value})
-      {:ok, %Entry{}}
-
-      iex> create_entry(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_entry(attrs \\ %{}) do
-    %Entry{}
-    |> Entry.changeset(attrs)
+  def create_post(attrs \\ %{}) do
+    %Post{}
+    |> Post.changeset(attrs)
     |> Repo.insert()
   end
 
-  @doc """
-  Updates a entry.
-
-  ## Examples
-
-      iex> update_entry(entry, %{field: new_value})
-      {:ok, %Entry{}}
-
-      iex> update_entry(entry, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_entry(%Entry{} = entry, attrs) do
-    entry
-    |> Entry.changeset(attrs)
+  def update_post(%Post{} = post, attrs) do
+    post
+    |> Post.changeset(attrs)
     |> Repo.update()
   end
 
-  @doc """
-  Deletes a entry.
-
-  ## Examples
-
-      iex> delete_entry(entry)
-      {:ok, %Entry{}}
-
-      iex> delete_entry(entry)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_entry(%Entry{} = entry) do
-    Repo.delete(entry)
+  def delete_post(%Post{} = post) do
+    Repo.delete(post)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking entry changes.
-
-  ## Examples
-
-      iex> change_entry(entry)
-      %Ecto.Changeset{data: %Entry{}}
-
-  """
-  def change_entry(%Entry{} = entry, attrs \\ %{}) do
-    Entry.changeset(entry, attrs)
+  def change_post(%Post{} = post, attrs \\ %{}) do
+    Post.changeset(post, attrs)
   end
 end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Ecto.Query
+
+`Ecto.Query` is imported in the example above. Contexts often work with `Ecto.Query` when writing queries for retrieving and manipulating data in a database.
+
+Here's an example query that allows us to filter a list of posts query by a case insensitive and partially matching `title` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def list_posts(title) do
+  search = "%#{title}%"
+  query = from p in Post, where: ilike(p.title, ^search)
+
+  Repo.all(query)
+end
+```
+
+[ilike](https://hexdocs.pm/ecto/Ecto.Query.API.html#ilike/2) allows us to search a case insensitive string. The `%` symbol acts as a wildcard to find partially matching searches.
+
+[from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2) selects the table to query, and [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3) filters the list of results.
+
+Ecto allows for a pipeable syntax that some developers prefer. For example, the above could also be written as:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def list_posts(title) do
+    search = "%#{title}%"
+    Post
+    |> where([p], ilike(p.title, ^search))
+    |> Repo.all()
+  end
 ```
 
 ## Schema
 
-The `Entries` context exposes functions for CRUD (create, read, update, delete) actions.
-These functions work with an `Entry` schema and the `Repo` module.
+In Ecto, a schema is a module that defines the structure and properties of a database table. The schema maps the fields of the table to the fields of the struct in the module, and it also defines any constraints or validations on those fields.
 
-An `Ecto.Schema` maps Elixir external data into Elixir structs. In this case, the `Entry` schema maps data from the `entries` table into an `Entry` struct.
-
-Here's our `Entry` schema.
+Here's an example of a `Post` schema that defines a post with `title`, `subtitle`, and `content` fields. We also see the `changeset/2` function used to define a `Post` changeset used with the `Repo` module earlier in the `Posts` context when creating or updating data.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Journal.Entries.Entry do
+defmodule Blog.Posts.Post do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "entries" do
+  schema "posts" do
     field :content, :string
+    field :subtitle, :string
     field :title, :string
 
     timestamps()
   end
 
   @doc false
-  def changeset(entry, attrs) do
-    entry
-    |> cast(attrs, [:title, :content])
-    |> validate_required([:title, :content])
+  def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:title, :subtitle, :content])
+    |> validate_required([:title, :subtitle, :content])
   end
 end
 ```
 
-The [Ecto.schema/2](https://hexdocs.pm/ecto/Ecto.Schema.html#schema/2) macro plays the same role that `@types` does for schemaless changesets, which we learned about in the [Ecto Changesets](./ecto_changeset.livemd) material.
+The [Ecto.schema/2](https://hexdocs.pm/ecto/Ecto.Schema.html#schema/2) and [field/3](https://hexdocs.pm/ecto/Ecto.Schema.html#field/3) macros define the fields and the data types of those fields. The Schema maps the fields of the PostgreSQL table into valid Elixir terms in a `Post` struct to make records in the database elixir-friendly when we work with them. You can find the full list of valid field types at [Ecto.Schema: Types and casting](https://hexdocs.pm/ecto/Ecto.Schema.html#module-types-and-casting).
 
-Each [field/3](https://hexdocs.pm/ecto/Ecto.Schema.html#field/3) macro defines the fields of our schema and their type. You can find the full list of valid field types at [Ecto.Schema: Types and casting](https://hexdocs.pm/ecto/Ecto.Schema.html#module-types-and-casting).
+<!-- livebook:{"break_markdown":true} -->
 
-We can use the `Entry.changeset/2` function to validate data before we attempt to insert it into the database. For example, in the `Entires` context, the [Ecto.Repo.insert/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) takes in the changeset returned from `Entry.changeset/2`.
+### Validations And Constraints
+
+Validations ensure data is valid before entering the database. Constraints are rules enforced by the database.
+
+For example, the [validate_required/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_required/3) validates that a field exists before inserting it into the database.
+
+However, we might add a [unique_constraint](https://hexdocs.pm/ecto/Ecto.Changeset.html#unique_constraint/3) that ensures a title is unique when compared with other posts in the database. This requires querying the database under the hood.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-  def create_entry(attrs \\ %{}) do
-    %Entry{}
-    |> Entry.changeset(attrs)
-    |> Repo.insert()
+def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:title, :subtitle, :content])
+    |> validate_required([:title, :subtitle, :content])
+    |> unique_constraint(:title)
   end
 ```
 
-## Repo
+## Migration
 
-The [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) module defines functions for working with the database.
-
-In our `Entries` context, we see some common functions:
-
-* [Repo.all](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2): get all records.
-* [Repo.get!](https://hexdocs.pm/ecto/Ecto.Repo.html#c:get!/3): get one record.
-* [Repo.insert/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2): insert a record.
-* [Repo.update](https://hexdocs.pm/ecto/Ecto.Repo.html#c:update/2): update existing record.
-* [Repo.delete](https://hexdocs.pm/ecto/Ecto.Repo.html#c:delete/2): delete record.
-
-These cover the full range of CRUD (create, read, update, delete) actions.
-
-## Migrations
-
-Earlier, the `mix phx.gen.html` command generated an Ecto migration file `priv/repo/migrations/create_entries.ex` which creates the entries table in our PostgreSQL database.
+Migrations are used to make changes to a database schema over time, as the requirements of an application evolve. Here's an example of a `CreatePosts` migration that would create a `posts` table in the database.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Journal.Repo.Migrations.CreateEntries do
+defmodule Blog.Repo.Migrations.CreatePosts do
   use Ecto.Migration
 
   def change do
-    create table(:entries) do
+    create table(:posts) do
       add :title, :string
+      add :subtitle, :string
       add :content, :text
 
       timestamps()
@@ -623,397 +250,232 @@ defmodule Journal.Repo.Migrations.CreateEntries do
 end
 ```
 
-> The actual file will have a timestamp in its name. i.e. `20220710205852_create_entries`.
+The [Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) module provides functions for manipulating tables and fields in a table. The [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2) macro creates a new table in the database and the [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new column to the table.
 
-`:string` is a simple string limited to `255` characters, and `:text` is a string with a larger character limit.
+You can use any of the [Elixir Primitive Types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types) and they will be converted to the appropriate [Field Type](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#module-field-types) for your database.
 
-See the [Attributes](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)  documentation for a complete list of attribute types.
+Some database field types which are not Elixir primitive types such as `:text` can be given directly.
 
-Run the following command to run all migration files in the `priv/repo/migrations/` folder.
+<!-- livebook:{"break_markdown":true} -->
 
+### Generating Migrations
+
+Migrations should always be generated rather than manually created to add a timestamp to the migration file. For example, the example above might be in a file `priv/repo/migrations/20230508221034_create_posts.ex`
+
+Migrations can be created individually using the [mix ecto.gen.migration](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Gen.Migration.html) command with the name of the migration.
+
+Here's an example where `create_posts` is the name of the migration.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ mix ecto.gen.migration create_posts
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Running Migrations
+
+Migrations are run in chronological order based on the timestamp, so they can be run or reset anytime using the following commands:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Run Migrations
 $ mix ecto.migrate
-The database for Journal.Repo has been created
 
-14:13:55.631 [info]  == Running 20220710205852 Journal.Repo.Migrations.CreateEntries.change/0 forward
-
-14:13:55.633 [info]  create table entries
-
-14:13:55.642 [info]  == Migrated 20220710205852 in 0.0s
+# Reset The Database And Re-run Migrations
+$ mix ecto.reset
 ```
 
-## GET :index
-
-To better understand our `journal` project we're going to walk through all of the HTTP requests and how they flow through our application.
-
-Ensure you have started the server, and visit http://localhost:4000.
+You can also rollback migrations with [mix ecto.rollback](https://hexdocs.pm/ecto_sql/Mix.Tasks.Ecto.Rollback.html). There are options that allow you to rollback specific migrations.
 
 ```
-$ mix phx.server
+$ mix ecto.rollback
 ```
-
-You'll see the following HTML web page.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/journal_index.png)
+### Manipulating Tables
+
+Ecto provides functions for manipulating tables in a database. Here are a few common functions:
+
+* [create/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#create/2): creates a new table in the database
+* [alter/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#alter/2): modifies an existing table in the database
+* [rename/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#rename/2): renames an existing table in the database
+* [drop/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#drop/2): removes an existing table from the database
 
 <!-- livebook:{"break_markdown":true} -->
 
-When we visit http://localhost:4000, the browser sends an HTTP GET request to the `"/"` route of the application.
+### Manipulating Fields
 
-This triggers the `EntryController.index/2` function in `lib/journal_web/controllers/entry_controller.ex`.
+[Ecto.Migration](https://hexdocs.pm/ecto_sql/Ecto.Migration.html) provides functions for manipulating fields in a table. Here are a few to get you started.
 
-<!-- livebook:{"force_markdown":true} -->
+* [add/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3) adds a new field to the table.
+* [modify/2](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#modify/3) modifies an existing field in the table.
+* [remove/2](https://hexdocs.pm/ecto/Ecto.Migration.html#remove/1) removes an existing field from the table.
 
-```elixir
-def index(conn, _params) do
-  entries = Entries.list_entries()
-  render(conn, "index.html", entries: entries)
-end
-```
-
-Which retrieves a list of entries (currently an empty list `[]`) from the `Entries` context in `lib/journal/entries.ex`.
+Here is an example migration that uses some of these Ecto functions to manipulate fields on a table:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def list_entries do
-  Repo.all(Entry)
-end
-```
+defmodule MyApp.Repo.Migrations.AlterUsersTable do
+  use Ecto.Migration
 
-The `EntryController.index/2` function then calls the `render/3` macro which delegates to the `EntryView` module in `lib/journal_web/views/journal_view.ex`.
+  def change do
+    alter table(:users) do
+      add :phone, :string
 
-<!-- livebook:{"force_markdown":true} -->
+      modify :email, :string, unique: true
+      modify :name, :string, null: false
 
-```elixir
-defmodule JournalWeb.EntryView do
-  use JournalWeb, :view
-end
-```
-
-Which uses the `lib/journal_web/templates/entry/index.html.heex` template file to build the HTML web page. This web page includes a link that navigates us to the `"/new"` route.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<span><%= link "New Entry", to: Routes.entry_path(@conn, :new) %></span>
-```
-
-See [Phoenix.HTML.Link](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Link.html) for more on the `link/2` function.
-
-## GET :new
-
-Click the `"New Entry"` link from the browser to navigate to http://localhost:4000/new.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/journal_new.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-By clicking the link, the browser sends an HTTP GET request to the `"/new"` route, which triggers the `EntryController.new/2` action.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def new(conn, _params) do
-  changeset = Entries.change_entry(%Entry{})
-  render(conn, "new.html", changeset: changeset)
-end
-```
-
-The `Entries.change_entry/1` function retrieves the [Ecto Changeset](https://hexdocs.pm/ecto/Ecto.Changeset.html) for the `Entry` schema. A form later uses this changeset to display form data validation errors.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-# Lib/journal/entries.ex
-def change_entry(%Entry{} = entry, attrs \\ %{}) do
-  Entry.changeset(entry, attrs)
-end
-
-# Lib/journal/entries/entry.ex
-def changeset(entry, attrs) do
-  entry
-  |> cast(attrs, [:title, :content])
-  |> validate_required([:title, :content])
-end
-```
-
-The `render/3` macro delegates to the `EntryView` module and renders the `lib/journal_web/templates/entry/new.html.heex` template file.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<h1>New Entry</h1>
-
-<%= render "form.html", Map.put(assigns, :action, Routes.entry_path(@conn, :create)) %>
-
-<span><%= link "Back", to: Routes.entry_path(@conn, :index) %></span>
-```
-
-Which uses the `render/3` macro to render the `lib/journal_web/templates/entry/form.html.heex` template file.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<.form let={f} for={@changeset} action={@action}>
-  <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
-    </div>
-  <% end %>
-
-  <%= label f, :title %>
-  <%= text_input f, :title %>
-  <%= error_tag f, :title %>
-
-  <%= label f, :content %>
-  <%= textarea f, :content %>
-  <%= error_tag f, :content %>
-
-  <div>
-    <%= submit "Save" %>
-  </div>
-</.form>
-```
-
-This form uses the changeset from the `Entry` schema to display validation errors. Click `"Submit"` without filling in the form, and you'll see the following errors.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/journal_new_errors.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-When we submit the form, it sends an HTTP POST request to the `"/"` route with the content of the form as parameters.
-
-For more on forms, see the [Phoenix.HTML.Form](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html) documentation.
-
-## POST :create
-
-While still on http://localhost:4000/new, enter a title and some content into the form and click the submit button.
-
-This sends a POST request to `"/"` which triggers the `EntryController.create/2` function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def create(conn, %{"entry" => entry_params}) do
-  case Entries.create_entry(entry_params) do
-    {:ok, entry} ->
-      conn
-      |> put_flash(:info, "Entry created successfully.")
-      |> redirect(to: Routes.entry_path(conn, :show, entry))
-
-    {:error, %Ecto.Changeset{} = changeset} ->
-      render(conn, "new.html", changeset: changeset)
+      remove :age
+    end
   end
 end
 ```
 
-`entry_params` is a map with the form content such as `%{"title" => "My Title", "content" => "My Content"}`.
-
-If we successfully create an entry, we flash a success message using the [put_flash/3](https://hexdocs.pm/phoenix/Phoenix.Controller.html#put_flash/3) macro and redirect the user to the show page.
-
-Otherwise, we re-render the `new.html.heex` template with an updated changeset that contains the form validation errors.
-
-## GET :show
-
-After successfully creating a journal entry, the controller redirects us to http://localhost:4000/1.
-
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/journal_show.png)
+### Schemas Reflect Migrations
 
-<!-- livebook:{"break_markdown":true} -->
+The schema maps the fields of our database table into Elixir data. A migration may involve changing the data type or structure of an existing column, which would in turn require updating the schema to reflect these changes. Always ensure the schema reflects the latest version of a table in the database.
 
-This is the `"/:id"` route which triggers the `EntryController.show/2` function.
+## Query
 
-<!-- livebook:{"force_markdown":true} -->
+The [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html) module defines functions for creating database queries. Queries themselves do not manipulate data in the database, but are instead a set of instructions to perform some operation in the database typically provided the [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) that performs the actual work on the Database.
 
-```elixir
-def show(conn, %{"id" => id}) do
-  entry = Entries.get_entry!(id)
-  render(conn, "show.html", entry: entry)
-end
-```
+Here are some common functions:
 
-The `show/2` function retrieves a single entry by its `:id` in the database, then uses the `render/3` function to render the `lib/journal_web/templates/entry/show.html.heex` template with the entry data.
+* [from/2](https://hexdocs.pm/ecto/Ecto.Query.html#from/2): Defines the table or tables to query
+* [where/3](https://hexdocs.pm/ecto/Ecto.Query.html#where/3): Specifies a condition that records must meet to be included in the query results.
+* [order_by/3](https://hexdocs.pm/ecto/Ecto.Query.html#order_by/3): Sorts the query results by one or more fields.
+* [select/3](https://hexdocs.pm/ecto/Ecto.Query.html#select/3): Specifies which fields to include in the query results.
+* [type](https://hexdocs.pm/ecto/Ecto.Query.API.html#type/2): Returns a new query object with a specific type. Often useful when providing Elixir terms in queries to convert them into a database type.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-<h1>Show Entry</h1>
-
-<ul>
-
-  <li>
-    <strong>Title:</strong>
-    <%= @entry.title %>
-  </li>
-
-  <li>
-    <strong>Content:</strong>
-    <%= @entry.content %>
-  </li>
-
-</ul>
-
-<span><%= link "Edit", to: Routes.entry_path(@conn, :edit, @entry) %></span> |
-<span><%= link "Back", to: Routes.entry_path(@conn, :index) %></span>
-```
-
-## GET :edit
-
-We can edit existing journal entries. Click on the `"Edit"` button to be taken to http://localhost:4000/1/edit. This is the `":id/edit"` route which triggers the `EntryController.edit/2` function.
+Here's an example query using keyword list syntax. The `^` symbol is used to inject Elixir terms into a database query. Elixir terms must be bound to a variable to inject them.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def edit(conn, %{"id" => id}) do
-  entry = Entries.get_entry!(id)
-  changeset = Entries.change_entry(entry)
-  render(conn, "edit.html", entry: entry, changeset: changeset)
-end
+search = "%#{title}%"
+
+today = DateTime.utc_now()
+
+query =
+  from(p in Post,
+    where: ilike(p.title, ^search),
+    where: p.visible,
+    where: p.published_on <= type(^today, :utc_datetime),
+    order_by: [desc: p.published_on]
+  )
 ```
 
-The `EntryController.edit/2` function retrieves an entry by its id and the `Entry` changeset.
-
-It then calls the `render/3` function to render the `lib/journal_web/templates/entry/edit.html.heex` template.
+The same query could be written using an alternative [pipe-based syntax](https://hexdocs.pm/ecto/Ecto.Query.html#module-macro-api) like so:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-<h1>Edit Entry</h1>
-
-<%= render "form.html", Map.put(assigns, :action, Routes.entry_path(@conn, :update, @entry)) %>
-
-<span><%= link "Back", to: Routes.entry_path(@conn, :index) %></span>
+query =
+  Post
+  |> where([p], ilike(p.title, ^search))
+  |> where([p], p.visible)
+  |> where([p], p.published_on <= type(^today, :utc_datetime))
+  |> order_by([p], desc: p.published_on)
 ```
 
-The `lib/journal_web/templates/entry/edit.html.heex` template renders the same form we saw in `lib/journal_web/templates/entry/new.html.heex` but with a different action.
+## Repo
 
-## PUT :update
+The [Ecto.Repo](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2) module defines functions for working with the database. Anytime we need to manipulate records in the database we work with the `Repo` module.
 
-This time, when we submit the form on http://localhost:4000/1/edit it sends a PUT request to the `"/:id"` route, which triggers the `EntryController.update/2` function.
+Here are some common functions:
+
+* [Repo.all](https://hexdocs.pm/ecto/Ecto.Repo.html#c:all/2): get all records.
+* [Repo.get!](https://hexdocs.pm/ecto/Ecto.Repo.html#c:get!/3): get one record.
+* [Repo.insert/2](https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert/2): insert a record.
+* [Repo.update](https://hexdocs.pm/ecto/Ecto.Repo.html#c:update/2): update existing record.
+* [Repo.delete](https://hexdocs.pm/ecto/Ecto.Repo.html#c:delete/2): delete record.
+
+These cover the full range of CRUD (create, read, update, delete) actions. Typically these functions will work in combination with the Schema module that defines a struct and a schema.
+
+For example, here's an example of how we use a `Post` struct to create a changeset that is then passed to the `Repo.insert/2` function to insert a new post into the database.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def update(conn, %{"id" => id, "entry" => entry_params}) do
-  entry = Entries.get_entry!(id)
-
-  case Entries.update_entry(entry, entry_params) do
-    {:ok, entry} ->
-      conn
-      |> put_flash(:info, "Entry updated successfully.")
-      |> redirect(to: Routes.entry_path(conn, :show, entry))
-
-    {:error, %Ecto.Changeset{} = changeset} ->
-      render(conn, "edit.html", entry: entry, changeset: changeset)
-  end
-end
+%Post{}
+|> Post.changeset(%{title: "some title", subtitle: "some subtitle" content: "some content"})
+|> Repo.insert()
 ```
 
-If we successfully update the entry, we flash a success message and redirect back to the show page.
+## Entity Relationship Diagrams
 
-Otherwise we display any errors in the form.
+Projects often use Entity Relationship Diagrams or UML (Unified Modelling Language) diagrams of some kind to represent the data layer of the application.
 
-## DELETE :delete
+Livebook let's us write Entity Relationship Diagrams directly. See [Mermaid: Entity Relationship Diagrams](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) for an overview of the syntax.
 
-If we navigate back to http://localhost:4000/ we'll see a list of our entries.
+It's important to be able to read these diagrams. Here's an example:
 
-<!-- livebook:{"break_markdown":true} -->
+```mermaid
+erDiagram
 
-![](images/journal_index_with_entries.png)
+Comment {
+  id post_id
+  text content
+}
 
-<!-- livebook:{"break_markdown":true} -->
+Post {
+  string title
+  text content
+  date published_on
+  boolean visibility
+}
 
-The template in `lib/journal_web/templates/entry/index.html.heex` builds this web page.
+Post ||--O{ Comment : "has many"
+```
+
+The above diagram describes both the fields and types of the data, as well as the associations between data.
+
+The pipe `||` in the line between `Post` and `Comment` represents **one** and the triple-lined-arrow with a circle represents **zero or more**. This describes the **one to many** relationship between posts and comments.
+
+The `post_id` field isn't strictly necessary given the diagram arrow implies the child contains a foreign key id but we've included it for sake of clarity.
+
+## Seeding
+
+Phoenix projects include a `priv/repo/seeds.exs` file for creating data (seeding) the database.
+
+The `seed.exs` file can be run with the following command from the project folder:
+
+```
+mix run priv/repo/seeds.exs
+```
+
+Typically seed files work with the `Repo` module or functions in contexts to create data for manual testing purposes.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-<h1>Listing Entries</h1>
+Blog.Repo.insert!(%Blog.Posts.Post{
+  title: "Some Title",
+  subtitle: "Some Subtitle",
+  content: "Some Content",
+})
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Content</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for entry <- @entries do %>
-    <tr>
-      <td><%= entry.title %></td>
-      <td><%= entry.content %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.entry_path(@conn, :show, entry) %></span>
-        <span><%= link "Edit", to: Routes.entry_path(@conn, :edit, entry) %></span>
-        <span><%= link "Delete", to: Routes.entry_path(@conn, :delete, entry), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
-<% end %>
-  </tbody>
-</table>
-
-<span><%= link "New Entry", to: Routes.entry_path(@conn, :new) %></span>
+Blog.Posts.create_post(%{
+  title: "Some Title",
+  subtitle: "Some Subtitle",
+  content: "Some Content",
+})
 ```
 
-Each entry has a `"Delete"` link which triggers an HTTP DELETE request to the `"/:id"` route. This calls the `EntryController.delete/2` function with the entry id.
+Seed files should not be run in the test environment, as they can interfere with test assertions.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def delete(conn, %{"id" => id}) do
-  entry = Entries.get_entry!(id)
-  {:ok, _entry} = Entries.delete_entry(entry)
-
-  conn
-  |> put_flash(:info, "Entry deleted successfully.")
-  |> redirect(to: Routes.entry_path(conn, :index))
-end
-```
-
-The `EntryController.delete/2` function deletes the entry and redirects the user back to the `"/"` route.
-
-Click the `"Delete"` link in the browser and see it deleted from the page.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/journal_entry_deleted.png)
-
-## Cleanup And Push To GitHub
-
-Since we removed the main page from the project, we no longer need the `PageController`.
-
-Remove the following files/folders:
-
-* `test/journal/controllers/page_controller.ex`
-* `test/journal_web/controllers/page_controller_test.ex`
-* `test/journal/templates/page`
-
-Ensure that all tests pass.
+Seeds files are automatically run when resetting the database.
 
 ```
-mix test
+mix ecto.reset
 ```
-
-Now stage and commit your changes from the `journal` project folder.
-
-```
-git add .
-git commit -m "finish journal project"
-```
-
-Now you can create a `journal` repository on [GitHub](https://github.com/) and push your project. Follow the instructions on GitHub to connect your local project to the remote repository.
 
 ## Further Reading
 
@@ -1022,6 +484,7 @@ Consider the following resource(s) to deepen your understanding of the topic.
 * [Phoenix Generators: mix phx.gen](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
 * [Phoenix HTML Generator: mix phx.gen.html](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.html#content)
 * [Phoenix Schema Generator Types](https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Schema.html#module-attributes)
+* [Pragmatic Bookshelf: Programming Ecto](https://pragprog.com/titles/wmecto/programming-ecto/)
 
 ## Commit Your Progress
 
@@ -1054,10 +517,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/rdbms.livemd">Relational Database Management Systems</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/group_project_blog.livemd">Group Project: Blog</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/sql_drills.livemd">SQL Drills</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_posts.livemd">Blog: Posts</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

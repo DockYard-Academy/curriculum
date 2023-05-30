@@ -1,0 +1,509 @@
+# One-To-Many Associations
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=One-To-Many Associations">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_migration.livemd">Blog: Visibility Migration</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_comments.livemd">Blog: Comments</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we create a foreign key reference in a migration?
+* How do we associate two records in a schema?
+* How do we write tests for associated records?
+* How do we preload associated data?
+
+## Overview
+
+This is a companion reading for the [Blog: Search](../exercises/blog_search.livemd) exercise. This lesson is an overview of how to work with one-to-many associations in a Phoenix application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### One To Many Associations
+
+In a one-to-many relationship, a single record in one table is associated with multiple records in another table. For example, a `Blog` might have many `Comments` associated with it.
+
+```mermaid
+erDiagram
+
+Post {
+}
+
+Comment {
+    text content
+    id blog_id
+}
+
+Post ||--o{ Comment : "has many"
+```
+
+In this relationship, we'd say the parent (post) **has many** children (comments), and the child **belongs to** the parent.
+
+The child in the relationship stores a **foreign key id** that associates it with the parent.
+
+## Generators
+
+We can generate the scaffolding for an associated resource using the phoenix generators.
+
+Often associated resources don't require their own controller, and instead only need to generate the context. For example:
+
+```
+mix phx.gen.context Comments Comment comments content:text post_id:references:posts
+```
+
+The `post_id:references:posts` field creates the `post_id` foreign key id field that references the `posts` table.
+
+Then if you need to create controller actions you might re-use the controller for the parent resource.
+
+Alternatively, you might generate the resource normally using `mix phx.gen.html` and selectively include controller actions you expect to use.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+resources "/comments", CommentController, only: [:create, :update, :delete]
+```
+
+## Migration
+
+Here's an example migration that creates a foreign key field `post_id` that references another table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Repo.Migrations.CreateComments do
+  use Ecto.Migration
+
+  def change do
+    create table(:comments) do
+      add :content, :text
+      add :post_id, references(:posts, on_delete: :nothing)
+
+      timestamps()
+    end
+
+    create index(:comments, [:post_id])
+  end
+end
+```
+
+The [index/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#index/3) macro creates A database that provides a quick and efficient way to look up records in a database. While not required, without an index, the database management system would need to scan through every record in the table to find the desired information.
+
+The `on_delete` behavior describes what should happen to the child if we delete the parent. For example, we could use the `:delete_all` behavior to delete all comments when a post is deleted. See [references/2 options](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#references/2-options) for a full list of similar options.
+
+We can also enforce that comments have an associated post using the `null: false` option. See [add/3 options](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#add/3-options) for a full list of similar options.
+
+Here's an example putting that together:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Repo.Migrations.CreateComments do
+  use Ecto.Migration
+
+  def change do
+    create table(:comments) do
+      add :content, :text
+      add :post_id, references(:posts, on_delete: :delete_all), null: false
+
+      timestamps()
+    end
+
+    create index(:comments, [:post_id])
+  end
+end
+```
+
+## Schema
+
+Schemas are like blueprints that define how data is stored in a database. They have an `id` field for an associated record, but they don't know anything else about how the records are related to each other.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Comments.Comment do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "comments" do
+    field :content, :string
+    field :post_id, :id
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(comment, attrs) do
+    comment
+    |> cast(attrs, [:content])
+    |> validate_required([:content])
+  end
+end
+```
+
+However, It's often useful to describe the association to the schema using the [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) and [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) macros.
+
+For example, we might want to load the associated comments when we retrieve a `Post`.
+
+Here's how we might modify the `Comment` to include the association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Comments.Comment do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "comments" do
+    field :content, :string
+    belongs_to :post, Blog.Posts.Post
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(comment, attrs) do
+    comment
+    |> cast(attrs, [:content, :post_id])
+    |> validate_required([:content, :post_id])
+    |> foreign_key_constraint(:post_id)
+  end
+end
+```
+
+We also use [foreign_key_constraint/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#foreign_key_constraint/3) above to ensure the `:post_id` provided is an actual post id in the database.
+
+Here's how we might modify the `Post` to include the association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Posts.Post do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "posts" do
+    field :content, :string
+    field :subtitle, :string
+    field :title, :string
+    has_many :comments, Blog.Comments.Comment
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:title, :subtitle, :content])
+    |> validate_required([:title, :subtitle, :content])
+  end
+end
+```
+
+## Preloading
+
+Once we've defined the association using [belongs_to/3](https://hexdocs.pm/ecto/Ecto.Schema.html#belongs_to/3) or [has_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#has_many/3) we can preload associated data structures when querying the database.
+
+For example, we can preload data before we've retrieved it from the database using [Ecto.Query.preload/3](https://hexdocs.pm/ecto/Ecto.Query.html#preload/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+from(p in Post, preload: [:comments]) |> Repo.get!(1)
+```
+
+Or we can preload data on a given struct using [Ecto.Repo.preload/3](https://hexdocs.pm/ecto/Ecto.Repo.html#c:preload/3).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Repo.preload(post, :comments)
+```
+
+## Adding Associations To Tests
+
+By default, when Phoenix generates tests they do not test the associated data structure, so we have to write our own or modify the existing tests.
+
+For example, in the case of comments and posts, we'd have to modify all of the tests to create a post and provide the post id when creating a comment.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Imported The PostsFixtures Module To Use The `post_fixture` Function.
+import Blog.PostsFixtures
+# Use The Post Fixture Whenever Creating A Comment To Provide The `post_id`.
+post = post_fixture()
+comment = comment_fixture(post_id: post.id)
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Testing Preloading Associations
+
+Here's an example of how to test that we preload an association. This would be useful if we want to display all of the comments for a particular post.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get_post!/1 returns the post with given id and associated comments" do
+  post = post_fixture()
+  comment = comment_fixture(post_id: post.id)
+  assert Posts.get_post!(post.id).comments == [comment]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Creating Associated Data
+
+Here's an example of how to test that creating a record with an associated data structure works as expected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_comment/1 with valid data creates a comment" do
+  post = post_fixture()
+  valid_attrs = %{content: "some content", post_id: post.id}
+
+  assert {:ok, %Comment{} = comment} = Comments.create_comment(valid_attrs)
+  assert comment.content == "some content"
+  assert comment.post_id == post.id
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Fixing Tests Due To An Unloaded Association
+
+Some tests might break due to not using preloaded associations in the assertions. Those tests can be fixed using [Repo.preload/3](https://hexdocs.pm/ecto/Ecto.Repo.html#c:preload/3). For example:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "get_post!/1 returns the post with given id" do
+  post = post_fixture()
+  assert Posts.get_post!(post.id) == Repo.preload(post, :comments)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller Tests
+
+We often have to fix or write our own tests to handle the creation of associated data and the redirect behavior of controller tests.
+
+Here's an example test for creating a comment.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  describe "create comment" do
+    test "redirects to show when data is valid", %{conn: conn} do
+      post = post_fixture()
+      create_attrs = %{content: "some content", post_id: post.id}
+      conn = post(conn, ~p"/comments", comment: create_attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      # redirect to the post show page
+      assert redirected_to(conn) == ~p"/posts/#{post.id}"
+
+      conn = get(conn, ~p"/posts/#{post.id}")
+      assert html_response(conn, 200) =~ "some content"
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      post = post_fixture()
+      invalid_attrs = %{content: nil, post_id: post.id}
+      conn = post(conn, ~p"/comments", comment: invalid_attrs)
+      # apostrophes are rendered as &#39; in HTML.
+      assert html_response(conn, 200) =~ "can&#39;t be blank"
+    end
+  end
+```
+
+If generating controllers or controller tests it's best to remove any unused tests and functionality.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Delete Behavior
+
+If we change the delete behavior of some resource, we might want to verify it works as expected. Here's an example test that ensures we delete comments when we delete a post.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "delete_post/1 deletes the post and associated comments" do
+  post = post_fixture()
+  comment = comment_fixture(post_id: post.id)
+  assert {:ok, %Post{}} = Posts.delete_post(post)
+
+  assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+  assert_raise Ecto.NoResultsError, fn -> Comments.get_comment!(comment.id) end
+end
+```
+
+## Associated Forms
+
+Associated data needs to be sent in an HTTP request. There are a few main ways to include this data:
+
+* body params in the form
+* URL params
+* query params
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Body Params
+
+Here's an example form that uses a `@post` and a `@comment_changeset` that would be defined in the `conn.assigns` by the controller. The form uses a hidden input to include the post id when it makes a request.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={@comment_changeset} action={~p"/comments"}>
+  <.input type="hidden" field={f[:post_id]} value={@post.id} />
+  <.input field={f[:content]} type="text" label="Content" />
+  <:actions>
+    <.button>Comment</.button>
+  </:actions>
+</.simple_form>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### URL Params Or Query Params
+
+To use URL params or query params, change the `action` in the form to include the associated data in the url, then omit the hidden input above.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# URL Params
+action={~p"/comments/#{@post.id}"}
+# Query Params
+action={~p"/comments/?post_id=#{@post.id}"}
+```
+
+## Handling Associated Data In The Controller
+
+A corresponding controller action needs to be defined to handle the HTTP request with the associated data sent by the form.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Body Params
+
+Here's an example controller action that assumes the `post_id` of a comment is included in the body params with the form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"comment" => comment_params}) do
+  case Comments.create_comment(comment_params) do
+    {:ok, comment} ->
+      conn
+      |> put_flash(:info, "Comment created successfully.")
+      # redirect to the post show page where the comment form is rendered
+      |> redirect(to: ~p"/posts/#{comment.post_id}")
+
+    {:error, %Ecto.Changeset{} = comment_changeset} ->
+      post = Posts.get_post!(comment_params["post_id"])
+      # re-render the post show page with a comment changeset that the page uses to display errors.
+      render(conn, :show, post: post, comment_changeset: comment_changeset)
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### URL Or Query Params
+
+If the request was sent using URL params or query params the post id would be handled separately like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create(conn, %{"comment" => comment_params, "post_id" => post_id}) do
+  case Comments.create_comment(Map.put(comment_params, "post_id", post_id)) do
+    {:ok, comment} ->
+      conn
+      |> put_flash(:info, "Comment created successfully.")
+      |> redirect(to: ~p"/posts/#{post_id}")
+
+    {:error, %Ecto.Changeset{} = comment_changeset} ->
+      post = Posts.get_post!(post_id)
+      render(conn, :show, post: post, comment_changeset: comment_changeset)
+  end
+end
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [Ecto.Query](https://hexdocs.pm/ecto/Ecto.Query.html)
+* [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+* [Elixir Schools: Querying#preloading](https://elixirschool.com/en/lessons/ecto/querying_basics#preloading-9)
+* [Elixir Forum: build_assoc vs put_assoc vs cast_assoc](https://elixirforum.com/t/confussed-with-build-assoc-vs-put-assoc-vs-cast-assoc/29116)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish One-To-Many Associations reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=One-To-Many Associations">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_migration.livemd">Blog: Visibility Migration</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_comments.livemd">Blog: Comments</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

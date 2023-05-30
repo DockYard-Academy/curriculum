@@ -1,0 +1,358 @@
+# Follow Along: LiveView Counter
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Follow Along: LiveView Counter">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/liveview.livemd">LiveView</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we mount a LiveView on a given route in the router?
+* What is the lifecycle of a LiveView?
+* How is information stored and set in the socket?
+* How do we send messages to a LiveView and handle them?
+
+## Follow Along: Counter
+
+We're going to build a `LiveViewCounter` application to learn more about LiveView. Users will click a button that increments the count on the page.
+
+You're also going to create a form with text input that can increment the count by a specific amount.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Scaffold Application
+
+First, let's create a new `LiveViewCounter` Phoenix application.
+
+```
+$ mix phx.new live_view_counter --no-ecto
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Start The Server
+
+We can start the server normally.
+
+```
+$ mix phx.server
+```
+
+The server should automatically reload every time we change our code. If you are a Linux user, you may have to install [inotify-tools](https://hexdocs.pm/phoenix/installation.html#inotify-tools-for-linux-users).
+
+## Define Live Route
+
+The [Phoenix.Router](https://hexdocs.pm/phoenix/Phoenix.Router.html) uses the [Phoenix.LiveView.Router.live/4](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Router.html#live/4) macro to define the route handled by the [Phoenix.LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html).
+
+Let's replace the default index route with a LiveView. We haven't yet created the `CounterLive` LiveView, but we'll do that next.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Counter_web/router.ex
+scope "/", LiveViewCounterWeb do
+  pipe_through :browser
+
+  live "/", CounterLive, :counter
+end
+```
+
+## Create A LiveView
+
+### CounterLive
+
+Now, create a new `live_view_counter_web/live` folder. This folder will store our LiveViews. In the folder, create a `live_view_counter_web/live/counter_live.ex` with the following content.
+
+The `~H` is a sigil used to define a HEEX (HTML + EEx) template. Remember that [sigils](https://elixir-lang.org/getting-started/sigils.html) are a textual way of working with data in Elixir.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule LiveViewCounterWeb.CounterLive do
+  use LiveViewCounterWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <h1>Counter</h1>
+    """
+  end
+end
+```
+
+## Display The Count
+
+Store the initial count in the socket and display it on the page using the embedded Elixir syntax.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule LiveViewCounterWeb.CounterLive do
+  use LiveViewCounterWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, :count, 0)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <h1>Counter</h1>
+    <p>Count: <%= @count %></p>
+    """
+  end
+end
+```
+
+## Increment The Count
+
+To increment this count, we'll make a button the user can click. This button will trigger a `phx-click` event with the `"increment"` message. This event is then handled by a corresponding handler, which increments the count in state.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule LiveViewCounterWeb.CounterLive do
+  use LiveViewCounterWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, :count, 0)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <p>Count: <%= @count %></p>
+    <.button id="increment-button" phx-click="increment">Increment</.button>
+    """
+  end
+
+  def handle_event("increment", _, socket) do
+    {:noreply, assign(socket, count: socket.assigns.count + 1)}
+  end
+end
+```
+
+## Increment Count Form
+
+Here's a simple form that submits the value provided and increments the count by that value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule LiveViewCounterWeb.CounterLive do
+  use LiveViewCounterWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, count: 0, form: to_form(%{"increment_by" => 1}))}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <h1>Counter</h1>
+    <p>Count: <%= @count %></p>
+    <.button id="increment-button" phx-click="increment">Increment</.button>
+    <.simple_form id="increment-form" for={@form} phx-submit="increment_by">
+      <.input type="number" field={@form[:increment_by]} label="Increment Count"/>
+      <:actions>
+        <.button>Increment</.button>
+      </:actions>
+    </.simple_form>
+    """
+  end
+
+  def handle_event("increment", _, socket) do
+    {:noreply, assign(socket, count: socket.assigns.count + 1)}
+  end
+
+  def handle_event("increment_by", params, socket) do
+    {:noreply,
+     assign(socket,
+       count: String.to_integer(params["increment_by"]) + socket.assigns.count
+     )}
+  end
+end
+```
+
+## Increment Count Form Validation
+
+This form demonstrates using both a `phx-change` and `phx-submit` event to validate the count and display errors. if the data is valid, then the count is incremented by the amount in the forms `:increment_by` field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule LiveViewCounterWeb.CounterLive do
+  use LiveViewCounterWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, assign(socket, count: 0, form: to_form(%{"increment_by" => 1}))}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <h1>Counter</h1>
+    <p>Count: <%= @count %></p>
+    <.button id="increment-button" phx-click="increment">Increment</.button>
+    <.simple_form id="increment-form" for={@form} phx-change="change" phx-submit="increment_by">
+      <.input type="number" field={@form[:increment_by]} label="Increment Count"/>
+      <:actions>
+        <.button>Increment</.button>
+      </:actions>
+    </.simple_form>
+    """
+  end
+
+  def handle_event("increment", _, socket) do
+    {:noreply, assign(socket, count: socket.assigns.count + 1)}
+  end
+
+  def handle_event("change", params, socket) do
+    socket =
+      case Integer.parse(params["increment_by"]) do
+        :error ->
+          assign(socket,
+            form: to_form(params, errors: [increment_by: {"Must be a valid integer", []}])
+          )
+
+        _ ->
+          assign(socket, form: to_form(params))
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("increment_by", params, socket) do
+    socket =
+      case Integer.parse(params["increment_by"]) do
+        :error ->
+          assign(socket,
+            form: to_form(params, errors: [increment_by: {"Must be a valid integer", []}])
+          )
+
+        {int, _rest} ->
+          assign(socket, count: socket.assigns.count + int)
+      end
+
+    {:noreply, socket}
+  end
+end
+
+```
+
+## Tests
+
+Here are some simple test examples for testing the increment button and the increment form in our LiveView. They aren't comprehensive, but they provide a good skeleton for you to understand the basics of LiveView testing.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Test/live_view_counter_web/live/counter_live_test.exs
+defmodule LiveViewCounterWeb.CounterLiveTest do
+  use LiveViewCounterWeb.ConnCase, async: true
+  import Phoenix.LiveViewTest
+
+  test "increment count", %{conn: conn} do
+    {:ok, view, html} = live(conn, "/")
+    assert html =~ "Count: 0"
+
+    assert view
+           |> element("#increment-button", "Increment")
+           |> render_click() =~ "Count: 1"
+  end
+
+  test "increment by count", %{conn: conn} do
+    {:ok, view, html} = live(conn, "/")
+    assert html =~ "Count: 0"
+
+    assert view
+           |> form("#increment-form")
+           |> render_submit(%{increment_by: "3"}) =~ "Count: 3"
+  end
+end
+
+```
+
+## Finishing Touches
+
+Make sure all tests pass. Remove any unnecessary boilerplate generated by Phoenix such as the page controller and page controller tests.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Bonus: Your Turn
+
+Make the count automatically increment every second.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+* [HexDocs: Phoenix.HTML](https://hexdocs.pm/phoenix_html/Phoenix.HTML.html)
+* [Elixir Schools: LiveView](https://elixirschool.com/blog/phoenix-live-view/)
+* [PragProg: Programming Phoenix LiveView](https://pragprog.com/titles/liveview/programming-phoenix-liveview/)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Follow Along: LiveView Counter exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Follow Along: LiveView Counter">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/liveview.livemd">LiveView</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_game.livemd">Math Game</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

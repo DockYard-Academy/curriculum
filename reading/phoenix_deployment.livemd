@@ -1,0 +1,437 @@
+# Phoenix Deployment
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix Deployment">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_home_page.livemd">Blog: Home Page</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_deployment.livemd">Blog: Deployment</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* What is Fly, and how do we use it to deploy applications?
+* What is CI/CD and how do we set it up?
+
+## Overview
+
+This is a companion reading for the [Blog: Deployment](../exercises/blog_deployment.livemd) exercise. This lesson is an overview of how to work with deployment in a Phoenix application. See the `example_projects/blog` project folder to contextualize the examples found throughout this lesson.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Software Deployment
+
+Software deployment is the process of making new or updated software available for users to use. This involves preparing the software for release, testing it to ensure it is working correctly, and installing it on the target systems. Deployment can be a complex process, especially for large and distributed systems, but automation tools and practices can help to streamline and simplify it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### DevOps
+
+DevOps is a software engineering culture and practice that aims to bring together the development and operations teams in an organization. It aims to increase collaboration and communication between these teams, and to automate the process of building, testing, and deploying software.
+
+The goal of DevOps is to enable organizations to rapidly and reliably deliver software changes, while also ensuring that these changes are of high quality and do not cause disruptions to users. By adopting DevOps practices, organizations can improve the speed and efficiency of their software development and delivery process, and increase the reliability and stability of their systems.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### CI/CD
+
+Continuous integration and continuous delivery (CI/CD) is a software development practice that aims to automate the process of building, testing, and deploying software. It involves integrating code changes into a shared repository frequently, and using automation to build, test, and deploy the software automatically.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Hosting Platforms
+
+A hosting platform is a service that helps you host and deploy your web applications and websites. It provides the necessary infrastructure and resources, such as servers, storage, and networking, as well as tools and features for building, deploying, and managing your apps. These tools may include support for various programming languages, database management, and monitoring and analytics.
+
+There are several different deployment platforms for Phoenix Applications including [Gigalixir](https://hexdocs.pm/phoenix/gigalixir.html), [Fly.io](https://hexdocs.pm/phoenix/fly.html), and [Heroku](https://hexdocs.pm/phoenix/heroku.html).
+
+While it's beyond the scope of this course, it's also possible to handle our own deployment by running a Phoenix application on a production machine. See [Introduction to Deployment](https://hexdocs.pm/phoenix/deployment.html) and [Deploying with Releases](https://hexdocs.pm/phoenix/releases.html) for more information.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Docker
+
+Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. Containers allow a developer to package an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+
+With Docker, developers can build and test applications in their own isolated environments, and then easily share them with others. This makes it easier to collaborate and ensures that applications will run the same way in different environments.
+
+Docker uses images to create containers. An image is a file that contains all the necessary components to run a specific application or service. When an image is run, Docker creates a new container from the image and runs the application or service inside the container.
+
+Docker also provides a centralized registry, called [Docker Hub](https://hub.docker.com/_/elixir), where users can store and share their own images. This makes it easy to share and distribute applications, as all the necessary components are packaged together in a single image.
+
+Fly.io uses a [Dockerfile](https://fly.io/docs/reference/builders/#dockerfile) to deploy your Phoenix application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### GitHub Actions
+
+GitHub Actions are a feature of GitHub that allows you to automate tasks (called "workflows") that are triggered by certain events in your repository. You can use GitHub Actions to build, test, and deploy your code, or to automate other tasks that are related to your repository.
+
+To use GitHub Actions, you create a workflows folder in your repository. Files in this folder defines the steps that should be taken when the workflow is triggered, and can be written in [YAML](https://en.wikipedia.org/wiki/YAML). You can configure your workflow to run whenever certain events occur in your repository, such as when you push code to the repository, when you open a pull request, or when you release a new version of your software.
+
+GitHub Actions makes it easy to automate many different types of tasks, including testing and deploying applications.
+
+## Deploy On Fly.io
+
+Follow the Phoenix [Deploying on Fly.io](https://hexdocs.pm/phoenix/fly.html) guide to deploy the project.
+
+Install the command-line interface for the Fly.io platform [here](https://fly.io/docs/hands-on/install-flyctl/).
+
+SignUp for a fly account.
+
+```
+$ fly auth signup
+```
+
+Then run the following command to configure Fly.io with the app.
+
+```
+$ fly launch
+```
+
+You will be prompted with a few steps. Select the following options or use your best judgement if the steps have changed:
+
+```
+? Choose an app name (leave blank to generate one): replace-this-with-your-app-name
+? Choose a region for deployment: pick-the-default-or-select-your-region
+? Would you like to set up a Postgresql database now? Yes
+? Select configuration: Development - Single node, 1x shared CPU, 256MB RAM, 1GB disk
+? Scale single node pg to zero after one hour? Yes
+? Would you like to set up an Upstash Redis database now? No
+? Would you like to deploy now? Yes
+```
+
+Deploy the app if you did not select `Yes` above.
+
+```
+$ fly deploy
+```
+
+Check that your application is deployed.
+
+```
+$ fly status
+```
+
+The result of `fly status` should say that your application is deployed. Here's an example output:
+
+```
+App
+  Name     = cohort2-blog                                        
+  Owner    = personal                                            
+  Hostname = cohort2-blog.fly.dev                                
+  Image    = cohort2-blog:deployment-01H0MA281RDD100YXFR6G8111M  
+  Platform = machines                                            
+
+Machines
+PROCESS ID              VERSION REGION  STATE   CHECKS  LAST UPDATED         
+app     148e272fe71038  1       ord     started         2023-05-17T07:35:47Z
+app     918599ef745d98  1       ord     started         2023-05-17T07:36:00Z
+```
+
+If you encounter any issues, try re-running the deployment steps, or speak with your classmates/teacher for help. You can also get support on the [fly community forum](https://community.fly.io/).
+
+Once your deployment is working, open the application in your browser.
+
+```
+$ fly open
+```
+
+Your application should automatically open in the browser. If not, you may need to click the link provided by the `fly open` command.
+
+## Seeding Production With The IEx Shell
+
+To seed the database, we can access the [IEx](https://hexdocs.pm/iex/IEx.html) shell of our production application using the following command. Replace `app_name` with the application's name.
+
+```
+$ fly ssh establish
+$ fly ssh issue --agent
+$ fly ssh console
+# App/bin/app_name Remote
+```
+
+See the following guide if you have any issues: [IEX into your running app](https://fly.io/docs/elixir/getting-started/iex-into-running-app/).
+
+From this IEx shell, we have access to all of our modules in production.
+
+For example, you could create an blog post like so:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Blog.Posts.create_post(%{title: "my first post", content: "some content", visible: true, published_at: DateTime.utc_now()}) 
+```
+
+Exit the IEx shell using <kbd>CTRL</kbd>+<kbd>C</kbd> <kbd>CTRL</kbd>+<kbd>C</kbd>. Then exit the console by typing `exit` and pressing enter.
+
+```
+# Exit
+```
+
+## Continuous Integration With GitHub Actions
+
+GitHub allows us to define `.yml` files in a `.github/workflows` folder that will be automatically run on certain steps of the GitHub pipeline.
+
+Create a `.github/workflows/continuous-integration.yml` file with the following content inside of a project folder to run tests on every pull-request made to the project.
+
+```yaml
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:11
+        ports: ['5432:5432']
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    name: run tests
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25.2'
+          elixir-version: '1.14.2'
+      - run: mix deps.get
+      - run: mix test
+```
+
+This file sets triggers our workflow to run our tests on every pull request. It also sets up a Postgres database for our tests. If you make a PR on a project with these continuous integration tests you'll see the following UI.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_ci.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+This is a nice simple workflow for any project. For a more advanced setup see [Fly: GitHub Actions for Elixir CI](https://fly.io/phoenix-files/github-actions-for-elixir-ci/).
+
+## Continuous Deployment With GitHub Actions
+
+Continuous deployment is the act of automatically deploying your application when you merge pull-requests, typically into the `main` branch of your project.
+
+In order to authorize deployment from a GitHub action, we need a Fly.io token. You can run the following to get a Fly.io token.
+
+```
+fly auth token
+```
+
+You can add this token in your GitHub repository from the `Settings` section. Name the token `FLY_API_TOKEN`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_fly_api_token.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+Then you can create `.github/workflows/continuous-deployment.yml` file with the following content. Notice this uses the secret token you just configured.
+
+```
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - main
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+jobs:
+  deploy:
+      name: Deploy app
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: superfly/flyctl-actions/setup-flyctl@master
+        - run: flyctl deploy --remote-only
+```
+
+After creating this file and making a PR, you should notice that the changes automatically deploy to your production application.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Troubleshooting
+
+Students using HTTPS instead of SSH for GitHub requests may encounter they need an HTTPS token with the `workflow` scope. If you encounter this issue you can find instructions on creating a token here: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token.
+
+## Fly Dashboard
+
+Fly provides some tools for managing and monitoring your application on the [Fly Dashboard](https://fly.io/dashboard).
+
+For example, you can select your application from the Dashboard and go to **Monitoring** to see your application logs. This is useful for debugging purposes when encountering bugs in production.
+
+<!-- livebook:{"break_markdown":true} -->
+
+![](images/book_search_deployment_fly_dashboard_monitoring.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+You can also set up metrics with Fly using tools such as [Prometheus](https://fly.io/docs/reference/metrics/#prometheus-on-fly), however that is beyond the scope of this lesson.
+
+## Error Reporting
+
+Error reporting tools such as [Honeybadger](https://hexdocs.pm/honeybadger/0.6.2/readme.html) and [Sentry](https://docs.sentry.io/platforms/elixir/) allow you to monitor your application and receive notifications when users encounter errors.
+
+This is beyond the scope of this lesson, but you should be aware of these services.
+
+## Using JS Libraries
+
+We often want to include JavaScript libraries in our projects. Here are a few popular libraries you might have reason to use:
+
+* [mermaid.js](https://mermaid.js.org/): various diagrams such as entity-relationship diagrams, sequence diagrams, etc.
+* [monaco-editor](https://github.com/microsoft/monaco-editor): a fully-featured code editor.
+* [tone.js](https://tonejs.github.io/): a Web Audio framework for creating interactive music in the browser.
+* [LaTeX.js](https://latex.js.org/) mathematical notation.
+* [Alpine.js](https://alpinejs.dev/) a lightweight js framework.
+
+There are a few different ways to include JavaScript projects in your application.
+
+* scripts using a CDN
+* downloading the assets in vendor.js and import them in app.js
+* install the package using npm (node package manager)
+
+Phoenix includes a [section on managing assets](https://hexdocs.pm/phoenix/asset_management.html#third-party-js-packages) for more information.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### CDN
+
+Here's an example of installing mermaid using a CDN. This would be included in the `head` section of `root.html.heex`.
+
+```html
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+</script>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Vendor
+
+Here's an example of installing [tone.js] by downloading a [js file](https://github.com/Tonejs/Tone.js/releases/tag/14.7.39) that would go in `assets/vendor/tone.js` then importing the file in `app.js`.
+
+```javascript
+import * as Tone from "../vendor/tone.js"
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### NPM
+
+Here's how you could install the `monaco-editor` in your project by running an `npm` command in the `assets` folder.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ npm install monaco-editor --save
+```
+
+The import the monaco-editor in `app.js`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+import * as monaco from 'monaco-editor';
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### NPM With Fly
+
+By default, the Fly Dockerfile [does not include npm](https://community.fly.io/t/elixir-alpinejs-on-fly-fail-to-install/5542).
+
+You can modify your Dockerfile to include the following to deploy to Fly with npm available for JavaScript libraries. Make sure not to duplicate any instructions in the Dockerfile.
+
+```
+# Initial Setup
+$ mix deps.get --only prod
+$ MIX_ENV=prod mix compile
+
+# Install / Update JavaScript Dependencies
+$ npm install --prefix ./assets
+
+# Compile Assets
+$ npm run deploy --prefix ./assets
+$ mix phx.digest
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [GitHub Actions](https://github.com/features/actions)
+* [HexDocs: Deploying on Fly.io](https://hexdocs.pm/phoenix/fly.html#content)
+* [Fly.io: IEx into your running app](https://fly.io/docs/elixir/getting-started/iex-into-running-app/)
+* [Fly.io: Continuous deployment with github actions](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/)
+* [GitHub: erlef/setup-beam](https://github.com/erlef/setup-beam)
+* [Fly.io: Metrics](https://fly.io/docs/reference/metrics/)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Phoenix Deployment reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Phoenix Deployment">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_home_page.livemd">Blog: Home Page</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_deployment.livemd">Blog: Deployment</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

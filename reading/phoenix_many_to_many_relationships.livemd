@@ -1,0 +1,676 @@
+# Many-To-Many Relationships
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Many-To-Many Relationships">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_authentication.livemd">Blog: Authentication</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_tags.livemd">Blog: Tags</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+Upon completing this lesson, a student should be able to answer the following questions.
+
+* How do we configure a many-to-many association with Ecto?
+* How do we load an association when making a database query?
+* How do we handle associated data in a form?
+
+## Overview
+
+This is a companion reading for the [Blog: Tags](../exercises/blog_tags.livemd) exercise. This lesson is an overview of how to work with one-to-many associations in a Phoenix application. See the `example_projects/blog` project folder to contextualize the examples found throughout this lesson.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Many-to-many Relationships
+
+A many-to-many relationship is a type of association where multiple entities from one table can be connected to multiple entities from another table.
+
+For example, consider blog posts and tags. Each post can have multiple tags, and each tag can be associated with multiple posts. This represents a many-to-many association between posts and tags.
+
+```mermaid
+erDiagram
+
+Post {
+    string title
+    text content
+    date published_on
+    boolean visibility
+}
+
+Tag {
+  string name
+}
+
+Post }O--O{ Tag: ""
+```
+
+For instance, consider the following scenario:
+
+* Post 1: "Introduction to Machine Learning in Elixir," 
+  * Tags - ["Machine Learning", "Elixir"]
+* Post 2: "Elixir Programming Tips" 
+  * Tags - ["Elixir", "Programming"]
+
+Here's a simplified posts table based on the data above.
+
+| id  | title                                      |
+| --- | ------------------------------------------ |
+| 1   | Introduction to Machine Learning in Elixir |
+| 2   | Elixir Programming Tips                    |
+
+And the tags table.
+
+| id  | tag              |
+| --- | ---------------- |
+| 1   | Machine Learning |
+| 2   | Elixir           |
+| 3   | Programming      |
+
+To associate the posts and tags, we use a **join table** that stores both the post and the tag, allowing for many posts and many tags to be associated.
+
+| Post                                       | Tag              |
+| ------------------------------------------ | ---------------- |
+| Introduction to Machine Learning in Elixir | Machine Learning |
+| Introduction to Machine Learning in Elixir | Elixir           |
+| Elixir Programming Tips                    | Elixir           |
+| Elixir Programming Tips                    | Programming      |
+
+The above table is for clarity purposes, in reality the **join table** only stores foreign key for each post/tag.
+
+| post_id | tag_id |
+| ------- | ------ |
+| 1       | 1      |
+| 1       | 2      |
+| 2       | 2      |
+| 2       | 3      |
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Breakdown
+
+To implement a many-to-many association, there are many parts of our application we need to be aware of.
+
+1. Migration: [create a join table](#join-table-migration)
+2. Schema: [setup the many_to_many association](#schema)
+3. Changeset + Context: [associate the records](#associating-records).
+4. Form: [send associated data in the form](#sending-associated-data-in-a-form)
+5. Controller: [handle associated data in the controller](#handling-associated-data-in-the-controller)
+
+We'll also cover how to [test many to many associations](#testing-many-to-many-associations).
+
+Here's a refresher of the HTTP request cycle in a Phoenix application using creating a post with associated tags as an example.
+
+```mermaid
+sequenceDiagram
+    Form->>Router: HTTP Post "/posts" %{attrs}
+    Router ->>Controller: :create
+    Controller ->> Context: create_post
+    Context -->> Schema: changeset
+    Schema -->> Context: changeset
+    Context -->> Repo: insert
+    Repo --> Migration: CREATE
+```
+
+In the example above `attrs` would be the data required to create a post and associate tags with the post.
+
+Rather than memorizing a series of steps, aspire to understand each layer of the Phoenix app well enough that you can connect them together to build any desired feature.
+
+In the following lesson, we'll cover examples of each step. You can refer to the example blog application in the `example_projects/blog` folder to see this working together in a real application.
+
+## Join Table Migration
+
+Join tables do not require a schema, only a migration in the database.
+
+Here's an example of a join table migration that could have been initial generated using `mix ecto.gen.migration add_posts_tags_join_table`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Repo.Migrations.AddPostsTagsJoinTable do
+  use Ecto.Migration
+
+  def change do
+      create table(:posts_tags, primary_key: false) do
+        add :post_id, references(:posts, on_delete: :delete_all)
+        add :tag_id, references(:tags, on_delete: :delete_all)
+      end
+
+      create(unique_index(:post_tags, [:post_id, :tag_id]))
+  end
+end
+```
+
+The `primary_key: false` option specifies that the records in the join table do not require a primary key.
+
+While not strictly necessary, the [unique_index/3](https://hexdocs.pm/ecto_sql/Ecto.Migration.html#unique_index/3) macro optimizes performance when searching for a post's tags and that a post cannot have the same tag twice.
+
+## Schema
+
+Join tables do not require their own schema, however it's possible to have a [separate schema that also joins two tables together](https://hexdocs.pm/ecto/associations.html#many-to-many). Instead, the [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) macro allows us to setup the many-to-many association in our schemas through the join table.
+
+Here's an example `Tag` schema that has a many-to-many relationship with `Post`s through the `posts_tags` table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Tags.Tag do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "tags" do
+    field :name, :string
+    many_to_many :posts, Blog.Posts.Post, join_through: "posts_tags"
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(tag, attrs) do
+    tag
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+  end
+end
+```
+
+Here's an example `Post` schema that has a many-to-many relationship with `Tag`s through the `posts_tags` table.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Blog.Posts.Post do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "posts" do
+    field :content, :string
+    field :title, :string
+    field :visible, :boolean, default: true
+    field :published_on, :utc_datetime
+
+    has_many :comments, Blog.Comments.Comment
+    belongs_to :user, Blog.Accounts.User
+    many_to_many :tags, Blog.Posts.Tag, join_through: "posts_tags"
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:title, :content, :visible, :published_on, :user_id])
+    |> validate_required([:title, :content, :visible, :user_id])
+    |> unique_constraint(:title)
+    |> foreign_key_constraint(:user_id)
+  end
+end
+```
+
+## Putting Associating Records
+
+To insert associated existing records, we can use the [put_assoc/3](https://hexdocs.pm/ecto/Ecto.Changeset.html#put_assoc/4) function which puts the associated data in a changeset.
+
+Here's an example of associating Tags with a post changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def changeset(post, attrs, tags \\ []) do
+  post
+  |> cast(attrs, [:title, :content, :visible, :published_on, :user_id])
+  |> validate_required([:title, :content, :visible, :user_id])
+  |> unique_constraint(:title)
+  |> foreign_key_constraint(:user_id)
+  # tags is a list of existing Tag structs.
+  |> put_assoc(:tags, tags)
+end
+```
+
+Associations built with `put_assoc/3` are stored in the changeset.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+#Ecto.Changeset<
+  action: nil,
+  changes: %{
+    content: "some content",
+    tags: [
+      #Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: #Blog.Tags.Tag<>, valid?: true>,
+      #Ecto.Changeset<action: :update, changes: %{}, errors: [],
+       data: #Blog.Tags.Tag<>, valid?: true>
+    ],
+    title: "some title",
+    user_id: 4975
+  },
+  errors: [],
+  data: #Blog.Posts.Post<>,
+  valid?: true
+>
+```
+
+These associated records put into the changeset will create records in the join table when passed to the `Repo` to insert the data into the database.
+
+Here's an example of a context function for creating posts that passes the list of tags to the changeset. Keep in mind this is just an example. There are many patterns for providing this data, and this pattern in particular is simple when there is only one association, but would not scale well when providing many different associated records.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def create_post(attrs \\ %{}, tags \\ []) do
+  %Post{}
+  |> Post.changeset(attrs, tags)
+  |> Repo.insert()
+end
+```
+
+See the [Ecto: Inserting Associated Records](https://hexdocs.pm/ecto/associations.html#inserting-associated-records) guide for more ways including:
+
+* Inserting a child record to an existing parent
+* Inserting parent and child records together
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Updating Associated Records
+
+Updating associated records requires setting the `on_replace` behavior for the many to many relationship on the schema. Here's an example of a [many_to_many/3](https://hexdocs.pm/ecto/Ecto.Schema.html#many_to_many/3) call which configures the `Post` schema so that `posts_tags` records are deleted when updating the post's tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+many_to_many(:tags, Blog.Tags.Tag, join_through: "posts_tags", on_replace: :delete)
+```
+
+Here's how the new tags could be sent from the context.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def update_post(%Post{} = post, attrs, tags \\ []) do
+  post
+  |> Post.changeset(attrs, tags)
+  |> Repo.update()
+end
+```
+
+## Form Association Data
+
+We've already seen how to send associated data in a form. However many-to-many relationships are more complex than other relationships, and there are many different ways to create the data.
+
+* Create the associated data
+* Associate existing data
+
+In the case of posts and tags, we might enforce that users only select from a list of existing tags. Alternatively, we might instead allow users to create their own tags when creating a post.
+
+Regardless of how our specific implementation works, there are only 3 ways to send associated data.
+
+* query params
+* url params
+* body params
+
+We can submit the required data for the association through a form. For example, to associate a post with certain tags, we might submit a list of tag ids.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Select Inputs
+
+Select inputs allow us to send a list of options and include a `selected` field for which options are selected.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  <.input 
+    field={f[:field]} 
+    type="select" 
+    multiple={true} 
+    options={[
+      [key: "Option1", value: 1, selected: true],
+      [key: "Option2", value: 2, selected: false],
+      [key: "Option3", value: 3, selected: true]
+    ]}
+  />
+```
+
+`options` in a select input can be in a few formats:
+
+* a list of values i.e. `["1", "2", "3"]`
+* a list of key/value tuples i.e. `[{"one", "1"}, {"two", "2"}]`
+* a keyword list with key, value, and selected field i.e. `[[key: "one", value: "1", selected: true]]`
+
+It's also possible to omit the `selected` option as `false` is the default.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Associating Existing Data
+
+Here's an example of a form that uses `tag_options` passed in from the `conn.assigns` to create a select input for a list of tags.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:user_id]} type="hidden" value={@current_user.id} />
+  <.input field={f[:title]} type="text" label="Title" />
+  <.input field={f[:content]} type="text" label="Content" />
+  <.input field={f[:published_on]} type="datetime-local" label="Publish On" value={DateTime.utc_now()} />
+  <.input field={f[:visible]} type="checkbox" label="Visible" />
+  <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
+
+
+  <:actions>
+    <.button>Save Post</.button>
+  </:actions>
+</.simple_form>
+```
+
+Keep in mind that it's not possible to store an Elixir term in an HTML input otherwise we'll encounter a `Phoenix.HTML.Safe not implemented for ELIXIRTERM` where `ELIXIRTERM` is the data structure we attempted to embed into HTML. We often encounter this issue when Phoenix uses the default value of some association, that's why we've made the field `:tag_ids` instead of `:tags`. There are work-arounds to this problem, but this is a simple way to avoid the issue.
+
+Here's how the tag options could be built:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp tag_options(selected_ids \\ []) do
+  Tags.list_tags()
+  |> Enum.map(fn tag ->
+    [key: tag.name, value: tag.id, selected: tag.id in selected_ids]
+  end)
+end
+```
+
+Then provided from the controller actions:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def new(conn, _params) do
+  changeset = Posts.change_post(%Post{tags: []})
+  render(conn, :new, changeset: changeset, tag_options: tag_options())
+end
+
+...
+
+def edit(conn, %{"id" => id}) do
+  post = Posts.get_post!(id)
+  changeset = Posts.change_post(post)
+
+  render(conn, :edit,
+    post: post,
+    changeset: changeset,
+    tag_options: tag_options(Enum.map(post.tags, & &1.id))
+  )
+end
+```
+
+If using a component, remember that values in the `conn.assigns` need to be passed to the component as well. Here's an example of providing a list of `tag_options` to a form component.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.post_form changeset={@changeset} action={~p"/posts"} current_user={@current_user} tag_options={@tag_options} />
+```
+
+See the example blog project in the `example_projects/blog` folder for more concrete examples.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Creating Associated Data
+
+For more advanced use-cases, the [inputs_for/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#inputs_for/1) macro makes it possible to send data for associated records in a form. For example, we could use [inputs_for/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#inputs_for/1) to create tags when creating a post.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+<.form
+  # other form attributes
+  ...
+>
+  # other form inputs
+  ...
+  <.inputs_for :let={f_nested} field={f[:tags]}>
+    <.input type="text" field={f_nested[:name]} />
+  </.inputs_for>
+</.form>
+```
+
+Ecto also provides [Ecto.Multi](https://hexdocs.pm/ecto/Ecto.Multi.html) for grouping such database operations.
+
+## Controller Association Data
+
+Often we have to load the associated data when performing the create or update actions on some associated resource.
+
+Here's an example create and update action in a controller that loads a list of tags using a list of `tag_ids` sent from a form.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  def create(conn, %{"post" => post_params}) do
+    tags = Map.get(post_params, "tag_ids", []) |> Enum.map(&Tags.get_tag!/1)
+
+    case Posts.create_post(post_params, tags) do
+      {:ok, post} ->
+        conn
+        |> put_flash(:info, "Post created successfully.")
+        |> redirect(to: ~p"/posts/#{post}")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+
+        render(conn, :new,
+          changeset: changeset,
+          tag_options: tag_options(Enum.map(tags, & &1.id))
+        )
+    end
+  end
+
+  ...
+
+  def update(conn, %{"id" => id, "post" => post_params}) do
+    post = Posts.get_post!(id)
+    tags = Map.get(post_params, "tag_ids", []) |> Enum.map(&Tags.get_tag!/1)
+
+    case Posts.update_post(post, post_params, tags) do
+      {:ok, post} ->
+        conn
+        |> put_flash(:info, "Post updated successfully.")
+        |> redirect(to: ~p"/posts/#{post}")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+
+        render(conn, :edit,
+          post: post,
+          changeset: changeset,
+          tag_options: tag_options(Enum.map(tags, & &1.id)),
+        )
+    end
+  end
+```
+
+## Testing Many-to-many Associations
+
+It's essential to test many-to-many associations to verify that the relationships between entities are properly established and that the functions for managing these associations behave correctly.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Context Test
+
+Here's an example context test that ensures we can associate a post with many tags when it's created. To be extra thorough, this test asserts on both the `post.tags` and `tag.posts` sides of the many-to-many association.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create_post/1 with tags" do
+  user = user_fixture()
+  tag1 = tag_fixture()
+  tag2 = tag_fixture()
+
+  valid_attrs1 = %{content: "some content", title: "post 1", user_id: user.id}
+  valid_attrs2 = %{content: "some content", title: "post 2", user_id: user.id}
+
+  assert {:ok, %Post{} = post1} = Posts.create_post(valid_attrs1, [tag1, tag2])
+  assert {:ok, %Post{} = post2} = Posts.create_post(valid_attrs2, [tag1])
+
+  # posts have many tags
+  assert Repo.preload(post1, :tags).tags == [tag1, tag2]
+  assert Repo.preload(post2, :tags).tags == [tag1]
+
+  # tags have many posts
+  # we preload posts: [:tags] because posts contain the list of tags when created
+  assert Repo.preload(tag1, posts: [:tags]).posts == [post1, post2]
+  assert Repo.preload(tag2, posts: [:tags]).posts == [post1]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Controller Test
+
+Here's an example controller test that verifies we can create a post with associated tags through a list of tag ids.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+test "create post with tags", %{conn: conn} do
+  # Arrange: Setup the necessary data
+  user = user_fixture()
+  conn = log_in_user(conn, user)
+
+  tag1 = tag_fixture(name: "tag 1 name")
+  tag2 = tag_fixture(name: "tag 2 name")
+
+  create_attrs = %{
+    content: "some content",
+    title: "some title",
+    visible: true,
+    published_on: DateTime.utc_now(),
+    user_id: user.id,
+    tag_ids: [tag1.id, tag2.id]
+  }
+
+  # Act: send the HTTP POST request
+  conn = post(conn, ~p"/posts", post: create_attrs)
+
+  # Assert: Verify the response is redirected and that the post is created with tags.
+  assert %{id: id} = redirected_params(conn)
+  assert redirected_to(conn) == ~p"/posts/#{id}"
+
+  assert Posts.get_post!(id).tags == [tag1, tag2]
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Testing Association Issues
+
+It's common to run into issues in tests due to loading or not loading associated data structures.
+
+Here are 3 common ways to fix this problem.
+
+* Compare IDs only
+* Remove the association field
+* Preload the association
+
+Here's an example of comparing the IDs only using pattern matching.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Use The Pin Operator ^ To Pattern Match On The Post's Id.
+assert [%{id: ^post_id}] = Posts.list_posts("ITL")
+```
+
+Here's an example of comparing the IDs by accessing the id.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+assert Posts.list_posts() |> Enum.map(& &1.id) == [post1.id, post2.id]
+```
+
+Here's an example of removing the association field.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Map.delete(post, :tags) == Map.delete(expected, :tags)
+```
+
+Here's an example of preloading the association. In this example, `post1` and `post2` have already loaded the `:tags` association. The `force` option is sometimes necessary if the association was created after the data was already loaded. See [Ecto.Repo.preload/3 #options](https://hexdocs.pm/ecto/Ecto.Repo.html#c:preload/3-options) for more.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+assert Blog.Repo.preload(post, :tags, force: true).tags == [tag1, tag2]
+```
+
+## Further Reading
+
+For more on Phoenix, consider the following resources.
+
+* [Ecto Associations: Many to Many](https://hexdocs.pm/ecto/associations.html#many-to-many)
+* [Elixir Schools: Associations](https://elixirschool.com/en/lessons/ecto/associations)
+* [Elixir Forum: Ecto associations and the purpose of has many through and many to many](https://elixirforum.com/t/ecto-associations-and-the-purpose-of-has-many-through-and-many-to-many/32164/2)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Many-To-Many Relationships reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Many-To-Many Relationships">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/blog_authentication.livemd">Blog: Authentication</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/blog_tags.livemd">Blog: Tags</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

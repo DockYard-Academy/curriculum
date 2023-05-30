@@ -1,0 +1,92 @@
+<.header>
+  Post <%= @post.id %>
+  <:subtitle>This is a post record from your database.</:subtitle>
+  <:actions>
+    <%= if assigns[:current_user] && @post.user_id==assigns[:current_user].id do %>
+      <.link href={~p"/posts/#{@post}/edit"}>
+        <.button>Edit post</.button>
+      </.link>
+    <% end %>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title">
+    <%= @post.title %>
+  </:item>
+  <:item title="Author">
+    <%= @post.user.username %>
+  </:item>
+  <:item title="Image">
+    <%= if @post.cover_image do %>
+      <img src={@post.cover_image.url} />
+    <% end %>
+  </:item>
+  <:item title="Content">
+    <%= @post.content %>
+  </:item>
+  <:item title="Publish On">
+    <%= Calendar.strftime(@post.published_on, "%c") %>
+  </:item>
+  <:item title="Visible">
+    <%= @post.visible %>
+  </:item>
+  <:item title="Tags">
+    <%= Enum.map(@post.tags, & &1.name) |> Enum.join(", ") %>
+  </:item>
+</.list>
+
+<%= if assigns[:current_user] do %>
+  <.simple_form :let={f} for={@comment_changeset} action={~p"/comments"}>
+    <.input type="hidden" field={f[:user_id]} value={@current_user.id} />
+    <.input type="hidden" field={f[:post_id]} value={@post.id} />
+    <.input field={f[:content]} type="text" label="Write a Comment" />
+    <:actions>
+      <.button>Comment</.button>
+    </:actions>
+  </.simple_form>
+<% else %>
+  <div class="mt-10 flex justify-end">
+    <.link href={~p"/users/log_in"}>
+      <.button>Sign in to comment</.button>
+    </.link>
+  </div>
+<% end %>
+
+<.table id="posts" rows={@post.comments}>
+  <:col :let={comment} label="Comments">
+    <span id={"comment-content-#{comment.id}"}>
+      <%= comment.content %>
+    </span>
+    <.form
+      :let={f}
+      id={"edit-comment-#{comment.id}"}
+      hidden
+      for={%{}}
+      method="put"
+      as={:comment}
+      action={~p"/comments/#{comment.id}"}
+    >
+      <.input required field={f[:content]} type="text" />
+    </.form>
+  </:col>
+  <:action :let={comment}>
+    <%= if assigns[:current_user] && comment.user_id==assigns[:current_user].id do %>
+      <.button phx-click={
+        JS.toggle(to: "#edit-comment-#{comment.id}")
+        |> JS.toggle(to: "#comment-content-#{comment.id}")
+      }>
+        Edit
+      </.button>
+    <% end %>
+  </:action>
+  <:action :let={comment}>
+    <%= if assigns[:current_user] && comment.user_id==assigns[:current_user].id do %>
+      <.link href={~p"/comments/#{comment.id}"} method="delete" data-confirm="Are you sure?">
+        Delete
+      </.link>
+    <% end %>
+  </:action>
+</.table>
+
+<.back navigate={~p"/posts"}>Back to posts</.back>

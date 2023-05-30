@@ -1,0 +1,18 @@
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:user_id]} type="hidden" value={@current_user.id} />
+  <.input field={f[:title]} type="text" label="Title" />
+  <.input field={f[:content]} type="text" label="Content" />
+  <.inputs_for :let={cover_image} field={f[:cover_image]}>
+    <.input type="text" field={cover_image[:url]} label="Cover Image URL" />
+  </.inputs_for>
+  <.input field={f[:published_on]} type="datetime-local" label="Publish On" value={DateTime.utc_now()} />
+  <.input field={f[:visible]} type="checkbox" label="Visible" />
+  <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
+
+  <:actions>
+    <.button>Save Post</.button>
+  </:actions>
+</.simple_form>
