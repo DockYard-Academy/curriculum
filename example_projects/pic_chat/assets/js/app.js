@@ -41,16 +41,13 @@ Hooks.InfiniteScroll = {
         this.pending = this.page()
         window.addEventListener("scroll", e => {
             if (this.pending == this.page() && scrollAt() > 90) {
-                console.log("Loading more content", this.page())
                 this.pending = this.page() + 1
                 this.pushEvent("load-more", {})
             }
         })
 
         this.handleEvent("highlight", ({id}) => {
-            console.log("HANDLING")
             new_message = document.getElementById(`messages-${id}`)
-            console.log(new_message)
             if (new_message) {
                 new_message.classList.add("highlight")
             }

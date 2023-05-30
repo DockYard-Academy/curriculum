@@ -79,5 +79,22 @@ defmodule PicChat.ChatTest do
       message = message_fixture(user_id: user.id)
       assert %Ecto.Changeset{} = Chat.change_message(message)
     end
+
+    test "todays_messages/0" do
+      user = user_fixture()
+      today_message = message_fixture(user_id: user.id)
+
+      yesterday =
+        NaiveDateTime.add(NaiveDateTime.utc_now(), -1, :day) |> NaiveDateTime.truncate(:second)
+
+      yesterday_message =
+        PicChat.Repo.insert!(%Message{
+          content: "some content",
+          user_id: user.id,
+          inserted_at: yesterday
+        })
+
+      assert Chat.todays_messages() == [today_message]
+    end
   end
 end

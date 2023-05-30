@@ -11,6 +11,19 @@ defmodule PicChat.Accounts do
   ## Database getters
 
   @doc """
+  Retrieves all user emails
+
+  ## Examples
+
+      iex> subscriber_emails()
+      ["test@test.test", ...]
+  """
+  def subscriber_emails() do
+    from(u in User, where: u.subscribed == true, select: u.email)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a user by email.
 
   ## Examples

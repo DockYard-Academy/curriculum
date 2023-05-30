@@ -42,8 +42,7 @@ defmodule PicChatWeb.MessageLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign_form(changeset)
-     |> allow_upload(:picture, accept: ~w(.jpg .jpeg .png), max_entries: 1)
-    }
+     |> allow_upload(:picture, accept: ~w(.jpg .jpeg .png), max_entries: 1)}
   end
 
   @impl true
@@ -56,16 +55,23 @@ defmodule PicChatWeb.MessageLive.FormComponent do
     {:noreply, assign_form(socket, changeset)}
   end
 
+  @impl true
   def handle_event("save", %{"message" => message_params}, socket) do
     file_uploads =
-      consume_uploaded_entries(socket, :picture, fn %{path: path}, _entry ->
-        file_name = Path.basename(path)
-        File.cp!(path, "priv/static/images/#{file_name}")
-
-        {:ok, "/images/#{file_name}"}
+      consume_uploaded_entries(socket, :picture, fn %{path: path}, entry ->
+        ext = "." <> get_entry_extension(entry)
+        dest = Path.join("priv/static/images", Path.basename(path <> ext))
+        File.cp!(path, dest)
+        {:ok, ~p"/images/#{Path.basename(dest)}"}
       end)
+
     message_params = Map.put(message_params, "picture", List.first(file_uploads))
     save_message(socket, socket.assigns.action, message_params)
+  end
+
+  defp get_entry_extension(entry) do
+    [ext | _] = MIME.extensions(entry.client_type)
+    ext
   end
 
   defp save_message(socket, :edit, message_params) do

@@ -441,6 +441,7 @@ defmodule PicChatWeb.CoreComponents do
       with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
       end
+
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full">

@@ -33,6 +33,7 @@ defmodule PicChatWeb.UserRegistrationLive do
 
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
+        <.input field={@form[:subscribed]} type="checkbox" label="Receive email updates" />
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>

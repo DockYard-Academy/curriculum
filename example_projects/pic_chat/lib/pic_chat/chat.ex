@@ -8,6 +8,16 @@ defmodule PicChat.Chat do
 
   alias PicChat.Chat.Message
 
+  def todays_messages do
+    today = Date.utc_today()
+
+    from(m in Message,
+      where: fragment("date(inserted_at) = ?", ^today),
+      order_by: [desc: :inserted_at, desc: :id]
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Returns the list of messages.
 

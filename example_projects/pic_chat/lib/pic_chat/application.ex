@@ -17,9 +17,11 @@ defmodule PicChat.Application do
       # Start Finch
       {Finch, name: PicChat.Finch},
       # Start the Endpoint (http/https)
-      PicChatWeb.Endpoint
+      PicChatWeb.Endpoint,
       # Start a worker by calling: PicChat.Worker.start_link(arg)
       # {PicChat.Worker, arg}
+      # Added Oban
+      {Oban, Application.fetch_env!(:pic_chat, Oban)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
