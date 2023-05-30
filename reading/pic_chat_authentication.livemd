@@ -247,7 +247,7 @@ First, define a `:require_user_owns_message` function clause for `on_mount/4` in
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-def on_mount(:require_user_owns_message, %{"id" => message_id}, session, socket) do
+def on_mount(:require_user_owns_message, %{"id" => message_id}, _session, socket) do
   message = PicChat.Chat.get_message!(message_id)
   if socket.assigns.current_user.id == message.user_id do
     {:cont, socket}
@@ -262,7 +262,7 @@ def on_mount(:require_user_owns_message, %{"id" => message_id}, session, socket)
 end
 
 # automatically continues for routes that are not for a specific message.
-def on_mount(:require_user_owns_message, params, session, socket), do: {:cont, socket}
+def on_mount(:require_user_owns_message, _params, _session, socket), do: {:cont, socket}
 ```
 
 Then protect the routes in the existing `live_session/3` for `:messages`.

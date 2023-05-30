@@ -14,19 +14,18 @@ defmodule PicChat.SummaryEmail do
   end
 
   def build(receiver_email, messages) do
-    email =
-      new()
-      |> to(receiver_email)
-      |> from({@sender_name, @sender_email})
-      |> subject("PicChat Summary Report")
-      |> html_body("""
-      <h1>Summary Report</h1>
-      #{Enum.map(messages, &render_message/1)}
-      """)
-      |> text_body("""
-      Summary Report
-      #{messages |> Enum.map(& &1.content) |> Enum.join("\n")}
-      """)
+    new()
+    |> to(receiver_email)
+    |> from({@sender_name, @sender_email})
+    |> subject("PicChat Summary Report")
+    |> html_body("""
+    <h1>Summary Report</h1>
+    #{Enum.map(messages, &render_message/1)}
+    """)
+    |> text_body("""
+    Summary Report
+    #{messages |> Enum.map(& &1.content) |> Enum.join("\n")}
+    """)
   end
 
   defp render_message(message) do

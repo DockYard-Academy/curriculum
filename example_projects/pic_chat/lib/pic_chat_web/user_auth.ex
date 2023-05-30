@@ -172,7 +172,7 @@ defmodule PicChatWeb.UserAuth do
     end
   end
 
-  def on_mount(:require_user_owns_message, %{"id" => message_id}, session, socket) do
+  def on_mount(:require_user_owns_message, %{"id" => message_id}, _session, socket) do
     message = PicChat.Chat.get_message!(message_id)
 
     if socket.assigns.current_user.id == message.user_id do
@@ -187,7 +187,7 @@ defmodule PicChatWeb.UserAuth do
     end
   end
 
-  def on_mount(:require_user_owns_message, params, session, socket), do: {:cont, socket}
+  def on_mount(:require_user_owns_message, _params, _session, socket), do: {:cont, socket}
 
   defp mount_current_user(session, socket) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
