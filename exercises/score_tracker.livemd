@@ -32,21 +32,21 @@ Mix.install([
 
 ## Score Tracker
 
-You're going to create a `ScoreTracker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which will be a generic score tracker that could be used in any game system. When spawned, the `ScoreTracker` should store a score starting at `0` in it's state.
+You're going to create a `ScoreTracker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which is a generic score tracker.
 
-The `ScoreTracker` module should **asynchronously** receive `{:score, amount}` messages where `amount` is an integer which
-increase the `ScoreTracker`'s state by the provided `amount`.
+### Requirements
 
-The `ScoreTracker` module should **synchronously** receive `:get_score` messages to return the current score.
+* The initial score starts as `0`.
+* Handle an asychronous `{:score, amount}` message to increment the score state.
+* Handle a synchronous `get_score` message to retrieve the current score.
+* Create the `start_link/1`, `get_score/1`, and `score/2` Client API functions as documented below.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 {:ok, pid} = ScoreTracker.start_link([])
-ScoreTracker.score(pid, 10)
+:ok = ScoreTracker.score(pid, 10)
 10 = ScoreTracker.get_score(pid)
-ScoreTracker.score(pid, 20)
-30 = ScoreTracker.get_score(pid)
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -87,7 +87,7 @@ end
 
 </details>
 
-Implement the `ScoreTracker` module as documented below. You will also have to implement the necessary [GenServer](https://hexdocs.pm/elixir/GenServer.html) callback functions such as [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1), [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2), and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
+Implement the `ScoreTracker` module below.
 
 ```elixir
 defmodule ScoreTracker do
@@ -96,38 +96,26 @@ defmodule ScoreTracker do
   """
   use GenServer
 
-  @doc """
-  Start the `ScoreTracker` process.
+  # Client API
 
-  ## Examples
-
-    iex> {:ok, pid} = ScoreTracker.start_link([])
-  """
   def start_link(_opts) do
   end
 
-  @doc """
-  Asynchronously increase the stored score by the specified amount.
-
-  ## Examples
-
-      iex> {:ok, pid} = ScoreTracker.start_link([])
-      iex> ScoreTracker.score(pid, 10)
-      :ok
-  """
   def score(score_tracker_pid, amount) do
   end
 
-  @doc """
-  Synchronously return the current score state.
-
-  ## Examples
-
-      iex> {:ok, pid} = ScoreTracker.start_link([])
-      iex> ScoreTracker.get_score(pid)
-      0
-  """
   def get_score(score_tracker_pid) do
+  end
+
+  # Server API
+
+  def init(_init_arg) do
+  end
+
+  def handle_cast({:score, amount}, state) do
+  end
+
+  def handle_call(:get_score, _from, state) do
   end
 end
 ```

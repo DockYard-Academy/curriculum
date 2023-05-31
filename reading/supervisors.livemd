@@ -471,6 +471,56 @@ Uncomment the following code to see the crash timeline, then re-comment it.
 * [Elixir Schools: Supervisor Strategies](https://elixirschool.com/blog/supervisor-strategies)
 * [Elixir Schools: OTP Supervisors](https://elixirschool.com/en/lessons/advanced/otp_supervisors)
 
+## Supervised Mix Projects
+
+Supervised mix projects use an [Application](https://hexdocs.pm/elixir/Application.html) module that defines application callbacks.
+
+The application module is configured in `mix.exs` in the `application/0` function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def application do
+  [
+    extra_applications: [:logger],
+    mod: {MyApp.Application, []}
+  ]
+end
+```
+
+The application module typically lives in the project folder in a `my_app/application.ex` file and contains the logic to start the application. In a supervised application, this module starts a supervision tree.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule MyApp.Application do
+  # See https://hexdocs.pm/elixir/Application.html
+  # for more information on OTP Applications
+  @moduledoc false
+
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      # Starts a worker by calling: RockPaperScissors.Worker.start_link(arg)
+      # {RockPaperScissors.Worker, arg}
+    ]
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: MyApp.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+```
+
+We can generate a mix project with all of the above scaffolding using the `--sup` flag, or add it manually to an existing project.
+
+```
+mix new my_app --sup
+```
+
 ## Commit Your Progress
 
 DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.

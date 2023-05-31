@@ -32,89 +32,37 @@ Mix.install([
 
 ## Tested Stack
 
-Previously you created a [Stack](./stack_server.livemd) [GenServer](https://hexdocs.pm/elixir/GenServer.html). Now you're going to re-create the `Stack` [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a full test suite.
+You're going to create a `Stack` mix project similar to the [Stack](../exercises/stack.livemd) module you previously created.
 
-The `Stack` process should store a list as state and `push/2` elements onto the stack, and `pop/2` elements off of the stack like so.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, pid} = Stack.start_link([])
-[:one] = Stack.push(pid, :one)
-[:two, :one] = Stack.push(pid, :two)
-:two = Stack.pop(pid)
-:one = Stack.pop(pid)
-# Return No Value When The Stack Is Empty
-nil = Stack.pop(pid)
 ```
+$ mix new stack
+```
+
+### Requirements
+
+Write a full test suite for the `Stack` module and implement the functionality. Include at least the following test cases.
+
+* `start_link/1 - default state`
+* `start_link/1 - default configuration`
+* `pop/1 - remove one element from stack`
+* `pop/1 - remove multiple elements from stack`
+* `pop/1 - remove element from empty stack`
+* `push/2 - add element to empty stack`
+* `push/2 - add element to stack with multiple elements`
+
+In addition to the above, add documentation and at least one doctest for the `push/2` and `pop/1` functions.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Pair Testing
 
-This will be a **pair testing** exercise. One student will be the **tester** and the other will be the **implementer**. The **tester** will write the test, and the **implementer** will implement the code for the test.
+This will be a **pair testing** exercise Using TDD (Test Driven Development). We recommend using Visual Studio Code LiveShare to collaborate.
 
-As the **implementer** you may challenge your **tester** to improve their tests by writing only the code necessary to make the test pass (within reason) even if it is a false-positive. This will encourage your **tester** to write more comprehensive tests.
+1. One student (**the tester**) will write a test
+2. The other student (**the implementer**) will implement **only** the code necessary to make the test pass.
+3. **Swap roles after each test.**
 
-Swap roles for each new test.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Create A Mix Project
-
-Create a new mix project and use LiveShare to make it simpler to collaborate with your pair partner.
-
-```
-mix new stack
-```
-
-Copy the code below into your `Stack` module.
-
-```elixir
-defmodule Stack do
-  use GenServer
-
-  def start_link(_opts) do
-  end
-
-  def push(pid, element) do
-  end
-
-  def pop(pid) do
-  end
-end
-```
-
-Then copy the following code into the associated test file for the `Stack` module.
-
-```elixir
-defmodule StackTest do
-  use ExUnit.Case
-
-  describe "start_link/1" do
-    test "with no configuration"
-    test "with a default state"
-  end
-
-  describe "push/2" do
-    test "an element onto an empty stack"
-    test "an element onto a stack with one element"
-    test "an element onto a stack with multiple elements"
-  end
-
-  describe "pop/1" do
-    test "an empty stack"
-    test "a stack with one element"
-    test "a stack with multiple elements"
-  end
-end
-```
-
-## Bonus: GitHub Repository
-
-Upload your stack project to GitHub. You may add your partner as a collaborator, or they can fork the project so that you both own a copy.
-
-Create a README that describes the purpose of the project and what you learned.
+As **the implementer** you are encouraged to *fake* your solution (within reason) if the test allows for it. This will encourage your **tester** to write a better test.
 
 ## Commit Your Progress
 

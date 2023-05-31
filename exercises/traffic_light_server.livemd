@@ -32,9 +32,13 @@ Mix.install([
 
 ## Traffic Light Server
 
-You're going to create a `TrafficLightServer` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that mimics a traffic light.
+You're going to create a `TrafficLights` mix project that manages traffic.
 
-<!-- livebook:{"break_markdown":true} -->
+```
+mix new traffic_lights
+```
+
+Create a `TrafficLights.Light` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that mimics a traffic light transitioning from green to yellow to red.
 
 ```mermaid
 flowchart LR
@@ -47,42 +51,31 @@ flowchart LR
   style R fill: coral
 ```
 
-<!-- livebook:{"break_markdown":true} -->
+This is also a simple example of building a [Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) using `GenServer`.
 
-### Server Callbacks
+### Requirements
 
-The `TrafficLightServer` should define some [Server API](https://hexdocs.pm/elixir/1.12/GenServer.html#module-client-server-apis) callback functions using [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) and [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1).
-
-The `TrafficLightServer`'s state should start as `:green`, then you should be able to send it a `:transition` message that will transition the state from `:green`, to `:yellow`, to `:red`.
-
-The `TrafficLightServer` should also be able to receive a `:current_light` message which returns the current light.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-{:ok, pid} = GenServer.start_link(TrafficLightServer, [])
-
-:green = GenServer.call(pid, :current_light)
-:yellow = GenServer.call(pid, :transition)
-:red = GenServer.call(pid, :transition)
-:green = GenServer.call(pid, :transition)
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Client API
-
-The `TrafficLightServer` should define some [Client API](https://hexdocs.pm/elixir/1.12/GenServer.html#module-client-server-apis) functions `transition/1`, `start_link/1` and `current_light/1` that abstract the underlying [GenServer](https://hexdocs.pm/elixir/GenServer.html) implementation details.
+* The initial traffic light state should start as `:green`. Store light states as atoms `:green`, `:yellow`, and `:red`.
+* Handle an asynchronous `:transition` message to transition the current light.
+* Handle a synchronous `:current_light` message to retrieve the current light.
+* Create the `transition/1` and `current_light/1` messages as documented below.
+* Write a full suite of tests for the `TrafficLight` module.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-{:ok, pid} = TrafficLightServer.start_link([])
+{:ok, pid} = TrafficLights.Light.start_link([])
 
-:green = TrafficLightServer.current_light(pid)
-:yellow = TrafficLightServer.transition(pid)
-:red = TrafficLightServer.transition(pid)
-:green = TrafficLightServer.transition(pid)
+:green = TrafficsLight.Light.current_light(pid)
+:ok = TrafficsLight.Light.transition(pid)
+
+:yellow = TrafficsLight.Light.current_light(pid)
+:ok = TrafficsLight.Light.transition(pid)
+
+:red = TrafficsLight.Light.current_light(pid)
+:ok = TrafficsLight.Light.transition(pid)
+
+:green = TrafficsLight.Light.current_light(pid)
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -130,55 +123,18 @@ end
 
 </details>
 
-Implement the `TrafficLightServer` as documented below. You will also need to define the GenServer callback functions [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1) and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
+## TrafficGrid
 
-```elixir
-defmodule TrafficLightServer do
-  @moduledoc """
-  Documentation for `TrafficLightServer`
-  """
-  use GenServer
-
-  @doc """
-  Start a TrafficLightServer linked to the current caller process.
-  """
-  def start_link(opts) do
-  end
-
-  @doc """
-  Transition the `TrafficLightServer`'s state.
-  :green -> :yellow -> :red
-  """
-  def transition(pid) do
-  end
-
-  @doc """
-  Get the `TrafficLightServer`'s current state.
-  """
-  def current_light(pid) do
-  end
-end
-```
-
-## Bonus: TrafficGrid
-
-You're going to create a `TrafficGrid` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that manages five `TrafficLightServers`.
-
-* Create a `TrafficGrid` which stores the pids of five `TrafficLightServers`.
-* Define a `current_lights/1` function that returns the current light of each `TrafficLightServer`.
-* Define a `transition/1` function that transitions one of the five lights (in order, from beginning to end).
-* Prefer `call` over `cast` to avoid concurrency issues.
-
-<!-- livebook:{"break_markdown":true} -->
+Create a `TrafficLights.Grid` `GenServer` that manages five `TrafficLights.Light` processes.
 
 ```mermaid
 flowchart
-TG[TrafficGrid]
-TLS1[TrafficLightServer]
-TLS2[TrafficLightServer]
-TLS3[TrafficLightServer]
-TLS4[TrafficLightServer]
-TLS5[TrafficLightServer]
+TG[TrafficLights.Grid]
+TLS1[TrafficLights.Light]
+TLS2[TrafficLights.Light]
+TLS3[TrafficLights.Light]
+TLS4[TrafficLights.Light]
+TLS5[TrafficLights.Light]
 G1[Green]
 G2[Green]
 G3[Green]
@@ -226,45 +182,34 @@ style R5 fill:lightcoral
 
 <!-- livebook:{"break_markdown":true} -->
 
-`transition/1` Examples:
+### Requirements
 
-<!-- livebook:{"force_markdown":true} -->
+* The initial state of the grid should contain a list with five `TrafficLights.Light` pids in addition to any other state you want to track
+* Create a `current_lights/1` and `transition/1` function as documented below.
+* Write a full suite of tests.
+  ```elixir
+  {:ok, pid} = TrafficLights.Grid.start_link([])
 
-```elixir
-iex> {:ok, pid} = TrafficGridServer.start_link([])
-iex> TrafficGridServer.transition(pid)
-[:yellow, :green, :green, :green, :green]
+  :ok = TrafficLights.Grid.transition(pid)
 
-iex> TrafficGridServer.transition(pid)
-[:yellow, :yellow, :green, :green, :green]
+  [:yellow, :green, :green, :green, :green] = TrafficLights.Grid.current_lights(pid)
 
-iex> TrafficGridServer.transition(pid)
-[:yellow, :yellow, :yellow, :green, :green]
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
 
-iex> TrafficGridServer.transition(pid)
-[:yellow, :yellow, :yellow, :yellow, :green]
+  [:red, :yellow, :yellow, :yellow, :yellow] = TrafficLights.Grid.current_lights(pid)
 
-iex> TrafficGridServer.transition(pid)
-[:yellow, :yellow, :yellow, :yellow, :yellow]
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
+  :ok = TrafficLights.Grid.transition(pid)
 
-iex> TrafficGridServer.transition(pid)
-[:red, :yellow, :yellow, :yellow, :yellow]
-
-iex> TrafficGridServer.transition(pid)
-[:red, :red, :yellow, :yellow, :yellow]
-```
-
-`current_lights/1` Examples:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-iex> {:ok, pid} = TrafficGridServer.start_link([])
-iex> TrafficGridServer.current_lights(pid)
-[:green, :green, :green, :green, :green]
-```
-
-<!-- livebook:{"break_markdown":true} -->
+  [:green, :red, :red, :red, :red] = TrafficLights.Grid.current_lights(pid)
+  ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -309,8 +254,7 @@ defmodule TrafficGridServer do
 
   @impl true
   def handle_call(:current_lights, _from, state) do
-    lights =
-      Enum.map(state.light_pids, fn light_pid -> TrafficLightServer.current_light(light_pid) end)
+    lights = Enum.map(state.light_pids, &TrafficLightServer.current_light/1)
 
     {:reply, lights, state}
   end
@@ -318,47 +262,6 @@ end
 ```
 
 </details>
-
-Implement the `TrafficGrid` module as documented below. You will also have to define callback functions for the [GenServer](https://hexdocs.pm/elixir/GenServer.html)'s Client API.
-
-```elixir
-defmodule TrafficGridServer do
-  use GenServer
-
-  @doc ~S"""
-  Start the `TrafficGridServer`.
-
-  ## Examples
-
-      TrafficGridServer.start_link([])
-      {:ok, pid}
-  """
-  def start_link(_opts) do
-  end
-
-  @doc """
-  transition the current light state of the next light to transition.
-
-  ## Examples
-      
-      TrafficGridServer.transition(pid)
-      [:yellow, :green, :green, :green, :green]
-  """
-  def transition(grid_pid) do
-  end
-
-  @doc """
-  Retrieve the current light state of each managed `TrafficLightServer`.
-
-  ## Examples
-
-      TrafficGridServer.current_lights(pid)
-      [:green, :green, :green, :green, :green]
-  """
-  def current_lights(grid_pid) do
-  end
-end
-```
 
 ## Commit Your Progress
 

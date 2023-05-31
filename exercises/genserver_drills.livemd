@@ -1,0 +1,324 @@
+# GenServer Drills
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Supervisor And GenServer Drills">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/supervised_mix_project.livemd">Supervised Mix Projects</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_supervisor_setup.livemd">Games: Supervisor Setup</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Supervisors](../reading/supervisors.livemd) and [GenServers](../reading/generic_server.livemd) and using them with [Supervised Mix Projects](../reading/supervised_mix_project.livemd).
+
+> A GenServer is a process like any other Elixir process and it can be used to keep state, execute code asynchronously and so on. The advantage of using a generic server process (GenServer) implemented using this module is that it will have a standard set of interface functions and include functionality for tracing and error reporting. It will also fit into a supervision tree.
+> 
+> [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html)
+
+## GenServer
+
+Create a `Zero` `Genserver` that does nothing other than store the integer `0` in its state. Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start the `Zero` process. Use `:sys.get_state/1` to view the state of your `Zero` process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Zero do
+  use GenServer
+
+  @impl true
+  def init(_opts) do
+    {:ok, 0}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(Zero, "init_arg")
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to start your `Zero` [GenServer](https://hexdocs.pm/elixir/GenServer.html) as a named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+GenServer.start_link(Zero, "init_arg", [name: :my_name])
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a `SimpleCounter` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose state starts as `0`. Implement a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function which accepts the `:increment` message and increments the state by `1` and returns `:ok`.
+
+Use [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) and [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) to spawn a `SimpleCounter` process and send it an `:increment` message.
+
+Use `:sys.get_state/1` to see that the state of the counter has incremented.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule SimpleCounter do
+  use GenServer do
+  
+  def init(_opts) do
+    {:ok, 0}
+  end
+  
+  def handle_call(:increment, _from, state) do
+    {:reply, :ok, state + 1}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(SimpleCounter, [])
+GenServer.call(pid, :increment)
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create an `InitialState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) whose initial state can be configured. Call [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) to spawn a `State` GenServer with an initial state. Use `:sys.get_state/1` to confirm the state matches your configured state.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule InitialState do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+{:ok, pid} = GenServer.start_link(InitialState, "my initial state")
+
+:sys.get_state(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a `State` module.
+
+It should:
+
+* Define a `State.get/1` function that uses [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) and a [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3) callback function to retrieve state.
+* Define a `State.set/2` function that uses [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) and a [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2) callback function to update state.
+* Define a `State.start_link/3` function with a [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#c:init/1) callback function to initialize the [GenServer](https://hexdocs.pm/elixir/GenServer.html) with a configurable state.
+
+Manually test each function (`State.set/2`, `State.get/1` and `State.start_link/3`) to confirm they work as expected.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+
+defmodule State do
+  use GenServer
+
+  @impl true
+  def init(state) do
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_cast({:set, new_state}, state) do
+    {:noreply, new_state}
+  end
+
+  @impl true
+  def handle_call(:get, _from, state) do
+    # response is not specified
+    {:reply, state, state}
+  end
+
+  def start_link(state) do
+    GenServer.start_link(pid, state)
+  end
+
+  def set(pid, new_state) do
+    GenServer.cast(pid, {:set, new_state})
+  end
+
+  def get(pid) do
+    GenServer.call(pid, :get)
+  end
+end
+
+{:ok, pid} = State.start_link("initial state")
+"initial state" = State.get(pid)
+State.set(pid, "updated state")
+"updated state" = State.get(pid)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a minimal `Named` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process using `Named.start_link/1`. Start a `Named` process and use [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Named do
+  use GenServer
+
+  def start_link(opts) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, [], name: name)
+  end
+
+  def init(_opts) do
+    {:ok, "any state!"}
+  end
+end
+
+Named.start_link([name: :my_configured_name])
+Process.whereis(:my_configured_name)
+```
+
+</details>
+
+```elixir
+
+```
+
+Create a minimal `NamedState` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that can be started and configured as a named process with a configurable state using `NamedState.start_link`. Use `:sys.get_state/1` to confirm the initial state is as expected and [GenServer.whereis/1](https://hexdocs.pm/elixir/GenServer.html#whereis/1) and/or [Process.whereis/1](https://hexdocs.pm/elixir/Process.html#whereis/1) to find the pid of the named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+There are many ways to configure `NamedState.start_link/1`
+
+Using multiple parameters:
+
+```elixir
+defmodule NamedState do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+NamedState.start_link("initial state", name: :multi_arg_example)
+
+Process.whereis(:multi_arg_example)
+```
+
+Using a keyword list with different keys:
+
+```elixir
+defmodule NamedState do
+  use GenServer
+
+  def start_link(opts) do
+    name = Keyword.get(opts, :name, __MODULE__)
+    state = Keyword.get(opts, :state)
+    GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+
+NamedState.start_link(state: "initial state", name: :keyword_list_example)
+Process.whereis(:keyword_list_example)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Supervisor And GenServer Drills exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Supervisor And GenServer Drills">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/supervised_mix_project.livemd">Supervised Mix Projects</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_supervisor_setup.livemd">Games: Supervisor Setup</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

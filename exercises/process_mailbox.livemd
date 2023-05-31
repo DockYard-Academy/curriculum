@@ -32,28 +32,63 @@ Mix.install([
 
 ## Process Mailbox
 
-You're going to create a `Mailbox` using a process which loops and receives messages.
+Using [spawn/1](https://hexdocs.pm/elixir/1.12/Kernel.html#spawn/1), [send/2](https://hexdocs.pm/elixir/1.12/Kernel.html#send/2), and `receive` You're going to create a `Mailbox` process which recursively sends and receives messages.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Spawn the Mailbox
+
+The `Mailbox` should recursively loop and wait to receive a message.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-mailbox_process = spawn(fn -> Mailbox.loop() end)
+maibox_process = spawn(fn -> Mailbox.loop() end)
 ```
 
-You should be able to send the `Mailbox` a message to add a virtual letter to the mailbox.
-Print the current list of letters during every loop to prove your spawned process is storing every message in its state.
+<!-- livebook:{"break_markdown":true} -->
+
+### Send Mail
+
+Send the mailbox process a `{:send, message}` message and it should store the message.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-send(mailbox_process, {:mail, "You've Got Mail!"})
-# ["You've Got Mail!"]
-
-send(mailbox_process, {:mail, "You've Got Mail..Again!"})
-# ["You've Got Mail..Again!", "You've Got Mail!"]
+send(mailbox_process, {:send, "You've got mail!"})
 ```
 
-We won't typically work directly with processes like this. Instead we'll rely on abstractions such as [GenServer](https://hexdocs.pm/elixir/GenServer.html) which we will learn about in a future lesson.
+<!-- livebook:{"break_markdown":true} -->
+
+### Read Mail
+
+Send the mailbox process a {:read, from_pid} message and it should send the most recent message back to the sender and remove it from the mailbox.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+send(mailbox_process, {:read, self()})
+
+receive do
+  message -> message 
+end
+# returns "You've got mail!"
+```
+
+If there are no messages, send an `:empty` message back.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+send(mailbox_process, {:read, self()})
+
+receive do
+  message -> message 
+end
+# returns :empty
+```
+
+<!-- livebook:{"break_markdown":true} -->
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -61,17 +96,27 @@ We won't typically work directly with processes like this. Instead we'll rely on
 ```elixir
 defmodule Mailbox do
   def loop(state \\ []) do
-    IO.inspect(state)
     receive do
-      {:mail, letter} -> loop([letter | state])
+      {:send, message} ->
+        IO.inspect(message)
+        loop([message | state])
+
+      {:read, from_pid} ->
+        case state do
+          [head | tail] ->
+            send(from_pid, head)
+            loop(tail)
+
+          [] ->
+            send(from_pid, :empty)
+            loop([])
+        end
     end
   end
 end
 ```
 
 </details>
-
-Implement the `Mailbox` module below.
 
 ```elixir
 defmodule Mailbox do
@@ -81,11 +126,17 @@ defmodule Mailbox do
 
   @doc """
   Recursively loop and receive messages.
+  This doctest will timeout if there is no implementation.
 
   ## Examples
 
-      iex> counter_process = spawn(fn -> Mailbox.loop() end)
-      iex> send(counter_process, {:mail, "Hello!"})
+      iex> mailbox_process = spawn(fn -> Mailbox.loop() end)
+      iex> send(mailbox_process, {:send, "Hello!"})
+      iex> send(mailbox_process, {:read, self()})
+      iex> receive do
+      ...>  message -> message 
+      ...> end
+      "Hello!"
   """
   def loop(state \\ []) do
   end
