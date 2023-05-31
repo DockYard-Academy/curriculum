@@ -32,11 +32,18 @@ Mix.install([
 
 ## Games: Menu
 
-In your existing [Games](./games_setup.livemd) project, you're going to create a `Games.Menu` module which allows players to select which game they would like to play.
+Configure your existing [Games](./setup_games.livemd) project as an escript.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+mix escript.build
+$ ./games
+```
+
+When a player starts the game project as an escript, prompt them with a menu to select which game to play.
 
 ```
-$ iex -S mix
-iex> Games.Menu.display()
 Select a game:
 1. Guessing Game
 2. Rock Paper Scissors
@@ -56,65 +63,27 @@ Select: 3
 Enter a five letter word:  
 ```
 
-## Games: Escript
-
-Configure your game as an Escript. You'll need to create a `Games.CLI` module with a `main/1` function to display the `Games.Menu`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule Games.CLI do
-  def main(args) do
-    Games.Menu.display()
-  end
-end
-```
-
-And configure the `Games.CLI` module using the `:escript` option inside of the `Games.MixProject.project/0` function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def project do
-    [
-      ...
-      escript: [main_module: Games.CLI]
-    ]
-  end
-```
-
-You should be able to build and start the games project as an escript.
-
-```
-$ mix escript.build
-$ ./games
-Select a game:
-1. Guessing Game
-2. Rock Paper Scissors
-3. Wordle
-Select: 
-```
-
-## Bonus: Finish Game
-
-Allow the user to type `"stop"` to end any game. They should then be re-prompted with the menu to select the game they want to play.
+Allow a user to enter `"stop"` when prompted with the menu to stop the program.
 
 ```
 Select a game:
 1. Guessing Game
 2. Rock Paper Scissors
 3. Wordle
-Select: 1
-Enter your guess:
-stop
-Select a game:
+Select: stop
+
+$
+```
+
+When a game finishes, reprompt the user with the menu.
+
+```
+You win!
+What game would you like to play?
 1. Guessing Game
 2. Rock Paper Scissors
 3. Wordle
-Select: 
 ```
-
-This may require custom stop logic in each existing game.
 
 ## Commit Your Progress
 
