@@ -51,7 +51,7 @@ flowchart LR
   style R fill: coral
 ```
 
-This is also a simple example of building a [Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) using `GenServer`.
+This is also a simple example of building a [Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) using [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 ### Requirements
 
@@ -125,7 +125,7 @@ end
 
 ## TrafficGrid
 
-Create a `TrafficLights.Grid` `GenServer` that manages five `TrafficLights.Light` processes.
+Create a `TrafficLights.Grid` [GenServer](https://hexdocs.pm/elixir/GenServer.html) that manages five `TrafficLights.Light` processes.
 
 ```mermaid
 flowchart
@@ -187,29 +187,32 @@ style R5 fill:lightcoral
 * The initial state of the grid should contain a list with five `TrafficLights.Light` pids in addition to any other state you want to track
 * Create a `current_lights/1` and `transition/1` function as documented below.
 * Write a full suite of tests.
-  ```elixir
-        {:ok, pid} = TrafficLights.Grid.start_link([])
 
-        :ok = TrafficLights.Grid.transition(pid)
+<!-- livebook:{"force_markdown":true} -->
 
-        [:yellow, :green, :green, :green, :green] = TrafficLights.Grid.current_lights(pid)
+```elixir
+{:ok, pid} = TrafficLights.Grid.start_link([])
 
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
 
-        [:red, :yellow, :yellow, :yellow, :yellow] = TrafficLights.Grid.current_lights(pid)
+[:yellow, :green, :green, :green, :green] = TrafficLights.Grid.current_lights(pid)
 
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
-        :ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
 
-        [:green, :red, :red, :red, :red] = TrafficLights.Grid.current_lights(pid)
-  ```
+[:red, :yellow, :yellow, :yellow, :yellow] = TrafficLights.Grid.current_lights(pid)
+
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+:ok = TrafficLights.Grid.transition(pid)
+
+[:green, :red, :red, :red, :red] = TrafficLights.Grid.current_lights(pid)
+```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>

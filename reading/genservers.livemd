@@ -35,27 +35,27 @@ Mix.install([
 * What is the purpose of a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
 * Explain the lifecycle of sending a message to a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and receiving a response.
 * Why might we use asynchronous vs synchronous messages?
-* What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? What might happen to the `GenServer` mailbox?
+* What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? What might happen to the [GenServer](https://hexdocs.pm/elixir/GenServer.html) mailbox?
 
 ## Generic Server
 
-In Elixir, a Generic Server refers to a programming pattern and behavior implemented using the `GenServer` module from the OTP (Open Telecom Platform) library. The Generic Server pattern is a way to structure concurrent and fault-tolerant processes that receive and handle messages.
+In Elixir, a Generic Server refers to a programming pattern and behavior implemented using the [GenServer](https://hexdocs.pm/elixir/GenServer.html) module from the OTP (Open Telecom Platform) library. The Generic Server pattern is a way to structure concurrent and fault-tolerant processes that receive and handle messages.
 
-A Generic Server, implemented as a `GenServer`, is a long-running Elixir process that encapsulates state and behavior. It allows for message-based communication between processes and provides a structured way to handle those messages.
+A Generic Server, implemented as a [GenServer](https://hexdocs.pm/elixir/GenServer.html), is a long-running Elixir process that encapsulates state and behavior. It allows for message-based communication between processes and provides a structured way to handle those messages.
 
-Key characteristics of a Generic Server implemented with `GenServer` include:
+Key characteristics of a Generic Server implemented with [GenServer](https://hexdocs.pm/elixir/GenServer.html) include:
 
-1. **State Management**: The `GenServer` process holds and manages its own internal state. This state can be modified by handling specific messages and updating the state accordingly.
+1. **State Management**: The [GenServer](https://hexdocs.pm/elixir/GenServer.html) process holds and manages its own internal state. This state can be modified by handling specific messages and updating the state accordingly.
 
-2. **Message Handling**: `GenServer` processes receive messages asynchronously and handle them using pattern matching on the message content. The behavior of the server can be defined based on the message received.
+2. **Message Handling**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes receive messages asynchronously and handle them using pattern matching on the message content. The behavior of the server can be defined based on the message received.
 
-3. **Synchronous and Asynchronous Communication**: `GenServer` processes can communicate synchronously by sending a message and waiting for a response, or asynchronously by sending a message without expecting an immediate reply.
+3. **Synchronous and Asynchronous Communication**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes can communicate synchronously by sending a message and waiting for a response, or asynchronously by sending a message without expecting an immediate reply.
 
-4. **Supervision and Fault Tolerance**: `GenServer` processes are often used within supervision trees, allowing them to be monitored and restarted in the event of failures or crashes. This contributes to the fault-tolerant nature of OTP applications.
+4. **Supervision and Fault Tolerance**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes are often used within supervision trees, allowing them to be monitored and restarted in the event of failures or crashes. This contributes to the fault-tolerant nature of OTP applications.
 
-5. **Callback Functions**: `GenServer` requires implementing specific callback functions such as [handle_call/3](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3), [handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_cast/2), and [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) to define the behavior of the server for different types of messages.
+5. **Callback Functions**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) requires implementing specific callback functions such as [handle_call/3](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3), [handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_cast/2), and [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) to define the behavior of the server for different types of messages.
 
-The Generic Server pattern implemented with `GenServer` is a fundamental building block in Elixir/OTP applications. It provides a structured approach to building concurrent and fault-tolerant systems by encapsulating state, managing message-based communication, and defining behavior through callback functions.
+The Generic Server pattern implemented with [GenServer](https://hexdocs.pm/elixir/GenServer.html) is a fundamental building block in Elixir/OTP applications. It provides a structured approach to building concurrent and fault-tolerant systems by encapsulating state, managing message-based communication, and defining behavior through callback functions.
 
 ## Generic Server Life-Cycle
 
@@ -86,13 +86,13 @@ end
 
 ### Message Handler Callbacks
 
-The `GenServer` module defines all of the boilerplate under the hood, and allows us to conveniently provide callback functions
+The [GenServer](https://hexdocs.pm/elixir/GenServer.html) module defines all of the boilerplate under the hood, and allows us to conveniently provide callback functions
  including:
 
-* [init/1](https://hexdocs.pm/elixir/1.14/GenServer.html#c:init/1) defines the initial state in an `{:ok, state}` tuple.
-* [handle_call/3](https://hexdocs.pm/elixir/1.14/GenServer.html#c:handle_call/3) handle a synchronous message meant for a GenServer process.
-* [handle_cast/2](https://hexdocs.pm/elixir/1.14/GenServer.html#c:handle_cast/2) handle an asynchronous message meant for a GenServer process.
-* [handle_info/2](https://hexdocs.pm/elixir/1.14/GenServer.html#c:handle_info/2) handle a generic asynchronous message.
+* [init/1](https://hexdocs.pm/elixir/GenServer.html#c:init/1) defines the initial state in an `{:ok, state}` tuple.
+* [handle_call/3](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3) handle a synchronous message meant for a GenServer process.
+* [handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_cast/2) handle an asynchronous message meant for a GenServer process.
+* [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) handle a generic asynchronous message.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -107,7 +107,7 @@ We commonly use one of the following functions to start a GenServer process.
 
 ### Sending A GenServer A Message
 
-We can send the `GenServer` messages with functions such as:
+We can send the [GenServer](https://hexdocs.pm/elixir/GenServer.html) messages with functions such as:
 
 * [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) send a synchronous message for a GenServer handled by `handle_call/3`.
 * [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) send an asynchronous message for a GenServer handled by `handle_cast/2`.
@@ -119,7 +119,7 @@ We can send the `GenServer` messages with functions such as:
 
 ### Counter Example
 
-Here's a simple `CounterServer` `GenServer`. It stores a count in state, and we can send it a message to increment the count.
+Here's a simple `CounterServer` [GenServer](https://hexdocs.pm/elixir/GenServer.html). It stores a count in state, and we can send it a message to increment the count.
 
 * `GenServer.handle_call/3` returns a synchronous response in a `{:reply, response, state}` tuple.
 * `GenServer.handle_cast/2` asynchronously updates the state in a `{:noreply, new_state}` tuple.
@@ -190,7 +190,7 @@ In the `CounterServer` above, add a handler for a `:decrement` message.
 
 ## Client API
 
-Typically we don't use `GenServer` functions directly, and instead create a [Client API](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis). The Client API makes our code more reusable, readable, and easy to change. This is purely for code organization.
+Typically we don't use [GenServer](https://hexdocs.pm/elixir/GenServer.html) functions directly, and instead create a [Client API](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis). The Client API makes our code more reusable, readable, and easy to change. This is purely for code organization.
 
 Client API functions typically use `__MODULE__` when referencing the current module to make it easier to rename the module in the future.
 
@@ -370,7 +370,7 @@ See [HexDocs: Receiving Regular Messages](https://hexdocs.pm/elixir/GenServer.ht
 
 ### GenServers Sending Themselves A Message
 
-A `GenServer` cannot synchronously send itself a message using `call/3` because the current message blocks the process mailbox.
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) cannot synchronously send itself a message using `call/3` because the current message blocks the process mailbox.
 
 ```elixir
 defmodule SendingSelfExample do
@@ -458,7 +458,7 @@ Process.whereis(NamedCounter)
 
 ## Configuration
 
-Often we make `GenServer` modules configurable for different situations.
+Often we make [GenServer](https://hexdocs.pm/elixir/GenServer.html) modules configurable for different situations.
 
 The `start_link/1` function in a GenServer module typically accepts a list of options. The `init/1` callback also accepts an argument, typically (but not necessarily) used to configure the initial state.
 

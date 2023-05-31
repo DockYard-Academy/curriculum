@@ -32,7 +32,7 @@ Mix.install([
 
 ## Stack
 
-You're going to create a `Stack` `GenServer`.
+You're going to create a `Stack` [GenServer](https://hexdocs.pm/elixir/GenServer.html).
 
 A stack is a common data structure similar to a list, however a stack can only **push** elements onto the top of the stack, and **pop** elements from the top of the stack.
 
@@ -41,20 +41,23 @@ A stack is a common data structure similar to a list, however a stack can only *
 * The initial stack state starts as an empty list `[]`.
 * Create the `push/2`, `pop/1`, and `start_link/1` functions as documented below.
 * Define the necessary server callbacks that update the stack's state.
-  ```elixir
-        {:ok, pid} = Stack.start_link([])
 
-        # asynchronous
-        :ok = Stack.push(pid, 1)
-        :ok = Stack.push(pid, 2)
-        :ok = Stack.push(pid, 3)
+<!-- livebook:{"force_markdown":true} -->
 
-        # synchronous
-        3 = Stack.pop(pid)
-        2 = Stack.pop(pid)
-        1 = Stack.pop(pid)
-        nil = Stack.pop(pid)
-  ```
+```elixir
+{:ok, pid} = Stack.start_link([])
+
+# Asynchronous
+:ok = Stack.push(pid, 1)
+:ok = Stack.push(pid, 2)
+:ok = Stack.push(pid, 3)
+
+# Synchronous
+3 = Stack.pop(pid)
+2 = Stack.pop(pid)
+1 = Stack.pop(pid)
+nil = Stack.pop(pid)
+```
 
 ```elixir
 defmodule Stack do
