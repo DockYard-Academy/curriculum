@@ -82,6 +82,7 @@ defmodule Utils.NotebooksTest do
       `ExUnit.run/1`
       `Phoenix.Flash.get_flash/2`
       `Phoenix.HTML.Form.checkbox/3`
+      `GenServer`
       """
     }
 
@@ -101,6 +102,7 @@ defmodule Utils.NotebooksTest do
              [ExUnit.run/1](https://hexdocs.pm/ex_unit/ExUnit.html#run/1)
              [Phoenix.Flash.get_flash/2](https://hexdocs.pm/phoenix/Phoenix.Flash.html#get_flash/2)
              [Phoenix.HTML.Form.checkbox/3](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#checkbox/3)
+             [GenServer](https://hexdocs.pm/elixir/GenServer.html)
              """
            }
   end
