@@ -34,11 +34,15 @@ Mix.install([
 
 You're going to create a pokemon battle game. If you're not familiar with pokemon, it's a game where elemental creatures battle.
 
-You're going to represent pokemon using a `Pokemon` struct with the keys `:name`, `:type`, `:health`, `:attack`, and `:speed`. Enforce that all keys must have a value.
+<!-- livebook:{"break_markdown":true} -->
 
-* `:name` is a string.
+### Define the Pokemon Struct
+
+You're going to represent pokemon using a `Pokemon` struct with the following keys.
+
+* `:name` will be a string.
 * `:type` will be an atom of either `:grass`, `:water`, or `:fire`
-* `:health` will be an integer with a default value of `20`
+* `:health` will be a float with a default value of `20.0`
 * `:attack` will be an integer with a default value of `5`
 * `:speed` will be an integer
 
@@ -53,22 +57,13 @@ These are simply the expected data types for each `Pokemon` struct instance.
 %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
 ```
 
-Then implement the `Pokemon.attack/2` function according to the documented examples.
+<!-- livebook:{"break_markdown":true} -->
 
-<!-- livebook:{"force_markdown":true} -->
+### Pokemon.attack/2
 
-```elixir
-attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+Create a Pokemon.attack/2 function to make one pokemon attack another.
 
-Pokemon.attack(attacker, defender)
-# Output: Subtract Attack From Health To Return An Updated Pokemon Struct
-%Pokemon{name: "Bulbasaur", type: :grass, health: 15, attack: 5, speed: 20}
-```
-
-`Pokemon.attack/2` should apply double damage if the pokemon has a type advantage, and half damage if the pokemon has a type disadvantage.
-
-The advantages are:
+The pokemon will apply their `:attack` value multiplied by a **type advantage** modified according to the following list.
 
 * `:fire` is strong against `:grass`
 * `:grass` is strong against `:water`
@@ -78,16 +73,46 @@ The advantages are:
 * `:water` is weak against `:grass`
 * the same type should deal normal damage.
 
+For example:
+
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
 defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
 
+# Applies 5 * 2 damage. original health: 20, new health: 10.
 Pokemon.attack(attacker, defender)
-# Output: Subtract Attack (doubled) From Health To Return An Updated Pokemon Struct
 %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
 ```
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example solution</summary>
+
+```elixir
+defmodule Pokemon do
+  defstruct [:name, :type, :health, :attack, :speed]
+
+  def attack(attacker, defender) do
+    damage = attacker.attack * modifier(attacker.type, defender.type)
+    %__MODULE__{defender | health: defender.health - damage}
+  end
+
+  defp modifier(attacker_type, defender_type) do
+    cond do
+      super_effective?(attacker_type, defender_type) -> 2
+      super_effective?(defender_type, attacker_type) -> 0.5
+      true -> 1
+    end
+  end
+
+  defp super_effective?(attacker_type, defender_type) do
+    {attacker_type, defender_type} in [{:fire, :grass}, {:grass, :water}, {:water, :fire}]
+  end
+end
+```
+
+</details>
 
 ```elixir
 defmodule Pokemon do
@@ -95,41 +120,13 @@ defmodule Pokemon do
   Pokemon
 
   ## Examples
-
-    iex> %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-
-    iex> %Pokemon{name: "Charmander", type: :fire, speed: 20}
-    %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
+      iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20.0, attack: 5, speed: 20}
+      iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20.0, attack: 5, speed: 20}
+      iex> Pokemon.attack(attacker, defender)
+      %Pokemon{name: "Bulbasaur", type: :grass, health: 10.0, attack: 5, speed: 20}
   """
+  defstruct []
 
-  @doc """
-  subtract the attack damage of an attacker from the defender's health.
-  return an updated pokemon struct, and take type advantage into consideration.
-
-  ## Examples
-
-    Same Type
-
-    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Charmander", type: :fire, health: 15, attack: 5, speed: 20}
-
-    Type Disadvantage
-
-    iex> attacker = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Charmander", type: :fire, health: 17.5, attack: 5, speed: 20}
-
-    Type Advantage
-
-    iex> attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-    iex> defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
-    iex> Pokemon.attack(attacker, defender)
-    %Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
-  """
   def attack(attacker, defender) do
   end
 end
