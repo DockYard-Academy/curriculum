@@ -30,9 +30,9 @@ Mix.install([
 </div>
 </div>
 
-## Math
+## Math With Guards
 
-You're going to create a `Math` module that uses guards to add or subtract **integers**, **strings**, and **lists** with the same `add/2` and `subtract/2` functions.
+You're going to create a `Math` module that uses **guards** to add or subtract **integers**, **strings**, and **lists** with the same `add/2` and `subtract/2` functions.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -46,7 +46,7 @@ You're going to create a `Math` module that uses guards to add or subtract **int
 "ab" = Math.subtract("babc", "bc")
 ```
 
-Raise a `FunctionClauseError` if an invalid value is provided, or if the two arguments are not the same type.
+Raise a `FunctionClauseError` error if an invalid value is provided.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -106,7 +106,7 @@ defmodule Math do
   2
   iex> Math.add([1, 2], [3, 4])
   [1, 2, 3, 4]
-  iex> Math.add("hello there")
+  iex> Math.add("hello ", "there")
   "hello there" 
 
   iex> Math.subtract(2, 1)
@@ -114,7 +114,10 @@ defmodule Math do
   iex> Math.subtract([3, 2, 3], [3])
   [2, 3] 
   iex> Math.subtract("babc", "bc")
-  "ab" 
+  "ab"
+
+  iex> Math.add(2, "2")
+  ** (FunctionClauseError) no function clause matching in Math.add/2
   """
 
   def add(value1, value2) do
