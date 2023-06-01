@@ -1,4 +1,4 @@
-# Message Validation
+# User Validation
 
 ```elixir
 Mix.install([
@@ -30,72 +30,55 @@ Mix.install([
 </div>
 </div>
 
-## Message Validation
+## User Validation
 
-You're going to use guards to create a `Message` module that only allows messags in the form of a string or a `Message` struct with a `:body` field to be sent. Sending a message simply returns a string of the message prepended with `"Sent: "`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Message.send("hello!")
-"Sent: hello!"
-
-Message.send(%Message{body: "hi!"})
-"Sent: hi!"
-```
-
-Invalid messages should raise a `FunctionClauseError`.
+You're going to use `with` to create a `User` module that can validate a list of user structs. Handle `:missing_name` and `:not_a_user` errors. Return `{:ok, user}` if the user is valid.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Message.send(123)
-** (FunctionClauseError) no function clause matching in Message.send/1    
-    
-    The following arguments were given to Message.send/1:
-    
-        # 1
-        123
+valid_user = %User{name: "Mohsin"}
+invalid_user1 = %User{}
+invalid_user2 = "Yusef"
+
+[{:ok, %User{name: "Mohsin"}}, {:error, :missing_name}, {:error, :not_a_user}] =
+  User.validate_users([valid_user, invalid_user1, invalid_user2])
 ```
 
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
-
 ```elixir
-defmodule Message do
-  defstruct [:body]
-  def send(message) when is_binary(message) do
-    "Sent: " <> message
-  end
-
-  def send(message) when is_binary(message.body) do
-    "Sent: " <> message.body
-  end
-end
-```
-
-</details>
-
-Implement the `Message` module as documented below.
-
-```elixir
-defmodule Message do
+defmodule User do
   @moduledoc """
   Send messages between users.
   Returns a string of the message if provided valid input.
 
   ## Examples
 
-    iex> Message.send("hello!")
-    "Sent: hello!"
+    iex> User.validate_users([%User{name: "valid user"}])
+    [{:ok, %User{name: "valid user"}}]
 
-    iex> Message.send(%Message{body: "hi!"})
-    "Sent: hi!"
+    iex> User.validate_users([%User{name: nil}])
+    [{:error, :missing_name}]
 
-    iex> Message.send(123)
-    ** (FunctionClauseError) no function clause matching in Message.send/1
+    iex> User.validate_users(["invalid user", "invalid user", "invalid user"])
+    [{:error, :not_a_user}, {:error, :not_a_user}, {:error, :not_a_user}]
   """
-  defstruct [:body]
+  defstruct [:name]
+
+  def validate_users(users) do
+    Enum.map(users, fn user ->
+      with %User{name: name} <- user, true <- {:missing_name, is_binary(name)} do
+        {:ok, user}
+      else
+        false ->
+          {:error, :missing_name}
+
+        _ ->
+          {:e}
+          IO.inspect(thing)
+          :error
+      end
+    end)
+  end
 end
 ```
 
