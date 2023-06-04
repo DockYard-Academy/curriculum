@@ -276,8 +276,7 @@ Have you tried turning it off and on again?
 <summary>Example Solution</summary>
 
 ```elixir
-initial_count = 0
-initial_count + high
+
 ```
 
 </details>
