@@ -111,7 +111,8 @@ defmodule UtilsTest do
     |> Enum.each(fn notebook ->
       notebook = Notebooks.load!(notebook)
 
-      refute Regex.match?(regex, notebook.content), "found version number #{Regex.run(regex, notebook.content)} in #{notebook.relative_path}"
+      refute Regex.match?(regex, notebook.content),
+             "found version number #{Regex.run(regex, notebook.content)} in #{notebook.relative_path}"
     end)
   end
 

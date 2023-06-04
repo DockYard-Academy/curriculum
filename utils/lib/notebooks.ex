@@ -159,8 +159,8 @@ defmodule Utils.Notebooks do
   end
 
   def format_headings(notebook) do
+    # format first line
     formatted_content =
-      # format first line
       String.replace(notebook.content, ~r/^.+/, &title_case/1)
       # format sub headings
       |> String.replace(~r/^\#{2,}+.+$/m, &title_case/1)

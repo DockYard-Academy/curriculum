@@ -10,6 +10,7 @@ defmodule Mix.Tasks.AllTasks do
     "format_notebooks",
     "update_readme_outline",
     "deprecate_unused_files",
+    "format",
     "spell_check"
   ]
 
