@@ -51,7 +51,7 @@ Therefore, we can let a process crash, and it will not affect the rest of our sy
 > completely separated; they share no memory, and a crash in one process can’t by default compromise the execution flow of another.
 > Process isolation allows you to confine the negative effects of an error to a single process or a small group of related processes,
 > which keeps most of the system functioning normally.
-> 
+>
 > * Sasa Juric, [Elixir in Action](https://www.manning.com/books/elixir-in-action-second-edition).
 
 For example, We can spawn a process and raise an error. Unless we explicitly link the process with `spawn_link/1`
@@ -222,7 +222,7 @@ However, sometimes we want different restart strategies such as `:one_for_all` a
 Restart only the worker that crashed.
 
 ```mermaid
-flowchart TD 
+flowchart TD
     Supervisor
     Supervisor --> P1
     Supervisor --> P2
@@ -245,7 +245,7 @@ In the diagram above, only P2 crashed, so only P2 will be restarted by the super
 Restart all of the child workers.
 
 ```mermaid
-flowchart TD 
+flowchart TD
     Supervisor
     Supervisor --> P1
     Supervisor --> P2
@@ -269,7 +269,7 @@ P2 crashed, which led to all the other child processes to be terminated, then al
 Restart child workers in order after the crashed process.
 
 ```mermaid
-flowchart TD 
+flowchart TD
     Supervisor
     Supervisor --> P1
     Supervisor --> P2
@@ -363,7 +363,7 @@ so the timeline of crashes should be:
 Uncomment and run the cell below to see the timeline of crashes, then re-comment it.
 
 ```elixir
-# {:ok, Supervisor_pid} = Supervisor.start_link(children, Strategy: :one_for_one, Max_restarts: 5)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_one, max_restarts: 5)
 ```
 
 ### One For All
@@ -384,7 +384,7 @@ Notice that `Bomb2` and `Bomb3` will never explode because their timers restart.
 Uncomment the line below to observe the timeline of crashes, then re-comment it.
 
 ```elixir
-# {:ok, Supervisor_pid} = Supervisor.start_link(children, Strategy: :one_for_all, Max_restarts: 5)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :one_for_all, max_restarts: 5)
 ```
 
 ### Rest For One
@@ -406,7 +406,7 @@ timeline will still be:
 Uncomment the line below to observe the timeline of crashes, then re-comment it.
 
 ```elixir
-# {:ok, Supervisor_pid} = Supervisor.start_link(children, Strategy: :rest_for_one, Max_restarts: 5)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
 ```
 
 However, if we change the order of children in the supervisor, only children after the crashed
@@ -438,7 +438,7 @@ So the timeline of crashes would be:
 * 9 seconds: `Bomb1` crashes (`Bomb2` restarted)
 
 ```elixir
-# {:ok, Supervisor_pid} = Supervisor.start_link(children, Strategy: :rest_for_one, Max_restarts: 5)
+# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
 ```
 
 ### Your Turn
@@ -462,7 +462,7 @@ children = [
 Uncomment the following code to see the crash timeline, then re-comment it.
 
 ```elixir
-# Supervisor.start_link(children, Strategy: :one_for_one)
+# Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 ## Further Reading
