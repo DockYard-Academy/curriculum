@@ -124,6 +124,42 @@ Pascal.of(5)
 ]
 ```
 
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+The following solution works, but is not very performant because it has to recalculate every previous row.
+
+```elixir
+defmodule Pascal do
+  def row(1), do: [1]
+  def row(2), do: [1, 1]
+  def row(n), do: [1 | Enum.chunk(row(n - 1), 2, 1) |> Enum.map(fn [a, b] -> a + b end)] ++ [1]
+
+  def of(n) do
+    Enum.map(1..n, &row/1)
+  end
+end
+```
+
+By building up the solution and refering to the previous value, we can avoid recalculating each row.
+
+```elixir
+defmodule Pascal do
+  def of(1), do: [[1]]
+  def of(2), do: [[1], [1, 1]]
+
+  def of(n) do
+    Enum.reduce(3..n, [[1, 1], [1]], fn each, [prev | _] = acc ->
+      row = [1 | Enum.chunk(prev, 2, 1) |> Enum.map(fn [a, b] -> a + b end)] ++ [1]
+      [row | acc]
+    end)
+    |> Enum.reverse()
+  end
+end
+```
+
+</details>
+
 ```elixir
 defmodule Pascal do
   @doc ~S"""
@@ -136,7 +172,6 @@ defmodule Pascal do
 
       iex> Pascal.of(5)
       [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
-
   """
   def of(n) do
   end
