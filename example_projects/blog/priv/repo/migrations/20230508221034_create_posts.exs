@@ -9,5 +9,7 @@ defmodule Blog.Repo.Migrations.CreatePosts do
 
       timestamps()
     end
+
+    create unique_index(:posts, [:title])
   end
 end
