@@ -61,7 +61,7 @@ create a list, and then separate each value with a comma `,`.
 [1, 2, 3]
 ```
 
-Lists can contain any data type in any combination, even other lists.
+Lists can contain any other Elixir term, even other lists.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -69,8 +69,9 @@ Lists can contain any data type in any combination, even other lists.
 ["a", 2, "c", []]
 ```
 
-Lists are used to represent a collection of information. For example, a shopping list, a to-do list,
-or a list of tags on an article.
+Lists are used to represent a collection of information. For example, a shopping list, a to-do list, or a list of tags on an article.
+
+<!-- livebook:{"break_markdown":true} -->
 
 ### Indexes
 
@@ -111,48 +112,33 @@ In the Elixir cell below, Create a list of your favourite foods as strings.
 
 ## List Operators
 
-List operators are useful for manipulating lists.
-
-`++` allows you to add lists together.
+List operators allow us to manipulate lists. Lists can be added together with `++` and subtracted from eachother with `--`.
 
 ```elixir
 [1] ++ [2]
 ```
 
-`--` allows you to subtract matching elements from a list.
-
 ```elixir
 [1, 2, 3] -- [2, 3]
 ```
 
-Unlike `Arithmetic Operators`, Lists do not follow the **BEDMAS** order of operations.
+Subtraction operations remove the leftmost elements first.
 
-For example, what do you think the result of `[1, 2] -- [1] -- [2]` should be?
-Intuitively, you might think it would be an empty list `[]`. Because
+```elixir
+[3, 2, 4, 3, 2] -- [3, 2]
+```
 
-<!-- livebook:{"force_markdown":true} -->
+List operations occur from **right to left** unlike Arithmatic Operators, which can cause some unintuitive behavior. You might think the following operation should result in an empty list `[]`, but instead it returns `[2]`.
 
 ```elixir
 [1, 2] -- [1] -- [2]
 ```
 
-Becomes `[2]` when you subtract `[1]`
+That's because `[1] -- [2]` evaluates first, because the operations occur from right to left.
 
 ```elixir
-[2] -- [2]
-```
-
-And then becomes `[]` when you subtract `[2]`
-
-```elixir
-[1, 2] -- [1] -- [2]
-```
-
-However, this is not the case. It's actually `[2]`. Why? because list operations evaluate from
-right to left.
-
-```elixir
-[1, 2] -- [1] -- [2]
+step1 = [1] -- [2]
+result = [1, 2] -- step1
 ```
 
 To avoid writing unintuitive code, you can either use brackets or split values in to variables to
@@ -160,12 +146,6 @@ break up the operations into steps using the match operator.
 
 ```elixir
 ([1, 2] -- [1]) -- [2]
-```
-
-```elixir
-step1 = [1, 2]
-step2 = step1 -- [1]
-step2 -- [2]
 ```
 
 ### Your Turn
@@ -182,9 +162,31 @@ In the Elixir cell below, remove `[1]` from `[1, 1, 2, 3]` to make `[1, 2, 3]`
 
 ```
 
-## Prepending
+## Head and Tail
 
-We can prepend elements to a list using `[element | list]` syntax.
+Under the hood, lists are implemented as **linked lists** where every element is a [cons cells](https://en.wikipedia.org/wiki/Cons). with a head and a tail.
+
+Let's take the example list `[2, 3]`.
+
+This is actually a linked list made of two cons cells `[2 | tail]` and `[3 | tail]`.
+
+We can see that [2, 3] is actually syntax sugar for `[2 | [3 | []]]` which uses a pipe symbol syntax `|` to join them.
+
+```elixir
+[2 | [3 | []]]
+```
+
+![](images/linked_list_cons_cells.png)
+
+<!-- livebook:{"break_markdown":true} -->
+
+We won't often write lists this way, but it's useful to be aware of their internal implementation details for the sake of **prepending** elements to a list and for **pattern matching** on a list.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Prepending
+
+Because lists are actually just cons cells joined together, we can prepend elements to a list using `[element | list]` syntax.
 
 For example, we can prepend `1` to the list `[2, 3]` to make `[1, 2, 3]`
 
@@ -228,6 +230,23 @@ This poses an issue for lists though who seem to require a match for every eleme
 
 To get around this, you can use the `[head | tail]` syntax for prepending elements to a list.
 
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+flowchart LR
+  subgraph Head
+  L
+  end
+  subgraph Tail
+  I
+  S
+  T
+  end
+  L -- tail --> I --> S --> T
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
 The **head** is the first element of the list.
 
 ```elixir
@@ -248,30 +267,6 @@ You can access multiple elements at the start of the list separated by commas `,
 [one, two | _tail] = [1, 2, 3, 4, 5, 6, 7]
 {one, two}
 ```
-
-Why head and tail? That's because under the hood lists in Elixir are a linked list.
-Essentially each element in the list knows the location of the next element in memory.
-
-Memory is a hardware component on computers responsible for storing short term data. Whenever we use data in an Elixir program and bind a variable, this is stored in memory.
-
-The **head** is the current element in the list, and the **tail** is the link to the remaining elements.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-flowchart LR
-  subgraph Head
-  L
-  end
-  subgraph Tail
-  I
-  S
-  T
-  end
-  L -- tail --> I --> S --> T
-```
-
-<!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
 
