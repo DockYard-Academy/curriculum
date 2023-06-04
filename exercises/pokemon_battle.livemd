@@ -63,7 +63,7 @@ These are simply the expected data types for each `Pokemon` struct instance.
 
 Create a Pokemon.attack/2 function to make one pokemon attack another.
 
-The pokemon will apply their `:attack` value multiplied by a **type advantage** modified according to the following list.
+The pokemon will apply their `:attack` value multiplied by a **type advantage** modified according to the following list. **strong** attacks are multiplied by `2` and **weak** attacks are multiplied by `0.5`.
 
 * `:fire` is strong against `:grass`
 * `:grass` is strong against `:water`
@@ -78,12 +78,12 @@ For example:
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-attacker = %Pokemon{name: "Charmander", type: :fire, health: 20, attack: 5, speed: 20}
-defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20, attack: 5, speed: 20}
+attacker = %Pokemon{name: "Charmander", type: :fire, health: 20.0, attack: 5, speed: 20}
+defender = %Pokemon{name: "Bulbasaur", type: :grass, health: 20.0, attack: 5, speed: 20}
 
-# Applies 5 * 2 Damage. Original Health: 20, New Health: 10.
+# Applies 5 * 2 Damage. Original Health: 20.0, New Health: 10.0.
 Pokemon.attack(attacker, defender)
-%Pokemon{name: "Bulbasaur", type: :grass, health: 10, attack: 5, speed: 20}
+%Pokemon{name: "Bulbasaur", type: :grass, health: 10.0, attack: 5, speed: 20}
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -147,21 +147,21 @@ classDiagram
   class charmander {
     name: "Charmander"
     type: :fire
-    health: 20
+    health: 20.0
     attack: 5
     speed: 20
   }
   class bulbasaur {
     name: "Bulbasar"
     type: :grass
-    health: 20
+    health: 20.0
     attack: 5
     speed: 20
   }
   class squirtle {
     name: "Squirtle"
     type: :water
-    health: 20
+    health: 20.0
     attack: 5
     speed: 20
   }

@@ -13,9 +13,11 @@ Email the instructor Brooklin at brooklin.myers@dockyard.com or direct message [
 * Install [Postgres](https://www.postgresql.org/download/) (optional to get started)
 * Install [Phoenix](https://hexdocs.pm/phoenix/installation.html) (optional to get started)
 * Setup [WSL with Visual Studio Code](https://code.visualstudio.com/docs/remote/wsl) (Windows Users Only)
-* Optionally Install [asdf](https://asdf-vm.com/guide/getting-started.html) to manage elixir and erlang versions.
+* Optionally Install [asdf](https://asdf-vm.com/guide/getting-started.html) to manage Elixir and Erlang versions.
 
 While we strongly recommend the [Visual Studio Code](https://code.visualstudio.com/) editor for its LiveShare capability, you may use any code editor you prefer.
+
+This course is intended to be approachable to students with no computer science background.
 
 ## Getting Started
 
