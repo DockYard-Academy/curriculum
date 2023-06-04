@@ -22,7 +22,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_supervisor_setup.livemd">Games: Supervisor Setup</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/supervised_stack.livemd">Supervised Stack</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/task.livemd">Task</a>
@@ -32,68 +32,69 @@ Mix.install([
 
 ## Games: Supervised Score Tracker
 
-Refactor your existing [Games: Score Tracker](./games_score_tracker.livemd) module to be a named process and configure it with your [Games Supervisor](./games_supervisor_setup.livemd).
-Ensure your existing [Games: Score Tracker](./games_score_tracker.livemd) test suite continue to pass. You may need to alter it slightly now
-that `Games.ScoreTracker` is a named process.
+You're going to setup your [Games](../exercises/games.livemd) project as a supervised mix project.
 
-If you don't already have a `ScoreTracker` module you can use the one below.
+Then, create a `Games.ScoreTracker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which will track a player score as they play different games.
 
-```elixir
-defmodule ScoreTracker do
-  use GenServer
+Decide on point rewards for winning a game such as:
 
-  def start_link(opts) do
-    name = Keyword.get(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, [], name: name)
-  end
+* **guessing game**: 5 points
+* **rock paper scissors**: 10 points
+* **wordle**: 25 points
 
-  def add(pid \\ __MODULE__, points) do
-    GenServer.call(pid, {:add, points})
-  end
-
-  def get(pid \\ __MODULE__) do
-    GenServer.call(pid, :get)
-  end
-
-  @impl true
-  def init(_opts) do
-    {:ok, 0}
-  end
-
-  @impl true
-  def handle_call(:get, _from, state) do
-    {:reply, state, state}
-  end
-
-  @impl true
-  def handle_call({:add, points}, _from, state) do
-    {:reply, state + points, state + points}
-  end
-end
-```
-
-### Bonus: Track Scores
-
-Whenever a player wins a round of [Guessing Game](./games_guessing_game.livemd), [RockPaperScissors](./games_rock_paper_scissors.livemd), or [Wordle](./games_wordle.livemd), increase the player's score.
-
-**(Optional)** Consider printing the current score every time you increment it to make debugging and visual display easier.
-**(Optional)** Each game can be worth the same amount of points, or you might vary the points depending on the game.
+Increase the `ScoreTracker`'s score whenever a user wins the game.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Bonus: Score Menu
+### Requirements
 
-In the previously implemented [Games.Menu](./games_menu.livemd) module, implement a `Total Score` option which prints the current total score. It should use the `Games.ScoreTracker` module to get the current score.
+* The initial score tracker state should be `0`.
+* Handle an asynchronous `{:add_points, points}` message to increment the score state.
+* Handle a synchronous `:get_score` message to retrieve the current score.
+* `Games.ScoreTracker` should be started as a named process by the supervisor.
+* Create the `start_link/1`, `add_points/1`, and `current_score/1` functions as documented below.
+* Write a full suite of tests including at least the following cases:
+  * `"current_score/1 retrieves the current score"`
+  * `"add_points/1 adds points to the score"`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# Games.ScoreTracker Should Be A Named Process, So It Is Not Necessary To Send The Pid.
+{:ok, _pid} = Games.ScoreTracker.start_link()
+:ok = Games.Score.add_points(10)
+:ok = Games.Score.add_points(10)
+20 = Games.Score.current_score()
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Score Menu
+
+Create a `"score"` command for the game menu that displays the user's current score. For example:
 
 ```
 $ ./games
-Select a game:
+What game would you like to play?
 1. Guessing Game
 2. Rock Paper Scissors
 3. Wordle
-4. Total Score
-Select: 4
-Your current session score: 3
+
+enter "stop" to exit
+enter "score" to view your current score
+score
+
+==================================================
+Your score is 0
+==================================================
+
+What game would you like to play?
+1. Guessing Game
+2. Rock Paper Scissors
+3. Wordle
+
+enter "stop" to exit
+enter "score" to view your current score
 ```
 
 ## Commit Your Progress
@@ -127,7 +128,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_supervisor_setup.livemd">Games: Supervisor Setup</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/supervised_stack.livemd">Supervised Stack</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/task.livemd">Task</a>

@@ -1,0 +1,138 @@
+# Data Traversal
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Data Traversal">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/custom_enum_with_reduce.livemd">Custom Enum With Reduce</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/datetime.livemd">Dates And Times</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Data Traversal
+
+`Enum.reduce/3` is often useful for traversing complex or nested data structures.
+
+You're going to create a `DataTraversal` module that can perform some complex data traversal operations.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule DataTraversal do
+  def sum_keyword_list(keyword_list) do
+    Enum.reduce(keyword_list, 0, fn {_key, value}, acc -> value + acc end)
+  end
+
+  def aggregate(keyword_list) do
+    Enum.reduce(keyword_list, [], fn {key, value}, acc ->
+      previous = acc[key] || 0
+      Keyword.put(acc, key, previous + value)
+    end)
+    |> Enum.sort()
+  end
+
+  def merge_maps(maps) do
+    Enum.reduce(maps, %{}, fn map, acc ->
+      Map.merge(acc, map)
+    end)
+  end
+end
+```
+
+</details>
+
+Implement the `DataTraversal` module as documented below.
+
+```elixir
+defmodule DataTraversal do
+  @doc """
+  Sum all of the integer values in a keyword list. The keys do not matter.
+
+  iex> DataTraversal.sum([key: 10, key: 20, key: 30])
+  60
+  """
+  def sum(keyword_list) do
+  end
+
+  @doc """
+  Aggregate values with common keys in a keyword list.
+  Ensure aggregated values are sorted with Enum.sort/1
+
+  iex> DataTraversal.aggregate([key1: 10, key1: 20, key2: 30, key2: 20])
+  [key1: 30, key2: 50]
+  """
+  def aggregate(keyword_list) do
+  end
+
+  @doc """
+  Merge a list of maps together. New values will replace old values.
+
+  iex> maps = [%{keya: "a"}, %{keyb: "b"}, %{keyc: "c"}, %{keyc: "c2"}]
+  iex> DataTraversal.merge_maps(maps)
+  %{keya: "a", keyb: "b", keyc: "c2"}
+  """
+  def merge_maps(maps) do
+  end
+end
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Data Traversal exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Data Traversal">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/custom_enum_with_reduce.livemd">Custom Enum With Reduce</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/datetime.livemd">Dates And Times</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

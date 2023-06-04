@@ -22,10 +22,10 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/phone_number_parsing.livemd">Phone Number Parsing</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/pascals_triangle.livemd">Pascal's Triangle</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_setup.livemd">Games Project</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games.livemd">Games Project</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -50,9 +50,11 @@ mix new app_name
 
 Where `app_name` is the name of the project.
 
+<!-- livebook:{"break_markdown":true} -->
+
 ### Your Turn
 
-Create a `hello_world` application in this course's `projects` folder.
+Create a `hello_world` application.
 
 You should notice that the command generated several files.
 
@@ -315,81 +317,8 @@ It defines two public functions, `project/0` and `application/0`.
 
 The `project/0` function returns project configuration such as the project name, current version, and installed dependencies. The `project/0` function relies on the private `deps/0` function to provide a list of dependencies.
 
-The `application/0` function returns application configuration used to generate an application manifest file `_build/ebin/hello_world.app`.
-This file is used under the hood to run the project. For more, you can see the [Application](https://hexdocs.pm/elixir/main/Application.html) module
-on HexDocs.
-
-### Your Turn
-
-Note the original contents of the application manifest `build/ebin/hello_world.app` should be similar to:
-
-```
-{application,hello_world,
-             [{applications,[kernel,stdlib,elixir,logger]},
-              {description,"hello_world"},
-              {modules,['Elixir.HelloWorld']},
-              {registered,[]},
-              {vsn,"0.1.0"}]}.
-```
-
-Change the `application/0` function to return an empty list.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-def application do
-  []
-end
-```
-
-Run `mix compile`.
-
-The `_build/ebin/hello_world.app` file will no longer have the `logger` application.
-
-```
-{application,hello_world,
-             [{applications,[kernel,stdlib,elixir]},
-              {description,"hello_world"},
-              {modules,['Elixir.HelloWorld']},
-              {registered,[]},
-              {vsn,"0.1.0"}]}.
-```
-
-Mix provides an abstraction for building Elixir applications, so
-we don't need to be concerned with these details. However, it's useful to be aware that nothing is magic. Changes to `mix.exs` directly impact the compiled `_build` folder.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-defmodule HelloWorld.MixProject do
-  use Mix.Project
-
-  def project do
-    [
-      app: :hello_world,
-      version: "0.1.0",
-      elixir: "~> 1.13",
-      start_permanent: Mix.env() == :prod,
-      deps: deps()
-    ]
-  end
-
-  # Run "mix help compile.app" to learn about applications.
-  def application do
-    [
-      extra_applications: [:logger]
-    ]
-  end
-
-  # Run "mix help deps" to learn about dependencies.
-  defp deps do
-    [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-    ]
-  end
-end
-```
+The `application/0` function returns application configuration used to generate an application manifest file  in the `_build` folder. This file is used under the hood to run the project. For more, you can see the [Application](https://hexdocs.pm/elixir/main/Application.html) module
+on HexDocs. Sometimes removing the `_build` folder and recompiling a project can resolve compilation bugs.
 
 ## Dependencies
 
@@ -575,10 +504,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/phone_number_parsing.livemd">Phone Number Parsing</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/pascals_triangle.livemd">Pascal's Triangle</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_setup.livemd">Games Project</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games.livemd">Games Project</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

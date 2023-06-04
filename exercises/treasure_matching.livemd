@@ -1,4 +1,4 @@
-# Treasure Matching
+# Drills: Pattern Matching
 
 ```elixir
 Mix.install([
@@ -18,7 +18,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Treasure Matching">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Drills: Pattern Matching">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
@@ -30,6 +30,12 @@ Mix.install([
 </div>
 </div>
 
+## Drills: Pattern Matching
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Pattern Matching](../reading/advanced_pattern_matching.livemd). Follow the instructions for each drill and complete them as quickly as you can.
+
 ## Treasure Matching
 
 In this exercise, you're going to use **pattern matching** to extract the `"jewel"`
@@ -40,7 +46,7 @@ string from the data provided and bind it to a `jewel` variable. The first exerc
 jewel
 ```
 
-Use pattern matching to bind a `jewel` variable to the `"jewel"` string.
+Use pattern matching to bind a `jewel` variable to the `"jewel"` string. Each cell should return the `jewel` variable to prove it was bound correctly.
 
 ```elixir
 [1, 2, 3, "jewel"]
@@ -118,6 +124,39 @@ Enum.map(1..4, fn each -> (each == 2 && "jewel") || each end)
 Enum.map(1..4, &((&1 > 3 && "jewel") || &1))
 ```
 
+## Sum
+
+Create a `Sum` module that uses **recursion** and **pattern matching** to sum all elements in a list. Avoid using the [Enum](https://hexdocs.pm/elixir/Enum.html) module or a comprehension.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+iex> Sum.list([1, 2, 3])
+6
+```
+
+<details style="background-color: lightgreen; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defmodule Sum do
+  def list(list, sum \\ 0)
+  def list([], sum), do: sum
+  def list([head | tail], sum), do: list(tail, sum + head)
+end
+```
+
+</details>
+
+```elixir
+defmodule Sum do
+  @moduledoc """
+  iex> Sum.list([1, 2, 3])
+  6
+  """
+end
+```
+
 ## Commit Your Progress
 
 DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
@@ -127,7 +166,7 @@ Then run the following in your command line from the `curriculum` folder to comm
 
 ```
 $ git add .
-$ git commit -m "finish Treasure Matching exercise"
+$ git commit -m "finish Drills: Pattern Matching exercise"
 $ git push
 ```
 
@@ -145,7 +184,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-bug-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Treasure Matching">Report An Issue</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Drills: Pattern Matching">Report An Issue</a>
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>

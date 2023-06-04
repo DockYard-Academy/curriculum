@@ -1,0 +1,529 @@
+# GenServers
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=GenServers">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/process_mailbox.livemd">Process Mailbox</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/genserver_drills.livemd">GenServer Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+* What is the purpose of a [GenServer](https://hexdocs.pm/elixir/GenServer.html)?
+* Explain the lifecycle of sending a message to a [GenServer](https://hexdocs.pm/elixir/GenServer.html) and receiving a response.
+* Why might we use asynchronous vs synchronous messages?
+* What happens when we send a [GenServer](https://hexdocs.pm/elixir/GenServer.html) too many messages? What might happen to the [GenServer](https://hexdocs.pm/elixir/GenServer.html) mailbox?
+
+## Generic Server
+
+In Elixir, a Generic Server refers to a programming pattern and behavior implemented using the [GenServer](https://hexdocs.pm/elixir/GenServer.html) module from the OTP (Open Telecom Platform) library. The Generic Server pattern is a way to structure concurrent and fault-tolerant processes that receive and handle messages.
+
+A Generic Server, implemented as a [GenServer](https://hexdocs.pm/elixir/GenServer.html), is a long-running Elixir process that encapsulates state and behavior. It allows for message-based communication between processes and provides a structured way to handle those messages.
+
+Key characteristics of a Generic Server implemented with [GenServer](https://hexdocs.pm/elixir/GenServer.html) include:
+
+1. **State Management**: The [GenServer](https://hexdocs.pm/elixir/GenServer.html) process holds and manages its own internal state. This state can be modified by handling specific messages and updating the state accordingly.
+
+2. **Message Handling**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes receive messages asynchronously and handle them using pattern matching on the message content. The behavior of the server can be defined based on the message received.
+
+3. **Synchronous and Asynchronous Communication**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes can communicate synchronously by sending a message and waiting for a response, or asynchronously by sending a message without expecting an immediate reply.
+
+4. **Supervision and Fault Tolerance**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) processes are often used within supervision trees, allowing them to be monitored and restarted in the event of failures or crashes. This contributes to the fault-tolerant nature of OTP applications.
+
+5. **Callback Functions**: [GenServer](https://hexdocs.pm/elixir/GenServer.html) requires implementing specific callback functions such as [handle_call/3](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3), [handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_cast/2), and [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) to define the behavior of the server for different types of messages.
+
+The Generic Server pattern implemented with [GenServer](https://hexdocs.pm/elixir/GenServer.html) is a fundamental building block in Elixir/OTP applications. It provides a structured approach to building concurrent and fault-tolerant systems by encapsulating state, managing message-based communication, and defining behavior through callback functions.
+
+## Generic Server Life-Cycle
+
+Generic Servers are a generic wrapper around state and message handling. They are given a callback module that defines callback functions for customizing the behavior of the Generic Server.
+
+The callback module contains the specific message handler callbacks and the callback for initializing state.
+
+Here's a diagram showing a broad overview of how GenServer's work with a callback module.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+sequenceDiagram
+Process ->> Generic Server: start_link/0
+Generic Server ->> Callback Module: init/1 
+Callback Module ->> Generic Server: initial state
+loop send/receive loop
+  Generic Server --> Generic Server: receive
+  Process ->> Generic Server: send message (e.g.  call/3)
+  Generic Server ->> Callback Module: handle message (e.g. handle_call/3)
+  Callback Module ->> Generic Server: sends response and new state
+  Generic Server --> Generic Server: updates state
+  Generic Server ->> Process: sends response
+end
+```
+
+## GenServer
+
+### Message Handler Callbacks
+
+The [GenServer](https://hexdocs.pm/elixir/GenServer.html) module defines all of the boilerplate under the hood, and allows us to conveniently provide callback functions
+ including:
+
+* [init/1](https://hexdocs.pm/elixir/GenServer.html#c:init/1) defines the initial state in an `{:ok, state}` tuple.
+* [handle_call/3](https://hexdocs.pm/elixir/GenServer.html#c:handle_call/3) handle a synchronous message meant for a GenServer process.
+* [handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_cast/2) handle an asynchronous message meant for a GenServer process.
+* [handle_info/2](https://hexdocs.pm/elixir/GenServer.html#c:handle_info/2) handle a generic asynchronous message.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Starting A GenServer
+
+We commonly use one of the following functions to start a GenServer process.
+
+* [GenServer.start_link/3](https://hexdocs.pm/elixir/GenServer.html#start_link/3) start a GenServer as a linked process.
+* [GenServer.start/3](https://hexdocs.pm/elixir/GenServer.html#start/3) start a GenServer without linking the process.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Sending A GenServer A Message
+
+We can send the [GenServer](https://hexdocs.pm/elixir/GenServer.html) messages with functions such as:
+
+* [GenServer.call/3](https://hexdocs.pm/elixir/GenServer.html#call/3) send a synchronous message for a GenServer handled by `handle_call/3`.
+* [GenServer.cast/2](https://hexdocs.pm/elixir/GenServer.html#cast/2) send an asynchronous message for a GenServer handled by `handle_cast/2`.
+* [Kernel.send/2](https://hexdocs.pm/elixir/Kernel.html#send/2) send a generic asynchronous message handled by `handle_info/2`
+* [Process.send/3](https://hexdocs.pm/elixir/Process.html#send/3) send a generic asynchronous message with some additional options handled by `handle_info/2`.
+* [Process.send_after/4](https://hexdocs.pm/elixir/Process.html#send_after/4) send a generic asynchronous message handled by `handle_info/2`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Counter Example
+
+Here's a simple `CounterServer` [GenServer](https://hexdocs.pm/elixir/GenServer.html). It stores a count in state, and we can send it a message to increment the count.
+
+* `GenServer.handle_call/3` returns a synchronous response in a `{:reply, response, state}` tuple.
+* `GenServer.handle_cast/2` asynchronously updates the state in a `{:noreply, new_state}` tuple.
+* `GenServer.init/2` initializes the initial state (`0`) in an `{:ok, state}` tuple.
+
+```elixir
+defmodule CounterServer do
+  use GenServer
+
+  @impl true
+  def init(_init_arg) do
+    {:ok, 0}
+  end
+
+  @impl true
+  def handle_cast(:increment, state) do
+    {:noreply, state + 1}
+  end
+
+  @impl true
+  def handle_call(:get_count, _from, state) do
+    # `response` bound for sake of clarity.
+    response = state
+    {:reply, response, state}
+  end
+end
+```
+
+Using the GenServer above, here's an example of sending an asynchronous message with `GenServer.cast/2` and an asynchronous message with `GenServer.call/3`.
+
+```elixir
+{:ok, pid} = GenServer.start_link(CounterServer, [])
+GenServer.cast(pid, :increment)
+GenServer.call(pid, :get_count)
+```
+
+In Livebook, we can use [Kino.Process.render_seq_trace/2](https://hexdocs.pm/kino/Kino.Process.html#render_seq_trace/2) to visualize the **CAST** and **CALL** messages sent to the GenServer.
+
+```elixir
+Kino.Process.render_seq_trace(fn ->
+  {:ok, pid} = GenServer.start_link(CounterServer, [])
+  GenServer.cast(pid, :increment)
+  GenServer.call(pid, :get_count)
+end)
+```
+
+The **INFO: ack** message is an acknowledgement message sent back to the parent process and received under the hood by `GenServer.start_link/3`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Messages With Params
+
+We send messages as a collection (typically a tuple) to add additional data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def handle_cast({:increment_by, increment_by}, state)
+  {:noreply, state + increment_by}
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+In the `CounterServer` above, add a handler for a `:decrement` message.
+
+## Client API
+
+Typically we don't use [GenServer](https://hexdocs.pm/elixir/GenServer.html) functions directly, and instead create a [Client API](https://hexdocs.pm/elixir/GenServer.html#module-client-server-apis). The Client API makes our code more reusable, readable, and easy to change. This is purely for code organization.
+
+Client API functions typically use `__MODULE__` when referencing the current module to make it easier to rename the module in the future.
+
+Callback functions are often referred to as the **Server API**.
+
+```elixir
+defmodule ClientServerExample do
+  use GenServer
+  # Client API
+
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def increment(pid) do
+    GenServer.cast(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+
+  # Server API
+
+  def init(_init_arg) do
+    {:ok, 0}
+  end
+
+  def handle_cast(:increment, state) do
+    {:noreply, state + 1}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    response = state
+    {:reply, response, state}
+  end
+end
+```
+
+Some projects will split the client and the server module when they get large enough. If we split the modules then we can't use `__MODULE__` to refer to the server module from the client module.
+
+```elixir
+defmodule ClientExample do
+  def start_link(_opts) do
+    GenServer.start_link(ServerExample, [])
+  end
+
+  def increment(pid) do
+    GenServer.cast(pid, :increment)
+  end
+
+  def get_count(pid) do
+    GenServer.call(pid, :get_count)
+  end
+end
+
+defmodule ServerExample do
+  use GenServer
+
+  def init(_init_arg) do
+    {:ok, 0}
+  end
+
+  def handle_cast(:increment, state) do
+    {:noreply, state + 1}
+  end
+
+  def handle_call(:get_count, _from, state) do
+    response = state
+    {:reply, response, state}
+  end
+end
+```
+
+## Synchronous Vs Asynchronous
+
+Here are some key characteristics of synchronous messages vs asynchronous messages.
+
+* Synchronous messages:
+
+  * Block the calling process until a response is received.
+  * Offer reliability and predictability.
+  * Provide a straightforward and ordered flow of communication.
+  * Can be slower in terms of performance.
+
+* Asynchronous messages:
+
+  * Do not block the calling process.
+  * Are faster in terms of performance.
+  * May introduce unexpected behavior and timing issues.
+  * Can result in a less predictable flow of communication.
+  * Often referred to as **fire-and-forget** as they do not care about a response.
+
+  Here's an example `SlowCounter` server that takes a second to increment the count. We're going to use it to demonstrate the difference between synchronous and asynchronous code.
+
+```elixir
+defmodule SlowCounter do
+  use GenServer
+
+  def init(_init_arg) do
+    {:ok, 0}
+  end
+
+  def handle_call(:slow_increment, _from, state) do
+    Process.sleep(2000)
+    IO.puts("Finished Synch Increment")
+    {:reply, state + 1, state + 1}
+  end
+
+  def handle_cast(:slow_increment, state) do
+    Process.sleep(2000)
+    IO.puts("Finished Asynch Increment")
+    {:noreply, state + 1}
+  end
+end
+```
+
+Synchronous messages block the caller process. Evaluate the cell below and notice it takes 2 seconds to finish.
+
+```elixir
+{:ok, pid} = GenServer.start_link(SlowCounter, [])
+GenServer.call(pid, :slow_increment)
+IO.puts("Evaluated")
+```
+
+Asynchronous messages do not block the caller process. Evaluate the cell below and you'll notice it evaluates immediately, but prints the "Finished Asynch Increment" message 2 seconds later.
+
+```elixir
+{:ok, pid} = GenServer.start_link(SlowCounter, [])
+GenServer.cast(pid, :slow_increment)
+IO.puts("Evaluated")
+```
+
+### Synchronous Mailbox
+
+Whether synchronous or asynchronous, GenServers handle messages in the order they are received. These messages are stored in a process **mailbox** until they are handled.
+
+The synchronous mailbox improves the predictability of a GenServer. It's a major reason for why Elixir is so powerful and simple when building concurrent systems compared to other languages.
+
+Notice that when we call `cast/2`twice below it takes `4` seconds for the second `cast/2` handler to finish. They are not handled concurrently.
+
+```elixir
+{:ok, pid} = GenServer.start_link(SlowCounter, [])
+GenServer.cast(pid, :slow_increment)
+GenServer.cast(pid, :slow_increment)
+```
+
+## Concurrency
+
+To have concurrent code, we simply need two GenServers. Notice both messages below finish at the same time because each is being processes concurrently.
+
+> If you have fewer CPU cores than processes, concurrent code does not run in **parallel**, so while code gains the benefits of task-switching typically giving the illusion of running in parallel, they will not actually process in parallel at the same time.
+
+```elixir
+{:ok, counter1} = GenServer.start_link(SlowCounter, [])
+{:ok, counter2} = GenServer.start_link(SlowCounter, [])
+
+GenServer.cast(counter1, :slow_increment)
+GenServer.cast(counter2, :slow_increment)
+```
+
+## Regular Messages
+
+You might wonder why we have both `handle_cast/2` and `handle_info/2` if they both handle asynchronous messages. Here are some key characteristics of each.
+
+* `GenServer.handle_cast/2`
+  * Non-blocking message handling.
+  * Typically only used to update GenServer state.
+* `GenServer.handle_info/2`
+  * Non-blocking message handling
+  * Used for a wider variety of messages such as system level behavior, or handling messages that are sent to many different types of processes.
+  * Can receive messages sent after an amount of time with `Process.send_after/4`.
+
+See [HexDocs: Receiving Regular Messages](https://hexdocs.pm/elixir/GenServer.html#module-receiving-regular-messages) for more information.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### GenServers Sending Themselves A Message
+
+A [GenServer](https://hexdocs.pm/elixir/GenServer.html) cannot synchronously send itself a message using `call/3` because the current message blocks the process mailbox.
+
+```elixir
+defmodule SendingSelfExample do
+  use GenServer
+
+  def init(_init_arg) do
+    {:ok, nil}
+  end
+
+  def handle_call(:talking_to_myself, _from, state) do
+    Process.sleep(1000)
+    IO.puts("Talking to myself")
+    GenServer.call(self(), :talking_to_myself)
+    {:reply, "response", state}
+  end
+
+  def handle_cast(:talking_to_myself, state) do
+    Process.sleep(1000)
+    IO.puts("Talking to myself")
+    GenServer.cast(self(), :talking_to_myself)
+    {:noreply, state}
+  end
+end
+```
+
+Run the code below and you'll notice the process crashes with the message `process attempted to call itself`.
+
+```elixir
+{:ok, pid} = GenServer.start(SendingSelfExample, [])
+GenServer.call(pid, :talking_to_myself)
+```
+
+## Debugging
+
+We can use `:sys.get_state/2` to view the state of a GenServer. This should **only** be used for debugging purposes. Generally speaking, do not use `:sys.get_state/2` to expose the state of a GenServer or for testing.
+
+```elixir
+{:ok, pid} = GenServer.start_link(CounterServer, [])
+
+:sys.get_state(pid)
+```
+
+## Named Processes
+
+`GenServer.start_link/3` takes additional options as the third argument. We can provide a `:name` option to name the process. Names are typically atoms or module names (which are just atoms under the hood.)
+
+Named processes are unique, there cannot be two processes with the same name. Named processes are also easy to reference as you can use the name of the process to send them a message.
+
+```elixir
+defmodule NamedCounter do
+  def start_link(_opts) do
+    GenServer.start_link(NamedCounter, [], name: NamedCounter)
+  end
+
+  def init(_init_arg) do
+    {:ok, 0}
+  end
+
+  def handle_cast(:increment, state) do
+    {:noreply, state + 1}
+  end
+end
+```
+
+Run the cell below multiple times.
+
+Starting an already started named process returns `{:error, {:already_started, #PID<0.613.0>}}`.
+
+```elixir
+NamedCounter.start_link([])
+```
+
+Most GenServer related functions accept the named process name instead of a `pid`.
+
+```elixir
+GenServer.cast(NamedCounter, :increment)
+:sys.get_state(NamedCounter)
+```
+
+However some do not. of needed we can use `Process.whereis/1` to find the pid of a named process.
+
+```elixir
+Process.whereis(NamedCounter)
+```
+
+## Configuration
+
+Often we make [GenServer](https://hexdocs.pm/elixir/GenServer.html) modules configurable for different situations.
+
+The `start_link/1` function in a GenServer module typically accepts a list of options. The `init/1` callback also accepts an argument, typically (but not necessarily) used to configure the initial state.
+
+Here's an example. There are many ways to make a GenServer configurable depending on your use case.
+
+```elixir
+defmodule ConfigurableServer do
+  def start_link(opts) do
+    name = Keyword.get(opts, :name)
+    initial_state = Keyword.get(opts, :state, 0)
+
+    GenServer.start_link(__MODULE__, initial_state, name: name)
+  end
+
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+end
+
+ConfigurableServer.start_link(name: :example_name, state: 10)
+```
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [HexDocs: GenServer](https://hexdocs.pm/elixir/GenServer.html#call/3)
+* [ElixirLang: GenServer](https://elixir-lang.org/getting-started/mix-otp/genserver.html)
+* [Exercism: GenServer](https://exercism.org/tracks/elixir/concepts/genserver)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish GenServers reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=GenServers">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/process_mailbox.livemd">Process Mailbox</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/genserver_drills.livemd">GenServer Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

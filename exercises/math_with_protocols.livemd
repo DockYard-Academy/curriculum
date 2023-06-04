@@ -25,37 +25,34 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/protocols.livemd">Protocols</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/consumable_protocol.livemd">Consumable Protocol</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/battle_map.livemd">Battle Map</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Math With Protocols
 
-In this exercise, you're going to create a `Math` protocol that handles adding and subtracting different data types.
-
-Create a `Math` protocol implementation for **integers**, **strings**, and **lists**. You do not need to handle adding or subtracting different data types.
+You're going to create a `Math` module that uses **protocols** to add or subtract **integers**, **strings**, and **lists** with the same `add/2` and `subtract/2` functions.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Math.add(1, 2)
-3
+2 = Math.add(1, 1)
+[1, 2, 3, 4] = Math.add([1, 2], [3, 4])
+"hello there" = Math.add("hello there")
 
-Math.add("Hello, ", "World!")
-"Hello, World!"
+1 = Math.subtract(2, 1)
+[2, 3] = Math.subtract([3, 2, 3], [3])
+"ab" = Math.subtract("babc", "bc")
+```
 
-Math.add([1, 2], [3, 4])
-[1, 2, 3, 4]
+Raise a `ProtocolUndefined` error if an invalid value is provided.
 
-Math.subtract(10, 2)
-8
+<!-- livebook:{"force_markdown":true} -->
 
-Math.subtract("hello there", "hello ")
-"there"
-
-Math.subtract([1, 2, 3, 4], [1, 3])
-[2, 4]
+```elixir
+Math.add(%{}, %{})
+** (Protocol.UndefinedError) protocol Math not implemented for %{} of type Map
 ```
 
 <details style="background-color: burlywood; padding: 1rem; margin: 1rem 0;">
@@ -112,61 +109,31 @@ Define implementations for the `Math` protocol as documented below.
 
 ```elixir
 defprotocol Math do
-  @doc """
-  Add two integers, lists, or strings.
+  @moduledoc """
+  iex> Math.add(1, 1)
+  2
+  iex> Math.add([1, 2], [3, 4])
+  [1, 2, 3, 4]
+  iex> Math.add("hello ", "there")
+  "hello there" 
 
-  ## Examples
+  iex> Math.subtract(2, 1)
+  1
+  iex> Math.subtract([3, 2, 3], [3])
+  [2, 3] 
+  iex> Math.subtract("babc", "bc")
+  "ab"
 
-    iex> Math.add(2, 2)
-    4
-    iex> Math.add(4, 4)
-    8
-
-    Math.add([1, 2], [3, 4])
-    [1, 2, 3, 4]
-    Math.add([1, 2, 3], [4, 5, 6])
-    [1, 2, 3, 4, 5, 6]
-
-    iex> Math.add("abc", "def")
-    "abcdef"
-    iex> Math.add("123", "456")
-    "123456"
-
-    iex> Math.add(%{}, %{})
-    ** (Protocol.UndefinedError) protocol Math not implemented for %{} of type Map
-
-    iex> Math.add({}, {})
-    ** (Protocol.UndefinedError) protocol Math not implemented for {} of type Tuple
+  iex> Math.add({}, {})
+  ** (Protocol.UndefinedError) protocol Math not implemented for {} of type Tuple
   """
+
   def add(value1, value2)
 
-  @doc """
-  Subtract two integers, lists, or strings.
-
-  ## Examples
-    iex> Math.subtract(10, 2)
-    8
-    iex> Math.subtract(20, 2)
-    18
-
-    iex> Math.subtract([1, 2], [1])
-    [2]
-    iex> Math.subtract([1, 2, 3, 4], [1, 3])
-    [2, 4]
-
-    iex> Math.subtract("abcd", "abc")
-    "d"
-    iex> Math.subtract("cbad", "abc")
-    "d"
-    iex> Math.subtract("abc", "xyz")
-    "abc"
-    iex> Math.subtract("abc", "xyza")
-    "bc"
-    iex> Math.subtract(1.0, 2.0)
-    ** (Protocol.UndefinedError) protocol Math not implemented for 1.0 of type Float
-  """
   def subtract(value1, value2)
 end
+
+# Define Implementations...
 ```
 
 ## Commit Your Progress
@@ -203,7 +170,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/protocols.livemd">Protocols</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/consumable_protocol.livemd">Consumable Protocol</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/battle_map.livemd">Battle Map</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

@@ -22,10 +22,10 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/consumable_protocol.livemd">Consumable Protocol</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_with_protocols.livemd">Math With Protocols</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/recursion.livemd">Recursion</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/streams.livemd">Streams</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -39,40 +39,36 @@ Characters in your game fight on a grid of potentially infinite size.
 
 ## Character Attack
 
-You're going to create a `Character.can_attack?/3` function
+You're going to use **protocols** create a `Character.can_attack?/3` function
 that expects the following:
 
-1. A struct
+1. A `Barbarian` or `Wizard` struct.
 2. The player's coordinate `{x, y}`
 3. An enemy's coordinate `{x, y}`
 
 It should then return a boolean.
 
-### Wizard
+Here's the `Character` protocol as well as the `Barbarian` and `Wizard` struct you're going to use.
 
-A <b style="color: purple;">Wizard</b> can attack in straight or diagonal lines of any length.
-
-![](images/wizard_grid.png)
-
-We've created a `Wizard` struct below. It does not need to store any information in the struct.
+**Do not modify this code:**
 
 ```elixir
+defprotocol Character do
+  def can_attack?(character, origin, target)
+end
+
 defmodule Wizard do
   defstruct []
 end
-```
 
-A <b style="color: red;">Barbarian</b> can attack in 2 square radius.
-
-![](images/barbarian_grid.png)
-
-We've created a `Barbarian` struct below. It does not need to store any information in the struct.
-
-```elixir
 defmodule Barbarian do
   defstruct []
 end
 ```
+
+## Barbarian
+
+A <b style="color: red;">Barbarian</b> can attack in 2 square radius.
 
 You should be able to check if a character can attack a coordinate `{x, y}` given their
 starting location in `{x, y}`.
@@ -86,34 +82,10 @@ true
 
 ![](images/barbarian_attack.png)
 
-<!-- livebook:{"break_markdown":true} -->
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Character.can_attack?(%Wizard{}, {4, 4}, {6, 6})
-true
-```
-
-![](images/wizard_attack.png)
-
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```elixir
-defprotocol Character do
-  def can_attack?(character, origin, target)
-end
-
-defimpl Character, for: Wizard do
-  def can_attack?(_character, {init_x, init_y}, {x, y}) do
-    x_diff = init_x - x
-    y_diff = init_y - y
-
-    init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
-  end
-end
-
 defimpl Character, for: Barbarian do
   def can_attack?(_character, {init_x, init_y}, {x, y}) do
     x_diff = init_x - x
@@ -126,29 +98,13 @@ end
 
 </details>
 
-Create implementations for the `Character` protocol as documented below. We've provided a full suite of tests for you.
-
 ```elixir
-defprotocol Character do
-  @doc """
+# Implementation Goes Here:
 
-  Determine if a character type can attack based on it's
-  current position and target position on a grid.
-
-  ## Examples
-
-    iex> Character.can_attack?(%Barbarian{}, {4, 4}, {6, 6})
-    true
-
-    iex> Character.can_attack?(%Wizard{}, {4, 4}, {7, 7})
-    true
-  """
-  def can_attack?(character, origin, target)
-end
-
+# You May Use The Following Test Suite To Validate Your Solution.
 ExUnit.start(auto_run: false)
 
-defmodule CharacterTests do
+defmodule BarbarianTests do
   use ExUnit.Case
 
   describe "Barbarian" do
@@ -169,6 +125,50 @@ defmodule CharacterTests do
       refute Character.can_attack?(%Barbarian{}, {3, 3}, {6, 6})
     end
   end
+end
+
+ExUnit.run()
+```
+
+## Wizard
+
+A <b style="color: purple;">Wizard</b> can attack in straight or diagonal lines of any length.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Character.can_attack?(%Wizard{}, {4, 4}, {6, 6})
+true
+```
+
+![](images/wizard_attack.png)
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+defimpl Character, for: Wizard do
+  def can_attack?(_character, {init_x, init_y}, {x, y}) do
+    x_diff = init_x - x
+    y_diff = init_y - y
+
+    init_x == x || init_y == y || abs(x_diff) == abs(y_diff)
+  end
+end
+```
+
+</details>
+
+Create a `Wizard` implementation for the `Character` protocol.
+
+```elixir
+# Implementation Goes Here:
+
+# You May Use The Following Test Suite To Validate Your Solution.
+ExUnit.start(auto_run: false)
+
+defmodule WizardTests do
+  use ExUnit.Case
 
   describe "Wizard" do
     test "can attack in eight directions" do
@@ -248,10 +248,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/consumable_protocol.livemd">Consumable Protocol</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/math_with_protocols.livemd">Math With Protocols</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/recursion.livemd">Recursion</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/streams.livemd">Streams</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

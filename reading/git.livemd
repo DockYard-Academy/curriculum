@@ -34,23 +34,13 @@ Mix.install([
 
 ### Version Control
 
-Version control is the management of changes to files, typically source code, configuration files and documentation, over time. The purpose of source control is to keep track of the changes made to the files, who made the changes, when the changes were made, and why the changes were made. This allows for easy collaboration, rollback of changes, and the ability to easily manage and maintain different versions of the codebase.
+Version control is a system that helps you track changes to your files over time. It allows you to save different versions of your work and collaborate with others efficiently. With version control, you can easily compare, revert, and merge changes, ensuring that you have a history of all modifications made to your project and enabling effective collaboration and backup of your code.
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Git
 
-Git is a distributed version control system (VCS) used for tracking changes in source code during software development. It allows multiple developers to work on the same codebase simultaneously, and keeps track of the changes made by each developer.
-
-Git provides a number of features that make it a popular VCS, such as being able to roll back changes, view the history of the codebase, and merge different versions of the code together. It also allows for easy collaboration and sharing of code between developers.
-
-It's widely used for open-source and closed-source projects, and it's the default VCS for many platforms such as GitHub, GitLab, and Bitbucket.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Local And Remote
-
-With Git, developers can work on their own copies of the code, known as "local repositories", and then "commit" their changes to a "remote repository" which can be shared among the team members. It also allows for easy branching, which allows developers to work on new features or bug fixes without affecting the main codebase.
+Git is a widely used version control system that helps you keep track of changes made to your files.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -67,6 +57,8 @@ GitHub provides several key features for developers, including:
 * **Branching**: Developers can create and work on multiple branches of a repository, allowing them to work on different features or bug fixes without affecting the main codebase.
 * **Wiki**: Developers can create a wiki for their repository to provide documentation and other information about the codebase.
 
+With Git and GitHub, developers store a **local** version of their changes with git, and push those changes to a **remote** version on GitHub.
+
 ## Install Git
 
 Git is a locally installed program on your computer. Git comes pre-installed on macOS and Linux operating systems. If you use Windows, you'll have to [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
@@ -78,18 +70,11 @@ $ git --version
 git version 2.25.1
 ```
 
-You can use Github Desktop, the command line, or a source control extension in your code editor for interacting with Git.
+For sake of consistency with reading material and instruction in this course, we recommend using the command line for Git instead of a program such as GitHub Desktop.
 
-However, we generally provide instructions in this course using the command line and the code editor.
+## Your Turn: Create A GitHub Account
 
-## Create A GitHub Account
-
-You'll use [GitHub](https://github.com/) to store the source code for your git managed projects.
-You'll also use GitHub to collaborate on projects with others students, and receive feedback from your instructor.
-
-Since you already have this course running, you likely already have a GitHub Account. If not, you can [Create a GitHub Account](https://docs.github.com/en/get-started/signing-up-for-github/signing-up-for-a-new-github-account). Remember that your GitHub is your public face in the code community. You'll want to ensure you represent yourself well, as it may be seen by future employers and co-workers.
-
-Out of the box, GitHub may ask you to enter your user credentials when running common commands. This can become tedious, and if you experience this, we recommend you [Setup SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) or use an alternative method to avoid tediously re-entering your credentials.
+[Create a GitHub Account](https://docs.github.com/en/get-started/signing-up-for-github/signing-up-for-a-new-github-account) if you have not already. You may also wish to setup [Setup SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) or some alternative authorization method so that you do not have to enter your credentials every time you interact with GitHub.
 
 ## Raising An Issue
 
@@ -136,7 +121,7 @@ No commits yet
 nothing to commit (create/copy files and use "git add" to track)
 ```
 
-## Saving Changes
+## Staging And Committing Changes
 
 Git allows you to save your changes in a commit. Changes go from **untracked** to **staged** to **committed**.
 
@@ -151,129 +136,25 @@ You'll use some common commands for saving changes in Git.
 * `git add`: Stage current changes.
 * `git commit`: Save staged changes into a commit.
 
-We can use `git add` from the command line to stage changes. We can stage a single file
-with `git add <filename>` or all of the files and folders in the current working directory
-with `git add .`.
+Putting that all together looks like this if run from the project folder. The `git status` commands are optional.
 
-Then we can use `git commit` from the command line to commit all staged changes.
+```
+$ git status
+$ git add .
+$ git status
+$ git commit -m "example commit message"
+$ git status
+```
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### Your Turn
+
+You're going to stage and commit some changes in the `github_example` project.
 
 In the `github_example` create an empty file named `finished.txt`.
 
-Use `git status` to see that the file is untracked.
-
-```sh
-$ git status
-On branch master
-
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        finished.txt
-
-nothing added to commit but untracked files present (use "git add" to track)
-```
-
-Now, stage `finished.txt` to prepare it to be committed.
-
-```sh
-$ git add finished.txt
-```
-
-Use `git status` again and see the file is staged.
-
-```sh
-$ git status
-On branch master
-
-No commits yet
-
-Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
-        new file:   finished.txt
-```
-
-Now we'll use `git commit` to commit the staged changes. We use the `-m` flag and provide
-a message in quotations. `"example commit message"` can be any description you want.
-
-```sh
-$ git commit -m "example commit message"
-```
-
-## Pushing Changes
-
-You've so far used Git locally. Now to share code and collaborate with other developers, we
-push code to a remote Git repository on **GitHub**.
-
-```mermaid
-flowchart LR
-  Local --git push--> Remote
-```
-
-We use `git push` to push changes to the remote repository.
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-Run `git push` now, and you'll notice the following error:
-
-```sh
-$ git push
-fatal: No configured push destination.
-Either specify the URL from the command line or configure a remote repository using
-
-    git remote add <name> <url>
-
-and then push using the remote name
-
-    git push <name>
-```
-
-We need to tell our local git repository where the remote git repository is.
-First, let's create one on [GitHub](https://github.com/).
-
-![](images/github_create_repo.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Provide a **Repository name** and an optional description. You can choose for this project
-to be **public** or **private**.
-
-Do not initialize the project with any of the optional files. Click **New repository** to create
-the remote repository.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/github_create_repo_form.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Now the remote repository is created, we need to tell our local Git repository how to find it. Follow
-the instructions for **push an existing repository from the command line**.
-
-* `git remote add origin <github_url>` Tell your local Git project where to find the remote Git repository.
-* `git branch -M main` Rename the default branch to main.
-* `git push -u origin main` Push local commits to the remote repository. This command sets the default remote repository, so only `git push` is necessary for future commits.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/setup%20git%20remote.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-You are done! You can now add, commit, and push any further changes.
-This will be your typical developer process with Git.
-
-```sh
-$ git add .
-$ git commit -m "add example changes"
-$ git push
-```
+Use `git add`, and `git commit` to stage and commit the file. Make sure to check the status between each step with `git status` to see how staged and unstaged files are displayed in the terminal.
 
 ## Cloning Repositories
 
@@ -326,7 +207,7 @@ Username for 'https://github.com':
 Password for 'https://a@github.com':
 ```
 
-It's pretty tedious for projects that you use regularly.
+HTTP is tedious for projects that you use regularly unless you setup your machine to remember your git credentials for you.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -377,14 +258,154 @@ To clone a project under a new name provide a new name to the `git clone` comman
 $ git clone <url> github_example2
 ```
 
-## Trunk Based Development
+## Branches
+
+By default, all Git changes happen on the `main` branch. We can create other **local** or **remote** branches for grouping changes together. Typically, we'll create a feature branch to group related changes together.
+
+`git checkout -b` creates a new branch.
+
+```
+$ git checkout -b example-feature-branch-name
+```
+
+It can also switch from the current branch to another existing branch.
+
+```
+$ git checkout main
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+```mermaid
+---
+title: Git
+---
+gitGraph
+   commit
+   commit
+   branch feature-branch
+   checkout feature-branch
+   commit
+   commit
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Merging Local Changes
+
+We can merge changes from one local branch to another with `git merge`.
+
+```mermaid
+---
+title: Git
+---
+gitGraph
+   commit
+   commit
+   branch feature-branch
+   checkout feature-branch
+   commit
+   commit
+   checkout main
+   merge feature-branch
+   commit
+   commit
+```
+
+We have to checkout into the branch we want to merge changes into. Here's an example flow:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ git checkout -b feature-branch
+# Stage And Commit Changes
+$ git checkout main
+$ git merge feature-branch
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Pushing And Pulling Changes
+
+We can push changes from a local branch to a remote branch, and pull changes from a remote branch to a local branch using `git pull` and `git push`.
+
+```
+$ git pull
+$ git push
+```
+
+The first time we push a change, we need to connect the local and remote branch using `--set-upstream`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ git push --set-upstream origin <branchname>
+# Or -u For Shorthant.
+$ git push -u origin <branchname>
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Merging Remote Changes (Making A Pull Request)
+
+To merge remote branches, we use [create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) on GitHub accept the pull request to merge one remote branch with another. Note, this does not update local branches. These changes need to be pulled to the corresponding local branch.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+$ git checkout -b feature-branch
+# Stage And Commit Changes
+$ git push -u origin feature-branch
+# Make Pull Request On GitHub
+# Make Merge Pull Request Into Main On GitHub
+$ git checkout main
+$ git pull
+```
+
+Here's a diagram of the complete flow.
+
+```mermaid
+sequenceDiagram
+participant LM as Local Main
+participant LF as Local Feature
+participant RF as Remote Feature
+participant RM as Remote Main
+
+Note right of LM: git checkout -b feature-branch
+LM --> LF: checkout
+Note left of LF: git add .
+Note left of LF: git commit -m "message"
+LF --> LF: commit changes
+Note left of RF: git push -u origin feature-branch
+LF ->> RF: push changes
+Note right of RF: Make PR on GitHub
+RF --> RF: create pull request
+Note left of RM: Accept PR on GitHub
+RF ->> RM: merge pull request
+Note left of RM: git checkout main
+Note left of RM: git pull
+RM ->> LM: pull changes
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Create a `feature-branch` in your `github_example` project.
+
+1. **local**: stage, commit, and merge some local changes to `main`.
+2. **remote**: stage, commit, and push some changes to a remote branch. Make a pull request and merge it into the remove `main` branch. Once merged, pull the changes to your local `main` branch.
+
+## Branching Strategies
+
+### Trunk-Based Development
+
+<!-- livebook:{"break_markdown":true} -->
 
 Source control allows us to store different versions of the project. Typically there is a main branch for the latest version of the project.
 
 The most straightforward source control strategy only uses a main branch. Developers can push and pull from the main branch to get
 the latest changes.
-
-<!-- livebook:{"break_markdown":true} -->
 
 ```mermaid
 sequenceDiagram
@@ -397,82 +418,13 @@ sequenceDiagram
     R->> D1: pulls changes
 ```
 
-<!-- livebook:{"break_markdown":true} -->
-
-It's convenient and fast. However, it lacks any review system for code changes. Therefore it's potentially
-excellent for small projects with highly trusted team members, but less effective for large projects requiring
-code review.
-
-## Pulling Changes
-
-The GitHub remote repository can get out of sync with a user's local repository. We have to
-manually pull changes from the remote repository onto our local repository.
-
-GitHub Desktop allows you to pull changes through the UI.
-
-![](images/github_desktop_pull.png)
-
-Alternatively, you can use the command line with `git pull` from the project folder.
-
-```sh
-$ git pull
-```
+It's convenient and fast. However, it lacks any review system for code changes. Therefore it's potentially excellent for small projects with highly trusted team members, but can be less effective for large projects requiring code review or multiple stages of testing.
 
 <!-- livebook:{"break_markdown":true} -->
 
-### Your Turn
+### Dev -> -> QA -> Staging -> Prod Pipelines
 
-We're going to simulate pulling changes on your `github_example` project.
-
-Create a new file called `pull.txt` in your `github_example2` project.
-**Not** your `github_example` project.
-
-Stage, commit and push the `pull.txt` file from `github_example2`.
-
-```sh
-$ git add pull.txt
-$ git commit -m "add pull.txt"
-$ git push
-```
-
-Now pull the change from your `github_example` project.
-
-```sh
-$ git pull
-```
-
-You should see `pull.txt` is now part of the `github_example` project.
-
-## Branching Strategies
-
-You can use branching strategies for your Git workflow as an alternative to trunk-based development.
-
-You create a branch for a feature from the main branch and then make a pull request which is
-reviewed and merged back into the main branch.
-
-These strategies vary in complexity. For example, you could simply make a pull request for a feature and then
-merge those changes directly into the main branch.
-
-<!-- livebook:{"break_markdown":true} -->
-
-```mermaid
-sequenceDiagram
-    actor D1 as Developer 1
-    participant B as Feature Branch
-    participant M as Main
-    actor D2 as Developer 2
-    D1 ->> D1: creates local branch
-    D1 ->> D1: commits changes on local branch
-    D1 ->> B: pushes new branch
-    B ->> M: create pull request to "main"
-    M ->> M: accept pull request
-    M ->> D2: pull changes
-    M ->> D1: pull changes
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Alternatively, many Git branching strategies have a pipeline for changes to be reviewed and tested.
+Some companies will have many stages of review for changes.
 
 There is no universal strategy. Each project may have a different pipeline.
 However, some common steps include:
@@ -484,84 +436,26 @@ However, some common steps include:
 * **Main**: The latest available version of the project.
 
 ```mermaid
-flowchart LR
-  F[Feature Branch]
-  D[Development]
-  Q[QA]
-  S[Staging]
-  M[Main]
-  F --> D --> Q --> S --> M
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-We will create a new branch on your `github_example` project.
-
-On the command line run:
-
-```sh
-$ git checkout -b <branchname>
-```
-
-Where `<branchname>` is the name of the branch with no spaces.
-Each branch must have a name with no spaces. For example, you could create a branch called `my-branch`.
-
-```sh
-$ git checkout -b my-branch
-```
-
-`git checkout` allows you to set the current branch. `git checkout -b` creates a new branch and sets it as the current branch.
-Any commits we make are saved on the current branch.
-
-Next, create, stage and commit a new file `branch.txt`.
-
-```sh
-$ git add branch.txt
-$ git commit -m "add branch.txt"
-```
-
-You'll need to create a remote `my-branch` and push the changes. You can visit the link provided
-to create a PR.
-
-```sh
-$ git push -u origin my-branch
-...
-remote: Create a pull request for 'my-branch' on GitHub by visiting:
-remote:      https://github.com/BrooklinJazz/github_example/pull/new/my-branch
-...
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Now you can optionally provide a description of the PR and click the **Create pull request** button.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/create_pr_github.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-You can review a pull request's changes under the **Files changed** tab.
-
-Click the **Merge pull request** button to merge the changed files into main.
-
-<!-- livebook:{"break_markdown":true} -->
-
-![](images/merge_pull_request.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-Now the `main` branch of the remote repository has the changes from the pull request, however
-your local `main` branch needs to be updated.
-
-Use `git pull` while on the `main` branch of your local `github_example` project. You
-may need to use `git checkout main` if you are not already on the `main` branch.
-
-```sh
-$ git checkout main
-$ git pull
+---
+title: Git Pipeline
+---
+gitGraph
+  commit
+  branch development
+  commit
+  branch feature-branch
+  checkout feature-branch
+  commit
+  commit
+  commit
+  branch qa
+  commit
+  branch staging
+  commit
+  branch production
+  commit
+  checkout main
+  merge production
 ```
 
 ## Merge Conflicts
@@ -575,37 +469,6 @@ or with Visual Studio Code.
 <!-- livebook:{"break_markdown":true} -->
 
 ![](images/resolve_conflicts_vsc.png)
-
-<!-- livebook:{"break_markdown":true} -->
-
-### Your Turn
-
-You're going to create a merge conflict.
-
-On your `github_example` and `github_example2` projects, edit the `finished.txt` file.
-
-Both should have conflicting content. i.e.
-
-```sh
-github_example version of finished.txt
-```
-
-and for `github_example2`:
-
-```sh
-conflicting github_example2 version of finished.txt
-```
-
-Stage and commit both versions of the project. By having two versions, you are simulating two
-developers working on the same project.
-
-Push `github_example` and attempt to pull from `github_example2`.
-
-You should see that there are merge conflicts.
-
-Use Visual Studio Code to resolve the conflicts by accepting both changes.
-
-Stage, commit, and push your resolved changes.
 
 ## Further Reading
 

@@ -22,29 +22,34 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/score_tracker.livemd">Score Tracker</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/stack_server.livemd">Stack Server</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/supervisors.livemd">Supervisors</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/testing_genservers.livemd">Testing GenServers</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Timer
 
-You're going to create a `Timer` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which when spawned, will send itself a message every second to increment an internal count.
+You're going to create a `Timer` GenServer.
 
-You should be able to retrieve the number of seconds that have passed since the `Timer` was spawned using a `Timer.seconds/1` function.
+### Requirements
+
+* The initial timer state starts as an integer `0` number of seconds.
+* After spawning, the `Timer` should send itself a message every second to increment the timer.
+* Create the `start_link/1` and `get_time/1` client API functions to start the timer and retrieve the current time.
+* Define any necessary server callbacks.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 {:ok, pid} = Timer.start_link([])
-Timer.seconds(pid)
+Timer.get_time(pid)
 0
-Process.sleep(1000)
+Process.sleep(1500)
 Timer.seconds(pid)
-2
+1
 ```
 
 Keep in mind, we cannot guarantee perfect timing when sending messages on an interval, and that is not the purpose of this exercise.
@@ -60,8 +65,8 @@ defmodule Timer do
     GenServer.start_link(__MODULE__, [])
   end
 
-  def seconds(timer_pid) do
-    GenServer.call(timer_pid, :seconds)
+  def get_time(timer_pid) do
+    GenServer.call(timer_pid, :get_time)
   end
 
   @impl true
@@ -77,7 +82,7 @@ defmodule Timer do
   end
 
   @impl true
-  def handle_call(:seconds, _from, state) do
+  def handle_call(:get_time, _from, state) do
     {:reply, state, state}
   end
 
@@ -89,100 +94,24 @@ end
 
 </details>
 
-Implement the `Timer` module as documented below. You will also have to implement the necessary [GenServer](https://hexdocs.pm/elixir/GenServer.html) callback functions such as [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1), [GenServer.handle_info/2](https://hexdocs.pm/elixir/GenServer.html#handle_info/2), and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
+Implement the `Timer` module as documented below.
 
 ```elixir
- defmodule Timer do
-   @moduledoc """
-   Documentation for `Timer`
-   """
-   use GenServer
-
-   @doc """
-   Start the `Timer` process.
-
-   ## Examples
-
-       iex> {:ok, pid} = Timer.start_link([])
-   """
-   def start_link(_opts) do
-   end
-
-   @doc """
-   Get the number of seconds that have elapsed since the `Timer` was started.
-
-   ## Examples
-
-     iex> {:ok, pid} = Timer.start_link([])
-     iex> Timer.seconds(pid)
-     0
-     iex> Process.sleep(1200)
-     iex> Timer.seconds(pid)
-     1
-   """
-   def seconds(timer_pid) do
-   end
- end
-```
-
-## Bonus :timer
-
-Re-implement your `Timer` module using the erlang [:timer](https://www.erlang.org/doc/man/timer.html) library. If already wrote your solution using the [:timer](https://www.erlang.org/doc/man/timer.html) library, then re-implement it using [Process.send_after/4](https://hexdocs.pm/elixir/Process.html#send_after/4).
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
-
-```elixir
-defmodule AlternateTimer do
-  use GenServer
-
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [])
-  end
-
-  def seconds(timer_pid) do
-    GenServer.call(timer_pid, :seconds)
-  end
-
-  @impl true
-  def init(_opts) do
-    :timer.send_interval(1000, self(), :increment)
-    {:ok, 0}
-  end
-
-  @impl true
-  def handle_call(:seconds, _from, state) do
-    {:reply, state, state}
-  end
-
-  @impl true
-  def handle_info(:increment, state) do
-    {:noreply, state + 1}
-  end
-end
-```
-
-</details>
-
-```elixir
-defmodule AlternateTimer do
+defmodule Timer do
   @moduledoc """
-  Documentation for `Timer`
+  iex> {:ok, pid} = Timer.start_link([])
+  iex> Timer.seconds(pid)
+  0
+  iex> Process.sleep(1200)
+  iex> Timer.seconds(pid)
+  1
   """
   use GenServer
 
-  @doc """
-  Start the `Timer` process.
-  """
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [])
   end
 
-  @doc """
-  Get the number of seconds that have elapsed since the `Timer` was started.
-  """
-  def seconds(timer_pid) do
-    GenServer.call(timer_pid, :seconds)
+  def get_time(timer_pid) do
   end
 end
 ```
@@ -218,10 +147,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/score_tracker.livemd">Score Tracker</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/stack_server.livemd">Stack Server</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/supervisors.livemd">Supervisors</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/testing_genservers.livemd">Testing GenServers</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

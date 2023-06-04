@@ -63,7 +63,11 @@ defmodule UtilsTest do
       %{content: content} = Notebooks.load!(notebook)
 
       assert content == LivebookFormatter.reformat(content),
-             "run mix all_tasks to resolve this issue."
+             """
+             #{notebook.relative_path} is not formatted.
+             Run mix all_tasks to resolve the issue.
+             Alternatively, sometimes code blocks and other markdown syntax immediately after bullet points can cause issues.
+             """
     end)
   end
 
@@ -97,6 +101,18 @@ defmodule UtilsTest do
       navigation_sections = Regex.scan(~r/\n## Navigation\n/, content)
 
       assert length(navigation_sections) == 2, "missing navigation in #{notebook.relative_path}"
+    end)
+  end
+
+  test "Documentation links should not contain references to version numbers" do
+    regex = ~r/\/\d\.\d\d\//
+
+    Notebooks.all_notebooks()
+    |> Enum.each(fn notebook ->
+      notebook = Notebooks.load!(notebook)
+
+      refute Regex.match?(regex, notebook.content),
+             "found version number #{Regex.run(regex, notebook.content)} in #{notebook.relative_path}"
     end)
   end
 

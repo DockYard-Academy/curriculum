@@ -1,0 +1,324 @@
+# Documentation And Static Analysis
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Documentation And Static Analysis">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_wordle.livemd">Games: Wordle</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/typespec_drills.livemd">Typespec Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Review Questions
+
+* How do we write documentation and doctests?
+* What is the purpose of dialyzer and typespecs?
+* What is the purpose of Credo?
+* How do we use dialyzer with typespecs to check for typespec issues?
+
+## Documentation And Static Analysis
+
+In this lesson, we'll cover the following tools for documentation and static analysis:
+
+* **Documentation and DocTests**: Elixir provides built-in support for documenting code and writing tests within the documentation itself.
+* **ExDoc**: Generates documentation for Elixir projects, making code easier to understand and use.
+* **Credo**: Checks Elixir code for issues, promotes coding standards, and catches common mistakes.
+* **Dialyzer**: Performs static analysis on Elixir code, identifies potential errors, and improves code reliability.
+* **Typespecs**: Annotations that specify types in Elixir code, enhancing readability and enabling better error checking with tools like Dialyzer.
+
+By leveraging these tools and practices, we can enhance the quality, reliability, and maintainability of our Elixir codebases while promoting collaboration and facilitating code understanding for ourselves and other developers working on the project.
+
+These static analysis tools are generally powered by the [Elixir Language Server](https://github.com/elixir-lsp/elixir-ls).
+
+## Documentation
+
+Elixir provides special module attributes for documenting modules and functions.
+
+* `@moduledoc` document the entire module.
+* `@doc` document the next function.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defmodule Hello do
+  @moduledoc """
+  Documentation for `Hello`
+  """
+
+  @doc """
+  An example function for demonstrating documentation.
+
+  prints "Hello, world!"
+
+  ## Examples
+
+      Hello.world()
+      "Hello, world!"
+  """
+  def world do
+    "Hello, world!"
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### DocTests
+
+lines starting with `iex>` will be interpreted as a documentation test.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@doc """
+    iex> 1 + 1
+    2
+"""
+```
+
+The [doctest/2](https://hexdocs.pm/ex_unit/ExUnit.DocTest.html#doctest/2) macro runs doctests for a module.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+doctest Example.Module
+```
+
+Doctests are automatically run inside of a Livebook. Here's an example of passing and failing tests.
+
+```elixir
+defmodule DocTestExample do
+  @doc """
+  adds two numbers together
+
+  ## Examples
+
+      iex> DocTestExample.add(1, 1)
+      2
+
+      iex> DocTestExample.add(1, 2)
+      3
+  """
+  def add(int, int) do
+    2
+  end
+end
+```
+
+## ExDoc
+
+[ExDoc](https://github.com/elixir-lang/ex_doc) generates project documentation.
+
+We can add the following dependency to a mix project to include `ExDoc`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+  defp deps do
+    [
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false}
+    ]
+  end
+```
+
+Install dependencies.
+
+```
+$ mix deps.get
+```
+
+Then generate documentation for the project.
+
+```
+$ mix docs
+```
+
+This creates a `docs/` folder. Inside the docs folder is an `index.html` file.
+`HTML` stands for hyper-text-markup-language. It's the code used to structure a web page and its content.
+
+You can open the `docs/index.html` file in your browser to view the project documentation.
+
+## Typespecs
+
+### `@spec`
+
+We can specify the input and output types of a function using `@spec`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@spec add(integer, integer) :: integer()
+def add(int, int) do
+  int + int
+end
+```
+
+`integer` is a built in type. Here's are several common built-in types you should be aware of.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+any()
+atom()
+map()
+tuple()
+list()
+list(type) or [type] # a list where the elements are particular type
+float()
+integer()
+number() # both integers and floats
+String.t() # the string type
+```
+
+See [Basic Types](https://hexdocs.pm/elixir/typespecs.html#basic-types) for a full list of built-in types.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### `@type`
+
+We can define custom types with `@type`. For example, we can use `|` in combination with other types to combine types.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@type color :: :red | :orange | :yellow | :green | :blue | :purple 
+```
+
+## Dialyzer
+
+Dialyzer is a static analysis tool used to provide warnings about your code, such as mismatched types,
+unreachable code, and other common issues.
+
+To use Dialyzer, we install [Dialyxir](https://github.com/jeremyjh/dialyxir), which provides conveniences for working with Dialyzer in an Elixir project.
+
+We can add `:dialyxir` as a dependency in the `mix.exs` file in any mix project.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ defp deps do
+    [
+      {:dialyxir, "~> 1.3", only: :dev, runtime: false}
+    ]
+  end
+```
+
+Make sure to install dependencies.
+
+```
+$ mix deps.get
+```
+
+We can then run Dialyzer by running the following in the command line.
+
+```
+$ mix dialyzer
+...
+Total errors: 0, Skipped: 0, Unnecessary Skips: 0
+done in 0m0.82s
+```
+
+If using Visual Studio Code, Dialyzer will also provide inline warnings if there are type issues.
+
+## Credo
+
+Credo is another static analysis tool which focuses on teaching and code consistency.
+It scans a project's code for anti-patterns and provides suggestions to improve it's quality and readability.
+
+We can install Credo a math project by adding it to your dependencies in `mix.exs` with the [latest Credo version](https://hex.pm/packages/credo).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp deps do
+  [
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+  ]
+end
+```
+
+Ensure you install the new dependency.
+
+```
+$ mix deps.get
+```
+
+Then run the following command to see credo warnings.
+
+```
+$ mix credo
+...
+Analysis took 0.01 seconds (0.01s to load, 0.00s running 52 checks on 3 files)
+3 mods/funs, found no issues.
+```
+
+Credo provides code suggestions that help you write idiomatic Elixir. For example, Credo will warn you if you leave an [IO.inspect/2](https://hexdocs.pm/elixir/IO.html#inspect/2) in your project.
+
+## Further Reading
+
+Consider the following resource(s) to deepen your understanding of the topic.
+
+* [ElixirSchools: Documentation](https://elixirschool.com/en/lessons/basics/documentation)
+* [elixir-lang: doctests](https://elixir-lang.org/getting-started/mix-otp/docs-tests-and-with.html#doctests)
+* [HexDocs: Credo](https://hexdocs.pm/credo/overview.html)
+* [elixir-lang: typespecs](https://elixir-lang.org/getting-started/typespecs-and-behaviours.html)
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Documentation And Static Analysis reading"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Documentation And Static Analysis">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_wordle.livemd">Games: Wordle</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/typespec_drills.livemd">Typespec Drills</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

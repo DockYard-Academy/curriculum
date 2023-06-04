@@ -22,7 +22,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/rps_pattern_matching.livemd">Rock Paper Scissors Pattern Matching</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/drill-patternmatching-replace-nils.livemd">Replacing Nils</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/guards.livemd">Guards</a>
@@ -34,80 +34,55 @@ Mix.install([
 
 You're going to build an app to convert metric measurements such as **millimeters**, **centimeters**, **meters**, and **kilometers** according to the following table.
 
-<!-- livebook:{"attrs":{"source":"[\n  [unit: :millimeter, value: 1, meter: 0.001],\n  [unit: :centimeter, value: 1, meter: 0.01],\n  [unit: :meter, value: 1, meter: 1],\n  [unit: :kilometer, value: 1, meter: 1000],\n] |> Kino.DataTable.new()","title":"Metric Conversion Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
-
-```elixir
-[
-  [unit: :millimeter, value: 1, meter: 0.001],
-  [unit: :centimeter, value: 1, meter: 0.01],
-  [unit: :meter, value: 1, meter: 1],
-  [unit: :kilometer, value: 1, meter: 1000]
-]
-|> Kino.DataTable.new()
-```
+| unit       | value | meters |
+| ---------- | ----- | ------ |
+| millimeter | 1.0   | 0.001  |
+| centimeter | 1.0   | 0.01   |
+| meter      | 1.0   | 1.0    |
+| kilometer  | 1.0   | 1000.0 |
 
 Users provide values using `{from_unit, value}` tuples, and the desired unit to convert to.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-Metric.convert({:centimeter, 100}, :meter)
+Metric.convert({:centimeter, 100.0}, :meter)
 1.0
 ```
 
-The unit to convert from, and the unit to convert to can be either `:millimeter`, `:centimeter`, `:meter`, or `:kilometer`. The output should always be a **float**.
+Units can be `:millimeter`, `:centimeter`, `:meter`, or `:kilometer`. Values are always floats.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
 
 ```elixir
 defmodule Metric do
-  @moduledoc """
-  Documentation for `Metric`
-  """
+  def convert(from, to) do
+    meters = to_meter(from)
 
-  @doc """
-  Convert one measurement to another.
-  We've used math values in the result
+    case to do
+      :millimeter -> meters / 0.001
+      :centimeter -> meters / 0.01
+      :meter -> meters / 1.0
+      :kilometer -> meters / 1000.0
+    end
+  end
 
-  ## Examples
+  defp to_meter({unit, value}) do
+    case unit do
+      :millimeter -> value * 0.001
+      :centimeter -> value * 0.01
+      :meter -> value * 1.0
+      :kilometer -> value * 1000.0
+    end
+  end
+end
+```
 
-    Convert unit to meters.
+</details>
 
-    iex> Metric.convert({:millimeter, 1}, :meter)
-    0.001
-
-    iex> Metric.convert({:centimeter, 1}, :meter)
-    0.01
-
-    iex> Metric.convert({:meter, 1}, :meter)
-    1.0
-
-    iex> Metric.convert({:kilometer, 1}, :meter)
-    1000
-
-    Convert meters to unit.
-
-    iex> Metric.convert({:meter, 1}, :millimeter)
-    1000.0
-
-    iex> Metric.convert({:meter, 1}, :centimeter)
-    100.0
-
-    iex> Metric.convert({:meter, 1}, :meter)
-    1.0
-
-    iex> Metric.convert({:meter, 1}, :kilometer)
-    0.001
-
-    Convert unit to unit.
-
-    iex> Metric.convert({:centimeter, 1000}, :kilometer)
-    0.01
-
-    iex> Metric.convert({:millimeter, 10}, :centimeter)
-    1.0
-
-    iex> Metric.convert({:kilometer, 10}, :centimeter)
-    1000000
-  """
+```elixir
+defmodule Metric do
   def convert(from, to) do
   end
 end
@@ -144,7 +119,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/rps_pattern_matching.livemd">Rock Paper Scissors Pattern Matching</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/drill-patternmatching-replace-nils.livemd">Replacing Nils</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/guards.livemd">Guards</a>

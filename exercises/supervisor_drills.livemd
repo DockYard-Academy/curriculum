@@ -1,0 +1,275 @@
+# Supervisor Drills
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Supervisor Drills">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/supervisors.livemd">Supervisors</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/supervised_stack.livemd">Supervised Stack</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Drills
+
+Drills help you develop familiarity and muscle memory with syntax through repeated exercises. Unlike usual problems, Drills are not intended to develop problem solving skills, they are purely for developing comfort and speed.
+
+This set of drills is for [Supervisor](https://hexdocs.pm/elixir/Supervisor.html)s.
+
+> A supervisor is a process which supervises other processes, which we refer to as child processes. Supervisors are used to build a hierarchical process structure called a supervision tree. Supervision trees provide fault-tolerance and encapsulate how our applications start and shutdown.
+> 
+> * [HexDocs: Supervisor](https://hexdocs.pm/elixir/Supervisor.html)
+
+## Supervisor
+
+We've created a `Worker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) for you to use with the following [Supervisor](https://hexdocs.pm/elixir/Supervisor.html) drills.
+
+```elixir
+defmodule Worker do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+end
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) to start a supervisor process with no children. Use [Supervisor.which_children/1](https://hexdocs.pm/elixir/Supervisor.html#which_children/1) to see the empty list of children.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+We often bind `children` to a variable in demonstrations.
+
+```elixir
+children = []
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+But that's not enforced, just idiomatic.
+
+```elixir
+Supervisor.start_link([], strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state"]}
+  } 
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor three `Worker` children using the **map** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state"]}
+  },
+  %{
+    id: :worker2,
+    start: {Worker, :start_link, ["initial state"]}
+  },
+  %{
+    id: :worker3,
+    start: {Worker, :start_link, ["initial state"]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **tuple** syntax.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  {Worker, "initial state"}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with the `Worker` as a child using the **map** syntax to start the `Worker` process as a named process.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :worker1,
+    start: {Worker, :start_link, ["initial state", [name: :named_worker1]]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+Usually worker GenServers should define a `start_link/1` function to start under a supervision tree. However, this is idiomatic and we can (but usually shouldn't) break this rule.
+
+Start the following `NonIdiomatic` [GenServer](https://hexdocs.pm/elixir/GenServer.html) under a supervision tree using the `starter/3` function.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  %{
+    id: :never_do_this,
+    start: {NonIdiomatic, :starter, ["arg", "arg", "arg"]}
+  }
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+defmodule NonIdiomatic do
+  use GenServer
+
+  def starter(_arg1, _arg2, _arg3) do
+    GenServer.start_link(__MODULE__, [])
+  end
+
+  def init(_opts) do
+    {:ok, "initial state"}
+  end
+end
+```
+
+Use [Supervisor.start_link/3](https://hexdocs.pm/elixir/Supervisor.html#start_link/3) function to start a supervisor with three `Worker` children using the **tuple** syntax.
+
+This should cause the supervisor to crash because each `Worker` has the same id.
+
+Comment your solution when finished to avoid crashing this livebook.
+
+<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
+<summary>Example Solution</summary>
+
+```elixir
+children = [
+  {Worker, "initial state"},
+  {Worker, "initial state"},
+  {Worker, "initial state"}
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+```
+
+</details>
+
+```elixir
+
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Supervisor Drills exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Supervisor Drills">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/supervisors.livemd">Supervisors</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/supervised_stack.livemd">Supervised Stack</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

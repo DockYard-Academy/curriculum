@@ -32,261 +32,103 @@ Mix.install([
 
 ## With
 
-`with` is often used with pattern matching to create "happy path" code.
-It's useful whenever you have a series of cases or values that rely on each other.
+In Elixir, `with` is a control structure that provides a convenient way to handle multiple expressions and pattern match on their results. It allows you to chain together a sequence of expressions and evaluate them one by one, stopping if any of them return an error or a pattern match fails.
 
-You can use `with` to check some preconditions before executing instructions.
-
-```mermaid
-flowchart LR
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-```
-
-If any of the preconditions fail, the with statement will stop and return the value
-of the failed precondition.
-
-```mermaid
-flowchart LR
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1 --> 5[failed pre-condition]
-  2 --> 5
-  3 --> 5
-```
-
-Alternatively, you can use `else` to handle the result of a failed precondition.
-
-```mermaid
-flowchart LR
-  1[pre-condition]
-  2[pre-condition]
-  3[pre-condition]
-  4[instruction]
-  with --> 1
-  1 --> 2
-  2 --> 3
-  3 --> 4
-  1 --> 5[failed pre-condition]
-  2 --> 5
-  3 --> 5
-  5 --> 6[else]
-```
-
-<!-- livebook:{"break_markdown":true} -->
-
-Here's a minimal example with a single precondition. `is_admin` must be true to delete a user. We're using pseudo-code and simply returning the `"delete user"` string.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-is_admin = true
-
-with true <- is_admin do
-  "delete user"
+with {:ok, v1} <- check1(),
+     {:ok, v2} <- check2(v1),
+     {:ok, v3} <- check3(v2),
+     {:ok, v4} <- check4(v3),
+     {:ok, _} <- check5(v4) do
+  # code that requires successful results above
 end
 ```
 
-The `with` statement checks `is_admin`. If `true`, it returns `"delete_user"`.
-If any other value, it returns the value of variable `is_admin`.
+The `with` construct simplifies error handling and makes code more readable by avoiding nested `case` statements or lengthy `if` conditions. It provides a concise way to handle a series of expressions while gracefully handling potential errors or failed pattern matches.
 
-```mermaid
-flowchart LR
-  with --> is_admin --> 3["delete user"]
-  is_admin --> 4[is_admin]
-```
+Here's a version of the above code written using nested `case` statements to demonstrate how much more concise `with` statements can be.
 
-<!-- livebook:{"break_markdown":true} -->
-
-`with` uses pattern matching to check if the left side of the `<-` matches the right side.
-The example above is probably better served using a simple `if` statement, so let's make it
-more realistic and store `is_admin` in a boolean on a user map.
+<!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-user = %{is_admin: true}
-
-with true <- user do
-  "delete user"
+case action1() do
+  {:ok, v1} ->
+  case action2(v1) do
+    {:ok, v2} ->
+      case action3(v2) do
+        {:ok, v3} -> 
+          case action4(v3) do
+            {:ok, v4} -> 
+              case check5(v4) do
+                {:ok, _} -> 
+                  # code that requires successful results above.
+              end
+          end
+      end
+  end
 end
 ```
 
-Because `%{is_admin: true}` does not match `true`, the with statement returns `%{is_admin: true}`.
-Let's correct that.
+We've use `{:ok, value}` tuples above, but `with` statements can pattern match on any Elixir term.
 
 ```elixir
-user = %{is_admin: true}
+student = %{name: "Einar", is_admin: true}
 
-with %{is_admin: true} <- user do
-  "delete user"
-end
-```
-
-Great! That's working. But this is still probably better handled by an `if` or `case` statement.
-
-```elixir
-user = %{is_admin: true}
-
-if user.is_admin do
-  "delete user"
-end
-```
-
-`with` is ideal for checking a series of preconditions.
-
-Let's change our example to sending an email. To send an email, we need to ensure:
-
-* The sending user is an admin.
-* The receiving user has an email.
-* The email has a title and a body.
-
-We also need the `name` of the sender and receiver and their emails.
-
-Before `with` statements, we might solve this problem using nested `case` statements. This produces unclear code.
-
-```elixir
-sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-case sending_user do
-  %{is_admin: true, name: sender_name, email: sender_email} ->
-    case receiving_user do
-      %{name: receiver_name, email: receiver_email} ->
-        case email do
-          %{title: title, body: body} ->
-            "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-        end
-    end
-end
-```
-
-`with` replaces the need for nested case statements.
-
-Here's the same code using `with`. There's still some natural complexity, but `with` improved the code clarity.
-
-```elixir
-sending_user = %{name: "Batman", email: "notbrucewayne@bat.net", is_admin: true}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-end
-```
-
-Right now, if a value doesn't match the precondition, it returns the value. For example,
-if the sender is `nil`, we return `nil`.
-
-```elixir
-sending_user = nil
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-end
-```
-
-Sometimes we want to return the value. Other times we want to handle the error in an `else` block.
-
-```elixir
-sending_user = "batman"
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "ROBIN!", body: "WE'RE OUT OF BAT SNACKS!"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-else
-  error -> "Email not sent because #{error} did not match expected format"
-end
-```
-
-You can match multiple cases to handle different errors.
-
-```elixir
-sending_user = %{name: "Joker", email: "joker@jokesonyou.haha"}
-receiving_user = %{name: "Robin", email: "boywonder@bat.net"}
-email = %{title: "HAHA!", body: "HAHAHAHAHA"}
-
-with %{is_admin: true, name: sender_name, email: sender_email} <- sending_user,
-     %{name: receiver_name, email: receiver_email} <- receiving_user,
-     %{title: title, body: body} <- email do
-  "from #{sender_name}:#{sender_email} to #{receiver_name}:#{receiver_email} #{title}, #{body}"
-else
-  %{name: "Joker"} -> "Get out of here Joker!"
-  error -> "Email not sent because #{error} did not match expected format"
-end
-```
-
-`with` statements can use values from previous conditions in future conditions.
-
-```elixir
-triangle = [3, 3, 3]
-
-with [side1, side2, side3] <- triangle, true <- side1 == side2 && side2 == side3 do
-  "all sides are equal!"
+with %{name: name, is_admin: true} <- student do
+  IO.puts("admin #{name} is authorized.")
 end
 ```
 
 ### Your Turn
 
-Use `with` to sum the numbers in two deeply nested maps. Return `{:error, :invalid}` if either input is invalid.
+`with` statements can include an `else` clause for handling errors. The `else` clause can match on many different patterns.
 
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Sum.sum_maps(%{value: 10}, %{value: 10})
-{:ok, 20}
-```
-
-<details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
-<summary>Example Solution</summary>
+Change the value of `user` below to hit every case in the `else` clause (one at a time.)
 
 ```elixir
-defmodule Sum do
-  def sum_maps(map1, map2) do
-    with %{value: value1} <- map1, %{value: value2} <- map2 do
-      {:ok, value1 + value2}
-    else
-      _ -> {:error, :invalid}
-    end
-  end
+user = %{name: "Jon", is_admin: false}
+
+with %{name: name, is_admin: true} <- user do
+  IO.puts("admin #{name} is authorized.")
+else
+  %{is_admin: false, name: name} ->
+    IO.puts("#{name} is not an admin")
+
+  %{is_admin: false} ->
+    IO.puts("Unknown user is not an admin")
+
+  _ ->
+    IO.puts("Something went wrong!")
 end
 ```
 
-</details>
+## Handling Errors
+
+Some projects use tuples to annotate which statement in a `with` expression failed.
+
+Some members of the community argue it's preferable to use custom error types instead of using `with` statements. See [Chris Keathley: Good and Bad Elixir](https://keathley.io/blog/good-and-bad-elixir.html) for more information.
+
+However, we want you to be aware of this pattern so that you are familiar with it if a future team you're on uses it.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Your Turn
+
+Change `value` to trigger every else clause.
 
 ```elixir
-defmodule Sum do
-  @doc """
-  Sum two maps. Return {:ok, value} if valid, and {:error, :invalid} if either input is invalid.
+value = "example"
 
-  ## Examples
-
-      iex> Sum.sum_maps(%{value: 10}, %{value: 10})
-      {:ok, 20}
-
-      iex> Sum.sum_maps(%{value: 20}, 10)
-      {:error, :invalid}
-  """
-  def sum_maps(map1, map2) do
-  end
+with {:not_binary, true} <- {:not_binary, is_binary(value)},
+     {:too_long, true} <- {:too_long, String.length(value) <= 10},
+     {:too_short, true} <- {:too_short, 2 <= String.length(value)} do
+  IO.puts("success")
+else
+  {:not_binary, _} -> IO.puts("value is not binary")
+  {:too_long, _} -> IO.puts("value is too long")
+  {:too_short, _} -> IO.puts("value is too short")
 end
 ```
 

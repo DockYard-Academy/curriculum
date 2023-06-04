@@ -22,31 +22,31 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/mailbox_server.livemd">Mailbox Server</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/genserver_drills.livemd">GenServer Drills</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/timer.livemd">Timer</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/stack_server.livemd">Stack Server</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Score Tracker
 
-You're going to create a `ScoreTracker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which will be a generic score tracker that could be used in any game system. When spawned, the `ScoreTracker` should store a score starting at `0` in it's state.
+You're going to create a `ScoreTracker` [GenServer](https://hexdocs.pm/elixir/GenServer.html) which is a generic score tracker.
 
-The `ScoreTracker` module should **asynchronously** receive `{:score, amount}` messages where `amount` is an integer which
-increase the `ScoreTracker`'s state by the provided `amount`.
+### Requirements
 
-The `ScoreTracker` module should **synchronously** receive `:get_score` messages to return the current score.
+* The initial score starts as `0`.
+* Handle an asynchronous `{:add_points, amount}` message to increment the score state.
+* Handle a synchronous `:current_score` message to retrieve the current score.
+* Create the `start_link/1`, `current_score/1`, and `add_points/2` Client API functions as documented below.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 {:ok, pid} = ScoreTracker.start_link([])
-ScoreTracker.score(pid, 10)
-10 = ScoreTracker.get_score(pid)
-ScoreTracker.score(pid, 20)
-30 = ScoreTracker.get_score(pid)
+:ok = ScoreTracker.add_points(pid, 10)
+10 = ScoreTracker.current_score(pid)
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
@@ -60,12 +60,12 @@ defmodule ScoreTracker do
     GenServer.start_link(__MODULE__, [])
   end
 
-  def score(score_tracker_pid, amount) do
-    GenServer.cast(score_tracker_pid, {:score, amount})
+  def add_points(score_tracker_pid, amount) do
+    GenServer.cast(score_tracker_pid, {:add_points, amount})
   end
 
   def get_score(score_tracker_pid) do
-    GenServer.call(score_tracker_pid, :get_score)
+    GenServer.call(score_tracker_pid, :current_score)
   end
 
   @impl true
@@ -74,12 +74,12 @@ defmodule ScoreTracker do
   end
 
   @impl true
-  def handle_cast({:score, amount}, state) do
-    {:noreply, state + amount}
+  def handle_cast({:add_points, points}, state) do
+    {:noreply, state + points}
   end
 
   @impl true
-  def handle_call(:get_score, _from, state) do
+  def handle_call(:current_score, _from, state) do
     {:reply, state, state}
   end
 end
@@ -87,47 +87,39 @@ end
 
 </details>
 
-Implement the `ScoreTracker` module as documented below. You will also have to implement the necessary [GenServer](https://hexdocs.pm/elixir/GenServer.html) callback functions such as [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1), [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2), and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
+Implement the `ScoreTracker` module below.
 
 ```elixir
 defmodule ScoreTracker do
   @moduledoc """
-  Documentation for `ScoreTracker`
+  iex> {:ok, pid} = ScoreTracker.start_link([])
+  iex> ScoreTracker.add_points(pid, 10)
+  :ok
+  iex> ScoreTracker.current_score(pid)
+  10
   """
   use GenServer
 
-  @doc """
-  Start the `ScoreTracker` process.
+  # Client API
 
-  ## Examples
-
-    iex> {:ok, pid} = ScoreTracker.start_link([])
-  """
   def start_link(_opts) do
   end
 
-  @doc """
-  Asynchronously increase the stored score by the specified amount.
-
-  ## Examples
-
-      iex> {:ok, pid} = ScoreTracker.start_link([])
-      iex> ScoreTracker.score(pid, 10)
-      :ok
-  """
   def score(score_tracker_pid, amount) do
   end
 
-  @doc """
-  Synchronously return the current score state.
+  def current_score(score_tracker_pid) do
+  end
 
-  ## Examples
+  # Server API
 
-      iex> {:ok, pid} = ScoreTracker.start_link([])
-      iex> ScoreTracker.get_score(pid)
-      0
-  """
-  def get_score(score_tracker_pid) do
+  def init(_init_arg) do
+  end
+
+  def handle_cast({:add_points, amount}, state) do
+  end
+
+  def handle_call(:current_score, _from, state) do
   end
 end
 ```
@@ -135,6 +127,31 @@ end
 ## Bonus: Multiplayer Score Tracker
 
 Create a `MultiplayerScoreTracker` which can track scores for multiple named players.
+
+### Requirements
+
+* The initial score starts as a map `%{}`.
+* Handle an asynchronous `{:add_points, player_name, amount}` message to increment the score state.
+* Handle a synchronous `{:current_score, player_name}` message to retrieve the current score.
+* Handle a synchronous `:all_scores` message to retrieve a map of all scores.
+* Create the `start_link/1`, `current_score/2`, and `add_points/3`, and `all_scores/1` Client API functions as documented below. For sake of practice, you will be required to define any necessary handlers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+{:ok, pid} = MultiplayerScoreTracker.start_link([])
+
+:ok = MultiplayerScoreTracker.add_points(pid, :player1, 10)
+:ok = MultiplayerScoreTracker.add_points(pid, :player1, 20)
+:ok = MultiplayerScoreTracker.add_points(pid, :player2, 20)
+
+%{
+  player1: 30,
+  player2: 20
+} = MultiplayerScoreTracker.all_scores(pid)
+
+30 = MultiplayerScoreTracker.current_score(pid, :player1)
+```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
@@ -147,16 +164,16 @@ defmodule MultiplayerScoreTracker do
     GenServer.start_link(__MODULE__, [])
   end
 
-  def score(multiplayer_score_tracker_pid, player_name, amount) do
-    GenServer.cast(multiplayer_score_tracker_pid, {:score, player_name, amount})
+  def add_points(multiplayer_score_tracker_pid, player_name, amount) do
+    GenServer.cast(multiplayer_score_tracker_pid, {:add_points, player_name, amount})
   end
 
   def all_scores(multiplayer_score_tracker_pid) do
     GenServer.call(multiplayer_score_tracker_pid, :all_scores)
   end
 
-  def get_score(multiplayer_score_tracker_pid, player_name) do
-    GenServer.call(multiplayer_score_tracker_pid, {:get_score, player_name})
+  def current_score(multiplayer_score_tracker_pid, player_name) do
+    GenServer.call(multiplayer_score_tracker_pid, {:current_score, player_name})
   end
 
   @impl true
@@ -165,7 +182,7 @@ defmodule MultiplayerScoreTracker do
   end
 
   @impl true
-  def handle_cast({:score, player_name, amount}, state) do
+  def handle_cast({:add_points, player_name, amount}, state) do
     {:noreply, Map.update(state, player_name, amount, fn current -> current + amount end)}
   end
 
@@ -175,7 +192,7 @@ defmodule MultiplayerScoreTracker do
   end
 
   @impl true
-  def handle_call({:get_score, player_name}, _from, state) do
+  def handle_call({:current_score, player_name}, _from, state) do
     {:reply, state[player_name], state}
   end
 end
@@ -183,90 +200,33 @@ end
 
 </details>
 
-Implement the `MultiplayerScoreTracker` as documented below. You will also have to implement the necessary [GenServer](https://hexdocs.pm/elixir/GenServer.html) callback functions such as [GenServer.init/1](https://hexdocs.pm/elixir/GenServer.html#init/1), [GenServer.handle_cast/2](https://hexdocs.pm/elixir/GenServer.html#handle_cast/2), and [GenServer.handle_call/3](https://hexdocs.pm/elixir/GenServer.html#handle_call/3).
-
 ```elixir
 defmodule MultiplayerScoreTracker do
   @moduledoc """
-  Documentation for `MultiplayerScoreTracker`
+  iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
+  iex> :ok = MultiplayerScoreTracker.add_points(pid, :player1, 10)
+  iex> :ok = MultiplayerScoreTracker.add_points(pid, :player1, 20)
+  iex> :ok = MultiplayerScoreTracker.add_points(pid, :player2, 20)
+  iex> MultiplayerScoreTracker.all_scores(pid)
+  %{
+    player1: 30,
+    player2: 20
+  }
+  iex> MultiplayerScoreTracker.current_score(pid, :player1)
+  30
   """
   use GenServer
 
-  @doc """
-  Start the `MultiplayerScoreTracker` process.
-
-  ## Examples
-
-      iex> {:ok, _pid} = MultiplayerScoreTracker.start_link([])
-  """
   def start_link(_opts) do
   end
 
-  @doc """
-  Asynchronously add to the score of a named player. Creates the player if they do not already exist.
-
-  ## Examples
-
-      iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-      iex> MultiplayerScoreTracker.score(pid, :player1, 10)
-      :ok
-      iex> MultiplayerScoreTracker.score(pid, :player2, 10)
-      :ok
-      iex> MultiplayerScoreTracker.score(pid, :abc, 10)
-      :ok
-  """
-  def score(multiplayer_score_tracker_pid, player_name, amount) do
+  def add_points(multiplayer_score_tracker_pid, player_name, amount) do
   end
 
-  @doc """
-  Synchronously retrieve all of the player scores in a map.
-
-  ## Examples
-
-      Empty Scores.
-
-      iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-      iex> MultiplayerScoreTracker.all_scores(pid)
-      %{}
-
-      Single Player Score.
-
-      iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-      iex> MultiplayerScoreTracker.score(pid, :player1, 10)
-      iex> MultiplayerScoreTracker.score(pid, :player1, 10)
-      iex> MultiplayerScoreTracker.all_scores(pid)
-      %{player1: 20}
-
-      Multiple Player Scores.
-
-      iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-      iex> MultiplayerScoreTracker.score(pid, :player1, 10)
-      iex> MultiplayerScoreTracker.score(pid, :player2, 10)
-      iex> MultiplayerScoreTracker.all_scores(pid)
-      %{player1: 10, player2: 10}
-  """
   def all_scores(multiplayer_score_tracker_pid) do
   end
 
-  @doc """
-  Synchronously retrieve a single player's score. Return `nil` if the player does not exist.
-
-  ## Examples
-
-    Player does not exist.
-
-    iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-    iex> MultiplayerScoreTracker.get_score(pid, :player1)
-    nil
-
-    Player exists.
-
-    iex> {:ok, pid} = MultiplayerScoreTracker.start_link([])
-    iex> MultiplayerScoreTracker.score(pid, :abc, 10)
-    iex> MultiplayerScoreTracker.get_score(pid, :abc)
-    10
-  """
-  def get_score(multiplayer_score_tracker_pid, player_name) do
+  def current_score(multiplayer_score_tracker_pid, player_name) do
   end
 end
 ```
@@ -302,10 +262,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/mailbox_server.livemd">Mailbox Server</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/genserver_drills.livemd">GenServer Drills</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/timer.livemd">Timer</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/stack_server.livemd">Stack Server</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

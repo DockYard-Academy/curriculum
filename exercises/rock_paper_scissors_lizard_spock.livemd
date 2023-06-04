@@ -58,7 +58,7 @@ Then we add the following extra rules
 
 We'll represent these choices as atoms `:rock, :paper, :scissors, :lizard, :spock`.
 
-1. Create a `beats?/2` function which determines if once choice beats another.
+* Create a `beats?/2` function which determines if once choice beats another.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -66,7 +66,7 @@ We'll represent these choices as atoms `:rock, :paper, :scissors, :lizard, :spoc
 RockPaperScissorsLizardSpock.beats?(:rock, :lizard) # true
 ```
 
-1. Create a `play/2` function which determines if player 1 or player 2 won the game.
+* Create a `play/2` function which determines if player 1 or player 2 won the game.
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -82,15 +82,15 @@ RockPaperScissorsLizardSpock.play(:lizard, :lizard) # "Draw!"
 ```elixir
   def beats?(guess1, guess2) do
     case {guess1, guess2} do
-      {:paper, :rock} -> true
-      {:scissors, :paper} -> true
       {:rock, :scissors} -> true
       {:rock, :lizard} -> true
-      {:lizard, :spock} -> true
-      {:spock, :scissors} -> true
-      {:scissors, :lizard} -> true
-      {:lizard, :paper} -> true
+      {:paper, :rock} -> true
       {:paper, :spock} -> true
+      {:scissors, :paper} -> true
+      {:scissors, :lizard} -> true
+      {:lizard, :spock} -> true
+      {:lizard, :paper} -> true
+      {:spock, :scissors} -> true
       {:spock, :rock} -> true
       _answer -> false
     end
@@ -98,53 +98,44 @@ RockPaperScissorsLizardSpock.play(:lizard, :lizard) # "Draw!"
 
   def play(player1, player2) do
     cond do
-      player1 == player2 -> "Draw"
       beats?(player1, player2) -> "Player 1 Wins!"
       beats?(player2, player1) -> "Player 2 Wins!"
+      true -> "Draw"
     end
   end
 ```
 
 </details>
 
-Implement the `RockPaperScissorsLizardSpock` module as documented.
+Implement the `RockPaperScissorsLizardSpock` module below.
+
+> `@doc` syntax runs tests on your code to provide feedback. However, be aware that for the sake of conciseness we do not always write fully comprehensive tests. You solution may pass tests, but be incomplete. You may press the dropdown button to hide the `@doc` documentation/tests.
 
 ```elixir
 defmodule RockPaperScissorsLizardSpock do
-  @moduledoc """
-  Rock Paper Scissors Lizard Spock Game
-  """
-
   @doc """
-  Returns `true` if the first guess beats the second, and `false` otherwise.
+  ## Examples
 
-  ## Winning Examples
-
-    iex> RockPaperScissorsLizardSpock.beats?(:rock, :lizard)
-    true
-
-    iex> RockPaperScissorsLizardSpock.beats?(:lizard, :rock)
-    false
-
-    iex> RockPaperScissorsLizardSpock.beats?(:rock, :rock)
-    false
+      iex> RockPaperScissorsLizardSpock.beats?(:lizard, :spock)
+      true
+      iex> RockPaperScissorsLizardSpock.beats?(:lizard, :paper)
+      true
+      iex> RockPaperScissorsLizardSpock.beats?(:spock, :scissors)
+      true
+      iex> RockPaperScissorsLizardSpock.beats?(:spock, :rock)
+      true
+      iex> RockPaperScissorsLizardSpock.beats?(:spock, :paper)
+      false
   """
   def beats?(guess1, guess2) do
   end
 
   @doc """
-  Return "Player 1 Wins!", "Player 2 Wins!", or "Draw" depending on which player guess won.
-
   ## Examples
-
-    iex> RockPaperScissorsLizardSpock.play(:rock, :lizard)
-    "Player 1 Wins!"
-
-    iex> RockPaperScissorsLizardSpock.play(:lizard, :rock)
-    "Player 2 Wins!"
-
-    iex> RockPaperScissorsLizardSpock.play(:lizard, :lizard)
-    "Draw"
+      
+      iex> "Player 1 Wins!" = RockPaperScissorsLizardSpock.play(:rock, :lizard)
+      iex> "Player 2 Wins!" = RockPaperScissorsLizardSpock.play(:lizard, :rock)
+      iex> "Draw!" = RockPaperScissorsLizardSpock.play(:lizard, :lizard)
   """
   def play(player1, player2) do
   end

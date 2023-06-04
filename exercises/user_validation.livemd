@@ -1,0 +1,122 @@
+# User Validation
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=User Validation">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/message_validation.livemd">Message Validation</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_with_guards.livemd">Math With Guards</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## User Validation
+
+You're going to use `with` to create a `User` module that can validate a list of user structs. Handle `:missing_name` and `:not_a_user` errors. Return `{:ok, user}` if the user is valid.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+valid_user = %User{name: "Mohsin"}
+invalid_user1 = %User{}
+invalid_user2 = "Yusef"
+
+[{:ok, %User{name: "Mohsin"}}, {:error, :missing_name}, {:error, :not_a_user}] =
+  User.validate_users([valid_user, invalid_user1, invalid_user2])
+```
+
+```elixir
+defmodule User do
+  @moduledoc """
+  Send messages between users.
+  Returns a string of the message if provided valid input.
+
+  ## Examples
+
+    iex> User.validate_users([%User{name: "valid user"}])
+    [{:ok, %User{name: "valid user"}}]
+
+    iex> User.validate_users([%User{name: nil}])
+    [{:error, :missing_name}]
+
+    iex> User.validate_users(["invalid user", "invalid user", "invalid user"])
+    [{:error, :not_a_user}, {:error, :not_a_user}, {:error, :not_a_user}]
+  """
+  defstruct [:name]
+
+  def validate_users(users) do
+    Enum.map(users, fn user ->
+      with %User{name: name} <- user, true <- {:missing_name, is_binary(name)} do
+        {:ok, user}
+      else
+        false ->
+          {:error, :missing_name}
+
+        _ ->
+          {:e}
+          IO.inspect(thing)
+          :error
+      end
+    end)
+  end
+end
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish User Validation exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=User Validation">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/message_validation.livemd">Message Validation</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_with_guards.livemd">Math With Guards</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

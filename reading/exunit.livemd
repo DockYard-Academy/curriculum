@@ -25,7 +25,7 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_rock_paper_scissors.livemd">Games: Rock Paper Scissors</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_module_testing.livemd">Math Module Testing</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_wordle.livemd">Games: Wordle</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
@@ -589,6 +589,94 @@ end
 ExUnit.run()
 ```
 
+## ExUnit With Mix
+
+Mix projects provide some conveniences when working with [ExUnit](https://hexdocs.pm/ex_unit/ExUnit.html).
+
+Tests in a mix project are in the `test/` folder. Generally there is an equivalent file in the `test/` folder for each tested file in the `lib` folder.
+
+ExUnit is started for us in the `test/test_helper.exs` file, and files in the `test/` folder automatically compile, evaluate, and execute when we run tests.
+
+We strongly recommend the [Elixir Test](https://marketplace.visualstudio.com/items?itemName=samuel-pordeus.elixir-test) extension for Visual Studio Code as it provides a number of useful commands for running tests in Elixir.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run Tests
+
+We can execute all tests by running the following from the command line in the project folder.
+
+```
+$ mix test
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run Tests In A File
+
+We can run a single test file by providing its path.
+
+```
+$ mix test path/to/test/file.exs
+```
+
+For example, we can run the `math_test.exs` file.
+
+```
+$ mix test test/math_test.exs
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Run Tests By Line Number
+
+We can execute a specific test or several tests under a `describe` block by providing the line number.
+
+```
+$ mix test test/math_test.exs:5
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Test Tags
+
+We can use `@moduletag`, `@describetag`, and `@tag` module attributes to tag our tests.
+Once tagged, we can configure ExUnit to exclude, include, or only run tests with specific tags using [ExUnit.configure/1](https://hexdocs.pm/ex_unit/ExUnit.html#configure/1).
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@tag :my_tag
+test "example test" do
+  assert false
+end
+```
+
+Once tagged, we can use the flags `--only`, `--exclude`, and `--include` to run specific tests.
+
+```
+$ mix test --exclude my_tag
+```
+
+Alternatively, we can place the [ExUnit.configure/1](https://hexdocs.pm/ex_unit/ExUnit.html#configure/1) function in `test_helpers.exs`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ExUnit.start()
+ExUnit.configure(exclude: :my_tag)
+```
+
+The `:skip` tag is excluded by default. This is useful for skipping tests.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+@tag :skip
+test "example test" do
+  assert false
+end
+```
+
 ## Further Reading
 
 For more on testing, consider using the following resources.
@@ -631,7 +719,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/games_rock_paper_scissors.livemd">Games: Rock Paper Scissors</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/math_module_testing.livemd">Math Module Testing</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/games_wordle.livemd">Games: Wordle</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

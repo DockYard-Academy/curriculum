@@ -272,7 +272,7 @@ Keep in mind that browsers do not enforce unique IDs. However, it is conventiona
 
 ### Children
 
-We select all children of an element using a `>` symbol between selectors.
+We select all direct children of an element using a `>` symbol between selectors.
 
 ```css
 .parent > .child {
@@ -283,34 +283,10 @@ We select all children of an element using a `>` symbol between selectors.
 The `>` selects all elements with the `.child` class that are direct children of the `.parent` class.
 
 ```html
-<p class="parent">
-  <p class="child">
-    This text will be green.
-    <p class="grandchild"> This text will NOT be green. </p>
-  </p>
-</p>
-
-<p class="child">This text will NOT be green and bold.</p>
-```
-
-```mermaid
-flowchart LR
-    classDef green fill:#9f6
-
-    subgraph parent class
-    p1(p) 
-    end
-    subgraph child class
-    
-    p1 --> p2(p):::green
-    p2 --> text1(text):::green
-    p3(p)
-    p3 --> text2(text)
-    end
-    subgraph grandchild class
-    p2 --> p4(p)
-    p4 --> text4(text)
-    end
+<div class="parent">
+  <p class="child">This text will be green.</p>
+  <p>This text will NOT be green.</p>
+</div>
 ```
 
 <!-- livebook:{"break_markdown":true} -->
@@ -320,7 +296,7 @@ flowchart LR
 We select can all descendants of an element using a space between selectors.
 
 ```css
-.parent .child {
+.parent .descendant {
   color: green;
 }
 ```
@@ -328,34 +304,11 @@ We select can all descendants of an element using a space between selectors.
 The space selects all elements with the `.child` class inside the`.parent` class element.
 
 ```html
-<p class="parent">
-  <p class="child">
-    This text will be green.
-    <p class="grandchild"> This text will be green. </p>
-  </p>
-</p>
-
-<p class="child">This text will NOT be green and bold.</p>
-```
-
-```mermaid
-flowchart LR
-    classDef green fill:#9f6
-
-    subgraph parent class
-    p1(p) 
-    end
-    subgraph child class
-    
-    p1 --> p2(p):::green
-    p2 --> text1(text):::green
-    p3(p)
-    p3 --> text2(text)
-    end
-    subgraph grandchild class
-    p2 --> p4(p):::green
-    p4 --> text4(text):::green
-    end
+<div class="parent">
+  <section>
+    <p class="descendant"> This text will be green. </p>
+  <section>
+</div>
 ```
 
 <!-- livebook:{"break_markdown":true} -->

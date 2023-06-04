@@ -75,7 +75,9 @@ defmodule Utils.Notebooks do
     Timex,
     Ecto,
     Phoenix.HTML,
-    Phoenix
+    Phoenix,
+    Credo,
+    Dialyzer
   ]
 
   def all_notebooks, do: @all_notebooks
@@ -147,51 +149,21 @@ defmodule Utils.Notebooks do
   end
 
   def link_to_docs(notebook) do
-    content =
-      Enum.reduce(
-        @documented_libraries,
-        notebook.content,
-        fn module, acc ->
-          "Elixir." <> module_name = to_string(module)
-
-          content =
-            Regex.replace(~r/`#{module_name}`/, acc, fn _ ->
-              "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
-            end)
-
-          module_regex = ~r/
-          \`                                   # backtick
-          (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
-          \.                                   # period
-          (\w+)                                # function
-          \/                                   # slash
-          (\d)                                 # arity
-          \`                                   # backtick
-          /x
-
-          Regex.replace(module_regex, content, fn _match, nested_module, function, arity ->
-            "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
-          end)
-        end
-      )
-
-    %Notebook{notebook | content: content}
-  end
-
-  def module_url(module_name) do
-    case module_name do
-      "Phoenix.HTML" ->
-        "phoenix_html"
-
-      _ ->
-        Regex.scan(~r/[A-Z]+[a-z]+/, module_name)
-        |> List.flatten()
-        |> Enum.map_join("_", &String.downcase/1)
-    end
+    %Notebook{
+      notebook
+      | content:
+          notebook.content
+          |> library_docs()
+          |> built_in_module_docs()
+    }
   end
 
   def format_headings(notebook) do
-    formatted_content = Regex.replace(~r/^#+.+$/m, notebook.content, &title_case/1)
+    # format first line
+    formatted_content =
+      String.replace(notebook.content, ~r/^.+/, &title_case/1)
+      # format sub headings
+      |> String.replace(~r/^\#{2,}+.+$/m, &title_case/1)
 
     %Notebook{notebook | content: formatted_content}
   end
@@ -305,15 +277,74 @@ defmodule Utils.Notebooks do
     """
   end
 
-  def prev(%{index: 0}), do: %{}
+  defp prev(%{index: 0}), do: %{}
 
-  def prev(notebook) do
+  defp prev(notebook) do
     Enum.at(outline_notebooks(), notebook.index - 1)
   end
 
-  def next(notebook) when @number_of_notebooks == notebook.index + 1, do: %{}
+  defp next(notebook) when @number_of_notebooks == notebook.index + 1, do: %{}
 
-  def next(notebook) do
+  defp next(notebook) do
     Enum.at(outline_notebooks(), notebook.index + 1)
+  end
+
+  defp built_in_module_docs(content) do
+    Regex.replace(~r/`(\w+)`/, content, fn full, module_name ->
+      module = String.to_atom("Elixir." <> module_name)
+
+      if Code.ensure_loaded?(module) do
+        "[#{module_name}](https://hexdocs.pm/elixir/#{module_name}.html)"
+      else
+        full
+      end
+    end)
+  end
+
+  defp library_docs(content) do
+    Enum.reduce(
+      @documented_libraries,
+      content,
+      fn module, acc ->
+        "Elixir." <> module_name = to_string(module)
+
+        content =
+          Regex.replace(~r/`#{module_name}`/, acc, fn _ ->
+            case module_name do
+              "Dialyzer" ->
+                "[Dialyzer](https://hexdocs.pm/dialyxir/readme.html)"
+
+              _ ->
+                "[#{module_name}](https://hexdocs.pm/#{module_url(module_name)}/#{module_name}.html)"
+            end
+          end)
+
+        module_regex = ~r/
+          \`                                   # backtick
+          (#{module_name}(?:\.[A-Z]+[a-z]*)*)  # module name
+          \.                                   # period
+          (\w+)                                # function
+          \/                                   # slash
+          (\d)                                 # arity
+          \`                                   # backtick
+          /x
+
+        Regex.replace(module_regex, content, fn _match, nested_module, function, arity ->
+          "[#{nested_module}.#{function}/#{arity}](https://hexdocs.pm/#{module_url(module_name)}/#{nested_module}.html##{function}/#{arity})"
+        end)
+      end
+    )
+  end
+
+  def module_url(module_name) do
+    case module_name do
+      "Phoenix.HTML" ->
+        "phoenix_html"
+
+      _ ->
+        Regex.scan(~r/[A-Z]+[a-z]+/, module_name)
+        |> List.flatten()
+        |> Enum.map_join("_", &String.downcase/1)
+    end
   end
 end

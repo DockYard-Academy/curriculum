@@ -25,23 +25,26 @@ Mix.install([
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/with.livemd">With</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/with_points.livemd">With Points</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/user_validation.livemd">User Validation</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Message Validation
 
-You're creating a messaging application where users can send each other messages as a string.
+You're going to use guards to create a `Message` module that only allows messages in the form of a string or a `Message` struct with a `:body` field to be sent. Sending a message simply returns a string of the message prepended with `"Sent: "`.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 Message.send("hello!")
-"hello!"
+"Sent: hello!"
+
+Message.send(%Message{body: "hi!"})
+"Sent: hi!"
 ```
 
-Use guards to ensure `Message.send/1` does not allow invalid data types.
+Invalid messages should raise a [FunctionClauseError](https://hexdocs.pm/elixir/FunctionClauseError.html).
 
 <!-- livebook:{"force_markdown":true} -->
 
@@ -55,30 +58,6 @@ Message.send(123)
         123
 ```
 
-Users can also send each other messages as a `Message` struct which has a `:body` key.
-Make sure you define a message struct, and use guards to create a `Message.send/1` clause which can handle `Message` structs. `Message.send/1` should return the `:body` field of the message.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Message.send(%Message{body: "hello!"})
-
-```
-
-Only allow messages that have a string in their `:body` field.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-Message.send(%Message{body: 123})
-** (FunctionClauseError) no function clause matching in Message.send/1    
-    
-    The following arguments were given to Message.send/1:
-    
-        # 1
-        %Message{body: 123}
-```
-
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
@@ -86,11 +65,11 @@ Message.send(%Message{body: 123})
 defmodule Message do
   defstruct [:body]
   def send(message) when is_binary(message) do
-    message
+    "Sent: " <> message
   end
 
   def send(message) when is_binary(message.body) do
-    message.body
+    "Sent: " <> message.body
   end
 end
 ```
@@ -102,50 +81,21 @@ Implement the `Message` module as documented below.
 ```elixir
 defmodule Message do
   @moduledoc """
-  Documentation for `Message`
-
-    ## Examples
-
-      iex> %Message{}
-      %Message{body: nil}
-  """
-  defstruct []
-
-  @doc """
   Send messages between users.
   Returns a string of the message if provided valid input.
 
   ## Examples
 
     iex> Message.send("hello!")
-    "hello!"
-
-    iex> Message.send("hi!")
-    "hi!"
-
-    iex> Message.send(%Message{body: "hello!"})
-    "hello!"
+    "Sent: hello!"
 
     iex> Message.send(%Message{body: "hi!"})
-    "hi!"
+    "Sent: hi!"
 
     iex> Message.send(123)
     ** (FunctionClauseError) no function clause matching in Message.send/1
-
-    iex> Message.send(%{})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
-
-    iex> Message.send({})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
-
-    iex> Message.send(%Message{body: nil})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
-        
-    iex> Message.send(%Message{body: {}})
-    ** (FunctionClauseError) no function clause matching in Message.send/1
   """
-  def send(message) do
-  end
+  defstruct [:body]
 end
 ```
 
@@ -183,7 +133,7 @@ We will accept applications for the June-August 2023 cohort soon.
 <a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/with.livemd">With</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/with_points.livemd">With Points</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/user_validation.livemd">User Validation</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>

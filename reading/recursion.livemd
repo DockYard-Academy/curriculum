@@ -22,7 +22,7 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/battle_map.livemd">Battle Map</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/phone_number_parsing.livemd">Phone Number Parsing</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/fibonacci.livemd">Fibonacci Sequence</a>
@@ -39,30 +39,26 @@ Upon completing this lesson, a student should be able to answer the following qu
 
 ## Recursion
 
-Recursion is a function that calls itself.
+Recursion is a programming technique where a function calls itself. This creates a looping effect until some exit condition is met.
 
-```mermaid
-flowchart LR
-b[Function] --> a[Function]
-a --> b
-```
-
-Recursion creates a loop effect where the function calls itself over and over.
+Here's an example of a recursive loop that counts down from some integer.
 
 ```elixir
-defmodule RecursiveLoop do
-  def loop(n) do
-    if n > 0 do
-      IO.puts(n)
-      loop(n - 1)
+defmodule Recursion do
+  def loop(count) do
+    if count <= 0 do
+      IO.puts(count)
+    else
+      IO.puts(count)
+      loop(count - 1)
     end
   end
 end
 
-RecursiveLoop.loop(5)
+Recursion.loop(5)
 ```
 
-This calls the loop function 5 times. Under the hood, this places 5 stack frames on the stack.
+This calls the loop function 5 times. Under the hood, this places 5 frames on the stack.
 
 We trigger a call to [IO.puts/2](https://hexdocs.pm/elixir/IO.html#puts/2) to show that the loop function has been called 5 times with
 a different argument.
@@ -123,10 +119,9 @@ the stack, and causes a stack overflow.
 
 That's because stack memory gets too full (overflowed) storing each stack frame of the recursive call.
 
-### Tail Recursion And Tail-Call Optimization
+## Tail Recursion
 
-Since functional programming languages rely so much on recursion, Elixir (and Erlang) implement tail-call
-optimization.
+Since functional programming languages rely so much on recursion, Elixir (and Erlang) implement **tail-call optimization**.
 
 Tail-call optimization circumvents adding new stack frames, instead, it reuses the current stack frame
 and jumps back to the top of the stack frame. This avoids additional memory consumption.
@@ -135,12 +130,9 @@ and jumps back to the top of the stack frame. This avoids additional memory cons
 
 ![](images/tail-recursion-optimized-stack.png)
 
-<!-- livebook:{"break_markdown":true} -->
+## Body Recursion
 
-### Body Recursion
-
-Keep in mind that Elixir can only tail-call optimize your recursive function if the last thing it does
-is call itself. That's why it's called **tail** recursion. Otherwise, if the function calls itself in the body,
+Keep in mind that Elixir can only tail-call optimize your recursive function if the last thing it does is call itself. That's why it's called **tail** recursion. Otherwise, if the function calls itself in the body,
 it's called **body-recursion** and is not optimized.
 
 ### Your Turn
@@ -161,11 +153,11 @@ You'll notice the **Process** memory consumption will increase, and eventually, 
 You may need to click the **Connect** button to reconnect the Elixir runtime.
 
 ```elixir
-# Defmodule Body Do
-# Def Recursion([head | Tail]) Do
-# Recursion(tail ++ Tail) ++ [head]
-# End
-# End
+# defmodule Body Do
+#   def recursion([head | tail]) Do
+#     recursion(tail ++ tail) ++ [head]
+#   end
+# end
 
 # Body.recursion([1,2,3])
 ```
@@ -181,9 +173,9 @@ Make sure you comment out the code above, otherwise Livebook will keep disconnec
 So why is recursion useful? Well, it's how we achieve a great deal of functionality in Elixir.
 For example, many functions in the [Enum](https://hexdocs.pm/elixir/Enum.html) module use recursion under the hood.
 
-Recursion allows us to accomplish enumeration.
+Recursion allows us to accomplish **enumeration** by traversing through data structures. It also enables the preservation of **state** between function calls.
 
-For example, we could use recursion to enumerate through and sum the elements in a list.
+Here's an example of a recursive function `sum/2` that traverses through a list and preserves an accumulator. It looks at every element in the list and adds it to the current accumulator to calculate the sum of all of the elements in the list. When the list is empty, it returns the final accumulator.
 
 ```elixir
 defmodule RecursiveSum do
@@ -213,81 +205,13 @@ sum4["sum([], 6)"]
 sum1 --> sum2 --> sum3 --> sum4 --> 6
 ```
 
-Walking through the function we bind `list` to `[1, 2, 3]` and accumulator to 0.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def sum(list, accumulator) do
-    case list do
-      # [] -> accumulator
-      [head | tail] -> sum(tail, accumulator + head)
-    end
-  end
-```
-
-`list` is not empty so the program recursively calls `sum([2, 3], 0 + 1)`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def sum([1, 2, 3], 0) do
-    case [1, 2, 3] do
-      # [] -> accumulator
-      [1 | [2, 3]] -> sum([2, 3], 0 + 1)
-    end
-  end
-```
-
-`list` is still not empty, so the program recursively calls `sum([3], 1 + 2)`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def sum([2, 3], 1) do
-    case [2, 3] do
-      # [] -> accumulator
-      [2 | [3]] -> sum([3], 1 + 2)
-    end
-  end
-```
-
-`list` is still not empty, so the program recursively calls `sum([], 3 + 3)`.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def sum([3], 3) do
-    case [3] do
-      # [] -> accumulator
-      [3 | []] -> sum([], 3 + 3)
-    end
-  end
-```
-
-`list` is empty, so the program returns the accumulator (`6`).
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def sum([],  6) do
-    case [] do
-      [] -> 6
-      # [head | tail] -> sum(tail, accumulator + head)
-    end
-  end
-```
-
 <!-- livebook:{"break_markdown":true} -->
 
 ### Base Cases
 
-Rather than using case statements, it's common to use different function clauses
-to handle the base case. The base case is when the function returns a value instead of making a recursive call.
+Recursive functions often have a **base case** (also sometimes called an **exit condition**) where they will stop running and return some value.
 
-In the `Recursion` module, the base case is when the `list` is empty and `sum/2` returns the `accumulator`.
-
-With multiple function clauses, the `Recursion` module could instead be implemented like so:
+Here's another example of the `sum/2` function, this time using multiple function clauses to separate out the base case into a separate function call that returns the accumulator.
 
 ```elixir
 defmodule BaseCaseExample do
@@ -335,7 +259,8 @@ end
 </details>
 
 ```elixir
-
+defmodule CountDown do
+end
 ```
 
 ### Your Turn
@@ -397,7 +322,8 @@ end
 </details>
 
 ```elixir
-
+defmodule CountBetween do
+end
 ```
 
 ## Commit Your Progress
@@ -431,7 +357,7 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/battle_map.livemd">Battle Map</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/phone_number_parsing.livemd">Phone Number Parsing</a>
 </div>
 <div style="display: flex;">
 <a style="display: flex; color: #61758a; margin-right: 1rem;" href="../exercises/fibonacci.livemd">Fibonacci Sequence</a>

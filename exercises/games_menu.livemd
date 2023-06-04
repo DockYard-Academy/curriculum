@@ -32,89 +32,29 @@ Mix.install([
 
 ## Games: Menu
 
-In your existing [Games](./games_setup.livemd) project, you're going to create a `Games.Menu` module which allows players to select which game they would like to play.
-
-```
-$ iex -S mix
-iex> Games.Menu.display()
-Select a game:
-1. Guessing Game
-2. Rock Paper Scissors
-3. Wordle
-Select: 
-```
-
-Depending on their choice, this let the player play either the [Guessing Game](games_guessing_game.livemd), [Rock Paper Scissors](./games_rock_paper_scissors.livemd),
-or  [Wordle](games_wordle.livemd) games you have already created.
-
-```
-Select a game:
-1. Guessing Game
-2. Rock Paper Scissors
-3. Wordle
-Select: 3
-Enter a five letter word:  
-```
-
-## Games: Escript
-
-Configure your game as an Escript. You'll need to create a `Games.CLI` module with a `main/1` function to display the `Games.Menu`.
+Configure your existing [Games](./games.livemd) project as an escript.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-defmodule Games.CLI do
-  def main(args) do
-    Games.Menu.display()
-  end
-end
-```
-
-And configure the `Games.CLI` module using the `:escript` option inside of the `Games.MixProject.project/0` function.
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-  def project do
-    [
-      ...
-      escript: [main_module: Games.CLI]
-    ]
-  end
-```
-
-You should be able to build and start the games project as an escript.
-
-```
-$ mix escript.build
+mix escript.build
 $ ./games
-Select a game:
+```
+
+### Requirements
+
+* Player can select a game to play (guessing game, rock paper scissors, wordle)
+* Players are re-prompted to select a game to play after finishing a game.
+* Player can stop the program by typing "stop" instead of selecting a game.
+
+```
+What game would you like to play?
 1. Guessing Game
 2. Rock Paper Scissors
 3. Wordle
-Select: 
+
+enter "stop" to exit
 ```
-
-## Bonus: Finish Game
-
-Allow the user to type `"stop"` to end any game. They should then be re-prompted with the menu to select the game they want to play.
-
-```
-Select a game:
-1. Guessing Game
-2. Rock Paper Scissors
-3. Wordle
-Select: 1
-Enter your guess:
-stop
-Select a game:
-1. Guessing Game
-2. Rock Paper Scissors
-3. Wordle
-Select: 
-```
-
-This may require custom stop logic in each existing game.
 
 ## Commit Your Progress
 

@@ -1,0 +1,173 @@
+# Comprehension Product Search
+
+```elixir
+Mix.install([
+  {:jason, "~> 1.4"},
+  {:kino, "~> 0.9", override: true},
+  {:youtube, github: "brooklinjazz/youtube"},
+  {:hidden_cell, github: "brooklinjazz/hidden_cell"}
+])
+```
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Comprehension Product Search">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/anagram.livemd">Anagram</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/reduce.livemd">Reduce</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>
+
+## Comprehension Product Search
+
+You're going to create a `Products` module that mimics searching a list of products.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Products.all_items/0
+
+Create a `Products.all_items/0` function that uses comprehensions to generate variations of items.
+
+items should be a map with the following fields:
+
+* **name**: a string of either `"computer"`, `"phone"` or `"tablet"`
+* **price**: A random integer between `1` and `100`.
+
+Using these values above, `all_items/0` should generate `300` unique items.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  %{name: "computer", price: 1},
+  %{name: "computer", price: 2},
+  %{name: "computer", price: 3}
+  ...
+] = Products.all_items()
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Products.search/2
+
+Given a list of items and a keyword list of filters, use comprehensions to filter the list of items that match the given filters.
+
+* **min**: The product price must be greater than or equal to this value.
+* **max**: The product must be less than or equal to this value.
+* **name**: The product name must be equal to this value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+all_items = Products.all_items()
+
+[
+  %{name: "computer", price: 10},
+  %{name: "computer", price: 11},
+  %{name: "computer", price: 12},
+  %{name: "computer", price: 13},
+  %{name: "computer", price: 14},
+  %{name: "computer", price: 15},
+] = Products.search(all_items, [min: 10, max: 15, name: "computer"])
+```
+
+If a filter is not provided, then do not filter based on that value.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+[
+  %{name: "computer", price: 10},
+  %{name: "phone", price: 10},
+  %{name: "tablet", price: 10},
+] = Products.search(all_items, [min: 10, max: 10])
+```
+
+<details style="background-color: lightgreen; padding: 12px; margin-top: 1rem;">
+<summary>Solution Example</summary>
+
+```elixir
+defmodule Products do
+  def all_items do
+    for name <- ["computer", "phone", "tablet"], price <- 1..100 do
+      %{name: name, price: price}
+    end
+  end
+
+  def search(items, filters) do
+    name = Keyword.get(filters, :name)
+    min = Keyword.get(filters, :min)
+    max = Keyword.get(filters, :max)
+
+    for item <- items,
+        !name || item.name == name,
+        !max || item.price <= max,
+        !min || min <= item.price do
+      item
+    end
+  end
+end
+```
+
+</details>
+
+```elixir
+defmodule Products do
+  def all_items do
+  end
+
+  def search(items, filters) do
+  end
+end
+```
+
+## Commit Your Progress
+
+DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
+
+Run `git status` to ensure there are no undesirable changes.
+Then run the following in your command line from the `curriculum` folder to commit your progress.
+
+```
+$ git add .
+$ git commit -m "finish Comprehension Product Search exercise"
+$ git push
+```
+
+We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
+
+We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
+We will accept applications for the June-August 2023 cohort soon.
+
+## Navigation
+
+<div style="display: flex; align-items: center; width: 100%; justify-content: space-between; font-size: 1rem; color: #61758a; background-color: #f0f5f9; height: 4rem; padding: 0 1rem; border-radius: 1rem;">
+<div style="display: flex;">
+<i class="ri-home-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../start.livemd">Home</a>
+</div>
+<div style="display: flex;">
+<i class="ri-bug-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=Comprehension Product Search">Report An Issue</a>
+</div>
+<div style="display: flex;">
+<i class="ri-arrow-left-fill"></i>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../exercises/anagram.livemd">Anagram</a>
+</div>
+<div style="display: flex;">
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/reduce.livemd">Reduce</a>
+<i class="ri-arrow-right-fill"></i>
+</div>
+</div>

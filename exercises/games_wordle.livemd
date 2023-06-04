@@ -22,17 +22,19 @@ Mix.install([
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/exunit_with_mix.livemd">ExUnit With Mix</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/exunit.livemd">ExUnit</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/doctests.livemd">Doctests</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/documentation_and_static_analysis.livemd">Documentation And Static Analysis</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
 
 ## Games: Wordle
 
-In your existing [Games](./games_setup.livemd) project, you're going to create a Wordle game.
+### Requirements
+
+In your existing [Games](./games.livemd) project, you're going to create a Wordle game.
 
 Wordle is a popular game where players get six attempts to guess a word.
 They are given feedback clues to guess the word.
@@ -53,6 +55,31 @@ style 5 fill:yellow
 
 1[T] --- 2[A] --- 3[R] --- 4[T] --- 5[S]
 ```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Tests
+
+You're going to create a full test suite for the wordle game. Write (at least) the following test cases
+
+* All green
+* All yellow
+* All grey
+* some green, yellow, and grey
+
+> **Bonus: Edge Case**: same letter is all 3 colors
+> 
+> ```elixir
+> Games.Wordle.feedback("XXXAA", "AAAAY") == [:yellow, :grey, :grey, :green, :grey]
+> ```
+> 
+> Handle greens first, then fill out yellows in order. The remaining characters are grey.
+> 
+> Be warned, this is a **hard** bonus challenge that significantly increases the complexity of the solution. Consider solving the exercise without this edge-case first.
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Feedback/0
 
 You should be able to start your project by running the following from the `game` folder in
 the command line.
@@ -80,8 +107,6 @@ iex> Games.Wordle.feedback("abdce", "edcba")
 iex> Games.Wordle.feedback("aaabb", "xaaaa")
 [:grey, :green, :green, :yellow, :grey]
 ```
-
-Test and implement a `Games.Wordle` module in your [Games](./games_setup.livemd) project.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -121,6 +146,12 @@ IO.puts(IO.ANSI.yellow() <> "yellow")
 IO.puts(IO.ANSI.light_black() <> "grey")
 ```
 
+Make sure you reset the color.
+
+```elixir
+IO.puts(IO.ANSI.green() <> "green" <> IO.ANSI.reset() <> " reset color")
+```
+
 ## Commit Your Progress
 
 DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
@@ -152,10 +183,10 @@ We will accept applications for the June-August 2023 cohort soon.
 </div>
 <div style="display: flex;">
 <i class="ri-arrow-left-fill"></i>
-<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/exunit_with_mix.livemd">ExUnit With Mix</a>
+<a style="display: flex; color: #61758a; margin-left: 1rem;" href="../reading/exunit.livemd">ExUnit</a>
 </div>
 <div style="display: flex;">
-<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/doctests.livemd">Doctests</a>
+<a style="display: flex; color: #61758a; margin-right: 1rem;" href="../reading/documentation_and_static_analysis.livemd">Documentation And Static Analysis</a>
 <i class="ri-arrow-right-fill"></i>
 </div>
 </div>
