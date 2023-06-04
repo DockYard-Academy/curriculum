@@ -159,7 +159,11 @@ defmodule Utils.Notebooks do
   end
 
   def format_headings(notebook) do
-    formatted_content = Regex.replace(~r/^#+.+$/m, notebook.content, &title_case/1)
+    formatted_content =
+      # format first line
+      String.replace(notebook.content, ~r/^.+/, &title_case/1)
+      # format sub headings
+      |> String.replace(~r/^\#{2,}+.+$/m, &title_case/1)
 
     %Notebook{notebook | content: formatted_content}
   end

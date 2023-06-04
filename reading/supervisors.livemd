@@ -51,7 +51,7 @@ Therefore, we can let a process crash, and it will not affect the rest of our sy
 > completely separated; they share no memory, and a crash in one process can’t by default compromise the execution flow of another.
 > Process isolation allows you to confine the negative effects of an error to a single process or a small group of related processes,
 > which keeps most of the system functioning normally.
->
+> 
 > * Sasa Juric, [Elixir in Action](https://www.manning.com/books/elixir-in-action-second-edition).
 
 For example, We can spawn a process and raise an error. Unless we explicitly link the process with `spawn_link/1`
@@ -72,7 +72,7 @@ Process.sleep(100)
 When a linked process crashes, it will also crashed the process that spawned it. Uncomment the code below, and you'll see it crashes the current Livebook process. Re-comment the code when finished.
 
 ```elixir
-# Spawn_link(fn -> Raise "error" End)
+# spawn_link(fn -> Raise "error" End)
 ```
 
 That means if we start a [GenServer](https://hexdocs.pm/elixir/GenServer.html) (or other process) **unsupervised** it will raise an error if it crashes.
@@ -94,14 +94,14 @@ end
 Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
 
 ```elixir
-# {:ok, Pid} = GenServer.start_link(UnsupervisedWorker, [])
+# {:ok, pid} = GenServer.start_link(UnsupervisedWorker, [])
 # Process.send(pid, :crash, [])
 ```
 
 The same is true if we manually exit a process using [Process.exit/2](https://hexdocs.pm/elixir/Process.html#exit/2) with the `:exit` reason. Uncomment and run the following code to see it crashes the current Livebook process, then re-comment the code.
 
 ```elixir
-# {:ok, Pid} = GenServer.start_link(UnsupervisedWorker, [])
+# {:ok, pid} = GenServer.start_link(UnsupervisedWorker, [])
 # Process.exit(pid, :exit)
 ```
 
@@ -438,7 +438,7 @@ So the timeline of crashes would be:
 * 9 seconds: `Bomb1` crashes (`Bomb2` restarted)
 
 ```elixir
-# {:ok, supervisor_pid} = Supervisor.start_link(children, strategy: :rest_for_one, max_restarts: 5)
+# {:ok, Supervisor_pid} = Supervisor.start_link(children, Strategy: :rest_for_one, Max_restarts: 5)
 ```
 
 ### Your Turn
