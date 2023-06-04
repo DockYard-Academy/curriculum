@@ -5,6 +5,7 @@ defmodule Mix.Tasks.AllTasks do
   use Mix.Task
 
   @requirements [
+    "compile --force",
     "add_notebook_boilerplate",
     "update_deps",
     "format_notebooks",
