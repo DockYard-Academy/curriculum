@@ -21,7 +21,7 @@ defmodule Mix.Tasks.UpdateReadmeOutline do
         """
         <!-- course-outline-start -->
         #{outline_snippet(outline)}
-        <!-- course-outline-start -->
+        <!-- course-outline-end -->
         """
       )
 
