@@ -271,18 +271,6 @@ defmodule Utils.Notebooks do
     """
   end
 
-  defp prev(%{index: 0}), do: %{}
-
-  defp prev(notebook) do
-    Enum.at(outline_notebooks(), notebook.index - 1)
-  end
-
-  defp next(notebook) when @number_of_notebooks == notebook.index + 1, do: %{}
-
-  defp next(notebook) do
-    Enum.at(outline_notebooks(), notebook.index + 1)
-  end
-
   defp built_in_module_docs(content) do
     Regex.replace(~r/`(\w+)`/, content, fn full, module_name ->
       module = String.to_atom("Elixir." <> module_name)
