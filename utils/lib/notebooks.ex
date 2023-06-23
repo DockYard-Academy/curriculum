@@ -7,23 +7,20 @@ defmodule Utils.Notebooks do
   alias Utils.Notebooks.Notebook
   require Logger
 
-  @outline_relative_paths Regex.scan(
-                            ~r/(?:reading|exercises)\/[^\/]+.livemd/,
+  @outline_notebooks Regex.scan(
+                            ~r/  \* \[(.*)\]\((.*)\)/,
                             File.read!("../start.livemd")
                           )
-                          |> Enum.map(fn name -> Path.join("../", name) end)
-
-  @outline_notebooks @outline_relative_paths
-                     |> Enum.with_index()
-                     |> Enum.map(fn {relative_path, index} ->
-                       Notebook.new!(%{
-                         relative_path: relative_path,
-                         index: index
-                       })
-                     end)
+                          |> Enum.map(fn [_full, name, path] -> 
+                            %{
+                              name: name,
+                              relative_path: Path.join("../", path)
+                            }
+                          end)
+                          |> Notebook.map_notebooks()
 
   @unused_notebooks Path.wildcard("../*/*.livemd")
-                    |> Kernel.--(@outline_relative_paths)
+                    |> Kernel.--(Enum.map(@outline_notebooks, & &1.relative_path))
                     |> Enum.map(fn relative_path ->
                       Notebook.new!(%{relative_path: relative_path})
                     end)
