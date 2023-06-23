@@ -4,13 +4,27 @@ defmodule Utils.Notebooks.Notebook do
   """
   defstruct [
     :content,
-    :index,
     :name,
     :relative_path,
     :title,
     :folder,
-    :type
+    :type,
+    :next_notebook,
+    :prev_notebook
   ]
+
+  @type t :: %__MODULE__{
+          content: String.t(),
+          name: String.t(),
+          relative_path: String.t(),
+          title: String.t(),
+          folder: String.t(),
+          type: String.t(),
+          next_notebook: map(),
+          prev_notebook: map()
+        }
+
+  require Logger
 
   @doc """
   Create a new Notebook struct
