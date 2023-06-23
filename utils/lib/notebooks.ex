@@ -246,9 +246,6 @@ defmodule Utils.Notebooks do
   end
 
   def navigation_snippet(notebook) do
-    prev_notebook = prev(notebook)
-    next_notebook = next(notebook)
-
     # indenting results in Livebook misformatting the code.
     """
     ## Navigation
@@ -263,12 +260,12 @@ defmodule Utils.Notebooks do
     <a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=#{notebook.title}">Report An Issue</a>
     </div>
     <div style="display: flex;">
-    <i #{if prev_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{Map.get(prev_notebook, :relative_path, "")}">#{Map.get(prev_notebook, :title, "")}</a>
+    <i #{if notebook.prev_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{Map.get(notebook.prev_notebook,:relative_path, "")}">#{Map.get(notebook.prev_notebook,:name, "")}</a>
     </div>
     <div style="display: flex;">
-    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{Map.get(next_notebook, :relative_path, "")}">#{Map.get(next_notebook, :title, "")}</a>
-    <i #{if next_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
+    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{Map.get(notebook.next_notebook,:relative_path, "")}">#{Map.get(notebook.next_notebook,:name, "")}</a>
+    <i #{if notebook.next_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
     </div>
     </div>
     """
