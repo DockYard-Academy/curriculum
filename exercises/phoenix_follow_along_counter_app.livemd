@@ -139,16 +139,6 @@ defmodule CounterWeb.CounterHTML do
   use CounterWeb, :html
 
   embed_templates "counter_html/*"
-
-    def to_number(number_as_string) when is_binary(number_as_string) do
-    number_as_string
-    |> String.trim()
-    |> String.to_integer()
-  end
-
-  def to_number(number) do
-    number
-  end
 end
 ```
 
@@ -208,8 +198,8 @@ Add the link to the template in `counter_web/controllers/counter_html/count.html
 <h1 class="text-4xl">The current count is: <%= @count %></h1>
 
 <.link
-  navigate={~p"/?count=#{to_number(@count) + 1}"}
-  class="bg-cyan-500 hover:bg-cyan-400 text-2xl p-4 mt-4 rounded-full inline-block"
+  navigate={~p"/?count=#{@count + 1}"}
+  class="inline-block p-4 mt-4 text-2xl rounded-full bg-cyan-500 hover:bg-cyan-400"
 >
   Increment
 </.link>
