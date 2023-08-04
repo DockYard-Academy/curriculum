@@ -59,30 +59,30 @@ This is also a simple example of building a [Finite-state machine](https://en.wi
 * Handle an asynchronous `:transition` message to transition the current light.
 * Handle a synchronous `:current_light` message to retrieve the current light.
 * Create the `transition/1` and `current_light/1` messages as documented below.
-* Write a full suite of tests for the `TrafficLight` module.
+* Write a full suite of tests for the `TrafficLights` module.
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 {:ok, pid} = TrafficLights.Light.start_link([])
 
-:green = TrafficsLight.Light.current_light(pid)
-:ok = TrafficsLight.Light.transition(pid)
+:green = TrafficLights.Light.current_light(pid)
+:ok = TrafficLights.Light.transition(pid)
 
-:yellow = TrafficsLight.Light.current_light(pid)
-:ok = TrafficsLight.Light.transition(pid)
+:yellow = TrafficLights.Light.current_light(pid)
+:ok = TrafficLights.Light.transition(pid)
 
-:red = TrafficsLight.Light.current_light(pid)
-:ok = TrafficsLight.Light.transition(pid)
+:red = TrafficLights.Light.current_light(pid)
+:ok = TrafficLights.Light.transition(pid)
 
-:green = TrafficsLight.Light.current_light(pid)
+:green = TrafficLights.Light.current_light(pid)
 ```
 
 <details style="background-color: lightgreen; padding: 1rem; margin: 1rem 0;">
 <summary>Example Solution</summary>
 
 ```elixir
-defmodule TrafficLightServer do
+defmodule TrafficLights.Light do
   use GenServer
 
   def start_link(_opts) do
@@ -218,7 +218,7 @@ style R5 fill:lightcoral
 <summary>Example Solution</summary>
 
 ```elixir
-defmodule TrafficGridServer do
+defmodule TrafficLights.Grid do
   use GenServer
 
   def start_link(_opts) do
@@ -237,7 +237,7 @@ defmodule TrafficGridServer do
   def init(_opts) do
     light_pids =
       Enum.map(1..5, fn _ ->
-        {:ok, pid} = TrafficLightServer.start_link([])
+        {:ok, pid} = TrafficLights.Light.start_link([])
         pid
       end)
 
@@ -247,9 +247,9 @@ defmodule TrafficGridServer do
   @impl true
   def handle_call(:transition, _from, state) do
     light_pid = Enum.at(state.light_pids, state.transition_index)
-    TrafficLightServer.transition(light_pid)
+    TrafficLights.Light.transition(light_pid)
 
-    lights = Enum.map(state.light_pids, &TrafficLightServer.current_light/1)
+    lights = Enum.map(state.light_pids, &TrafficLights.Light.current_light/1)
     next_transition_index = rem(state.transition_index + 1, length(state.light_pids))
 
     {:reply, lights, %{state | transition_index: next_transition_index}}
@@ -257,7 +257,7 @@ defmodule TrafficGridServer do
 
   @impl true
   def handle_call(:current_lights, _from, state) do
-    lights = Enum.map(state.light_pids, &TrafficLightServer.current_light/1)
+    lights = Enum.map(state.light_pids, &TrafficLights.Light.current_light/1)
 
     {:reply, lights, state}
   end
