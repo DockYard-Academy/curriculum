@@ -314,7 +314,7 @@ For now, we'll implement a very simple solution. Hide the delete button if the m
 
 ```elixir
 # Index.html.heex
-<%= if assigns[:current_user] && @current_user == message.user_id do %>
+<%= if assigns[:current_user] && @current_user.id == message.user_id do %>
   <.link
     phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
     data-confirm="Are you sure?"
