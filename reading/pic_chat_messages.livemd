@@ -275,7 +275,14 @@ Elements are inserted into or removed from the stream.
 
 ```elixir
 @impl true
-def handle_info({PicChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:new, message}}, socket) do
+  # prepends the new message
+  {:noreply, stream_insert(socket, :messages, message, at: 0)}
+end
+
+@impl true
+def handle_info({PicChatWeb.MessageLive.FormComponent, {:edit, message}}, socket) do
+  # updates the new message in its current position
   {:noreply, stream_insert(socket, :messages, message)}
 end
 
