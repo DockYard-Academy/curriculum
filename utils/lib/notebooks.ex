@@ -7,23 +7,20 @@ defmodule Utils.Notebooks do
   alias Utils.Notebooks.Notebook
   require Logger
 
-  @outline_relative_paths Regex.scan(
-                            ~r/(?:reading|exercises)\/[^\/]+.livemd/,
+  @outline_notebooks Regex.scan(
+                            ~r/  \* \[(.*)\]\((.*)\)/,
                             File.read!("../start.livemd")
                           )
-                          |> Enum.map(fn name -> Path.join("../", name) end)
-
-  @outline_notebooks @outline_relative_paths
-                     |> Enum.with_index()
-                     |> Enum.map(fn {relative_path, index} ->
-                       Notebook.new!(%{
-                         relative_path: relative_path,
-                         index: index
-                       })
-                     end)
+                          |> Enum.map(fn [_full, name, path] -> 
+                            %{
+                              name: name,
+                              relative_path: Path.join("../", path)
+                            }
+                          end)
+                          |> Notebook.map_notebooks()
 
   @unused_notebooks Path.wildcard("../*/*.livemd")
-                    |> Kernel.--(@outline_relative_paths)
+                    |> Kernel.--(Enum.map(@outline_notebooks, & &1.relative_path))
                     |> Enum.map(fn relative_path ->
                       Notebook.new!(%{relative_path: relative_path})
                     end)
@@ -249,9 +246,6 @@ defmodule Utils.Notebooks do
   end
 
   def navigation_snippet(notebook) do
-    prev_notebook = prev(notebook)
-    next_notebook = next(notebook)
-
     # indenting results in Livebook misformatting the code.
     """
     ## Navigation
@@ -266,27 +260,15 @@ defmodule Utils.Notebooks do
     <a style="display: flex; color: #61758a; margin-left: 1rem;" href="https://github.com/DockYard-Academy/curriculum/issues/new?assignees=&labels=&template=issue.md&title=#{notebook.title}">Report An Issue</a>
     </div>
     <div style="display: flex;">
-    <i #{if prev_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
-    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{Map.get(prev_notebook, :relative_path, "")}">#{Map.get(prev_notebook, :title, "")}</a>
+    <i #{if notebook.prev_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-left-fill"></i>
+    <a style="display: flex; color: #61758a; margin-left: 1rem;" href="#{Map.get(notebook.prev_notebook,:relative_path, "")}">#{Map.get(notebook.prev_notebook,:name, "")}</a>
     </div>
     <div style="display: flex;">
-    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{Map.get(next_notebook, :relative_path, "")}">#{Map.get(next_notebook, :title, "")}</a>
-    <i #{if next_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
+    <a style="display: flex; color: #61758a; margin-right: 1rem;" href="#{Map.get(notebook.next_notebook,:relative_path, "")}">#{Map.get(notebook.next_notebook,:name, "")}</a>
+    <i #{if notebook.next_notebook == %{}, do: "style=\"display: none;\" "}class="ri-arrow-right-fill"></i>
     </div>
     </div>
     """
-  end
-
-  defp prev(%{index: 0}), do: %{}
-
-  defp prev(notebook) do
-    Enum.at(outline_notebooks(), notebook.index - 1)
-  end
-
-  defp next(notebook) when @number_of_notebooks == notebook.index + 1, do: %{}
-
-  defp next(notebook) do
-    Enum.at(outline_notebooks(), notebook.index + 1)
   end
 
   defp built_in_module_docs(content) do
