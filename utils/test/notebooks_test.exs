@@ -267,7 +267,7 @@ defmodule Utils.NotebooksTest do
              content: """
              Mix.install([
                {:jason, "~> 1.4"},
-               {:kino, "~> 0.9", override: true},
+               {:kino, "~> 0.12.3", override: true},
                {:youtube, github: "brooklinjazz/youtube"},
                {:hidden_cell, github: "brooklinjazz/hidden_cell"},
                {:benchee, "~> 1.1"},
