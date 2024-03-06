@@ -40,7 +40,7 @@ defmodule Utils.Notebooks do
   @notebook_boilerplate_word_count 245
 
   @notebook_dependencies [
-    {:kino, "1.12.3"},
+    {:kino, "0.12.3"},
     {:benchee, "1.1"},
     {:poison, "5.0.0"},
     {:httpoison, "2.1.0"},
