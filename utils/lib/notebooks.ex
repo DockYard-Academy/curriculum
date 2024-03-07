@@ -40,7 +40,7 @@ defmodule Utils.Notebooks do
   @notebook_boilerplate_word_count 245
 
   @notebook_dependencies [
-    {:kino, "0.9"},
+    {:kino, "0.12.3"},
     {:benchee, "1.1"},
     {:poison, "5.0.0"},
     {:httpoison, "2.1.0"},
@@ -207,8 +207,6 @@ defmodule Utils.Notebooks do
     """
     ## Commit Your Progress
 
-    DockYard Academy now recommends you use the latest [Release](https://github.com/DockYard-Academy/curriculum/releases) rather than forking or cloning our repository.
-
     Run `git status` to ensure there are no undesirable changes.
     Then run the following in your command line from the `curriculum` folder to commit your progress.
     ```
@@ -216,11 +214,6 @@ defmodule Utils.Notebooks do
     $ git commit -m "finish #{notebook.title} #{notebook.type}"
     $ git push
     ```
-
-    We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
-
-    We also offer a paid course where you can learn from an instructor alongside a cohort of your peers.
-    We will accept applications for the June-August 2023 cohort soon.
     """
   end
 
@@ -291,7 +284,16 @@ defmodule Utils.Notebooks do
 
   defp built_in_module_docs(content) do
     Regex.replace(~r/`(\w+)`/, content, fn full, module_name ->
-      module = String.to_atom("Elixir." <> module_name)
+      module =
+        module_name
+        |> String.capitalize()
+        |> then(fn
+          "Genserver" -> "GenServer"
+          "Mapset" -> "MapSet"
+          x -> x
+        end)
+        |> then(fn x -> "Elixir." <> x end)
+        |> String.to_atom()
 
       if Code.ensure_loaded?(module) do
         "[#{module_name}](https://hexdocs.pm/elixir/#{module_name}.html)"
