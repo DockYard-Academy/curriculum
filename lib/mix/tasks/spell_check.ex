@@ -11,10 +11,10 @@ defmodule Mix.Tasks.SpellCheck do
     System.cmd(
       "codespell",
       [
-        "--skip=./.git,./utils/.credo.exs,./utils/deps/*,./.git/*,./utils/lib/assets/*,./example_projects/*",
+        "--skip=./.git,./.credo.exs,./deps/*,./.git/*,./lib/assets/*,./example_projects/*",
         "-w"
       ],
-      cd: "../"
+      cd: ""
     )
   end
 end

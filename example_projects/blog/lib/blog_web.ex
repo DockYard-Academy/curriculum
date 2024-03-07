@@ -100,7 +100,7 @@ defmodule BlogWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: BlogWeb.Endpoint,
         router: BlogWeb.Router,
-        statics: BlogWeb.static_paths()
+        statistics: BlogWeb.static_paths()
     end
   end
 

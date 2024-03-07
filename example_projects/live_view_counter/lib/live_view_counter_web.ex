@@ -100,7 +100,7 @@ defmodule LiveViewCounterWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: LiveViewCounterWeb.Endpoint,
         router: LiveViewCounterWeb.Router,
-        statics: LiveViewCounterWeb.static_paths()
+        statistics: LiveViewCounterWeb.static_paths()
     end
   end
 
