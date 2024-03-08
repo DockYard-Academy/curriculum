@@ -36,7 +36,7 @@ defmodule Utils.Notebooks.Notebook do
     field :name, :binary
     field :relative_path, :binary
     field :full_path, :binary
-    field :release_path, :binary
+    field :release_dir, :binary
     field :file_name, :binary
 
     field :title, :binary
@@ -65,7 +65,9 @@ defmodule Utils.Notebooks.Notebook do
       ch
       |> put_change(
         :relative_path,
-        ch |> get_field(:full_path) |> String.replace("/livebooks", "")
+        ch
+        |> get_field(:full_path)
+        |> Path.relative_to("./livebooks")
       )
       |> put_change(
         :file_name,
@@ -96,18 +98,12 @@ defmodule Utils.Notebooks.Notebook do
       |> put_change(:title, title)
     end)
     |> then(fn ch ->
-      release_path =
-        Path.join([@release_dir, get_field(ch, :relative_path)])
-        |> then(fn x ->
-          if get_field(ch, :type) == :outline do
-            String.replace(x, "livebooks", "")
-          else
-            x
-          end
-        end)
-
       ch
-      |> put_change(:release_path, release_path)
+      |> put_change(
+        :release_dir,
+        get_field(ch, :release_dir) ||
+          Path.join([@release_dir, get_field(ch, :file_name) |> Path.basename(".livemd")])
+      )
     end)
     |> then(fn ch ->
       ch |> put_change(:content, ch |> get_field(:full_path) |> File.read!())
@@ -133,7 +129,10 @@ defmodule Utils.Notebooks.Notebook do
   end
 
   def save_release(notebook) do
-    notebook.release_path
+    Path.join([
+      notebook.release_dir,
+      notebook.relative_path
+    ])
     |> tap(fn path ->
       path |> Path.dirname() |> File.mkdir_p!()
     end)
@@ -157,6 +156,7 @@ defmodule Utils.Notebooks.Notebook do
     |> Enum.with_index()
     |> Enum.map(fn {relative_path, index} ->
       new!(
+        release_dir: nb.release_dir,
         full_path: relative_path,
         index: index,
         parent_notebook: nb
