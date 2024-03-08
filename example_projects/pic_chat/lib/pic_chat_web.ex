@@ -100,7 +100,7 @@ defmodule PicChatWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: PicChatWeb.Endpoint,
         router: PicChatWeb.Router,
-        statics: PicChatWeb.static_paths()
+        statistics: PicChatWeb.static_paths()
     end
   end
 
