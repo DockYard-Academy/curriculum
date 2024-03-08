@@ -68,7 +68,7 @@ defmodule Utils.Notebooks.Notebook do
         :relative_path,
         ch
         |> get_field(:full_path)
-        |> Path.relative_to("./livebooks")
+        |> String.replace("livebooks/", "")
       )
       |> put_change(
         :file_name,
@@ -80,7 +80,12 @@ defmodule Utils.Notebooks.Notebook do
         get_field(ch, :relative_path)
 
       "# " <> title =
-        get_field(ch, :full_path) |> File.stream!() |> Enum.take(1) |> hd() |> String.trim()
+        get_field(ch, :full_path)
+        |> file_path_to_read()
+        |> File.stream!()
+        |> Enum.take(1)
+        |> hd()
+        |> String.trim()
 
       name = Path.basename(relative_path, ".livemd")
 
@@ -108,7 +113,8 @@ defmodule Utils.Notebooks.Notebook do
       )
     end)
     |> then(fn ch ->
-      ch |> put_change(:content, ch |> get_field(:full_path) |> File.read!())
+      ch
+      |> put_change(:content, ch |> get_field(:full_path) |> file_path_to_read() |> File.read!())
     end)
   end
 
@@ -131,6 +137,8 @@ defmodule Utils.Notebooks.Notebook do
   end
 
   def save_release(notebook) do
+    IO.inspect(notebook)
+
     Path.join([
       notebook.release_dir,
       notebook.relative_path
@@ -150,7 +158,7 @@ defmodule Utils.Notebooks.Notebook do
   def load_outline_notebooks(any), do: any
 
   defp outline_notebooks(%Notebook{content: content} = nb) do
-    Regex.compile!("livebooks/(?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd")
+    Regex.compile!("(?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd")
     |> Regex.scan(content)
     |> Enum.map(fn name -> Path.join("./", name) end)
     |> Enum.with_index()
@@ -360,19 +368,22 @@ defmodule Utils.Notebooks.Notebook do
 
   def set_release_links(%Notebook{} = nb) do
     content =
-      Regex.compile!("(livebooks/)?((?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd)")
-      |> IO.inspect()
+      Regex.compile!("((?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd)")
       |> Regex.replace(
         nb.content,
-        fn _full, _livebooks, relative ->
+        fn full, relative ->
           if nb.type == :outline do
-            "./#{relative}"
+            relative
           else
-            "../#{relative}"
+            Path.join(["..", relative])
           end
         end
       )
 
     %Notebook{nb | content: content}
+  end
+
+  defp file_path_to_read(full_path) do
+    Path.join(["livebooks", full_path]) |> String.replace("livebooks/livebooks", "livebooks/")
   end
 end
