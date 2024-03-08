@@ -41,12 +41,13 @@ defmodule Utils.Notebooks.Notebook do
 
     field :title, :binary
     field :folder, :binary
-    field :type, Ecto.Enum, values: [:outline, :reading, :exercise]
+    field :type, Ecto.Enum, values: [:outline, :reading, :exercise, :presentation]
 
     field :parent_notebook, :map
     field :outline_notebooks, {:array, :map}
   end
 
+  @outline_notebooks_types_regex_part "reading|exercise|presentation"
   @doc """
   Create a new Notebook struct
 
@@ -84,7 +85,8 @@ defmodule Utils.Notebooks.Notebook do
       name = Path.basename(relative_path, ".livemd")
 
       type =
-        case Regex.scan(~r/(?:reading|exercises)/, relative_path) do
+        case Regex.compile!("(?:#{@outline_notebooks_types_regex_part})")
+             |> Regex.scan(relative_path) do
           [[folder]] ->
             folder
 
@@ -148,10 +150,8 @@ defmodule Utils.Notebooks.Notebook do
   def load_outline_notebooks(any), do: any
 
   defp outline_notebooks(%Notebook{content: content} = nb) do
-    Regex.scan(
-      ~r/livebooks\/(?:reading|exercises)\/[^\/]+.livemd/,
-      content
-    )
+    Regex.compile!("livebooks/(?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd")
+    |> Regex.scan(content)
     |> Enum.map(fn name -> Path.join("./", name) end)
     |> Enum.with_index()
     |> Enum.map(fn {relative_path, index} ->
@@ -360,8 +360,9 @@ defmodule Utils.Notebooks.Notebook do
 
   def set_release_links(%Notebook{} = nb) do
     content =
-      Regex.replace(
-        ~r/(livebooks\/)?((?:reading|exercises)\/[^\/]+.livemd)/,
+      Regex.compile!("(livebooks/)?((?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd)")
+      |> IO.inspect()
+      |> Regex.replace(
         nb.content,
         fn _full, _livebooks, relative ->
           if nb.type == :outline do
