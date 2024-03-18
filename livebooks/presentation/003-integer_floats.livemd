@@ -1,0 +1,254 @@
+# Elixir Bootcamp - Integers & Floats
+
+## Navigation
+
+## Introduction
+
+### Integers
+
+There are two different kinds of numbers in Elixir - integers and floats.
+
+Integers are whole numbers.
+
+```elixir
+integer = 3
+# => 3
+```
+
+### Floating Point Numbers
+
+Floats are numbers with one or more digits behind the decimal separator. They use the 64-bit double precision floating-point format.
+
+```elixir
+float = 3.45
+# => 3.45
+```
+
+### Working with numbers
+
+In the [`Integer`](https://hexdocs.pm/elixir/Integer.html#functions) and [`Float`](https://hexdocs.pm/elixir/Float.html#functions) modules you can find some useful functions for working with those types. Basic arithmetic operators are defined in the [`Kernel`](https://hexdocs.pm/elixir/Kernel.html#*/2) module.
+
+### Conversion
+
+Integers and floats can be mixed together in a single arithmetic expression. Using a float in an expression ensures the result will be a float too.
+
+```elixir
+2 * 3
+# => 6
+
+2 * 3.0
+# => 6.0
+```
+
+However, when doing division, the result will always be a float, even if only integers are used.
+
+```elixir
+6 / 2
+# => 3.0
+```
+
+Floats can be rounded (`round`), rounded up (`ceil`), or rounded down (`floor`).
+
+To round a float into a float, use functions from the `Float` module ([`Float.round`](https://hexdocs.pm/elixir/Float.html#round/2), [`Float.ceil`](https://hexdocs.pm/elixir/Float.html#ceil/2), [`Float.floor`](https://hexdocs.pm/elixir/Float.html#floor/2)). To get an integer instead, use functions from the `Kernel` module ([`round`](https://hexdocs.pm/elixir/Kernel.html#round/1), [`ceil`](https://hexdocs.pm/elixir/Kernel.html#ceil/1), [`floor`](https://hexdocs.pm/elixir/Kernel.html#floor/1)).
+
+Another method of changing a float into an integer is cutting off its decimal part with [`trunc`](https://hexdocs.pm/elixir/Kernel.html#trunc/1).
+
+```elixir
+Float.ceil(5.2)
+# => 6.0
+
+ceil(5.2)
+# => 6
+
+trunc(5.2)
+# => 5
+```
+
+## Exercise - Freelancer Rates
+
+In this exercise you'll be writing code to help a freelancer communicate with a project manager by providing a few utilities to quickly calculate daily and
+monthly rates, optionally with a given discount.
+
+We first establish a few rules between the freelancer and the project manager:
+
+* The daily rate is 8 times the hourly rate.
+* A month has 22 billable days.
+
+Sometimes, the freelancer is offering to apply a discount on their daily rate (for example for their most loyal customers or for non-for-profit customers).
+
+Discounts are modeled as fractional numbers representing percentage, for example `25.0` (25%).
+
+### 1. Calculate the daily rate given an hourly rate
+
+Implement a function to calculate the daily rate given an hourly rate:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+FreelancerRates.daily_rate(60)
+# => 480.0
+```
+
+The returned daily rate should be a float.
+
+### 2. Calculate a discounted price
+
+Implement a function to calculate the price after a discount.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+FreelancerRates.apply_discount(150, 10)
+# => 135.0
+```
+
+The returned value should always be a float, not rounded in any way.
+
+### 3. Calculate the monthly rate, given an hourly rate and a discount
+
+Implement a function to calculate the monthly rate, and apply a discount:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+FreelancerRates.monthly_rate(77, 10.5)
+# => 12130
+```
+
+The returned monthly rate should be rounded up (take the ceiling) to the nearest integer.
+
+### 4. Calculate the number of workdays given a budget, hourly rate and discount
+
+Implement a function that takes a budget, an hourly rate, and a discount, and calculates how many days of work that covers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+FreelancerRates.days_in_budget(20000, 80, 11.0)
+# => 35.1
+```
+
+The returned number of days should be rounded down (take the floor) to one decimal place.
+
+## Implementation
+
+```elixir
+defmodule FreelancerRates do
+  def daily_rate(hourly_rate) do
+    # Please implement the daily_rate/1 function
+  end
+
+  def apply_discount(before_discount, discount) do
+    # Please implement the apply_discount/2 function
+  end
+
+  def monthly_rate(hourly_rate, discount) do
+    # Please implement the monthly_rate/2 function
+  end
+
+  def days_in_budget(budget, hourly_rate, discount) do
+    # Please implement the days_in_budget/3 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule FreelancerRatesTest do
+  use ExUnit.Case
+
+  describe "daily_rate/1" do
+    @tag task_id: 1
+    test "it's the hourly_rate times 8" do
+      assert FreelancerRates.daily_rate(50) == 400.0
+    end
+
+    @tag task_id: 1
+    test "it always returns a float" do
+      assert FreelancerRates.daily_rate(60) === 480.0
+    end
+
+    @tag task_id: 1
+    test "it does not round" do
+      assert FreelancerRates.daily_rate(55.1) == 440.8
+    end
+  end
+
+  describe "apply_discount/2" do
+    @tag task_id: 2
+    test "a discount of 10% leaves 90% of the original price" do
+      assert FreelancerRates.apply_discount(140.0, 10) == 126.0
+    end
+
+    @tag task_id: 2
+    test "it always returns a float" do
+      assert FreelancerRates.apply_discount(100, 10) == 90.0
+    end
+
+    @tag task_id: 2
+    test "it doesn't round" do
+      assert_in_delta FreelancerRates.apply_discount(111.11, 13.5), 96.11015, 0.000001
+    end
+  end
+
+  describe "monthly_rate/2" do
+    @tag task_id: 3
+    test "it's the daily_rate times 22" do
+      assert FreelancerRates.monthly_rate(62, 0.0) == 10_912
+    end
+
+    @tag task_id: 3
+    test "it always returns an integer" do
+      assert FreelancerRates.monthly_rate(70, 0.0) === 12_320
+    end
+
+    @tag task_id: 3
+    test "the result is rounded up" do
+      # 11_052.8
+      assert FreelancerRates.monthly_rate(62.8, 0.0) == 11_053
+      # 11_475.2
+      assert FreelancerRates.monthly_rate(65.2, 0.0) == 11_476
+    end
+
+    @tag task_id: 3
+    test "gives a discount" do
+      # 11_792 - 12% * 11_792 = 10_376.96
+      assert FreelancerRates.monthly_rate(67, 12.0) == 10_377
+    end
+  end
+
+  describe "days_in_budget/3" do
+    @tag task_id: 4
+    test "it's the budget divided by the daily rate" do
+      assert FreelancerRates.days_in_budget(1_600, 50, 0.0) == 4
+    end
+
+    @tag task_id: 4
+    test "it always returns a float" do
+      assert FreelancerRates.days_in_budget(520, 65, 0.0) === 1.0
+    end
+
+    @tag task_id: 4
+    test "it rounds down to one decimal place" do
+      # 10.02273
+      assert FreelancerRates.days_in_budget(4_410, 55, 0.0) == 10.0
+      # 10.18182
+      assert FreelancerRates.days_in_budget(4_480, 55, 0.0) == 10.1
+    end
+
+    @tag task_id: 4
+    test "it applies the discount" do
+      # 1.25
+      assert FreelancerRates.days_in_budget(480, 60, 20) == 1.2
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](002-booleans.livemd)
+[Next Page](004-lists.livemd)

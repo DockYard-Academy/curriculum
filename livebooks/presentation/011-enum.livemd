@@ -1,0 +1,396 @@
+# Elixir Bootcamp - Enumerable Interface
+
+## Navigation
+
+## Introduction
+
+`Enum` is a very useful module that provides a set of algorithms for working with enumerables. It offers:
+
+* sorting ([`sort/2`](https://hexdocs.pm/elixir/Enum.html#sort/2), [`sort_by/2`](https://hexdocs.pm/elixir/Enum.html#sort_by/2)),
+* filtering ([`filter/2`](https://hexdocs.pm/elixir/Enum.html#filter/2)),
+* grouping ([`group_by/3`](https://hexdocs.pm/elixir/Enum.html#group_by/3)),
+* counting ([`count/2`](https://hexdocs.pm/elixir/Enum.html#count/2))
+* searching ([`find/3`](https://hexdocs.pm/elixir/Enum.html#find/3)),
+* finding min/max values ([`min/3`](https://hexdocs.pm/elixir/Enum.html#min/3), [`max/3`](https://hexdocs.pm/elixir/Enum.html#max/3)),
+* reducing ([`reduce/3`](https://hexdocs.pm/elixir/Enum.html#reduce/3), [`reduce_while/3`](https://hexdocs.pm/elixir/Enum.html#reduce_while/3)),
+
+And much more! Refer to the [`Enum` module documentation](https://hexdocs.pm/elixir/Enum.html#functions) for a full list.
+
+### Enumerable
+
+In general, an _enumerable_ is any data that can be iterated over, a collection. In Elixir, an enumerable is any data type that implements the `Enumerable` protocol. Those are:
+
+* [`List`](https://hexdocs.pm/elixir/List.html)
+* [`Map`](https://hexdocs.pm/elixir/Map.html)
+* [`Range`](https://hexdocs.pm/elixir/Map.html)
+* [`Stream`](https://hexdocs.pm/elixir/Stream.html)
+* [`MapSet`](https://hexdocs.pm/elixir/MapSet.html)
+* [`Function`](https://hexdocs.pm/elixir/Function.html)
+* [`Date.Range`](https://hexdocs.pm/elixir/Date.Range.html)
+* [`IO.Stream`](https://hexdocs.pm/elixir/IO.Stream.html)
+* [`File.Stream`](https://hexdocs.pm/elixir/File.Stream.html)
+
+Don't worry if you don't know them all yet.
+
+Anyone can implement the `Enumerable` protocol for their own custom data structure.
+
+### Map
+
+`Enum.map/2` allows you to replace every element in an enumerable with another element. The second argument to `Enum.map/2` is a function that accepts the original element and returns its replacement.
+
+```elixir
+Enum.map([1, 2, 3], fn x -> x * 2 end)
+# => [2, 4, 6]
+
+Enum.map([a: 1, b: 2], fn {k, v} -> {k, -v} end)
+# => [a: -1, b: -2]
+```
+
+### Reduce
+
+`Enum.reduce/2` allows you to _reduce_ the whole enumerable to a single value. To achieve this, a special variable called the _accumulator_ is used. The accumulator carries the intermediate state of the reduction between iterations. This makes it one of the most powerful functions for enumerables. Many other specialized functions could be replaced by the more general `reduce`.
+
+Finding the maximum value:
+
+```elixir
+Enum.max([4, 20, 31, 9, 2])
+# => 31
+
+Enum.reduce([4, 20, 31, 9, 2], nil, fn x, acc ->
+  cond do
+    acc == nil -> x
+    x > acc -> x
+    x <= acc -> acc
+  end
+end)
+
+# => 31
+```
+
+### Working with maps
+
+When using maps with `Enum` functions, the map gets automatically converted to a list of 2 `{key, value}` tuples. To transform it back to a map, use `Enum.into/2`.
+
+```elixir
+%{a: 1, b: 2, e: 3}
+|> Enum.map(fn {key, value} -> {key, value * 10} end)
+|> Enum.into(%{})
+```
+
+## Exercise - Boutique Inventory
+
+You are running an online fashion boutique. Your big annual sale is coming up, so you need to take stock of your inventory to make sure you're ready.
+
+A single item in the inventory is represented by a map, and the whole inventory is a list of such maps.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{
+  name: "White Shirt",
+  price: 40,
+  quantity_by_size: %{s: 3, m: 7, l: 8, xl: 4}
+}
+```
+
+### 1. Sort items by price
+
+Implement the `sort_by_price/1` function. It should take the inventory and return it sorted by item price, ascending.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BoutiqueInventory.sort_by_price([
+  %{price: 65, name: "Maxi Brown Dress", quantity_by_size: %{}},
+  %{price: 50, name: "Red Short Skirt", quantity_by_size: %{}},
+  %{price: 50, name: "Black Short Skirt", quantity_by_size: %{}},
+  %{price: 20, name: "Bamboo Socks Cats", quantity_by_size: %{}}
+])
+
+# => [
+#      %{price: 20, name: "Bamboo Socks Cats", quantity_by_size: %{}},
+#      %{price: 50, name: "Red Short Skirt", quantity_by_size: %{}},
+#      %{price: 50, name: "Black Short Skirt", quantity_by_size: %{}},
+#      %{price: 65, name: "Maxi Brown Dress", price: 65, quantity_by_size: %{}}
+#    ]
+```
+
+### 2. Find all items with missing prices
+
+After sorting your inventory by price, you noticed that you must have made a mistake when you were taking stock and forgot to fill out prices for a few items.
+
+Implement the `with_missing_price/1` function. It should take the inventory and return a list of items that do not have prices.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BoutiqueInventory.with_missing_price([
+  %{price: 40, name: "Black T-shirt", quantity_by_size: %{}},
+  %{price: nil, name: "Denim Pants", quantity_by_size: %{}},
+  %{price: nil, name: "Denim Skirt", quantity_by_size: %{}},
+  %{price: 40, name: "Orange T-shirt", quantity_by_size: %{}}
+])
+
+# => [
+#      %{price: nil, name: "Denim Pants", quantity_by_size: %{}},
+#      %{price: nil, name: "Denim Skirt", quantity_by_size: %{}}
+#    ]
+```
+
+### 3. Update item names
+
+You noticed that some item names have a word that you don't like to use anymore. Now you need to update all the item names with that word.
+
+Implement the `update_names/3` function. It should take the inventory, the old word that you want to remove, and a new word that you want to use instead. It should return a list of items with updated names.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BoutiqueInventory.update_names(
+  [
+    %{price: 40, name: "Black T-shirt", quantity_by_size: %{}},
+    %{price: 70, name: "Denim Pants", quantity_by_size: %{}},
+    %{price: 65, name: "Denim Skirt", quantity_by_size: %{}},
+    %{price: 40, name: "Orange T-shirt", quantity_by_size: %{}}
+  ],
+  "T-shirt",
+  "Tee"
+)
+
+# => [
+#      %{price: 40, name: "Black Tee", quantity_by_size: %{}},
+#      %{price: 70, name: "Denim Pants", quantity_by_size: %{}},
+#      %{price: 65, name: "Denim Skirt", quantity_by_size: %{}},
+#      %{price: 40, name: "Orange Tee", quantity_by_size: %{}}
+#    ]
+```
+
+### 4. Increment the item's quantity
+
+Some items were selling especially well, so you ordered more, in all sizes.
+
+Implement the `increase_quantity/2` function. It should take a single item and a number `n`, and return that item with the quantity for each size increased by `n`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BoutiqueInventory.increase_quantity(
+  %{
+    name: "Polka Dot Skirt",
+    price: 68,
+    quantity_by_size: %{s: 3, m: 5, l: 3, xl: 4}
+  },
+  6
+)
+
+# => %{
+#      name: "Polka Dot Skirt",
+#      price: 68,
+#      quantity_by_size: %{l: 9, m: 11, s: 9, xl: 10}
+#    }
+```
+
+### 5. Calculate the item's total quantity
+
+To know how much space you need in your storage, you need to know how many of each item you have in total.
+
+Implement the `total_quantity/1` function. It should take a single item and return how many pieces you have in total, in any size.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BoutiqueInventory.total_quantity(%{
+  name: "Red Shirt",
+  price: 62,
+  quantity_by_size: %{s: 3, m: 6, l: 5, xl: 2}
+})
+
+# => 16
+```
+
+## Implementation
+
+```elixir
+defmodule BoutiqueInventory do
+  def sort_by_price(inventory) do
+    # Please implement the sort_by_price/1 function
+  end
+
+  def with_missing_price(inventory) do
+    # Please implement the with_missing_price/1 function
+  end
+
+  def update_names(inventory, old_word, new_word) do
+    # Please implement the update_names/3 function
+  end
+
+  def increase_quantity(item, count) do
+    # Please implement the increase_quantity/2 function
+  end
+
+  def total_quantity(item) do
+    # Please implement the total_quantity/1 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule BoutiqueInventoryTest do
+  use ExUnit.Case
+
+  describe "sort_by_price/1" do
+    @tag task_id: 1
+    test "works for an empty inventory" do
+      assert BoutiqueInventory.sort_by_price([]) == []
+    end
+
+    @tag task_id: 1
+    test "sorts items by price" do
+      assert BoutiqueInventory.sort_by_price([
+               %{price: 65, name: "Maxi Yellow Summer Dress", quantity_by_size: %{}},
+               %{price: 60, name: "Cream Linen Pants", quantity_by_size: %{}},
+               %{price: 33, name: "Straw Hat", quantity_by_size: %{}}
+             ]) == [
+               %{price: 33, name: "Straw Hat", quantity_by_size: %{}},
+               %{price: 60, name: "Cream Linen Pants", quantity_by_size: %{}},
+               %{price: 65, name: "Maxi Yellow Summer Dress", quantity_by_size: %{}}
+             ]
+    end
+
+    @tag task_id: 1
+    test "the order of items of equal price is preserved" do
+      assert BoutiqueInventory.sort_by_price([
+               %{price: 65, name: "Maxi Yellow Summer Dress", quantity_by_size: %{}},
+               %{price: 60, name: "Cream Linen Pants", quantity_by_size: %{}},
+               %{price: 33, name: "Straw Hat", quantity_by_size: %{}},
+               %{price: 60, name: "Brown Linen Pants", quantity_by_size: %{}}
+             ]) == [
+               %{price: 33, name: "Straw Hat", quantity_by_size: %{}},
+               %{price: 60, name: "Cream Linen Pants", quantity_by_size: %{}},
+               %{price: 60, name: "Brown Linen Pants", quantity_by_size: %{}},
+               %{price: 65, name: "Maxi Yellow Summer Dress", quantity_by_size: %{}}
+             ]
+    end
+  end
+
+  describe "with_missing_price/1" do
+    @tag task_id: 2
+    test "works for an empty inventory" do
+      assert BoutiqueInventory.with_missing_price([]) == []
+    end
+
+    @tag task_id: 2
+    test "filters out items that do have a price" do
+      assert BoutiqueInventory.with_missing_price([
+               %{name: "Red Flowery Top", price: 50, quantity_by_size: %{}},
+               %{name: "Purple Flowery Top", price: nil, quantity_by_size: %{}},
+               %{name: "Bamboo Socks Avocado", price: 10, quantity_by_size: %{}},
+               %{name: "Bamboo Socks Palm Trees", price: 10, quantity_by_size: %{}},
+               %{name: "Bamboo Socks Kittens", price: nil, quantity_by_size: %{}}
+             ]) == [
+               %{name: "Purple Flowery Top", price: nil, quantity_by_size: %{}},
+               %{name: "Bamboo Socks Kittens", price: nil, quantity_by_size: %{}}
+             ]
+    end
+  end
+
+  describe "update_names/3" do
+    @tag task_id: 3
+    test "works for an empty inventory" do
+      assert BoutiqueInventory.update_names([], "T-Shirt", "Tee") == []
+    end
+
+    @tag task_id: 3
+    test "replaces the word in all the names" do
+      assert BoutiqueInventory.update_names(
+               [
+                 %{name: "Bambo Socks Avocado", price: 10, quantity_by_size: %{}},
+                 %{name: "3x Bambo Socks Palm Trees", price: 26, quantity_by_size: %{}},
+                 %{name: "Red Sequin Top", price: 87, quantity_by_size: %{}}
+               ],
+               "Bambo",
+               "Bamboo"
+             ) == [
+               %{name: "Bamboo Socks Avocado", price: 10, quantity_by_size: %{}},
+               %{name: "3x Bamboo Socks Palm Trees", price: 26, quantity_by_size: %{}},
+               %{name: "Red Sequin Top", price: 87, quantity_by_size: %{}}
+             ]
+    end
+
+    @tag task_id: 3
+    test "replaces all the instances of the word within one name" do
+      assert BoutiqueInventory.update_names(
+               [
+                 %{name: "GO! GO! GO! Tee", price: 8, quantity_by_size: %{}}
+               ],
+               "GO!",
+               "Go!"
+             ) == [
+               %{name: "Go! Go! Go! Tee", price: 8, quantity_by_size: %{}}
+             ]
+    end
+  end
+
+  describe "increase_quantity/2" do
+    @tag task_id: 4
+    test "works for an empty quantity map" do
+      assert BoutiqueInventory.increase_quantity(
+               %{
+                 name: "Long Black Evening Dress",
+                 price: 105,
+                 quantity_by_size: %{}
+               },
+               1
+             ) == %{
+               name: "Long Black Evening Dress",
+               price: 105,
+               quantity_by_size: %{}
+             }
+    end
+
+    @tag task_id: 4
+    test "increases quantity of an item" do
+      assert BoutiqueInventory.increase_quantity(
+               %{
+                 name: "Green Swimming Shorts",
+                 price: 46,
+                 quantity_by_size: %{s: 1, m: 2, l: 4, xl: 1}
+               },
+               3
+             ) == %{
+               name: "Green Swimming Shorts",
+               price: 46,
+               quantity_by_size: %{s: 4, m: 5, l: 7, xl: 4}
+             }
+    end
+  end
+
+  describe "total_quantity/1" do
+    @tag task_id: 5
+    test "works for an empty quantity map" do
+      assert BoutiqueInventory.total_quantity(%{
+               name: "Red Denim Pants",
+               price: 77,
+               quantity_by_size: %{}
+             }) == 0
+    end
+
+    @tag task_id: 5
+    test "sums up total quantity" do
+      assert BoutiqueInventory.total_quantity(%{
+               name: "Black Denim Skirt",
+               price: 50,
+               quantity_by_size: %{s: 4, m: 11, l: 6, xl: 8}
+             }) == 29
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](010-structs_pipe.livemd)

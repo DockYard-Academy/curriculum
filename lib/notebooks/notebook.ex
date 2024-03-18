@@ -371,7 +371,7 @@ defmodule Utils.Notebooks.Notebook do
       Regex.compile!("((?:#{@outline_notebooks_types_regex_part})/[^/]+.livemd)")
       |> Regex.replace(
         nb.content,
-        fn full, relative ->
+        fn _full, relative ->
           if nb.type == :outline do
             relative
           else

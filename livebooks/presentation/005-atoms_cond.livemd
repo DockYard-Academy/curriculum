@@ -1,0 +1,241 @@
+# Elixir Bootcamp - Atoms & Code branching
+
+## Navigation
+
+## Introduction
+
+### Atoms
+
+Elixir's `atom` type represents a fixed constant. An atom's value is simply its own name. This gives us a type-safe way to interact with data. Atoms can be defined as follows:
+
+```elixir
+# All atoms are preceded with a ':' then follow with alphanumeric snake-cased characters
+variable = :an_atom
+```
+
+_Atoms_ are internally represented by an integer in a lookup table, which are set automatically. It is not possible to change this internal value.
+
+### Cond
+
+Often, we want to write code that can branch based on a condition. While there are many ways to do this in Elixir, one of the simplest ways is using `cond/1`.
+
+At its simplest, `cond` follows the first path that evaluates to `true` with one or more branches:
+
+```elixir
+x = 5
+y = 7
+
+cond do
+  x > 10 -> :this_might_be_the_way
+  y < 7 -> :or_that_might_be_the_way
+  x == 3 and y == 5 -> :this_is_definitely_the_way
+  true -> :this_is_the_default_way
+end
+```
+
+If no path evaluates to `true`, an error is raised by the runtime.
+
+### If
+
+Besides `cond`, Elixir also provides the macro [`if/2`](https://hexdocs.pm/elixir/case-cond-and-if.html#if-unless) which is useful when you need to check for only one condition.
+
+[`if/2`](https://hexdocs.pm/elixir/Kernel.html#if/2) accepts a condition and two options. It returns the first option if the condition is _truthy_, and the second option if the condition is _falsy_.
+
+```elixir
+age = 15
+
+if age >= 16 do
+  "You are allowed to drink beer in Germany."
+else
+  "No beer for you!"
+end
+
+# => "No beer for you!"
+```
+
+It is also possible to write an `if` expression on a single line. Note the comma after the condition.
+
+```elixir
+if age > 16, do: "beer", else: "no beer"
+```
+
+This syntax is helpful for very short expressions, but should be avoided if the expression won't fit on a single line.
+
+### _Truthy_ and _falsy_
+
+In Elixir, all datatypes evaluate to a _truthy_ or _falsy_ value when they are encountered in a boolean context (like an `if` expression). All data is considered _truthy_ **except** for `false` and `nil`. In particular, empty strings, the integer `0`, and empty lists are all considered _truthy_ in Elixir.
+
+## Exercise - Log Level
+
+You are running a system that consists of a few applications producing many logs. You want to write a small program that will aggregate those logs and give them labels according to their severity level. All applications in your system use the same log codes, but some of the legacy applications don't support all the codes.
+
+| Log code              | Log label | Supported in legacy apps? |
+| --------------------- | --------- | ------------------------- |
+| 0                     | trace     | no                        |
+| 1                     | debug     | yes                       |
+| 2                     | info      | yes                       |
+| 3                     | warning   | yes                       |
+| 4                     | error     | yes                       |
+| 5                     | fatal     | no                        |
+| other / not supported | unknown   | -                         |
+
+### 1. Determine the log label
+
+Implement the `LogLevel.to_label/2` function. It should take an integer code and a boolean flag telling you if the log comes from a legacy app, and return the label of a log line as an atom.
+
+Log codes not specified in the table should return an _unknown_ label. Log codes specified in the table as not supported in legacy apps should also return an _unknown_ label if the log came from a legacy app.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+LogLevel.to_label(0, false)
+# => :trace
+
+LogLevel.to_label(0, true)
+# => :unknown
+```
+
+### 2. Send an alert
+
+Somebody has to be notified when unexpected things happen.
+
+Implement the `LogLevel.alert_recipient/2` function to determine to whom the alert needs to be sent. The function should take an integer code and a boolean flag telling you if the log comes from a legacy app, and return the name of the recipient as an atom.
+
+Use the `LogLevel.to_label/2` function from the previous task. If the log label is _error_ or _fatal_, send the alert to the _ops_ team. If you receive a log with an _unknown_ label from a legacy system, send the alert to the _dev1_ team, other unknown labels should be sent to the _dev2_ team. All other log labels can be safely ignored by returning _false_.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+LogLevel.alert_recipient(-1, true)
+# => :dev1
+
+LogLevel.alert_recipient(0, false)
+# => false
+```
+
+## Implementation
+
+```elixir
+defmodule LogLevel do
+  def to_label(level, legacy?) do
+    # Please implement the to_label/2 function
+  end
+
+  def alert_recipient(level, legacy?) do
+    # Please implement the alert_recipient/2 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule LogLevelTest do
+  use ExUnit.Case
+
+  describe "LogLevel.to_label/2" do
+    @tag task_id: 1
+    test "level 0 has label trace only in a non-legacy app" do
+      assert LogLevel.to_label(0, false) == :trace
+      assert LogLevel.to_label(0, true) == :unknown
+    end
+
+    @tag task_id: 1
+    test "level 1 has label debug" do
+      assert LogLevel.to_label(1, false) == :debug
+      assert LogLevel.to_label(1, true) == :debug
+    end
+
+    @tag task_id: 1
+    test "level 2 has label info" do
+      assert LogLevel.to_label(2, false) == :info
+      assert LogLevel.to_label(2, true) == :info
+    end
+
+    @tag task_id: 1
+    test "level 3 has label warning" do
+      assert LogLevel.to_label(3, false) == :warning
+      assert LogLevel.to_label(3, true) == :warning
+    end
+
+    @tag task_id: 1
+    test "level 4 has label error" do
+      assert LogLevel.to_label(4, false) == :error
+      assert LogLevel.to_label(4, true) == :error
+    end
+
+    @tag task_id: 1
+    test "level 5 has label fatal only in a non-legacy app" do
+      assert LogLevel.to_label(5, false) == :fatal
+      assert LogLevel.to_label(5, true) == :unknown
+    end
+
+    @tag task_id: 1
+    test "level 6 has label unknown" do
+      assert LogLevel.to_label(6, false) == :unknown
+      assert LogLevel.to_label(6, true) == :unknown
+    end
+
+    @tag task_id: 1
+    test "level -1 has label unknown" do
+      assert LogLevel.to_label(-1, false) == :unknown
+      assert LogLevel.to_label(-1, true) == :unknown
+    end
+  end
+
+  describe "LogLevel.alert_recipient/2" do
+    @tag task_id: 2
+    test "fatal code sends alert to ops" do
+      assert LogLevel.alert_recipient(5, false) == :ops
+    end
+
+    @tag task_id: 2
+    test "error code sends alert to ops" do
+      assert LogLevel.alert_recipient(4, false) == :ops
+      assert LogLevel.alert_recipient(4, true) == :ops
+    end
+
+    @tag task_id: 2
+    test "unknown code sends alert to dev team 1 for a legacy app" do
+      assert LogLevel.alert_recipient(6, true) == :dev1
+      assert LogLevel.alert_recipient(0, true) == :dev1
+      assert LogLevel.alert_recipient(5, true) == :dev1
+    end
+
+    @tag task_id: 2
+    test "unknown code sends alert to dev team 2" do
+      assert LogLevel.alert_recipient(6, false) == :dev2
+    end
+
+    @tag task_id: 2
+    test "trace code does not send alert" do
+      assert LogLevel.alert_recipient(0, false) == false
+    end
+
+    @tag task_id: 2
+    test "debug code does not send alert" do
+      assert LogLevel.alert_recipient(1, false) == false
+      assert LogLevel.alert_recipient(1, true) == false
+    end
+
+    @tag task_id: 2
+    test "info code does not send alert" do
+      assert LogLevel.alert_recipient(2, false) == false
+      assert LogLevel.alert_recipient(2, true) == false
+    end
+
+    @tag task_id: 2
+    test "warning code does not send alert" do
+      assert LogLevel.alert_recipient(3, false) == false
+      assert LogLevel.alert_recipient(3, true) == false
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](004-lists.livemd)
+[Next page](006-guards.livemd)

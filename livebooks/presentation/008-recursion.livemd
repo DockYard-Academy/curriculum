@@ -1,0 +1,283 @@
+# Elixir Bootcamp - Recursion
+
+## Navigation
+
+## Introduction
+
+Recursive functions are functions that call themselves.
+
+A recursive function needs to have at least one _base case_ and at least one _recursive case_.
+
+A _base case_ returns a value without calling the function again. A _recursive case_ calls the function again, modifying the input so that it will at some point match the base case.
+
+Very often, each case is written in its own function clause.
+
+```elixir
+defmodule Counter do
+  # base case
+  def call([]), do: 0
+
+  # recursive case
+  def call([_head | tail]), do: 1 + call(tail)
+end
+
+Counter.call(["a", 1, 2, "c", "apple"])
+```
+
+A recursive function can have many base cases and/or many recursive cases. For example [the Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number) is a recursive sequence with two base cases:
+
+```elixir
+defmodule Fibbonacci do
+  def call(0), do: 0
+  def call(1), do: 1
+  def call(n), do: call(n - 1) + call(n - 2)
+end
+
+Fibbonacci.call(10)
+```
+
+Counting the number of occurrences of some given value `x` in a list has two recursive cases:
+
+```elixir
+defmodule CounterPremium do
+  def count_occurrences([], _x), do: 0
+  def count_occurrences([x | tail], x), do: 1 + count_occurrences(tail, x)
+  def count_occurrences([_ | tail], x), do: count_occurrences(tail, x)
+end
+
+CounterPremium.count_occurrences([1, 2, 3, 1, 4, 1], 1)
+# => 3
+```
+
+### Loops through recursion
+
+Due to immutability, loops in Elixir are written differently from imperative languages. For example, loops commonly look like:
+
+```
+for(i = 0; i < array.size; i++) {
+  # do something with array[i]
+}
+```
+
+In a functional language, mutating `i` (by calling `i++`) is not possible. Thus, loops have to be implemented with recursion.
+
+The equivalent of a `for` loop in Elixir would look like this:
+
+```elixir
+defmodule ElixirForLoop do
+  def loop([]), do: nil
+
+  def loop([head | tail]) do
+    do_something(head)
+    loop(tail)
+  end
+
+  def do_something(element) do
+    IO.inspect(element)
+  end
+end
+
+ElixirForLoop.loop([1, 2, 3, 4, 5])
+```
+
+In practice, iterating over lists and other enumerable data structures is most often done using the [`Enum`](https://hexdocs.pm/elixir/Enum.html) module. Under the hood, functions from the `Enum` module are [implemented using recursion](https://github.com/elixir-lang/elixir/blob/291ebf7458bb588be64e0a65afc1b9fd51ebc4dc/lib/elixir/lib/enum.ex#L3767-L3768).
+
+Yet, there is other use case of a `for` which are list comprehensions
+
+```elixir
+for n <- [1, 2, 3, 4], do: n * n
+# => [1, 4, 9, 16]
+
+for n <- 1..4, do: n * n
+# => [1, 4, 9, 16]
+```
+
+`for` also support pattern matching on the left-hand side; all non-matching patterns are ignored.
+
+```elixir
+values = [good: 1, good: 2, bad: 3, good: 4]
+for {:good, n} <- values, do: n * n
+# => [1, 4, 16]
+```
+
+## Exercise - Birds Count
+
+You're an avid bird watcher that keeps track of how many birds have visited your garden on any given day.
+
+You decided to bring your bird watching to a new level and implement a few tools that will help you track and process the data.
+
+You have chosen to store the data as a list of integers. The first number in the list is the number of birds that visited your garden today, the second yesterday, and so on.
+
+### 1. Check how many birds visited today
+
+Implement the `BirdCount.today/1` function. It should take a list of daily bird counts and return today's count. If the list is empty, it should return `nil`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BirdCount.today([2, 5, 1])
+# => 2
+```
+
+### 2. Increment today's count
+
+Implement the `BirdCount.increment_day_count/1` function. It should take a list of daily bird counts and increment the today's count by 1. If the list is empty, return `[1]`.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BirdCount.increment_day_count([4, 0, 2])
+# => [5, 0, 2]
+```
+
+### 3. Check if there was a day with no visiting birds
+
+Implement the `BirdCount.has_day_without_birds?/1` function. It should take a list of daily bird counts. It should return `true` if there was at least one day when no birds visited the garden, and `false` otherwise.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BirdCount.has_day_without_birds?([2, 0, 4])
+# => true
+
+BirdCount.has_day_without_birds?([3, 8, 1, 5])
+# => false
+```
+
+### 4. Calculate the total number of visiting birds
+
+Implement the `BirdCount.total/1` function. It should take a list of daily bird counts and return the total number that visited your garden since you started collecting the data.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BirdCount.total([4, 0, 9, 0, 5])
+# => 18
+```
+
+### 5. Calculate the number of busy days
+
+Some days are busier than others. A busy day is one where five or more birds have visited your garden.
+
+Implement the `BirdCount.busy_days/1` function. It should take a list of daily bird counts and return the number of busy days.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+BirdCount.busy_days([4, 5, 0, 0, 6])
+# => 2
+```
+
+## Implementation
+
+```elixir
+defmodule BirdCount do
+  def today(list) do
+    # Please implement the today/1 function
+  end
+
+  def increment_day_count(list) do
+    # Please implement the increment_day_count/1 function
+  end
+
+  def has_day_without_birds?(list) do
+    # Please implement the has_day_without_birds?/1 function
+  end
+
+  def total(list) do
+    # Please implement the total/1 function
+  end
+
+  def busy_days(list) do
+    # Please implement the busy_days/1 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule BirdCountTest do
+  use ExUnit.Case
+
+  describe "today/1" do
+    @tag task_id: 1
+    test "returns nil if no bird watching data recorded" do
+      assert BirdCount.today([]) == nil
+    end
+
+    @tag task_id: 1
+    test "returns today's bird count" do
+      assert BirdCount.today([5]) == 5
+      assert BirdCount.today([2, 4, 11, 10, 6, 8]) == 2
+    end
+  end
+
+  describe "increment_day_count/1" do
+    @tag task_id: 2
+    test "creates entry for today if no bird watching data recorded" do
+      assert BirdCount.increment_day_count([]) == [1]
+    end
+
+    @tag task_id: 2
+    test "adds 1 to today's bird count" do
+      assert BirdCount.increment_day_count([5]) == [6]
+      assert BirdCount.increment_day_count([4, 2, 1, 0, 10]) == [5, 2, 1, 0, 10]
+    end
+  end
+
+  describe "has_day_without_birds?/1" do
+    @tag task_id: 3
+    test "false if no bird watching data recorded" do
+      assert BirdCount.has_day_without_birds?([]) == false
+    end
+
+    @tag task_id: 3
+    test "false if there are no zeros in bird watching data" do
+      assert BirdCount.has_day_without_birds?([1]) == false
+      assert BirdCount.has_day_without_birds?([6, 7, 10, 2, 5]) == false
+    end
+
+    @tag task_id: 3
+    test "true if there are is at least one zero in bird watching data" do
+      assert BirdCount.has_day_without_birds?([0]) == true
+      assert BirdCount.has_day_without_birds?([4, 4, 0, 1]) == true
+      assert BirdCount.has_day_without_birds?([0, 0, 3, 0, 5, 6, 0]) == true
+    end
+  end
+
+  describe "total/1" do
+    @tag task_id: 4
+    test "zero if no bird watching data recorded" do
+      assert BirdCount.total([]) == 0
+    end
+
+    @tag task_id: 4
+    test "sums up bird counts" do
+      assert BirdCount.total([4]) == 4
+      assert BirdCount.total([3, 0, 0, 4, 4, 0, 0, 10]) == 21
+    end
+  end
+
+  describe "busy_days/1" do
+    @tag task_id: 5
+    test "zero if no bird watching data recorded" do
+      assert BirdCount.busy_days([]) == 0
+    end
+
+    @tag task_id: 5
+    test "counts days with bird count of 5 or more" do
+      assert BirdCount.busy_days([1]) == 0
+      assert BirdCount.busy_days([0, 5]) == 1
+      assert BirdCount.busy_days([0, 6, 10, 4, 4, 5, 0]) == 3
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](007-tuples_pattern_matching.livemd)
+[Next page](009-keyword_list_maps.livemd)

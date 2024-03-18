@@ -1,0 +1,409 @@
+# Elixir Bootcamp - Structs & Pipe Operator
+
+## Navigation
+
+## Introduction
+
+[Structs](https://hexdocs.pm/elixir/structs.html) are special [maps](https://hexdocs.pm/elixir/Map.html#content) with a defined set of keys.
+
+* Structs provide compile-time checks and default values.
+* A struct is named after the module it is defined in.
+* To define a struct use the [`defstruct`](https://hexdocs.pm/elixir/Kernel.html#defstruct/1) construct.
+  * The construct usually immediately follows after the module definition.
+* `defstruct` accepts either a list of `atoms` (for nil default values) or `keyword lists` (for specified default values).
+  * The fields without defaults must precede the fields with default values.
+
+```elixir
+defmodule Plane do
+  defstruct [:engine, wings: 2, seats: 4]
+end
+```
+
+```elixir
+plane = %Plane{}
+# => %Plane{engine: nil, wings: 2, seats: 4}
+```
+
+### Accessing fields and updating
+
+* Most functions that work with `maps` will also work with structs.
+
+* It is recommended to use the _static access operator_ `.` to access struct fields.
+
+* Get/fetch field values:
+
+  ```elixir
+  plane = %Plane{}
+  plane.steats
+  # => 4
+  Map.fetch(plane, :wings)
+  # => {:ok, 2}
+  ```
+
+* Update field values
+
+  ```elixir
+  plane = %Plane{}
+  %{plane | wings: 4}
+  # => %Plane{engine: nil, wings: 4, seats: 4}
+  ```
+
+### Enforcing field value initialization
+
+* The [`@enforce_keys` module attribute](https://hexdocs.pm/elixir/Kernel.html#defstruct/1-enforcing-keys) creates a run-time check that specified fields must be initialized to a **non**-`nil` value when the struct is created.
+* `@enforce_keys` is followed by a list of the field keys (which are atoms).
+* If an enforced key is not initialized, an error is raised.
+
+```elixir
+defmodule User do
+  @enforce_keys [:username]
+  defstruct [:username]
+end
+```
+
+```elixir
+%User{}
+# => (ArgumentError) the following keys must also be given when building struct User: [:username]
+```
+
+### Pipe Operator
+
+The `|>` operator is called [the pipe operator](https://hexdocs.pm/elixir/Kernel.html#%7C%3E/2). It can be used to chain function calls together in such a way that the value returned by the previous function call is passed as the first argument to the next function call.
+
+```elixir
+String.replace_suffix(String.upcase(String.duplicate("go ", 3)), " ", "!")
+
+# versus
+
+"go "
+|> String.duplicate(3)
+|> String.upcase()
+|> String.replace_suffix(" ", "!")
+```
+
+It can also be used on a single line:
+
+```elixir
+"go " |> String.duplicate(3) |> String.upcase() |> String.replace_suffix(" ", "!")
+```
+
+## Exercise - Remote Control Car
+
+In this exercise you'll be playing around with a remote controlled car, which you've finally saved enough money for to buy.
+
+Cars start with full (100%) batteries. Each time you drive the car using the remote control, it covers 20 meters and drains one percent of the battery. The car's nickname is not known until it is created.
+
+The remote controlled car has a fancy LED display that shows two bits of information:
+
+* The total distance it has driven, displayed as: `"<METERS> meters"`.
+* The remaining battery charge, displayed as: `"Battery at <PERCENTAGE>%"`.
+
+If the battery is at 0%, you can't drive the car anymore and the battery display will show `"Battery empty"`.
+
+### 1. Create a brand-new remote controlled car
+
+Implement the `RemoteControlCar.new/0` function to return a brand-new remote controlled car struct:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RemoteControlCar.new()
+# => %RemoteControlCar{
+#      battery_percentage: 100,
+#      distance_driven_in_meters: 0,
+#      nickname: "none"
+#    }
+```
+
+The nickname is required by the struct, make sure that a value is initialized in the `new` function, but not in the struct.
+
+### 2. Create a brand-new remote controlled car with a nickname
+
+Implement the `RemoteControlCar.new/1` function to return a brand-new remote controlled car struct with a provided nickname:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RemoteControlCar.new("Blue")
+# => %RemoteControlCar{
+#      battery_percentage: 100,
+#      distance_driven_in_meters: 0,
+#      nickname: "Blue"
+#    }
+```
+
+### 3. Display the distance
+
+Implement the `RemoteControlCar.display_distance/1` function to return the distance as displayed on the LED display:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+car = RemoteControlCar.new()
+RemoteControlCar.display_distance(car)
+# => "0 meters"
+```
+
+Make sure the function only accepts a `RemoteControlCar` struct as the argument.
+
+### 4. Display the battery percentage
+
+Implement the `RemoteControlCar.display_battery/1` function to return the battery percentage as displayed on the LED display:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+car = RemoteControlCar.new()
+RemoteControlCar.display_battery(car)
+# => "Battery at 100%"
+```
+
+Make sure the function only accepts a `RemoteControlCar` struct as the argument. If the battery is at 0%, the battery display will show "Battery empty".
+
+### 5. Driving changes the battery and distance driven
+
+Implement the `RemoteControlCar.drive/1` function that:
+
+* updates the number of meters driven by 20
+* drains 1% of the battery
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+RemoteControlCar.new("Red")
+|> RemoteControlCar.drive()
+
+# => %RemoteControlCar{
+#      battery_percentage: 99,
+#      distance_driven_in_meters: 20,
+#      nickname: "Red"
+#    }
+```
+
+Make sure the function only accepts a `RemoteControlCar` struct as the argument.
+
+### 6. Account for driving with a dead battery
+
+Update the `RemoteControlCar.drive/1` function to not increase the distance driven nor decrease the battery percentage when the battery is drained (at 0%):
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%RemoteControlCar{
+  battery_percentage: 0,
+  distance_driven_in_meters: 1980,
+  nickname: "Red"
+}
+|> RemoteControlCar.drive()
+
+# => %RemoteControlCar{
+#      battery_percentage: 0,
+#      distance_driven_in_meters: 1980,
+#      nickname: "Red"
+#    }
+```
+
+## Implementation
+
+```elixir
+defmodule RemoteControlCar do
+  # Please implement the struct with the specified fields
+
+  def new() do
+    # Please implement the new/0 function
+  end
+
+  def new(nickname) do
+    # Please implement the new/1 function
+  end
+
+  def display_distance(remote_car) do
+    # Please implement the display_distance/1 function
+  end
+
+  def display_battery(remote_car) do
+    # Please implement the display_battery/1 function
+  end
+
+  def drive(remote_car) do
+    # Please implement the drive/1 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+defmodule FakeRemoteControlCar do
+  defstruct battery_percentage: 100,
+            distance_driven_in_meters: 0,
+            nickname: nil
+end
+
+defmodule RemoteControlCarTest do
+  use ExUnit.Case
+
+  @tag task_id: 1
+  test "required key 'nickname' should not have a default value" do
+    assert_raise ArgumentError, fn ->
+      quote do
+        %RemoteControlCar{}
+      end
+      |> Code.eval_quoted()
+    end
+  end
+
+  @tag task_id: 1
+  test "new" do
+    car = RemoteControlCar.new()
+
+    assert car.__struct__ == RemoteControlCar
+    assert car.battery_percentage == 100
+    assert car.distance_driven_in_meters == 0
+    assert car.nickname == "none"
+  end
+
+  @tag task_id: 2
+  test "new with nickname" do
+    nickname = "Red"
+    car = RemoteControlCar.new(nickname)
+
+    assert car.__struct__ == RemoteControlCar
+    assert car.battery_percentage == 100
+    assert car.distance_driven_in_meters == 0
+    assert car.nickname == nickname
+  end
+
+  @tag task_id: 3
+  test "display distance raises error when not given struct" do
+    fake_car = %{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.display_distance(fake_car)
+    end)
+  end
+
+  @tag task_id: 3
+  test "display distance raises error when given unexpected struct" do
+    fake_car = %FakeRemoteControlCar{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.display_distance(fake_car)
+    end)
+  end
+
+  @tag task_id: 3
+  test "display distance of new" do
+    car = RemoteControlCar.new()
+
+    assert RemoteControlCar.display_distance(car) == "0 meters"
+  end
+
+  @tag task_id: 3
+  test "display distance of driven" do
+    car = RemoteControlCar.new()
+    car = %{car | distance_driven_in_meters: 20}
+
+    assert RemoteControlCar.display_distance(car) == "20 meters"
+  end
+
+  @tag task_id: 4
+  test "display battery raises error when not given struct" do
+    fake_car = %{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.display_battery(fake_car)
+    end)
+  end
+
+  @tag task_id: 4
+  test "display battery raises error when given unexpected struct" do
+    fake_car = %FakeRemoteControlCar{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.display_battery(fake_car)
+    end)
+  end
+
+  @tag task_id: 4
+  test "display battery of new" do
+    car = RemoteControlCar.new()
+
+    assert RemoteControlCar.display_battery(car) == "Battery at 100%"
+  end
+
+  @tag task_id: 4
+  test "display battery of dead battery" do
+    car = RemoteControlCar.new()
+    car = %{car | battery_percentage: 0}
+
+    assert RemoteControlCar.display_battery(car) == "Battery empty"
+  end
+
+  @tag task_id: 5
+  test "drive raises error when not given struct" do
+    fake_car = %{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.drive(fake_car)
+    end)
+  end
+
+  @tag task_id: 5
+  test "drive raises error when given unexpected struct" do
+    fake_car = %FakeRemoteControlCar{
+      battery_percentage: 100,
+      distance_driven_in_meters: 0,
+      nickname: "Fake"
+    }
+
+    assert_raise(FunctionClauseError, fn ->
+      RemoteControlCar.drive(fake_car)
+    end)
+  end
+
+  @tag task_id: 5
+  test "drive with battery" do
+    car = RemoteControlCar.new() |> RemoteControlCar.drive()
+
+    assert car.__struct__ == RemoteControlCar
+    assert car.battery_percentage == 99
+    assert car.distance_driven_in_meters == 20
+  end
+
+  @tag task_id: 6
+  test "drive with dead battery" do
+    car =
+      RemoteControlCar.new()
+      |> Map.put(:battery_percentage, 0)
+      |> RemoteControlCar.drive()
+
+    assert car.__struct__ == RemoteControlCar
+    assert car.battery_percentage == 0
+    assert car.distance_driven_in_meters == 0
+  end
+end
+```
+
+[Previous Page](009-keyword_list_maps.livemd)
+[Next Page](011-enum.livemd)

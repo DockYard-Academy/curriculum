@@ -1,0 +1,271 @@
+# Elixir Bootcamp - Introduction
+
+## Navigation
+
+## Introduction
+
+### Variables
+
+Elixir is a dynamically-typed language, meaning that the type of a variable is only checked at runtime. Using the match `=` operator, we can bind a value of any type to a variable name:
+
+```elixir
+# Bound an integer value of 1
+count = 1
+# You may re-bind variables
+count = 2
+
+# You may re-bind any type to a variable
+count = false
+
+# Strings can be created by enclosing characters within double quotes
+message = "Success!"
+```
+
+### Strings
+
+[Strings](https://hexdocs.pm/elixir/basic-types.html#strings) in Elixir are delimited by double quotes, and they are encoded in UTF-8:
+
+```elixir
+"Hi!"
+```
+
+Strings can be concatenated using the [`<>/2`](https://hexdocs.pm/elixir/Kernel.html#%3C%3E/2) operator:
+
+```elixir
+"Welcome to" <> " " <> "New York"
+# => "Welcome to New York"
+```
+
+Strings in Elixir support [interpolation](https://hexdocs.pm/elixir/String.html#module-interpolation) using the `#{}` syntax:
+
+```elixir
+result = 6 * 7
+"The result is #{result}"
+# => "The result is 42"
+```
+
+### Modules
+
+Elixir is a functional-programming language and requires all named functions to be defined in a _module_.The `defmodule` keyword is used to define a module.
+All modules are available to all other modules at runtime and do not require an _access modifier_ to make them visible to other parts of the program. A _module_ is analogous to a _class_ in other programming languages.
+
+```elixir
+defmodule SuperModule do
+  # ...
+end
+```
+
+### Named functions
+
+_Named Functions_ must be defined in a module. The `def` keyword is used to define a _public_ named function.
+
+Each function can have zero or more arguments. The value of the last expression in a function is always _implicitly returned_.
+
+```elixir
+defmodule Calculator do
+  def add(x, y) do
+    x + y
+  end
+end
+```
+
+Invoking a function is done by specifying its module and function name and passing arguments for each of the function's arguments.
+
+```elixir
+sum = Calculator.add(1, 2)
+# => 3
+```
+
+The `defp` keyword can be used instead of `def` to define a _private_ function. Private functions can only be used from within the same module that defined them.
+
+When invoking a function inside the same module where it's defined, the module name can be omitted.
+
+You may also write short functions using a one-line syntax (note the comma `,` and the colon `:` around the keyword `do`).
+
+```elixir
+defmodule PessimisticCalculator do
+  def subtract(x, y) do
+    private_subtract(x, y)
+  end
+
+  defp private_subtract(x, y), do: x - y
+end
+
+difference = PessimisticCalculator.subtract(7, 2)
+# => 5
+
+difference = PessimisticCalculator.private_subtract(7, 2)
+# => ** (UndefinedFunctionError) function Calculator.private_subtract/2 is undefined or private
+#       Calculator.private_subtract(7, 2)
+```
+
+### Arity of functions
+
+It is common to refer to functions with their _arity_. The _arity_ of a function is the number of arguments it accepts.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+# add/3 because this function has three arguments, thus an arity of 3
+def add(x, y, z) do
+  x + y + z
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### Naming conventions
+
+Module names should use `PascalCase`. A module name must start with an uppercase letter `A-Z` and can contain letters `a-zA-Z`, numbers `0-9`, and underscores `_`.
+
+Variable and function names should use `snake_case`. A variable or function name must start with a lowercase letter `a-z` or an underscore `_`, can contain letters `a-zA-Z`, numbers `0-9`, and underscores `_`, and might end with a question mark `?` or an exclamation mark `!`.
+
+### Standard library
+
+Elixir has a very rich and well-documented standard library. The documentation is available online at [hexdocs.pm/elixir][docs]. Save this link somewhere - you will use it a lot!
+
+Most built-in data types have a corresponding module that offers functions for working with that data type, e.g. there's the `Integer` module for integers, `String` module for strings, `List` module for lists and so on.
+
+A notable module is the `Kernel` module. It provides the basic capabilities on top of which the rest of the standard library is built, like arithmetic operators, control-flow macros, and much more. Functions for the `Kernel` module are automatically imported, so you can use them without the `Kernel.` prefix.
+
+### Code comments
+
+Comments can be used to leave notes for other developers reading the source code. Single line comments in Elixir are preceded by `#`.
+
+## Exercise 1 - Lasagne
+
+In this exercise you're going to write some code to help you cook a brilliant lasagna from your favorite cooking book.
+
+You have five tasks, all related to the time spent cooking the lasagna.
+
+---
+
+### 1. Define the expected oven time in minutes
+
+Define the `Lasagna.expected_minutes_in_oven/0` function that does not take any arguments and returns how many minutes the lasagna should be in the oven.
+According to the cooking book, the expected oven time in minutes is 40:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Lasagna.expected_minutes_in_oven()
+# => 40
+```
+
+### 2. Calculate the remaining oven time in minutes
+
+Define the `Lasagna.remaining_minutes_in_oven/1` function that takes the actual minutes the lasagna has been in the oven as an argument and returns how many minutes the lasagna still has to remain in the oven, based on the expected oven time in minutes from the previous task.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Lasagna.remaining_minutes_in_oven(30)
+# => 10
+```
+
+### 3. Calculate the preparation time in minutes
+
+Define the `Lasagna.preparation_time_in_minutes/1` function that takes the number of layers you added to the lasagna as an argument and returns how many minutes you spent preparing the lasagna, assuming each layer takes you 2 minutes to prepare.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Lasagna.preparation_time_in_minutes(2)
+# => 4
+```
+
+### 4. Calculate the total working time in minutes
+
+Define the `Lasagna.total_time_in_minutes/2` function that takes two arguments: the first argument is the number of layers you added to the lasagna, and the second argument is the number of minutes the lasagna has been in the oven. The function should return how many minutes in total you've worked on cooking the lasagna, which is the sum of the preparation time in minutes, and the time in minutes the lasagna has spent in the oven at the moment.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Lasagna.total_time_in_minutes(3, 20)
+# => 26
+```
+
+### 5. Create a function which displays the notification message with remaining time
+
+Define the `Lasagna.alarm/1` function that takes remaining time and returns pretty information for user with information of remaining time
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Lasagna.alarm(40)
+# => "Lasagna will be ready in 40 minutes"
+```
+
+## Implementation
+
+```elixir
+defmodule Lasagna do
+  # Please define the 'expected_minutes_in_oven/0' function
+  def expected_minutes_in_oven do
+    40
+  end
+
+  # Please define the 'remaining_minutes_in_oven/1' function
+
+  # Please define the 'preparation_time_in_minutes/1' function
+
+  # Please define the 'total_time_in_minutes/2' function
+
+  # Please define the 'alarm/1' function
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule LasagnaTest do
+  use ExUnit.Case
+  doctest Lasagna
+
+  @tag task_id: 1
+  test "expected minutes in oven" do
+    assert Lasagna.expected_minutes_in_oven() === 40
+  end
+
+  @tag task_id: 2
+  test "remaining minutes in oven" do
+    assert Lasagna.remaining_minutes_in_oven(25) === 15
+  end
+
+  @tag task_id: 2
+  test "remaining minutes in oven, a few minutes later" do
+    assert Lasagna.remaining_minutes_in_oven(30) === 10
+  end
+
+  @tag task_id: 3
+  test "preparation time in minutes for one layer" do
+    assert Lasagna.preparation_time_in_minutes(1) === 2
+  end
+
+  @tag task_id: 3
+  test "preparation time in minutes for multiple layers" do
+    assert Lasagna.preparation_time_in_minutes(4) === 8
+  end
+
+  @tag task_id: 4
+  test "total time in minutes for one layer" do
+    assert Lasagna.total_time_in_minutes(1, 30) === 32
+  end
+
+  @tag task_id: 4
+  test "total time in minutes for multiple layers" do
+    assert Lasagna.total_time_in_minutes(4, 8) === 16
+  end
+
+  @tag task_id: 5
+  test "notification message" do
+    assert Lasagna.alarm(40) === "Lasagna will be ready in 40 minutes"
+  end
+end
+
+ExUnit.run()
+```
+
+[Next Page](002-booleans.livemd)

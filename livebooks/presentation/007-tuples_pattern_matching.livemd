@@ -1,0 +1,283 @@
+# Elixir Bootcamp - Tuples & Pattern Matching
+
+## Navigation
+
+## Introduction
+
+### Tuples
+
+In Elixir, a tuple is a data structure which organizes data, holding a fixed number of items of any type, but without explicit names for each element. Tuples are often used in Elixir for memory read-intensive operations, since read-access of an element is a constant-time operation. They are not usually used when elements may need to be added/removed dynamically because rather than modifying the existing tuple, a new tuple is created which requires memory to be allocated upfront.
+
+In practice, tuples are created in Elixir using curly braces. Elements in a tuple can be individually accessed using the `elem/2` function using 0-based indexing:
+
+```elixir
+empty_tuple = {}
+one_element_tuple = {1}
+multiple_element_tuple = {1, :a, "hello"}
+
+elem(multiple_element_tuple, 2)
+# => "hello"
+```
+
+### Tuples as grouped information
+
+Tuples are often used in practice to represent grouped information.
+
+```elixir
+Float.ratio(0.25)
+# => {1, 4} indicating the numerator and denominator of the fraction ¼
+```
+
+### Pattern Matching
+
+The use of pattern matching is dominant in assertive, idiomatic Elixir code. You might recall that `=/2` is described as a match operator rather than as an assignment operator. When using the match operator, if the pattern on the left matches the right, any variables on the left are bound, and the value of the right side is returned. A `MatchError` is raised if there is no match.
+
+```elixir
+2 = 2
+# => 2
+# Literals can be matched if they are the same
+
+2 = 3
+# => ** (MatchError) no match of right hand side value: 3
+
+{_, denominator} = Float.ratio(0.25)
+# => {1, 4}
+# the variable `denominator` is bound to the value 4
+```
+
+Remember, matches occur from the right side to the left side.
+
+In the last example, if we don't need a variable in a pattern match, we can discard it by referencing `_`.
+Any variable starting with an `_` is not tracked by the runtime.
+
+### Pattern matching in named functions
+
+Pattern matching is also a useful tool when creating multiple function clauses. Pattern matching can be used on the functions' arguments which then determines which function clause to invoke -- starting from the top of the file down until the first match. Variables may be bound in a function head and used in the function body.
+
+```elixir
+defmodule Example do
+  def named_function(:a = variable_a) do
+    {variable_a, 1}
+  end
+
+  def named_function(:b = variable_b) do
+    {variable_b, 2}
+  end
+end
+
+Example.named_function(:a)
+# => {:a, 1}
+
+Example.named_function(:b)
+# => {:b, 2}
+
+Example.named_function(:c)
+# => ** (FunctionClauseError) no function clause matching in Example.named_function/1
+```
+
+## Exercise - Kitchen Calculator
+
+While preparing to bake cookies for your friends, you have found that you have to convert some of the measurements used in the recipe. Being only familiar with the metric system, you need to come up with a way to convert common US baking measurements to milliliters (mL) for your own ease.
+
+Use this conversion chart for your solution:
+
+| Unit to convert | volume | in milliliters (mL) |
+| --------------- | ------ | ------------------- |
+| mL              | 1      | 1                   |
+| US cup          | 1      | 240                 |
+| US fluid ounce  | 1      | 30                  |
+| US teaspoon     | 1      | 5                   |
+| US tablespoon   | 1      | 15                  |
+
+Being a talented programmer in training, you decide to use milliliters as a transition unit to facilitate the conversion from any unit listed to any other (even itself).
+
+### 1. Get the numeric component from a volume-pair
+
+Implement the `KitchenCalculator.get_volume/1` function. Given a volume-pair tuple, it should return just the numeric component.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+KitchenCalculator.get_volume({:cup, 2.0})
+# => 2.0
+```
+
+### 2. Convert the volume-pair to milliliters
+
+Implement the `KitchenCalculator.to_milliliter/1` function. Given a volume-pair tuple, it should convert the volume to milliliters using the conversion chart.
+
+Use multiple function clauses and pattern matching to create the functions for each unit. The atoms used to denote each unit are: `:cup`, `:fluid_ounce`, `:teaspoon`, `:tablespoon`, `:milliliter`. Return the result of the conversion wrapped in a tuple.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+KitchenCalculator.to_milliliter({:cup, 2.5})
+# => {:milliliter, 600.0}
+```
+
+### 3. Convert the milliliter volume-pair to another unit
+
+Implement the `KitchenCalculator.from_milliliter/2` function. Given a volume-pair tuple and the desired unit, it should convert the volume to the desired unit using the conversion chart.
+
+Use multiple function clauses and pattern matching to create the functions for each unit. The atoms used to denote each unit are: `:cup`, `:fluid_ounce`, `:teaspoon`, `:tablespoon`, `:milliliter`
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+KitchenCalculator.from_milliliter({:milliliter, 1320.0}, :cup)
+# => {:cup, 5.5}
+```
+
+### 4. Convert from any unit to any unit
+
+Implement the `KitchenCalculator.convert/2` function. Given a volume-pair tuple and the desired unit, it should convert the given volume to the desired unit.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+KitchenCalculator.convert({:teaspoon, 9.0}, :tablespoon)
+# => {:tablespoon, 3.0}
+```
+
+## Implementation
+
+```elixir
+defmodule KitchenCalculator do
+  def get_volume(volume_pair) do
+    # Please implement the get_volume/1 function
+  end
+
+  def to_milliliter(volume_pair) do
+    # Please implement the to_milliliter/1 functions
+  end
+
+  def from_milliliter(volume_pair, unit) do
+    # Please implement the from_milliliter/2 functions
+  end
+
+  def convert(volume_pair, unit) do
+    # Please implement the convert/2 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule KitchenCalculatorTest do
+  use ExUnit.Case
+
+  describe "get volume from tuple pair" do
+    @tag task_id: 1
+    test "get cups" do
+      assert KitchenCalculator.get_volume({:cup, 1}) == 1
+    end
+
+    @tag task_id: 1
+    test "get fluid ounces" do
+      assert KitchenCalculator.get_volume({:fluid_ounce, 2}) == 2
+    end
+
+    @tag task_id: 1
+    test "get teaspoons" do
+      assert KitchenCalculator.get_volume({:teaspoon, 3}) == 3
+    end
+
+    @tag task_id: 1
+    test "get tablespoons" do
+      assert KitchenCalculator.get_volume({:tablespoon, 4}) == 4
+    end
+
+    @tag task_id: 1
+    test "get milliliters" do
+      assert KitchenCalculator.get_volume({:milliliter, 5}) == 5
+    end
+  end
+
+  describe "convert to milliliters from" do
+    @tag task_id: 2
+    test "milliliters" do
+      assert KitchenCalculator.to_milliliter({:milliliter, 3}) == {:milliliter, 3}
+    end
+
+    @tag task_id: 2
+    test "cups" do
+      assert KitchenCalculator.to_milliliter({:cup, 3}) == {:milliliter, 720}
+    end
+
+    @tag task_id: 2
+    test "fluid ounces" do
+      assert KitchenCalculator.to_milliliter({:fluid_ounce, 100}) == {:milliliter, 3000}
+    end
+
+    @tag task_id: 2
+    test "teaspoon" do
+      assert KitchenCalculator.to_milliliter({:teaspoon, 3}) == {:milliliter, 15}
+    end
+
+    @tag task_id: 2
+    test "tablespoon" do
+      assert KitchenCalculator.to_milliliter({:tablespoon, 3}) == {:milliliter, 45}
+    end
+  end
+
+  describe "convert from milliliters to" do
+    @tag task_id: 3
+    test "milliliters" do
+      assert KitchenCalculator.from_milliliter({:milliliter, 4}, :milliliter) == {:milliliter, 4}
+    end
+
+    @tag task_id: 3
+    test "cups" do
+      assert KitchenCalculator.from_milliliter({:milliliter, 840}, :cup) == {:cup, 3.5}
+    end
+
+    @tag task_id: 3
+    test "fluid ounces" do
+      assert KitchenCalculator.from_milliliter({:milliliter, 4522.5}, :fluid_ounce) ==
+               {:fluid_ounce, 150.75}
+    end
+
+    @tag task_id: 3
+    test "teaspoon" do
+      assert KitchenCalculator.from_milliliter({:milliliter, 61.25}, :teaspoon) ==
+               {:teaspoon, 12.25}
+    end
+
+    @tag task_id: 3
+    test "tablespoon" do
+      assert KitchenCalculator.from_milliliter({:milliliter, 71.25}, :tablespoon) ==
+               {:tablespoon, 4.75}
+    end
+  end
+
+  describe "convert from x to y:" do
+    @tag task_id: 4
+    test "teaspoon to tablespoon" do
+      assert KitchenCalculator.convert({:teaspoon, 15}, :tablespoon) == {:tablespoon, 5}
+    end
+
+    @tag task_id: 4
+    test "cups to fluid ounces" do
+      assert KitchenCalculator.convert({:cup, 4}, :fluid_ounce) == {:fluid_ounce, 32}
+    end
+
+    @tag task_id: 4
+    test "fluid ounces to teaspoons" do
+      assert KitchenCalculator.convert({:fluid_ounce, 4}, :teaspoon) == {:teaspoon, 24}
+    end
+
+    @tag task_id: 4
+    test "tablespoons to cups" do
+      assert KitchenCalculator.convert({:tablespoon, 320}, :cup) == {:cup, 20}
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](006-guards.livemd)
+[Next page](008-recursion.livemd)

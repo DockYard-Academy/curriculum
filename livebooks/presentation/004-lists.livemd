@@ -1,0 +1,298 @@
+# Elixir Bootcamp - Lists
+
+## Navigation
+
+## Introduction
+
+### Lists
+
+Lists are built-in to the Elixir language. They are considered a basic type, denoted by square brackets. Lists may be empty or hold any number of items of any type. For example:
+
+```elixir
+empty_list = []
+one_item_list = [1]
+two_item_list = [1, 2]
+multiple_type_list = [1, :pi, 3.14, "four"]
+```
+
+Elixir implements lists as a linked list, where each node stores two values: the first item and another list with all the remaining items. The first item in the list is referred to as the _head_ and the remaining list of items is called the _tail_. We can use this notation in code:
+
+```elixir
+# [1] represented in [head | tail] notation
+[1 | []]
+
+# [1, 2, 3] represented in [head | tail] notation
+[1 | [2 | [3 | []]]]
+```
+
+We can use _`[head | tail]`_ notation to prepend elements to a list:
+
+```elixir
+# Suppose
+list = [2, 1]
+
+[3, 2, 1] == [3 | list]
+# => true
+```
+
+There are several functions in the `Kernel` module for working with lists, as well as the whole `List` module.
+
+```elixir
+# Check if 1 is a member of the list
+1 in [1, 2, 3, 4]
+# => true
+```
+
+## Exercise - Language List
+
+In this exercise you need to implement some functions to manipulate a list of programming languages.
+
+### 1. Define a function to return an empty language list
+
+Define the `new/0` function that takes no arguments and returns an empty list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+LanguageList.new()
+# => []
+```
+
+### 2. Define a function to add a language to the list
+
+Define the `add/2` function that takes 2 arguments (a _language list_ and a string literal of a _language_). It should return the resulting list with the new language prepended to the given list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+language_list = LanguageList.new()
+# => []
+language_list = LanguageList.add(language_list, "Clojure")
+# => ["Clojure"]
+language_list = LanguageList.add(language_list, "Haskell")
+# => ["Haskell", "Clojure"]
+```
+
+### 3. Define a function to remove a language from the list
+
+Define the `remove/1` function that takes 1 argument (a _language list_). It should return the list without the first item. Assume the list will always have at least one item.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+language_list = LanguageList.new()
+# => []
+language_list = LanguageList.add(language_list, "Clojure")
+# => ["Clojure"]
+language_list = LanguageList.add(language_list, "Haskell")
+# => ["Haskell", "Clojure"]
+language_list = LanguageList.remove(language_list)
+# => ["Clojure"]
+```
+
+### 4. Define a function to return the first item in the list
+
+Define the `first/1` function that takes 1 argument (a _language list_). It should return the first language in the list. Assume the list will always have at least one item.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+language_list = LanguageList.new()
+# => []
+language_list = LanguageList.add(language_list, "Elm")
+# => ["Elm"]
+language_list = LanguageList.add(language_list, "Prolog")
+# => ["Prolog", "Elm"]
+LanguageList.first(language_list)
+# => "Prolog"
+```
+
+### 5. Define a function to return how many languages are in the list
+
+Define the `count/1` function that takes 1 argument (a _language list_). It should return the number of languages in the list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+language_list = LanguageList.new()
+# => []
+language_list = LanguageList.add(language_list, "Elm")
+# => ["Elm"]
+language_list = LanguageList.add(language_list, "Prolog")
+# => ["Prolog", "Elm"]
+LanguageList.count(language_list)
+# => 2
+```
+
+### 6. Define a function to determine if the list includes a functional language
+
+Define the `functional_list?/1` function which takes 1 argument (a _language list_). It should return a boolean value. It should return true if _"Elixir"_ is one of the languages in the list.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+language_list = LanguageList.new()
+# => []
+language_list = LanguageList.add(language_list, "Elixir")
+# => ["Elixir"]
+LanguageList.functional_list?(language_list)
+# => true
+```
+
+## Implementation
+
+```elixir
+defmodule LanguageList do
+  def new() do
+    # Please implement the new/0 function
+  end
+
+  def add(list, language) do
+    # Please implement the add/2 function
+  end
+
+  def remove(list) do
+    # Please implement the remove/1 function
+  end
+
+  def first(list) do
+    # Please implement the first/1 function
+  end
+
+  def count(list) do
+    # Please implement the count/1 function
+  end
+
+  def functional_list?(list) do
+    # Please implement the functional_list?/1 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule LanguageListTest do
+  use ExUnit.Case
+
+  describe "new/0" do
+    @tag task_id: 1
+    test "new list" do
+      assert LanguageList.new() == []
+    end
+  end
+
+  describe "add/2" do
+    @tag task_id: 2
+    test "add a language to a list" do
+      language = "Elixir"
+      list = [language]
+
+      assert LanguageList.new() |> LanguageList.add(language) == list
+    end
+
+    @tag task_id: 2
+    test "add several languages to a list" do
+      list =
+        LanguageList.new()
+        |> LanguageList.add("Clojure")
+        |> LanguageList.add("Haskell")
+        |> LanguageList.add("Erlang")
+        |> LanguageList.add("F#")
+        |> LanguageList.add("Elixir")
+
+      assert list == ["Elixir", "F#", "Erlang", "Haskell", "Clojure"]
+    end
+  end
+
+  describe "remove/1" do
+    @tag task_id: 3
+    test "add then remove results in empty list" do
+      list =
+        LanguageList.new()
+        |> LanguageList.add("Elixir")
+        |> LanguageList.remove()
+
+      assert list == []
+    end
+
+    @tag task_id: 3
+    test "adding two languages, when removed, removes first item" do
+      list =
+        LanguageList.new()
+        |> LanguageList.add("F#")
+        |> LanguageList.add("Elixir")
+        |> LanguageList.remove()
+
+      assert list == ["F#"]
+    end
+  end
+
+  describe "first/1" do
+    @tag task_id: 4
+    test "add one language, then get the first" do
+      assert LanguageList.new() |> LanguageList.add("Elixir") |> LanguageList.first() == "Elixir"
+    end
+
+    @tag task_id: 4
+    test "add a few languages, then get the first" do
+      first =
+        LanguageList.new()
+        |> LanguageList.add("Elixir")
+        |> LanguageList.add("Prolog")
+        |> LanguageList.add("F#")
+        |> LanguageList.first()
+
+      assert first == "F#"
+    end
+  end
+
+  describe "count/1" do
+    @tag task_id: 5
+    test "the count of a new list is 0" do
+      assert LanguageList.new() |> LanguageList.count() == 0
+    end
+
+    @tag task_id: 5
+    test "the count of a one-language list is 1" do
+      count =
+        LanguageList.new()
+        |> LanguageList.add("Elixir")
+        |> LanguageList.count()
+
+      assert count == 1
+    end
+
+    @tag task_id: 5
+    test "the count of a multiple-item list is equal to its length" do
+      count =
+        LanguageList.new()
+        |> LanguageList.add("Elixir")
+        |> LanguageList.add("Prolog")
+        |> LanguageList.add("F#")
+        |> LanguageList.count()
+
+      assert count == 3
+    end
+  end
+
+  describe "functional_list?/1" do
+    @tag task_id: 6
+    test "a functional language list" do
+      assert LanguageList.functional_list?(["Clojure", "Haskell", "Erlang", "Elixir", "F#"])
+    end
+
+    @tag task_id: 6
+    test "not a functional language list" do
+      assert false = LanguageList.functional_list?(["Java", "C", "JavaScript"])
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](003-integer_floats.livemd)
+[Next page](005-atoms_cond.livemd)

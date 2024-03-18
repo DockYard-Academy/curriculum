@@ -1,0 +1,423 @@
+# Elixir Bootcamp - Keyword List & Maps
+
+## Navigation
+
+## Introduction
+
+### Keyword List
+
+Keyword lists are a key-value data structure.
+
+```elixir
+[month: "April", year: 2018]
+```
+
+Keyword lists are lists of `{key, value}` [tuples](https://elixirschool.com/en/lessons/basics/collections#tuples-4), and can also be written as such, but the shorter syntax is more widely used.
+
+```elixir
+[month: "April"] == [{:month, "April"}]
+# => true
+```
+
+Keys in a keyword list must be `atoms`, but the values can be anything. Each key can be used more than once. The key-value pairs in a keyword list are ordered.
+
+You can work with keyword lists using the same approaches as for lists, or you can use the `Keyword` module.
+
+### Maps
+
+Maps in Elixir are the data structure for storing information in key-value pairs. In other languages, these might also be known as associative arrays (PHP), hashes (Perl 5, Raku), or dictionaries (Python).
+
+* Keys can be of any type, but must be unique.
+* Values can be of any type, they do not have to be unique.
+* Maps do not guarantee the order of their contents despite appearing to do so.
+
+If the key is an `atom` we can use a shorthand syntax. Maps do not guarantee the order of their entries when accessed or returned.
+
+### Literal forms
+
+An empty map is simply declared with `%{}`. If we want to add items to a map literal, we can use two forms:
+
+```elixir
+# If the key is an atom:
+%{atom_key: 1}
+
+# If the key is a different type:
+%{1 => :atom_value}
+
+# You can even mix these if the atom form comes second:
+%{"first_form" => :a, atom_form: :b}
+```
+
+### Map module functions
+
+Elixir provides many functions for working with maps in the [Map module](https://hexdocs.pm/elixir/Map.html). Some _Map module_ functions require an _anonymous_ function to be passed into the function to assist with the map transformation.
+
+```elixir
+# You can turn existing Enumerable into Map
+kw_list = [a: 1, b: 2]
+map = Map.new(kw_list)
+# => %{a: 1, b: 2}
+
+Map.get(map, :a)
+# => 1
+
+Map.delete(map, :a)
+# => %{b: 2}
+
+Map.put(map, :c, 3)
+```
+
+### Keyword lists vs maps
+
+|                  | Keyword list                  | Map                                 |
+| ---------------- | ----------------------------- | ----------------------------------- |
+| Key type         | Atoms                         | Any, can be mixed in one map        |
+| Duplicate keys   | Yes                           | No                                  |
+| Keys ordered     | Yes                           | No                                  |
+| Access           | `list[:key]`, `Keyword.get/2` | `map.key`, `map[:key]`, `Map.get/2` |
+| Access time      | Linear                        | Logarithmic                         |
+| Pattern matching | Not very useful               | Useful                              |
+
+Faster access time, flexible key type, and useful pattern matching makes maps the default choice in most cases.
+
+Use keyword lists when you don't have a lot of data, but need duplicate keys or keys in a specific order.
+
+## Exercise - High Score
+
+In this exercise, you're implementing a way to keep track of the high scores for the most popular game in your local arcade hall.
+
+### 1. Define a new high score map
+
+To make a new high score map, define the `HighScore.new/0` function which doesn't take any arguments and returns a new, empty map of high scores.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+HighScore.new()
+# => %{}
+```
+
+### 2. Add players to the high score map
+
+To add a player to the high score map, define `HighScore.add_player/3`, which is a function which takes 3 arguments:
+
+* The first argument is the map of scores.
+* The second argument is the name of a player as a string.
+* The third argument is the score as an integer. The argument is optional, implement the third argument with a default value of 0.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+score_map = HighScore.new()
+# => %{}
+score_map = HighScore.add_player(score_map, "Dave Thomas")
+# => %{"Dave Thomas" => 0}
+score_map = HighScore.add_player(score_map, "José Valim", 486_373)
+# => %{"Dave Thomas" => 0, "José Valim"=> 486_373}
+```
+
+### 3. Remove players from the score map
+
+To remove a player from the high score map, define `HighScore.remove_player/2`, which takes 2 arguments:
+
+* The first argument is the map of scores.
+* The second argument is the name of the player as a string.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+score_map = HighScore.new()
+# => %{}
+score_map = HighScore.add_player(score_map, "Dave Thomas")
+# => %{"Dave Thomas" => 0}
+score_map = HighScore.remove_player(score_map, "Dave Thomas")
+# => %{}
+```
+
+### 4. Reset a player's score
+
+To reset a player's score, define `HighScore.reset_score/2`, which takes 2 arguments:
+
+* The first argument is the map of scores.
+* The second argument is the name of the player as a string, whose score you wish to reset.
+
+The function should also work if the player doesn't have a score.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+score_map = HighScore.new()
+# => %{}
+score_map = HighScore.add_player(score_map, "José Valim", 486_373)
+# => %{"José Valim"=> 486_373}
+score_map = HighScore.reset_score(score_map, "José Valim")
+# => %{"José Valim"=> 0}
+```
+
+### 5. Update a player's score
+
+To update a player's score by adding to the previous score, define `HighScore.update_score/3`, which takes 3 arguments:
+
+* The first argument is the map of scores.
+* The second argument is the name of the player as a string, whose score you wish to update.
+* The third argument is the score that you wish to **add** to the stored high score.
+
+The function should also work if the player doesn't have a previous score - assume the previous score is 0.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+score_map = HighScore.new()
+# => %{}
+score_map = HighScore.add_player(score_map, "José Valim", 486_373)
+# => %{"José Valim"=> 486_373}
+score_map = HighScore.update_score(score_map, "José Valim", 5)
+# => %{"José Valim"=> 486_378}
+```
+
+### 6. Get a list of players
+
+To get a list of players, define `HighScore.get_players/1`, which takes 1 argument:
+
+* The first argument is the map of scores.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+score_map = HighScore.new()
+# => %{}
+score_map = HighScore.add_player(score_map, "Dave Thomas", 2_374)
+# => %{"Dave Thomas" => 2_374}
+score_map = HighScore.add_player(score_map, "José Valim", 486_373)
+# => %{"Dave Thomas" => 2_374, "José Valim"=> 486_373}
+HighScore.get_players(score_map)
+# => ["Dave Thomas", "José Valim"]
+```
+
+## Implementation
+
+```elixir
+defmodule HighScore do
+  def new() do
+    # Please implement the new/0 function
+  end
+
+  def add_player(scores, name, score) do
+    # Please implement the add_player/3 function
+  end
+
+  def remove_player(scores, name) do
+    # Please implement the remove_player/2 function
+  end
+
+  def reset_score(scores, name) do
+    # Please implement the reset_score/2 function
+  end
+
+  def update_score(scores, name, score) do
+    # Please implement the update_score/3 function
+  end
+
+  def get_players(scores) do
+    # Please implement the get_players/1 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule HighScoreTest do
+  use ExUnit.Case
+
+  # Trivia: Scores used in this test suite are based on lines of code
+  # added to the elixir-lang/elixir github repository as of Apr 27, 2020.
+
+  @tag task_id: 1
+  test "new/1 result in empty score map" do
+    assert HighScore.new() == %{}
+  end
+
+  describe "add_player/2" do
+    @tag task_id: 2
+    test "add player without score to empty score map" do
+      scores = HighScore.new()
+
+      assert HighScore.add_player(scores, "José Valim") == %{"José Valim" => 0}
+    end
+
+    @tag task_id: 2
+    test "add two players without score to empty map" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.add_player("Chris McCord")
+
+      assert scores == %{"Chris McCord" => 0, "José Valim" => 0}
+    end
+
+    @tag task_id: 2
+    test "add player with score to empty score map" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim", 486_373)
+
+      assert scores == %{"José Valim" => 486_373}
+    end
+
+    @tag task_id: 2
+    test "add players with scores to empty score map" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim", 486_373)
+        |> HighScore.add_player("Dave Thomas", 2_374)
+
+      assert scores == %{"José Valim" => 486_373, "Dave Thomas" => 2_374}
+    end
+  end
+
+  describe "remove_player/2" do
+    @tag task_id: 3
+    test "remove from empty score map results in empty score map" do
+      scores =
+        HighScore.new()
+        |> HighScore.remove_player("José Valim")
+
+      assert scores == %{}
+    end
+
+    @tag task_id: 3
+    test "remove player after adding results in empty score map" do
+      map =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.remove_player("José Valim")
+
+      assert map == %{}
+    end
+
+    @tag task_id: 3
+    test "remove first player after adding two results in map with remaining player" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.add_player("Chris McCord")
+        |> HighScore.remove_player("José Valim")
+
+      assert scores == %{"Chris McCord" => 0}
+    end
+
+    @tag task_id: 3
+    test "remove second player after adding two results in map with remaining player" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.add_player("Chris McCord")
+        |> HighScore.remove_player("Chris McCord")
+
+      assert scores == %{"José Valim" => 0}
+    end
+  end
+
+  describe "reset_score/2" do
+    @tag task_id: 4
+    test "resetting score for non-existent player sets player score to 0" do
+      scores =
+        HighScore.new()
+        |> HighScore.reset_score("José Valim")
+
+      assert scores == %{"José Valim" => 0}
+    end
+
+    @tag task_id: 4
+    test "resetting score for existing player sets previous player score to 0" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim", 486_373)
+        |> HighScore.reset_score("José Valim")
+
+      assert scores == %{"José Valim" => 0}
+    end
+  end
+
+  describe "update_score/3" do
+    @tag task_id: 5
+    test "update score for non existent player initializes value" do
+      scores =
+        HighScore.new()
+        |> HighScore.update_score("José Valim", 486_373)
+
+      assert scores == %{"José Valim" => 486_373}
+    end
+
+    @tag task_id: 5
+    test "update score for existing player adds score to previous" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.update_score("José Valim", 486_373)
+
+      assert scores == %{"José Valim" => 486_373}
+    end
+
+    @tag task_id: 5
+    test "update score for existing player with non-zero score adds score to previous" do
+      scores =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.update_score("José Valim", 1)
+        |> HighScore.update_score("José Valim", 486_373)
+
+      assert scores == %{"José Valim" => 486_374}
+    end
+  end
+
+  describe "get_players/1" do
+    @tag task_id: 6
+    test "empty score map gives empty list" do
+      scores_by_player =
+        HighScore.new()
+        |> HighScore.get_players()
+
+      assert scores_by_player == []
+    end
+
+    @tag task_id: 6
+    test "score map with one entry gives one result" do
+      players =
+        HighScore.new()
+        |> HighScore.add_player("José Valim")
+        |> HighScore.update_score("José Valim", 486_373)
+        |> HighScore.get_players()
+
+      assert players == ["José Valim"]
+    end
+
+    @tag task_id: 6
+    test "score map with multiple entries gives results in unknown order" do
+      players =
+        HighScore.new()
+        |> HighScore.add_player("José Valim", 486_373)
+        |> HighScore.add_player("Dave Thomas", 2_374)
+        |> HighScore.add_player("Chris McCord", 0)
+        |> HighScore.add_player("Saša Jurić", 762)
+        |> HighScore.get_players()
+        |> Enum.sort()
+
+      assert players == [
+               "Chris McCord",
+               "Dave Thomas",
+               "José Valim",
+               "Saša Jurić"
+             ]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](008-recursion.livemd)
+[Next Page](010-structs_pipe.livemd)

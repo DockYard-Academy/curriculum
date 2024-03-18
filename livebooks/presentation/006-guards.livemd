@@ -1,0 +1,198 @@
+# Elixir Bootcamp - Guards
+
+## Navigation
+
+## Introduction
+
+### Multiple Clause Functions
+
+Elixir facilitates **Open-Closed Principle** practices by allowing functions to have multiple clauses, so instead of sprawling and hard-coded control-logic, pointed functions can be written to add/remove behavior easily.
+
+Elixir offers _multiple function clauses_ and _guards_ to write:
+
+```elixir
+defmodule Guess do
+  def number(n) when n == 7 do
+    "Awesome, that's my favorite"
+  end
+
+  def number(_n) do
+    "That's not my favorite"
+  end
+end
+
+Guess.number(5)
+```
+
+At run-time, Elixir will test, from top to bottom of the source file, which function clause to invoke.
+
+Variables that are unused should be prefixed with an underscore.
+
+### Guards
+
+Guards are used to prevent Elixir from invoking functions based on evaluation of the arguments by guard functions. Guards begin with the `when` keyword, followed by a boolean expression. Guard functions are special functions which:
+
+* Must be pure and not mutate any global states.
+* Must return strict `true` or `false` values.
+
+A list of common guards can be found in the [Elixir documentation](https://hexdocs.pm/elixir/Kernel.html#guards). It includes type checks, basic arithmetic, comparisons, and strictly boolean operators.
+
+### Default Arguments
+
+Functions may declare default values for one or more arguments. Let's consider this function:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def number(n \\ 13), do: "That's not my favorite"
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+When compiled, Elixir creates a function definition for `number/0` (no arguments), and `number/1` (one argument).
+
+If more than one argument has default values, the default values will be applied to the function from left to right to fill in for missing arguments.
+
+If the function has more than one clause, the default arguments should be defined in a function header (a function without a body) before the function clauses:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def number(n \\ 13)
+def number(n) when n < 10, do: "Dream bigger!"
+def number(n) when n > 100, do: "Not that big..."
+```
+
+## Exercise - Guessing Game
+
+You are creating a trivial online game where a friend can guess a secret number. You want to give some feedback, but not give away the answer with a guess. You need to devise a function to provide different responses depending on how the guess relates to the secret number.
+
+| Condition                                                     | Response       |
+| ------------------------------------------------------------- | -------------- |
+| When the guess matches the secret number                      | "Correct"      |
+| When the guess is one more or one less than the secret number | "So close"     |
+| When the guess is greater than the secret number              | "Too high"     |
+| When the guess is less than the secret number                 | "Too low"      |
+| When a guess isn't made                                       | "Make a guess" |
+
+All guesses and secret numbers are integer numbers.
+
+### 1. Make the response when the guess matches the secret number
+
+Implement the `compare/2` function which takes two arguments, `secret_number` and `guess`, which are both integers.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GuessingGame.compare(5, 5)
+# => "Correct"
+```
+
+### 2. Make the response when the guess is greater than the secret number
+
+Modify the `compare` function to respond to guesses that are higher than the secret number.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GuessingGame.compare(5, 8)
+# => "Too high"
+```
+
+### 3. Make the response when the guess is less than the secret number
+
+Modify the `compare` function to respond to guesses that are lower than the secret number.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GuessingGame.compare(5, 2)
+# => "Too low"
+```
+
+### 4. Make the responses when the guess is one more or one less than the secret number
+
+Modify the `compare` function to respond to guesses that are close to the secret number.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GuessingGame.compare(5, 6)
+# => "So close"
+GuessingGame.compare(5, 4)
+# => "So close"
+```
+
+### 5. Make the response when there is no guess
+
+Modify the `compare` function to respond to a lack of guess.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+GuessingGame.compare(5)
+# => "Make a guess"
+
+GuessingGame.compare(5, :no_guess)
+# => "Make a guess"
+```
+
+## Implementation
+
+```elixir
+defmodule GuessingGame do
+  def compare(secret_number, guess) do
+    # Please implement the compare/2 function
+  end
+end
+```
+
+### Tests
+
+```elixir
+ExUnit.start(autorun: false)
+
+defmodule GuessingGameTest do
+  use ExUnit.Case
+
+  @tag task_id: 1
+  test "correct when the guessed number equals secret" do
+    assert GuessingGame.compare(7, 7) == "Correct"
+  end
+
+  @tag task_id: 2
+  test "too high when guessed number is greater than the secret" do
+    assert GuessingGame.compare(9, 18) == "Too high"
+  end
+
+  @tag task_id: 3
+  test "too low when guessed number is less than the secret" do
+    assert GuessingGame.compare(42, 30) == "Too low"
+  end
+
+  @tag task_id: 4
+  test "so close when guess differs from secret by -1" do
+    assert GuessingGame.compare(64, 63) == "So close"
+  end
+
+  @tag task_id: 4
+  test "so close when guess differs from secret by +1" do
+    assert GuessingGame.compare(52, 53) == "So close"
+  end
+
+  @tag task_id: 5
+  test "when no guess is supplied, ask the player to make a guess" do
+    assert GuessingGame.compare(15) == "Make a guess"
+  end
+
+  @tag task_id: 5
+  test "when the atom :no_guess is supplied, ask the player to make a guess" do
+    assert GuessingGame.compare(16, :no_guess) == "Make a guess"
+  end
+end
+
+ExUnit.run()
+```
+
+[Previous Page](005-atoms_cond.livemd)
+[Next page](007-tuples_pattern_matching.livemd)
