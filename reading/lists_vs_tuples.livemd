@@ -1,3 +1,5 @@
+<!-- livebook:{"file_entries":[{"name":"abc_tuple_garbage_collection.png","type":"attachment"},{"name":"concatinate_list.png","type":"attachment"},{"name":"copying_abc_tuple.png","type":"attachment"},{"name":"delete_list_memory.png","type":"attachment"},{"name":"delete_tuple_memory_diagram.png","type":"attachment"},{"name":"insert_linked_list_memory.png","type":"attachment"},{"name":"inserting_tuples_memory.png","type":"attachment"},{"name":"linked_list_cons_cells.png","type":"attachment"},{"name":"prepend_linked_list_memory.png","type":"attachment"},{"name":"prepending_tuples.png","type":"attachment"},{"name":"tuple_concatination.png","type":"attachment"},{"name":"tuple_storage_contiguously.png","type":"attachment"},{"name":"update_linked_list.png","type":"attachment"},{"name":"update_tuples.png","type":"attachment"}]} -->
+
 # Lists Vs Tuples
 
 ```elixir
@@ -67,7 +69,7 @@ Notice below, that each element in the list is stored as a pair in the **heap**.
 element of the pair is the value, and the second element of the pair is the location of the next
 element.
 
-![](images/linked_list_cons_cells.png)
+![](files/linked_list_cons_cells.png)
 
 In fact, `[2, 3]` can also be written as pairs like so `[2 | [3 | []]]`, where each cell is written
 as `[head | tail]`. The head is the value, and the tail is the reference to the rest of the list.
@@ -79,7 +81,7 @@ Tuples are stored contiguously in memory. Contiguously means that each element i
 shares a common border.
 
 For example, the tuple `{1, 2, 3}` could be stored like so.
-![](images/tuple_storage_contiguously.png)
+![](files/tuple_storage_contiguously.png)
 
 ## Lists Vs Tuples
 
@@ -130,7 +132,7 @@ and point it to the head of the existing list. Let's prepend `1` to `[2, 3]` as 
 [1 | [2, 3]]
 ```
 
-![](images/prepend_linked_list_memory.png)
+![](files/prepend_linked_list_memory.png)
 
 Therefore, prepending an element to a list is $O(1)$ complexity.
 This holds true no matter the size of the list, because the work done remains the same.
@@ -145,7 +147,7 @@ Let's prepend `0` to `{1, 2, 3}` as an example. To prepend a value we can use ei
 Tuple.insert_at({1, 2, 3}, 0, 0)
 ```
 
-![](images/prepending_tuples.png)
+![](files/prepending_tuples.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -281,7 +283,7 @@ in the second tuple.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/tuple_concatination.png)
+![](files/tuple_concatination.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -307,7 +309,7 @@ For example,
 [1, 2, 3] ++ [4, 5]
 ```
 
-![](images/concatinate_list.png)
+![](files/concatinate_list.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -344,7 +346,7 @@ list = [1, 2, 3, 4, 5]
 List.replace_at(list, 2, 7)
 ```
 
-![](images/update_linked_list.png)
+![](files/update_linked_list.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -360,7 +362,7 @@ tuple = {1, 2, 3, 4, 5}
 put_elem(tuple, 2, 7)
 ```
 
-![](images/update_tuples.png)
+![](files/update_tuples.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -414,7 +416,7 @@ list = [1, 2, 3, 4, 5]
 List.insert_at(list, 3, 7)
 ```
 
-![](images/insert_linked_list_memory.png)
+![](files/insert_linked_list_memory.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -425,7 +427,7 @@ tuple = {1, 2, 3, 4, 5}
 Tuple.insert_at(tuple, 3, 7)
 ```
 
-![](images/inserting_tuples_memory.png)
+![](files/inserting_tuples_memory.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -460,13 +462,13 @@ list = [1, 2, 3, 4, 5]
 List.delete_at(list, 3)
 ```
 
-![](images/delete_list_memory.png)
+![](files/delete_list_memory.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
 Deleting a tuple requires copying over every non-deleted element.
 
-![](images/delete_tuple_memory_diagram.png)
+![](files/delete_tuple_memory_diagram.png)
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -589,7 +591,7 @@ In memory, that might look like the following.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/copying_abc_tuple.png)
+![](files/copying_abc_tuple.png)
 
 ## Garbage Collection
 
@@ -612,7 +614,7 @@ Below we use `b` and `b2` to represent rebinding the `b` variable.
 
 <!-- livebook:{"break_markdown":true} -->
 
-![](images/abc_tuple_garbage_collection.png)
+![](files/abc_tuple_garbage_collection.png)
 
 ## Conclusion
 
