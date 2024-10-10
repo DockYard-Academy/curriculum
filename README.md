@@ -3,9 +3,7 @@
 The DockYard Academy curriculum is an open source Elixir curriculum built with Livebook.
 We're proud to offer our open-source curriculum free of charge for anyone to learn from at their own pace.
 
-We also offer a paid course where you can learn from an instructor alongside a cohort of your peers. Applications will be accepted soon.
-
-Email the instructor Brooklin at brooklin.myers@dockyard.com or direct message [@BrooklinJMyers](https://twitter.com/BrooklinJMyers) on Twitter if you would like more information.
+This curriculum is designed for our paid full time course, which is currently on hiatus.
 
 ## Prerequisites
 * Install [Elixir](https://elixir-lang.org/install.html)
@@ -15,9 +13,7 @@ Email the instructor Brooklin at brooklin.myers@dockyard.com or direct message [
 * Setup [WSL with Visual Studio Code](https://code.visualstudio.com/docs/remote/wsl) (Windows Users Only)
 * Optionally Install [asdf](https://asdf-vm.com/guide/getting-started.html) to manage Elixir and Erlang versions.
 
-While we strongly recommend the [Visual Studio Code](https://code.visualstudio.com/) editor for its LiveShare capability, you may use any code editor you prefer.
-
-This course is intended to be approachable to students with no computer science background.
+We recommend the [Visual Studio Code](https://code.visualstudio.com/) editor for ease of collaboration with LiveShare. However, you may use any code editor you prefer.
 
 ## Getting Started
 
